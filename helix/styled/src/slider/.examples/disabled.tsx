@@ -1,0 +1,25 @@
+import './disabled.css'
+
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-slider
+        default-value="40"
+        disabled
+        hint="Hint"
+        label="Written off"
+        show-value
+      ></helix-slider>
+
+      {/* The same state, arriving from an ancestor fieldset. */}
+      <fieldset disabled>
+        <helix-slider
+          default-value="70"
+          hint="Hint"
+          label="Off from the fieldset"
+          show-value
+        ></helix-slider>
+      </fieldset>
+    </helix-flex>
+  )
+}

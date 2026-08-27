@@ -6,6 +6,7 @@
 # time, regular weight first and then fill, so adding an icon is adding a line
 airplay
 arrow-down
+arrow-elbow-down-left
 arrow-left
 arrow-right
 arrow-square-out

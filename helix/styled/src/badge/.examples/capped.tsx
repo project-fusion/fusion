@@ -1,0 +1,9 @@
+export function Example() {
+  return (
+    <helix-badge label="42 unread" max={9} value="42">
+      <helix-icon-button label="Inbox">
+        <helix-icon name="envelope"></helix-icon>
+      </helix-icon-button>
+    </helix-badge>
+  )
+}

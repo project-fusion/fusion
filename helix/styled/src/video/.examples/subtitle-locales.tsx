@@ -1,0 +1,23 @@
+export function Example() {
+  return (
+    <helix-video
+      extra-controls="rewind forward"
+      label="A clip with subtitles in two languages"
+      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
+    >
+      <track
+        default
+        kind="subtitles"
+        label="English"
+        src="data:text/vtt,WEBVTT%0A%0A00%3A00%3A00.000%20--%3E%2000%3A00%3A00.999%0AHildy%21%0A%0A00%3A00%3A01.000%20--%3E%2000%3A00%3A01.499%0AHow%20are%20you%3F%0A%0A00%3A00%3A01.500%20--%3E%2000%3A00%3A02.999%0ATell%20me%2C%20is%20the%20lord%20of%20the%20universe%20in%3F%0A%0A00%3A00%3A03.000%20--%3E%2000%3A00%3A04.299%0AYes%2C%20he%27s%20in%20-%20in%20a%20bad%20humor%0A%0A00%3A00%3A04.300%20--%3E%2000%3A00%3A06.000%0ASomebody%20must%27ve%20stolen%20the%20crown%20jewels"
+        srclang="en"
+      />
+      <track
+        kind="subtitles"
+        label="Français"
+        src="data:text/vtt,WEBVTT%0A%0A00%3A00%3A00.000%20--%3E%2000%3A00%3A00.999%0AHildy%20%21%0A%0A00%3A00%3A01.000%20--%3E%2000%3A00%3A01.499%0AComment%20allez-vous%20%3F%0A%0A00%3A00%3A01.500%20--%3E%2000%3A00%3A02.999%0ADites-moi%2C%20le%20ma%C3%AEtre%20de%20l%27univers%20est-il%20l%C3%A0%20%3F%0A%0A00%3A00%3A03.000%20--%3E%2000%3A00%3A04.299%0AOui%2C%20il%20est%20l%C3%A0%2C%20et%20de%20mauvaise%20humeur%0A%0A00%3A00%3A04.300%20--%3E%2000%3A00%3A06.000%0AQuelqu%27un%20a%20d%C3%BB%20voler%20les%20joyaux%20de%20la%20couronne"
+        srclang="fr"
+      />
+    </helix-video>
+  )
+}

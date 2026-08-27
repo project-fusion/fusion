@@ -1,0 +1,61 @@
+<!-- @summary A drop and a click reach the same place, and the value is the file names. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-file-input
+    hint="PNG or JPG"
+    id="files"
+    label="Attachments"
+    multiple
+    name="attachments"
+  ></helix-file-input>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Drop a file, or press to choose one</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const files = document.getElementById('files')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  files.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  files.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}" chosen so far`)
+  })
+  files.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+</script>

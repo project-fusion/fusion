@@ -43,6 +43,7 @@
     "/helix/components/empty",
     "/helix/components/file-input",
     "/helix/components/flex",
+    "/helix/components/format-date",
     "/helix/components/grid",
     "/helix/components/heatmap",
     "/helix/components/icon",

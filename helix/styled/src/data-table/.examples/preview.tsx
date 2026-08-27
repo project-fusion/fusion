@@ -1,0 +1,56 @@
+/* The cell shows a size a person can read and the column still sorts by the
+   number, which is what `compare` is for: told only the formatted string, the
+   column would put 9.8 MB below 812 B and look broken while every value in it
+   is right.
+
+   The unit is chosen per value rather than fixed. Formatted in megabytes
+   throughout, 2,100 bytes and 812 bytes both read "0 MB": the table looks
+   broken and the values are correct, which is the failure this whole column is
+   here to demonstrate rather than commit. */
+const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte']
+
+const bytes = (value: number): string => {
+  const step = Math.min(units.length - 1, Math.floor(Math.log10(Math.max(value, 1)) / 3))
+  return new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: step === 0 ? 0 : 1,
+    style: 'unit',
+    unit: units[step],
+  }).format(value / 1000 ** step)
+}
+
+/* Module scope, so the identity is stable across renders. An array written
+   inline is a new array every time, which is a fresh assignment the element has
+   to answer for no reason. */
+const rows = [
+  { name: 'archive.tar.gz', region: 'us-east-1', size: 4_823_100 },
+  { name: 'backup.sql', region: 'eu-central-1', size: 918_400 },
+  { name: 'index.json', region: 'us-east-1', size: 2_100 },
+  { name: 'manifest.yaml', region: 'ap-south-1', size: 812 },
+  { name: 'profile.bin', region: 'eu-west-2', size: 61_440 },
+  { name: 'report.pdf', region: 'us-west-1', size: 1_204_000 },
+  { name: 'snapshot.img', region: 'eu-central-1', size: 9_800_000 },
+  { name: 'trace.log', region: 'ap-south-1', size: 44_900 },
+]
+
+export function Example() {
+  return (
+    <helix-data-table default-sort="name:asc" label="Objects" page-size="4" rows={rows}>
+      <helix-table-column field="name" sortable width="14rem">
+        Name
+      </helix-table-column>
+      <helix-table-column field="region" sortable>
+        Region
+      </helix-table-column>
+      <helix-table-column
+        align="end"
+        cell={(row) => bytes(row.size as number)}
+        compare={(row) => row.size}
+        field="size"
+        sortable
+        width="8rem"
+      >
+        Size
+      </helix-table-column>
+    </helix-data-table>
+  )
+}

@@ -1,0 +1,16 @@
+import './disabled.css'
+
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-checkbox default-checked disabled name="a">
+        Ticked and written off
+      </helix-checkbox>
+
+      {/* The same state, arriving from an ancestor fieldset. */}
+      <fieldset disabled>
+        <helix-checkbox name="b">Off from the fieldset</helix-checkbox>
+      </fieldset>
+    </helix-flex>
+  )
+}

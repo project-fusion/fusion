@@ -1,0 +1,68 @@
+<!-- @summary A typed date and one taken from the calendar arrive the same way. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-date-input
+    id="starts"
+    label="Starts"
+    name="starts"
+  ></helix-date-input>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type a date, or open the calendar</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const starts = document.getElementById('starts')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 8
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  starts.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'the panel is about to show, refusable')
+  })
+  starts.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'the panel is about to go, refusable')
+  })
+  starts.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+  })
+  starts.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  starts.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  starts.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+</script>

@@ -1,0 +1,20 @@
+export function Example() {
+  return (
+    <helix-table columns="14rem 1fr 6rem" label="Deploys">
+      <helix-table-column>Service</helix-table-column>
+      <helix-table-column>Last change</helix-table-column>
+      <helix-table-column>Count</helix-table-column>
+
+      <helix-table-row>
+        <helix-table-cell header>Gateway</helix-table-cell>
+        <helix-table-cell>Retry budget raised to five</helix-table-cell>
+        <helix-table-cell>34</helix-table-cell>
+      </helix-table-row>
+      <helix-table-row>
+        <helix-table-cell header>Billing</helix-table-cell>
+        <helix-table-cell>Invoice rounding fixed</helix-table-cell>
+        <helix-table-cell>18</helix-table-cell>
+      </helix-table-row>
+    </helix-table>
+  )
+}

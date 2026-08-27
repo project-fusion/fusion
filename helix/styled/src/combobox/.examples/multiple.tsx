@@ -1,0 +1,21 @@
+export function Example() {
+  return (
+    <helix-combobox
+      default-value="rs,ts"
+      hint="Each choice is a tag, and Backspace on an empty field takes the last one off"
+      label="Languages"
+      multiple
+      name="languages"
+      placeholder="Search languages"
+    >
+      <helix-option value="c">C</helix-option>
+      <helix-option value="go">Go</helix-option>
+      <helix-option value="js">JavaScript</helix-option>
+      <helix-option value="py">Python</helix-option>
+      <helix-option value="rb">Ruby</helix-option>
+      <helix-option value="rs">Rust</helix-option>
+      <helix-option value="ts">TypeScript</helix-option>
+      <helix-option value="zig">Zig</helix-option>
+    </helix-combobox>
+  )
+}

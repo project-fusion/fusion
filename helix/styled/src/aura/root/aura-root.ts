@@ -243,6 +243,18 @@ export class HelixAura extends HelixElement {
   private program: WebGLProgram | null = null
   private uniforms: Record<string, WebGLUniformLocation | null> = {}
 
+  /** The pending context release, or `0`. Canceled by a reconnection. */
+  private release = 0
+
+  /** What every context is asked for, here rather than at two call sites. */
+  private static readonly CONTEXT: WebGLContextAttributes = {
+    alpha: true,
+    antialias: false,
+    depth: false,
+    powerPreference: 'low-power',
+    stencil: false,
+  }
+
   private frame = 0
   private elapsed = 0
   private last = 0
@@ -329,52 +341,14 @@ export class HelixAura extends HelixElement {
   private start(): void {
     /* Client only, and by contract. There is no canvas on a server, so the
        shader is an enhancement over markup that already renders a gradient. */
-    this.canvas = this.renderRoot.querySelector('canvas')
-    if (!this.canvas) {
+    if (!this.renderRoot.querySelector('canvas')) {
       return
     }
-
-    /* `antialias` off, because nothing here has a geometric edge to alias:
-       every boundary is a gradient the shader computes. Multisampling would
-       allocate a second screen-sized buffer to average pixels already smooth.
-       `preserveDrawingBuffer` off too, which costs the ability to sample the
-       canvas from a test and saves a full-screen copy on every frame. */
-    this.gl = this.canvas.getContext('webgl2', {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      powerPreference: 'low-power',
-      stencil: false,
-    })
-    if (!this.gl) {
+    /* A reconnection that outran its own release has everything already: the
+       context is live and the program is linked, so the reorder costs the
+       listeners and the observers and no GL work at all. */
+    if (!this.program && !this.build()) {
       return
-    }
-
-    this.program = this.link(VERTEX, FRAGMENT)
-    if (!this.program) {
-      return
-    }
-    this.gl.useProgram(this.program)
-    for (const name of [
-      'uBloom',
-      'uGain',
-      'uGlow',
-      'uGround',
-      'uHaze',
-      'uInk',
-      'uInteraction',
-      'uPeak',
-      'uPointer',
-      'uReach',
-      'uResolution',
-      'uScale',
-      'uShape',
-      'uTilt',
-      'uTime',
-      'uTrail',
-      'uVariance',
-    ]) {
-      this.uniforms[name] = this.gl.getUniformLocation(this.program, name)
     }
 
     this.motion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -407,8 +381,98 @@ export class HelixAura extends HelixElement {
     this.play()
   }
 
+  /**
+   * The context and the program, from whatever canvas can still give one.
+   *
+   * **A canvas whose context was force-lost never yields a working one again**,
+   * and the release below used to assume the opposite: `getContext` hands back
+   * the very same dead object, which reports `isContextLost()` and answers
+   * `null` to every `getShaderParameter`. So `link` failed, `start` returned
+   * before installing a single observer, and the element sat connected and
+   * permanently blind, holding whatever buffer it last painted. Measured on the
+   * landing page, where one remove-and-reinsert was enough: the frozen frame
+   * was the 2x2 the first `measure` took before layout, stretched across two
+   * screens as a gray smear that reads as a broken gradient rather than as a
+   * dead component. The only sound in the console was `getShaderInfoLog`
+   * answering `null`, twice per element.
+   *
+   * A spent canvas is therefore replaced rather than re-asked. `restoreContext`
+   * is the other way and is not reachable from here: it needs the `webglcontextlost`
+   * event default-prevented and the extension held from before the loss, and it
+   * restores asynchronously, so `start` would have to become a state machine to
+   * use it. A fresh canvas is synchronous and cannot half-succeed.
+   */
+  private build(): boolean {
+    let canvas = this.renderRoot.querySelector('canvas')
+    if (!canvas) {
+      return false
+    }
+
+    /* `antialias` off, because nothing here has a geometric edge to alias:
+       every boundary is a gradient the shader computes. Multisampling would
+       allocate a second screen-sized buffer to average pixels already smooth.
+       `preserveDrawingBuffer` off too, which costs the ability to sample the
+       canvas from a test and saves a full-screen copy on every frame. */
+    let gl = canvas.getContext('webgl2', HelixAura.CONTEXT)
+    if (gl?.isContextLost()) {
+      /* Swapped under Lit, which is safe because the template is static: the
+         strings never change, so no re-render ever touches this node again. */
+      const fresh = document.createElement('canvas')
+      fresh.setAttribute('part', 'canvas')
+      fresh.setAttribute('aria-hidden', 'true')
+      canvas.replaceWith(fresh)
+      canvas = fresh
+      /* Cleared, so `measure` sizes the new buffer rather than comparing it
+         against the spent one's dimensions and returning early. */
+      this.width = 0
+      this.height = 0
+      gl = canvas.getContext('webgl2', HelixAura.CONTEXT)
+    }
+
+    this.canvas = canvas
+    this.gl = gl
+    if (!gl || gl.isContextLost()) {
+      return false
+    }
+
+    this.program = this.link(VERTEX, FRAGMENT)
+    if (!this.program) {
+      return false
+    }
+    gl.useProgram(this.program)
+    for (const name of [
+      'uBloom',
+      'uGain',
+      'uGlow',
+      'uGround',
+      'uHaze',
+      'uInk',
+      'uInteraction',
+      'uPeak',
+      'uPointer',
+      'uReach',
+      'uResolution',
+      'uScale',
+      'uShape',
+      'uTilt',
+      'uTime',
+      'uTrail',
+      'uVariance',
+    ]) {
+      this.uniforms[name] = gl.getUniformLocation(this.program, name)
+    }
+    return true
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
+    /* A move is a removal followed by an insertion, so the release scheduled a
+       moment ago was never about this element going away. Canceled here, which
+       is what makes a framework reorder cost no GL work at all. */
+    if (this.release) {
+      clearTimeout(this.release)
+      this.release = 0
+    }
     if (this.hasUpdated) {
       this.start()
     }
@@ -432,23 +496,41 @@ export class HelixAura extends HelixElement {
     window.removeEventListener('scroll', this.handleScroll, { capture: true })
     this.sized?.disconnect()
     this.sized = undefined
+    /* **Deferred by a task, and canceled by a reconnection.**
+     *
+     * The DOM has no signal for a move: a framework reordering its children
+     * removes the node and inserts it again, and the element is told only that
+     * it was disconnected. Releasing the context there punished every reorder
+     * for a departure that never happened, and the landing page reorders three
+     * auras on the way in. An insertion in the same task cancels this, so a
+     * move is free and a real removal still pays a task later.
+     *
+     * A task rather than a microtask, because what has to fit inside the window
+     * is a framework's whole commit rather than one call. */
+    this.release = window.setTimeout(this.drop, 0)
+  }
+
+  /**
+   * Gives the context back, once nothing has claimed the element again.
+   *
+   * **The context is not released by dropping the reference.** A browser caps
+   * live WebGL contexts at about sixteen and drops the oldest when a
+   * seventeenth is asked for, so a page that mounts and unmounts auras kills
+   * the ones still on screen: the symptom is an aura elsewhere going blank,
+   * which looks like a fault in that element and is this one. The context
+   * belongs to the canvas, and the canvas is held by the shadow root until the
+   * element is collected, which is a moment nothing here controls and which is
+   * far too late for a cap of sixteen. `WEBGL_lose_context` is the only way.
+   *
+   * **It spends the canvas**, which is what `build` is written around: the
+   * canvas can never serve a context again and a returning element takes a
+   * fresh one.
+   */
+  private readonly drop = (): void => {
+    this.release = 0
     if (this.gl && this.program) {
       this.gl.deleteProgram(this.program)
     }
-    /* **And the context itself, which deleting the program does not release.**
-     * A browser caps live WebGL contexts at about sixteen and drops the oldest
-     * when a seventeenth is asked for, so a page that mounts and unmounts auras
-     * kills the ones still on screen: the symptom is an aura elsewhere going
-     * blank, which looks like a fault in that element and is this one.
-     *
-     * `WEBGL_lose_context` is the only way to give a context back. Dropping the
-     * reference does not: the context belongs to the canvas, and the canvas is
-     * held by the shadow root until the element is collected, which is a moment
-     * nothing here controls and which is far too late for a cap of sixteen.
-     *
-     * `start()` builds a fresh context on reconnect, so losing this one costs
-     * nothing: an aura that comes back gets a new canvas context the same way
-     * it got the first. */
     this.gl?.getExtension('WEBGL_lose_context')?.loseContext()
     this.program = null
     this.gl = null
@@ -518,7 +600,13 @@ export class HelixAura extends HelixElement {
    * at no other time. A `ResizeObserver` is told when that is.
    */
   private measure(): void {
-    const { canvas, gl } = this
+    /* Read through `this` rather than destructured, which is not a style
+       preference: `noUnusedPrivateClassMembers` does not count a destructured
+       read, so a `const { canvas } = this` here is the field's only use and the
+       rule offers to delete the field. `TokenColorController` carries the same
+       false positive under a suppression; this one costs a word instead. */
+    const canvas = this.canvas
+    const gl = this.gl
     if (!canvas || !gl) {
       return
     }

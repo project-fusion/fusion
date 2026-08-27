@@ -1,0 +1,33 @@
+import './centered.css'
+
+export function Example() {
+  return (
+    <>
+      <helix-button
+        command="--show"
+        commandfor="discard"
+        emphasis="solid"
+        tone="danger"
+        width="standard"
+      >
+        Discard changes
+      </helix-button>
+
+      <helix-dialog align="center" id="discard" label="Discard changes" size="sm">
+        <helix-icon name="warning-fill" slot="icon"></helix-icon>
+        <helix-text as="h2" slot="header">
+          Discard changes?
+        </helix-text>
+        <helix-text>Nine edits have not been saved. Closing now leaves them behind.</helix-text>
+        <helix-flex gap="sm" slot="footer">
+          <helix-button emphasis="solid" tone="danger" width="standard">
+            Discard
+          </helix-button>
+          <helix-button command="--close" commandfor="discard" width="standard">
+            Keep editing
+          </helix-button>
+        </helix-flex>
+      </helix-dialog>
+    </>
+  )
+}

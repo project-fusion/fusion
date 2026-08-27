@@ -189,3 +189,46 @@ describe('the fold and the count agree about how far they go', () => {
     expect(sheet()).not.toContain(`[max="${FOLDS_UP_TO + 1}"]`)
   })
 })
+
+/**
+ * The fold is a stylesheet rule keyed on the attribute, so `max` has to reach it.
+ *
+ * **This is the shape of bug a spec suite cannot see by accident.** Every
+ * example writes `max` in markup, where the author put the attribute there
+ * themselves, so the fold worked everywhere anybody looked. Set as a property,
+ * which is what a script does and what React does for a matching prop name,
+ * `max` reached the element and never reached the host: no attribute, no rule,
+ * no fold, and every avatar drawn beside a count claiming some were hidden.
+ * Found by rendering the React twin of `avatar/group` beside the markup one.
+ */
+describe('max reaches the host, because the fold is a rule and not code', () => {
+  test('a property write reflects, which is the only way the stylesheet hears it', async () => {
+    const group = (await mount(
+      `<helix-avatar-group label="Reviewers">
+         <helix-avatar name="Ada Lovelace"></helix-avatar>
+         <helix-avatar name="Grace Hopper"></helix-avatar>
+         <helix-avatar name="Alan Turing"></helix-avatar>
+       </helix-avatar-group>`,
+    )) as Group
+    group.max = 2
+    await (group as unknown as { updateComplete: Promise<unknown> }).updateComplete
+
+    expect(group.getAttribute('max')).toBe('2')
+    expect(group.overflow).toBe(1)
+    group.remove()
+  })
+
+  /* The other half of the rule this property answers to: a reflected property
+     takes no default, or every group that never asked for a limit ships with
+     `max="0"` on it, on the server as well as in the browser. */
+  test('and an unset max writes nothing at all', async () => {
+    const group = (await mount(
+      `<helix-avatar-group label="Reviewers">
+         <helix-avatar name="Ada Lovelace"></helix-avatar>
+       </helix-avatar-group>`,
+    )) as Group
+    expect(group.hasAttribute('max')).toBe(false)
+    expect(group.overflow).toBe(0)
+    group.remove()
+  })
+})

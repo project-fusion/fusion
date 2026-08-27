@@ -351,6 +351,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * typed into at all. Range is settled on blur, on a step, and at submit.
    */
   private readonly handleInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const control = event.target as HTMLInputElement
     this.requestValue(control.value)
     restoreValue(control, this.value)

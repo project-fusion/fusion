@@ -263,6 +263,15 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * do.
    */
   private readonly handleInput = (event: Event): void => {
+    /* **Stopped, because the control inside this one is not a control a consumer
+       has.** `input` is composed by specification, so the native event from the
+       `<input>` in this shadow root crosses the boundary and reaches the host
+       beside the one the mixin announces: measured in Chrome 148, one keystroke
+       produced `helix-before-change`, this element's own `input`, and the inner
+       control's, so `onInput` ran twice and one of the two carried the value
+       from before the change. `handleChange` two methods down has always done
+       this; the pair was half applied. */
+    event.stopPropagation()
     const control = event.target as HTMLInputElement
     const next = control.value
     /* Through the mixin, which announces and then applies only if the value is

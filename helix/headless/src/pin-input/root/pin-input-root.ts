@@ -225,6 +225,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   }
 
   private readonly handleInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const cell = event.target as HTMLInputElement
     const at = this.cells.indexOf(cell)
     if (at === -1) {

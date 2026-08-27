@@ -1,0 +1,80 @@
+<!-- @summary A stop asks, the run decides, and finishing is not the same as leaving. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <div class="stage">
+    <helix-button id="anchor">The thing being explained</helix-button>
+  </div>
+
+  <helix-tour
+    id="run"
+    open
+  >
+    <helix-tour-stop for="anchor">
+      This is where a deploy starts.
+    </helix-tour-stop>
+    <helix-tour-stop for="anchor">
+      And this is where it is watched.
+    </helix-tour-stop>
+  </helix-tour>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Step through it, then skip</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const run = document.getElementById('run')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 8
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  run.addEventListener('helix-tour-ask', (event) => {
+    say('helix-tour-ask', `a stop asked to go ${event.detail.what}, which is not the decision`)
+  })
+  run.addEventListener('helix-before-activate', (event) => {
+    say('helix-before-activate', `proposing stop ${event.detail.value}, refusable`)
+  })
+  run.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'leaving early, which is refusable')
+  })
+  run.addEventListener('helix-complete', () => {
+    say('helix-complete', 'the last stop was reached, which is not refusable')
+  })
+  run.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the run moved`)
+  })
+</script>

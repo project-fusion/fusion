@@ -57,6 +57,7 @@ import type {
   HelixFileInput,
   HelixFilterEvent,
   HelixFlex,
+  HelixFormatDate,
   HelixGrid,
   HelixHeadlessSplitter,
   HelixHeatmap,
@@ -78,8 +79,8 @@ import type {
   HelixNavigateEvent,
   HelixNavigation,
   HelixNextEvent,
+  HelixNotification,
   HelixNotifications,
-  HelixNotificationsItem,
   HelixNumberInput,
   HelixOption,
   HelixOptionGroup,
@@ -123,13 +124,13 @@ import type {
   HelixStep,
   HelixSteps,
   HelixSwitch,
+  HelixTab,
+  HelixTabPanel,
   HelixTable,
   HelixTableCell,
   HelixTableColumn,
   HelixTableRow,
   HelixTabs,
-  HelixTabsPanel,
-  HelixTabsTab,
   HelixTag,
   HelixText,
   HelixTextarea,
@@ -1101,8 +1102,27 @@ export type HelixAvatarGroupProps = {
   label?: HelixAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
-Zero or less shows all of them, which is what an unset limit means and is
-more useful than refusing to render. */
+Unset shows all of them, which is what no limit means and is more useful
+than refusing to render.
+
+**Reflected, because the fold is a stylesheet rule and nothing else.** The
+styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+so the attribute *is* the mechanism: a `max` that reaches this property and
+never reaches the host matches no rule, and every avatar is drawn beside a
+count that says two of them are hidden. That is the failure this repository
+already writes down as "reflect only what CSS selects on", and it went
+unnoticed because the examples set `max` in markup, where the author had
+written the attribute themselves.
+
+It is the path a script takes that was broken, and React takes it for
+everyone: React assigns a matching property rather than an attribute, so
+`<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+markup twin, the fifth and sixth avatars rendered at full size where the
+markup version had them at 0x0.
+
+**Optional rather than defaulted, per the rule that a reflected property
+takes no default**: `max = 0` would stamp `max="0"` onto every host that
+never asked for a limit, including on the server. */
   max?: HelixAvatarGroup["max"];
 };
 
@@ -1111,8 +1131,27 @@ export type HelixAvatarGroupSolidJsProps = {
   "prop:label"?: HelixAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
-Zero or less shows all of them, which is what an unset limit means and is
-more useful than refusing to render. */
+Unset shows all of them, which is what no limit means and is more useful
+than refusing to render.
+
+**Reflected, because the fold is a stylesheet rule and nothing else.** The
+styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+so the attribute *is* the mechanism: a `max` that reaches this property and
+never reaches the host matches no rule, and every avatar is drawn beside a
+count that says two of them are hidden. That is the failure this repository
+already writes down as "reflect only what CSS selects on", and it went
+unnoticed because the examples set `max` in markup, where the author had
+written the attribute themselves.
+
+It is the path a script takes that was broken, and React takes it for
+everyone: React assigns a matching property rather than an attribute, so
+`<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+markup twin, the fifth and sixth avatars rendered at full size where the
+markup version had them at 0x0.
+
+**Optional rather than defaulted, per the rule that a reflected property
+takes no default**: `max = 0` would stamp `max="0"` onto every host that
+never asked for a limit, including on the server. */
   "prop:max"?: HelixAvatarGroup["max"];
 
   /** Set the innerHTML of the element */
@@ -2910,6 +2949,30 @@ export type HelixChatMessageHelixSendElementEvent =
   HelixChatMessageElementEvent<HelixSendEvent>;
 
 export type HelixChatMessageProps = {
+  /** Where the turn's surface ends.
+
+**A bubble is one answer and not the only one, and the category has moved.**
+Two people messaging read as two columns of bubbles, which is what the form
+has looked like since it existed. An assistant answering does not: the reply
+is a paragraph, often a long one with code and lists in it, and every AI
+surface worth copying sets it as prose with the reader's own turns in
+bubbles beside it. A component that can only draw bubbles cannot render the
+conversation most people are now building.
+
+- `filled` is the default and is told apart by its own ground, which is the
+  bubble.
+- `plain` has no ground and no edge: the turn is text on the transcript, and
+  the space around it and the avatar beside it are what separate it. For an
+  assistant's side of a conversation, and for any turn long enough that a
+  fill reads as a wall.
+
+**On this tier, because it is where the surface ends and nothing else.**
+`check:axes` keeps `separation` off the headless tier for the reason it
+keeps every painted axis off it: that tier has no ground to end. The two
+values are a subset of the registry's four; `elevated` and `outlined` are
+available and neither is a thing a turn should be, a lifted message reading
+as a card and an outlined one as an input. */
+  separation?: HelixChatMessage["separation"];
   /** Who said it.
 
 Free text rather than a two-value union, because a conversation is not
@@ -2942,6 +3005,30 @@ which is what most of a transcript is. */
 };
 
 export type HelixChatMessageSolidJsProps = {
+  /** Where the turn's surface ends.
+
+**A bubble is one answer and not the only one, and the category has moved.**
+Two people messaging read as two columns of bubbles, which is what the form
+has looked like since it existed. An assistant answering does not: the reply
+is a paragraph, often a long one with code and lists in it, and every AI
+surface worth copying sets it as prose with the reader's own turns in
+bubbles beside it. A component that can only draw bubbles cannot render the
+conversation most people are now building.
+
+- `filled` is the default and is told apart by its own ground, which is the
+  bubble.
+- `plain` has no ground and no edge: the turn is text on the transcript, and
+  the space around it and the avatar beside it are what separate it. For an
+  assistant's side of a conversation, and for any turn long enough that a
+  fill reads as a wall.
+
+**On this tier, because it is where the surface ends and nothing else.**
+`check:axes` keeps `separation` off the headless tier for the reason it
+keeps every painted axis off it: that tier has no ground to end. The two
+values are a subset of the registry's four; `elevated` and `outlined` are
+available and neither is a thing a turn should be, a lifted message reading
+as a card and an outlined one as an input. */
+  "prop:separation"?: HelixChatMessage["separation"];
   /** Who said it.
 
 Free text rather than a two-value union, because a conversation is not
@@ -7158,6 +7245,107 @@ export type HelixFlexSolidJsProps = {
   textContent?: string | number;
 };
 
+export type HelixFormatDateProps = {
+  /** The timestamp, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset this
+renders nothing rather than the epoch, which is what parsing an empty string
+would give.
+
+**The element's own text is read as a fallback, and only in a browser.**
+`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+spelling that reads best in markup, and it cannot be the only one: measured
+against Lit's server shim, `textContent`, `children`, `firstChild` and
+`querySelector` are all `undefined` there, so a server has no way to see it.
+An element rendered on a server needs the attribute; one rendered in a
+browser may use either. */
+  date?: HelixFormatDate["date"];
+  /** How the day of the month is written, where a date is shown. */
+  day?: HelixFormatDate["day"];
+  /** Show how long ago it was, compactly, instead of the date.
+
+Reflected, because it is the one property that decides which of two readings
+this is and a stylesheet has a reason to know: a compact reading is a fixed
+few characters and a date is not. */
+  elapsed?: HelixFormatDate["elapsed"];
+  /** How the hour is written, where a time of day is shown. */
+  hour?: HelixFormatDate["hour"];
+  /** Locale for the reading. Empty is the runtime's own. */
+  locale?: HelixFormatDate["locale"];
+  /** How the minute is written, where a time of day is shown. */
+  minute?: HelixFormatDate["minute"];
+  /** How the month is written, where a date is shown. */
+  month?: HelixFormatDate["month"];
+  /** How the second is written, where a time of day is shown. */
+  second?: HelixFormatDate["second"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  "time-zone"?: HelixFormatDate["timeZone"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  timeZone?: HelixFormatDate["timeZone"];
+  /** Whether to name the time zone, and how. */
+  "time-zone-name"?: HelixFormatDate["timeZoneName"];
+  /** Whether to name the time zone, and how. */
+  timeZoneName?: HelixFormatDate["timeZoneName"];
+  /** How the weekday is written, where one is shown. */
+  weekday?: HelixFormatDate["weekday"];
+  /** How the year is written, where a date is shown. */
+  year?: HelixFormatDate["year"];
+};
+
+export type HelixFormatDateSolidJsProps = {
+  /** The timestamp, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset this
+renders nothing rather than the epoch, which is what parsing an empty string
+would give.
+
+**The element's own text is read as a fallback, and only in a browser.**
+`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+spelling that reads best in markup, and it cannot be the only one: measured
+against Lit's server shim, `textContent`, `children`, `firstChild` and
+`querySelector` are all `undefined` there, so a server has no way to see it.
+An element rendered on a server needs the attribute; one rendered in a
+browser may use either. */
+  "prop:date"?: HelixFormatDate["date"];
+  /** How the day of the month is written, where a date is shown. */
+  "prop:day"?: HelixFormatDate["day"];
+  /** Show how long ago it was, compactly, instead of the date.
+
+Reflected, because it is the one property that decides which of two readings
+this is and a stylesheet has a reason to know: a compact reading is a fixed
+few characters and a date is not. */
+  "prop:elapsed"?: HelixFormatDate["elapsed"];
+  /** How the hour is written, where a time of day is shown. */
+  "prop:hour"?: HelixFormatDate["hour"];
+  /** Locale for the reading. Empty is the runtime's own. */
+  "prop:locale"?: HelixFormatDate["locale"];
+  /** How the minute is written, where a time of day is shown. */
+  "prop:minute"?: HelixFormatDate["minute"];
+  /** How the month is written, where a date is shown. */
+  "prop:month"?: HelixFormatDate["month"];
+  /** How the second is written, where a time of day is shown. */
+  "prop:second"?: HelixFormatDate["second"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  "attr:time-zone"?: HelixFormatDate["timeZone"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  "prop:timeZone"?: HelixFormatDate["timeZone"];
+  /** Whether to name the time zone, and how. */
+  "attr:time-zone-name"?: HelixFormatDate["timeZoneName"];
+  /** Whether to name the time zone, and how. */
+  "prop:timeZoneName"?: HelixFormatDate["timeZoneName"];
+  /** How the weekday is written, where one is shown. */
+  "prop:weekday"?: HelixFormatDate["weekday"];
+  /** How the year is written, where a date is shown. */
+  "prop:year"?: HelixFormatDate["year"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type HelixGridProps = {
   /** Fixed number of equal columns. */
   columns?: HelixGrid["columns"];
@@ -7237,36 +7425,42 @@ compare two hues at all. This shipped demonstrating the opposite,
 `tones="surface info accent success primary"` for a commit count, and five
 unrelated hues for five amounts is confetti with no order in it. */
   tones?: HelixHeatmap["tones"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "min-cell"?: HelixHeatmap["minCell"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
@@ -7322,36 +7516,42 @@ compare two hues at all. This shipped demonstrating the opposite,
 `tones="surface info accent success primary"` for a commit count, and five
 unrelated hues for five amounts is confetti with no order in it. */
   "prop:tones"?: HelixHeatmap["tones"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "attr:min-cell"?: HelixHeatmap["minCell"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
@@ -9949,26 +10149,26 @@ export type HelixNavigationSolidJsProps = {
   textContent?: string | number;
 };
 
-/** `HelixNotificationsItem` component event */
-export type HelixNotificationsItemElementEvent<E = Event> = TypedEvent<
-  HelixNotificationsItem,
+/** `HelixNotification` component event */
+export type HelixNotificationElementEvent<E = Event> = TypedEvent<
+  HelixNotification,
   E
 >;
 /** `helix-read` event type */
-export type HelixNotificationsItemHelixReadElementEvent =
-  HelixNotificationsItemElementEvent<HelixReadEvent>;
+export type HelixNotificationHelixReadElementEvent =
+  HelixNotificationElementEvent<HelixReadEvent>;
 /** `helix-dismiss` event type */
-export type HelixNotificationsItemHelixDismissElementEvent =
-  HelixNotificationsItemElementEvent<HelixDismissEvent>;
+export type HelixNotificationHelixDismissElementEvent =
+  HelixNotificationElementEvent<HelixDismissEvent>;
 
-export type HelixNotificationsItemProps = {
+export type HelixNotificationProps = {
   /** When it happened, as anything `Date` parses.
 
 An ISO string is what an API sends and what `<time datetime>` takes, so it
 is the shape that needs no translation at either end. Left unset the item
 shows no timestamp rather than showing the epoch, which is what parsing an
 empty string would give. */
-  at?: HelixNotificationsItem["at"];
+  at?: HelixNotification["at"];
   /** Whether the reader has seen it.
 
 Set it and this element defers: a reader's click fires `helix-read` and
@@ -9978,43 +10178,41 @@ this element then owns.
 **Not reflected, and it was until 27 Aug 2026.** The reason given was that
 unread is a visual state and a stylesheet has no other way to know, which
 is the same reason the four mixins mirror theirs, and the mirror may not be
-the property's own attribute: `<helix-notifications-item default-read>`
+the property's own attribute: `<helix-notification default-read>`
 came back from a server without `read` and gained it on the first update,
 which React reports as a hydration mismatch, and a copy of the serialized
 element re-parses that attribute as a declaration. `:state(read)` is what
 the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
 learned to mount an element a consumer had configured rather than a bare
 one. */
-  read?: HelixNotificationsItem["read"];
+  read?: HelixNotification["read"];
   /** State to open with, where nothing declared one. */
-  "default-read"?: HelixNotificationsItem["defaultRead"];
+  "default-read"?: HelixNotification["defaultRead"];
   /** State to open with, where nothing declared one. */
-  defaultRead?: HelixNotificationsItem["defaultRead"];
+  defaultRead?: HelixNotification["defaultRead"];
   /** Whether a reader may remove it. */
-  dismissible?: HelixNotificationsItem["dismissible"];
+  dismissible?: HelixNotification["dismissible"];
   /** Locale for the timestamp. Empty is the runtime's own. */
-  locale?: HelixNotificationsItem["locale"];
+  locale?: HelixNotification["locale"];
   /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixNotificationsItem["dismissLabel"];
+  "dismiss-label"?: HelixNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixNotificationsItem["dismissLabel"];
+  dismissLabel?: HelixNotification["dismissLabel"];
 
   /** Fired when the item is marked read or unread, and cancelable. */
-  "onhelix-read"?: (e: HelixNotificationsItemHelixReadElementEvent) => void;
+  "onhelix-read"?: (e: HelixNotificationHelixReadElementEvent) => void;
   /** Fired when a reader asks to remove it, and cancelable. */
-  "onhelix-dismiss"?: (
-    e: HelixNotificationsItemHelixDismissElementEvent,
-  ) => void;
+  "onhelix-dismiss"?: (e: HelixNotificationHelixDismissElementEvent) => void;
 };
 
-export type HelixNotificationsItemSolidJsProps = {
+export type HelixNotificationSolidJsProps = {
   /** When it happened, as anything `Date` parses.
 
 An ISO string is what an API sends and what `<time datetime>` takes, so it
 is the shape that needs no translation at either end. Left unset the item
 shows no timestamp rather than showing the epoch, which is what parsing an
 empty string would give. */
-  "prop:at"?: HelixNotificationsItem["at"];
+  "prop:at"?: HelixNotification["at"];
   /** Whether the reader has seen it.
 
 Set it and this element defers: a reader's click fires `helix-read` and
@@ -10024,32 +10222,30 @@ this element then owns.
 **Not reflected, and it was until 27 Aug 2026.** The reason given was that
 unread is a visual state and a stylesheet has no other way to know, which
 is the same reason the four mixins mirror theirs, and the mirror may not be
-the property's own attribute: `<helix-notifications-item default-read>`
+the property's own attribute: `<helix-notification default-read>`
 came back from a server without `read` and gained it on the first update,
 which React reports as a hydration mismatch, and a copy of the serialized
 element re-parses that attribute as a declaration. `:state(read)` is what
 the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
 learned to mount an element a consumer had configured rather than a bare
 one. */
-  "prop:read"?: HelixNotificationsItem["read"];
+  "prop:read"?: HelixNotification["read"];
   /** State to open with, where nothing declared one. */
-  "bool:default-read"?: HelixNotificationsItem["defaultRead"];
+  "bool:default-read"?: HelixNotification["defaultRead"];
   /** State to open with, where nothing declared one. */
-  "prop:defaultRead"?: HelixNotificationsItem["defaultRead"];
+  "prop:defaultRead"?: HelixNotification["defaultRead"];
   /** Whether a reader may remove it. */
-  "prop:dismissible"?: HelixNotificationsItem["dismissible"];
+  "prop:dismissible"?: HelixNotification["dismissible"];
   /** Locale for the timestamp. Empty is the runtime's own. */
-  "prop:locale"?: HelixNotificationsItem["locale"];
+  "prop:locale"?: HelixNotification["locale"];
   /** Accessible name for the dismiss control. */
-  "attr:dismiss-label"?: HelixNotificationsItem["dismissLabel"];
+  "attr:dismiss-label"?: HelixNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
-  "prop:dismissLabel"?: HelixNotificationsItem["dismissLabel"];
+  "prop:dismissLabel"?: HelixNotification["dismissLabel"];
   /** Fired when the item is marked read or unread, and cancelable. */
-  "on:helix-read"?: (e: HelixNotificationsItemHelixReadElementEvent) => void;
+  "on:helix-read"?: (e: HelixNotificationHelixReadElementEvent) => void;
   /** Fired when a reader asks to remove it, and cancelable. */
-  "on:helix-dismiss"?: (
-    e: HelixNotificationsItemHelixDismissElementEvent,
-  ) => void;
+  "on:helix-dismiss"?: (e: HelixNotificationHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14645,11 +14841,11 @@ export type HelixTableRowSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixTabsPanelProps = {
+export type HelixTabPanelProps = {
   /** Pairs the panel with the tab of the same value. */
-  value?: HelixTabsPanel["value"];
+  value?: HelixTabPanel["value"];
   /** Whether this panel is the visible one. */
-  selected?: HelixTabsPanel["selected"];
+  selected?: HelixTabPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -14663,14 +14859,14 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  label?: HelixTabsPanel["label"];
+  label?: HelixTabPanel["label"];
 };
 
-export type HelixTabsPanelSolidJsProps = {
+export type HelixTabPanelSolidJsProps = {
   /** Pairs the panel with the tab of the same value. */
-  "prop:value"?: HelixTabsPanel["value"];
+  "prop:value"?: HelixTabPanel["value"];
   /** Whether this panel is the visible one. */
-  "prop:selected"?: HelixTabsPanel["selected"];
+  "prop:selected"?: HelixTabPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -14684,7 +14880,7 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  "prop:label"?: HelixTabsPanel["label"];
+  "prop:label"?: HelixTabPanel["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14825,33 +15021,33 @@ panels on the way. */
   textContent?: string | number;
 };
 
-/** `HelixTabsTab` component event */
-export type HelixTabsTabElementEvent<E = Event> = TypedEvent<HelixTabsTab, E>;
+/** `HelixTab` component event */
+export type HelixTabElementEvent<E = Event> = TypedEvent<HelixTab, E>;
 /** `helix-select` event type */
-export type HelixTabsTabHelixSelectElementEvent =
-  HelixTabsTabElementEvent<HelixSelectEvent>;
+export type HelixTabHelixSelectElementEvent =
+  HelixTabElementEvent<HelixSelectEvent>;
 
-export type HelixTabsTabProps = {
+export type HelixTabProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixTabsTab["value"];
+  value?: HelixTab["value"];
   /** Whether this tab is the current one. */
-  selected?: HelixTabsTab["selected"];
+  selected?: HelixTab["selected"];
   /** Whether the tab can be chosen. */
-  disabled?: HelixTabsTab["disabled"];
+  disabled?: HelixTab["disabled"];
 
   /** Fired when the tab is chosen. */
-  "onhelix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
+  "onhelix-select"?: (e: HelixTabHelixSelectElementEvent) => void;
 };
 
-export type HelixTabsTabSolidJsProps = {
+export type HelixTabSolidJsProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  "prop:value"?: HelixTabsTab["value"];
+  "prop:value"?: HelixTab["value"];
   /** Whether this tab is the current one. */
-  "prop:selected"?: HelixTabsTab["selected"];
+  "prop:selected"?: HelixTab["selected"];
   /** Whether the tab can be chosen. */
-  "prop:disabled"?: HelixTabsTab["disabled"];
+  "prop:disabled"?: HelixTab["disabled"];
   /** Fired when the tab is chosen. */
-  "on:helix-select"?: (e: HelixTabsTabHelixSelectElementEvent) => void;
+  "on:helix-select"?: (e: HelixTabHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -18970,8 +19166,27 @@ export type CustomElements = {
    * - `label`: Accessible name for the set, such as "Reviewers".
    * - `max`: How many avatars are shown before the rest become a count.
    *
-   * Zero or less shows all of them, which is what an unset limit means and is
-   * more useful than refusing to render.
+   * Unset shows all of them, which is what no limit means and is more useful
+   * than refusing to render.
+   *
+   * **Reflected, because the fold is a stylesheet rule and nothing else.** The
+   * styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+   * so the attribute *is* the mechanism: a `max` that reaches this property and
+   * never reaches the host matches no rule, and every avatar is drawn beside a
+   * count that says two of them are hidden. That is the failure this repository
+   * already writes down as "reflect only what CSS selects on", and it went
+   * unnoticed because the examples set `max` in markup, where the author had
+   * written the attribute themselves.
+   *
+   * It is the path a script takes that was broken, and React takes it for
+   * everyone: React assigns a matching property rather than an attribute, so
+   * `<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+   * markup twin, the fifth and sixth avatars rendered at full size where the
+   * markup version had them at 0x0.
+   *
+   * **Optional rather than defaulted, per the rule that a reflected property
+   * takes no default**: `max = 0` would stamp `max="0"` onto every host that
+   * never asked for a limit, including on the server.
    * - `avatars`: The avatars, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    * - `overflow`: How many avatars are past the limit, and so not shown.
    *
@@ -20480,8 +20695,8 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the field: attachments, a model picker.
-   * - `end`: After the field, beside the send control.
+   * - `start`: Under the field, at the leading edge: attachments, a model picker.
+   * - `end`: Under the field, beside the send control.
    *
    * ## Methods
    *
@@ -20497,7 +20712,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-composer-background`: Fill behind the field. (default: `undefined`)
+   * - `--chat-composer-background`: Fill behind the composer. (default: `undefined`)
+   * - `--chat-composer-border-width`: The composer's edge, so a theme can remove it. (default: `undefined`)
    * - `--chat-composer-max-height`: How tall the field may grow. (default: `undefined`)
    *
    * ## CSS Parts
@@ -20505,10 +20721,12 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The text field.
+   * - `tools`: The row under the field.
    * - `send`: The control that offers the turn.
-   * - `composer`: The whole row.
+   * - `composer`: The whole composer.
    * - `start`: The leading slot's box.
    * - `end`: The trailing slot's box.
+   * - `mark`: The glyph inside the send control.
    */
   "helix-chat-composer": Partial<
     HelixChatComposerProps & BaseProps<HelixChatComposer> & BaseEvents<HelixChatComposer>
@@ -20527,6 +20745,29 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `separation`: Where the turn's surface ends.
+   *
+   * **A bubble is one answer and not the only one, and the category has moved.**
+   * Two people messaging read as two columns of bubbles, which is what the form
+   * has looked like since it existed. An assistant answering does not: the reply
+   * is a paragraph, often a long one with code and lists in it, and every AI
+   * surface worth copying sets it as prose with the reader's own turns in
+   * bubbles beside it. A component that can only draw bubbles cannot render the
+   * conversation most people are now building.
+   *
+   * - `filled` is the default and is told apart by its own ground, which is the
+   *   bubble.
+   * - `plain` has no ground and no edge: the turn is text on the transcript, and
+   *   the space around it and the avatar beside it are what separate it. For an
+   *   assistant's side of a conversation, and for any turn long enough that a
+   *   fill reads as a wall.
+   *
+   * **On this tier, because it is where the surface ends and nothing else.**
+   * `check:axes` keeps `separation` off the headless tier for the reason it
+   * keeps every painted axis off it: that tier has no ground to end. The two
+   * values are a subset of the registry's four; `elevated` and `outlined` are
+   * available and neither is a thing a turn should be, a lifted message reading
+   * as a card and an outlined one as an input.
    * - `author`: Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -20588,6 +20829,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--chat-message-background`: Fill behind a turn. (default: `undefined`)
+   * - `--chat-message-border-width`: The edge every turn carries, which only a failed one colors. (default: `undefined`)
    * - `--chat-message-background-me`: Fill behind the reader's own turns. (default: `undefined`)
    * - `--chat-message-color`: Ink in a turn. (default: `undefined`)
    * - `--chat-message-measure`: How wide a turn may get before it wraps. (default: `undefined`)
@@ -20604,6 +20846,7 @@ export type CustomElements = {
    * - `sources`: What the turn was drawn from, under it and outside the bubble.
    * - `time`: When it was said.
    * - `state`: What has happened to it, where that is worth saying.
+   * - `mark`: The status glyph beside a failure.
    * - `retry`: The control offered on a failed message.
    * - `actions`: The controls offered on the turn, beside its time.
    */
@@ -20718,7 +20961,7 @@ export type CustomElements = {
    *
    * - `--chat-max-height`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
    * - `--chat-gap`: Space between turns. (default: `undefined`)
-   * - `--chat-rule`: The hairline above the composer and under the header. (default: `undefined`)
+   * - `--chat-rule`: The hairline under the header. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
    * - `--chat-resume-shadow`: The lift under the way back, which floats over the transcript. (default: `undefined`)
    *
@@ -24274,6 +24517,83 @@ export type CustomElements = {
   "helix-flex": Partial<HelixFlexProps & BaseProps<HelixFlex> & BaseEvents<HelixFlex>>;
 
   /**
+   * The base tier does the reading; this adds the one thing a design system has to
+   * say about it. A timestamp takes the family, size and color of the text around
+   * it, so almost nothing here is a decision. The exception is figures: an elapsed
+   * reading counts up under the reader, and proportional digits move the trailing
+   * edge as it does, which in a feed is a whole column shifting whenever any row
+   * in it ticks over. `tabular-nums` in that mode and not in the other, because a
+   * date is written once and should sit in the text like the text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `date`: The timestamp, as anything `Date` parses.
+   *
+   * An ISO string is what an API sends and what `<time datetime>` takes, so it
+   * is the shape that needs no translation at either end. Left unset this
+   * renders nothing rather than the epoch, which is what parsing an empty string
+   * would give.
+   *
+   * **The element's own text is read as a fallback, and only in a browser.**
+   * `<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+   * spelling that reads best in markup, and it cannot be the only one: measured
+   * against Lit's server shim, `textContent`, `children`, `firstChild` and
+   * `querySelector` are all `undefined` there, so a server has no way to see it.
+   * An element rendered on a server needs the attribute; one rendered in a
+   * browser may use either.
+   * - `day`: How the day of the month is written, where a date is shown.
+   * - `elapsed`: Show how long ago it was, compactly, instead of the date.
+   *
+   * Reflected, because it is the one property that decides which of two readings
+   * this is and a stylesheet has a reason to know: a compact reading is a fixed
+   * few characters and a date is not.
+   * - `hour`: How the hour is written, where a time of day is shown.
+   * - `locale`: Locale for the reading. Empty is the runtime's own.
+   * - `minute`: How the minute is written, where a time of day is shown.
+   * - `month`: How the month is written, where a date is shown.
+   * - `second`: How the second is written, where a time of day is shown.
+   * - `time-zone`/`timeZone`: The time zone to read the timestamp in. Empty is the runtime's own.
+   * - `time-zone-name`/`timeZoneName`: Whether to name the time zone, and how.
+   * - `weekday`: How the weekday is written, where one is shown.
+   * - `year`: How the year is written, where a date is shown.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `time`: The `<time>` element carrying the reading.
+   */
+  "helix-format-date": Partial<
+    HelixFormatDateProps & BaseProps<HelixFormatDate> & BaseEvents<HelixFormatDate>
+  >;
+
+  /**
    * Two ways to declare columns, and only two. `columns` is a fixed count;
    * `min` fills as many equal columns as fit above that width, which is a
    * responsive layout with no breakpoint to maintain. Setting `min` wins, because
@@ -24384,19 +24704,22 @@ export type CustomElements = {
    * compare two hues at all. This shipped demonstrating the opposite,
    * `tones="surface info accent success primary"` for a commit count, and five
    * unrelated hues for five amounts is confetti with no order in it.
-   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
    *
-   * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves.
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so for as long as this was the only answer it was a promise the consumer had
+   * to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+   * believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+   * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+   * number a summary is told to trust was the number that was wrong.
    *
-   * **Which makes it a statement about the sheet, and it has to agree with
-   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
-   * both because it draws something bigger: it was 8 and 2 against a sheet
-   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-   * width measured. `visible` said 59 the whole time, so the one number a
-   * summary is told to trust was the number that was wrong. A consumer who moves
-   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
@@ -24489,8 +24812,10 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
-   * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
+   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
+   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
    * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
@@ -24513,6 +24838,13 @@ export type CustomElements = {
    * - `strip`: The grid of cells.
    * - `cell`: One reading.
    * - `footer`: The three-slot row under the strip.
+   * - `mark`: The invisible point the tooltip is anchored to.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `start`: The leading slot's box.
    * - `summary`: The middle slot's box.
    * - `end`: The trailing slot's box.
@@ -26843,7 +27175,7 @@ export type CustomElements = {
    * **Not reflected, and it was until 27 Aug 2026.** The reason given was that
    * unread is a visual state and a stylesheet has no other way to know, which
    * is the same reason the four mixins mirror theirs, and the mirror may not be
-   * the property's own attribute: `<helix-notifications-item default-read>`
+   * the property's own attribute: `<helix-notification default-read>`
    * came back from a server without `read` and gained it on the first update,
    * which React reports as a hydration mismatch, and a copy of the serialized
    * element re-parses that attribute as a declaration. `:state(read)` is what
@@ -26893,6 +27225,7 @@ export type CustomElements = {
    * - `(default)`: What happened, in the consumer's own markup.
    * - `media`: An avatar or icon identifying who or what it came from.
    * - `actions`: What a reader can do about it.
+   * - `caption`: A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.
    *
    * ## Methods
    *
@@ -26910,7 +27243,12 @@ export type CustomElements = {
    *
    * - `--notifications-rule`: The hairline between items. (default: `undefined`)
    * - `--notifications-color`: Ink in an item that has been read. (default: `undefined`)
-   * - `--notifications-unread-mark`: The edge mark on an unread item. (default: `undefined`)
+   * - `--notifications-unread-mark`: Color of the edge mark on an unread item. (default: `undefined`)
+   * - `--notifications-unread-block-size`: How long that mark is. (default: `undefined`)
+   * - `--notifications-unread-inline-size`: How thick that mark is. (default: `undefined`)
+   * - `--notifications-unread-inset`: How far it sits from the row's leading edge. (default: `undefined`)
+   * - `--notifications-unread-offset`: How far it sits from the row's top. (default: `undefined`)
+   * - `--notifications-unread-radius`: Its corner radius, which is what turns it into a dot. (default: `undefined`)
    * - `--notifications-padding-block`: Space above and below an item. (default: `undefined`)
    * - `--notifications-padding-inline`: Space either side of an item. (default: `undefined`)
    *
@@ -26920,15 +27258,17 @@ export type CustomElements = {
    *
    * - `item`: The whole notification.
    * - `time`: When it happened.
+   * - `trailing`: The column holding the time and the controls.
+   * - `controls`: The actions and the dismiss, which replace the time.
    * - `dismiss`: The control that removes it.
    * - `dismiss-mark`: The glyph on that control, where none is slotted.
    * - `media`: The leading slot's box.
-   * - `body`: Content and timestamp together.
-   * - `content`: The consumer's own markup.
+   * - `body`: The label and the caption together.
+   * - `label`: What happened, on the first line.
    * - `actions`: The trailing slot's box.
    */
-  "helix-notifications-item": Partial<
-    HelixNotificationsItemProps & BaseProps<HelixNotificationsItem> & BaseEvents<HelixNotificationsItem>
+  "helix-notification": Partial<
+    HelixNotificationProps & BaseProps<HelixNotification> & BaseEvents<HelixNotification>
   >;
 
   /**
@@ -27005,7 +27345,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The notifications, as `helix-notifications-item` children.
+   * - `(default)`: The notifications, as `helix-notification` children.
    * - `header`: Above the list, for a title and the mark-all control.
    * - `footer`: Below the list, for a link to everything.
    *
@@ -31683,8 +32023,8 @@ export type CustomElements = {
    *
    * - `panel`: The panel container.
    */
-  "helix-tabs-panel": Partial<
-    HelixTabsPanelProps & BaseProps<HelixTabsPanel> & BaseEvents<HelixTabsPanel>
+  "helix-tab-panel": Partial<
+    HelixTabPanelProps & BaseProps<HelixTabPanel> & BaseEvents<HelixTabPanel>
   >;
 
   /**
@@ -31863,9 +32203,7 @@ export type CustomElements = {
    *
    * - `tab`: The tab itself.
    */
-  "helix-tabs-tab": Partial<
-    HelixTabsTabProps & BaseProps<HelixTabsTab> & BaseEvents<HelixTabsTab>
-  >;
+  "helix-tab": Partial<HelixTabProps & BaseProps<HelixTab> & BaseEvents<HelixTab>>;
 
   /**
    * Five tones. The fill is a tint of the status color, mixed with
@@ -35646,8 +35984,27 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for the set, such as "Reviewers".
    * - `max`: How many avatars are shown before the rest become a count.
    *
-   * Zero or less shows all of them, which is what an unset limit means and is
-   * more useful than refusing to render.
+   * Unset shows all of them, which is what no limit means and is more useful
+   * than refusing to render.
+   *
+   * **Reflected, because the fold is a stylesheet rule and nothing else.** The
+   * styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+   * so the attribute *is* the mechanism: a `max` that reaches this property and
+   * never reaches the host matches no rule, and every avatar is drawn beside a
+   * count that says two of them are hidden. That is the failure this repository
+   * already writes down as "reflect only what CSS selects on", and it went
+   * unnoticed because the examples set `max` in markup, where the author had
+   * written the attribute themselves.
+   *
+   * It is the path a script takes that was broken, and React takes it for
+   * everyone: React assigns a matching property rather than an attribute, so
+   * `<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+   * markup twin, the fifth and sixth avatars rendered at full size where the
+   * markup version had them at 0x0.
+   *
+   * **Optional rather than defaulted, per the rule that a reflected property
+   * takes no default**: `max = 0` would stamp `max="0"` onto every host that
+   * never asked for a limit, including on the server.
    * - `avatars`: The avatars, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    * - `overflow`: How many avatars are past the limit, and so not shown.
    *
@@ -37193,8 +37550,8 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the field: attachments, a model picker.
-   * - `end`: After the field, beside the send control.
+   * - `start`: Under the field, at the leading edge: attachments, a model picker.
+   * - `end`: Under the field, beside the send control.
    *
    * ## Methods
    *
@@ -37210,7 +37567,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-composer-background`: Fill behind the field. (default: `undefined`)
+   * - `--chat-composer-background`: Fill behind the composer. (default: `undefined`)
+   * - `--chat-composer-border-width`: The composer's edge, so a theme can remove it. (default: `undefined`)
    * - `--chat-composer-max-height`: How tall the field may grow. (default: `undefined`)
    *
    * ## CSS Parts
@@ -37218,10 +37576,12 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The text field.
+   * - `tools`: The row under the field.
    * - `send`: The control that offers the turn.
-   * - `composer`: The whole row.
+   * - `composer`: The whole composer.
    * - `start`: The leading slot's box.
    * - `end`: The trailing slot's box.
+   * - `mark`: The glyph inside the send control.
    */
   "helix-chat-composer": Partial<
     HelixChatComposerProps &
@@ -37243,6 +37603,29 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `separation`: Where the turn's surface ends.
+   *
+   * **A bubble is one answer and not the only one, and the category has moved.**
+   * Two people messaging read as two columns of bubbles, which is what the form
+   * has looked like since it existed. An assistant answering does not: the reply
+   * is a paragraph, often a long one with code and lists in it, and every AI
+   * surface worth copying sets it as prose with the reader's own turns in
+   * bubbles beside it. A component that can only draw bubbles cannot render the
+   * conversation most people are now building.
+   *
+   * - `filled` is the default and is told apart by its own ground, which is the
+   *   bubble.
+   * - `plain` has no ground and no edge: the turn is text on the transcript, and
+   *   the space around it and the avatar beside it are what separate it. For an
+   *   assistant's side of a conversation, and for any turn long enough that a
+   *   fill reads as a wall.
+   *
+   * **On this tier, because it is where the surface ends and nothing else.**
+   * `check:axes` keeps `separation` off the headless tier for the reason it
+   * keeps every painted axis off it: that tier has no ground to end. The two
+   * values are a subset of the registry's four; `elevated` and `outlined` are
+   * available and neither is a thing a turn should be, a lifted message reading
+   * as a card and an outlined one as an input.
    * - `author`: Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -37304,6 +37687,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--chat-message-background`: Fill behind a turn. (default: `undefined`)
+   * - `--chat-message-border-width`: The edge every turn carries, which only a failed one colors. (default: `undefined`)
    * - `--chat-message-background-me`: Fill behind the reader's own turns. (default: `undefined`)
    * - `--chat-message-color`: Ink in a turn. (default: `undefined`)
    * - `--chat-message-measure`: How wide a turn may get before it wraps. (default: `undefined`)
@@ -37320,6 +37704,7 @@ export type CustomElementsSolidJs = {
    * - `sources`: What the turn was drawn from, under it and outside the bubble.
    * - `time`: When it was said.
    * - `state`: What has happened to it, where that is worth saying.
+   * - `mark`: The status glyph beside a failure.
    * - `retry`: The control offered on a failed message.
    * - `actions`: The controls offered on the turn, beside its time.
    */
@@ -37437,7 +37822,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--chat-max-height`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
    * - `--chat-gap`: Space between turns. (default: `undefined`)
-   * - `--chat-rule`: The hairline above the composer and under the header. (default: `undefined`)
+   * - `--chat-rule`: The hairline under the header. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
    * - `--chat-resume-shadow`: The lift under the way back, which floats over the transcript. (default: `undefined`)
    *
@@ -41058,6 +41443,86 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The base tier does the reading; this adds the one thing a design system has to
+   * say about it. A timestamp takes the family, size and color of the text around
+   * it, so almost nothing here is a decision. The exception is figures: an elapsed
+   * reading counts up under the reader, and proportional digits move the trailing
+   * edge as it does, which in a feed is a whole column shifting whenever any row
+   * in it ticks over. `tabular-nums` in that mode and not in the other, because a
+   * date is written once and should sit in the text like the text.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `date`: The timestamp, as anything `Date` parses.
+   *
+   * An ISO string is what an API sends and what `<time datetime>` takes, so it
+   * is the shape that needs no translation at either end. Left unset this
+   * renders nothing rather than the epoch, which is what parsing an empty string
+   * would give.
+   *
+   * **The element's own text is read as a fallback, and only in a browser.**
+   * `<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+   * spelling that reads best in markup, and it cannot be the only one: measured
+   * against Lit's server shim, `textContent`, `children`, `firstChild` and
+   * `querySelector` are all `undefined` there, so a server has no way to see it.
+   * An element rendered on a server needs the attribute; one rendered in a
+   * browser may use either.
+   * - `day`: How the day of the month is written, where a date is shown.
+   * - `elapsed`: Show how long ago it was, compactly, instead of the date.
+   *
+   * Reflected, because it is the one property that decides which of two readings
+   * this is and a stylesheet has a reason to know: a compact reading is a fixed
+   * few characters and a date is not.
+   * - `hour`: How the hour is written, where a time of day is shown.
+   * - `locale`: Locale for the reading. Empty is the runtime's own.
+   * - `minute`: How the minute is written, where a time of day is shown.
+   * - `month`: How the month is written, where a date is shown.
+   * - `second`: How the second is written, where a time of day is shown.
+   * - `time-zone`/`timeZone`: The time zone to read the timestamp in. Empty is the runtime's own.
+   * - `time-zone-name`/`timeZoneName`: Whether to name the time zone, and how.
+   * - `weekday`: How the weekday is written, where one is shown.
+   * - `year`: How the year is written, where a date is shown.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `time`: The `<time>` element carrying the reading.
+   */
+  "helix-format-date": Partial<
+    HelixFormatDateProps &
+      HelixFormatDateSolidJsProps &
+      BaseProps<HelixFormatDate> &
+      BaseEvents<HelixFormatDate>
+  >;
+
+  /**
    * Two ways to declare columns, and only two. `columns` is a fixed count;
    * `min` fills as many equal columns as fit above that width, which is a
    * responsive layout with no breakpoint to maintain. Setting `min` wins, because
@@ -41170,19 +41635,22 @@ export type CustomElementsSolidJs = {
    * compare two hues at all. This shipped demonstrating the opposite,
    * `tones="surface info accent success primary"` for a commit count, and five
    * unrelated hues for five amounts is confetti with no order in it.
-   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
    *
-   * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves.
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so for as long as this was the only answer it was a promise the consumer had
+   * to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+   * believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+   * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+   * number a summary is told to trust was the number that was wrong.
    *
-   * **Which makes it a statement about the sheet, and it has to agree with
-   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
-   * both because it draws something bigger: it was 8 and 2 against a sheet
-   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-   * width measured. `visible` said 59 the whole time, so the one number a
-   * summary is told to trust was the number that was wrong. A consumer who moves
-   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
@@ -41275,8 +41743,10 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
-   * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
+   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
+   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
    * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
@@ -41299,6 +41769,13 @@ export type CustomElementsSolidJs = {
    * - `strip`: The grid of cells.
    * - `cell`: One reading.
    * - `footer`: The three-slot row under the strip.
+   * - `mark`: The invisible point the tooltip is anchored to.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `start`: The leading slot's box.
    * - `summary`: The middle slot's box.
    * - `end`: The trailing slot's box.
@@ -43682,7 +44159,7 @@ export type CustomElementsSolidJs = {
    * **Not reflected, and it was until 27 Aug 2026.** The reason given was that
    * unread is a visual state and a stylesheet has no other way to know, which
    * is the same reason the four mixins mirror theirs, and the mirror may not be
-   * the property's own attribute: `<helix-notifications-item default-read>`
+   * the property's own attribute: `<helix-notification default-read>`
    * came back from a server without `read` and gained it on the first update,
    * which React reports as a hydration mismatch, and a copy of the serialized
    * element re-parses that attribute as a declaration. `:state(read)` is what
@@ -43732,6 +44209,7 @@ export type CustomElementsSolidJs = {
    * - `(default)`: What happened, in the consumer's own markup.
    * - `media`: An avatar or icon identifying who or what it came from.
    * - `actions`: What a reader can do about it.
+   * - `caption`: A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.
    *
    * ## Methods
    *
@@ -43749,7 +44227,12 @@ export type CustomElementsSolidJs = {
    *
    * - `--notifications-rule`: The hairline between items. (default: `undefined`)
    * - `--notifications-color`: Ink in an item that has been read. (default: `undefined`)
-   * - `--notifications-unread-mark`: The edge mark on an unread item. (default: `undefined`)
+   * - `--notifications-unread-mark`: Color of the edge mark on an unread item. (default: `undefined`)
+   * - `--notifications-unread-block-size`: How long that mark is. (default: `undefined`)
+   * - `--notifications-unread-inline-size`: How thick that mark is. (default: `undefined`)
+   * - `--notifications-unread-inset`: How far it sits from the row's leading edge. (default: `undefined`)
+   * - `--notifications-unread-offset`: How far it sits from the row's top. (default: `undefined`)
+   * - `--notifications-unread-radius`: Its corner radius, which is what turns it into a dot. (default: `undefined`)
    * - `--notifications-padding-block`: Space above and below an item. (default: `undefined`)
    * - `--notifications-padding-inline`: Space either side of an item. (default: `undefined`)
    *
@@ -43759,18 +44242,20 @@ export type CustomElementsSolidJs = {
    *
    * - `item`: The whole notification.
    * - `time`: When it happened.
+   * - `trailing`: The column holding the time and the controls.
+   * - `controls`: The actions and the dismiss, which replace the time.
    * - `dismiss`: The control that removes it.
    * - `dismiss-mark`: The glyph on that control, where none is slotted.
    * - `media`: The leading slot's box.
-   * - `body`: Content and timestamp together.
-   * - `content`: The consumer's own markup.
+   * - `body`: The label and the caption together.
+   * - `label`: What happened, on the first line.
    * - `actions`: The trailing slot's box.
    */
-  "helix-notifications-item": Partial<
-    HelixNotificationsItemProps &
-      HelixNotificationsItemSolidJsProps &
-      BaseProps<HelixNotificationsItem> &
-      BaseEvents<HelixNotificationsItem>
+  "helix-notification": Partial<
+    HelixNotificationProps &
+      HelixNotificationSolidJsProps &
+      BaseProps<HelixNotification> &
+      BaseEvents<HelixNotification>
   >;
 
   /**
@@ -43847,7 +44332,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The notifications, as `helix-notifications-item` children.
+   * - `(default)`: The notifications, as `helix-notification` children.
    * - `header`: Above the list, for a title and the mark-all control.
    * - `footer`: Below the list, for a link to everything.
    *
@@ -48648,11 +49133,11 @@ export type CustomElementsSolidJs = {
    *
    * - `panel`: The panel container.
    */
-  "helix-tabs-panel": Partial<
-    HelixTabsPanelProps &
-      HelixTabsPanelSolidJsProps &
-      BaseProps<HelixTabsPanel> &
-      BaseEvents<HelixTabsPanel>
+  "helix-tab-panel": Partial<
+    HelixTabPanelProps &
+      HelixTabPanelSolidJsProps &
+      BaseProps<HelixTabPanel> &
+      BaseEvents<HelixTabPanel>
   >;
 
   /**
@@ -48833,11 +49318,8 @@ export type CustomElementsSolidJs = {
    *
    * - `tab`: The tab itself.
    */
-  "helix-tabs-tab": Partial<
-    HelixTabsTabProps &
-      HelixTabsTabSolidJsProps &
-      BaseProps<HelixTabsTab> &
-      BaseEvents<HelixTabsTab>
+  "helix-tab": Partial<
+    HelixTabProps & HelixTabSolidJsProps & BaseProps<HelixTab> & BaseEvents<HelixTab>
   >;
 
   /**
@@ -52144,12 +52626,16 @@ export type CustomCssProperties = {
   "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
-  /** Fill behind the field. */
+  /** Fill behind the composer. */
   "--chat-composer-background"?: string;
+  /** The composer's edge, so a theme can remove it. */
+  "--chat-composer-border-width"?: string;
   /** How tall the field may grow. */
   "--chat-composer-max-height"?: string;
   /** Fill behind a turn. */
   "--chat-message-background"?: string;
+  /** The edge every turn carries, which only a failed one colors. */
+  "--chat-message-border-width"?: string;
   /** Fill behind the reader's own turns. */
   "--chat-message-background-me"?: string;
   /** Ink in a turn. */
@@ -52160,7 +52646,7 @@ export type CustomCssProperties = {
   "--chat-max-height"?: string;
   /** Space between turns. */
   "--chat-gap"?: string;
-  /** The hairline above the composer and under the header. */
+  /** The hairline under the header. */
   "--chat-rule"?: string;
   /** Space either side of every region. */
   "--chat-padding-inline"?: string;
@@ -52348,9 +52834,13 @@ export type CustomCssProperties = {
   "--file-input-inset"?: string;
   /** An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. */
   "--grid-columns"?: string;
-  /** The size a cell wants. The strip fits as many as the container allows. */
+  /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
-  /** Space between cells. */
+  /** How wide a cell is. The strip fits as many as the container allows. */
+  "--heatmap-cell-width"?: string;
+  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
+  "--heatmap-cell-height"?: string;
+  /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
@@ -52510,8 +53000,18 @@ export type CustomCssProperties = {
   "--notifications-rule"?: string;
   /** Ink in an item that has been read. */
   "--notifications-color"?: string;
-  /** The edge mark on an unread item. */
+  /** Color of the edge mark on an unread item. */
   "--notifications-unread-mark"?: string;
+  /** How long that mark is. */
+  "--notifications-unread-block-size"?: string;
+  /** How thick that mark is. */
+  "--notifications-unread-inline-size"?: string;
+  /** How far it sits from the row's leading edge. */
+  "--notifications-unread-inset"?: string;
+  /** How far it sits from the row's top. */
+  "--notifications-unread-offset"?: string;
+  /** Its corner radius, which is what turns it into a dot. */
+  "--notifications-unread-radius"?: string;
   /** Space above and below an item. */
   "--notifications-padding-block"?: string;
   /** Space either side of an item. */

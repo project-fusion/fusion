@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <helix-pin-input
+      disabled
+      hint="Sign in to verify"
+      label="Verification code"
+      length={6}
+      name="code"
+    ></helix-pin-input>
+  )
+}

@@ -1,0 +1,25 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <helix-headless-app-header>
+      {' '}
+      <span slot="start">Logo</span>{' '}
+      <helix-headless-navigation label="Sections">
+        {' '}
+        <a aria-current="page" href="#one">
+          Item One
+        </a>{' '}
+        <a href="#two">Item Two</a>{' '}
+      </helix-headless-navigation>{' '}
+      <helix-headless-icon-button label="Search" slot="end">
+        {' '}
+        <helix-headless-icon name="magnifying-glass"></helix-headless-icon>{' '}
+      </helix-headless-icon-button>{' '}
+      <helix-headless-icon-button label="Settings" slot="end">
+        {' '}
+        <helix-headless-icon name="gear"></helix-headless-icon>{' '}
+      </helix-headless-icon-button>{' '}
+    </helix-headless-app-header>
+  )
+}

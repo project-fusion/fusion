@@ -43,10 +43,33 @@ describe('the states', () => {
   })
 
   /**
+   * The mark is not there because color needs a second carrier: "Not sent" is
+   * words, so the meaning survives without it. It is there because a failure is
+   * the one state that has to be *found* rather than noticed, and a shape is
+   * what a reader scanning a transcript finds. It carries the accessible name
+   * from the library's one status vocabulary, so it says "Error" rather than
+   * "danger", which is the word the API uses and not the word a reader knows.
+   */
+  test('a failure is marked as well as worded, and the mark says Error', async () => {
+    const element = await message('state="failed"')
+    const mark = part(element, 'mark')
+    expect(mark).not.toBeNull()
+    expect(mark?.getAttribute('role')).toBe('img')
+    expect(mark?.getAttribute('aria-label')).toBe('Error')
+  })
+
+  /**
    * Retry is `helix-send` again, from the message rather than the composer. A
    * listener telling them apart has `event.target`, which the DOM already
    * distinguishes without a second event name.
    */
+
+  test('no other state takes a mark, since none of them has to be found', async () => {
+    expect(part(await message('state="sending"'), 'mark')).toBeNull()
+    expect(part(await message('state="sent"'), 'mark')).toBeNull()
+    expect(part(await message('state="streaming"'), 'mark')).toBeNull()
+  })
+
   test('retry offers the turn again, and names itself as the source', async () => {
     const element = await message('state="failed"')
     const seen: Array<{ target: string; value: string }> = []

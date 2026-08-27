@@ -1,0 +1,62 @@
+<!-- @summary A panel anchored to its trigger, announcing before it moves and after. -->
+<!-- @min 380 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-popover
+    id="details"
+    label="Details"
+  >
+    <helix-button slot="trigger">Details</helix-button>
+    <helix-text>Built from commit 4f2a1c on 27 August.</helix-text>
+  </helix-popover>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press the trigger, then press it again</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const details = document.getElementById('details')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  details.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, and refusable')
+  })
+  details.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to close, and refusable')
+  })
+  details.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+</script>

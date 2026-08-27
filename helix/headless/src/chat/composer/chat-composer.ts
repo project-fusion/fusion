@@ -1,6 +1,8 @@
-import { customElement, HelixElement, HelixSendEvent, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, HelixSendEvent, hostAria, slotFilled } from '@helix-io/core'
+import { arrowElbowDownLeft } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary Where the reader writes their turn.
@@ -26,14 +28,16 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Message box, Prompt input
  * @documentation https://helix.fusion.dev/components/chat
  *
- * @slot start - Before the field: attachments, a model picker.
- * @slot end - After the field, beside the send control.
+ * @slot start - Under the field, at the leading edge: attachments, a model picker.
+ * @slot end - Under the field, beside the send control.
  *
- * @csspart composer - The whole row.
- * @csspart start - The leading slot's box.
+ * @csspart composer - The whole composer.
  * @csspart field - The text field.
+ * @csspart tools - The row under the field.
+ * @csspart start - The leading slot's box.
  * @csspart end - The trailing slot's box.
  * @csspart send - The control that offers the turn.
+ * @csspart mark - The glyph inside the send control.
  *
  * @event {HelixSendEvent} helix-send - Fired when the reader offers their turn, and cancelable.
  */
@@ -109,14 +113,84 @@ export class HelixHeadlessChatComposer extends HelixElement {
     return true
   }
 
+  /**
+   * Says on each tool box whether anything is in it.
+   *
+   * They are boxes in a flex row, so an empty one still takes the gap beside it
+   * and the send control drifts inward by one for every slot a consumer left
+   * alone. No selector can ask this: a slot's assigned nodes are not its DOM
+   * children, so `:empty` describes the fallback rather than the fill.
+   */
+  private markEmpty(): void {
+    for (const name of ['start', 'end'] as const) {
+      const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${name}"]`)
+      const empty = !slotFilled(
+        this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`),
+      )
+      region?.toggleAttribute('data-empty', empty)
+      region?.toggleAttribute('hidden', empty)
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markEmpty()
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
   }
 
+  /**
+   * The control that offers the turn, behind a seam so a tier can draw its own.
+   *
+   * **A glyph with the label as its accessible name, rather than the label as
+   * text.** The word "Send" beside a field is the widest thing in the row and
+   * says nothing a return key does not, and every composer a reader has used in
+   * the last five years marks it rather than spells it. The return glyph is the
+   * mark because Enter is what actually sends, which `submit-on` says out loud:
+   * the control and the key are one affordance and should look like it.
+   *
+   * `send-label` is unchanged and is now the accessible name rather than the
+   * visible one, so a screen reader hears the same word it always did.
+   */
+  protected renderSend(): TemplateResult {
+    return html`<button
+      part="send"
+      type="button"
+      aria-label=${this.sendLabel}
+      ?disabled=${this.disabled}
+      @click=${this.handleSend}
+    >
+      <svg
+        part="mark"
+        fill="currentColor"
+        viewBox=${arrowElbowDownLeft.viewBox}
+        aria-hidden="true"
+      >
+        ${unsafeSVG(arrowElbowDownLeft.content)}
+      </svg>
+    </button>`
+  }
+
+  /**
+   * The field, and a row of tools under it.
+   *
+   * **One row was the wrong shape and it got worse the more a composer had to
+   * carry.** Everything sat on a single line: an attachment control, the field,
+   * a stop control and a send button, so the field was squeezed from both sides
+   * and every tool a consumer added took width away from the thing being typed
+   * into. Under it, the field spans the whole composer at every width and the
+   * tools have a line of their own to grow along.
+   *
+   * Send is at the trailing end of that line rather than in the field, which is
+   * the same corner and costs no overlay: a control positioned inside a
+   * scrolling textarea either covers the last line of a long draft or scrolls
+   * away with it.
+   */
   protected override render(): TemplateResult {
     return html`<div part="composer">
-      <span part="start"><slot name="start"></slot></span>
       <textarea
         part="field"
         .value=${this.text}
@@ -127,10 +201,11 @@ export class HelixHeadlessChatComposer extends HelixElement {
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
-      <span part="end"><slot name="end"></slot></span>
-      <button part="send" type="button" ?disabled=${this.disabled} @click=${this.handleSend}>
-        ${this.sendLabel}
-      </button>
+      <div part="tools">
+        <span part="start"><slot name="start"></slot></span>
+        <span part="end"><slot name="end"></slot></span>
+        ${this.renderSend()}
+      </div>
     </div>`
   }
 

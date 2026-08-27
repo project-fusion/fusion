@@ -1,0 +1,66 @@
+<!-- @summary A message asks to go, and what happens next is the page’s to decide. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-toast
+    id="stack"
+    label="Notifications"
+    placement="bottom-end"
+  >
+    <helix-toast-item
+      dismissible
+      tone="success"
+    >
+      Project saved.
+    </helix-toast-item>
+    <helix-toast-item
+      dismissible
+      tone="danger"
+    >
+      The build failed.
+    </helix-toast-item>
+  </helix-toast>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press a message’s close control</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const stack = document.getElementById('stack')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  stack.addEventListener('helix-dismiss', (event) => {
+    say('helix-dismiss', `"${event.detail.label}" asked to go, and it bubbles so the stack hears it`)
+  })
+</script>

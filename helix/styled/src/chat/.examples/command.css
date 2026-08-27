@@ -1,0 +1,21 @@
+/* A palette is anchored near the top rather than centered, because it is
+   summoned over whatever the reader was looking at and centering it puts it on
+   top of that. The dialog gives up its padding for the same reason the other
+   containers here do: the conversation pads its own regions. */
+.command::part(dialog) {
+  --dialog-inset: var(--helix-space-none);
+
+  gap: var(--helix-space-none);
+  margin-block-start: 12vh;
+}
+
+/* No rule of its own. The conversation already draws one above its composer, and
+   a second line a few pixels under the first reads as a thicker one drawn badly. */
+.command helix-text[slot="footer"] {
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-md);
+}
+
+.command-chat {
+  --chat-max-height: 22rem;
+}

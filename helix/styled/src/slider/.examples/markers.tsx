@@ -1,0 +1,24 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="xl">
+      <helix-slider
+        default-value="50"
+        label="Label"
+        marker-labels
+        markers={5}
+        max={100}
+        min={0}
+        step={25}
+      ></helix-slider>
+
+      <helix-slider
+        default-value="40"
+        hint="Hint"
+        label="Label"
+        markers={5}
+        max={100}
+        show-value
+      ></helix-slider>
+    </helix-flex>
+  )
+}

@@ -1,5 +1,12 @@
-/* Avatar, body, actions. A grid rather than a flex row, so each part can name
-   its own column and hiding one does not move the others.
+/* Two columns: the avatar, and everything else. A grid rather than a flex row so
+   the avatar column can be sized and named independently of what is beside it.
+
+   **`actions` was a third column and is not one now.** It sits on the line under
+   the turn, inside `meta`, because a column of its own put it at the container's
+   trailing edge, a hundred and fifty pixels from a short bubble; and moved into
+   the body as a track it landed under the *middle* of the turn, because `content`
+   spans the body and a spanning grid item inflates every track it spans.
+   Measured at 36rem: bubble at 58, copy control at 232.
 
    **It does not reserve an avatar column across the transcript, and the note
    here used to claim it did.** Each turn is its own grid, so no turn can know
@@ -36,11 +43,6 @@
   margin-inline-end: var(--helix-space-sm);
 }
 
-/* **Each part names its own column**, so hiding one does not move the others.
-   A `display: none` grid item leaves the grid entirely, so with implicit
-   placement the body slid into the avatar's column the moment a me-turn hid it,
-   and the 1fr column was left holding the empty actions box: measured at 640,
-   the reader's own bubbles sat at 16 and 52 with the container's edge at 640. */
 /* **The avatar centers on the first line of the turn, not on the top of its
    box.** `align-items: start` puts it at the row's top edge, which is where the
    bubble's padding is rather than where its words are: measured, the avatar's
@@ -59,7 +61,13 @@
   font-size: var(--helix-text-sm);
   grid-column: 1;
   line-height: var(--helix-leading-normal);
-  min-block-size: calc(1lh + var(--helix-space-xs) * 2);
+  min-block-size: calc(
+    1lh +
+    var(--helix-space-xs) *
+    2 +
+    var(--chat-message-border-width, var(--helix-border-thin)) *
+    2
+  );
 }
 
 [part="body"] {
@@ -88,6 +96,7 @@
    above, so a turn with no avatar is laid out as though the column were not
    there. Emptiness stopped being a thing this stylesheet has to detect. */
 
+/* The body: what was said, what it was drawn from, and the line under both. */
 [part="body"] {
   display: grid;
   gap: var(--helix-space-2xs);
@@ -115,11 +124,41 @@
   justify-self: end;
 }
 
-/* The controls sit on the line under the turn, inside `meta` rather than in a
-   column of their own. A column was tried and is worse: `content` spans the
-   body, and a spanning grid item inflates every track it spans, so the controls
-   came to rest under the middle of the bubble rather than under its edge.
-   Measured at 36rem: the bubble started at 58 and the copy control at 232. */
+/* **The controls are there when the turn is, and not before.** A transcript with
+   a copy and a retry under every turn is a transcript of controls: they are the
+   third thing in every row and none of them is what anybody came to read. Shown
+   on hover, on focus inside the turn so the keyboard reaches them, and always on
+   a device with no pointer to hover with, which is the case a hover-only
+   affordance forgets.
+
+   `opacity` rather than `display`, so the line under a turn is the same height
+   whether they are showing or not and nothing moves as the pointer crosses the
+   transcript. */
+[part="actions"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:hover) [part="actions"],
+:host(:focus-within) [part="actions"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  [part="actions"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="actions"] {
+    transition: none;
+  }
+}
+
 [part="actions"] {
   /* **A dense row declares the size once, so nothing slotted has to be told.**
      A control takes `--helix-size-control` unless something says otherwise, and
@@ -129,9 +168,12 @@
      it, for `Announcement`'s reason: a container that sets the control size and
      stops there draws `md` glyphs inside `sm` boxes.
 
-     `sm` rather than a number, so a consumer reading this line at another
-     density still gets the step below their own. */
-  --helix-size-control: var(--helix-size-control-sm);
+     **A notch inside `sm`, which is the same 28 the send control takes**, and
+     for the same reason: these sit under a line of 12 pixel text rather than in
+     a row of their own, and at the full small step they were still the tallest
+     thing on the line. Derived from the step rather than written as a number, so
+     a consumer at another density gets the same relationship. */
+  --helix-size-control: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
   --helix-size-icon: var(--helix-size-icon-sm);
 
   align-items: center;
@@ -143,13 +185,39 @@
   display: none;
 }
 
-/* What the turn was drawn from, under the bubble rather than in it: a citation
-   is about the answer rather than part of what was said, and a consumer that
-   puts it inside the bubble is quoting its own footnotes. */
+/* **What the turn was drawn from, set as a footnote.** Under the bubble rather
+   than in it, because a citation is about the answer rather than part of what
+   was said. Set quietly, because it was not: a row of outlined tags at the
+   control step was the second loudest thing in a transcript and read as a set of
+   filters rather than as a reference.
+
+   So the row declares the type and the density once and whatever is slotted
+   takes them: `text-xs` and the muted ink a footnote has everywhere else in this
+   library, the small avatar step so a favicon or an initial reads as a mark
+   beside the words, and the small tag step so a chip is a citation rather than a
+   control. A consumer who wants otherwise sets it on their own element and wins,
+   which is what inherited properties are for.
+
+   The negative gap between slotted avatars is the avatar-group overlap, and it
+   applies only to those: a stack of round marks reads as "these sources" at a
+   glance and the same treatment on text chips would hide the text. */
 [part="sources"] {
+  --helix-size-avatar: var(--helix-size-avatar-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
   display: flex;
   flex-wrap: wrap;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
   gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-normal);
+}
+
+[part="sources"] slot::slotted(helix-avatar + helix-avatar) {
+  margin-inline-start: calc(var(--helix-size-avatar-sm) / -3);
 }
 
 [part="sources"][hidden] {
@@ -187,6 +255,19 @@
     --chat-message-background,
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
   );
+  /* **Every turn carries the edge, and only a failed one colors it.** The edge
+     is how this library says a thing is wrong: an invalid field turns its own
+     border `danger` rather than relying on the note under it, and a turn that
+     did not send is the same fact about a different box. Held at `transparent`
+     on every other turn so the state costs no layout when it arrives, which is
+     the trick `field` uses on the line that swaps between a hint and a message.
+
+     The width is a hook because `shape-and-borders` asks for one: of 68 border
+     declarations in the library, eight put the color behind a hook and none put
+     the width behind one, so an edge could be recolored and never removed. The
+     *color* is deliberately not hooked. It is the meaning rather than the
+     treatment, and a theme that can recolor a failure can hide one. */
+  border: var(--chat-message-border-width, var(--helix-border-thin)) solid transparent;
   border-radius: var(--helix-radii-md);
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
@@ -196,16 +277,15 @@
   padding-inline: var(--helix-space-sm);
 }
 
-/* **The brand, not the accent.** This was `accent-subtle` and was the only rule
-   in the library that reached for an accent nobody asked for: `Button` and
-   `IconButton` are the other two elements that can paint one and both take it
-   from `tone="accent"`, which a consumer writes. The accent is derived as the
-   brand's complement, `--helix-seed-accent-hue: 180` off a blue seed, so the
-   default theme's own turns came out at hue 78 and a reader who had themed
-   nothing was asked why their chat was orange. `primary-subtle` is the same
-   lightness and chroma at the brand's hue, so the tint is as quiet as it was
-   and is now a color the page is already wearing. */
-/* The same wash at the brand's hue, and 28% because that is where it weighs the
+/* **The brand, and this rule has been wrong twice.** It was `accent-subtle`, the
+   only rule in the library reaching for an accent nobody asked for: the accent
+   is derived as the brand's complement, `--helix-seed-accent-hue: 180` off a
+   blue seed, so a reader who had themed nothing was asked why their chat was
+   orange. `primary-subtle` fixed the hue and kept the fault underneath it, which
+   was being an absolute color at all. Both are recorded here because the second
+   was a considered fix for the first and still failed.
+
+   The same wash at the brand's hue, and 28% because that is where it weighs the
    same as the one above: 1.43 to 1.54 against every ground in both modes, where
    the neutral wash is 1.35 to 1.57. The two turns are the same object with a
    different tint, which is what keeps the transcript one rhythm rather than two.
@@ -216,6 +296,17 @@
    alone, and gone entirely in grayscale or to a reader who cannot separate blue
    from gray. That is the same collision `Option` records between `surface-raised`
    and `surface-overlay`, one rung further down. */
+/* **`plain` takes the ground away and leaves the words.** Not the padding: the
+   inline padding goes, because there is no box left for it to be inside, and the
+   block padding stays so a run of plain turns keeps the rhythm a bubble gave it.
+   The edge goes with the ground, and with it the failure edge, which is why a
+   plain turn that failed still has the mark and the words on the line below. */
+:host([separation="plain"]) [part="content"] {
+  background-color: transparent;
+  border-color: transparent;
+  padding-inline: var(--helix-space-none);
+}
+
 :host([author="me"]) [part="content"] {
   background-color: var(
     --chat-message-background-me,
@@ -262,10 +353,23 @@
 
    Painted rather than rendered, because it is nothing but paint: no part, no
    node, and the headless tier keeps saying the whole of the accessible story
-   with `aria-busy`. One element and three background layers, each grown in turn,
-   which is the only way to stagger three dots without three boxes to stagger. */
+   with `aria-busy`. One element and three background layers, each moved in turn,
+   which is the only way to stagger three dots without three boxes to stagger.
+
+   **The first version animated `background-size` and was inert.** A
+   `circle closest-side` gradient takes its radius from the *smaller* half of its
+   layer box, and the layers are wider than they are tall: growing the height
+   from 30% to 60% left the width untouched, so the closest side never changed
+   and the dot never changed with it. The animation ran, the computed value moved
+   every frame, and nothing on screen did. Measured in a browser mid-cycle:
+   `background-size: 20% 30%, 20% 59.7%, 20% 30.3%` against three dots the same
+   size.
+
+   `background-position` moves instead. A percentage positions a layer in the
+   space left over after its own size, so 50% is centered and 10% is most of the
+   way up, and a dot hopping is what a typing indicator has always looked like. */
 :host([state="streaming"]) [part="content"][data-empty]::after {
-  animation: helix-chat-typing 1.4s infinite ease-in-out;
+  animation: helix-chat-typing 1.2s infinite ease-in-out;
   background-image:
     radial-gradient(circle closest-side, currentColor 90%, transparent),
     radial-gradient(circle closest-side, currentColor 90%, transparent),
@@ -288,32 +392,33 @@
 
 @keyframes helix-chat-typing {
   0%,
+  60%,
   100% {
-    background-size:
-      20% 30%,
-      20% 30%,
-      20% 30%;
+    background-position:
+      0% 50%,
+      50% 50%,
+      100% 50%;
   }
 
-  25% {
-    background-size:
-      20% 60%,
-      20% 30%,
-      20% 30%;
+  20% {
+    background-position:
+      0% 10%,
+      50% 50%,
+      100% 50%;
   }
 
-  50% {
-    background-size:
-      20% 30%,
-      20% 60%,
-      20% 30%;
+  33% {
+    background-position:
+      0% 50%,
+      50% 10%,
+      100% 50%;
   }
 
-  75% {
-    background-size:
-      20% 30%,
-      20% 30%,
-      20% 60%;
+  46% {
+    background-position:
+      0% 50%,
+      50% 50%,
+      100% 10%;
   }
 }
 
@@ -325,25 +430,94 @@
   }
 }
 
-/* A failure is the one state that has to be found rather than noticed, so it is
-   the only one that takes a tone. `sending` is quieter than a settled turn and
-   `streaming` is left alone: the text arriving is the signal. */
+/* A failure is the one state that takes a tone, because it is the one that has
+   to be found rather than noticed. `sending` is quieter than a settled turn, and
+   `streaming` is drawn only while it has nothing to show: once the text is
+   arriving the text is the signal, and decorating it competes with it. */
+:host([state="failed"]) [part="content"] {
+  border-color: var(--helix-color-danger);
+}
+
+/* **A turn with no box has no edge to color, and this rule is what makes that
+   true rather than merely claimed.** The `plain` rule above sets the edge back
+   to transparent and the failure rule sets it to `danger`; both are (0,2,0), so
+   the later one won and a plain turn that failed drew a red hairline tight
+   around bare prose with no padding inside it, reading as a broken input.
+
+   Nothing is lost by dropping it. The mark and the words on the line below are
+   what a failure says, and they are the same thing `field` falls back to on a
+   control whose border a theme has removed. */
+:host([separation="plain"][state="failed"]) [part="content"] {
+  border-color: transparent;
+}
+
 :host([state="failed"]) [part="meta"] {
   color: var(--helix-color-danger);
+}
+
+/* **A step up in weight, for `field`'s reason.** That component's error message
+   and its hint are one line that swaps, so color already carries the danger and
+   weight is the only thing left to separate them. The same holds on a line that
+   is a timestamp on every other turn and a failure on this one. */
+[part="state"] {
+  align-items: center;
+  display: inline-flex;
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+}
+
+/* Size only. Stroke width belongs to the glyph, which is `Callout`'s note about
+   the same set: it is drawn on a 256 box at width 16, and a value tuned for a 24
+   box would come out hairline. */
+[part="mark"] {
+  block-size: var(--helix-size-icon-sm);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-sm);
 }
 
 :host([state="sending"]) [part="content"] {
   opacity: 0.6;
 }
 
+/* **The red says what happened; the control says what to do about it.** This
+   inherited the danger color from the line it sits on, so "Not sent" and "Try
+   again" were the same red at the same weight and the only thing separating them
+   was an underline, which made the action read as a broken link rather than as a
+   control. Three treatments were drawn and compared: danger with no underline is
+   more red text and offers nothing to click; the primary color puts a second
+   loud color on a small line and lands it beside a bubble already wearing it;
+   the ordinary foreground with an underline leaves exactly one red thing on the
+   line, which is the state, and one thing that reads as a control, which is the
+   way out.
+
+   It was also a bare 12 pixel word, about 55 by 15, under the 24 by 24 a pointer
+   target is meant to clear. It takes its padding and radius from the shape the
+   library gives an inline text control, which is `Notifications`' mark-all, and
+   its height from the step the turn's own controls take, so a failed turn's line
+   is the height it is on every other turn. */
 [part="retry"] {
   background: none;
   border: 0;
-  color: inherit;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
   cursor: pointer;
   font: inherit;
-  padding: var(--helix-space-none);
+  font-weight: var(--helix-weight-medium);
+  min-block-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs);
   text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* The wash `Option` settled on for the same job: a step away from whatever is
+   underneath rather than a rung on the surface ladder, since this control sits
+   on a transcript that may be on a page, a card or a panel. */
+[part="retry"]:hover {
+  background-color: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
 }
 
 [part="retry"]:focus-visible {
@@ -353,6 +527,13 @@
 
 @media print {
   [part="retry"] {
+    display: none;
+  }
+
+  /* The controls are held at `opacity: 0` until a pointer arrives, and no
+     pointer ever arrives on paper: unsaid, they printed as a reserved gap under
+     every turn holding nothing. */
+  [part="actions"] {
     display: none;
   }
 

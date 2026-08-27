@@ -1,0 +1,75 @@
+<!-- @summary Four announcements for one panel, and `close` is the platform’s own. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-button
+    command="--show"
+    commandfor="panel"
+    emphasis="solid"
+    tone="primary"
+  >Open drawer</helix-button>
+
+  <helix-drawer
+    id="panel"
+    label="Filters"
+  >
+    <helix-text>Everything the list is narrowed by.</helix-text>
+    <helix-button
+      command="--close"
+      commandfor="panel"
+    >Done</helix-button>
+  </helix-drawer>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open it, then close it</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const panel = document.getElementById('panel')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  panel.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, and refusable')
+  })
+  panel.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to close, and refusable')
+  })
+  panel.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+  panel.addEventListener('close', () => {
+    say('close', 'the platform name, relayed from the dialog inside')
+  })
+</script>

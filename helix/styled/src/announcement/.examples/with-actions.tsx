@@ -1,0 +1,10 @@
+export function Example() {
+  return (
+    <helix-announcement tone="warning">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      <helix-button emphasis="ghost" slot="actions">
+        Action
+      </helix-button>
+    </helix-announcement>
+  )
+}

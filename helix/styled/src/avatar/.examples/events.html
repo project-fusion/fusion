@@ -1,0 +1,67 @@
+<!-- @summary The platform’s own two words, relayed because neither crosses a shadow boundary. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-flex
+    gap="sm"
+    id="people"
+  >
+    <helix-avatar
+      name="Ada Okonjo"
+      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96"
+    ></helix-avatar>
+    <helix-avatar
+      name="Grace Hopper"
+      src="https://example.invalid/missing.png"
+    ></helix-avatar>
+  </helix-flex>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">One picture loads and one does not</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const people = document.getElementById('people')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* Bound in the capture phase, and that is the whole of what these two teach.
+     `load` and `error` do not bubble, here or on a native `<img>`, so a listener
+     on the row hears nothing without it. */
+  people.addEventListener('load', (event) => {
+    say('load', `${event.target.name} arrived`)
+  }, true)
+  people.addEventListener('error', (event) => {
+    say('error', `${event.target.name} did not, so the initials stand in`)
+  }, true)
+
+</script>

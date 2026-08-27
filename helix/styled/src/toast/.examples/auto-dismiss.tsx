@@ -1,0 +1,10 @@
+export function Example() {
+  return (
+    <helix-toast label="Notifications" placement="top-center">
+      <helix-toast-item dismissible duration={8000} tone="info">
+        Your export is ready to download.
+        <helix-button slot="actions">Undo</helix-button>
+      </helix-toast-item>
+    </helix-toast>
+  )
+}

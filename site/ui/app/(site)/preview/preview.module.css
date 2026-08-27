@@ -1,0 +1,1230 @@
+/**
+ * Styles for the draft landing pages only.
+ *
+ * Deliberately thin. Everything these pages are made of is either a Helix
+ * element or one of the global band attributes the real landing page uses, so
+ * what is left here is the handful of things a draft needs and the site does
+ * not have yet. If a variant is promoted, most of this file should not travel
+ * with it.
+ */
+
+/**
+ * A figure printed large enough to be the thing you read first.
+ *
+ * `ch` rather than a font size in rem, so the four columns keep their optical
+ * weight when the type scale moves under them.
+ */
+.claimValue {
+  font-size: var(--helix-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1;
+}
+
+/**
+ * Tall enough for five bars to be compared rather than glanced at.
+ *
+ * **The second series is forced neutral, and that is an honesty fix.** Splitting
+ * the measurement into `Helix` and `Others` handed the chart its default series
+ * palette, which paints the second one red: every competitor came out looking
+ * like an error, including Material Web, which beats us on this row. A
+ * comparison that colors the winner as a failure is not a comparison.
+ *
+ * Ours takes the brand, theirs takes a muted neutral. The distinction a reader
+ * needs is which bar is which, not which is good.
+ */
+.proofBars {
+  block-size: 14rem;
+  inline-size: 100%;
+}
+
+/**
+ * Centered under the bars, against my own advice and on the author's call.
+ *
+ * The argument for left was that it lines up with the title and the button
+ * above and below it. The argument against, which won: a key belongs to the
+ * thing it explains, and the thing it explains is a full-width row of bars, so
+ * a left-aligned key sits under the first bar and reads as belonging to that
+ * one rather than to the row.
+ */
+.proofLegend {
+  display: flex;
+  justify-content: center;
+}
+
+/* On the panel rather than the chart, because the legend is the chart's sibling
+   and would otherwise keep the default palette while the bars changed. */
+.proofPanel {
+  --helix-color-series-1: var(--helix-color-primary);
+  --helix-color-series-2: var(--helix-color-foreground-subtle);
+}
+
+/** Two navs stacked for comparison, each in its own frame. */
+.navSample {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  padding: var(--helix-space-md);
+}
+
+/* Reads as chrome rather than as content, which is what a nav sample is. */
+.navRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-lg);
+}
+
+/* ── The control strip ─────────────────────────────────────────────── */
+
+/* Wide enough for the handle to have somewhere to go, narrow enough that six
+   controls fit one row on a laptop before the flex wraps them. */
+/* ── The field ─────────────────────────────────────────────────────── */
+
+/**
+ * Everything in a band that carries a field has to out-rank it, or the field
+ * paints over the type. One rule here rather than a z-index on each.
+ *
+ * **`[data-layer]` rather than `:not(.gridField)`, and the difference was a
+ * bug.** The first version excluded the grid by class, so when an aura joined
+ * the band it matched the rule instead, took `position: relative`, and put
+ * 1296px of canvas into the flow: the hero's own display line ended up 2,850px
+ * down the page under a screen of white. Marking what a layer *is* means the
+ * next one added is excluded by being one, rather than by somebody remembering
+ * to extend a selector.
+ */
+.fieldBand {
+  isolation: isolate;
+  position: relative;
+}
+
+.fieldBand > *:not([data-layer]) {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes preview-settle {
+  from {
+    opacity: 0;
+    transform: translateY(var(--helix-space-lg)) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/**
+ * **Behind both guards, exactly as `site.css` does it.**
+ *
+ * A browser with no scroll-driven animations must get the content rather than
+ * an element parked at `opacity: 0`, and a reader who asked for less motion is
+ * not asking to be persuaded. Everything in this block is decoration and every
+ * one of these elements is legible without it.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Tied to the document's own scroll rather than to the element's pass
+       through the viewport: the grid should keep moving while a tall band is
+       parked on screen, which `view()` would not do. */
+    /* The parallax layer, a fraction of the page's speed so it reads as depth
+       rather than as an element that came loose. */
+    /**
+     * **The stagger is the layout, not a delay.** Each child gets its own
+     * `view()` timeline, so a grid's second row starts later than its first
+     * because it *is* later up the page. Handing every card the same timeline
+     * and a `--i` multiplier would fake the same effect and then get it wrong
+     * the moment the grid reflows to one column.
+     */
+    .stagger > * {
+      animation: preview-settle linear both;
+      animation-range: entry 5% entry 55%;
+      animation-timeline: view();
+    }
+  }
+}
+
+/**
+ * The themed scope has to paint its own ground.
+ *
+ * **Found by dragging the scheme toggle.** The tokens moved to light while the
+ * page under them stayed the site's dark, so the derived light border came out
+ * as bright white gridlines over a black page and the body text went to
+ * near-invisible. The tokens were right and nothing was reading them: a scope
+ * that sets `--helix-color-background` and does not paint with it has described
+ * a ground rather than drawn one.
+ *
+ * `color-scheme` is set for the same reason it was in the Payload bridge, and
+ * it is the half a token cannot cover: form controls, scrollbars and the canvas
+ * behind an overscroll are the browser's, and they follow this property rather
+ * than any custom one.
+ */
+.themedScope {
+  background: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+  color-scheme: var(--preview-color-scheme, light dark);
+  min-block-size: 100svh;
+}
+
+/* ── The derivation diagram ────────────────────────────────────────── */
+
+/**
+ * A wide technical figure, with a floor under how small it may be drawn.
+ *
+ * **Everything in the drawing is sized in user units**, so the whole figure
+ * scales with its container and the type scales with it: at a 375px viewport
+ * the row labels came out near 6px, which is a drawing nobody can read rather
+ * than a small one. Below the floor the figure keeps its size and the container
+ * scrolls, which is what a schematic does on paper too.
+ */
+.diagram {
+  margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.diagramSvg {
+  block-size: auto;
+  inline-size: 100%;
+  min-inline-size: 52rem;
+}
+
+/* Type inside the drawing. `text` inherits nothing useful from the page, so the
+   three roles are stated rather than assumed, and all three take tokens so they
+   move with the theme like every stroke around them. */
+/**
+ * **Sizes live on the elements, not here.**
+ *
+ * These are user units inside a viewBox that scales with its container, so a
+ * `--helix-text-*` token would be the wrong quantity entirely: it would set a
+ * page size on something measured in the drawing's own coordinates. `check:tokens`
+ * is right that a raw number in page CSS is a smell, and right that this is not
+ * page CSS, so the numbers moved to where SVG has always put them.
+ */
+.diagramMeta {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+}
+
+.diagramLabel {
+  fill: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.01em;
+}
+
+@keyframes preview-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/**
+ * The routing: a quiet permanent base with a moving highlight over it.
+ *
+ * **The base is deliberately near-invisible.** Measured against the reference,
+ * the old single bright layer was the loudest thing in the band and the labels
+ * it connects were the quietest, which is backwards: the drawing is about what
+ * is at the ends, not about the wires.
+ */
+.diagramBase path {
+  stroke: var(--helix-color-foreground-muted);
+  /* 0.32 went too far the other way: the run from `brand` to the bus was hard to
+     follow at all, so the figure stopped explaining a route and became a pulse
+     floating over a grid. The base has to be readable on its own; the pulse is
+     an emphasis on something already there. */
+  stroke-opacity: 0.45;
+}
+
+/**
+ * One pulse per path, and it never seams.
+ *
+ * `--len` is the path's own length, emitted with the geometry that produced it.
+ * A dash of `[16, len - 16]` puts exactly one lit segment on the path, and
+ * winding the offset by `len` over one cycle returns the pattern to its starting
+ * position, so the loop closes on itself no matter how long the run is. That is
+ * what `pathLength` was supposed to buy and does not deliver in WebKit.
+ *
+ * **The previous version drew the whole route in and then reset**, which a
+ * recording caught: the diagram dismantled and rebuilt itself every few seconds
+ * while a reader was looking at it. Nothing here is ever undrawn.
+ */
+.diagramPulse path {
+  stroke: var(--helix-color-primary);
+  /* Lifted above the brand so the traveling head reads against a field that is
+     itself brand-coloured. At the token value it disappeared into the aura. */
+  stroke-opacity: 0.92;
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--helix-color-primary) 45%, transparent));
+}
+
+/**
+ * **`--len` has to be registered or nothing animates.**
+ *
+ * An unregistered custom property is a string to the cascade, so
+ * `calc(var(--len) * -1)` in a keyframe has no type to interpolate between and
+ * WebKit simply holds the start value. The dash was sitting at offset 0 on every
+ * path, which is why the routing looked painted rather than moving: the segment
+ * was parked at the start of each run, in the same place, forever.
+ *
+ * Registered as a number, the same value now resolves in the keyframe and the
+ * offset animates.
+ */
+@property --len {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 120;
+}
+
+/**
+ * **The animated thing is a number, not the offset.**
+ *
+ * Animating `stroke-dashoffset` to `calc(var(--len) * -1)` does not interpolate
+ * in WebKit: sampled across a second it returned only `0px` and
+ * `calc(-125.7px)` and nothing between, so the pulse teleported between the two
+ * ends of every path instead of traveling along it. A `calc()` endpoint is not
+ * an interpolable value there, however the custom property inside it is
+ * registered.
+ *
+ * So `--shift` is what animates, from 0 to 1, and it is a registered number so
+ * it interpolates properly. `stroke-dashoffset` recomputes from it every frame,
+ * which gives a real sweep and keeps the per-path length that makes the loop
+ * seamless.
+ */
+@property --shift {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes preview-junction {
+  0%,
+  100% {
+    opacity: 0.45;
+    scale: 1;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1.4;
+  }
+}
+
+.diagramJunction {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .diagramJunction {
+    animation: preview-junction 3.2s var(--helix-easing-standard) infinite;
+  }
+
+  .diagramJunction:last-of-type {
+    animation-delay: -1.6s;
+  }
+}
+
+/* With no motion the highlight would sit frozen mid-path, which reads as a
+   defect rather than as a still. The base carries the drawing on its own. */
+@media (prefers-reduced-motion: reduce) {
+  .diagramPulse {
+    display: none;
+  }
+
+  .diagramBase path {
+    stroke: var(--helix-color-primary);
+    stroke-opacity: 0.75;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* The engine turning, slowly enough to read as machined rather than as a
+       spinner saying the page is busy. `transform-box: fill-box` so the origin
+       is the circle's own box and not the SVG's. */
+    .diagramRing {
+      animation: preview-ring 48s linear infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+  }
+}
+
+/* ── The floating dock ─────────────────────────────────────────────── */
+
+/* Shorter than the bar's, because a dock is measured across rather than down
+   and five full-width tracks would be a bar again with rounder corners. */
+/* ── Draft C's surface ─────────────────────────────────────────────── */
+
+/* A number meant to be read before its label. */
+.diagramFigure {
+  fill: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /**
+     * The sweep is drawn by the scroll rather than by a clock. It is a
+     * measurement, and a measurement that loops forever is an ornament: tying it
+     * to `view()` means it completes as the diagram finishes arriving and then
+     * stays completed, which is what a finished measurement looks like.
+     */
+  }
+}
+
+@keyframes preview-sweep {
+  from {
+    stroke-dashoffset: 100;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ── Brand swatch trigger ──────────────────────────────────────────── */
+
+.brandSwatch {
+  background: var(--swatch);
+  block-size: 2rem;
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-border) 80%, transparent);
+  border-radius: var(--helix-radii-md);
+  cursor: pointer;
+  inline-size: 2rem;
+  padding: 0;
+}
+
+.brandSwatch:focus-visible {
+  outline: 2px solid var(--helix-color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── One light source ──────────────────────────────────────────────── */
+
+/* ── Theme this page ───────────────────────────────────────────────── */
+
+.fabRail {
+  display: flex;
+  inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
+  inset-inline: 0;
+  justify-content: center;
+  padding-inline: var(--helix-space-md);
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--helix-layer-sticky);
+}
+
+/**
+ * The pill, and the bar it becomes.
+ *
+ * **Both faces occupy one grid cell**, so the container's width is the only
+ * thing that moves and the two states cross-fade in place. Swapping one node for
+ * another would pop, and the whole gesture is that this was always the same
+ * object.
+ *
+ * **Real transparency, not a tinted panel.** 42% of the surface color, which is
+ * low enough that the page reads through it and the blur has something to do.
+ * `saturate` above 1 puts back the chroma that a heavy blur washes out, which is
+ * the difference between glass and frosted plastic.
+ */
+.fab {
+  backdrop-filter: blur(24px) saturate(1.8);
+  background: color-mix(in oklab, var(--helix-color-surface-overlay) 42%, transparent);
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-border) 55%, transparent);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-floating);
+  /**
+   * **One height for both states, stated rather than inherited.**
+   *
+   * The collapsed face is a line of text and the open bar holds sliders and a
+   * toggle group, so left to their content the pill was noticeably shorter than
+   * the bar it became: the thing grew in two directions at once and the morph
+   * read as two elements swapping rather than one changing shape. Only the width
+   * should move.
+   */
+  block-size: 3.25rem;
+  display: grid;
+  grid-template-areas: "stack";
+  inline-size: 13rem;
+  overflow: hidden;
+  padding-inline: var(--helix-space-2xs);
+  place-items: center;
+  pointer-events: auto;
+  transition:
+    inline-size var(--helix-duration-slow) var(--helix-easing-spring),
+    background var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* An explicit number, because `auto` does not animate. The cost of the effect is
+   that a sixth control means changing this line. */
+.fabOpen {
+  inline-size: min(54rem, calc(100vw - 2.5rem));
+}
+
+.fabFace,
+.fabTools {
+  grid-area: stack;
+  min-inline-size: 0;
+}
+
+.fabFace {
+  align-items: center;
+  block-size: 100%;
+  background: none;
+  border: 0;
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--helix-space-sm);
+  justify-content: center;
+  padding-inline: var(--helix-space-md);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-accelerate);
+  white-space: nowrap;
+}
+
+.fabDot {
+  background: var(--swatch);
+  block-size: 0.85rem;
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--helix-color-border) 70%, transparent);
+  flex: none;
+  inline-size: 0.85rem;
+}
+
+/* Held back until the pill has most of its width, so the controls arrive into
+   room that already exists rather than being squeezed out of a closing gap. */
+.fabTools {
+  align-items: center;
+  block-size: 100%;
+  display: flex;
+  opacity: 0;
+  padding-inline: var(--helix-space-xs);
+  pointer-events: none;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-decelerate)
+    var(--helix-duration-fast);
+}
+
+.fabOpen .fabFace {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fabOpen .fabTools {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fabChannel {
+  flex: 1 1 0;
+  min-inline-size: 4rem;
+}
+
+/* The morph is the decoration; the two states are not. A reader who asked for
+   less motion gets the same control, arriving instantly. */
+@media (prefers-reduced-motion: reduce) {
+  .fab,
+  .fabFace,
+  .fabTools {
+    transition-duration: var(--helix-duration-instant);
+  }
+}
+
+/* ── One brand control per page ────────────────────────────────────── */
+
+/**
+ * Hides the showcase's own brand input inside a draft.
+ *
+ * **The panel derives into itself, and the page now derives too.** `Showcase`
+ * sets `data-helix-theme` on its own stage, which sits inside the page's scope
+ * and so wins locally: two controls, two sources of truth, and a reader who
+ * drags the pill watches every band move except the one that is explicitly about
+ * the palette. They agree at rest only because both start from the same default.
+ *
+ * Hiding one is the draft's fix, not the real one. The real one is for the
+ * showcase to take its brand from the same place the page does, at which point
+ * the panel becomes a demonstration of the page's theme rather than a second
+ * theme arguing with it. That is a change to a component the live page shares,
+ * so it does not belong in a draft.
+ */
+.oneBrand :global(helix-color-input) {
+  display: none;
+}
+
+/**
+ * Room at the foot of the page for the pill to float over nothing.
+ *
+ * **Lost in the rebuild, and it cost the closing call to action.** The dock
+ * version reserved this and the rewrite onto the live composition dropped it, so
+ * the fixed control landed on top of "Take on the work", which is the one thing
+ * the page exists to get a reader to press. A floating control that covers the
+ * primary action has hidden the point of the page.
+ *
+ * Sized against the pill's own height plus its inset, rather than a round
+ * number, so it stays correct if either changes.
+ */
+.fabClearance {
+  padding-block-end: calc(var(--helix-space-lg) * 2 + 3.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Draft C's type scale ──────────────────────────────────────────── */
+
+/**
+ * A scale of five, set here rather than taken from the tokens.
+ *
+ * **The token scale is right for a page of prose and wrong for this page.** It
+ * steps in even ratios because a document needs a rhythm that holds over many
+ * paragraphs. A landing page is a handful of statements at very different
+ * weights, and the sizes it wants are not evenly spaced: a display line, a
+ * subhead that carries real reading, and body.
+ *
+ * **The middle size is the whole point.** Draft C previously went from a 64px
+ * display straight to a 15px lede, a jump of more than four to one with nothing
+ * between, so the hero read as a poster with a caption stuck under it. `.tLede`
+ * sits at roughly a third of the display and is the size the argument is
+ * actually made at.
+ *
+ * Fluid rather than stepped, because these are single lines given a screen each
+ * and a breakpoint would just be a worse version of the same curve.
+ */
+/**
+ * **The display face, which a plain `<h1>` does not get.**
+ *
+ * Helix hangs it on `helix-text[as="h1"]` and `[data-text="display"]`, so the
+ * live page's hero has it and this draft lost it the moment the markup became a
+ * bare tag for the sake of its own type scale. Nobody would have caught that
+ * from a screenshot: the two faces differ most at large sizes and in the
+ * details, which is exactly where a hero lives.
+ *
+ * The section titles take it here too. On the live page they are `heading`
+ * variant and set in the body face, which is right for a document; a landing
+ * page is six statements and the face earns its keep on all of them.
+ */
+.tDisplay {
+  font-family: var(--helix-font-display);
+  /* Fluid between two rungs of the ramp rather than between two numbers
+     nobody chose. `check:tokens` was right to flag the originals: a page that
+     invents its own sizes is how a scale stops being one. */
+  font-size: clamp(var(--helix-text-3xl), 5.6vw, calc(var(--helix-text-3xl) * 1.6));
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: -0.028em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.tTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 3vw, calc(var(--helix-text-2xl) * 1.16));
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+/* The size the argument is made at, and the one that was missing. */
+.tLede {
+  font-size: clamp(var(--helix-text-lg), 1.45vw, calc(var(--helix-text-lg) * 1.16));
+  line-height: 1.55;
+  max-inline-size: 54ch;
+  text-wrap: pretty;
+}
+
+.tClaim {
+  font-size: clamp(var(--helix-text-lg), 1.5vw, calc(var(--helix-text-lg) * 1.2));
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+/**
+ * The eyebrow, in sentence case.
+ *
+ * **All caps was doing too much work in too many places.** Every band opened
+ * with one, the diagram carried three more inside it, and set at 0.14em tracking
+ * they read as five competing signs rather than as quiet labels. Caps are a
+ * shout, and a page that shouts six times has said nothing.
+ *
+ * What made them read as eyebrows was never the case: it is the size, the color
+ * and the position above a heading. Those stay.
+ */
+.tLabel {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: 0.01em;
+}
+
+/**
+ * A capability's proof, as a list rather than a paragraph.
+ *
+ * Three checkable facts read as three facts. The same three welded into a
+ * sentence read as a claim, which is what the marker is there to prevent: each
+ * line begins with a rule, so the eye counts them before it reads them.
+ */
+.proofList {
+  display: grid;
+  gap: var(--helix-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * **Set at reading size, not caption size.**
+ *
+ * These inherited body and landed near 13px under a 21px claim, which makes the
+ * one part of the block that is checkable look like fine print under the part
+ * that is merely asserted. The proportion is now closer to three to four, so the
+ * eye moves from the claim to the evidence rather than skipping it.
+ */
+.proofList li {
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  line-height: 1.5;
+  padding-block: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-md);
+}
+
+/* ── The news kicker ───────────────────────────────────────────────── */
+
+/**
+ * **No border, a fill instead.** The whole page is losing its strokes, and this
+ * is the smallest element to prove the rule on: a pill outlined in a hairline
+ * reads as a control, and a pill that is just a tint reads as a label you can
+ * press.
+ */
+.kicker {
+  align-items: center;
+  background: color-mix(in oklab, var(--helix-color-primary) 12%, transparent);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground);
+  display: inline-flex;
+  font-size: var(--helix-text-md);
+  gap: var(--helix-space-sm);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs) var(--helix-space-md);
+  text-decoration: none;
+  transition: background var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.kicker:hover {
+  background: color-mix(in oklab, var(--helix-color-primary) 20%, transparent);
+}
+
+.kickerBadge {
+  background: var(--helix-color-primary);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-on-accent);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+.kickerText {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* Slides on hover, which is the only motion a link this small can carry without
+   becoming a distraction next to a display line. */
+.kickerArrow {
+  color: var(--helix-color-primary);
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.kicker:hover .kickerArrow {
+  translate: 3px 0;
+}
+
+/* ── Floating, not bordered ────────────────────────────────────────── */
+
+/**
+ * Strips the strokes off anything the shared components draw for themselves.
+ *
+ * `data-substrate` and `helix-card` both carry their own edge, and those live in
+ * packages this draft does not own. Rather than fork them, the draft turns the
+ * edge off where it lands and lets the fill and the shadow carry the grouping.
+ */
+.noRules :global([data-substrate]),
+.noRules :global(helix-card) {
+  border-color: transparent;
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--helix-color-foreground) 6%, transparent) inset,
+    0 18px 40px -24px rgb(0 0 0 / 0.55);
+}
+
+/* ── The construction field ────────────────────────────────────────── */
+
+.blueprint {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  /* Faded at both ends, so the drawing continues past the band rather than
+     stopping at it. */
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+/**
+ * **Fainter than it wants to be.**
+ *
+ * At 0.18 the rectangles read as boxes drawn on the page and collided visibly
+ * with the eyebrow row. Construction lines are supposed to be noticed second, on
+ * the way back out of a section, not competing with the first thing read. The
+ * reference keeps them near the threshold of visible and so does this.
+ */
+.blueprintInk {
+  opacity: 0.11;
+}
+
+@keyframes preview-ink {
+  from {
+    stroke-dashoffset: 1400;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /**
+     * Each rectangle inks itself in on its own `view()` timeline, so the ones
+     * lower in a tall band arrive later because they *are* later. A shared
+     * timeline with per-child delays would fake the same order and get it wrong
+     * the moment the band's height changes.
+     */
+    .blueprintInk rect {
+      animation: preview-ink linear both;
+      animation-range: entry 0% entry 60%;
+      animation-timeline: view();
+      stroke-dasharray: 1400;
+    }
+  }
+}
+
+/* ── The drawing's own furniture ───────────────────────────────────── */
+
+/**
+ * The starfield. Deliberately near the threshold of visible.
+ *
+ * It is doing one job: putting the figure in space rather than on paper, which
+ * is what stops a circle with lines into it from reading as a flowchart. If it
+ * is noticed as dots, it is too strong.
+ */
+.diagramStars {
+  opacity: 0.55;
+}
+
+/**
+ * The sheet the figure is a detail of.
+ *
+ * A dashed rectangle alone reads as a dotted border. What makes it a drawing
+ * frame is the corner ticks drawn over it, which is the trick the reference
+ * uses: the corners are solid and the sides are not, so the eye reads a
+ * registration mark rather than an outline.
+ */
+.diagramFrame {
+  opacity: 0.5;
+}
+
+@keyframes preview-twinkle {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Very slow and very small. A starfield that visibly blinks is a screensaver;
+     this is only enough to stop the field reading as a static texture. */
+  .diagramStars {
+    animation: preview-twinkle 7s ease-in-out infinite alternate;
+  }
+}
+
+/* ── What the engine made of it ────────────────────────────────────── */
+
+.fabDivider {
+  align-self: stretch;
+  background: color-mix(in oklab, var(--helix-color-border) 70%, transparent);
+  inline-size: 1px;
+  margin-inline: var(--helix-space-2xs);
+}
+
+.fabReadout {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+.fabSwatches {
+  display: flex;
+  /* Overlapped, so eight roles read as one palette rather than as eight chips. */
+  padding-inline-start: var(--helix-space-2xs);
+}
+
+.fabSwatch {
+  background: var(--swatch);
+  block-size: 1.1rem;
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 2px var(--helix-color-surface-overlay);
+  inline-size: 1.1rem;
+  margin-inline-start: calc(var(--helix-space-2xs) * -1);
+}
+
+/**
+ * The verdict. Neutral when everything clears, because a green badge on every
+ * palette is a badge that means nothing; it only earns a color when it fails.
+ */
+.fabVerdict {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fabVerdict[data-failing] {
+  color: var(--helix-color-danger);
+}
+
+/**
+ * Eight swatches and a verdict need more room than five sliders did, but 66rem
+ * spanned nearly the whole viewport and the thing stopped reading as a floating
+ * instrument. Wide enough to hold the row, narrow enough to still be an object
+ * on the page rather than a second header stuck to the bottom.
+ */
+.fabOpen {
+  inline-size: min(58rem, calc(100vw - 3rem));
+}
+
+/* The tooltip is now the flex child, so it carries the sizing the slider had. */
+.fabTip {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+.fabTip .fabChannel {
+  inline-size: 100%;
+}
+
+/* The tooltip is now the flex child, so it carries the sizing the slider had. */
+.fabTip {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+.fabTip .fabChannel {
+  inline-size: 100%;
+}
+
+/**
+ * A band that stops the field.
+ *
+ * Opaque rather than translucent: the point is to interrupt the light, and a
+ * band that merely dims it still has a moving gradient behind a panel of live
+ * controls. `isolation` so anything inside keeps its own stacking context.
+ */
+.solidBand {
+  background: var(--helix-color-background);
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+}
+
+/**
+ * The field's drift.
+ *
+ * **One tile of travel, which is what makes it seamless.** The pattern repeats
+ * every 40 units, so translating by exactly 40 in each axis lands on an
+ * arrangement identical to the start: the loop closes on itself and there is no
+ * moment where the grid jumps back.
+ *
+ * Slow enough to be noticed only on a second look. A grid that visibly slides is
+ * a parallax effect; this is meant to read as the drawing being alive rather
+ * than printed.
+ */
+/**
+ * Horizontal only, and the vertical axis is the reason.
+ *
+ * Drifting diagonally moved the horizontal rules too, so the one alignment a
+ * reader measures the figure against, whether it sits evenly between the lines
+ * above and below it, was different at every instant and never the registered
+ * one. Sliding along a single axis leaves the horizontal rules fixed where the
+ * composition puts them and still gives the field motion.
+ */
+@keyframes preview-field-drift {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 40px 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .diagramField {
+    animation: preview-field-drift 26s linear infinite;
+  }
+}
+
+/* ── The search at the center ──────────────────────────────────────── */
+
+.diagramSample {
+  fill: var(--helix-color-primary);
+  font-family: var(--helix-font-display);
+  font-weight: var(--helix-weight-semibold);
+  text-anchor: middle;
+}
+
+.diagramCoreMuted {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.04em;
+}
+
+/**
+ * The gauge: the scale the reading is judged on.
+ *
+ * The track is the whole range a contrast ratio can usefully take, 1:1 to 7:1.
+ * The value arc fills to what the engine actually landed on, in step with the
+ * search converging below it, so the two are legibly one event. The ticks are
+ * the thresholds a build passes or fails on, and only AA gets a word, because
+ * it is the only one that decides anything.
+ */
+.diagramGaugeTrack {
+  stroke: var(--helix-color-foreground-muted);
+  stroke-opacity: 0.2;
+}
+
+.diagramGaugeValue {
+  stroke: var(--helix-color-primary);
+  stroke-opacity: 0.9;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-primary) 45%, transparent));
+}
+
+.diagramGaugeTick {
+  stroke: var(--helix-color-foreground-muted);
+}
+
+.diagramGaugeLabel {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.08em;
+}
+
+/* Without motion the arc cannot fill, so it stands at its reading. */
+@media (prefers-reduced-motion: reduce) {
+  .diagramGaugeValue {
+    stroke-dasharray: none;
+  }
+}
+
+/* ── Glass, thinner ────────────────────────────────────────────────── */
+
+.fab {
+  background: color-mix(in oklab, var(--helix-color-surface-overlay) 26%, transparent);
+}
+
+/* The shared components carry their own fills, and those are opaque tokens
+   rather than mixes, so they need the same treatment where a draft uses them. */
+.noRules :global([data-substrate]),
+.noRules :global(helix-card) {
+  --card-background-color: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+
+  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+
+/* ── The field takes the brand too ─────────────────────────────────── */
+
+/* ── One glass recipe, everywhere ──────────────────────────────────── */
+
+/**
+ * **The closing card and the header were mixing their own surfaces.**
+ *
+ * `closingCard` sets `light-dark(surface-sunken, material-translucent)` and the
+ * header carries its own material, so a page that had settled on one glass
+ * recipe still showed three: the chart panel reading as glass over the field,
+ * the close reading as a sunken slab, and the header as a third thing again. A
+ * material is a claim about what a surface is made of, and a page cannot hold
+ * three answers to that.
+ *
+ * The chart card's is the one that won, so it is the one everything takes.
+ *
+ * **Specificity rather than `!important`, and the number is the reason.** The
+ * closing card is also reached by `:root:not([data-color-mode]) .closingCard`,
+ * which is (0,3,0), against this selector's (0,2,0): the override was losing on
+ * weight, not on source order, and `!important` was papering over the gap by
+ * reversing the cascade for every future rule too. Matching the attribute three
+ * times reaches (0,4,0) and wins on the same terms everything else competes on.
+ * Measured identical across dark, light and the no-attribute case.
+ */
+.noRules :global([data-closing][data-closing][data-closing]) {
+  backdrop-filter: blur(18px) saturate(1.5);
+  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  border-color: transparent;
+}
+
+/**
+ * The header sits above `main`, outside anything a page can scope to, so this is
+ * global. It is loaded only on the preview routes, which is what keeps it from
+ * reaching the rest of the site.
+ */
+:global(helix-app-header) {
+  --app-header-background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  --app-header-backdrop: blur(18px) saturate(1.5);
+}
+
+/* ── Insight plates ────────────────────────────────────────────────── */
+
+.plate {
+  backdrop-filter: blur(18px) saturate(1.5);
+  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  border-radius: var(--helix-radii-lg);
+  color: inherit;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  text-decoration: none;
+  transition: translate var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* Lifts rather than brightens. A card that changes color on hover is a second
+   surface; one that rises is the same card, closer. */
+.plate:hover {
+  translate: 0 -3px;
+}
+
+.plate:focus-visible {
+  outline: 2px solid var(--helix-color-focus-ring);
+  outline-offset: 3px;
+}
+
+/* The plate is a band across the top, not a square: a cover that takes half the
+   card leaves the title fighting for the rest. */
+.cover {
+  aspect-ratio: 16 / 7;
+  display: block;
+  inline-size: 100%;
+}
+
+.plateBody {
+  display: grid;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-lg);
+}
+
+.plateTitle {
+  font-family: var(--helix-font-display);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: -0.012em;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/**
+ * Clamped, because the reel shows four across and an unclamped paragraph at a
+ * quarter of the shell is a column rather than a teaser.
+ */
+.plateSummary {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  color: var(--helix-color-foreground-muted);
+  display: -webkit-box;
+  font-size: var(--helix-text-md);
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+.plateDate {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+}
+
+/**
+ * The reading inside the disc, sized to the width actually available there.
+ *
+ * **A circle is not a box.** At 26px the string ran about 210 units wide, and
+ * 54 below the center of a 112 radius disc there are only 198 to spend, so it
+ * broke the edge on both sides. The room a line has inside a circle depends on
+ * how far from the center it sits, which a font size chosen against the diameter
+ * gets wrong every time.
+ */
+.diagramCoreSmall {
+  fill: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  /* 20, not 22: at 22 the string runs 185 units against the 197 the disc has
+     to spare at that height, which is five units of air a side and reads as
+     touching. */
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+}
+
+/* ── The figure answers the pointer ────────────────────────────────── */
+
+/**
+ * Hovering an input dims every channel but that one.
+ *
+ * **`:has()` relates the row to its wire without nesting them.** A label and the
+ * route it feeds are in different layers of the drawing, drawn at different
+ * depths so the pulse can sit over the base; putting them in a shared group to
+ * make a `:hover` cascade work would flatten that ordering. Tagging both with
+ * the same channel and letting the svg match on `:has()` keeps the paint order
+ * and the relationship independent, which is what they are.
+ *
+ * **Decoration, not information.** The svg is `role="img"` with a description
+ * that already names every input and output, so nothing here is the only way to
+ * learn something. A reader who cannot hover has lost an emphasis, not a fact.
+ */
+.diagramSvg [data-ch] {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    stroke-opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.diagramSvg:has([data-ch]:hover) [data-ch] {
+  opacity: 0.22;
+}
+
+.diagramSvg:has([data-ch="brand"]:hover) [data-ch="brand"],
+.diagramSvg:has([data-ch="saturation"]:hover) [data-ch="saturation"],
+.diagramSvg:has([data-ch="density"]:hover) [data-ch="density"],
+.diagramSvg:has([data-ch="radius"]:hover) [data-ch="radius"] {
+  opacity: 1;
+}
+
+/* The hovered route lifts out of the base's usual near-invisibility, so the
+   path from one input to the hub reads as a single continuous thing. */
+.diagramSvg:has([data-ch="brand"]:hover) .diagramBase [data-ch="brand"],
+.diagramSvg:has([data-ch="saturation"]:hover) .diagramBase [data-ch="saturation"],
+.diagramSvg:has([data-ch="density"]:hover) .diagramBase [data-ch="density"],
+.diagramSvg:has([data-ch="radius"]:hover) .diagramBase [data-ch="radius"] {
+  stroke: var(--helix-color-primary);
+  stroke-opacity: 0.9;
+}
+
+/* The label rows need a hit area; text alone is a thin target. */
+.diagramSvg g[data-ch] {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagramSvg [data-ch] {
+    transition-duration: var(--helix-duration-instant);
+  }
+}

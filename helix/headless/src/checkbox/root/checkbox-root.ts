@@ -183,6 +183,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
           @change=${this.handleChange}
+          @input=${this.stopInner}
         />
         <span part="mark" aria-hidden="true"></span>
       </span>

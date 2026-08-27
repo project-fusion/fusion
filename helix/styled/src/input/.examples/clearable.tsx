@@ -1,0 +1,13 @@
+export function Example() {
+  return (
+    <helix-input
+      clearable
+      default-value="quantum error correction"
+      hint="The button is there only while there is something to clear"
+      label="Search"
+      name="search"
+      placeholder="Search papers"
+      type="search"
+    ></helix-input>
+  )
+}

@@ -1,0 +1,56 @@
+<!-- @summary A tag asks to go and does not go on its own. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-flex
+    gap="xs"
+    id="row"
+  >
+    <helix-tag dismissible>design</helix-tag>
+    <helix-tag dismissible>infra</helix-tag>
+    <helix-tag dismissible>docs</helix-tag>
+  </helix-flex>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press the tag\u2019s close control</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const row = document.getElementById('row')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  row.addEventListener('helix-dismiss', (event) => {
+    say('helix-dismiss', `"${event.detail.label}" asked to go, which is a request and not a removal`)
+  })
+</script>

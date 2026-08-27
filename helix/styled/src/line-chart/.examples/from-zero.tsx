@@ -1,0 +1,57 @@
+import './from-zero.css'
+
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <table data-hidden-visually id="incidents">
+        <caption>Open incidents at month end</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Incidents</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Jan</th>
+            <td data-value="14">14</td>
+          </tr>
+          <tr>
+            <th scope="row">Feb</th>
+            <td data-value="11">11</td>
+          </tr>
+          <tr>
+            <th scope="row">Mar</th>
+            <td data-value="15">15</td>
+          </tr>
+          <tr>
+            <th scope="row">Apr</th>
+            <td data-value="9">9</td>
+          </tr>
+          <tr>
+            <th scope="row">May</th>
+            <td data-value="12">12</td>
+          </tr>
+          <tr>
+            <th scope="row">Jun</th>
+            <td data-value="8">8</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <helix-flex direction="column" gap="2xs">
+        <helix-text as="p" tone="muted">
+          Its own range, 8 to 15. June looks like zero and March like a crisis.
+        </helix-text>
+        <helix-line-chart for="incidents"></helix-line-chart>
+      </helix-flex>
+
+      <helix-flex direction="column" gap="2xs">
+        <helix-text as="p" tone="muted">
+          From zero. Eight is most of fifteen, and neither month was quiet.
+        </helix-text>
+        <helix-line-chart for="incidents" zero></helix-line-chart>
+      </helix-flex>
+    </helix-flex>
+  )
+}

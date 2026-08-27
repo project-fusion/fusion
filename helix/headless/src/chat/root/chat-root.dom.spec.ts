@@ -132,6 +132,23 @@ describe('the pin', () => {
   })
 
   /**
+   * The way back goes back, which it did not.
+   *
+   * The control is slotted so a consumer picks the words, and `resume()` was
+   * public for them to call: shipped that way it was a button this element
+   * positions, lifts, and shows and hides, doing nothing at all. A press in a
+   * region that exists for one purpose means that purpose.
+   */
+  test('a press in the way back pins again', async () => {
+    const element = await chat()
+    element.pinned = false
+    await element.updateComplete
+    part(element, 'resume')?.dispatchEvent(new Event('click', { bubbles: true }))
+    await element.updateComplete
+    expect(element.pinned).toBe(true)
+  })
+
+  /**
    * And only while there is one to offer.
    *
    * The way back is a slot, so a consumer who never filled it has no control to

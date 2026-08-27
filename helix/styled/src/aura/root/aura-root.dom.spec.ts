@@ -72,6 +72,63 @@ describe('aura', () => {
     await host.updateComplete
     expect(host.hasAttribute('interactive')).toBe(true)
   })
+
+  /* The reconnection, which was one-way and silent.
+   *
+   * `disconnectedCallback` gives the context back through `WEBGL_lose_context`,
+   * because a browser caps live contexts at about sixteen. What it cannot do is
+   * assume the canvas recovers: `getContext` hands back the very same dead
+   * object, so `link` failed, `start` returned before installing one observer,
+   * and the element sat connected and permanently blind holding its last frame.
+   * On the landing page that frame was the 2x2 the first `measure` took before
+   * layout, stretched over two screens as a gray smear.
+   *
+   * Both halves are asserted because they are two mechanisms. A move is a
+   * removal and an insertion with nothing between them, so the release is
+   * canceled and no GL work happens at all; a real departure lets it fire, and
+   * what comes back has to take a fresh canvas.
+   *
+   * This is the lane that runs twice, and only one of the two can see it:
+   * happy-dom answers `null` to `getContext`, which is a reader with no WebGL
+   * rather than a reader whose context was spent. That case is the test above
+   * and the fallback gradient is its contract, so this returns rather than
+   * asserting something the double cannot know. `specs:browser` is where it
+   * bites. */
+  test('comes back from a reorder, and from a real removal', async () => {
+    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+
+    /* Read through the canvas the element is currently showing, never a held
+       reference: recovering from a spent context replaces that node. */
+    const painting = (): boolean | null => {
+      const canvas = host.shadowRoot?.querySelector('canvas')
+      const gl = canvas?.getContext('webgl2')
+      return gl ? !gl.isContextLost() : null
+    }
+    if (painting() === null) {
+      return
+    }
+
+    /* Put back with `append` rather than before the sibling it had. Where it
+       lands is not what is under test, and the two lanes disagree about what
+       else is in the body, so a held `nextSibling` is a child of nothing by the
+       time the browser lane reaches it. */
+    const parent = host.parentElement
+    expect(parent).not.toBeNull()
+
+    // A framework reordering its children. The release never fires.
+    host.remove()
+    parent?.append(host)
+    expect(painting()).toBe(true)
+
+    // A real departure, given long enough for the release to run.
+    host.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    parent?.append(host)
+    expect(painting()).toBe(true)
+  })
 })
 
 /* The axis, asserted where it lands rather than at what angle.

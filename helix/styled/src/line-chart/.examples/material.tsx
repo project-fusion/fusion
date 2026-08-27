@@ -1,0 +1,56 @@
+import './material.css'
+
+export function Example() {
+  return (
+    <>
+      <table data-hidden-visually id="linematerial">
+        <caption>Latency by week</caption>
+        <thead>
+          <tr>
+            <th scope="col">Week</th>
+            <th scope="col">p50</th>
+            <th scope="col">p95</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">W1</th>
+            <td>112</td>
+            <td>340</td>
+          </tr>
+          <tr>
+            <th scope="row">W2</th>
+            <td>98</td>
+            <td>410</td>
+          </tr>
+          <tr>
+            <th scope="row">W3</th>
+            <td>121</td>
+            <td>286</td>
+          </tr>
+          <tr>
+            <th scope="row">W4</th>
+            <td>104</td>
+            <td>318</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="panel">
+        <figure>
+          <figcaption>Opaque</figcaption>
+          <helix-line-chart area for="linematerial" gridlines="both"></helix-line-chart>
+        </figure>
+        <figure>
+          <figcaption>Glass</figcaption>
+          <helix-line-chart
+            area
+            for="linematerial"
+            gridlines="both"
+            material="glass"
+          ></helix-line-chart>
+        </figure>
+      </div>
+    </>
+  )
+}

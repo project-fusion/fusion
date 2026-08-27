@@ -1,0 +1,20 @@
+export function Example() {
+  return (
+    <helix-breadcrumbs aria-label="Breadcrumb">
+      <helix-breadcrumb href="/">Home</helix-breadcrumb>
+
+      <helix-breadcrumb>
+        <helix-menu label="Hidden steps">
+          <helix-icon-button emphasis="ghost" label="Show hidden steps" slot="trigger">
+            <helix-icon name="dots-three"></helix-icon>
+          </helix-icon-button>
+          <helix-menu-item href="/design">Design</helix-menu-item>
+          <helix-menu-item href="/design/components">Components</helix-menu-item>
+          <helix-menu-item href="/design/components/navigation">Navigation</helix-menu-item>
+        </helix-menu>
+      </helix-breadcrumb>
+
+      <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
+    </helix-breadcrumbs>
+  )
+}

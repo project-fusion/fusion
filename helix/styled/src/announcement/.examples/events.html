@@ -1,0 +1,55 @@
+<!-- @summary The bar says it was dismissed and leaves the going to whoever put it there. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-announcement
+    dismissible
+    id="bar"
+    tone="info"
+  >
+    A new version is available.
+  </helix-announcement>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press the close control</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const bar = document.getElementById('bar')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  bar.addEventListener('helix-dismiss', (event) => {
+    say('helix-dismiss', `"${event.detail.label}" was dismissed, and this decides what happens`)
+  })
+</script>

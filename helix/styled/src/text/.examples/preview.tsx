@@ -1,0 +1,16 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="sm">
+      <helix-text as="h1" variant="display">
+        Heading
+      </helix-text>
+      <helix-text as="p" tone="muted" variant="subheading">
+        Subheading
+      </helix-text>
+      <helix-text as="p" variant="body">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua.
+      </helix-text>
+    </helix-flex>
+  )
+}

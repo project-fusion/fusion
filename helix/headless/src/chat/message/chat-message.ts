@@ -5,9 +5,11 @@ import {
   hostAria,
   relativeTime,
   slotFilled,
+  TONE_MARKS,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One turn in a conversation, and what has happened to it.
@@ -43,6 +45,7 @@ import { property, state } from 'lit/decorators.js'
  * @csspart meta - The line under a turn: its time, its state, and its controls.
  * @csspart time - When it was said.
  * @csspart state - What has happened to it, where that is worth saying.
+ * @csspart mark - The status glyph beside a failure.
  * @csspart retry - The control offered on a failed message.
  * @csspart actions - The controls offered on the turn, beside its time.
  *
@@ -146,6 +149,29 @@ export class HelixHeadlessChatMessage extends HelixElement {
   }
 
   /**
+   * The status glyph, behind a seam so a tier can draw its own.
+   *
+   * `TONE_MARKS.danger` rather than a glyph chosen here: the library has one
+   * status vocabulary, `Callout`, `Toast.Item` and `Announcement` all read from
+   * it, and a reader meets these four marks in a passage, in a message and now
+   * on a turn and has to read them as the same four things. It carries the
+   * accessible name with it, which is the half that matters: `danger` is the
+   * word the API uses and "Error" is the word a reader understands.
+   */
+  protected renderMark(): TemplateResult {
+    const { icon, label } = TONE_MARKS.danger
+    return html`<svg
+      part="mark"
+      fill="currentColor"
+      viewBox=${icon.viewBox}
+      role="img"
+      aria-label=${label}
+    >
+      ${unsafeSVG(icon.content)}
+    </svg>`
+  }
+
+  /**
    * What has happened to it, in words, and the way back from a failure.
    *
    * A seam of its own, because the styled tier draws a failure as an icon and a
@@ -153,6 +179,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * sent, and a transcript that labels each one is a transcript of the word
    * "sent".
    */
+
   protected renderState(): TemplateResult | typeof nothing {
     if (this.state === 'sending') {
       return html`<span part="state">${this.sendingLabel}</span>`
@@ -160,8 +187,12 @@ export class HelixHeadlessChatMessage extends HelixElement {
     if (this.state !== 'failed') {
       return nothing
     }
+    /* **The mark, and not because color needs a second carrier here.** "Not
+       sent" is words, so the meaning survives without it. It is here because a
+       failure is the one state that has to be *found* rather than noticed, and a
+       shape is what a reader scanning a transcript finds. */
     return html`<span part="state"
-      >${this.failedLabel}
+      >${this.renderMark()} ${this.failedLabel}
       <button part="retry" type="button" @click=${this.handleRetry}>${this.retryLabel}</button>
     </span>`
   }

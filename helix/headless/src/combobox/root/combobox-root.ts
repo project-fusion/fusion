@@ -447,6 +447,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   private readonly handleInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const typed = (event.target as HTMLInputElement).value
     this.typed = typed
     /* The list is narrowed before the completion is looked for, because the

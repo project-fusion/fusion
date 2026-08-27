@@ -121,6 +121,9 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * submit disagree.
    */
   private readonly handleInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const control = event.target as HTMLTextAreaElement
     const next = control.value
     /* Through the mixin, which announces and then applies only if the value is

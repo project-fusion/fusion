@@ -1595,11 +1595,11 @@
               "kind": "field",
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | undefined"
               },
-              "default": "0",
-              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
-              "attribute": "max"
+              "description": "How many avatars are shown before the rest become a count.\n\nUnset shows all of them, which is what no limit means and is more useful\nthan refusing to render.\n\n**Reflected, because the fold is a stylesheet rule and nothing else.** The\nstyled tier hides past the limit with `:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`,\nso the attribute *is* the mechanism: a `max` that reaches this property and\nnever reaches the host matches no rule, and every avatar is drawn beside a\ncount that says two of them are hidden. That is the failure this repository\nalready writes down as \"reflect only what CSS selects on\", and it went\nunnoticed because the examples set `max` in markup, where the author had\nwritten the attribute themselves.\n\nIt is the path a script takes that was broken, and React takes it for\neveryone: React assigns a matching property rather than an attribute, so\n`<helix-avatar-group max={4}>` folded nothing at all. Measured against the\nmarkup twin, the fifth and sixth avatars rendered at full size where the\nmarkup version had them at 0x0.\n\n**Optional rather than defaulted, per the rule that a reflected property\ntakes no default**: `max = 0` would stamp `max=\"0\"` onto every host that\nnever asked for a limit, including on the server.",
+              "attribute": "max",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -1816,10 +1816,9 @@
             {
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | undefined"
               },
-              "default": "0",
-              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
+              "description": "How many avatars are shown before the rest become a count.\n\nUnset shows all of them, which is what no limit means and is more useful\nthan refusing to render.\n\n**Reflected, because the fold is a stylesheet rule and nothing else.** The\nstyled tier hides past the limit with `:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`,\nso the attribute *is* the mechanism: a `max` that reaches this property and\nnever reaches the host matches no rule, and every avatar is drawn beside a\ncount that says two of them are hidden. That is the failure this repository\nalready writes down as \"reflect only what CSS selects on\", and it went\nunnoticed because the examples set `max` in markup, where the author had\nwritten the attribute themselves.\n\nIt is the path a script takes that was broken, and React takes it for\neveryone: React assigns a matching property rather than an attribute, so\n`<helix-avatar-group max={4}>` folded nothing at all. Measured against the\nmarkup twin, the fifth and sixth avatars rendered at full size where the\nmarkup version had them at 0x0.\n\n**Optional rather than defaulted, per the rule that a reflected property\ntakes no default**: `max = 0` would stamp `max=\"0\"` onto every host that\nnever asked for a limit, including on the server.",
               "fieldName": "max"
             }
           ],
@@ -6700,16 +6699,20 @@
           "name": "HelixHeadlessChatComposer",
           "cssParts": [
             {
-              "description": "The whole row.",
+              "description": "The whole composer.",
               "name": "composer"
-            },
-            {
-              "description": "The leading slot's box.",
-              "name": "start"
             },
             {
               "description": "The text field.",
               "name": "field"
+            },
+            {
+              "description": "The row under the field.",
+              "name": "tools"
+            },
+            {
+              "description": "The leading slot's box.",
+              "name": "start"
             },
             {
               "description": "The trailing slot's box.",
@@ -6718,15 +6721,19 @@
             {
               "description": "The control that offers the turn.",
               "name": "send"
+            },
+            {
+              "description": "The glyph inside the send control.",
+              "name": "mark"
             }
           ],
           "slots": [
             {
-              "description": "Before the field: attachments, a model picker.",
+              "description": "Under the field, at the leading edge: attachments, a model picker.",
               "name": "start"
             },
             {
-              "description": "After the field, beside the send control.",
+              "description": "Under the field, beside the send control.",
               "name": "end"
             }
           ],
@@ -6833,6 +6840,28 @@
               "type": {
                 "text": "send() => boolean"
               }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each tool box whether anything is in it.\n\nThey are boxes in a flex row, so an empty one still takes the gap beside it\nand the send control drifts inward by one for every slot a consumer left\nalone. No selector can ask this: a slot's assigned nodes are not its DOM\nchildren, so `:empty` describes the fallback rather than the fill."
+            },
+            {
+              "kind": "method",
+              "name": "renderSend",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that offers the turn, behind a seam so a tier can draw its own.\n\n**A glyph with the label as its accessible name, rather than the label as\ntext.** The word \"Send\" beside a field is the widest thing in the row and\nsays nothing a return key does not, and every composer a reader has used in\nthe last five years marks it rather than spells it. The return glyph is the\nmark because Enter is what actually sends, which `submit-on` says out loud:\nthe control and the key are one affordance and should look like it.\n\n`send-label` is unchanged and is now the accessible name rather than the\nvisible one, so a screen reader hears the same word it always did."
             },
             {
               "kind": "field",
@@ -7218,6 +7247,10 @@
               "name": "state"
             },
             {
+              "description": "The status glyph beside a failure.",
+              "name": "mark"
+            },
+            {
               "description": "The control offered on a failed message.",
               "name": "retry"
             },
@@ -7333,6 +7366,17 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderMark",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The status glyph, behind a seam so a tier can draw its own.\n\n`TONE_MARKS.danger` rather than a glyph chosen here: the library has one\nstatus vocabulary, `Callout`, `Toast.Item` and `Announcement` all read from\nit, and a reader meets these four marks in a passage, in a message and now\non a turn and has to read them as the same four things. It carries the\naccessible name with it, which is the half that matters: `danger` is the\nword the API uses and \"Error\" is the word a reader understands."
             },
             {
               "kind": "method",
@@ -7888,6 +7932,13 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "field",
+              "name": "handleResume",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A press anywhere in the way back takes the reader back.\n\n**The affordance was inert, in the component and in every example.** The\ncontrol is slotted so the consumer picks the words, and `resume()` was\npublic \"because the control offering it is the consumer's and needs\nsomething to call\". True, and it left a button this element positions, lifts\nand shows and hides doing nothing at all until somebody wired it, which none\nof the five examples did: the one control whose whole job is to undo a\nscroll shipped as decoration.\n\nThe region exists for exactly one purpose, so a press inside it has exactly\none meaning and this element is entitled to act on it. `resume()` stays\npublic for the other callers it was always for: a keyboard shortcut, or a\nconsumer's own control somewhere else on the page."
             },
             {
               "kind": "field",
@@ -25872,6 +25923,564 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/format-date/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessFormatDate",
+          "declaration": {
+            "name": "HelixHeadlessFormatDate",
+            "module": "./root/format-date-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/format-date/root/format-date-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A date in a page is almost never wanted as an ISO string, and formatting one\nin the consumer's own code means every consumer ships a copy of the same\n`Intl` call and a different set of options. This is that call, as an element,\nso a date is written where it is shown.\n\n**`elapsed` is the mode a feed wants, and it stops being relative on\npurpose.** \"42m\", \"3h\", \"1d\" is what a row of activity reads as, and past a\nweek the compact form is a lie: `Intl.NumberFormat` narrow renders both\n`minute` and `month` as `m` in en-US, so \"3m\" is three minutes at the top of a\nfeed and three months further down it. Past six days this shows a date, which\nis shorter to read and impossible to misread. `elapsedTime` in `helix/core`\ncarries the measurement.\n\n**The reading refreshes itself, from one timer the page shares.** A relative\ntimestamp is correct for as long as its unit lasts and wrong afterwards, and a\npage left open is exactly where that shows. Each element asks to be woken when\nits own reading expires rather than polling, and an element showing a date\nasks for nothing at all: fifty rows and fifty intervals is fifty wakeups a\nsecond where one will do, and a feed of last month's notifications should cost\nnothing to leave open.\n\n**`<time datetime>` whatever the text says**, so a screen reader, a copy and\npaste, and anything parsing the page all get the real instant rather than\n\"yesterday\".",
+          "name": "HelixHeadlessFormatDate",
+          "cssParts": [
+            {
+              "description": "The `<time>` element carrying the reading.",
+              "name": "time"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "date",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The timestamp, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset this\nrenders nothing rather than the epoch, which is what parsing an empty string\nwould give.\n\n**The element's own text is read as a fallback, and only in a browser.**\n`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the\nspelling that reads best in markup, and it cannot be the only one: measured\nagainst Lit's server shim, `textContent`, `children`, `firstChild` and\n`querySelector` are all `undefined` there, so a server has no way to see it.\nAn element rendered on a server needs the attribute; one rendered in a\nbrowser may use either.",
+              "attribute": "date"
+            },
+            {
+              "kind": "field",
+              "name": "day",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the day of the month is written, where a date is shown.",
+              "attribute": "day"
+            },
+            {
+              "kind": "field",
+              "name": "elapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show how long ago it was, compactly, instead of the date.\n\nReflected, because it is the one property that decides which of two readings\nthis is and a stylesheet has a reason to know: a compact reading is a fixed\nfew characters and a date is not.",
+              "attribute": "elapsed",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "hour",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the hour is written, where a time of day is shown.",
+              "attribute": "hour"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the reading. Empty is the runtime's own.",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "minute",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the minute is written, where a time of day is shown.",
+              "attribute": "minute"
+            },
+            {
+              "kind": "field",
+              "name": "month",
+              "type": {
+                "text": "'numeric' | '2-digit' | 'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the month is written, where a date is shown.",
+              "attribute": "month"
+            },
+            {
+              "kind": "field",
+              "name": "second",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the second is written, where a time of day is shown.",
+              "attribute": "second"
+            },
+            {
+              "kind": "field",
+              "name": "timeZone",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The time zone to read the timestamp in. Empty is the runtime's own.",
+              "attribute": "time-zone"
+            },
+            {
+              "kind": "field",
+              "name": "timeZoneName",
+              "type": {
+                "text": "'long' | 'short' | undefined"
+              },
+              "description": "Whether to name the time zone, and how.",
+              "attribute": "time-zone-name"
+            },
+            {
+              "kind": "field",
+              "name": "weekday",
+              "type": {
+                "text": "'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the weekday is written, where one is shown.",
+              "attribute": "weekday"
+            },
+            {
+              "kind": "field",
+              "name": "year",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the year is written, where a date is shown.",
+              "attribute": "year"
+            },
+            {
+              "kind": "field",
+              "name": "clock",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The clock this element last drew against.\n\nA state field and not a read of `Date.now()` inside `render`, which would\nmake the template a function of something Lit cannot see change: the element\nwould draw the right text once and never notice it had gone stale."
+            },
+            {
+              "kind": "field",
+              "name": "written",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The date read out of the light DOM, where no attribute carried one."
+            },
+            {
+              "kind": "field",
+              "name": "stopTicking",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "watching",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "moment",
+              "type": {
+                "text": "Date | undefined"
+              },
+              "privacy": "private",
+              "description": "The timestamp, or nothing where there is not one to read.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "Absolute"
+              },
+              "privacy": "private",
+              "description": "Every `Intl.DateTimeFormat` option a consumer set, and none they did not.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The light DOM's own text, which is the other way to write the value."
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Schedules the next reading, and only the next one.\n\nThe formatter says when its own answer expires, so this asks for exactly\nthat moment rather than polling: an item minutes old wakes once a minute, an\nitem hours old once an hour, and an item showing a date never, which is the\ndifference between a feed that costs nothing to leave open and one that\ndoes."
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-headless-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stopInner",
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Stops an inner control's own announcement at this element's boundary.\n\n**A composed control is one control to a consumer, and the natives had no\nequivalent of the stop the prefixed events already get.** `<helix-select>`\nrenders a `<helix-listbox>`, and both announce: the listbox dispatches\n`input` and `change` from its own host, `input` is composed by\nspecification, and a consumer listening on the select therefore heard one\nchoice twice. Measured before this existed, on the styled tier, one choice\non the inner listbox: select `input` twice and `change` three times,\ncombobox, date input, time input and color input twice each. `Command` was\nthe only one that was right, because it happened to reach for\n`stopImmediatePropagation` for a different reason.\n\nBound on the child in the parent's template, so it runs while the event is\nstill at the child and before it can cross. The guard is for the case where\na component binds this on itself: an element must never stop its own\nannouncement, which is the one it exists to make.\n\nThis is the same job the `helix-before-*` handlers do with their own\n`stopPropagation`, and it is separate rather than folded into them because\na consumer may legitimately refuse a request without the notification ever\nhappening: the two travel at different times and one can be absent.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "date",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The timestamp, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset this\nrenders nothing rather than the epoch, which is what parsing an empty string\nwould give.\n\n**The element's own text is read as a fallback, and only in a browser.**\n`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the\nspelling that reads best in markup, and it cannot be the only one: measured\nagainst Lit's server shim, `textContent`, `children`, `firstChild` and\n`querySelector` are all `undefined` there, so a server has no way to see it.\nAn element rendered on a server needs the attribute; one rendered in a\nbrowser may use either.",
+              "fieldName": "date"
+            },
+            {
+              "name": "day",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the day of the month is written, where a date is shown.",
+              "fieldName": "day"
+            },
+            {
+              "name": "elapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show how long ago it was, compactly, instead of the date.\n\nReflected, because it is the one property that decides which of two readings\nthis is and a stylesheet has a reason to know: a compact reading is a fixed\nfew characters and a date is not.",
+              "fieldName": "elapsed"
+            },
+            {
+              "name": "hour",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the hour is written, where a time of day is shown.",
+              "fieldName": "hour"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the reading. Empty is the runtime's own.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "minute",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the minute is written, where a time of day is shown.",
+              "fieldName": "minute"
+            },
+            {
+              "name": "month",
+              "type": {
+                "text": "'numeric' | '2-digit' | 'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the month is written, where a date is shown.",
+              "fieldName": "month"
+            },
+            {
+              "name": "second",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the second is written, where a time of day is shown.",
+              "fieldName": "second"
+            },
+            {
+              "name": "time-zone",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The time zone to read the timestamp in. Empty is the runtime's own.",
+              "fieldName": "timeZone"
+            },
+            {
+              "name": "time-zone-name",
+              "type": {
+                "text": "'long' | 'short' | undefined"
+              },
+              "description": "Whether to name the time zone, and how.",
+              "fieldName": "timeZoneName"
+            },
+            {
+              "name": "weekday",
+              "type": {
+                "text": "'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the weekday is written, where one is shown.",
+              "fieldName": "weekday"
+            },
+            {
+              "name": "year",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the year is written, where a date is shown.",
+              "fieldName": "year"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A timestamp, written the way the reader's locale writes one.",
+          "helix": {
+            "category": "typography",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/format-date",
+            "aliases": [
+              "RelativeTime",
+              "Timestamp",
+              "TimeAgo"
+            ],
+            "tier": "headless",
+            "group": "BaseFormatDate",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "The same readings on the headless tier, where the value is the element's own text.",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/headless/src/format-date"
+          },
+          "tagName": "helix-headless-format-date",
+          "customElement": true,
+          "modulePath": "src/format-date/root/format-date-root.ts",
+          "definitionPath": "src/format-date/root/format-date-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixHeadlessFormatDate",
+          "declaration": {
+            "name": "HelixHeadlessFormatDate",
+            "module": "src/format-date/root/format-date-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-headless-format-date",
+          "declaration": {
+            "name": "HelixHeadlessFormatDate",
+            "module": "src/format-date/root/format-date-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/heatmap/index.ts",
       "declarations": [],
       "exports": [
@@ -26081,11 +26690,19 @@
           "name": "HelixHeadlessHeatmap",
           "cssProperties": [
             {
-              "description": "The size a cell wants. The strip fits as many as the container allows.",
+              "description": "The size a cell wants on both axes, where neither is given its own.",
               "name": "--heatmap-cell-size"
             },
             {
-              "description": "Space between cells.",
+              "description": "How wide a cell is. The strip fits as many as the container allows.",
+              "name": "--heatmap-cell-width"
+            },
+            {
+              "description": "How tall a cell is. A row of a tall thin cell is what a status page draws.",
+              "name": "--heatmap-cell-height"
+            },
+            {
+              "description": "Space between cells. Zero is a continuous field rather than a grid of tiles.",
               "name": "--heatmap-gap"
             },
             {
@@ -26173,6 +26790,34 @@
             {
               "description": "Shown when the table has no readings in it.",
               "name": "empty"
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
+            },
+            {
+              "description": "The bubble, forwarded from `Tooltip`.",
+              "name": "tooltip"
+            },
+            {
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor"
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell"
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label"
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name"
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value"
             }
           ],
           "slots": [
@@ -26227,7 +26872,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them, in CSS pixels.\n\n**Set this only to overrule what the strip actually draws.** The arithmetic\nneeds a width in pixels and the width is a length the stylesheet resolves,\nso for as long as this was the only answer it was a promise the consumer had\nto keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic\nbelieved a cell cost 10 pixels where it cost 16, and a ninety day strip ran\n940 pixels wide out of a 592 pixel box while `visible` reported 59. The one\nnumber a summary is told to trust was the number that was wrong.\n\nThe strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are\nenough on their own and these two are the estimate used until the first\nmeasurement lands. Writing the attribute pins the value and stops the\nmeasurement being consulted, which is what a container query or a transition\non the cell size wants, where what is drawn this frame is not what the\narithmetic should plan around.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "attribute": "min-cell"
             },
             {
@@ -26271,6 +26916,26 @@
             },
             {
               "kind": "field",
+              "name": "metrics",
+              "type": {
+                "text": "{ cell: number; gap: number } | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The cell and gap the strip is drawing, in pixels, once it has been read.\n\n**The arithmetic's inputs are a stylesheet's decisions, so the honest way to\nlearn them is to ask the stylesheet.** A cell's size is a length that only\nthe cascade can resolve: it may be a `rem` against a root font size, a\npercentage of a container, or whatever a container query chose this frame.\nEvery one of those is invisible to a number typed into an attribute, and\neach of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`\nadded one more way for the two to drift apart silently.\n\nReading it back is not styling and does not breach the tier: this asks what\nwas decided rather than deciding, which is the same direction as the facts\nthis component writes out as custom properties, run backwards."
+            },
+            {
+              "kind": "field",
+              "name": "hovered",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "-1",
+              "description": "Which drawn cell the pointer is on, as an index into `drawn`, or -1 for none."
+            },
+            {
+              "kind": "field",
               "name": "observer",
               "type": {
                 "text": "ResizeObserver | undefined"
@@ -26309,6 +26974,26 @@
             },
             {
               "kind": "field",
+              "name": "cellPx",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The cell width the arithmetic should plan around, in pixels.\n\nThe attribute wins where a consumer wrote one, because that is what writing\nit is for; otherwise what the strip draws, and the declared default only\nuntil the first measurement lands.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "gapPx",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The gap the arithmetic should plan around, on the same terms as `cellPx`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "room",
               "type": {
                 "text": "number"
@@ -26316,6 +27001,17 @@
               "privacy": "private",
               "description": "How many cells the container has room for, as a whole number of columns.",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reads back the cell and the gap the strip resolved.\n\n`gridAutoColumns` and `columnGap` rather than a cell's own box, and the\ndifference matters on the frame it matters: a cell exists only once some\nhave been drawn, and how many are drawn is what this is measuring *for*.\nAsking the track instead breaks the circle, since a track is sized whether\nor not anything sits in it. Neither property forces layout, so this stays a\nstyle read on every update rather than a reflow.\n\nAnything that does not parse to a positive number leaves the estimate alone:\n`columnGap` computes to `normal` where no gap is set, and a track given a\nkeyword or a `repeat()` has no single width to report. A wrong number here\nis worse than no number, because it is the one the count is published from."
             },
             {
               "kind": "field",
@@ -26369,6 +27065,30 @@
                 }
               ],
               "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one."
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The bubble over the cell a pointer is resting on.\n\n**One tooltip that moves, which is what every other chart here does and is\nthe thing the `title` attribute was kept to avoid.** The note this replaces\nread that ninety `helix-tooltip` elements was the cost of a real one, and\nthat was never the shape: Bar Chart, Line Chart and Donut Chart each render\na single anchor against an invisible mark and move the mark, so the count is\none however many readings there are. `drawTooltip` is their shared markup\nand this is the fourth caller.\n\nWhat it buys over the native one is the row rather than the reading.\n`sourceRows` carries every column of the table including the ones nothing\nwas plotted from, so a cell reads \"11 Jun 2026 / Uptime 81.2% / Note Partial\noutage\" where `title` could only ever say the two values this component\nhappens to hold. It is also styleable, appears at once rather than after the\nplatform's second of delay, and cannot be truncated by the window edge.\n\nThe mark is placed in pixels rather than in percent, which is the one thing\nthis does differently from its siblings: they divide a plot into equal\nslots, and a strip's cells are a fixed size with a fixed gap inside a box\nthat is usually wider, so a percentage of the box lands between cells. The\npitch is `cell + gap` and both are measured."
+            },
+            {
+              "kind": "field",
+              "name": "onPointerOver",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Which drawn cell the pointer is over, or -1.\n\n`pointerover` on the strip rather than a listener per cell: the event\nbubbles, so one handler covers however many cells there are, and unlike\n`mouseover` it is delivered for a pen and for the touch that follows a long\npress."
+            },
+            {
+              "kind": "field",
+              "name": "onPointerLeave",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -26691,7 +27411,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them, in CSS pixels.\n\n**Set this only to overrule what the strip actually draws.** The arithmetic\nneeds a width in pixels and the width is a length the stylesheet resolves,\nso for as long as this was the only answer it was a promise the consumer had\nto keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic\nbelieved a cell cost 10 pixels where it cost 16, and a ninety day strip ran\n940 pixels wide out of a 592 pixel box while `visible` reported 59. The one\nnumber a summary is told to trust was the number that was wrong.\n\nThe strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are\nenough on their own and these two are the estimate used until the first\nmeasurement lands. Writing the attribute pins the value and stops the\nmeasurement being consulted, which is what a container query or a transition\non the cell size wants, where what is drawn this frame is not what the\narithmetic should plan around.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "fieldName": "minCell"
             },
             {
@@ -28796,6 +29516,14 @@
           "declaration": {
             "name": "*",
             "module": "src/file-input/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/format-date/index.js"
           }
         },
         {
@@ -37611,10 +38339,10 @@
       "exports": [
         {
           "kind": "js",
-          "name": "HelixHeadlessNotificationsItem",
+          "name": "HelixHeadlessNotification",
           "declaration": {
-            "name": "HelixHeadlessNotificationsItem",
-            "module": "./item/notifications-item.js"
+            "name": "HelixHeadlessNotification",
+            "module": "./notification/notification.js"
           }
         },
         {
@@ -37629,12 +38357,12 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/notifications/item/notifications-item.ts",
+      "path": "src/notifications/notification/notification.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A notification is a toast that did not go away. `helix-toast` is deliberately\nthe opposite of this: a live region whose items carry a `duration` and whose\nroot never creates or destroys anything. What makes this its own family is the\nstate each item carries rather than the arrangement it sits in: read and\nunread, a timestamp that has to stay correct, and an action a reader can take\nlater.\n\n**The timestamp is the part that is easy to get wrong and impossible to\nnotice.** \"2 minutes ago\" is correct for sixty seconds, and a feed left open\nends up describing when the page loaded rather than when anything happened.\nEvery item's reading is refreshed on a schedule it works out for itself, from\none timer the page shares: fifty items with fifty intervals is fifty wakeups a\nsecond where one will do.\n\n**Read state is reported, not invented.** Marking something read is usually a\nround trip, and a component that flips its own state and then hears the\nrequest failed has told the reader something untrue. `helix-read` is\ncancelable, and a `read` set by the consumer makes this element defer entirely.",
-          "name": "HelixHeadlessNotificationsItem",
+          "description": "A notification is a toast that did not go away. `helix-toast` is deliberately\nthe opposite of this: a live region whose items carry a `duration` and whose\nroot never creates or destroys anything. What makes this its own family is the\nstate each item carries rather than the arrangement it sits in: read and\nunread, a timestamp that has to stay correct, and an action a reader can take\nlater.\n\n**The row is a label, a caption under it, and one trailing column that holds\neither the time or the controls.** A feed is scanned rather than read, so the\nthing that happened gets the first line on its own and everything qualifying\nit goes under. The time and the controls occupy the same place because a\nreader wants exactly one of them at a time: the time while they are scanning,\nand what they can do about it once they have stopped on a row.\n\n**The timestamp is `helix-format-date`**, which is where the reading, the\n`<time datetime>` and the shared timer now live. It was implemented here, and\na component that formats a date is not a fact about notifications: Chat wanted\nthe same thing and had its own copy of half of it.\n\n**Read state is reported, not invented.** Marking something read is usually a\nround trip, and a component that flips its own state and then hears the\nrequest failed has told the reader something untrue. `helix-read` is\ncancelable, and a `read` set by the consumer makes this element defer entirely.",
+          "name": "HelixHeadlessNotification",
           "cssParts": [
             {
               "description": "The whole notification.",
@@ -37645,16 +38373,24 @@
               "name": "media"
             },
             {
-              "description": "Content and timestamp together.",
+              "description": "The label and the caption together.",
               "name": "body"
             },
             {
-              "description": "The consumer's own markup.",
-              "name": "content"
+              "description": "What happened, on the first line.",
+              "name": "label"
+            },
+            {
+              "description": "The column holding the time and the controls.",
+              "name": "trailing"
             },
             {
               "description": "When it happened, read the way a person reads one.",
               "name": "time"
+            },
+            {
+              "description": "The actions and the dismiss, which replace the time.",
+              "name": "controls"
             },
             {
               "description": "The trailing slot's box.",
@@ -37673,6 +38409,10 @@
             {
               "description": "What happened, in the consumer's own markup.",
               "name": ""
+            },
+            {
+              "description": "A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.",
+              "name": "caption"
             },
             {
               "description": "An avatar or icon identifying who or what it came from.",
@@ -37700,7 +38440,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notifications-item default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
+              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notification default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
               "attribute": "read"
             },
             {
@@ -37745,41 +38485,12 @@
             },
             {
               "kind": "field",
-              "name": "stopTicking",
-              "type": {
-                "text": "(() => void) | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined"
-            },
-            {
-              "kind": "field",
               "name": "readState",
               "type": {
                 "text": "boolean | undefined"
               },
               "privacy": "private",
               "default": "undefined"
-            },
-            {
-              "kind": "field",
-              "name": "clock",
-              "type": {
-                "text": "number | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "The clock this item last drew against.\n\nA state field and not a read of `Date.now()` inside `render`, which would\nmake the template a function of something Lit cannot see change: the item\nwould draw the right text once and never notice it had gone stale."
-            },
-            {
-              "kind": "field",
-              "name": "moment",
-              "type": {
-                "text": "Date | undefined"
-              },
-              "privacy": "private",
-              "description": "The timestamp, or nothing where there is not one to read.",
-              "readonly": true
             },
             {
               "kind": "method",
@@ -37802,24 +38513,14 @@
             },
             {
               "kind": "method",
-              "name": "tick",
+              "name": "markControls",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Schedules the next reading, and only the next one.\n\nThe formatter says when its own answer expires, so this asks for exactly\nthat moment rather than polling: an item minutes old wakes once a minute and\nan item weeks old wakes once an hour, which is the difference between a\nfeed that costs nothing to leave open and one that does not."
-            },
-            {
-              "kind": "method",
-              "name": "renderTime",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult | typeof nothing"
-                }
-              }
+              "description": "Says whether there is anything for the time to make way for.\n\nThe trailing column holds the time and the controls in one place and shows\none of them, so a row with nothing to do about it would hide its timestamp\non hover and put nothing there. `dismissible` this element knows on the\nserver; whether a consumer filled the actions slot it can only find out from\na DOM, so this runs after the render and the resting answer, no controls, is\nthe one the server writes."
             },
             {
               "kind": "method",
@@ -37831,6 +38532,23 @@
                 }
               },
               "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws.\n\n**The mark is drawn rather than typed, which is what lets it align.** It was\n`&times;`, and a character is placed by its font rather than by its box:\nmeasured against the ghost button beside it at 8x, the cross carried 6\npixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two\nboxes whose own centers agreed to a tenth of a pixel. No stylesheet can\ncorrect that, because the offset is inside the glyph. An `<svg>` is centered\non its own viewBox, so it lands where the box says and takes the icon step\nthe row is already set in. It is the `x` the Tag's dismiss draws, so two\ncontrols that mean \"take this away\" are one mark."
+            },
+            {
+              "kind": "method",
+              "name": "renderTime",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "When it happened, delegated whole.\n\nThe tag is interpolated rather than written, so each tier renders its own:\nthe base tier may not name a styled element, and a styled item inherits this\ntemplate without having a tag of its own to remind anybody. `check:composed`\nholds both halves.\n\n`exportparts` and no `part` of its own, which is the rule about a part\nalready named for its role: the child publishes `time`, the role here is\n`time`, and naming both would leave `::part(time)` matching two elements.\nWhat a consumer wants to reach is the `<time>`, so that is what the name\nreaches."
+            },
+            {
+              "kind": "field",
+              "name": "handleActions",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -38045,7 +38763,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notifications-item default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
+              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notification default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
               "fieldName": "read"
             },
             {
@@ -38101,69 +38819,29 @@
             ],
             "tier": "headless",
             "group": "BaseNotifications",
-            "part": "Item"
+            "part": "Notification"
           },
-          "tagName": "helix-headless-notifications-item",
+          "tagName": "helix-headless-notification",
           "customElement": true,
-          "modulePath": "src/notifications/item/notifications-item.ts",
-          "definitionPath": "src/notifications/item/notifications-item.ts"
+          "modulePath": "src/notifications/notification/notification.ts",
+          "definitionPath": "src/notifications/notification/notification.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixHeadlessNotificationsItem",
+          "name": "HelixHeadlessNotification",
           "declaration": {
-            "name": "HelixHeadlessNotificationsItem",
-            "module": "src/notifications/item/notifications-item.ts"
+            "name": "HelixHeadlessNotification",
+            "module": "src/notifications/notification/notification.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-headless-notifications-item",
+          "name": "helix-headless-notification",
           "declaration": {
-            "name": "HelixHeadlessNotificationsItem",
-            "module": "src/notifications/item/notifications-item.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/notifications/item/ticker.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "subscribe",
-          "return": {
-            "type": {
-              "text": "(() => void)"
-            }
-          },
-          "parameters": [
-            {
-              "name": "delay",
-              "type": {
-                "text": "number"
-              }
-            },
-            {
-              "name": "run",
-              "type": {
-                "text": "() => void"
-              }
-            }
-          ],
-          "description": "Asks to be run in `delay` milliseconds, and returns the way to stop asking.\n\nThe returned function is the whole of the contract: an element that forgets to\ncall it on disconnect leaks a closure over itself for the life of the page,\nand a panel that opens and closes leaks one per open."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "subscribe",
-          "declaration": {
-            "name": "subscribe",
-            "module": "src/notifications/item/ticker.ts"
+            "name": "HelixHeadlessNotification",
+            "module": "src/notifications/notification/notification.ts"
           }
         }
       ]
@@ -38204,7 +38882,7 @@
           ],
           "slots": [
             {
-              "description": "The notifications, as `helix-notifications-item` children.",
+              "description": "The notifications, as `helix-notification` children.",
               "name": ""
             },
             {
@@ -38270,7 +38948,7 @@
               "kind": "field",
               "name": "items",
               "type": {
-                "text": "HelixHeadlessNotificationsItem[]"
+                "text": "HelixHeadlessNotification[]"
               },
               "description": "The notifications declared as children, in the order they are written.",
               "readonly": true
@@ -57941,7 +58619,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/tabs/panel/tabs-panel.js"
+            "module": "src/tabs/panel/tab-panel.js"
           }
         },
         {
@@ -57957,19 +58635,19 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/tabs/tab/tabs-tab.js"
+            "module": "src/tabs/tab/tab.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/panel/tabs-panel.ts",
+      "path": "src/tabs/panel/tab-panel.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "Hidden rather than unmounted when inactive, so anything typed into a panel is\nstill there when the reader comes back to it, and so the content is in the\nserver's markup for a crawler regardless of which tab is open.",
-          "name": "HelixHeadlessTabsPanel",
+          "name": "HelixHeadlessTabPanel",
           "cssParts": [
             {
               "description": "The panel container.",
@@ -58222,27 +58900,27 @@
             "group": "BaseTabs",
             "part": "Panel"
           },
-          "tagName": "helix-headless-tabs-panel",
+          "tagName": "helix-headless-tab-panel",
           "customElement": true,
-          "modulePath": "src/tabs/panel/tabs-panel.ts",
-          "definitionPath": "src/tabs/panel/tabs-panel.ts"
+          "modulePath": "src/tabs/panel/tab-panel.ts",
+          "definitionPath": "src/tabs/panel/tab-panel.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixHeadlessTabsPanel",
+          "name": "HelixHeadlessTabPanel",
           "declaration": {
-            "name": "HelixHeadlessTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
+            "name": "HelixHeadlessTabPanel",
+            "module": "src/tabs/panel/tab-panel.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-headless-tabs-panel",
+          "name": "helix-headless-tab-panel",
           "declaration": {
-            "name": "HelixHeadlessTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
+            "name": "HelixHeadlessTabPanel",
+            "module": "src/tabs/panel/tab-panel.ts"
           }
         }
       ]
@@ -58338,7 +59016,7 @@
               "kind": "field",
               "name": "tabs",
               "type": {
-                "text": "HelixHeadlessTabsTab[]"
+                "text": "HelixHeadlessTab[]"
               },
               "privacy": "private",
               "readonly": true
@@ -58347,7 +59025,7 @@
               "kind": "field",
               "name": "panels",
               "type": {
-                "text": "HelixHeadlessTabsPanel[]"
+                "text": "HelixHeadlessTabPanel[]"
               },
               "privacy": "private",
               "readonly": true
@@ -58790,12 +59468,12 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/tab/tabs-tab.ts",
+      "path": "src/tabs/tab/tab.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "An element rather than a slot because it owns selection and its own tab stop.\n\nIts id and the id it controls are both derived from `value`, so the pairing\nbetween a tab and its panel survives server rendering. A generated id would\ndiffer between the server's render and the client's and break the link, and\n`aria-controls` pointing at nothing is worse than not being there.",
-          "name": "HelixHeadlessTabsTab",
+          "name": "HelixHeadlessTab",
           "cssParts": [
             {
               "description": "The tab itself.",
@@ -59095,27 +59773,27 @@
             "group": "BaseTabs",
             "part": "Tab"
           },
-          "tagName": "helix-headless-tabs-tab",
+          "tagName": "helix-headless-tab",
           "customElement": true,
-          "modulePath": "src/tabs/tab/tabs-tab.ts",
-          "definitionPath": "src/tabs/tab/tabs-tab.ts"
+          "modulePath": "src/tabs/tab/tab.ts",
+          "definitionPath": "src/tabs/tab/tab.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixHeadlessTabsTab",
+          "name": "HelixHeadlessTab",
           "declaration": {
-            "name": "HelixHeadlessTabsTab",
-            "module": "src/tabs/tab/tabs-tab.ts"
+            "name": "HelixHeadlessTab",
+            "module": "src/tabs/tab/tab.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-headless-tabs-tab",
+          "name": "helix-headless-tab",
           "declaration": {
-            "name": "HelixHeadlessTabsTab",
-            "module": "src/tabs/tab/tabs-tab.ts"
+            "name": "HelixHeadlessTab",
+            "module": "src/tabs/tab/tab.ts"
           }
         }
       ]

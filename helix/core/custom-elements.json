@@ -4083,6 +4083,14 @@
         },
         {
           "kind": "js",
+          "name": "elapsedTime",
+          "declaration": {
+            "name": "elapsedTime",
+            "module": "./utils/elapsed-time/elapsed-time.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "deepActiveElement",
           "declaration": {
             "name": "deepActiveElement",
@@ -4351,6 +4359,14 @@
           "declaration": {
             "name": "slotFilled",
             "module": "./utils/slot-filled/slot-filled.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "subscribe",
+          "declaration": {
+            "name": "subscribe",
+            "module": "./utils/ticker/ticker.js"
           }
         },
         {
@@ -6748,6 +6764,40 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/elapsed-time/elapsed-time.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "elapsedTime",
+          "return": {
+            "type": {
+              "text": "((from: Date, now: Date) => Relative)"
+            }
+          },
+          "parameters": [
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "A formatter for one locale, kept.\n\n`now` is a parameter rather than read from the clock, for the reason\n`relativeTime` gives: a function that reads `Date.now()` internally can only\nbe tested by waiting or by replacing a global, and both produce specs that\nfail on a slow machine."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "elapsedTime",
+          "declaration": {
+            "name": "elapsedTime",
+            "module": "src/utils/elapsed-time/elapsed-time.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/utils/focusable-elements/focusable-elements.ts",
       "declarations": [
         {
@@ -7440,6 +7490,46 @@
           "declaration": {
             "name": "slotFilled",
             "module": "src/utils/slot-filled/slot-filled.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/ticker/ticker.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "subscribe",
+          "return": {
+            "type": {
+              "text": "(() => void)"
+            }
+          },
+          "parameters": [
+            {
+              "name": "delay",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "run",
+              "type": {
+                "text": "() => void"
+              }
+            }
+          ],
+          "description": "Asks to be run in `delay` milliseconds, and returns the way to stop asking.\n\nThe returned function is the whole of the contract: an element that forgets to\ncall it on disconnect leaks a closure over itself for the life of the page,\nand a panel that opens and closes leaks one per open."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "subscribe",
+          "declaration": {
+            "name": "subscribe",
+            "module": "src/utils/ticker/ticker.ts"
           }
         }
       ]

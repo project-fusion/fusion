@@ -1,0 +1,15 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <>
+      <helix-headless-icon name="caret-down"></helix-headless-icon>{' '}
+      <helix-headless-icon name="check-circle"></helix-headless-icon>{' '}
+      <helix-headless-icon name="gear"></helix-headless-icon>{' '}
+      <helix-headless-icon name="lightbulb"></helix-headless-icon>{' '}
+      <helix-headless-icon name="magnifying-glass"></helix-headless-icon>{' '}
+      <helix-headless-icon name="shield-check"></helix-headless-icon>{' '}
+      <helix-headless-icon label="Warning" name="warning"></helix-headless-icon>
+    </>
+  )
+}

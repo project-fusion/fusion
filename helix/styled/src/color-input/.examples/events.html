@@ -1,0 +1,68 @@
+<!-- @summary A field and the picker it opens, which announce as two things because they are. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-color-input
+    id="brand"
+    label="Brand"
+    name="brand"
+  ></helix-color-input>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open the swatch, then choose a color</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const brand = document.getElementById('brand')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 8
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  brand.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'the panel is about to show, refusable')
+  })
+  brand.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'the panel is about to go, refusable')
+  })
+  brand.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+  })
+  brand.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  brand.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  brand.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+</script>

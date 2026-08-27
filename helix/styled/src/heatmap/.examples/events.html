@@ -1,0 +1,68 @@
+<!-- @summary A measurement, not a proposal: the grid says how many cells it can show. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-heatmap
+    for="uptime"
+    id="grid"
+    label="Uptime, last 30 days"
+  >
+    <table
+      data-hidden-visually
+      id="uptime"
+    >
+      <caption>Uptime</caption>
+      <tbody>
+        <tr><th scope="row">2026-08-01</th><td>100</td></tr>
+        <tr><th scope="row">2026-08-02</th><td>98</td></tr>
+        <tr><th scope="row">2026-08-03</th><td>100</td></tr>
+      </tbody>
+    </table>
+  </helix-heatmap>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Narrow the preview until a column drops</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const grid = document.getElementById('grid')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* Not cancelable, and that is the shape rather than an omission: the grid is
+     reporting what it can show, and the number is true whether or not anybody
+     wanted it. See 303. */
+  grid.addEventListener('helix-resize', (event) => {
+    say('helix-resize', `${event.detail.size} cells fit, which is a report`)
+  })
+</script>

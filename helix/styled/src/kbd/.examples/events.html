@@ -1,0 +1,59 @@
+<!-- @summary A key that binds as well as draws, and says so where it is bound. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-input
+    aria-label="Filter"
+    placeholder="Filter"
+  >
+    <helix-kbd
+      id="key"
+      keys="/"
+      slot="end"
+      within="control"
+    ></helix-kbd>
+  </helix-input>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Put the cursor in the field and press slash</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const key = document.getElementById('key')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  key.addEventListener('helix-shortcut', (event) => {
+    say('helix-shortcut', `${event.detail.keys} was pressed inside the field it sits in`)
+  })
+</script>

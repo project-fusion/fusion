@@ -1,0 +1,15 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <helix-headless-file-input
+      hint="PNG or JPG, up to 10MB each"
+      label="Attachments"
+      multiple
+      name="attachments"
+    >
+      <helix-headless-icon name="upload-simple" slot="trigger"></helix-headless-icon>
+      <span slot="trigger">Choose files, or drop them here</span>
+    </helix-headless-file-input>
+  )
+}

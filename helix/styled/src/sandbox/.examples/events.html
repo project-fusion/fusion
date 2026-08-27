@@ -1,0 +1,69 @@
+<!-- @summary An edit, a caret, a divider and a log, which are four different things. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-sandbox id="pad">
+    <helix-sandbox-source
+      name="html"
+      slot="source"
+      value="<p>Hello</p>"
+    ></helix-sandbox-source>
+    <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+  </helix-sandbox>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type in the source, then drag the divider</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const pad = document.getElementById('pad')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 7
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  pad.addEventListener('helix-before-edit', (event) => {
+    say('helix-before-edit', `the source pane proposed ${event.detail.value.length} characters`)
+  })
+  pad.addEventListener('helix-caret', (event) => {
+    say('helix-caret', `line ${event.detail.line}, column ${event.detail.column}`)
+  })
+  pad.addEventListener('helix-before-resize', (event) => {
+    say('helix-before-resize', `${event.detail.property} settling at ${event.detail.value}`)
+  })
+  pad.addEventListener('helix-resize', (event) => {
+    say('helix-resize', `the frame measured itself at ${event.detail.size}`)
+  })
+  pad.addEventListener('helix-console', (event) => {
+    say('helix-console', `${event.detail.level}: ${event.detail.text}`)
+  })
+</script>

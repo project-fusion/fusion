@@ -1,0 +1,71 @@
+<!-- @summary A panel across the navigation, announcing before it moves and after. -->
+<!-- @layout padded -->
+<!-- @min 360 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-navigation label="Main">
+    <a href="#overview">Overview</a>
+    <helix-megamenu
+      id="products"
+      label="Products"
+    >
+      <div data-megamenu-group>
+        <h3 data-megamenu-heading>Design</h3>
+        <a
+          data-megamenu-item
+          href="#helix"
+        >Helix</a>
+      </div>
+    </helix-megamenu>
+  </helix-navigation>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open the panel, then close it</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const products = document.getElementById('products')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  products.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, and refusable')
+  })
+  products.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to close, and refusable')
+  })
+  products.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+</script>

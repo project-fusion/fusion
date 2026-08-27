@@ -1,0 +1,67 @@
+<!-- @summary A panel that opens and an item that is chosen, which travel differently. -->
+<!-- @min 300 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-menu
+    id="actions"
+    label="Actions"
+  >
+    <helix-button slot="trigger">Actions</helix-button>
+    <helix-menu-item value="rename">Rename</helix-menu-item>
+    <helix-menu-item value="duplicate">Duplicate</helix-menu-item>
+    <helix-menu-item value="archive">Archive</helix-menu-item>
+  </helix-menu>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open the menu and choose an item</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const actions = document.getElementById('actions')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  actions.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, and refusable')
+  })
+  actions.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to close, and refusable')
+  })
+  actions.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+  actions.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" was chosen, and this one bubbles`)
+  })
+</script>

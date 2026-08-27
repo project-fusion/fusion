@@ -1,0 +1,15 @@
+export function Example() {
+  return (
+    <helix-command default-open label="Commands">
+      {' '}
+      <helix-option value="new">New file</helix-option>{' '}
+      <helix-option value="open">Open folder</helix-option>{' '}
+      <helix-option value="save">Save all</helix-option>{' '}
+      <helix-text slot="footer">
+        {' '}
+        <helix-kbd>Cmd</helix-kbd> <helix-kbd>K</helix-kbd> to open, <helix-kbd>Esc</helix-kbd> to
+        close{' '}
+      </helix-text>{' '}
+    </helix-command>
+  )
+}

@@ -1,0 +1,18 @@
+export function Example() {
+  return (
+    <helix-flex gap="xs">
+      <helix-tag>
+        <span slot="prefix">Priority</span>
+        High
+      </helix-tag>
+      <helix-tag tone="info">
+        <span slot="prefix">Env</span>
+        Staging
+      </helix-tag>
+      <helix-tag dismissible tone="success">
+        <span slot="prefix">Owner</span>
+        Ada
+      </helix-tag>
+    </helix-flex>
+  )
+}

@@ -222,6 +222,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   }
 
   private readonly handleInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const control = event.target as HTMLInputElement
     if (this.range) {
       const [start, end] = this.bounds

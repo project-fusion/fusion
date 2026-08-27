@@ -1,0 +1,13 @@
+export function Example() {
+  return (
+    <helix-time-input
+      default-value="09:30"
+      hint="Between nine and five, every half hour"
+      label="Appointment"
+      max="17:00"
+      min="09:00"
+      name="appointment"
+      step={30}
+    ></helix-time-input>
+  )
+}

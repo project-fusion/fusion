@@ -1,0 +1,23 @@
+import './disabled.css'
+
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-input
+        default-value="Cannot be edited"
+        disabled
+        hint="Hint"
+        label="Written off"
+      ></helix-input>
+
+      {/* The same state, arriving from an ancestor fieldset. */}
+      <fieldset disabled>
+        <helix-input
+          default-value="Also cannot be edited"
+          hint="Hint"
+          label="Off from the fieldset"
+        ></helix-input>
+      </fieldset>
+    </helix-flex>
+  )
+}

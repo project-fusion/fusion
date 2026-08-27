@@ -1,6 +1,7 @@
-/* Three rows: header, the transcript that scrolls, and everything under it. The
-   transcript scrolls and nothing else does, because a composer that slides away
-   as the reader scrolls up to re-read is the thing they were about to type into. */
+/* Five rows: the header, the transcript that scrolls, the way back over it, the
+   status band and the composer. The transcript scrolls and nothing else does,
+   because a composer that slides away as the reader scrolls up to re-read is the
+   thing they were about to type into. */
 :host {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto auto;
@@ -103,6 +104,11 @@
    controls belong to the whole thing rather than to any turn in it, so they sit
    with the title rather than in the transcript. */
 [part="header"] {
+  /* The tag step comes down with the control step, for the same reason: a model
+     name beside a title is a label on the conversation rather than a control in
+     it, and at the default step it stood as tall as the controls opposite it. */
+  --helix-size-tag: var(--helix-size-tag-sm);
+
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--chat-rule, var(--helix-color-border));
   display: flex;
@@ -173,8 +179,12 @@
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }
 
+/* **No rule above it, and there was one.** The composer draws its own edge now,
+   so a hairline twelve pixels above that edge is a second line separating the
+   same two things, and the pair reads as one badly drawn border. The header
+   keeps its rule because a header is a band of chrome with nothing else to bound
+   it; a composer is a control and a control's own edge is its boundary. */
 [part="composer"] {
-  border-block-start: var(--helix-border-thin) solid var(--chat-rule, var(--helix-color-border));
   padding-block: var(--helix-space-sm);
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }

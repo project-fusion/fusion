@@ -1,0 +1,35 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-sparkline
+        label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
+        plot="area"
+        values="1240 1318 1102 1291 1244 1180 1102"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
+        values="1240 1318 1102 1291 1244 1180 1102"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="The same seven readings as columns. They measure from zero, so they are nearly the same height, because they nearly are"
+        plot="bar"
+        values="1240 1318 1102 1291 1244 1180 1102"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Columns suit a series that reaches toward zero, where the lengths carry the differences"
+        plot="bar"
+        values="4 12 7 15 9 3 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Thin, for a sparkline set in a table row among many"
+        values="1240 1318 1102 1291 1244 1180 1102"
+        weight="thin"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Thick, for one standing on its own"
+        values="1240 1318 1102 1291 1244 1180 1102"
+        weight="thick"
+      ></helix-sparkline>
+    </helix-flex>
+  )
+}

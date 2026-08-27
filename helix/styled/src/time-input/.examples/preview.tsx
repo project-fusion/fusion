@@ -1,0 +1,9 @@
+export function Example() {
+  return (
+    <helix-time-input
+      hint="Every quarter hour, or type one"
+      label="Starts"
+      name="starts"
+    ></helix-time-input>
+  )
+}

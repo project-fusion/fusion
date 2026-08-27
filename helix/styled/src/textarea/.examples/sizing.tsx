@@ -1,0 +1,19 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="md">
+      <helix-textarea
+        hint="Two hundred at most"
+        label="Summary"
+        maxLength="200"
+        rows={2}
+      ></helix-textarea>
+
+      <helix-textarea
+        hint="Forty at least, so there is something to review"
+        label="Detail"
+        minlength="40"
+        rows={6}
+      ></helix-textarea>
+    </helix-flex>
+  )
+}

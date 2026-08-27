@@ -1,0 +1,31 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-meter
+        high={25}
+        label="Temperature"
+        low={15}
+        optimum={20}
+        show-value
+        value={22}
+      ></helix-meter>
+      <helix-meter
+        high={25}
+        label="Temperature"
+        low={15}
+        optimum={20}
+        show-value
+        value={34}
+      ></helix-meter>
+      <helix-meter
+        band="poor"
+        high={25}
+        label="Temperature"
+        low={15}
+        optimum={20}
+        show-value
+        value={34}
+      ></helix-meter>
+    </helix-flex>
+  )
+}

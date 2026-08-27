@@ -1,0 +1,40 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="sm">
+      <helix-sparkline label="Line, full strength" values="4 9 6 11 8 14 12 18"></helix-sparkline>
+      <helix-sparkline
+        emphasis="subtle"
+        label="Line, as context"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Area, full strength"
+        plot="area"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        emphasis="outlined"
+        label="Area, the line carrying it"
+        plot="area"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        emphasis="solid"
+        label="Area, the fill carrying it"
+        plot="area"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Bars, full strength"
+        plot="bar"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+      <helix-sparkline
+        emphasis="outlined"
+        label="Bars, edged"
+        plot="bar"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
+    </helix-flex>
+  )
+}

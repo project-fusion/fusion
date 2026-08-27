@@ -267,6 +267,26 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     }
   }
 
+  /**
+   * A press anywhere in the way back takes the reader back.
+   *
+   * **The affordance was inert, in the component and in every example.** The
+   * control is slotted so the consumer picks the words, and `resume()` was
+   * public "because the control offering it is the consumer's and needs
+   * something to call". True, and it left a button this element positions, lifts
+   * and shows and hides doing nothing at all until somebody wired it, which none
+   * of the five examples did: the one control whose whole job is to undo a
+   * scroll shipped as decoration.
+   *
+   * The region exists for exactly one purpose, so a press inside it has exactly
+   * one meaning and this element is entitled to act on it. `resume()` stays
+   * public for the other callers it was always for: a keyboard shortcut, or a
+   * consumer's own control somewhere else on the page.
+   */
+  private readonly handleResume = (): void => {
+    this.resume()
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     /* **A turn that arrives after first paint reaches nothing on its own.**
@@ -366,7 +386,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
         ${this.renderStatus(this.messages.length > 0)}
       </div>
-      <div part="resume" ?hidden=${!away || !this.has('resume')}>
+      <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>
         <slot name="resume"></slot>
       </div>
       <div part="status" role="status" ?hidden=${!this.has('status')}>

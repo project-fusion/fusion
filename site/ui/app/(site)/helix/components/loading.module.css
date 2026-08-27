@@ -1,0 +1,47 @@
+/* A place to put `inert`, and not a box. The hero, the filter bar and the grid
+   have to stay direct children of the layout that lays them out. */
+.standIn {
+  display: contents;
+}
+
+/* The boxes the gallery's skeleton stands in.
+ *
+ * Sized to what they replace rather than to a convenient number, because the
+ * point of a skeleton is that nothing moves when the real thing lands. Each
+ * measurement here is the rendered height of the element it precedes.
+ *
+ * `helix-skeleton` is `inline-size: 100%` and takes its height from its
+ * container unless `shape` says otherwise, so every rule here is a box and the
+ * component fills it. */
+
+.heroTitle {
+  block-size: var(--helix-text-3xl);
+  inline-size: min(22rem, 60%);
+}
+
+.heroLede {
+  block-size: var(--helix-text-lg);
+  inline-size: min(34rem, 80%);
+}
+
+.heroSearch {
+  block-size: var(--helix-size-control);
+  inline-size: min(28rem, 100%);
+}
+
+.filterControl {
+  block-size: var(--helix-size-control-sm);
+  inline-size: 7rem;
+}
+
+/* The drawing each card carries. A square, which is what `ComponentArt` renders
+   into, so the grid's row heights are the ones the catalog will produce. */
+.cardArt {
+  aspect-ratio: 1 / 1;
+  inline-size: 100%;
+}
+
+.cardName {
+  margin-block-start: var(--helix-space-sm);
+  inline-size: 60%;
+}

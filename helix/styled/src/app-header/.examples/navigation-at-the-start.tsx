@@ -1,0 +1,17 @@
+export function Example() {
+  return (
+    <helix-app-header content-align="start">
+      <helix-text slot="brand" variant="label">
+        Fusion
+      </helix-text>
+      <helix-navigation label="Main">
+        <a href="#products">Products</a>
+        <a href="#services">Services</a>
+        <a href="#insights">Insights</a>
+      </helix-navigation>
+      <helix-button emphasis="solid" slot="actions" tone="primary">
+        Sign in
+      </helix-button>
+    </helix-app-header>
+  )
+}

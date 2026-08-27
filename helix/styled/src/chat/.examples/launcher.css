@@ -1,0 +1,23 @@
+/* **The corner goes on the trigger, not on the popover.** A `helix-popover` host
+   is `display: contents`: it generates no box at all, so it takes no position
+   and the panel is placed against whatever opened it. Which is the right shape
+   for this, because the launcher a page puts in its corner is the button, and
+   the conversation is only ever wherever that button turned out to be. */
+.launcher-trigger {
+  inset-block-end: var(--helix-space-lg);
+  inset-inline-end: var(--helix-space-lg);
+  position: fixed;
+}
+
+/* The panel is sized from the popover's own hooks, which inherit into its
+   shadow root. The inset goes to none because the conversation pads each of its
+   regions already, and two sets of padding hold the composer's rule short of
+   the panel's edge. */
+.launcher {
+  --popover-inline-size: 22rem;
+  --popover-inset: var(--helix-space-none);
+}
+
+.launcher-chat {
+  --chat-max-height: 24rem;
+}

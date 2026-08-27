@@ -1,0 +1,14 @@
+export function Example() {
+  return (
+    <helix-checkbox-group
+      hint="Hint"
+      label="Label"
+      name="group"
+      orientation="horizontal"
+      value="one"
+    >
+      <helix-checkbox value="one">Option One</helix-checkbox>
+      <helix-checkbox value="two">Option Two</helix-checkbox>
+    </helix-checkbox-group>
+  )
+}

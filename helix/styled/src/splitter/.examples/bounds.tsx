@@ -1,0 +1,15 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-splitter default-position="40" max={70} min={20} step={5}>
+        <div slot="start">Between a fifth and seven tenths, five at a time.</div>
+        <div slot="end">The other side.</div>
+      </helix-splitter>
+
+      <helix-splitter default-collapsed>
+        <div slot="start">Folded away until the divider is moved.</div>
+        <div slot="end">The whole width, for now.</div>
+      </helix-splitter>
+    </helix-flex>
+  )
+}

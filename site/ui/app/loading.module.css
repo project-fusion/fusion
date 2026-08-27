@@ -1,0 +1,38 @@
+/* The centered fallback, and the delay that keeps it from flashing.
+ *
+ * `animation` rather than `transition`, because there is nothing to transition
+ * from: the element is painted once and never changes state. A forwards
+ * animation with a delay is the shape that says "invisible, then visible" for
+ * something that only ever arrives.
+ *
+ * `dvh` rather than `vh`, so the box is the space actually available on a phone
+ * with a retracting toolbar rather than the space there would be without one. */
+.loading {
+  align-items: center;
+  animation: siteLoadingArrive var(--helix-duration-normal) var(--helix-easing-decelerate)
+    var(--helix-duration-slow) both;
+  display: flex;
+  justify-content: center;
+  min-block-size: 60dvh;
+}
+
+@keyframes siteLoadingArrive {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* A reader who has asked for less motion still needs to know it is working, so
+   the loader stays and only its fade stops. `--helix-duration-instant` is the
+   scale's own zero, which is what the token layer emits for a theme asking for
+   no motion at all: the delay is kept, because a wait that is too short to be
+   worth reporting is too short whatever a reader thinks of animation. */
+@media (prefers-reduced-motion: reduce) {
+  .loading {
+    animation-duration: var(--helix-duration-instant);
+  }
+}

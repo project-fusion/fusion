@@ -1,0 +1,61 @@
+<!-- @summary An option says it was chosen, and the list it is in is what hears it. -->
+<!-- @min 300 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-listbox
+    id="owner"
+    label="Assignee"
+  >
+    <helix-option value="ada">Ada Okonjo</helix-option>
+    <helix-option value="grace">Grace Hopper</helix-option>
+    <helix-option value="alan">Alan Turing</helix-option>
+  </helix-listbox>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Choose an option</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const owner = document.getElementById('owner')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* On the list rather than on each option, and that is the difference from a
+     lifecycle event: `helix-select` bubbles and is composed, so a container
+     hears it without being told which child sent it. `composedPath()[0]` is
+     which one, and survives the shadow boundary where `target` would not. */
+  owner.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" from <${event.composedPath()[0].localName}>`)
+  })
+</script>

@@ -1,0 +1,14 @@
+export function Example() {
+  return (
+    <helix-checkbox-group
+      feedback="Choose at least one"
+      hint="Pick everything that applies"
+      label="Notify me about"
+      name="notify"
+    >
+      <helix-checkbox value="deploys">Deploys</helix-checkbox>
+      <helix-checkbox value="incidents">Incidents</helix-checkbox>
+      <helix-checkbox value="digest">Weekly digest</helix-checkbox>
+    </helix-checkbox-group>
+  )
+}

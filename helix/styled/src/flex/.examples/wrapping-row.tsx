@@ -1,0 +1,25 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-flex gap="sm" justify="between" wrap>
+        <helix-tag>Design</helix-tag>
+        <helix-tag>Engineering</helix-tag>
+        <helix-tag>Research</helix-tag>
+        <helix-tag>Operations</helix-tag>
+        <helix-tag>Finance</helix-tag>
+        <helix-tag>Legal</helix-tag>
+        <helix-tag>Support</helix-tag>
+        <helix-tag>Security</helix-tag>
+      </helix-flex>
+
+      <p>
+        Deploys are gated on{' '}
+        <helix-flex gap="2xs" inline>
+          <helix-tag tone="success">passing</helix-tag>
+          <helix-tag tone="warning">review</helix-tag>
+        </helix-flex>{' '}
+        before they reach production.
+      </p>
+    </helix-flex>
+  )
+}

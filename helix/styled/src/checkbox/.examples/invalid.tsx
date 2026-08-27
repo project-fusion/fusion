@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <helix-checkbox
+      feedback="You have to accept these to continue"
+      hint="They are short"
+      label="Terms"
+      name="terms"
+      value="accepted"
+    ></helix-checkbox>
+  )
+}

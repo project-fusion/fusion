@@ -1,0 +1,76 @@
+export function Example() {
+  return (
+    <helix-radio-group default-value="1" label="How was your experience?" orientation="horizontal">
+      <helix-radio value="-2" variant="chip">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          slot="icon"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6.5 15.6c1.4-2.3 3.3-3.4 5.5-3.4s4.1 1.1 5.5 3.4" />
+        </svg>
+        Very dissatisfied
+      </helix-radio>
+      <helix-radio value="-1" variant="chip">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          slot="icon"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6.5 14.8c1.4-1.5 3.3-2.2 5.5-2.2s4.1.7 5.5 2.2" />
+        </svg>
+        Dissatisfied
+      </helix-radio>
+      <helix-radio value="0" variant="chip">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          slot="icon"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6.5 13.5h11" />
+        </svg>
+        Neutral
+      </helix-radio>
+      <helix-radio value="1" variant="chip">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          slot="icon"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6.5 12.2c1.4 1.5 3.3 2.2 5.5 2.2s4.1-.7 5.5-2.2" />
+        </svg>
+        Satisfied
+      </helix-radio>
+      <helix-radio value="2" variant="chip">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          slot="icon"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6.5 11.4c1.4 2.3 3.3 3.4 5.5 3.4s4.1-1.1 5.5-3.4" />
+        </svg>
+        Very satisfied
+      </helix-radio>
+    </helix-radio-group>
+  )
+}

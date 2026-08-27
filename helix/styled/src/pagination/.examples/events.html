@@ -1,0 +1,57 @@
+<!-- @summary Paging chooses nothing, so it says where it is going and not what the answer is. -->
+<!-- @layout hug -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-pagination
+    default-page="4"
+    id="pages"
+    pages="12"
+  ></helix-pagination>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Move between pages</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const pages = document.getElementById('pages')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  pages.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing page ${event.detail.value}, refusable`)
+  })
+  pages.addEventListener('helix-navigate', (event) => {
+    say('helix-navigate', `page ${event.detail.value}, which is a move and not a choice`)
+  })
+</script>

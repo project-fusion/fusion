@@ -1,0 +1,72 @@
+<!-- @summary Each section announces for itself, and a listener on the set hears nothing. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-accordion id="sections">
+    <helix-accordion-item>
+      <span slot="summary">Deployment</span>
+      Every push to main builds and promotes.
+    </helix-accordion-item>
+    <helix-accordion-item>
+      <span slot="summary">Billing</span>
+      Invoices are issued on the first of the month.
+    </helix-accordion-item>
+  </helix-accordion>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open a section, then another</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const sections = document.getElementById('sections')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* Bound to each section rather than to the accordion, and that is the point
+     rather than a detail. Lifecycle events do not bubble and are not composed,
+     so a listener on the set hears nothing at all: overlays nest, and an inner
+     one closing must never read as the outer one closing. Coordination events
+     are the opposite and would arrive here. */
+  for (const section of sections.querySelectorAll('helix-accordion-item')) {
+    const name = section.querySelector('[slot="summary"]').textContent
+    section.addEventListener('helix-before-open', () => {
+      say('helix-before-open', `${name} is about to open, and this is refusable`)
+    })
+    section.addEventListener('helix-before-close', () => {
+      say('helix-before-close', `${name} is about to close, and this is refusable`)
+    })
+    section.addEventListener('toggle', (event) => {
+      say('toggle', `${name} went ${event.oldState} to ${event.newState}`)
+    })
+  }
+</script>

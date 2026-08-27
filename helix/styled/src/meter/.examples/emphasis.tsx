@@ -1,0 +1,23 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="md">
+      <helix-meter high={80} label="Disk" low={40} show-value value={88}></helix-meter>
+      <helix-meter
+        emphasis="subtle"
+        high={80}
+        label="Memory"
+        low={40}
+        show-value
+        value={52}
+      ></helix-meter>
+      <helix-meter
+        emphasis="subtle"
+        high={80}
+        label="Network"
+        low={40}
+        show-value
+        value={21}
+      ></helix-meter>
+    </helix-flex>
+  )
+}

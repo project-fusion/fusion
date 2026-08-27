@@ -1,0 +1,12 @@
+export function Example() {
+  return (
+    <helix-date-picker
+      default-month="2026-08"
+      default-value="2026-08-05,2026-08-06,2026-08-20"
+      first-day-of-week="1"
+      label="Label"
+      locale="en-GB"
+      mode="multiple"
+    ></helix-date-picker>
+  )
+}

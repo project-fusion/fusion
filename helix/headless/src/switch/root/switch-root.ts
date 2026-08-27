@@ -133,6 +133,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
           @change=${this.handleChange}
+          @input=${this.stopInner}
         />
         <span part="thumb" aria-hidden="true"></span>
       </span>

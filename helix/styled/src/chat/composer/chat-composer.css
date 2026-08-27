@@ -1,30 +1,36 @@
-/* One row: what comes before the field, the field, what comes after, and send.
-   The field takes the room and grows down to a ceiling, because a composer that
-   grows without one eats the transcript it belongs to. */
+/* The field, and a row of tools under it. The whole thing is one box with one
+   edge, so a consumer's attachment control and the send control read as parts of
+   the composer rather than as three controls that happen to be adjacent.
+
+   `focus-within` on the box rather than a ring on the textarea, for the reason
+   `Input` gives about a field with a mark in it: the reader is typing into the
+   composer, and a ring drawn around the inner half of it says the wrong thing
+   about where they are. */
 :host {
   display: block;
 }
 
 [part="composer"] {
-  align-items: end;
-  display: grid;
-  /* A step up from `2xs`, which had the send control touching whatever was
-     slotted before it: four pixels between a solid fill and a ghost button reads
-     as one control that lost its left half. Eight separates them and still reads
-     as one row. */
-  gap: var(--helix-space-xs);
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-}
-
-[part="start"]:not(:has(*)),
-[part="end"]:not(:has(*)) {
-  display: none;
-}
-
-[part="field"] {
   background-color: var(--chat-composer-background, var(--helix-color-surface));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--chat-composer-border-width, var(--helix-border-thin)) solid
+    var(--helix-color-border);
   border-radius: var(--helix-radii-md);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  padding: var(--helix-space-xs);
+}
+
+[part="composer"]:focus-within {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The field owns no edge and no ground of its own: it is the inside of the box
+   above, and a second border inside the first is the double-struck look every
+   field rule in this library exists to prevent. */
+[part="field"] {
+  background-color: transparent;
+  border: 0;
   color: var(--helix-color-foreground);
   /* `field-sizing` grows the box with the text and stops at the ceiling, which
      is the whole of the auto-grow behavior with no script measuring anything.
@@ -35,56 +41,107 @@
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
   max-block-size: var(--chat-composer-max-height, 12rem);
-  /* **One row, one height.** The field, the send control and whatever a consumer
-     slots beside them are the same row and have to agree, and they did not: the
-     field came out 38 pixels from its own padding, the send control 33 from a
-     different padding, and an `IconButton` in the `start` slot 40 from
-     `--helix-size-control`, which is what every other control in the library
-     takes. Measured in a 34rem panel, the composer grew from 38 to 40 the moment
-     an attachment button was slotted, and the send control sat five pixels short
-     of the field it belongs to for as long as the component existed.
-
-     `min-block-size` rather than `block-size`, because the field grows: this is
-     the floor a one-line composer rests at, and `field-sizing` takes it up from
-     there. */
-  min-block-size: var(--helix-size-control);
-  /* **Derived rather than picked, so the one line in an empty composer sits on
-     the same center as everything beside it.** A textarea top-aligns its text,
-     so `padding-block: xs` with a `min-block-size` floor left the box at 40 and
-     the text at the top of it: measured, the placeholder's center was 287 while
-     the send label's and the attach glyph's were both 289. Splitting whatever is
-     left of the control's height after one line and two borders puts it at 289
-     too, and keeps the field symmetric as it grows to two lines and three. */
-  padding-block: calc((var(--helix-size-control) - 1lh - var(--helix-border-thin) * 2) / 2);
-  padding-inline: var(--helix-space-sm);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs);
   resize: none;
 }
 
 [part="field"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline: none;
 }
 
-/* Primary, for the reason the own-turn tint is: send is the ordinary affirmative
-   control and every other one in the library is `tone="primary"` by default.
-   Painting it `accent-surface` made the accent the color of an action nobody
-   opted into, and put an orange button under a chat on an otherwise blue page. */
+/* The tools, with whatever a consumer put before the field at the leading edge
+   and the send control at the trailing one.
+
+   **`flex-end` plus one auto margin, and not `space-between`.** Most composers
+   slot nothing at all, and `space-between` with a single visible child puts that
+   child at the *start*: the send control sat at the bottom left of every
+   composer that had no tools, which is every one in the library's own examples
+   but the assistant. This way the row ends at the trailing edge whatever is in
+   it, and a filled `start` pushes itself back to the leading one. */
+[part="tools"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  justify-content: flex-end;
+}
+
+/* A dense row declares the size once, so nothing slotted has to be told. The
+   tools are chrome beside the thing being written, not controls in their own
+   right, and at the full step two of them are taller than the line of text
+   above them. */
+[part="start"],
+[part="end"] {
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+}
+
+/* The leading tools push everything after them to the trailing edge. */
+[part="start"] {
+  margin-inline-end: auto;
+}
+
+/* `end` sits beside `send` rather than at the other end of the row, so the two
+   read as one cluster: a stop control belongs with the control it replaces. */
+[part="end"] {
+  margin-inline-end: var(--helix-space-2xs);
+}
+
+/* Nothing in them, no box and no gap beside it. There is no selector that can
+   ask whether a slot was filled, so the element says so. See `slotFilled`. */
+[part="start"][data-empty],
+[part="end"][data-empty] {
+  display: none;
+}
+
+/* Square, because it holds a glyph and nothing else.
+
+   **Subtle and monotone, and a notch inside the small control step.** A filled
+   primary square is what a page's one affirmative action looks like, and this is
+   not on a page: it is inside the composer, under the words being written, and
+   at that strength it was the loudest thing in a component whose whole subject
+   is the text above it. `emphasis="subtle"` is the library's word for the
+   strength, "coloured without reading as the one thing to press", and `Button`'s
+   recipe is the shape of it: a wash of the tone with the tone as the ink, and a
+   stronger wash under the pointer.
+
+   The tone is the foreground rather than the brand. Blue put a second color in a
+   composer that already has one on the reader's own turns above it, and pointed
+   at the least surprising control in the component: nobody needs telling which
+   button sends. Monotone leaves it reading as a control, because it has a fill
+   where the tools beside it have none, without reading as an argument.
+
+   The size is `sm` less the smallest space, which is 28. A control that sits on
+   a page takes a step off the control ladder; this one sits inside another
+   control, so it is deliberately a notch inside the step its neighbours take,
+   and 28 still clears the 24 a pointer target is meant to. Drawn at 32, 28 and
+   24 and compared: 24 crowds the glyph and spends the whole target allowance,
+   32 is the same size as a slotted tool and reads as one. */
 [part="send"] {
-  background-color: var(--helix-color-primary-surface);
+  align-items: center;
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  block-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
   border: 0;
-  border-radius: var(--helix-radii-md);
-  color: var(--helix-color-foreground-on-accent);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
   cursor: pointer;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  /* The same floor as the field, for the same reason. See the note above. */
-  min-block-size: var(--helix-size-control);
-  padding-block: var(--helix-space-xs);
-  padding-inline: var(--helix-space-sm);
+  display: inline-flex;
+  inline-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  justify-content: center;
+  padding: var(--helix-space-none);
+}
+
+[part="mark"] {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
 }
 
 [part="send"]:hover:not(:disabled) {
-  background-color: var(--helix-color-primary-surface-hover);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 20%, transparent);
 }
 
 [part="send"]:disabled {

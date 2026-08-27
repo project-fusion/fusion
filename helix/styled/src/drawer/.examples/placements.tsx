@@ -1,0 +1,48 @@
+export function Example() {
+  return (
+    <>
+      <helix-flex gap="sm">
+        <helix-button command="--show" commandfor="start-drawer">
+          Start
+        </helix-button>
+        <helix-button command="--show" commandfor="end-drawer">
+          End
+        </helix-button>
+        <helix-button command="--show" commandfor="top-drawer">
+          Top
+        </helix-button>
+        <helix-button command="--show" commandfor="bottom-drawer">
+          Bottom
+        </helix-button>
+      </helix-flex>
+
+      <helix-drawer id="start-drawer" label="Start" placement="start">
+        <span slot="header">Start</span>
+        <helix-text variant="body">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </helix-text>
+      </helix-drawer>
+
+      <helix-drawer id="end-drawer" label="End" placement="end">
+        <span slot="header">End</span>
+        <helix-text variant="body">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </helix-text>
+      </helix-drawer>
+
+      <helix-drawer id="top-drawer" label="Top" placement="top">
+        <span slot="header">Top</span>
+        <helix-text variant="body">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </helix-text>
+      </helix-drawer>
+
+      <helix-drawer id="bottom-drawer" label="Bottom" placement="bottom">
+        <span slot="header">Bottom</span>
+        <helix-text variant="body">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </helix-text>
+      </helix-drawer>
+    </>
+  )
+}

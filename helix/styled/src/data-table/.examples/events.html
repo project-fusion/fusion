@@ -1,0 +1,87 @@
+<!-- @summary Three questions about one result, and not one of them is a value changing. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-data-table
+    id="objects"
+    label="Objects"
+    page-size="3"
+  >
+    <helix-input
+      id="query"
+      placeholder="Search"
+      slot="toolbar"
+    ></helix-input>
+    <helix-table-column
+      field="name"
+      sortable
+    >Name</helix-table-column>
+    <helix-table-column
+      field="size"
+      sortable
+    >Size</helix-table-column>
+  </helix-data-table>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Sort a column, search, or page</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const objects = document.getElementById('objects')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 7
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  objects.rows = [
+    { name: 'avatar.png', size: '18 KB' },
+    { name: 'index.html', size: '2 KB' },
+    { name: 'report.pdf', size: '1.2 MB' },
+    { name: 'styles.css', size: '44 KB' },
+  ]
+
+  /* `search` rather than writing `filter`, because it goes through the request
+     the component makes for itself, which is the one that announces. */
+  document.getElementById('query').addEventListener('helix-before-change', (event) => {
+    objects.search(event.detail.value)
+  })
+
+  objects.addEventListener('helix-sort', (event) => {
+    say('helix-sort', `${event.detail.value}, which reorders and changes nothing`)
+  })
+  objects.addEventListener('helix-filter', (event) => {
+    say('helix-filter', `the query is "${event.detail.value}"`)
+  })
+  objects.addEventListener('helix-navigate', (event) => {
+    say('helix-navigate', `page ${event.detail.value}, which is a move`)
+  })
+</script>

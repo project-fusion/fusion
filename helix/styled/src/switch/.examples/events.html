@@ -1,0 +1,59 @@
+<!-- @summary A setting that takes effect as it moves, and says so twice. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-switch
+    id="setting"
+    label="Deploy on push"
+    name="autodeploy"
+  ></helix-switch>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Flip the switch</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const setting = document.getElementById('setting')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  setting.addEventListener('helix-before-toggle', (event) => {
+    say('helix-before-toggle', `proposing ${event.detail.checked}, a real boolean and not a string`)
+  })
+  setting.addEventListener('input', (event) => {
+    say('input', `${event.currentTarget.checked}, announced as the state moves`)
+  })
+  setting.addEventListener('change', (event) => {
+    say('change', `${event.currentTarget.checked}, relayed from the control inside`)
+  })
+</script>

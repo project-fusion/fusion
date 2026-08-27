@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <>
+      <helix-icon name="caret-down"></helix-icon> <helix-icon name="check-circle"></helix-icon>{' '}
+      <helix-icon name="gear"></helix-icon> <helix-icon name="lightbulb"></helix-icon>{' '}
+      <helix-icon name="magnifying-glass"></helix-icon>{' '}
+      <helix-icon name="shield-check"></helix-icon>{' '}
+      <helix-icon label="Warning" name="warning"></helix-icon>
+    </>
+  )
+}

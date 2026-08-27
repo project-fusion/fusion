@@ -1,0 +1,18 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="md">
+      <helix-trend direction="down">
+        8%
+        <span slot="label">Headcount, stated and not judged</span>
+      </helix-trend>
+      <helix-trend direction="down" good="down">
+        8%
+        <span slot="label">Churn, where down is the improvement</span>
+      </helix-trend>
+      <helix-trend direction="down" good="up">
+        8%
+        <span slot="label">Conversion, where up is</span>
+      </helix-trend>
+    </helix-flex>
+  )
+}

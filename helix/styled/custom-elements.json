@@ -949,6 +949,10 @@
                 "slug": "chevron-at-the-end"
               },
               {
+                "description": "Each section announces for itself, and a listener on the set hears nothing.",
+                "slug": "events"
+              },
+              {
                 "description": "A hairline around the set, for a panel that needs an edge against the page.",
                 "slug": "outlined"
               },
@@ -1339,6 +1343,10 @@
               {
                 "description": "A dismissible bar across the top of a page, tone and all.",
                 "slug": "preview"
+              },
+              {
+                "description": "The bar says it was dismissed and leaves the going to whoever put it there.",
+                "slug": "events"
               },
               {
                 "description": "The four tones side by side, from neutral notice to danger.",
@@ -2264,6 +2272,28 @@
             },
             {
               "kind": "field",
+              "name": "release",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "The pending context release, or `0`. Canceled by a reconnection."
+            },
+            {
+              "kind": "field",
+              "name": "CONTEXT",
+              "type": {
+                "text": "WebGLContextAttributes"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "{ alpha: true, antialias: false, depth: false, powerPreference: 'low-power', stencil: false, }",
+              "description": "What every context is asked for, here rather than at two call sites."
+            },
+            {
+              "kind": "field",
               "name": "frame",
               "type": {
                 "text": "number"
@@ -2406,6 +2436,24 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "build",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "The context and the program, from whatever canvas can still give one.\n\n**A canvas whose context was force-lost never yields a working one again**,\nand the release below used to assume the opposite: `getContext` hands back\nthe very same dead object, which reports `isContextLost()` and answers\n`null` to every `getShaderParameter`. So `link` failed, `start` returned\nbefore installing a single observer, and the element sat connected and\npermanently blind, holding whatever buffer it last painted. Measured on the\nlanding page, where one remove-and-reinsert was enough: the frozen frame\nwas the 2x2 the first `measure` took before layout, stretched across two\nscreens as a gray smear that reads as a broken gradient rather than as a\ndead component. The only sound in the console was `getShaderInfoLog`\nanswering `null`, twice per element.\n\nA spent canvas is therefore replaced rather than re-asked. `restoreContext`\nis the other way and is not reachable from here: it needs the `webglcontextlost`\nevent default-prevented and the extension held from before the loss, and it\nrestores asynchronously, so `start` would have to become a state machine to\nuse it. A fresh canvas is synchronous and cannot half-succeed."
+            },
+            {
+              "kind": "field",
+              "name": "drop",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Gives the context back, once nothing has claimed the element again.\n\n**The context is not released by dropping the reference.** A browser caps\nlive WebGL contexts at about sixteen and drops the oldest when a\nseventeenth is asked for, so a page that mounts and unmounts auras kills\nthe ones still on screen: the symptom is an aura elsewhere going blank,\nwhich looks like a fault in that element and is this one. The context\nbelongs to the canvas, and the canvas is held by the shadow root until the\nelement is collected, which is a moment nothing here controls and which is\nfar too late for a cap of sixteen. `WEBGL_lose_context` is the only way.\n\n**It spends the canvas**, which is what `build` is written around: the\ncanvas can never serve a context again and a returning element takes a\nfresh one."
             },
             {
               "kind": "method",
@@ -3118,11 +3166,11 @@
               "kind": "field",
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | undefined"
               },
-              "default": "0",
-              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
+              "description": "How many avatars are shown before the rest become a count.\n\nUnset shows all of them, which is what no limit means and is more useful\nthan refusing to render.\n\n**Reflected, because the fold is a stylesheet rule and nothing else.** The\nstyled tier hides past the limit with `:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`,\nso the attribute *is* the mechanism: a `max` that reaches this property and\nnever reaches the host matches no rule, and every avatar is drawn beside a\ncount that says two of them are hidden. That is the failure this repository\nalready writes down as \"reflect only what CSS selects on\", and it went\nunnoticed because the examples set `max` in markup, where the author had\nwritten the attribute themselves.\n\nIt is the path a script takes that was broken, and React takes it for\neveryone: React assigns a matching property rather than an attribute, so\n`<helix-avatar-group max={4}>` folded nothing at all. Measured against the\nmarkup twin, the fifth and sixth avatars rendered at full size where the\nmarkup version had them at 0x0.\n\n**Optional rather than defaulted, per the rule that a reflected property\ntakes no default**: `max = 0` would stamp `max=\"0\"` onto every host that\nnever asked for a limit, including on the server.",
               "attribute": "max",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessAvatarGroup",
                 "module": "src/avatar/group/avatar-group.ts"
@@ -3398,10 +3446,9 @@
             {
               "name": "max",
               "type": {
-                "text": "number"
+                "text": "number | undefined"
               },
-              "default": "0",
-              "description": "How many avatars are shown before the rest become a count.\n\nZero or less shows all of them, which is what an unset limit means and is\nmore useful than refusing to render.",
+              "description": "How many avatars are shown before the rest become a count.\n\nUnset shows all of them, which is what no limit means and is more useful\nthan refusing to render.\n\n**Reflected, because the fold is a stylesheet rule and nothing else.** The\nstyled tier hides past the limit with `:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`,\nso the attribute *is* the mechanism: a `max` that reaches this property and\nnever reaches the host matches no rule, and every avatar is drawn beside a\ncount that says two of them are hidden. That is the failure this repository\nalready writes down as \"reflect only what CSS selects on\", and it went\nunnoticed because the examples set `max` in markup, where the author had\nwritten the attribute themselves.\n\nIt is the path a script takes that was broken, and React takes it for\neveryone: React assigns a matching property rather than an attribute, so\n`<helix-avatar-group max={4}>` folded nothing at all. Measured against the\nmarkup twin, the fifth and sixth avatars rendered at full size where the\nmarkup version had them at 0x0.\n\n**Optional rather than defaulted, per the rule that a reflected property\ntakes no default**: `max = 0` would stamp `max=\"0\"` onto every host that\nnever asked for a limit, including on the server.",
               "fieldName": "max",
               "inheritedFrom": {
                 "name": "HelixHeadlessAvatarGroup",
@@ -3862,6 +3909,10 @@
               {
                 "description": "A source that fails, falling back to initials rather than a broken image.",
                 "slug": "broken-image"
+              },
+              {
+                "description": "The platform’s own two words, relayed because neither crosses a shadow boundary.",
+                "slug": "events"
               },
               {
                 "description": "Overlapped faces with a count for the rest.",
@@ -9827,6 +9878,10 @@
                 "slug": "controlled"
               },
               {
+                "description": "The slide in view, announced as it changes and not as it is dragged.",
+                "slug": "events"
+              },
+              {
                 "description": "Full-bleed slides with the controls over the picture.",
                 "slug": "hero"
               },
@@ -10014,8 +10069,12 @@
           "name": "HelixChatComposer",
           "cssProperties": [
             {
-              "description": "Fill behind the field.",
+              "description": "Fill behind the composer.",
               "name": "--chat-composer-background"
+            },
+            {
+              "description": "The composer's edge, so a theme can remove it.",
+              "name": "--chat-composer-border-width"
             },
             {
               "description": "How tall the field may grow.",
@@ -10032,6 +10091,14 @@
               }
             },
             {
+              "description": "The row under the field.",
+              "name": "tools",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
               "description": "The control that offers the turn.",
               "name": "send",
               "inheritedFrom": {
@@ -10040,7 +10107,7 @@
               }
             },
             {
-              "description": "The whole row.",
+              "description": "The whole composer.",
               "name": "composer",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatComposer",
@@ -10062,11 +10129,19 @@
                 "name": "HelixHeadlessChatComposer",
                 "module": "src/chat/composer/chat-composer.ts"
               }
+            },
+            {
+              "description": "The glyph inside the send control.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
             }
           ],
           "slots": [
             {
-              "description": "Before the field: attachments, a model picker.",
+              "description": "Under the field, at the leading edge: attachments, a model picker.",
               "name": "start",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatComposer",
@@ -10074,7 +10149,7 @@
               }
             },
             {
-              "description": "After the field, beside the send control.",
+              "description": "Under the field, beside the send control.",
               "name": "end",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatComposer",
@@ -10235,6 +10310,36 @@
               "type": {
                 "text": "send() => boolean"
               },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each tool box whether anything is in it.\n\nThey are boxes in a flex row, so an empty one still takes the gap beside it\nand the send control drifts inward by one for every slot a consumer left\nalone. No selector can ask this: a slot's assigned nodes are not its DOM\nchildren, so `:empty` describes the fallback rather than the fill.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatComposer",
+                "module": "src/chat/composer/chat-composer.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderSend",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control that offers the turn, behind a seam so a tier can draw its own.\n\n**A glyph with the label as its accessible name, rather than the label as\ntext.** The word \"Send\" beside a field is the widest thing in the row and\nsays nothing a return key does not, and every composer a reader has used in\nthe last five years marks it rather than spells it. The return glyph is the\nmark because Enter is what actually sends, which `submit-on` says out loud:\nthe control and the key are one affordance and should look like it.\n\n`send-label` is unchanged and is now the accessible name rather than the\nvisible one, so a screen reader hears the same word it always did.",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatComposer",
                 "module": "src/chat/composer/chat-composer.ts"
@@ -10642,6 +10747,10 @@
               "name": "--chat-message-background"
             },
             {
+              "description": "The edge every turn carries, which only a failed one colors.",
+              "name": "--chat-message-border-width"
+            },
+            {
               "description": "Fill behind the reader's own turns.",
               "name": "--chat-message-background-me"
             },
@@ -10720,6 +10829,14 @@
               }
             },
             {
+              "description": "The status glyph beside a failure.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
               "description": "The control offered on a failed message.",
               "name": "retry",
               "inheritedFrom": {
@@ -10784,6 +10901,16 @@
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
               }
+            },
+            {
+              "kind": "field",
+              "name": "separation",
+              "type": {
+                "text": "'filled' | 'plain' | undefined"
+              },
+              "description": "Where the turn's surface ends.\n\n**A bubble is one answer and not the only one, and the category has moved.**\nTwo people messaging read as two columns of bubbles, which is what the form\nhas looked like since it existed. An assistant answering does not: the reply\nis a paragraph, often a long one with code and lists in it, and every AI\nsurface worth copying sets it as prose with the reader's own turns in\nbubbles beside it. A component that can only draw bubbles cannot render the\nconversation most people are now building.\n\n- `filled` is the default and is told apart by its own ground, which is the\n  bubble.\n- `plain` has no ground and no edge: the turn is text on the transcript, and\n  the space around it and the avatar beside it are what separate it. For an\n  assistant's side of a conversation, and for any turn long enough that a\n  fill reads as a wall.\n\n**On this tier, because it is where the surface ends and nothing else.**\n`check:axes` keeps `separation` off the headless tier for the reason it\nkeeps every painted axis off it: that tier has no ground to end. The two\nvalues are a subset of the registry's four; `elevated` and `outlined` are\navailable and neither is a thing a turn should be, a lifted message reading\nas a card and an outlined one as an input.",
+              "attribute": "separation",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -10905,6 +11032,21 @@
                   "text": "TemplateResult | typeof nothing"
                 }
               },
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderMark",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The status glyph, behind a seam so a tier can draw its own.\n\n`TONE_MARKS.danger` rather than a glyph chosen here: the library has one\nstatus vocabulary, `Callout`, `Toast.Item` and `Announcement` all read from\nit, and a reader meets these four marks in a passage, in a message and now\non a turn and has to read them as the same four things. It carries the\naccessible name with it, which is the half that matters: `danger` is the\nword the API uses and \"Error\" is the word a reader understands.",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatMessage",
                 "module": "src/chat/message/chat-message.ts"
@@ -11122,23 +11264,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixHeadlessChatMessage",
-            "package": "@helix-io/headless/chat"
-          },
-          "summary": "One turn in a conversation, and what has happened to it.",
-          "helix": {
-            "category": "feedback",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/chat",
-            "tier": "styled",
-            "group": "Chat",
-            "part": "Message"
-          },
-          "tagName": "helix-chat-message",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "separation",
+              "type": {
+                "text": "'filled' | 'plain' | undefined"
+              },
+              "description": "Where the turn's surface ends.\n\n**A bubble is one answer and not the only one, and the category has moved.**\nTwo people messaging read as two columns of bubbles, which is what the form\nhas looked like since it existed. An assistant answering does not: the reply\nis a paragraph, often a long one with code and lists in it, and every AI\nsurface worth copying sets it as prose with the reader's own turns in\nbubbles beside it. A component that can only draw bubbles cannot render the\nconversation most people are now building.\n\n- `filled` is the default and is told apart by its own ground, which is the\n  bubble.\n- `plain` has no ground and no edge: the turn is text on the transcript, and\n  the space around it and the avatar beside it are what separate it. For an\n  assistant's side of a conversation, and for any turn long enough that a\n  fill reads as a wall.\n\n**On this tier, because it is where the surface ends and nothing else.**\n`check:axes` keeps `separation` off the headless tier for the reason it\nkeeps every painted axis off it: that tier has no ground to end. The two\nvalues are a subset of the registry's four; `elevated` and `outlined` are\navailable and neither is a thing a turn should be, a lifted message reading\nas a card and an outlined one as an input.",
+              "fieldName": "separation"
+            },
             {
               "name": "author",
               "type": {
@@ -11216,6 +11350,22 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixHeadlessChatMessage",
+            "package": "@helix-io/headless/chat"
+          },
+          "summary": "One turn in a conversation, and what has happened to it.",
+          "helix": {
+            "category": "feedback",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/chat",
+            "tier": "styled",
+            "group": "Chat",
+            "part": "Message"
+          },
+          "tagName": "helix-chat-message",
+          "customElement": true,
           "events": [
             {
               "type": {
@@ -11291,7 +11441,7 @@
               "name": "--chat-gap"
             },
             {
-              "description": "The hairline above the composer and under the header.",
+              "description": "The hairline under the header.",
               "name": "--chat-rule"
             },
             {
@@ -11794,6 +11944,17 @@
             },
             {
               "kind": "field",
+              "name": "handleResume",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A press anywhere in the way back takes the reader back.\n\n**The affordance was inert, in the component and in every example.** The\ncontrol is slotted so the consumer picks the words, and `resume()` was\npublic \"because the control offering it is the consumer's and needs\nsomething to call\". True, and it left a button this element positions, lifts\nand shows and hides doing nothing at all until somebody wired it, which none\nof the five examples did: the one control whose whole job is to undo a\nscroll shipped as decoration.\n\nThe region exists for exactly one purpose, so a press inside it has exactly\none meaning and this element is entitled to act on it. `resume()` stays\npublic for the other callers it was always for: a keyboard shortcut, or a\nconsumer's own control somewhere else on the page.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleSlotChange",
               "privacy": "private",
               "readonly": true,
@@ -11997,6 +12158,15 @@
                 "slug": "assistant"
               },
               {
+                "description": "The command palette: summoned from anywhere, anchored near the top, and gone when it is answered.",
+                "min": 420,
+                "slug": "command"
+              },
+              {
+                "description": "A turn sent and a transcript pinned, which are the reader’s two asks.",
+                "slug": "events"
+              },
+              {
                 "description": "The whole screen: a dialog at full size with the conversation filling it.",
                 "min": 420,
                 "slug": "fullscreen"
@@ -12006,11 +12176,6 @@
                 "layout": "fullscreen",
                 "min": 380,
                 "slug": "launcher"
-              },
-              {
-                "description": "The palette: summoned from anywhere, anchored near the top, and gone when it is answered.",
-                "min": 420,
-                "slug": "palette"
               },
               {
                 "description": "The sidebar: a drawer from the trailing edge, with the conversation filling the panel.",
@@ -14134,6 +14299,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A boolean carried as a boolean, and the native pair a click sends.",
+                "slug": "events"
+              },
+              {
                 "description": "The third state, for a parent whose children disagree.",
                 "slug": "indeterminate"
               },
@@ -16223,6 +16392,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A field and the picker it opens, which announce as two things because they are.",
+                "slug": "events"
+              },
+              {
                 "description": "A color the field will not accept, and what it says about it.",
                 "slug": "invalid"
               },
@@ -17870,6 +18043,11 @@
               {
                 "description": "Disabled, which is a picker that shows a color and does not move.",
                 "slug": "disabled"
+              },
+              {
+                "description": "A value moving, a color taken off the screen, and one put on the clipboard.",
+                "layout": "hug",
+                "slug": "events"
               },
               {
                 "description": "The picker reporting a value it cannot use.",
@@ -19792,6 +19970,10 @@
                 "slug": "empty"
               },
               {
+                "description": "Seven announcements for one choice, and each of them is a different fact.",
+                "slug": "events"
+              },
+              {
                 "description": "A choice the field will not accept, and why.",
                 "slug": "invalid"
               },
@@ -20956,6 +21138,11 @@
                 "slug": "preview"
               },
               {
+                "description": "A palette runs a command rather than holding a value, and says exactly that.",
+                "min": 320,
+                "slug": "events"
+              },
+              {
                 "description": "Opened by a key from anywhere on the page.",
                 "slug": "hotkey"
               },
@@ -22067,6 +22254,10 @@
               {
                 "description": "A button that copies a string and confirms it for a moment.",
                 "slug": "preview"
+              },
+              {
+                "description": "Said after the clipboard write succeeded, and not before it is attempted.",
+                "slug": "events"
               }
             ],
             "source": "helix/styled/src/copy-button"
@@ -23553,6 +23744,11 @@
               {
                 "description": "A result the table owns: sort by clicking a heading, and page through the rest.",
                 "slug": "preview"
+              },
+              {
+                "description": "Three questions about one result, and not one of them is a value changing.",
+                "min": 420,
+                "slug": "events"
               },
               {
                 "description": "One query across every column, from a search field the page owns.",
@@ -25266,6 +25462,10 @@
               {
                 "description": "Disabled with a date in it.",
                 "slug": "disabled"
+              },
+              {
+                "description": "A typed date and one taken from the calendar arrive the same way.",
+                "slug": "events"
               },
               {
                 "description": "The same date written long, medium and short.",
@@ -27146,6 +27346,10 @@
               {
                 "description": "Disabled, showing its date and refusing to move.",
                 "slug": "disabled"
+              },
+              {
+                "description": "Paging the month is a move, and choosing a day is an answer.",
+                "slug": "events"
               },
               {
                 "description": "The calendar reporting a date it cannot accept.",
@@ -30403,6 +30607,11 @@
                 "slug": "preview"
               },
               {
+                "description": "Four announcements for one panel, and `close` is the platform’s own.",
+                "min": 420,
+                "slug": "events"
+              },
+              {
                 "description": "A panel beside the page rather than over it, with the page still usable behind it.",
                 "slug": "inline"
               },
@@ -31463,6 +31672,10 @@
               {
                 "description": "A menu that replaces itself rather than opening sideways, for a narrow screen.",
                 "slug": "preview"
+              },
+              {
+                "description": "A row chosen, from whichever page the stack has replaced itself with.",
+                "slug": "events"
               }
             ],
             "source": "helix/styled/src/drilldown"
@@ -32911,6 +33124,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A drop and a click reach the same place, and the value is the file names.",
+                "slug": "events"
+              },
+              {
                 "description": "Asking a phone for its camera rather than its files.",
                 "slug": "from-a-camera"
               },
@@ -33742,6 +33959,715 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/format-date/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixFormatDate",
+          "declaration": {
+            "name": "HelixFormatDate",
+            "module": "./root/format-date-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/format-date/root/format-date-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/format-date/root/format-date-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/format-date/root/format-date-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The base tier does the reading; this adds the one thing a design system has to\nsay about it. A timestamp takes the family, size and color of the text around\nit, so almost nothing here is a decision. The exception is figures: an elapsed\nreading counts up under the reader, and proportional digits move the trailing\nedge as it does, which in a feed is a whole column shifting whenever any row\nin it ticks over. `tabular-nums` in that mode and not in the other, because a\ndate is written once and should sit in the text like the text.",
+          "name": "HelixFormatDate",
+          "members": [
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-headless-pagination-size` composes `helix-headless-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/styled` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "date",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The timestamp, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset this\nrenders nothing rather than the epoch, which is what parsing an empty string\nwould give.\n\n**The element's own text is read as a fallback, and only in a browser.**\n`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the\nspelling that reads best in markup, and it cannot be the only one: measured\nagainst Lit's server shim, `textContent`, `children`, `firstChild` and\n`querySelector` are all `undefined` there, so a server has no way to see it.\nAn element rendered on a server needs the attribute; one rendered in a\nbrowser may use either.",
+              "attribute": "date",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "day",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the day of the month is written, where a date is shown.",
+              "attribute": "day",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "elapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show how long ago it was, compactly, instead of the date.\n\nReflected, because it is the one property that decides which of two readings\nthis is and a stylesheet has a reason to know: a compact reading is a fixed\nfew characters and a date is not.",
+              "attribute": "elapsed",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hour",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the hour is written, where a time of day is shown.",
+              "attribute": "hour",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the reading. Empty is the runtime's own.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "minute",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the minute is written, where a time of day is shown.",
+              "attribute": "minute",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "month",
+              "type": {
+                "text": "'numeric' | '2-digit' | 'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the month is written, where a date is shown.",
+              "attribute": "month",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "second",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the second is written, where a time of day is shown.",
+              "attribute": "second",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "timeZone",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The time zone to read the timestamp in. Empty is the runtime's own.",
+              "attribute": "time-zone",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "timeZoneName",
+              "type": {
+                "text": "'long' | 'short' | undefined"
+              },
+              "description": "Whether to name the time zone, and how.",
+              "attribute": "time-zone-name",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "weekday",
+              "type": {
+                "text": "'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the weekday is written, where one is shown.",
+              "attribute": "weekday",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "year",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the year is written, where a date is shown.",
+              "attribute": "year",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "clock",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The clock this element last drew against.\n\nA state field and not a read of `Date.now()` inside `render`, which would\nmake the template a function of something Lit cannot see change: the element\nwould draw the right text once and never notice it had gone stale.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "written",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The date read out of the light DOM, where no attribute carried one.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stopTicking",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "watching",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "moment",
+              "type": {
+                "text": "Date | undefined"
+              },
+              "privacy": "private",
+              "description": "The timestamp, or nothing where there is not one to read.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "Absolute"
+              },
+              "privacy": "private",
+              "description": "Every `Intl.DateTimeFormat` option a consumer set, and none they did not.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The light DOM's own text, which is the other way to write the value.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Schedules the next reading, and only the next one.\n\nThe formatter says when its own answer expires, so this asks for exactly\nthat moment rather than polling: an item minutes old wakes once a minute, an\nitem hours old once an hour, and an item showing a date never, which is the\ndifference between a feed that costs nothing to leave open and one that\ndoes.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stopInner",
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Stops an inner control's own announcement at this element's boundary.\n\n**A composed control is one control to a consumer, and the natives had no\nequivalent of the stop the prefixed events already get.** `<helix-select>`\nrenders a `<helix-listbox>`, and both announce: the listbox dispatches\n`input` and `change` from its own host, `input` is composed by\nspecification, and a consumer listening on the select therefore heard one\nchoice twice. Measured before this existed, on the styled tier, one choice\non the inner listbox: select `input` twice and `change` three times,\ncombobox, date input, time input and color input twice each. `Command` was\nthe only one that was right, because it happened to reach for\n`stopImmediatePropagation` for a different reason.\n\nBound on the child in the parent's template, so it runs while the event is\nstill at the child and before it can cross. The guard is for the case where\na component binds this on itself: an element must never stop its own\nannouncement, which is the one it exists to make.\n\nThis is the same job the `helix-before-*` handlers do with their own\n`stopPropagation`, and it is separate rather than folded into them because\na consumer may legitimately refuse a request without the notification ever\nhappening: the two travel at different times and one can be absent.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixHeadlessFormatDate",
+            "package": "@helix-io/headless/format-date"
+          },
+          "summary": "A timestamp, written the way the reader's locale writes one.",
+          "helix": {
+            "category": "typography",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/format-date",
+            "tier": "styled",
+            "group": "FormatDate",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "The same instant, read four ways: elapsed, and three arrangements of a date.",
+                "slug": "preview"
+              }
+            ],
+            "source": "helix/styled/src/format-date"
+          },
+          "tagName": "helix-format-date",
+          "customElement": true,
+          "cssParts": [
+            {
+              "description": "The `<time>` element carrying the reading.",
+              "name": "time",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "date",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The timestamp, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset this\nrenders nothing rather than the epoch, which is what parsing an empty string\nwould give.\n\n**The element's own text is read as a fallback, and only in a browser.**\n`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the\nspelling that reads best in markup, and it cannot be the only one: measured\nagainst Lit's server shim, `textContent`, `children`, `firstChild` and\n`querySelector` are all `undefined` there, so a server has no way to see it.\nAn element rendered on a server needs the attribute; one rendered in a\nbrowser may use either.",
+              "fieldName": "date",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "day",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the day of the month is written, where a date is shown.",
+              "fieldName": "day",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "elapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show how long ago it was, compactly, instead of the date.\n\nReflected, because it is the one property that decides which of two readings\nthis is and a stylesheet has a reason to know: a compact reading is a fixed\nfew characters and a date is not.",
+              "fieldName": "elapsed",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "hour",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the hour is written, where a time of day is shown.",
+              "fieldName": "hour",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for the reading. Empty is the runtime's own.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "minute",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the minute is written, where a time of day is shown.",
+              "fieldName": "minute",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "text": "'numeric' | '2-digit' | 'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the month is written, where a date is shown.",
+              "fieldName": "month",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "second",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the second is written, where a time of day is shown.",
+              "fieldName": "second",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "time-zone",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "The time zone to read the timestamp in. Empty is the runtime's own.",
+              "fieldName": "timeZone",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "time-zone-name",
+              "type": {
+                "text": "'long' | 'short' | undefined"
+              },
+              "description": "Whether to name the time zone, and how.",
+              "fieldName": "timeZoneName",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "weekday",
+              "type": {
+                "text": "'long' | 'short' | 'narrow' | undefined"
+              },
+              "description": "How the weekday is written, where one is shown.",
+              "fieldName": "weekday",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            },
+            {
+              "name": "year",
+              "type": {
+                "text": "'numeric' | '2-digit' | undefined"
+              },
+              "description": "How the year is written, where a date is shown.",
+              "fieldName": "year",
+              "inheritedFrom": {
+                "name": "HelixHeadlessFormatDate",
+                "module": "src/format-date/root/format-date-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/format-date/root/format-date-root.ts",
+          "definitionPath": "src/format-date/root/format-date-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixFormatDate",
+          "declaration": {
+            "name": "HelixFormatDate",
+            "module": "src/format-date/root/format-date-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-format-date",
+          "declaration": {
+            "name": "HelixFormatDate",
+            "module": "src/format-date/root/format-date-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/grid/index.ts",
       "declarations": [],
       "exports": [
@@ -34163,7 +35089,7 @@
           "name": "HelixHeatmap",
           "cssProperties": [
             {
-              "description": "The size a cell wants. The strip fits as many as the container allows.",
+              "description": "The size a cell wants on both axes, where neither is given its own.",
               "name": "--heatmap-cell-size",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34171,7 +35097,23 @@
               }
             },
             {
-              "description": "Space between cells.",
+              "description": "How wide a cell is. The strip fits as many as the container allows.",
+              "name": "--heatmap-cell-width",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "How tall a cell is. A row of a tall thin cell is what a status page draws.",
+              "name": "--heatmap-cell-height",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "Space between cells. Zero is a continuous field rather than a grid of tiles.",
               "name": "--heatmap-gap",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34317,6 +35259,62 @@
               }
             },
             {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The bubble, forwarded from `Tooltip`.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
               "description": "The leading slot's box.",
               "name": "start",
               "inheritedFrom": {
@@ -34401,7 +35399,7 @@
                 "text": "number"
               },
               "default": "4",
-              "description": "What the sheet beside this actually draws, in the pixels the fit arithmetic\ncounts in.\n\n**The base tier's numbers are a bare strip's and this tier draws something\nbigger, so somebody has to say so.** `fits()` works against a measured width\nand cannot resolve `--helix-space-2xs`; this sheet chose that gap and a\n`0.75rem` cell, so this is the one place that knows both halves. Left at the\ninherited 8 and 2, the arithmetic believed a cell cost 10 pixels where it\ncost 16: measured 27 Aug 2026, a ninety day strip drew 940 pixels of cells\ninto a 592 pixel box at 640 and 540 into 342 at 390, overflowing the\ndocument both times, while `visible` reported 59 and 34. The number a\nsummary is told to trust was the number that was wrong, which is the exact\nfailure the property exists to prevent.\n\nA consumer who moves `--heatmap-cell-size` or `--heatmap-gap` sets `min-cell`\nand `gap` to match, and the attributes are how they say it.",
+              "description": "The first guess at what this sheet draws, before it has been measured.\n\n**Not a contract any more, and it was a bad one.** `fits()` works against a\nmeasured width and a cell size it has to be told, and being told by hand\nmeant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:\nthe arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety\nday strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into\n342 at 390, overflowing the document both times while `visible` reported 59\nand 34. The number a summary is told to trust was the number that was wrong.\n\nThe strip is read back now, so nothing has to be kept in step and\n`--heatmap-cell-width` on its own is enough. These two remain because a\nmeasurement arrives one frame after the first paint, and a first paint from\nnumbers that match the sheet is one that does not move.",
               "attribute": "gap",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34415,7 +35413,7 @@
                 "text": "number"
               },
               "default": "12",
-              "description": "The drawn cell, for the reason `gap` is the drawn gap. `0.75rem` at the root font size.",
+              "description": "The drawn cell width, for the reason `gap` is the drawn gap. `0.75rem` at the root font size.",
               "attribute": "min-cell",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34610,6 +35608,34 @@
             },
             {
               "kind": "field",
+              "name": "metrics",
+              "type": {
+                "text": "{ cell: number; gap: number } | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The cell and gap the strip is drawing, in pixels, once it has been read.\n\n**The arithmetic's inputs are a stylesheet's decisions, so the honest way to\nlearn them is to ask the stylesheet.** A cell's size is a length that only\nthe cascade can resolve: it may be a `rem` against a root font size, a\npercentage of a container, or whatever a container query chose this frame.\nEvery one of those is invisible to a number typed into an attribute, and\neach of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`\nadded one more way for the two to drift apart silently.\n\nReading it back is not styling and does not breach the tier: this asks what\nwas decided rather than deciding, which is the same direction as the facts\nthis component writes out as custom properties, run backwards.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hovered",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "-1",
+              "description": "Which drawn cell the pointer is on, as an index into `drawn`, or -1 for none.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "observer",
               "type": {
                 "text": "ResizeObserver | undefined"
@@ -34664,6 +35690,34 @@
             },
             {
               "kind": "field",
+              "name": "cellPx",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The cell width the arithmetic should plan around, in pixels.\n\nThe attribute wins where a consumer wrote one, because that is what writing\nit is for; otherwise what the strip draws, and the declared default only\nuntil the first measurement lands.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "gapPx",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The gap the arithmetic should plan around, on the same terms as `cellPx`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "room",
               "type": {
                 "text": "number"
@@ -34671,6 +35725,21 @@
               "privacy": "private",
               "description": "How many cells the container has room for, as a whole number of columns.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reads back the cell and the gap the strip resolved.\n\n`gridAutoColumns` and `columnGap` rather than a cell's own box, and the\ndifference matters on the frame it matters: a cell exists only once some\nhave been drawn, and how many are drawn is what this is measuring *for*.\nAsking the track instead breaks the circle, since a track is sized whether\nor not anything sits in it. Neither property forces layout, so this stays a\nstyle read on every update rather than a reflow.\n\nAnything that does not parse to a positive number leaves the estimate alone:\n`columnGap` computes to `normal` where no gap is set, and a track given a\nkeyword or a `repeat()` has no single width to report. A wrong number here\nis worse than no number, because it is the one the count is published from.",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34736,6 +35805,42 @@
                 }
               ],
               "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The bubble over the cell a pointer is resting on.\n\n**One tooltip that moves, which is what every other chart here does and is\nthe thing the `title` attribute was kept to avoid.** The note this replaces\nread that ninety `helix-tooltip` elements was the cost of a real one, and\nthat was never the shape: Bar Chart, Line Chart and Donut Chart each render\na single anchor against an invisible mark and move the mark, so the count is\none however many readings there are. `drawTooltip` is their shared markup\nand this is the fourth caller.\n\nWhat it buys over the native one is the row rather than the reading.\n`sourceRows` carries every column of the table including the ones nothing\nwas plotted from, so a cell reads \"11 Jun 2026 / Uptime 81.2% / Note Partial\noutage\" where `title` could only ever say the two values this component\nhappens to hold. It is also styleable, appears at once rather than after the\nplatform's second of delay, and cannot be truncated by the window edge.\n\nThe mark is placed in pixels rather than in percent, which is the one thing\nthis does differently from its siblings: they divide a plot into equal\nslots, and a strip's cells are a fixed size with a fixed gap inside a box\nthat is usually wider, so a percentage of the box lands between cells. The\npitch is `cell + gap` and both are measured.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onPointerOver",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Which drawn cell the pointer is over, or -1.\n\n`pointerover` on the strip rather than a listener per cell: the event\nbubbles, so one handler covers however many cells there are, and unlike\n`mouseover` it is delivered for a pen and for the touch that follows a long\npress.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onPointerLeave",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34920,8 +36025,28 @@
                 "slug": "preview"
               },
               {
+                "description": "Cells with nothing between them, for a reading that never stopped.",
+                "slug": "continuous"
+              },
+              {
                 "description": "Ten weeks of commits, bucketed into five levels rather than a gradient.",
                 "slug": "contributions"
+              },
+              {
+                "description": "A range with no readings in it, which is not the same as a range of empty ones.",
+                "slug": "empty"
+              },
+              {
+                "description": "A measurement, not a proposal: the grid says how many cells it can show.",
+                "slug": "events"
+              },
+              {
+                "description": "Half hours of one day, drawn tall and narrow the way a status page draws them.",
+                "slug": "hours"
+              },
+              {
+                "description": "The same readings at three cell sizes, set with one custom property.",
+                "slug": "sizes"
               }
             ],
             "source": "helix/styled/src/heatmap"
@@ -35000,7 +36125,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them, in CSS pixels.\n\n**Set this only to overrule what the strip actually draws.** The arithmetic\nneeds a width in pixels and the width is a length the stylesheet resolves,\nso for as long as this was the only answer it was a promise the consumer had\nto keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic\nbelieved a cell cost 10 pixels where it cost 16, and a ninety day strip ran\n940 pixels wide out of a 592 pixel box while `visible` reported 59. The one\nnumber a summary is told to trust was the number that was wrong.\n\nThe strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are\nenough on their own and these two are the estimate used until the first\nmeasurement lands. Writing the attribute pins the value and stops the\nmeasurement being consulted, which is what a container query or a transition\non the cell size wants, where what is drawn this frame is not what the\narithmetic should plan around.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "fieldName": "minCell",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -37115,6 +38240,10 @@
                 "slug": "preview"
               },
               {
+                "description": "Load and error under the platform’s own names, which is what a fallback needs.",
+                "slug": "events"
+              },
+              {
                 "description": "A picture that never arrives says so, rather than leaving a hole.",
                 "slug": "fallback"
               },
@@ -37515,6 +38644,14 @@
           "declaration": {
             "name": "*",
             "module": "src/flex/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/format-date/index.js"
           }
         },
         {
@@ -39908,6 +41045,10 @@
               {
                 "description": "A key, and a chord of keys, as a reader would see them written.",
                 "slug": "preview"
+              },
+              {
+                "description": "A key that binds as well as draws, and says so where it is bound.",
+                "slug": "events"
               },
               {
                 "description": "A chord written once, drawn for whichever keyboard is reading it.",
@@ -43838,6 +44979,11 @@
                 "slug": "disabled"
               },
               {
+                "description": "A list that filters and a list that chooses, which are not the same event.",
+                "min": 300,
+                "slug": "events"
+              },
+              {
                 "description": "A field over the list that narrows it as it is typed.",
                 "slug": "filtered"
               },
@@ -45427,6 +46573,12 @@
                 "layout": "padded",
                 "min": 360,
                 "slug": "preview"
+              },
+              {
+                "description": "A panel across the navigation, announcing before it moves and after.",
+                "layout": "padded",
+                "min": 360,
+                "slug": "events"
               },
               {
                 "description": "A band from edge to edge, for a panel too wide to hang off one word.",
@@ -47094,6 +48246,11 @@
                 "slug": "preview"
               },
               {
+                "description": "A panel that opens and an item that is chosen, which travel differently.",
+                "min": 300,
+                "slug": "events"
+              },
+              {
                 "description": "Rows that navigate, as real anchors.",
                 "slug": "links"
               },
@@ -48717,10 +49874,10 @@
       "exports": [
         {
           "kind": "js",
-          "name": "HelixNotificationsItem",
+          "name": "HelixNotification",
           "declaration": {
-            "name": "HelixNotificationsItem",
-            "module": "./item/notifications-item.js"
+            "name": "HelixNotification",
+            "module": "./notification/notification.js"
           }
         },
         {
@@ -48735,7 +49892,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/notifications/item/notifications-item.css.ts",
+      "path": "src/notifications/notification/notification.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -48748,19 +49905,19 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/notifications/item/notifications-item.css.ts"
+            "module": "src/notifications/notification/notification.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/notifications/item/notifications-item.ts",
+      "path": "src/notifications/notification/notification.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "A four-column grid: media, body, actions, dismiss.\n\n**The media column is held open by the feed, not by the item.** Each item is\nits own grid, so nothing about one row's tracks reaches the row below it: a\nfeed where some items had an avatar and some did not drew its text at two\ndifferent left edges, which is the fault a grid was chosen to prevent. The\nroot publishes whether anything in it has media and every item reserves that\nmuch, so a mixed feed reads down one edge and a feed with no media anywhere\npays nothing for the column.\n\n**Unread is weight and a mark on the inline start edge, not a fill.** Depth\ncomes from a single border in this library, and a filled row is elevation\nspelled differently; a feed of filled rows is a striped list nobody can read.\nThe mark is a fixed height on the first line rather than the height of the\nrow, so it says the same thing about a one line notification and a five line\none.\n\n**Narrow, the actions go under the body.** How much room the row was given is\na fact about this box and about nothing else, so it is a container query: a\nfeed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a\nviewport rule would hand it the wide branch.",
-          "name": "HelixNotificationsItem",
+          "name": "HelixNotification",
           "cssProperties": [
             {
               "description": "The hairline between items.",
@@ -48771,8 +49928,28 @@
               "name": "--notifications-color"
             },
             {
-              "description": "The edge mark on an unread item.",
+              "description": "Color of the edge mark on an unread item.",
               "name": "--notifications-unread-mark"
+            },
+            {
+              "description": "How long that mark is.",
+              "name": "--notifications-unread-block-size"
+            },
+            {
+              "description": "How thick that mark is.",
+              "name": "--notifications-unread-inline-size"
+            },
+            {
+              "description": "How far it sits from the row's leading edge.",
+              "name": "--notifications-unread-inset"
+            },
+            {
+              "description": "How far it sits from the row's top.",
+              "name": "--notifications-unread-offset"
+            },
+            {
+              "description": "Its corner radius, which is what turns it into a dot.",
+              "name": "--notifications-unread-radius"
             },
             {
               "description": "Space above and below an item.",
@@ -48788,64 +49965,80 @@
               "description": "The whole notification.",
               "name": "item",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "When it happened.",
               "name": "time",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
+              }
+            },
+            {
+              "description": "The column holding the time and the controls.",
+              "name": "trailing",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
+              }
+            },
+            {
+              "description": "The actions and the dismiss, which replace the time.",
+              "name": "controls",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "The control that removes it.",
               "name": "dismiss",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "The glyph on that control, where none is slotted.",
               "name": "dismiss-mark",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "The leading slot's box.",
               "name": "media",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
-              "description": "Content and timestamp together.",
+              "description": "The label and the caption together.",
               "name": "body",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
-              "description": "The consumer's own markup.",
-              "name": "content",
+              "description": "What happened, on the first line.",
+              "name": "label",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "The trailing slot's box.",
               "name": "actions",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             }
           ],
@@ -48854,24 +50047,32 @@
               "description": "What happened, in the consumer's own markup.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "An avatar or icon identifying who or what it came from.",
               "name": "media",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "description": "What a reader can do about it.",
               "name": "actions",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
+              }
+            },
+            {
+              "description": "A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.",
+              "name": "caption",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             }
           ],
@@ -48900,8 +50101,8 @@
               "description": "When it happened, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset the item\nshows no timestamp rather than showing the epoch, which is what parsing an\nempty string would give.",
               "attribute": "at",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48910,11 +50111,11 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notifications-item default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
+              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notification default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
               "attribute": "read",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48927,8 +50128,8 @@
               "description": "State to open with, where nothing declared one.",
               "attribute": "default-read",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48941,8 +50142,8 @@
               "description": "Whether a reader may remove it.",
               "attribute": "dismissible",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48955,8 +50156,8 @@
               "description": "Locale for the timestamp. Empty is the runtime's own.",
               "attribute": "locale",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48969,21 +50170,8 @@
               "description": "Accessible name for the dismiss control.",
               "attribute": "dismiss-label",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "stopTicking",
-              "type": {
-                "text": "(() => void) | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -48995,36 +50183,8 @@
               "privacy": "private",
               "default": "undefined",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "clock",
-              "type": {
-                "text": "number | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "The clock this item last drew against.\n\nA state field and not a read of `Date.now()` inside `render`, which would\nmake the template a function of something Lit cannot see change: the item\nwould draw the right text once and never notice it had gone stale.",
-              "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "moment",
-              "type": {
-                "text": "Date | undefined"
-              },
-              "privacy": "private",
-              "description": "The timestamp, or nothing where there is not one to read.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49046,37 +50206,23 @@
                 "text": "markRead(next = true) => boolean"
               },
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
               "kind": "method",
-              "name": "tick",
+              "name": "markControls",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Schedules the next reading, and only the next one.\n\nThe formatter says when its own answer expires, so this asks for exactly\nthat moment rather than polling: an item minutes old wakes once a minute and\nan item weeks old wakes once an hour, which is the difference between a\nfeed that costs nothing to leave open and one that does not.",
+              "description": "Says whether there is anything for the time to make way for.\n\nThe trailing column holds the time and the controls in one place and shows\none of them, so a row with nothing to do about it would hide its timestamp\non hover and put nothing there. `dismissible` this element knows on the\nserver; whether a consumer filled the actions slot it can only find out from\na DOM, so this runs after the render and the resting answer, no controls, is\nthe one the server writes.",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "renderTime",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult | typeof nothing"
-                }
-              },
-              "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49090,8 +50236,33 @@
               },
               "description": "The control that removes the item, with the mark a consumer can replace.\n\n**A method rather than markup inside `render`, and the slot moves with\nit.** A fallback answers a consumer and a seam answers the tier above, which\nare different people: the styled tier wants an icon here, and with the slot\nwritten inline the only way to change it is to reimplement the whole\ntemplate. `check:fallbacks` holds that, and moving only the fallback out was\nnot enough, which is the right rule: the slot is the thing a tier redraws.\n\n**The mark is drawn rather than typed, which is what lets it align.** It was\n`&times;`, and a character is placed by its font rather than by its box:\nmeasured against the ghost button beside it at 8x, the cross carried 6\npixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two\nboxes whose own centers agreed to a tenth of a pixel. No stylesheet can\ncorrect that, because the offset is inside the glyph. An `<svg>` is centered\non its own viewBox, so it lands where the box says and takes the icon step\nthe row is already set in. It is the `x` the Tag's dismiss draws, so two\ncontrols that mean \"take this away\" are one mark.",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTime",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "When it happened, delegated whole.\n\nThe tag is interpolated rather than written, so each tier renders its own:\nthe base tier may not name a styled element, and a styled item inherits this\ntemplate without having a tag of its own to remind anybody. `check:composed`\nholds both halves.\n\n`exportparts` and no `part` of its own, which is the rule about a part\nalready named for its role: the child publishes `time`, the role here is\n`time`, and naming both would leave `::part(time)` matching two elements.\nWhat a consumer wants to reach is the `<time>`, so that is what the name\nreaches.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleActions",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49100,8 +50271,8 @@
               "privacy": "private",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49265,7 +50436,7 @@
             }
           ],
           "superclass": {
-            "name": "HelixHeadlessNotificationsItem",
+            "name": "HelixHeadlessNotification",
             "package": "@helix-io/headless/notifications"
           },
           "summary": "One thing that happened, which a reader may not have seen yet.",
@@ -49276,9 +50447,9 @@
             "documentation": "https://helix.fusion.dev/components/notifications",
             "tier": "styled",
             "group": "Notifications",
-            "part": "Item"
+            "part": "Notification"
           },
-          "tagName": "helix-notifications-item",
+          "tagName": "helix-notification",
           "customElement": true,
           "attributes": [
             {
@@ -49290,8 +50461,8 @@
               "description": "When it happened, as anything `Date` parses.\n\nAn ISO string is what an API sends and what `<time datetime>` takes, so it\nis the shape that needs no translation at either end. Left unset the item\nshows no timestamp rather than showing the epoch, which is what parsing an\nempty string would give.",
               "fieldName": "at",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49299,11 +50470,11 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notifications-item default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
+              "description": "Whether the reader has seen it.\n\nSet it and this element defers: a reader's click fires `helix-read` and\nchanges nothing until a new value arrives. `default-read` seeds a state\nthis element then owns.\n\n**Not reflected, and it was until 27 Aug 2026.** The reason given was that\nunread is a visual state and a stylesheet has no other way to know, which\nis the same reason the four mixins mirror theirs, and the mirror may not be\nthe property's own attribute: `<helix-notification default-read>`\ncame back from a server without `read` and gained it on the first update,\nwhich React reports as a hydration mismatch, and a copy of the serialized\nelement re-parses that attribute as a declaration. `:state(read)` is what\nthe stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it\nlearned to mount an element a consumer had configured rather than a bare\none.",
               "fieldName": "read",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49315,8 +50486,8 @@
               "description": "State to open with, where nothing declared one.",
               "fieldName": "defaultRead",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49328,8 +50499,8 @@
               "description": "Whether a reader may remove it.",
               "fieldName": "dismissible",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49341,8 +50512,8 @@
               "description": "Locale for the timestamp. Empty is the runtime's own.",
               "fieldName": "locale",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49354,8 +50525,8 @@
               "description": "Accessible name for the dismiss control.",
               "fieldName": "dismissLabel",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             }
           ],
@@ -49368,8 +50539,8 @@
               "name": "helix-read",
               "reactProp": "onhelix-read",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             },
             {
@@ -49380,30 +50551,30 @@
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
-                "name": "HelixHeadlessNotificationsItem",
-                "module": "src/notifications/item/notifications-item.ts"
+                "name": "HelixHeadlessNotification",
+                "module": "src/notifications/notification/notification.ts"
               }
             }
           ],
-          "modulePath": "src/notifications/item/notifications-item.ts",
-          "definitionPath": "src/notifications/item/notifications-item.ts"
+          "modulePath": "src/notifications/notification/notification.ts",
+          "definitionPath": "src/notifications/notification/notification.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixNotificationsItem",
+          "name": "HelixNotification",
           "declaration": {
-            "name": "HelixNotificationsItem",
-            "module": "src/notifications/item/notifications-item.ts"
+            "name": "HelixNotification",
+            "module": "src/notifications/notification/notification.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-notifications-item",
+          "name": "helix-notification",
           "declaration": {
-            "name": "HelixNotificationsItem",
-            "module": "src/notifications/item/notifications-item.ts"
+            "name": "HelixNotification",
+            "module": "src/notifications/notification/notification.ts"
           }
         }
       ]
@@ -49506,7 +50677,7 @@
           ],
           "slots": [
             {
-              "description": "The notifications, as `helix-notifications-item` children.",
+              "description": "The notifications, as `helix-notification` children.",
               "name": "",
               "inheritedFrom": {
                 "name": "HelixHeadlessNotifications",
@@ -49748,7 +50919,7 @@
               "kind": "field",
               "name": "items",
               "type": {
-                "text": "HelixHeadlessNotificationsItem[]"
+                "text": "HelixHeadlessNotification[]"
               },
               "description": "The notifications declared as children, in the order they are written.",
               "readonly": true,
@@ -50063,6 +51234,10 @@
               {
                 "description": "A feed with unread items, a mark-all control, and timestamps that stay correct.",
                 "slug": "preview"
+              },
+              {
+                "description": "Read and dismissed are two different things a feed is told.",
+                "slug": "events"
               },
               {
                 "description": "Read state the page owns, so marking read can be the round trip it usually is.",
@@ -52538,6 +53713,11 @@
                 "slug": "preview"
               },
               {
+                "description": "An option says it was chosen, and the list it is in is what hears it.",
+                "min": 300,
+                "slug": "events"
+              },
+              {
                 "description": "Options under headings, for a list long enough to need them.",
                 "slug": "grouped"
               }
@@ -53285,6 +54465,10 @@
               {
                 "description": "Headings on a page, with the one in view marked as the page scrolls.",
                 "slug": "preview"
+              },
+              {
+                "description": "The section being read, announced as the page scrolls past it.",
+                "slug": "events"
               },
               {
                 "description": "The same outline, scrolling smoothly and stopping clear of a sticky header.",
@@ -54329,6 +55513,11 @@
               {
                 "description": "Just the arrows and a count, for a footer with no room.",
                 "slug": "compact"
+              },
+              {
+                "description": "Paging chooses nothing, so it says where it is going and not what the answer is.",
+                "layout": "hug",
+                "slug": "events"
               },
               {
                 "description": "Pagination sitting in a table footer beside a total.",
@@ -57574,6 +58763,11 @@
                 "slug": "commanded"
               },
               {
+                "description": "A panel anchored to its trigger, announcing before it moves and after.",
+                "min": 380,
+                "slug": "events"
+              },
+              {
                 "description": "No arrow and no fill, for a panel that supplies its own.",
                 "slug": "plain"
               },
@@ -60606,6 +61800,11 @@
                 "slug": "disabled"
               },
               {
+                "description": "The group answers for the set, and the member says it was the one pressed.",
+                "layout": "hug",
+                "slug": "events"
+              },
+              {
                 "description": "The options in a row, which suits a short scale.",
                 "slug": "horizontal"
               },
@@ -62062,6 +63261,10 @@
                 "slug": "dots"
               },
               {
+                "description": "One score per choice, because a drag asks for nothing until it is let go.",
+                "slug": "events"
+              },
+              {
                 "description": "Half marks, which is the case the value is a number for.",
                 "slug": "halves"
               },
@@ -63452,6 +64655,11 @@
               {
                 "description": "The real preview frame, which runs what it is given inside a sandboxed document.",
                 "slug": "a-live-preview"
+              },
+              {
+                "description": "An edit, a caret, a divider and a log, which are four different things.",
+                "min": 420,
+                "slug": "events"
               },
               {
                 "description": "The preview leading, stacked, with the source pane taking the smaller share.",
@@ -70444,6 +71652,10 @@
                 "slug": "preview"
               },
               {
+                "description": "A fan of actions that opens, and one of them chosen.",
+                "slug": "events"
+              },
+              {
                 "description": "The actions opening upward and to the side, further from the button that holds them.",
                 "slug": "placed"
               }
@@ -73110,6 +74322,10 @@
                 "slug": "controlled"
               },
               {
+                "description": "A step asks to be the current one, and the sequence decides.",
+                "slug": "events"
+              },
+              {
                 "description": "Numbered steps rather than marked ones.",
                 "slug": "numeric"
               },
@@ -74566,6 +75782,10 @@
               {
                 "description": "Disabled on and disabled off, since the two look different.",
                 "slug": "disabled"
+              },
+              {
+                "description": "A setting that takes effect as it moves, and says so twice.",
+                "slug": "events"
               },
               {
                 "description": "A switch reporting that it has to be on.",
@@ -76490,7 +77710,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/tabs/panel/tabs-panel.js"
+            "module": "src/tabs/panel/tab-panel.js"
           }
         },
         {
@@ -76506,14 +77726,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/tabs/tab/tabs-tab.js"
+            "module": "src/tabs/tab/tab.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/panel/tabs-panel.css.ts",
+      "path": "src/tabs/panel/tab-panel.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -76526,26 +77746,26 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/tabs/panel/tabs-panel.css.ts"
+            "module": "src/tabs/panel/tab-panel.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/panel/tabs-panel.ts",
+      "path": "src/tabs/panel/tab-panel.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "Selection is marked with a rule under the active tab rather than a filled\npill, which keeps the row flat and lets the underline animate between tabs as\na movement instead of two separate fills.",
-          "name": "HelixTabsPanel",
+          "name": "HelixTabPanel",
           "cssParts": [
             {
               "description": "The panel container.",
               "name": "panel",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             }
           ],
@@ -76554,8 +77774,8 @@
               "description": "The panel's content.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             }
           ],
@@ -76570,8 +77790,8 @@
               "description": "Pairs the panel with the tab of the same value.",
               "attribute": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             },
             {
@@ -76584,8 +77804,8 @@
               "description": "Whether this panel is the visible one.",
               "attribute": "selected",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             },
             {
@@ -76597,8 +77817,8 @@
               "default": "''",
               "description": "The name of the panel, which is the text of the tab that opens it.\n\nSet by the root, which is the only thing that sees both. No attribute,\nbecause it is coordination between elements rather than anything a consumer\nwrites: the tab already says it.\n\nA string where the markup wanted a reference. `aria-labelledby` named\n`tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF\nresolves only in the tree it is written in, so the panel had no accessible\nname at all. An element reference cannot reach there either, a sibling\nshadow tree being neither the same tree nor an ancestor of it. A name is\nthe one form that crosses, and `aria-label` on a `tabpanel` is how the\npattern names one anyway.",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             },
             {
@@ -76776,7 +77996,7 @@
             }
           ],
           "superclass": {
-            "name": "HelixHeadlessTabsPanel",
+            "name": "HelixHeadlessTabPanel",
             "package": "@helix-io/headless/tabs"
           },
           "summary": "The content shown for one tab.",
@@ -76788,7 +78008,7 @@
             "group": "Tabs",
             "part": "Panel"
           },
-          "tagName": "helix-tabs-panel",
+          "tagName": "helix-tab-panel",
           "customElement": true,
           "attributes": [
             {
@@ -76800,8 +78020,8 @@
               "description": "Pairs the panel with the tab of the same value.",
               "fieldName": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             },
             {
@@ -76813,30 +78033,30 @@
               "description": "Whether this panel is the visible one.",
               "fieldName": "selected",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsPanel",
-                "module": "src/tabs/panel/tabs-panel.ts"
+                "name": "HelixHeadlessTabPanel",
+                "module": "src/tabs/panel/tab-panel.ts"
               }
             }
           ],
-          "modulePath": "src/tabs/panel/tabs-panel.ts",
-          "definitionPath": "src/tabs/panel/tabs-panel.ts"
+          "modulePath": "src/tabs/panel/tab-panel.ts",
+          "definitionPath": "src/tabs/panel/tab-panel.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixTabsPanel",
+          "name": "HelixTabPanel",
           "declaration": {
-            "name": "HelixTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
+            "name": "HelixTabPanel",
+            "module": "src/tabs/panel/tab-panel.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-tabs-panel",
+          "name": "helix-tab-panel",
           "declaration": {
-            "name": "HelixTabsPanel",
-            "module": "src/tabs/panel/tabs-panel.ts"
+            "name": "HelixTabPanel",
+            "module": "src/tabs/panel/tab-panel.ts"
           }
         }
       ]
@@ -77085,7 +78305,7 @@
               "kind": "field",
               "name": "tabs",
               "type": {
-                "text": "HelixHeadlessTabsTab[]"
+                "text": "HelixHeadlessTab[]"
               },
               "privacy": "private",
               "readonly": true,
@@ -77098,7 +78318,7 @@
               "kind": "field",
               "name": "panels",
               "type": {
-                "text": "HelixHeadlessTabsPanel[]"
+                "text": "HelixHeadlessTabPanel[]"
               },
               "privacy": "private",
               "readonly": true,
@@ -77506,7 +78726,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/tab/tabs-tab.css.ts",
+      "path": "src/tabs/tab/tab.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -77519,26 +78739,26 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/tabs/tab/tabs-tab.css.ts"
+            "module": "src/tabs/tab/tab.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/tab/tabs-tab.ts",
+      "path": "src/tabs/tab/tab.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "Selection is marked with a rule under the active tab rather than a filled\npill, which keeps the row flat and lets the underline animate between tabs as\na movement instead of two separate fills.",
-          "name": "HelixTabsTab",
+          "name": "HelixTab",
           "cssParts": [
             {
               "description": "The tab itself.",
               "name": "tab",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             }
           ],
@@ -77547,8 +78767,8 @@
               "description": "The tab's label.",
               "name": "",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             }
           ],
@@ -77563,8 +78783,8 @@
               "description": "Identifies the tab, and pairs it with the panel of the same value.",
               "attribute": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77577,8 +78797,8 @@
               "description": "Whether this tab is the current one.",
               "attribute": "selected",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77592,8 +78812,8 @@
               "attribute": "disabled",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77609,8 +78829,8 @@
                 "text": "focusItem() => void"
               },
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77626,8 +78846,8 @@
                 "text": "select() => void"
               },
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77805,7 +79025,7 @@
             }
           ],
           "superclass": {
-            "name": "HelixHeadlessTabsTab",
+            "name": "HelixHeadlessTab",
             "package": "@helix-io/headless/tabs"
           },
           "summary": "One tab in a tab list.",
@@ -77817,7 +79037,7 @@
             "group": "Tabs",
             "part": "Tab"
           },
-          "tagName": "helix-tabs-tab",
+          "tagName": "helix-tab",
           "customElement": true,
           "attributes": [
             {
@@ -77829,8 +79049,8 @@
               "description": "Identifies the tab, and pairs it with the panel of the same value.",
               "fieldName": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77842,8 +79062,8 @@
               "description": "Whether this tab is the current one.",
               "fieldName": "selected",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             },
             {
@@ -77855,8 +79075,8 @@
               "description": "Whether the tab can be chosen.",
               "fieldName": "disabled",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             }
           ],
@@ -77869,30 +79089,30 @@
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
-                "name": "HelixHeadlessTabsTab",
-                "module": "src/tabs/tab/tabs-tab.ts"
+                "name": "HelixHeadlessTab",
+                "module": "src/tabs/tab/tab.ts"
               }
             }
           ],
-          "modulePath": "src/tabs/tab/tabs-tab.ts",
-          "definitionPath": "src/tabs/tab/tabs-tab.ts"
+          "modulePath": "src/tabs/tab/tab.ts",
+          "definitionPath": "src/tabs/tab/tab.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixTabsTab",
+          "name": "HelixTab",
           "declaration": {
-            "name": "HelixTabsTab",
-            "module": "src/tabs/tab/tabs-tab.ts"
+            "name": "HelixTab",
+            "module": "src/tabs/tab/tab.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-tabs-tab",
+          "name": "helix-tab",
           "declaration": {
-            "name": "HelixTabsTab",
-            "module": "src/tabs/tab/tabs-tab.ts"
+            "name": "HelixTab",
+            "module": "src/tabs/tab/tab.ts"
           }
         }
       ]
@@ -78346,6 +79566,10 @@
               {
                 "description": "Tags a reader can take off, which is what a filter bar holds.",
                 "slug": "dismissible"
+              },
+              {
+                "description": "A tag asks to go and does not go on its own.",
+                "slug": "events"
               },
               {
                 "description": "A glyph or an avatar before the label.",
@@ -81640,6 +82864,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A typed time and one taken from the wheels arrive the same way.",
+                "slug": "events"
+              },
+              {
                 "description": "A time outside the window, and what the field says about it.",
                 "slug": "invalid"
               },
@@ -83475,6 +84703,11 @@
               {
                 "description": "Disabled, showing its time and refusing to move.",
                 "slug": "disabled"
+              },
+              {
+                "description": "A time chosen from a list, which is a discrete step and announces like one.",
+                "layout": "hug",
+                "slug": "events"
               },
               {
                 "description": "The picker reporting a time it cannot accept.",
@@ -85709,6 +86942,10 @@
                 "slug": "auto-dismiss"
               },
               {
+                "description": "A message asks to go, and what happens next is the page’s to decide.",
+                "slug": "events"
+              },
+              {
                 "description": "Toasts over a dark page, taking their own color mode.",
                 "slug": "page-mode"
               },
@@ -87313,6 +88550,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "Buttons where one stays pressed, which is a value and announces like one.",
+                "slug": "events"
+              },
+              {
                 "description": "The pressed member filled rather than outlined.",
                 "slug": "filled"
               },
@@ -88874,6 +90115,10 @@
                 "slug": "described"
               },
               {
+                "description": "A bubble that opens on hover and on focus, and says so both ways.",
+                "slug": "events"
+              },
+              {
                 "description": "A bubble clamped to a box of the page's choosing rather than to the window.",
                 "slug": "kept-inside"
               },
@@ -89587,6 +90832,11 @@
                 "description": "Four stops across an app shell, each holding a card.",
                 "min": 420,
                 "slug": "preview"
+              },
+              {
+                "description": "A stop asks, the run decides, and finishing is not the same as leaving.",
+                "min": 420,
+                "slug": "events"
               },
               {
                 "description": "A path that opens a menu and a drawer to point at what is inside them.",
@@ -92138,6 +93388,10 @@
                 "slug": "controlled"
               },
               {
+                "description": "Choosing bubbles to the tree and opening does not, which is why they are bound apart.",
+                "slug": "events"
+              },
+              {
                 "description": "A node told its own depth, for a tree built from a flat list rather than by nesting.",
                 "slug": "flattened"
               },
@@ -94091,6 +95345,10 @@
               {
                 "description": "A playlist whose current clip is the page's, so a deep link can choose one.",
                 "slug": "controlled"
+              },
+              {
+                "description": "A clip asks to be next, and the playlist decides which one plays.",
+                "slug": "events"
               },
               {
                 "description": "The entries as a menu in the player's control bar, and no list beside it.",

@@ -1,0 +1,10 @@
+export function Example() {
+  return (
+    <helix-time-input
+      default-value="09:30"
+      disabled
+      label="Starts"
+      name="starts"
+    ></helix-time-input>
+  )
+}

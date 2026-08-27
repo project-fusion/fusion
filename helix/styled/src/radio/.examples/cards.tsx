@@ -1,0 +1,26 @@
+export function Example() {
+  return (
+    <helix-radio-group default-value="team" hint="Hint" label="Label" name="plan">
+      <helix-radio value="solo" variant="card">
+        <helix-flex direction="column" gap="2xs">
+          <helix-text as="span" variant="body-strong">
+            Solo
+          </helix-text>
+          <helix-text as="span" tone="subtle" variant="caption">
+            One seat, and everything on it.
+          </helix-text>
+        </helix-flex>
+      </helix-radio>
+      <helix-radio value="team" variant="card">
+        <helix-flex direction="column" gap="2xs">
+          <helix-text as="span" variant="body-strong">
+            Team
+          </helix-text>
+          <helix-text as="span" tone="subtle" variant="caption">
+            Up to ten seats, shared billing.
+          </helix-text>
+        </helix-flex>
+      </helix-radio>
+    </helix-radio-group>
+  )
+}

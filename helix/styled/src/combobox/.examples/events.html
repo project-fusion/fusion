@@ -1,0 +1,77 @@
+<!-- @summary Seven announcements for one choice, and each of them is a different fact. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-combobox
+    creatable
+    id="language"
+    label="Language"
+    name="language"
+    placeholder="Search languages"
+  >
+    <helix-option value="rust">Rust</helix-option>
+    <helix-option value="ts">TypeScript</helix-option>
+    <helix-option value="go">Go</helix-option>
+  </helix-combobox>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type to narrow it, then choose</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const language = document.getElementById('language')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 9
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  language.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'the panel is about to show, refusable')
+  })
+  language.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'the panel is about to go, refusable')
+  })
+  language.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+  })
+  language.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  language.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  language.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+  language.addEventListener('helix-create', (event) => {
+    say('helix-create', `"${event.detail.value}" is not in the list and was made from the query`)
+  })
+</script>

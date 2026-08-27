@@ -1,0 +1,18 @@
+export function Example() {
+  return (
+    <helix-combobox
+      creatable
+      hint="The row is offered beside near misses too, and announces before it takes"
+      label="Tags"
+      multiple
+      name="tags"
+      placeholder="Search or add"
+    >
+      <helix-option value="bug">Bug</helix-option>
+      <helix-option value="chore">Chore</helix-option>
+      <helix-option value="docs">Documentation</helix-option>
+      <helix-option value="feature">Feature</helix-option>
+      <helix-option value="regression">Regression</helix-option>
+    </helix-combobox>
+  )
+}

@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <helix-date-input
+      date-style="iso"
+      default-value="2026-08-04"
+      hint="The ISO form, for a reader entering data"
+      label="Starts"
+      name="starts"
+    ></helix-date-input>
+  )
+}

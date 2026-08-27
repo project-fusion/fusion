@@ -1,0 +1,12 @@
+export function Example() {
+  return (
+    <helix-file-input
+      feedback="Choose at least one file"
+      hint="PNG or JPG, up to 10MB each"
+      label="Attachments"
+      multiple
+      name="attachments"
+      required
+    ></helix-file-input>
+  )
+}

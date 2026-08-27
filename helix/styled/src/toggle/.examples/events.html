@@ -1,0 +1,65 @@
+<!-- @summary Buttons where one stays pressed, which is a value and announces like one. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-toggle-group
+    id="density"
+    label="Density"
+  >
+    <helix-toggle value="sm">Compact</helix-toggle>
+    <helix-toggle value="md">Cosy</helix-toggle>
+    <helix-toggle value="lg">Roomy</helix-toggle>
+  </helix-toggle-group>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press one, then another</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const density = document.getElementById('density')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  density.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  density.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  density.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the choice is made`)
+  })
+  density.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" was pressed, which is the member speaking`)
+  })
+</script>

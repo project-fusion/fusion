@@ -746,6 +746,9 @@ export class HelixHeadlessListbox extends MixinCollection(
    * told them nothing before this.
    */
   private readonly handleFilter = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const control = event.target as HTMLInputElement
     this.requestFilter(control.value)
     if (control.value !== this.filter) {

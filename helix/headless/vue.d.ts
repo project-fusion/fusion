@@ -40,6 +40,7 @@ import type {
   HelixHeadlessDrilldown,
   HelixHeadlessEmpty,
   HelixHeadlessFileInput,
+  HelixHeadlessFormatDate,
   HelixHeadlessHeatmap,
   HelixHeadlessIconButton,
   HelixHeadlessIcon,
@@ -57,7 +58,7 @@ import type {
   HelixHeadlessMenu,
   HelixHeadlessMeter,
   HelixHeadlessNavigation,
-  HelixHeadlessNotificationsItem,
+  HelixHeadlessNotification,
   HelixHeadlessNotifications,
   HelixHeadlessNumberInput,
   HelixHeadlessOptionGroup,
@@ -92,9 +93,9 @@ import type {
   HelixHeadlessTableColumn,
   HelixHeadlessTable,
   HelixHeadlessTableRow,
-  HelixHeadlessTabsPanel,
+  HelixHeadlessTabPanel,
   HelixHeadlessTabs,
-  HelixHeadlessTabsTab,
+  HelixHeadlessTab,
   HelixHeadlessTag,
   HelixHeadlessTextarea,
   HelixHeadlessTimeInput,
@@ -387,8 +388,27 @@ export type HelixHeadlessAvatarGroupVueProps = {
   label?: HelixHeadlessAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
-Zero or less shows all of them, which is what an unset limit means and is
-more useful than refusing to render. */
+Unset shows all of them, which is what no limit means and is more useful
+than refusing to render.
+
+**Reflected, because the fold is a stylesheet rule and nothing else.** The
+styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+so the attribute *is* the mechanism: a `max` that reaches this property and
+never reaches the host matches no rule, and every avatar is drawn beside a
+count that says two of them are hidden. That is the failure this repository
+already writes down as "reflect only what CSS selects on", and it went
+unnoticed because the examples set `max` in markup, where the author had
+written the attribute themselves.
+
+It is the path a script takes that was broken, and React takes it for
+everyone: React assigns a matching property rather than an attribute, so
+`<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+markup twin, the fifth and sixth avatars rendered at full size where the
+markup version had them at 0x0.
+
+**Optional rather than defaulted, per the rule that a reflected property
+takes no default**: `max = 0` would stamp `max="0"` onto every host that
+never asked for a limit, including on the server. */
   max?: HelixHeadlessAvatarGroup["max"];
 };
 
@@ -2992,6 +3012,56 @@ export type HelixHeadlessFileInputVueEvents = {
   input: HelixHeadlessFileInputElementEvent;
 };
 
+export type HelixHeadlessFormatDateVueProps = {
+  /** The timestamp, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset this
+renders nothing rather than the epoch, which is what parsing an empty string
+would give.
+
+**The element's own text is read as a fallback, and only in a browser.**
+`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+spelling that reads best in markup, and it cannot be the only one: measured
+against Lit's server shim, `textContent`, `children`, `firstChild` and
+`querySelector` are all `undefined` there, so a server has no way to see it.
+An element rendered on a server needs the attribute; one rendered in a
+browser may use either. */
+  date?: HelixHeadlessFormatDate["date"];
+  /** How the day of the month is written, where a date is shown. */
+  day?: HelixHeadlessFormatDate["day"];
+  /** Show how long ago it was, compactly, instead of the date.
+
+Reflected, because it is the one property that decides which of two readings
+this is and a stylesheet has a reason to know: a compact reading is a fixed
+few characters and a date is not. */
+  elapsed?: HelixHeadlessFormatDate["elapsed"];
+  /** How the hour is written, where a time of day is shown. */
+  hour?: HelixHeadlessFormatDate["hour"];
+  /** Locale for the reading. Empty is the runtime's own. */
+  locale?: HelixHeadlessFormatDate["locale"];
+  /** How the minute is written, where a time of day is shown. */
+  minute?: HelixHeadlessFormatDate["minute"];
+  /** How the month is written, where a date is shown. */
+  month?: HelixHeadlessFormatDate["month"];
+  /** How the second is written, where a time of day is shown. */
+  second?: HelixHeadlessFormatDate["second"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  "time-zone"?: HelixHeadlessFormatDate["timeZone"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  timeZone?: HelixHeadlessFormatDate["timeZone"];
+  /** Whether to name the time zone, and how. */
+  "time-zone-name"?: HelixHeadlessFormatDate["timeZoneName"];
+  /** Whether to name the time zone, and how. */
+  timeZoneName?: HelixHeadlessFormatDate["timeZoneName"];
+  /** How the weekday is written, where one is shown. */
+  weekday?: HelixHeadlessFormatDate["weekday"];
+  /** How the year is written, where a date is shown. */
+  year?: HelixHeadlessFormatDate["year"];
+};
+
+export type HelixHeadlessFormatDateVueEvents = {};
+
 /** `HelixHeadlessHeatmap` component event */
 export type HelixHeadlessHeatmapElementEvent<E = Event> = TypedEvent<
   HelixHeadlessHeatmap,
@@ -3027,36 +3097,42 @@ compare two hues at all. This shipped demonstrating the opposite,
 `tones="surface info accent success primary"` for a commit count, and five
 unrelated hues for five amounts is confetti with no order in it. */
   tones?: HelixHeadlessHeatmap["tones"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "min-cell"?: HelixHeadlessHeatmap["minCell"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
@@ -4209,26 +4285,26 @@ export type HelixHeadlessNavigationVueProps = {
 
 export type HelixHeadlessNavigationVueEvents = {};
 
-/** `HelixHeadlessNotificationsItem` component event */
-export type HelixHeadlessNotificationsItemElementEvent<E = Event> = TypedEvent<
-  HelixHeadlessNotificationsItem,
+/** `HelixHeadlessNotification` component event */
+export type HelixHeadlessNotificationElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessNotification,
   E
 >;
 /** `helix-read` event type */
-export type HelixHeadlessNotificationsItemHelixReadElementEvent =
-  HelixHeadlessNotificationsItemElementEvent<HelixReadEvent>;
+export type HelixHeadlessNotificationHelixReadElementEvent =
+  HelixHeadlessNotificationElementEvent<HelixReadEvent>;
 /** `helix-dismiss` event type */
-export type HelixHeadlessNotificationsItemHelixDismissElementEvent =
-  HelixHeadlessNotificationsItemElementEvent<HelixDismissEvent>;
+export type HelixHeadlessNotificationHelixDismissElementEvent =
+  HelixHeadlessNotificationElementEvent<HelixDismissEvent>;
 
-export type HelixHeadlessNotificationsItemVueProps = {
+export type HelixHeadlessNotificationVueProps = {
   /** When it happened, as anything `Date` parses.
 
 An ISO string is what an API sends and what `<time datetime>` takes, so it
 is the shape that needs no translation at either end. Left unset the item
 shows no timestamp rather than showing the epoch, which is what parsing an
 empty string would give. */
-  at?: HelixHeadlessNotificationsItem["at"];
+  at?: HelixHeadlessNotification["at"];
   /** Whether the reader has seen it.
 
 Set it and this element defers: a reader's click fires `helix-read` and
@@ -4238,33 +4314,33 @@ this element then owns.
 **Not reflected, and it was until 27 Aug 2026.** The reason given was that
 unread is a visual state and a stylesheet has no other way to know, which
 is the same reason the four mixins mirror theirs, and the mirror may not be
-the property's own attribute: `<helix-notifications-item default-read>`
+the property's own attribute: `<helix-notification default-read>`
 came back from a server without `read` and gained it on the first update,
 which React reports as a hydration mismatch, and a copy of the serialized
 element re-parses that attribute as a declaration. `:state(read)` is what
 the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
 learned to mount an element a consumer had configured rather than a bare
 one. */
-  read?: HelixHeadlessNotificationsItem["read"];
+  read?: HelixHeadlessNotification["read"];
   /** State to open with, where nothing declared one. */
-  "default-read"?: HelixHeadlessNotificationsItem["defaultRead"];
+  "default-read"?: HelixHeadlessNotification["defaultRead"];
   /** State to open with, where nothing declared one. */
-  defaultRead?: HelixHeadlessNotificationsItem["defaultRead"];
+  defaultRead?: HelixHeadlessNotification["defaultRead"];
   /** Whether a reader may remove it. */
-  dismissible?: HelixHeadlessNotificationsItem["dismissible"];
+  dismissible?: HelixHeadlessNotification["dismissible"];
   /** Locale for the timestamp. Empty is the runtime's own. */
-  locale?: HelixHeadlessNotificationsItem["locale"];
+  locale?: HelixHeadlessNotification["locale"];
   /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixHeadlessNotificationsItem["dismissLabel"];
+  "dismiss-label"?: HelixHeadlessNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixHeadlessNotificationsItem["dismissLabel"];
+  dismissLabel?: HelixHeadlessNotification["dismissLabel"];
 };
 
-export type HelixHeadlessNotificationsItemVueEvents = {
+export type HelixHeadlessNotificationVueEvents = {
   /** Fired when the item is marked read or unread, and cancelable. */
-  "helix-read": HelixHeadlessNotificationsItemHelixReadElementEvent;
+  "helix-read": HelixHeadlessNotificationHelixReadElementEvent;
   /** Fired when a reader asks to remove it, and cancelable. */
-  "helix-dismiss": HelixHeadlessNotificationsItemHelixDismissElementEvent;
+  "helix-dismiss": HelixHeadlessNotificationHelixDismissElementEvent;
 };
 
 /** `HelixHeadlessNotifications` component event */
@@ -6250,11 +6326,11 @@ export type HelixHeadlessTableRowVueProps = {};
 
 export type HelixHeadlessTableRowVueEvents = {};
 
-export type HelixHeadlessTabsPanelVueProps = {
+export type HelixHeadlessTabPanelVueProps = {
   /** Pairs the panel with the tab of the same value. */
-  value?: HelixHeadlessTabsPanel["value"];
+  value?: HelixHeadlessTabPanel["value"];
   /** Whether this panel is the visible one. */
-  selected?: HelixHeadlessTabsPanel["selected"];
+  selected?: HelixHeadlessTabPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -6268,10 +6344,10 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  label?: HelixHeadlessTabsPanel["label"];
+  label?: HelixHeadlessTabPanel["label"];
 };
 
-export type HelixHeadlessTabsPanelVueEvents = {};
+export type HelixHeadlessTabPanelVueEvents = {};
 
 /** `HelixHeadlessTabs` component event */
 export type HelixHeadlessTabsElementEvent<E = Event> = TypedEvent<
@@ -6345,27 +6421,27 @@ export type HelixHeadlessTabsVueEvents = {
   "helix-select": HelixHeadlessTabsHelixSelectElementEvent;
 };
 
-/** `HelixHeadlessTabsTab` component event */
-export type HelixHeadlessTabsTabElementEvent<E = Event> = TypedEvent<
-  HelixHeadlessTabsTab,
+/** `HelixHeadlessTab` component event */
+export type HelixHeadlessTabElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessTab,
   E
 >;
 /** `helix-select` event type */
-export type HelixHeadlessTabsTabHelixSelectElementEvent =
-  HelixHeadlessTabsTabElementEvent<HelixSelectEvent>;
+export type HelixHeadlessTabHelixSelectElementEvent =
+  HelixHeadlessTabElementEvent<HelixSelectEvent>;
 
-export type HelixHeadlessTabsTabVueProps = {
+export type HelixHeadlessTabVueProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixHeadlessTabsTab["value"];
+  value?: HelixHeadlessTab["value"];
   /** Whether this tab is the current one. */
-  selected?: HelixHeadlessTabsTab["selected"];
+  selected?: HelixHeadlessTab["selected"];
   /** Whether the tab can be chosen. */
-  disabled?: HelixHeadlessTabsTab["disabled"];
+  disabled?: HelixHeadlessTab["disabled"];
 };
 
-export type HelixHeadlessTabsTabVueEvents = {
+export type HelixHeadlessTabVueEvents = {
   /** Fired when the tab is chosen. */
-  "helix-select": HelixHeadlessTabsTabHelixSelectElementEvent;
+  "helix-select": HelixHeadlessTabHelixSelectElementEvent;
 };
 
 /** `HelixHeadlessTag` component event */
@@ -8048,9 +8124,13 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
-  /** The size a cell wants. The strip fits as many as the container allows. */
+  /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
-  /** Space between cells. */
+  /** How wide a cell is. The strip fits as many as the container allows. */
+  "--heatmap-cell-width"?: string;
+  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
+  "--heatmap-cell-height"?: string;
+  /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
@@ -8370,6 +8450,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessFileInputVueProps,
     HelixHeadlessFileInputVueEvents
   >;
+  /** A date in a page is almost never wanted as an ISO string, and formatting one in the consumer's own code means every consumer ships a copy of the same 'Intl' call and a different set of options. This is that call, as an element, so a date is written where it is shown.  **'elapsed' is the mode a feed wants, and it stops being relative on purpose.** "42m", "3h", "1d" is what a row of activity reads as, and past a week the compact form is a lie: 'Intl.NumberFormat' narrow renders both 'minute' and 'month' as 'm' in en-US, so "3m" is three minutes at the top of a feed and three months further down it. Past six days this shows a date, which is shorter to read and impossible to misread. 'elapsedTime' in 'helix/core' carries the measurement.  **The reading refreshes itself, from one timer the page shares.** A relative timestamp is correct for as long as its unit lasts and wrong afterwards, and a page left open is exactly where that shows. Each element asks to be woken when its own reading expires rather than polling, and an element showing a date asks for nothing at all: fifty rows and fifty intervals is fifty wakeups a second where one will do, and a feed of last month's notifications should cost nothing to leave open.  **'<time datetime>' whatever the text says**, so a screen reader, a copy and paste, and anything parsing the page all get the real instant rather than "yesterday". */
+  "helix-headless-format-date": DefineCustomElement<
+    HelixHeadlessFormatDate,
+    HelixHeadlessFormatDateVueProps,
+    HelixHeadlessFormatDateVueEvents
+  >;
   /** **One family covers both readings, and the split people expect does not exist.** It was filed as two on the argument that a contribution graph needs a continuous ramp where uptime needs a category. GitHub's contribution graph is five discrete levels rather than a gradient, so a cell that takes a tone covers both: 'rows="1"' is a status strip, 'rows="7"' is a contribution graph, and heatmap is the name of that.  **What it cannot be is a bar chart with flat values**, and the data model is what closes that rather than taste: chart color is per *series* everywhere else here, '--chart-series-1' through '-15', so ninety differently coloured cells would be ninety series.  The data is a real '<table>' named by 'for', the same convention every chart in this library uses, which also answers the accessibility question without inventing anything: **the table is the accessible representation**, it is already in the markup, and the drawing is a picture of it. Hide it with 'data-hidden-visually' and the reading is still there for anyone who needs it.  A cell takes its tone from its own 'data-tone', or from 'thresholds' and 'tones' bucketing its value. The first is what a status page wants and the second is what a contribution graph wants; the cell's own wins, so a page that already knows a day was degraded does not have to encode that as a number for this component to decode again.  **A tone is a name this tier never resolves.** 'tone="success"' writes '--heatmap-tone: var(--heatmap-tone-success)' onto the cell and stops there, so what a name is worth is the answering tier's to say: 'helix/styled' points the semantic names at the theme's status colors and the numbered ones at a ramp, and a consumer on 'headless' declares the same names as whatever they like. It read 'var(--helix-color-${tone})' until 27 Aug 2026, which is the dependency the tiers exist to prevent and which failed loudly rather than quietly: off-tier that property is not undefined, it is *invalid*, so 'background-color: var(--heatmap-tone, …)' declined its own fallback and every cell came out transparent. The headless baseline was a blank page under a row of footer text. 'shared/chart/series.css' records Bar Chart having had the same fault for the same reason.  **On a narrow container it draws fewer cells rather than thinner ones.** Ninety cells in 320 pixels is three and a half pixels each, which is a smear and not a strip. The cells it drops are the oldest, and it reflects 'visible' and fires 'helix-resize' when the number changes, because **a summary saying "99.2% over 90 days" above a strip drawing 45 of them is telling the reader something false about the picture in front of them** and nothing about the picture says so. */
   "helix-headless-heatmap": DefineCustomElement<
     HelixHeadlessHeatmap,
@@ -8472,11 +8558,11 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessNavigationVueProps,
     HelixHeadlessNavigationVueEvents
   >;
-  /** A notification is a toast that did not go away. 'helix-toast' is deliberately the opposite of this: a live region whose items carry a 'duration' and whose root never creates or destroys anything. What makes this its own family is the state each item carries rather than the arrangement it sits in: read and unread, a timestamp that has to stay correct, and an action a reader can take later.  **The timestamp is the part that is easy to get wrong and impossible to notice.** "2 minutes ago" is correct for sixty seconds, and a feed left open ends up describing when the page loaded rather than when anything happened. Every item's reading is refreshed on a schedule it works out for itself, from one timer the page shares: fifty items with fifty intervals is fifty wakeups a second where one will do.  **Read state is reported, not invented.** Marking something read is usually a round trip, and a component that flips its own state and then hears the request failed has told the reader something untrue. 'helix-read' is cancelable, and a 'read' set by the consumer makes this element defer entirely. */
-  "helix-headless-notifications-item": DefineCustomElement<
-    HelixHeadlessNotificationsItem,
-    HelixHeadlessNotificationsItemVueProps,
-    HelixHeadlessNotificationsItemVueEvents
+  /** A notification is a toast that did not go away. 'helix-toast' is deliberately the opposite of this: a live region whose items carry a 'duration' and whose root never creates or destroys anything. What makes this its own family is the state each item carries rather than the arrangement it sits in: read and unread, a timestamp that has to stay correct, and an action a reader can take later.  **The row is a label, a caption under it, and one trailing column that holds either the time or the controls.** A feed is scanned rather than read, so the thing that happened gets the first line on its own and everything qualifying it goes under. The time and the controls occupy the same place because a reader wants exactly one of them at a time: the time while they are scanning, and what they can do about it once they have stopped on a row.  **The timestamp is 'helix-format-date'**, which is where the reading, the '<time datetime>' and the shared timer now live. It was implemented here, and a component that formats a date is not a fact about notifications: Chat wanted the same thing and had its own copy of half of it.  **Read state is reported, not invented.** Marking something read is usually a round trip, and a component that flips its own state and then hears the request failed has told the reader something untrue. 'helix-read' is cancelable, and a 'read' set by the consumer makes this element defer entirely. */
+  "helix-headless-notification": DefineCustomElement<
+    HelixHeadlessNotification,
+    HelixHeadlessNotificationVueProps,
+    HelixHeadlessNotificationVueEvents
   >;
   /** **Slotted children rather than a data property**, which is the opposite of the choice 'helix-data-table' made and correct for the opposite reason. A table's rows are homogeneous values a consumer wants windowed; a notification is a small piece of somebody's own markup, with an avatar and a link and a button in it, and there are tens of them rather than thousands. Writing them out is the web-component reading of a list and lets an item hold anything.  **The cost is stated rather than discovered: this does not virtualize, and it cannot.** Windowing needs the list to own the data, and here the consumer owns it: N notifications is N elements by construction. That is the same trade '25-data-table.md' §2.2 rejected for a table and accepts here, because the sizes are not comparable. A feed that really does hold thousands wants a data table with a custom cell, and this component will not grow into one.  **Read state is reported, never invented.** Marking read is usually a round trip: this element asks its items and each item asks the consumer, so a refused 'helix-read' leaves everything alone and a consumer who owns 'read' sees nothing change until they say so. 'unread' is derived from the items and reflected, so a stylesheet and a badge can both read it without either of them counting. */
   "helix-headless-notifications": DefineCustomElement<
@@ -8677,10 +8763,10 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTableRowVueEvents
   >;
   /** Hidden rather than unmounted when inactive, so anything typed into a panel is still there when the reader comes back to it, and so the content is in the server's markup for a crawler regardless of which tab is open. */
-  "helix-headless-tabs-panel": DefineCustomElement<
-    HelixHeadlessTabsPanel,
-    HelixHeadlessTabsPanelVueProps,
-    HelixHeadlessTabsPanelVueEvents
+  "helix-headless-tab-panel": DefineCustomElement<
+    HelixHeadlessTabPanel,
+    HelixHeadlessTabPanelVueProps,
+    HelixHeadlessTabPanelVueEvents
   >;
   /** Selection is coordinated by event, the same shape the accordion and the tree use: a tab dispatches 'SelectionChange' and the root pairs it with the panel of the same value. Nothing registers with anything, so tabs added later work without the root being told.  The tab list is a single tab stop, moved with the arrow keys through 'KeyboardNavigationController', the same one the radio and toggle groups use. Selection follows focus, which is the right default for a small set where showing a panel is cheap; a set where it is not should use 'manual'. */
   "helix-headless-tabs": DefineCustomElement<
@@ -8689,10 +8775,10 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTabsVueEvents
   >;
   /** An element rather than a slot because it owns selection and its own tab stop.  Its id and the id it controls are both derived from 'value', so the pairing between a tab and its panel survives server rendering. A generated id would differ between the server's render and the client's and break the link, and 'aria-controls' pointing at nothing is worse than not being there. */
-  "helix-headless-tabs-tab": DefineCustomElement<
-    HelixHeadlessTabsTab,
-    HelixHeadlessTabsTabVueProps,
-    HelixHeadlessTabsTabVueEvents
+  "helix-headless-tab": DefineCustomElement<
+    HelixHeadlessTab,
+    HelixHeadlessTabVueProps,
+    HelixHeadlessTabVueEvents
   >;
   /** A tag is a label, and optionally a label the reader can take off. 'dismissible' is what separates it from a badge: a badge reports a state the reader cannot change, a tag names something they can.  Dismissing is a request. The tag does not remove itself, because the consumer owns the list it sits in and taking the node out from under them would put their state and the document out of step. Canceling 'helix-dismiss' is a refusal. */
   "helix-headless-tag": DefineCustomElement<

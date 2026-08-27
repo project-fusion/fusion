@@ -1,0 +1,48 @@
+import './proportions.css'
+
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="2xl">
+      <helix-slider default-value="60" label="Default" max={100} min={0} show-value></helix-slider>
+
+      <helix-flex className="thick" direction="column" gap="2xl">
+        <helix-slider
+          default-value="60"
+          label="Thick track"
+          max={100}
+          min={0}
+          show-value
+        ></helix-slider>
+
+        <helix-slider
+          default-value="35"
+          label="Capsule handle"
+          markers={5}
+          max={100}
+          min={0}
+          show-value
+        ></helix-slider>
+      </helix-flex>
+
+      <helix-flex align="end" className="thick" gap="2xl">
+        <helix-slider
+          default-value="70"
+          label="Upright"
+          max={100}
+          min={0}
+          orientation="vertical"
+          show-value
+        ></helix-slider>
+
+        <helix-slider
+          default-value="30"
+          label="Beside it"
+          max={100}
+          min={0}
+          orientation="vertical"
+          show-value
+        ></helix-slider>
+      </helix-flex>
+    </helix-flex>
+  )
+}

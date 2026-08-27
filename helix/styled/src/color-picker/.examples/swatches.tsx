@@ -1,0 +1,9 @@
+export function Example() {
+  return (
+    <helix-color-picker
+      alpha
+      default-value="#3366ff"
+      swatches="#ef4444,#f97316,#eab308,#22c55e,#3366ff,#8b5cf6,#ec4899,#111827"
+    ></helix-color-picker>
+  )
+}

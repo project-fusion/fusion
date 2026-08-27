@@ -1,0 +1,33 @@
+export function Example() {
+  return (
+    <>
+      <helix-button command="--show" commandfor="large-dialog" emphasis="solid" tone="primary">
+        Open dialog
+      </helix-button>
+
+      <helix-dialog id="large-dialog" label="Dialog Title" size="lg">
+        <helix-text as="h2" slot="header">
+          Dialog Title
+        </helix-text>
+        <helix-text>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+          ut labore et dolore magna aliqua.
+        </helix-text>
+        <helix-flex gap="sm" slot="footer">
+          <helix-button
+            command="--close"
+            commandfor="large-dialog"
+            emphasis="solid"
+            tone="primary"
+            width="standard"
+          >
+            Save
+          </helix-button>
+          <helix-button command="--close" commandfor="large-dialog" width="standard">
+            Cancel
+          </helix-button>
+        </helix-flex>
+      </helix-dialog>
+    </>
+  )
+}

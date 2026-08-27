@@ -1,0 +1,13 @@
+export function Example() {
+  return (
+    <helix-toggle-group
+      feedback="Choose a view"
+      hint="How the results are laid out"
+      label="View"
+      required
+    >
+      <helix-toggle value="list">List</helix-toggle>
+      <helix-toggle value="grid">Grid</helix-toggle>
+    </helix-toggle-group>
+  )
+}

@@ -1,0 +1,28 @@
+import './a-live-preview.css'
+
+export function Example() {
+  return (
+    <div className="stage">
+      <helix-sandbox>
+        <helix-sandbox-source
+          name="html"
+          slot="source"
+          value="&lt;p&gt;Edited here, drawn beside it.&lt;/p&gt;"
+        ></helix-sandbox-source>
+
+        {/* The frame is the security boundary: `allow-scripts` and never
+               `allow-same-origin`, so what runs in it cannot reach this page. `src`
+               is the document it loads, `styles` the sheet to put in it, and
+               `source` is what the root hands over whenever the editor changes. */}
+        <helix-sandbox-preview
+          label="Live preview"
+          layout="padded"
+          slot="preview"
+          source="&lt;p&gt;Edited here, drawn beside it.&lt;/p&gt;"
+          src="/sandbox/frame.html"
+          styles="p { font: inherit }"
+        ></helix-sandbox-preview>
+      </helix-sandbox>
+    </div>
+  )
+}

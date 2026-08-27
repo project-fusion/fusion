@@ -1,0 +1,52 @@
+<!-- @summary Said after the clipboard write succeeded, and not before it is attempted. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-copy-button
+    id="copier"
+    value="bun add @helix-io/styled"
+  ></helix-copy-button>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Press the button</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const copier = document.getElementById('copier')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  copier.addEventListener('helix-copy', (event) => {
+    say('helix-copy', `"${event.detail.value}" is on the clipboard`)
+  })
+</script>

@@ -1,0 +1,59 @@
+<!-- @summary A time chosen from a list, which is a discrete step and announces like one. -->
+<!-- @layout hug -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-time-picker
+    default-value="09:30"
+    id="clock"
+  ></helix-time-picker>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Choose a time</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const clock = document.getElementById('clock')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  clock.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  clock.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}" as it is chosen`)
+  })
+  clock.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  })
+</script>

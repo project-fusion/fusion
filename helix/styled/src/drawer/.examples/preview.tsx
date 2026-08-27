@@ -1,0 +1,22 @@
+export function Example() {
+  return (
+    <>
+      <helix-button command="--show" commandfor="panel" emphasis="solid" tone="primary">
+        Open drawer
+      </helix-button>
+
+      <helix-drawer id="panel" label="Drawer Title" placement="end">
+        <span slot="header">Drawer Title</span>
+        <helix-flex direction="column" gap="md">
+          <helix-text variant="body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore.
+          </helix-text>
+          <helix-button command="--close" commandfor="panel" emphasis="solid" tone="primary">
+            Close
+          </helix-button>
+        </helix-flex>
+      </helix-drawer>
+    </>
+  )
+}

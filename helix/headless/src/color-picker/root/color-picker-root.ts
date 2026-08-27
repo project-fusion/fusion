@@ -275,6 +275,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
 
   /** Takes what was typed, and lets the square follow only a whole color. */
   private readonly handleValueInput = (event: Event): void => {
+    // Stopped for the reason `Input.handleInput` gives: the inner control's own
+    // `input` is composed and would reach a consumer beside this element's.
+    event.stopPropagation()
     const typed = (event.target as HTMLInputElement).value
     const parsed = parseColor(typed)
     if (parsed) {

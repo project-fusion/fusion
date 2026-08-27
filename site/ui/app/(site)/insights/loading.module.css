@@ -1,0 +1,43 @@
+/* A place to put `inert`, and not a box, so the hero, the bar and the grid stay
+   direct children of the layout that lays them out. */
+.standIn {
+  display: contents;
+}
+
+/* The hero and the bar are the shared chrome and take the shared measurements.
+   Only the card differs, an insight being text where a family is a drawing. */
+.heroTitle {
+  block-size: var(--helix-text-3xl);
+  inline-size: min(22rem, 60%);
+}
+
+.heroLede {
+  block-size: var(--helix-text-lg);
+  inline-size: min(34rem, 80%);
+}
+
+.heroSearch {
+  block-size: var(--helix-size-control);
+  inline-size: min(28rem, 100%);
+}
+
+.filterControl {
+  block-size: var(--helix-size-control-sm);
+  inline-size: 7rem;
+}
+
+/* A title that runs to two lines, then the byline under it. The second line is
+   short because a title that wrapped exactly is a title nobody wrote. */
+.cardTitle {
+  font-size: var(--helix-text-lg);
+}
+
+.cardLine {
+  font-size: var(--helix-text-lg);
+  inline-size: 70%;
+}
+
+.cardByline {
+  font-size: var(--helix-text-sm);
+  inline-size: 45%;
+}

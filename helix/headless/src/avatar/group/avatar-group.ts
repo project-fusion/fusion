@@ -73,11 +73,30 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   /**
    * How many avatars are shown before the rest become a count.
    *
-   * Zero or less shows all of them, which is what an unset limit means and is
-   * more useful than refusing to render.
+   * Unset shows all of them, which is what no limit means and is more useful
+   * than refusing to render.
+   *
+   * **Reflected, because the fold is a stylesheet rule and nothing else.** The
+   * styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+   * so the attribute *is* the mechanism: a `max` that reaches this property and
+   * never reaches the host matches no rule, and every avatar is drawn beside a
+   * count that says two of them are hidden. That is the failure this repository
+   * already writes down as "reflect only what CSS selects on", and it went
+   * unnoticed because the examples set `max` in markup, where the author had
+   * written the attribute themselves.
+   *
+   * It is the path a script takes that was broken, and React takes it for
+   * everyone: React assigns a matching property rather than an attribute, so
+   * `<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+   * markup twin, the fifth and sixth avatars rendered at full size where the
+   * markup version had them at 0x0.
+   *
+   * **Optional rather than defaulted, per the rule that a reflected property
+   * takes no default**: `max = 0` would stamp `max="0"` onto every host that
+   * never asked for a limit, including on the server.
    */
-  @property({ type: Number })
-  max = 0
+  @property({ reflect: true, type: Number })
+  max?: number
 
   /** The avatars, in light-DOM order. Empty on the server, which has no tree. */
   get avatars(): HTMLElement[] {
@@ -99,8 +118,9 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    * the attribute that hides the whole group.
    */
   get overflow(): number {
-    const limited = this.max > 0 && this.max <= FOLDS_UP_TO
-    return limited ? Math.max(this.avatars.length - this.max, 0) : 0
+    const limit = this.max ?? 0
+    const limited = limit > 0 && limit <= FOLDS_UP_TO
+    return limited ? Math.max(this.avatars.length - limit, 0) : 0
   }
 
   /** Said once per element, because a re-render is not a second mistake. */
@@ -118,7 +138,8 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
        rather than one update later. What is left is saying so when a `max` is
        set that no rule can match, because showing everyone is a defensible
        answer and showing everyone beside a "+5" is not. */
-    if (this.max > FOLDS_UP_TO && this.avatars.length > this.max && !this.warned) {
+    const limit = this.max ?? 0
+    if (limit > FOLDS_UP_TO && this.avatars.length > limit && !this.warned) {
       this.warned = true
       console.warn(
         `<${this.localName}> has max="${this.max}", past the ${FOLDS_UP_TO} the fold is written for, ` +

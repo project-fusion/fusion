@@ -1,0 +1,60 @@
+<!-- @summary A bubble that opens on hover and on focus, and says so both ways. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-tooltip
+    content="Deploys the current branch"
+    id="hint"
+  >
+    <helix-button>Deploy</helix-button>
+  </helix-tooltip>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Hover the button, then tab to it</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const hint = document.getElementById('hint')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  hint.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to open, and refusable')
+  })
+  hint.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to close, and refusable')
+  })
+  hint.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+</script>

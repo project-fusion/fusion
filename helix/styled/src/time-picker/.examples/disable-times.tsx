@@ -1,0 +1,9 @@
+export function Example() {
+  return (
+    <helix-time-picker
+      disable-times="09:30,10:00,11:15,13:00,14:30"
+      max="16:00"
+      min="09:00"
+    ></helix-time-picker>
+  )
+}

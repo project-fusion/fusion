@@ -1,0 +1,28 @@
+export function Example() {
+  return (
+    <helix-command default-open label="Search components" placeholder="Find a component">
+      <helix-option
+        alternate="/helix/sandbox?family=card"
+        alternate-label="Open in the sandbox"
+        value="/helix/components/card"
+      >
+        Card
+        <span slot="end">Reference</span>
+      </helix-option>
+      <helix-option
+        alternate="/helix/sandbox?family=button"
+        alternate-label="Open in the sandbox"
+        value="/helix/components/button"
+      >
+        Button
+        <span slot="end">Reference</span>
+      </helix-option>
+
+      {/* The footer is the consumer's, because only they know what the second
+             destination is called on their own site. */}
+      <helix-text slot="footer" tone="subtle" variant="caption">
+        Enter opens the reference. Hold the modifier to open the sandbox.
+      </helix-text>
+    </helix-command>
+  )
+}

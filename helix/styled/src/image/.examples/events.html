@@ -1,0 +1,70 @@
+<!-- @summary Load and error under the platform’s own names, which is what a fallback needs. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-flex
+    direction="column"
+    gap="sm"
+    id="pictures"
+  >
+    <helix-image
+      alt="A road winding below highland cliffs at sunset"
+      rounded
+      src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
+    ></helix-image>
+    <helix-image
+      alt="Nothing, because this one cannot arrive"
+      rounded
+      src="https://example.invalid/missing.png"
+    ></helix-image>
+  </helix-flex>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">One picture loads and one does not</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const pictures = document.getElementById('pictures')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* In the capture phase, because neither of these bubbles: that is the platform
+     on an `<img>` and it is deliberately the platform here too, since a bubbling
+     relay is the one shape React cannot bind on a custom element. */
+  pictures.addEventListener('load', (event) => {
+    say('load', `${event.target.naturalWidth} by ${event.target.naturalHeight}`)
+  }, true)
+  pictures.addEventListener('error', () => {
+    say('error', 'nothing arrived, so the fallback shows')
+  }, true)
+
+</script>

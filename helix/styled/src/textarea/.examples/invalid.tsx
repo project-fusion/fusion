@@ -1,0 +1,10 @@
+export function Example() {
+  return (
+    <helix-textarea
+      default-value="broken"
+      feedback="Say a little more than that"
+      hint="What went wrong, in your own words"
+      label="Description"
+    ></helix-textarea>
+  )
+}

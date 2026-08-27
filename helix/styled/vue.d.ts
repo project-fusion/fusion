@@ -40,6 +40,7 @@ import type {
   HelixEmpty,
   HelixFileInput,
   HelixFlex,
+  HelixFormatDate,
   HelixGrid,
   HelixHeatmap,
   HelixIconButton,
@@ -58,7 +59,7 @@ import type {
   HelixMenu,
   HelixMeter,
   HelixNavigation,
-  HelixNotificationsItem,
+  HelixNotification,
   HelixNotifications,
   HelixNumberInput,
   HelixOptionGroup,
@@ -98,9 +99,9 @@ import type {
   HelixTableColumn,
   HelixTable,
   HelixTableRow,
-  HelixTabsPanel,
+  HelixTabPanel,
   HelixTabs,
-  HelixTabsTab,
+  HelixTab,
   HelixTag,
   HelixText,
   HelixTextarea,
@@ -575,8 +576,27 @@ export type HelixAvatarGroupVueProps = {
   label?: HelixAvatarGroup["label"];
   /** How many avatars are shown before the rest become a count.
 
-Zero or less shows all of them, which is what an unset limit means and is
-more useful than refusing to render. */
+Unset shows all of them, which is what no limit means and is more useful
+than refusing to render.
+
+**Reflected, because the fold is a stylesheet rule and nothing else.** The
+styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
+so the attribute *is* the mechanism: a `max` that reaches this property and
+never reaches the host matches no rule, and every avatar is drawn beside a
+count that says two of them are hidden. That is the failure this repository
+already writes down as "reflect only what CSS selects on", and it went
+unnoticed because the examples set `max` in markup, where the author had
+written the attribute themselves.
+
+It is the path a script takes that was broken, and React takes it for
+everyone: React assigns a matching property rather than an attribute, so
+`<helix-avatar-group max={4}>` folded nothing at all. Measured against the
+markup twin, the fifth and sixth avatars rendered at full size where the
+markup version had them at 0x0.
+
+**Optional rather than defaulted, per the rule that a reflected property
+takes no default**: `max = 0` would stamp `max="0"` onto every host that
+never asked for a limit, including on the server. */
   max?: HelixAvatarGroup["max"];
 };
 
@@ -1486,6 +1506,30 @@ export type HelixChatMessageHelixSendElementEvent =
   HelixChatMessageElementEvent<HelixSendEvent>;
 
 export type HelixChatMessageVueProps = {
+  /** Where the turn's surface ends.
+
+**A bubble is one answer and not the only one, and the category has moved.**
+Two people messaging read as two columns of bubbles, which is what the form
+has looked like since it existed. An assistant answering does not: the reply
+is a paragraph, often a long one with code and lists in it, and every AI
+surface worth copying sets it as prose with the reader's own turns in
+bubbles beside it. A component that can only draw bubbles cannot render the
+conversation most people are now building.
+
+- `filled` is the default and is told apart by its own ground, which is the
+  bubble.
+- `plain` has no ground and no edge: the turn is text on the transcript, and
+  the space around it and the avatar beside it are what separate it. For an
+  assistant's side of a conversation, and for any turn long enough that a
+  fill reads as a wall.
+
+**On this tier, because it is where the surface ends and nothing else.**
+`check:axes` keeps `separation` off the headless tier for the reason it
+keeps every painted axis off it: that tier has no ground to end. The two
+values are a subset of the registry's four; `elevated` and `outlined` are
+available and neither is a thing a turn should be, a lifted message reading
+as a card and an outlined one as an input. */
+  separation?: HelixChatMessage["separation"];
   /** Who said it.
 
 Free text rather than a two-value union, because a conversation is not
@@ -3660,6 +3704,56 @@ export type HelixFlexVueProps = {
 
 export type HelixFlexVueEvents = {};
 
+export type HelixFormatDateVueProps = {
+  /** The timestamp, as anything `Date` parses.
+
+An ISO string is what an API sends and what `<time datetime>` takes, so it
+is the shape that needs no translation at either end. Left unset this
+renders nothing rather than the epoch, which is what parsing an empty string
+would give.
+
+**The element's own text is read as a fallback, and only in a browser.**
+`<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
+spelling that reads best in markup, and it cannot be the only one: measured
+against Lit's server shim, `textContent`, `children`, `firstChild` and
+`querySelector` are all `undefined` there, so a server has no way to see it.
+An element rendered on a server needs the attribute; one rendered in a
+browser may use either. */
+  date?: HelixFormatDate["date"];
+  /** How the day of the month is written, where a date is shown. */
+  day?: HelixFormatDate["day"];
+  /** Show how long ago it was, compactly, instead of the date.
+
+Reflected, because it is the one property that decides which of two readings
+this is and a stylesheet has a reason to know: a compact reading is a fixed
+few characters and a date is not. */
+  elapsed?: HelixFormatDate["elapsed"];
+  /** How the hour is written, where a time of day is shown. */
+  hour?: HelixFormatDate["hour"];
+  /** Locale for the reading. Empty is the runtime's own. */
+  locale?: HelixFormatDate["locale"];
+  /** How the minute is written, where a time of day is shown. */
+  minute?: HelixFormatDate["minute"];
+  /** How the month is written, where a date is shown. */
+  month?: HelixFormatDate["month"];
+  /** How the second is written, where a time of day is shown. */
+  second?: HelixFormatDate["second"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  "time-zone"?: HelixFormatDate["timeZone"];
+  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  timeZone?: HelixFormatDate["timeZone"];
+  /** Whether to name the time zone, and how. */
+  "time-zone-name"?: HelixFormatDate["timeZoneName"];
+  /** Whether to name the time zone, and how. */
+  timeZoneName?: HelixFormatDate["timeZoneName"];
+  /** How the weekday is written, where one is shown. */
+  weekday?: HelixFormatDate["weekday"];
+  /** How the year is written, where a date is shown. */
+  year?: HelixFormatDate["year"];
+};
+
+export type HelixFormatDateVueEvents = {};
+
 export type HelixGridVueProps = {
   /** Fixed number of equal columns. */
   columns?: HelixGrid["columns"];
@@ -3722,36 +3816,42 @@ compare two hues at all. This shipped demonstrating the opposite,
 `tones="surface info accent success primary"` for a commit count, and five
 unrelated hues for five amounts is confetti with no order in it. */
   tones?: HelixHeatmap["tones"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "min-cell"?: HelixHeatmap["minCell"];
-  /** The smallest a cell may get before the strip draws fewer of them.
+  /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
-In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves.
+**Set this only to overrule what the strip actually draws.** The arithmetic
+needs a width in pixels and the width is a length the stylesheet resolves,
+so for as long as this was the only answer it was a promise the consumer had
+to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
+believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
+940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
+number a summary is told to trust was the number that was wrong.
 
-**Which makes it a statement about the sheet, and it has to agree with
-one.** These two defaults are a bare strip's, and `helix/styled` overrides
-both because it draws something bigger: it was 8 and 2 against a sheet
-drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
-cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
-width measured. `visible` said 59 the whole time, so the one number a
-summary is told to trust was the number that was wrong. A consumer who moves
-`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+enough on their own and these two are the estimate used until the first
+measurement lands. Writing the attribute pins the value and stops the
+measurement being consulted, which is what a container query or a transition
+on the cell size wants, where what is drawn this frame is not what the
+arithmetic should plan around.
 
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
@@ -5072,26 +5172,26 @@ export type HelixNavigationVueProps = {
 
 export type HelixNavigationVueEvents = {};
 
-/** `HelixNotificationsItem` component event */
-export type HelixNotificationsItemElementEvent<E = Event> = TypedEvent<
-  HelixNotificationsItem,
+/** `HelixNotification` component event */
+export type HelixNotificationElementEvent<E = Event> = TypedEvent<
+  HelixNotification,
   E
 >;
 /** `helix-read` event type */
-export type HelixNotificationsItemHelixReadElementEvent =
-  HelixNotificationsItemElementEvent<HelixReadEvent>;
+export type HelixNotificationHelixReadElementEvent =
+  HelixNotificationElementEvent<HelixReadEvent>;
 /** `helix-dismiss` event type */
-export type HelixNotificationsItemHelixDismissElementEvent =
-  HelixNotificationsItemElementEvent<HelixDismissEvent>;
+export type HelixNotificationHelixDismissElementEvent =
+  HelixNotificationElementEvent<HelixDismissEvent>;
 
-export type HelixNotificationsItemVueProps = {
+export type HelixNotificationVueProps = {
   /** When it happened, as anything `Date` parses.
 
 An ISO string is what an API sends and what `<time datetime>` takes, so it
 is the shape that needs no translation at either end. Left unset the item
 shows no timestamp rather than showing the epoch, which is what parsing an
 empty string would give. */
-  at?: HelixNotificationsItem["at"];
+  at?: HelixNotification["at"];
   /** Whether the reader has seen it.
 
 Set it and this element defers: a reader's click fires `helix-read` and
@@ -5101,33 +5201,33 @@ this element then owns.
 **Not reflected, and it was until 27 Aug 2026.** The reason given was that
 unread is a visual state and a stylesheet has no other way to know, which
 is the same reason the four mixins mirror theirs, and the mirror may not be
-the property's own attribute: `<helix-notifications-item default-read>`
+the property's own attribute: `<helix-notification default-read>`
 came back from a server without `read` and gained it on the first update,
 which React reports as a hydration mismatch, and a copy of the serialized
 element re-parses that attribute as a declaration. `:state(read)` is what
 the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
 learned to mount an element a consumer had configured rather than a bare
 one. */
-  read?: HelixNotificationsItem["read"];
+  read?: HelixNotification["read"];
   /** State to open with, where nothing declared one. */
-  "default-read"?: HelixNotificationsItem["defaultRead"];
+  "default-read"?: HelixNotification["defaultRead"];
   /** State to open with, where nothing declared one. */
-  defaultRead?: HelixNotificationsItem["defaultRead"];
+  defaultRead?: HelixNotification["defaultRead"];
   /** Whether a reader may remove it. */
-  dismissible?: HelixNotificationsItem["dismissible"];
+  dismissible?: HelixNotification["dismissible"];
   /** Locale for the timestamp. Empty is the runtime's own. */
-  locale?: HelixNotificationsItem["locale"];
+  locale?: HelixNotification["locale"];
   /** Accessible name for the dismiss control. */
-  "dismiss-label"?: HelixNotificationsItem["dismissLabel"];
+  "dismiss-label"?: HelixNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
-  dismissLabel?: HelixNotificationsItem["dismissLabel"];
+  dismissLabel?: HelixNotification["dismissLabel"];
 };
 
-export type HelixNotificationsItemVueEvents = {
+export type HelixNotificationVueEvents = {
   /** Fired when the item is marked read or unread, and cancelable. */
-  "helix-read": HelixNotificationsItemHelixReadElementEvent;
+  "helix-read": HelixNotificationHelixReadElementEvent;
   /** Fired when a reader asks to remove it, and cancelable. */
-  "helix-dismiss": HelixNotificationsItemHelixDismissElementEvent;
+  "helix-dismiss": HelixNotificationHelixDismissElementEvent;
 };
 
 /** `HelixNotifications` component event */
@@ -7472,11 +7572,11 @@ export type HelixTableRowVueProps = {};
 
 export type HelixTableRowVueEvents = {};
 
-export type HelixTabsPanelVueProps = {
+export type HelixTabPanelVueProps = {
   /** Pairs the panel with the tab of the same value. */
-  value?: HelixTabsPanel["value"];
+  value?: HelixTabPanel["value"];
   /** Whether this panel is the visible one. */
-  selected?: HelixTabsPanel["selected"];
+  selected?: HelixTabPanel["selected"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -7490,10 +7590,10 @@ name at all. An element reference cannot reach there either, a sibling
 shadow tree being neither the same tree nor an ancestor of it. A name is
 the one form that crosses, and `aria-label` on a `tabpanel` is how the
 pattern names one anyway. */
-  label?: HelixTabsPanel["label"];
+  label?: HelixTabPanel["label"];
 };
 
-export type HelixTabsPanelVueEvents = {};
+export type HelixTabPanelVueEvents = {};
 
 /** `HelixTabs` component event */
 export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
@@ -7564,24 +7664,24 @@ export type HelixTabsVueEvents = {
   "helix-select": HelixTabsHelixSelectElementEvent;
 };
 
-/** `HelixTabsTab` component event */
-export type HelixTabsTabElementEvent<E = Event> = TypedEvent<HelixTabsTab, E>;
+/** `HelixTab` component event */
+export type HelixTabElementEvent<E = Event> = TypedEvent<HelixTab, E>;
 /** `helix-select` event type */
-export type HelixTabsTabHelixSelectElementEvent =
-  HelixTabsTabElementEvent<HelixSelectEvent>;
+export type HelixTabHelixSelectElementEvent =
+  HelixTabElementEvent<HelixSelectEvent>;
 
-export type HelixTabsTabVueProps = {
+export type HelixTabVueProps = {
   /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixTabsTab["value"];
+  value?: HelixTab["value"];
   /** Whether this tab is the current one. */
-  selected?: HelixTabsTab["selected"];
+  selected?: HelixTab["selected"];
   /** Whether the tab can be chosen. */
-  disabled?: HelixTabsTab["disabled"];
+  disabled?: HelixTab["disabled"];
 };
 
-export type HelixTabsTabVueEvents = {
+export type HelixTabVueEvents = {
   /** Fired when the tab is chosen. */
-  "helix-select": HelixTabsTabHelixSelectElementEvent;
+  "helix-select": HelixTabHelixSelectElementEvent;
 };
 
 /** `HelixTag` component event */
@@ -9479,12 +9579,16 @@ export type CustomCssProperties = {
   "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
-  /** Fill behind the field. */
+  /** Fill behind the composer. */
   "--chat-composer-background"?: string;
+  /** The composer's edge, so a theme can remove it. */
+  "--chat-composer-border-width"?: string;
   /** How tall the field may grow. */
   "--chat-composer-max-height"?: string;
   /** Fill behind a turn. */
   "--chat-message-background"?: string;
+  /** The edge every turn carries, which only a failed one colors. */
+  "--chat-message-border-width"?: string;
   /** Fill behind the reader's own turns. */
   "--chat-message-background-me"?: string;
   /** Ink in a turn. */
@@ -9495,7 +9599,7 @@ export type CustomCssProperties = {
   "--chat-max-height"?: string;
   /** Space between turns. */
   "--chat-gap"?: string;
-  /** The hairline above the composer and under the header. */
+  /** The hairline under the header. */
   "--chat-rule"?: string;
   /** Space either side of every region. */
   "--chat-padding-inline"?: string;
@@ -9683,9 +9787,13 @@ export type CustomCssProperties = {
   "--file-input-inset"?: string;
   /** An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. */
   "--grid-columns"?: string;
-  /** The size a cell wants. The strip fits as many as the container allows. */
+  /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
-  /** Space between cells. */
+  /** How wide a cell is. The strip fits as many as the container allows. */
+  "--heatmap-cell-width"?: string;
+  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
+  "--heatmap-cell-height"?: string;
+  /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
@@ -9845,8 +9953,18 @@ export type CustomCssProperties = {
   "--notifications-rule"?: string;
   /** Ink in an item that has been read. */
   "--notifications-color"?: string;
-  /** The edge mark on an unread item. */
+  /** Color of the edge mark on an unread item. */
   "--notifications-unread-mark"?: string;
+  /** How long that mark is. */
+  "--notifications-unread-block-size"?: string;
+  /** How thick that mark is. */
+  "--notifications-unread-inline-size"?: string;
+  /** How far it sits from the row's leading edge. */
+  "--notifications-unread-inset"?: string;
+  /** How far it sits from the row's top. */
+  "--notifications-unread-offset"?: string;
+  /** Its corner radius, which is what turns it into a dot. */
+  "--notifications-unread-radius"?: string;
   /** Space above and below an item. */
   "--notifications-padding-block"?: string;
   /** Space either side of an item. */
@@ -10485,6 +10603,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixFlexVueProps,
     HelixFlexVueEvents
   >;
+  /** The base tier does the reading; this adds the one thing a design system has to say about it. A timestamp takes the family, size and color of the text around it, so almost nothing here is a decision. The exception is figures: an elapsed reading counts up under the reader, and proportional digits move the trailing edge as it does, which in a feed is a whole column shifting whenever any row in it ticks over. 'tabular-nums' in that mode and not in the other, because a date is written once and should sit in the text like the text. */
+  "helix-format-date": DefineCustomElement<
+    HelixFormatDate,
+    HelixFormatDateVueProps,
+    HelixFormatDateVueEvents
+  >;
   /** Two ways to declare columns, and only two. 'columns' is a fixed count; 'min' fills as many equal columns as fit above that width, which is a responsive layout with no breakpoint to maintain. Setting 'min' wins, because a fixed count that also reflows is two intentions in one element.  Presentation only, so there is no headless tier. */
   "helix-grid": DefineCustomElement<
     HelixGrid,
@@ -10594,10 +10718,10 @@ export interface WcToolkitVueGlobalComponents {
     HelixNavigationVueEvents
   >;
   /** A four-column grid: media, body, actions, dismiss.  **The media column is held open by the feed, not by the item.** Each item is its own grid, so nothing about one row's tracks reaches the row below it: a feed where some items had an avatar and some did not drew its text at two different left edges, which is the fault a grid was chosen to prevent. The root publishes whether anything in it has media and every item reserves that much, so a mixed feed reads down one edge and a feed with no media anywhere pays nothing for the column.  **Unread is weight and a mark on the inline start edge, not a fill.** Depth comes from a single border in this library, and a filled row is elevation spelled differently; a feed of filled rows is a striped list nobody can read. The mark is a fixed height on the first line rather than the height of the row, so it says the same thing about a one line notification and a five line one.  **Narrow, the actions go under the body.** How much room the row was given is a fact about this box and about nothing else, so it is a container query: a feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a viewport rule would hand it the wide branch. */
-  "helix-notifications-item": DefineCustomElement<
-    HelixNotificationsItem,
-    HelixNotificationsItemVueProps,
-    HelixNotificationsItemVueEvents
+  "helix-notification": DefineCustomElement<
+    HelixNotification,
+    HelixNotificationVueProps,
+    HelixNotificationVueEvents
   >;
   /** Three rows: header, a list that scrolls, footer. The list scrolls and the other two do not, because a panel is opened at a fixed height and a mark-all control that slides away as the reader scrolls is the control they were reaching for.  **It does not virtualize and it cannot**, which is the headless tier's note and worth repeating where the choice is made: the items are the consumer's own elements, so N notifications is N elements by construction. A feed that really holds thousands wants 'helix-data-table' with a custom cell. */
   "helix-notifications": DefineCustomElement<
@@ -10833,10 +10957,10 @@ export interface WcToolkitVueGlobalComponents {
     HelixTableRowVueEvents
   >;
   /** Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills. */
-  "helix-tabs-panel": DefineCustomElement<
-    HelixTabsPanel,
-    HelixTabsPanelVueProps,
-    HelixTabsPanelVueEvents
+  "helix-tab-panel": DefineCustomElement<
+    HelixTabPanel,
+    HelixTabPanelVueProps,
+    HelixTabPanelVueEvents
   >;
   /** Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills. */
   "helix-tabs": DefineCustomElement<
@@ -10845,10 +10969,10 @@ export interface WcToolkitVueGlobalComponents {
     HelixTabsVueEvents
   >;
   /** Selection is marked with a rule under the active tab rather than a filled pill, which keeps the row flat and lets the underline animate between tabs as a movement instead of two separate fills. */
-  "helix-tabs-tab": DefineCustomElement<
-    HelixTabsTab,
-    HelixTabsTabVueProps,
-    HelixTabsTabVueEvents
+  "helix-tab": DefineCustomElement<
+    HelixTab,
+    HelixTabVueProps,
+    HelixTabVueEvents
   >;
   /** Five tones. The fill is a tint of the status color, mixed with 'color-mix' rather than held as a token per status, so a theme that changes the status colors gets the tints with them. */
   "helix-tag": DefineCustomElement<

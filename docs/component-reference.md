@@ -370,7 +370,7 @@ its markup is the worse trade of the two.
 | --- | --- | --- | --- | --- | --- |
 | `avatars` | - | `HTMLElement[]` | - | `HelixHeadlessAvatarGroup` | The avatars, in light-DOM order. Empty on the server, which has no tree. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessAvatarGroup` | Accessible name for the set, such as "Reviewers". |
-| `max` | `max` | `number` | `0` | `HelixHeadlessAvatarGroup` | How many avatars are shown before the rest become a count. |
+| `max` | `max` | `number \| undefined` | - | `HelixHeadlessAvatarGroup` | How many avatars are shown before the rest become a count. |
 | `overflow` | - | `number` | - | `HelixHeadlessAvatarGroup` | How many avatars are past the limit, and so not shown. |
 
 #### Slots
@@ -995,7 +995,7 @@ offering it.
 | --- | --- |
 | `--chat-max-height` | How tall the conversation may get before the transcript scrolls. |
 | `--chat-gap` | Space between turns. |
-| `--chat-rule` | The hairline above the composer and under the header. |
+| `--chat-rule` | The hairline under the header. |
 | `--chat-padding-inline` | Space either side of every region. |
 | `--chat-resume-shadow` | The lift under the way back, which floats over the transcript. |
 
@@ -1039,24 +1039,27 @@ a ceiling eats the transcript it belongs to.
 
 | Slot | Description |
 | --- | --- |
-| `start` | Before the field: attachments, a model picker. |
-| `end` | After the field, beside the send control. |
+| `start` | Under the field, at the leading edge: attachments, a model picker. |
+| `end` | Under the field, beside the send control. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `field` | The text field. |
+| `tools` | The row under the field. |
 | `send` | The control that offers the turn. |
-| `composer` | The whole row. |
+| `composer` | The whole composer. |
 | `start` | The leading slot's box. |
 | `end` | The trailing slot's box. |
+| `mark` | The glyph inside the send control. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--chat-composer-background` | Fill behind the field. |
+| `--chat-composer-background` | Fill behind the composer. |
+| `--chat-composer-border-width` | The composer's edge, so a theme can remove it. |
 | `--chat-composer-max-height` | How tall the field may grow. |
 
 ### Message (`helix-chat-message`)
@@ -1082,6 +1085,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. Empty is the runtime's own. |
 | `retryLabel` | `retry-label` | `string` | `'Try again'` | `HelixHeadlessChatMessage` | Label for the control offered on a failed message. |
 | `sendingLabel` | `sending-label` | `string` | `'Sending'` | `HelixHeadlessChatMessage` | What to call each state, for a reader who cannot see it. |
+| `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Where the turn's surface ends. |
 | `state` | `state` | `'failed' \| 'sending' \| 'sent' \| 'streaming' \| undefined` | - | `HelixHeadlessChatMessage` | What has happened to it. |
 
 #### Events
@@ -1111,6 +1115,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | `sources` | What the turn was drawn from, under it and outside the bubble. |
 | `time` | When it was said. |
 | `state` | What has happened to it, where that is worth saying. |
+| `mark` | The status glyph beside a failure. |
 | `retry` | The control offered on a failed message. |
 | `actions` | The controls offered on the turn, beside its time. |
 
@@ -1119,6 +1124,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | Property | Description |
 | --- | --- |
 | `--chat-message-background` | Fill behind a turn. |
+| `--chat-message-border-width` | The edge every turn carries, which only a failed one colors. |
 | `--chat-message-background-me` | Fill behind the reader's own turns. |
 | `--chat-message-color` | Ink in a turn. |
 | `--chat-message-measure` | How wide a turn may get before it wraps. |
@@ -2751,6 +2757,45 @@ behavior separate from styling, and this is entirely styling.
 | --- | --- |
 | *(default)* | The items to lay out. |
 
+## Format Date
+
+### Root (`helix-format-date`)
+
+A timestamp, written the way the reader's locale writes one.
+
+Extends `HelixHeadlessFormatDate`.
+
+The base tier does the reading; this adds the one thing a design system has to
+say about it. A timestamp takes the family, size and color of the text around
+it, so almost nothing here is a decision. The exception is figures: an elapsed
+reading counts up under the reader, and proportional digits move the trailing
+edge as it does, which in a feed is a whole column shifting whenever any row
+in it ticks over. `tabular-nums` in that mode and not in the other, because a
+date is written once and should sit in the text like the text.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `date` | `date` | `string` | `''` | `HelixHeadlessFormatDate` | The timestamp, as anything `Date` parses. |
+| `day` | `day` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the day of the month is written, where a date is shown. |
+| `elapsed` | `elapsed` | `boolean` | `false` | `HelixHeadlessFormatDate` | Show how long ago it was, compactly, instead of the date. |
+| `hour` | `hour` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the hour is written, where a time of day is shown. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessFormatDate` | Locale for the reading. Empty is the runtime's own. |
+| `minute` | `minute` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the minute is written, where a time of day is shown. |
+| `month` | `month` | `'numeric' \| '2-digit' \| 'long' \| 'short' \| 'narrow' \| undefined` | - | `HelixHeadlessFormatDate` | How the month is written, where a date is shown. |
+| `second` | `second` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the second is written, where a time of day is shown. |
+| `timeZone` | `time-zone` | `string \| undefined` | - | `HelixHeadlessFormatDate` | The time zone to read the timestamp in. Empty is the runtime's own. |
+| `timeZoneName` | `time-zone-name` | `'long' \| 'short' \| undefined` | - | `HelixHeadlessFormatDate` | Whether to name the time zone, and how. |
+| `weekday` | `weekday` | `'long' \| 'short' \| 'narrow' \| undefined` | - | `HelixHeadlessFormatDate` | How the weekday is written, where one is shown. |
+| `year` | `year` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the year is written, where a date is shown. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `time` | The `<time>` element carrying the reading. |
+
 ## Grid
 
 ### Root (`helix-grid`)
@@ -2815,9 +2860,9 @@ compare two cells by. Both are hooks, so a page may answer differently.
 | --- | --- | --- | --- | --- | --- |
 | `emptyText` | `empty-text` | `string` | `'No readings'` | `HelixHeadlessHeatmap` | Shown when the table has no readings in it. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `gap` | `gap` | `number` | `4` | `HelixHeadlessHeatmap` | What the sheet beside this actually draws, in the pixels the fit arithmetic counts in. |
+| `gap` | `gap` | `number` | `4` | `HelixHeadlessHeatmap` | The first guess at what this sheet draws, before it has been measured. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
-| `minCell` | `min-cell` | `number` | `12` | `HelixHeadlessHeatmap` | The drawn cell, for the reason `gap` is the drawn gap. `0.75rem` at the root font size. |
+| `minCell` | `min-cell` | `number` | `12` | `HelixHeadlessHeatmap` | The drawn cell width, for the reason `gap` is the drawn gap. `0.75rem` at the root font size. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -2850,6 +2895,13 @@ compare two cells by. Both are hooks, so a page may answer differently.
 | `strip` | The grid of cells. |
 | `cell` | One reading. |
 | `footer` | The three-slot row under the strip. |
+| `mark` | The invisible point the tooltip is anchored to. |
+| `tooltip` | The bubble, forwarded from `Tooltip`. |
+| `tooltip-anchor` | The `Tooltip` element itself. |
+| `tooltip-cell` | One column's name and value inside the tooltip. |
+| `tooltip-label` | The reading's own name inside the tooltip. |
+| `tooltip-name` | A column's name inside the tooltip. |
+| `tooltip-value` | A column's value inside the tooltip. |
 | `start` | The leading slot's box. |
 | `summary` | The middle slot's box. |
 | `end` | The trailing slot's box. |
@@ -2859,8 +2911,10 @@ compare two cells by. Both are hooks, so a page may answer differently.
 
 | Property | Description |
 | --- | --- |
-| `--heatmap-cell-size` | The size a cell wants. The strip fits as many as the container allows. |
-| `--heatmap-gap` | Space between cells. |
+| `--heatmap-cell-size` | The size a cell wants on both axes, where neither is given its own. |
+| `--heatmap-cell-width` | How wide a cell is. The strip fits as many as the container allows. |
+| `--heatmap-cell-height` | How tall a cell is. A row of a tall thin cell is what a status page draws. |
+| `--heatmap-gap` | Space between cells. Zero is a continuous field rather than a grid of tiles. |
 | `--heatmap-cell-radius` | How far a cell's corners are rounded. |
 | `--heatmap-tone-success` | What `success` is worth, as a name or a `data-tone`. |
 | `--heatmap-tone-warning` | What `warning` is worth. |
@@ -3876,7 +3930,7 @@ holds thousands wants `helix-data-table` with a custom cell.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
-| `items` | - | `HelixHeadlessNotificationsItem[]` | - | `HelixHeadlessNotifications` | The notifications declared as children, in the order they are written. |
+| `items` | - | `HelixHeadlessNotification[]` | - | `HelixHeadlessNotifications` | The notifications declared as children, in the order they are written. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessNotifications` | Accessible name for the feed. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
@@ -3901,7 +3955,7 @@ holds thousands wants `helix-data-table` with a custom cell.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | The notifications, as `helix-notifications-item` children. |
+| *(default)* | The notifications, as `helix-notification` children. |
 | `header` | Above the list, for a title and the mark-all control. |
 | `footer` | Below the list, for a link to everything. |
 
@@ -3925,11 +3979,11 @@ holds thousands wants `helix-data-table` with a custom cell.
 | `--notifications-rule` | The hairline between items and around the regions. |
 | `--notifications-padding-inline` | Space either side of the header and footer. |
 
-### Item (`helix-notifications-item`)
+### Notification (`helix-notification`)
 
 One thing that happened, which a reader may not have seen yet.
 
-Extends `HelixHeadlessNotificationsItem`.
+Extends `HelixHeadlessNotification`.
 
 A four-column grid: media, body, actions, dismiss.
 
@@ -3957,18 +4011,18 @@ viewport rule would hand it the wide branch.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `at` | `at` | `string` | `''` | `HelixHeadlessNotificationsItem` | When it happened, as anything `Date` parses. |
-| `defaultRead` | `default-read` | `boolean` | `false` | `HelixHeadlessNotificationsItem` | State to open with, where nothing declared one. |
-| `dismissible` | `dismissible` | `boolean` | `false` | `HelixHeadlessNotificationsItem` | Whether a reader may remove it. |
-| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixHeadlessNotificationsItem` | Accessible name for the dismiss control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessNotificationsItem` | Locale for the timestamp. Empty is the runtime's own. |
-| `read` | `read` | `boolean` | - | `HelixHeadlessNotificationsItem` | Whether the reader has seen it. |
+| `at` | `at` | `string` | `''` | `HelixHeadlessNotification` | When it happened, as anything `Date` parses. |
+| `defaultRead` | `default-read` | `boolean` | `false` | `HelixHeadlessNotification` | State to open with, where nothing declared one. |
+| `dismissible` | `dismissible` | `boolean` | `false` | `HelixHeadlessNotification` | Whether a reader may remove it. |
+| `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixHeadlessNotification` | Accessible name for the dismiss control. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessNotification` | Locale for the timestamp. Empty is the runtime's own. |
+| `read` | `read` | `boolean` | - | `HelixHeadlessNotification` | Whether the reader has seen it. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `markRead()` | `HelixHeadlessNotificationsItem` | Asks to be marked read, and reports whether the request stood. |
+| `markRead()` | `HelixHeadlessNotification` | Asks to be marked read, and reports whether the request stood. |
 
 #### Events
 
@@ -3984,6 +4038,7 @@ viewport rule would hand it the wide branch.
 | *(default)* | What happened, in the consumer's own markup. |
 | `media` | An avatar or icon identifying who or what it came from. |
 | `actions` | What a reader can do about it. |
+| `caption` | A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`. |
 
 #### Parts
 
@@ -3991,11 +4046,13 @@ viewport rule would hand it the wide branch.
 | --- | --- |
 | `item` | The whole notification. |
 | `time` | When it happened. |
+| `trailing` | The column holding the time and the controls. |
+| `controls` | The actions and the dismiss, which replace the time. |
 | `dismiss` | The control that removes it. |
 | `dismiss-mark` | The glyph on that control, where none is slotted. |
 | `media` | The leading slot's box. |
-| `body` | Content and timestamp together. |
-| `content` | The consumer's own markup. |
+| `body` | The label and the caption together. |
+| `label` | What happened, on the first line. |
 | `actions` | The trailing slot's box. |
 
 #### Custom properties
@@ -4004,7 +4061,12 @@ viewport rule would hand it the wide branch.
 | --- | --- |
 | `--notifications-rule` | The hairline between items. |
 | `--notifications-color` | Ink in an item that has been read. |
-| `--notifications-unread-mark` | The edge mark on an unread item. |
+| `--notifications-unread-mark` | Color of the edge mark on an unread item. |
+| `--notifications-unread-block-size` | How long that mark is. |
+| `--notifications-unread-inline-size` | How thick that mark is. |
+| `--notifications-unread-inset` | How far it sits from the row's leading edge. |
+| `--notifications-unread-offset` | How far it sits from the row's top. |
+| `--notifications-unread-radius` | Its corner radius, which is what turns it into a dot. |
 | `--notifications-padding-block` | Space above and below an item. |
 | `--notifications-padding-inline` | Space either side of an item. |
 
@@ -6252,11 +6314,11 @@ a movement instead of two separate fills.
 | `panels` | The panel container. |
 | `indicator` | The mark that travels to the selected tab. |
 
-### Panel (`helix-tabs-panel`)
+### Panel (`helix-tab-panel`)
 
 The content shown for one tab.
 
-Extends `HelixHeadlessTabsPanel`.
+Extends `HelixHeadlessTabPanel`.
 
 Selection is marked with a rule under the active tab rather than a filled
 pill, which keeps the row flat and lets the underline animate between tabs as
@@ -6266,9 +6328,9 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | - | `string` | `''` | `HelixHeadlessTabsPanel` | The name of the panel, which is the text of the tab that opens it. |
-| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTabsPanel` | Whether this panel is the visible one. |
-| `value` | `value` | `string` | `''` | `HelixHeadlessTabsPanel` | Pairs the panel with the tab of the same value. |
+| `label` | - | `string` | `''` | `HelixHeadlessTabPanel` | The name of the panel, which is the text of the tab that opens it. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTabPanel` | Whether this panel is the visible one. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessTabPanel` | Pairs the panel with the tab of the same value. |
 
 #### Slots
 
@@ -6282,11 +6344,11 @@ a movement instead of two separate fills.
 | --- | --- |
 | `panel` | The panel container. |
 
-### Tab (`helix-tabs-tab`)
+### Tab (`helix-tab`)
 
 One tab in a tab list.
 
-Extends `HelixHeadlessTabsTab`.
+Extends `HelixHeadlessTab`.
 
 Selection is marked with a rule under the active tab rather than a filled
 pill, which keeps the row flat and lets the underline animate between tabs as
@@ -6296,16 +6358,16 @@ a movement instead of two separate fills.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessTabsTab` | Whether the tab can be chosen. |
-| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTabsTab` | Whether this tab is the current one. |
-| `value` | `value` | `string` | `''` | `HelixHeadlessTabsTab` | Identifies the tab, and pairs it with the panel of the same value. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessTab` | Whether the tab can be chosen. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessTab` | Whether this tab is the current one. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessTab` | Identifies the tab, and pairs it with the panel of the same value. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focusItem()` | `HelixHeadlessTabsTab` | Moves focus to this tab, for the list's arrow keys. |
-| `select()` | `HelixHeadlessTabsTab` | Selects this tab and announces it. |
+| `focusItem()` | `HelixHeadlessTab` | Moves focus to this tab, for the list's arrow keys. |
+| `select()` | `HelixHeadlessTab` | Selects this tab and announces it. |
 
 #### Events
 

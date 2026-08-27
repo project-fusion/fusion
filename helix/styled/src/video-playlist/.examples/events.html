@@ -1,0 +1,63 @@
+<!-- @summary A clip asks to be next, and the playlist decides which one plays. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-video-playlist
+    default-active="one"
+    id="episodes"
+    label="Episodes"
+  >
+    <helix-video
+      label="One of several"
+      slot="player"
+    ></helix-video>
+    <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
+    <helix-video-playlist-item value="two">Theming</helix-video-playlist-item>
+  </helix-video-playlist>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Choose another clip</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const episodes = document.getElementById('episodes')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  episodes.addEventListener('helix-before-activate', (event) => {
+    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+  })
+  episodes.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" was pressed, which is the item speaking`)
+  })
+</script>

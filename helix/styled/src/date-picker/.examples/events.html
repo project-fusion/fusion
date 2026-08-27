@@ -1,0 +1,62 @@
+<!-- @summary Paging the month is a move, and choosing a day is an answer. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-date-picker
+    default-month="2026-08"
+    id="calendar"
+    label="Ship date"
+  ></helix-date-picker>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Page the month, then choose a day</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const calendar = document.getElementById('calendar')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  calendar.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  calendar.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  calendar.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the choice is made`)
+  })
+  calendar.addEventListener('helix-navigate', (event) => {
+    say('helix-navigate', `the view moved to ${event.detail.value}, and nothing was chosen`)
+  })
+</script>

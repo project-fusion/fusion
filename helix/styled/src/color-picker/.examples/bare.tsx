@@ -1,0 +1,5 @@
+export function Example() {
+  return (
+    <helix-color-picker default-value="rgb(51 102 255)" format="rgb" no-format></helix-color-picker>
+  )
+}

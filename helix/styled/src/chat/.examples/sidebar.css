@@ -1,0 +1,25 @@
+/* The drawer's content box is what has the height here, so the conversation
+   takes all of it and the transcript is the only thing inside that scrolls.
+   `min-block-size: 0` is what lets it: a grid item's automatic minimum is its
+   content, so without it the transcript refuses to shrink and pushes the
+   composer off the bottom of the panel. */
+.sidebar {
+  --drawer-size: 24rem;
+}
+
+/* The drawer gives up its own padding and its own header. The conversation has
+   a header of its own and pads every region it owns, so a second set of both
+   put the drawer's title at one inset and the transcript at another, with a
+   band of nothing between them. */
+.sidebar::part(header) {
+  display: none;
+}
+
+.sidebar::part(content) {
+  display: grid;
+  padding: var(--helix-space-none);
+}
+
+.sidebar-chat {
+  min-block-size: 0;
+}

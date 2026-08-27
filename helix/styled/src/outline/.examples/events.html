@@ -1,0 +1,66 @@
+<!-- @summary The section being read, announced as the page scrolls past it. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-outline
+    id="rail"
+    label="On this page"
+  >
+    <a href="#install">Install</a>
+    <a href="#usage">Usage</a>
+    <a href="#api">API</a>
+  </helix-outline>
+
+  <div class="reading">
+    <section id="install"><h2>Install</h2>Add the package and import the stylesheet.</section>
+    <section id="usage"><h2>Usage</h2>Write the tag and give it a label.</section>
+    <section id="api"><h2>API</h2>Every property is on the reference page.</section>
+  </div>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Scroll the panel, or press a heading</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const rail = document.getElementById('rail')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  rail.addEventListener('helix-before-activate', (event) => {
+    say('helix-before-activate', `"${event.detail.value}" is the one being read`)
+  })
+</script>

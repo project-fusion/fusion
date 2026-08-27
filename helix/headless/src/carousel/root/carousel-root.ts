@@ -603,8 +603,70 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (count > 0 && this.index > count - 1) {
       this.goTo(count - 1)
     }
-    // Named on the slides themselves rather than on wrappers, so each is the
-    // consumer's own element and keeps whatever it already carried.
+    /* Held back until the first pass has run, which is a frame after the first
+       update. Everything reaching here afterwards is a slide set that changed
+       under a page long since hydrated, and wants naming immediately. */
+    if (this.named) {
+      this.nameSlides()
+    }
+  }
+
+  /**
+   * Whether the first naming pass has run. See `firstUpdated`.
+   */
+  private named = false
+
+  /**
+   * Names the slides a frame late, so React has committed before they change.
+   *
+   * **These are the consumer's own elements, and on a React page they are nodes
+   * React is in the middle of hydrating.** Written from `updated`, the
+   * attributes landed on the anchors before React reached them, so React found
+   * a DOM it had not rendered and reported a mismatch naming `role="group"` and
+   * `aria-roledescription="slide"` on every slide. It says the mismatch "won't
+   * be patched up", and it means it: the ARIA survived and the announcement was
+   * correct, so nothing looked wrong and the console was the only tell.
+   *
+   * **What it costs is the boundary, not the attributes.** React answers a
+   * mismatch by discarding the server's HTML for that subtree and rendering it
+   * again on the client, which re-inserts every node in it. On the landing page
+   * that subtree also holds three `<helix-aura>`, and re-inserting one used to
+   * put it out permanently: see the note in `aura-root.ts` on why a spent canvas
+   * cannot serve a second context. One component's hydration mismatch blinded
+   * another component two sections away, which is the shape this class of bug
+   * takes and the reason it is worth a frame to avoid.
+   *
+   * **A frame, and this is the library's established window**, not a number
+   * picked here: `HelixElement.firstUpdated` waits exactly one for the same
+   * reason, that React has to have committed for there to be anything to read.
+   * A frame callback runs in the rendering step before paint, so the names are
+   * on the slides in the frame the element upgraded in rather than after an
+   * empty one.
+   *
+   * **Deferred for every consumer rather than only where React is detected.**
+   * The bag `reactPropsOf` reads sits on the element React rendered, and these
+   * are its children; asking each slide whether a framework owns it is a
+   * question with no reliable answer, and the honest one costs a frame nobody
+   * can perceive. An HTML page gains a frame of unnamed slides, during which
+   * the carousel is still a labeled region holding six links.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    requestAnimationFrame(() => {
+      this.named = true
+      this.nameSlides()
+    })
+  }
+
+  /**
+   * Gives each slide its role, its slide-ness, and a position in the set.
+   *
+   * Named on the slides themselves rather than on wrappers, so each is the
+   * consumer's own element and keeps whatever it already carried. The label is
+   * a fallback for the same reason: a slide that came with a name of its own
+   * keeps it, and `1 of 6` is what a slide with nothing to say gets.
+   */
+  private nameSlides(): void {
     const slides = this.slides
     slides.forEach((slide, index) => {
       slide.setAttribute('role', 'group')

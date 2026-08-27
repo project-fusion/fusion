@@ -157,3 +157,48 @@ describe('Enter', () => {
     expect(heard).toBe(1)
   })
 })
+
+describe('the shape of the composer', () => {
+  /**
+   * The field spans the composer and the tools sit under it.
+   *
+   * One row was the wrong shape: an attachment control, the field, a stop
+   * control and a send button all on one line meant every tool a consumer added
+   * took width from the thing being typed into.
+   */
+  test('the tools are under the field, not beside it', async () => {
+    const element = await composer()
+    const tools = part(element, 'tools')
+    expect(tools).not.toBeNull()
+    expect(tools?.querySelector('[part="start"]')).not.toBeNull()
+    expect(tools?.querySelector('[part="end"]')).not.toBeNull()
+    expect(tools?.querySelector('[part="send"]')).not.toBeNull()
+  })
+
+  /**
+   * The send control is a glyph with the label as its accessible name, so a
+   * screen reader hears the same word it always did while the composer stops
+   * spending its widest column on it.
+   */
+  test('send is marked rather than spelled, and keeps its name', async () => {
+    const element = await composer('send-label="Send message"')
+    const send = part(element, 'send')
+    expect(send?.getAttribute('aria-label')).toBe('Send message')
+    expect(send?.querySelector('[part="mark"]')).not.toBeNull()
+  })
+
+  /**
+   * A tool box nobody filled is not laid out: it is a flex item, so it takes the
+   * gap beside it and the send control drifts inward for every slot a consumer
+   * left alone.
+   */
+  test('an empty tool box is hidden and a filled one is not', async () => {
+    const bare = await composer()
+    expect(part(bare, 'start')?.hasAttribute('data-empty')).toBe(true)
+    const filled = (await mount(
+      `<helix-headless-chat-composer><button slot="start">Attach</button></helix-headless-chat-composer>`,
+    )) as Composer
+    await filled.updateComplete
+    expect(part(filled, 'start')?.hasAttribute('data-empty')).toBe(false)
+  })
+})

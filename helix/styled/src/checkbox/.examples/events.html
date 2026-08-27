@@ -1,0 +1,60 @@
+<!-- @summary A boolean carried as a boolean, and the native pair a click sends. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-checkbox
+    id="box"
+    label="Send me release notes"
+    name="notes"
+    value="yes"
+  ></helix-checkbox>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Tick the box</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const box = document.getElementById('box')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  box.addEventListener('helix-before-toggle', (event) => {
+    say('helix-before-toggle', `proposing ${event.detail.checked}, a real boolean and not a string`)
+  })
+  box.addEventListener('input', (event) => {
+    say('input', `${event.currentTarget.checked}, announced as the state moves`)
+  })
+  box.addEventListener('change', (event) => {
+    say('change', `${event.currentTarget.checked}, relayed from the control inside`)
+  })
+</script>

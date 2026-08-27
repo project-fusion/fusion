@@ -52,6 +52,11 @@ helix/icons/src/generated.ts
 .next-dev/
 
 # Spec bundles for the sandbox, built from the spec files by `bun run specs`.
+# Event probes, written by the `specs` step of `bun run dev`. Generated like
+# `public/specs` beside it, and ignored for the same reason: `biome ci` lints
+# what it can see, and a generated page failing lint fails the push.
+site/ui/public/probe-events/
+
 site/ui/public/specs
 
 # The sandbox preview document, built from source by `bun run frame`.

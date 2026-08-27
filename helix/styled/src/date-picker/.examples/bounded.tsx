@@ -1,0 +1,10 @@
+export function Example() {
+  return (
+    <helix-date-picker
+      default-month="2026-08"
+      label="Label"
+      max="2026-08-22"
+      min="2026-08-10"
+    ></helix-date-picker>
+  )
+}

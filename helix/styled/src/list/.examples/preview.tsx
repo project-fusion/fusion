@@ -1,0 +1,16 @@
+export function Example() {
+  return (
+    <helix-list divided label="Label">
+      <helix-list-item>
+        <helix-icon name="cube" slot="start"></helix-icon>
+        Item One
+        <span slot="supporting">Caption</span>
+      </helix-list-item>
+      <helix-list-item>
+        <helix-icon name="cube" slot="start"></helix-icon>
+        Item Two
+        <span slot="supporting">Caption</span>
+      </helix-list-item>
+    </helix-list>
+  )
+}

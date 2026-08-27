@@ -1,0 +1,55 @@
+import './material.css'
+
+export function Example() {
+  return (
+    <>
+      <table data-hidden-visually id="barchartmaterial">
+        <caption>Deploys per service</caption>
+        <thead>
+          <tr>
+            <th scope="col">Service</th>
+            <th scope="col">Deploys</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Gateway</th>
+            <td data-value="34">34</td>
+          </tr>
+          <tr>
+            <th scope="row">Billing</th>
+            <td data-value="18">18</td>
+          </tr>
+          <tr>
+            <th scope="row">Search</th>
+            <td data-value="47">47</td>
+          </tr>
+          <tr>
+            <th scope="row">Identity</th>
+            <td data-value="9">9</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="panel">
+        <figure>
+          <figcaption>glass</figcaption>
+          <helix-bar-chart
+            for="barchartmaterial"
+            gridlines="value"
+            material="glass"
+          ></helix-bar-chart>
+        </figure>
+
+        <figure>
+          <figcaption>gradient</figcaption>
+          <helix-bar-chart
+            for="barchartmaterial"
+            gridlines="value"
+            wash="gradient"
+          ></helix-bar-chart>
+        </figure>
+      </div>
+    </>
+  )
+}

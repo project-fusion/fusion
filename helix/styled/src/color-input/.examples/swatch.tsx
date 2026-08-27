@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <helix-color-input
+      default-value="#3366ff"
+      label="Accent"
+      name="accent"
+      swatches="#ef4444,#f97316,#eab308,#22c55e,#3366ff,#8b5cf6"
+      variant="swatch"
+    ></helix-color-input>
+  )
+}

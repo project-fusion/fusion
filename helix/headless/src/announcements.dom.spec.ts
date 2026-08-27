@@ -46,8 +46,12 @@ beforeAll(async () => {
     import('./date-input/index.js'),
     import('./input/index.js'),
     import('./listbox/index.js'),
+    import('./number-input/index.js'),
     import('./option/index.js'),
     import('./select/index.js'),
+    import('./slider/index.js'),
+    import('./switch/index.js'),
+    import('./textarea/index.js'),
     import('./time-input/index.js'),
   ])
 })
@@ -192,6 +196,63 @@ describe('a group whose members are controls in their own right', () => {
     await settle(host)
 
     expect(heard.toSorted()).toEqual(['change', 'input'])
+  })
+})
+
+describe('a control that renders a native control', () => {
+  /* **`input` is composed by specification, so the inner control's own event
+     leaves the shadow root.** Every form control here renders a real `<input>`
+     or `<textarea>` and announces `input` from the host beside it, so one
+     keystroke reached a consumer twice and one of the two carried the value from
+     before the change. Measured in Chrome 148 on `<helix-checkbox>`: `input`
+     from the inner control with `checked` still false, then
+     `helix-before-toggle`, then `input` from the host with it true.
+     `handleChange` had stopped the inner one since it was written and
+     `handleInput` never did, so the pair was half applied. */
+  const NATIVE: Array<[string, string, 'check' | 'text']> = [
+    ['helix-headless-input', `<helix-headless-input label="L"></helix-headless-input>`, 'text'],
+    [
+      'helix-headless-textarea',
+      `<helix-headless-textarea label="L"></helix-headless-textarea>`,
+      'text',
+    ],
+    [
+      'helix-headless-number-input',
+      `<helix-headless-number-input label="L"></helix-headless-number-input>`,
+      'text',
+    ],
+    ['helix-headless-slider', `<helix-headless-slider label="L"></helix-headless-slider>`, 'text'],
+    [
+      'helix-headless-checkbox',
+      `<helix-headless-checkbox label="L"></helix-headless-checkbox>`,
+      'check',
+    ],
+    ['helix-headless-switch', `<helix-headless-switch label="L"></helix-headless-switch>`, 'check'],
+  ]
+
+  test.each(NATIVE)('%s announces once, not once per element', async (tag, markup, kind) => {
+    const host = (await mount(markup)) as HTMLElement
+    await settle(host)
+    const inner = (host as unknown as { renderRoot: ParentNode }).renderRoot.querySelector(
+      'input, textarea',
+    ) as HTMLInputElement | HTMLTextAreaElement
+    expect(inner, `${tag} renders no native control`).toBeDefined()
+
+    const heard: string[] = []
+    host.addEventListener('input', (event) => {
+      heard.push((event.composedPath()[0] as Element).localName)
+    })
+    if (kind === 'check') {
+      ;(inner as HTMLInputElement).click()
+    } else {
+      inner.value = '7'
+      inner.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    }
+    await settle(host)
+
+    /* Named by element rather than counted, so a failure says which one spoke
+       out of turn rather than only that the total was wrong. */
+    expect(heard).toEqual([tag])
   })
 })
 

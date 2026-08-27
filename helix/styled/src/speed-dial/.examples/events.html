@@ -1,0 +1,78 @@
+<!-- @summary A fan of actions that opens, and one of them chosen. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <div class="stage">
+    <helix-speed-dial
+      data-dock="bottom-end"
+      data-dock-within
+      id="dial"
+      label="Actions"
+    >
+      <helix-icon-button
+        label="New file"
+        value="new"
+      ></helix-icon-button>
+      <helix-icon-button
+        label="Upload"
+        value="upload"
+      ></helix-icon-button>
+    </helix-speed-dial>
+  </div>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open the dial, then choose an action</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const dial = document.getElementById('dial')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 7
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  dial.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'about to fan out, and refusable')
+  })
+  dial.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'about to fold away, and refusable')
+  })
+  dial.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  })
+  dial.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" was chosen, which bubbles`)
+  })
+</script>

@@ -1,0 +1,67 @@
+<!-- @summary The group answers for the set, and the member says it was the one pressed. -->
+<!-- @layout hug -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-radio-group
+    id="plan"
+    label="Plan"
+    name="plan"
+  >
+    <helix-radio value="free">Free</helix-radio>
+    <helix-radio value="team">Team</helix-radio>
+    <helix-radio value="scale">Scale</helix-radio>
+  </helix-radio-group>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Choose an answer</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const plan = document.getElementById('plan')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  plan.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  plan.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  })
+  plan.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", the choice is made`)
+  })
+  plan.addEventListener('helix-select', (event) => {
+    say('helix-select', `"${event.detail.value}" was pressed, which is the member speaking`)
+  })
+</script>

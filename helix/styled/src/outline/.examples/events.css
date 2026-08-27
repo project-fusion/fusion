@@ -1,0 +1,13 @@
+.reading {
+  block-size: 9rem;
+  overflow: auto;
+  padding-inline: var(--helix-space-sm);
+}
+
+.reading h2 {
+  margin-block-start: 0;
+}
+
+.reading section {
+  min-block-size: 7rem;
+}

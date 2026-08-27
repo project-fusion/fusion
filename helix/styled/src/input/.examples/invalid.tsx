@@ -1,0 +1,11 @@
+export function Example() {
+  return (
+    <helix-input
+      default-value="short"
+      feedback="Too short"
+      hint="At least 12 characters"
+      label="Password"
+      type="password"
+    ></helix-input>
+  )
+}

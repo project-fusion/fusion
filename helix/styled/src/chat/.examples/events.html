@@ -1,0 +1,62 @@
+<!-- @summary A turn sent and a transcript pinned, which are the reader’s two asks. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-chat
+    id="support"
+    label="Support"
+  >
+    <strong slot="header">Support</strong>
+    <helix-chat-message
+      author="them"
+      state="sent"
+    >How can I help?</helix-chat-message>
+    <helix-chat-composer slot="composer"></helix-chat-composer>
+  </helix-chat>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Send a message, then scroll the transcript</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const support = document.getElementById('support')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 7
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  support.addEventListener('helix-send', (event) => {
+    say('helix-send', `"${event.detail.value}" was sent, and posting it is the page’s job`)
+  })
+  support.addEventListener('helix-before-pin', (event) => {
+    say('helix-before-pin', `proposing ${event.detail.value}, which follows the reader’s scrolling`)
+  })
+</script>

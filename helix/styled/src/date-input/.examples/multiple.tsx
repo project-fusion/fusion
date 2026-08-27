@@ -1,0 +1,12 @@
+export function Example() {
+  return (
+    <helix-date-input
+      default-value="2026-08-04,2026-08-11,2026-08-18,2026-08-25"
+      hint="Any number of dates"
+      label="Sessions"
+      max-tags="2"
+      mode="multiple"
+      name="sessions"
+    ></helix-date-input>
+  )
+}

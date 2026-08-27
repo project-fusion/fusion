@@ -1,0 +1,36 @@
+export function Example() {
+  return (
+    <helix-navigation label="Main">
+      <a href="#overview">Overview</a>
+      <helix-megamenu label="Products">
+        <div data-megamenu-group>
+          <h3 data-megamenu-heading>Design</h3>
+          <a data-megamenu-item href="#helix">
+            <helix-icon name="cube"></helix-icon>
+            <strong>Helix</strong>
+            <span>Components, tokens and the base layer.</span>
+          </a>
+          <a data-megamenu-item href="#icons">
+            <helix-icon name="palette"></helix-icon>
+            <strong>Icons</strong>
+            <span>One set, drawn at a single weight.</span>
+          </a>
+        </div>
+        <div data-megamenu-group>
+          <h3 data-megamenu-heading>Mind</h3>
+          <a data-megamenu-item href="#cortex">
+            <helix-icon name="pulse"></helix-icon>
+            <strong>Cortex</strong>
+            <span>Memory, provenance and context.</span>
+          </a>
+          <a data-megamenu-item href="#trace">
+            <helix-icon name="strategy"></helix-icon>
+            <strong>Trace</strong>
+            <span>Where an answer came from.</span>
+          </a>
+        </div>
+      </helix-megamenu>
+      <a href="#pricing">Pricing</a>
+    </helix-navigation>
+  )
+}

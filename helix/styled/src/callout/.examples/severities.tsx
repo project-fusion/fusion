@@ -1,0 +1,22 @@
+export function Example() {
+  return (
+    <helix-flex direction="column" gap="sm">
+      <helix-callout tone="info">
+        <span slot="title">Information</span>
+        The next release ships on Tuesday.
+      </helix-callout>
+      <helix-callout tone="success">
+        <span slot="title">Success</span>
+        Your workspace has been created.
+      </helix-callout>
+      <helix-callout tone="warning">
+        <span slot="title">Warning</span>
+        Two of your API keys expire this month.
+      </helix-callout>
+      <helix-callout tone="danger">
+        <span slot="title">Error</span>
+        The deploy failed and the previous build is still live.
+      </helix-callout>
+    </helix-flex>
+  )
+}

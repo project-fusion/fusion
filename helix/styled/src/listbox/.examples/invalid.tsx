@@ -1,0 +1,14 @@
+export function Example() {
+  return (
+    <helix-listbox
+      feedback="Pick a role before inviting"
+      hint="What they will be able to do"
+      label="Role"
+      name="role"
+    >
+      <helix-option value="viewer">Viewer</helix-option>
+      <helix-option value="editor">Editor</helix-option>
+      <helix-option value="owner">Owner</helix-option>
+    </helix-listbox>
+  )
+}

@@ -1,0 +1,7 @@
+export function Example() {
+  return (
+    <helix-badge label="Unread messages">
+      <helix-avatar name="Jane Doe"></helix-avatar>
+    </helix-badge>
+  )
+}

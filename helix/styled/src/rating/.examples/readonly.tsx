@@ -1,0 +1,9 @@
+export function Example() {
+  return (
+    <helix-rating
+      default-value="4.2"
+      readonly
+      value-text="4.2 out of 5, from 318 reviews"
+    ></helix-rating>
+  )
+}

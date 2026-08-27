@@ -1,0 +1,57 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <div className="layout">
+      <helix-headless-outline className="nav" label="On this page">
+        <a href="#install">Install</a>
+        <a data-level="2" href="#requirements">
+          Requirements
+        </a>
+        <a href="#usage">Usage</a>
+        <a data-level="2" href="#options">
+          Options
+        </a>
+        <a href="#api">API</a>
+      </helix-headless-outline>
+
+      <div className="prose">
+        <section id="install">
+          <h2>Install</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+        </section>
+        <section id="requirements">
+          <h2>Requirements</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+        </section>
+        <section id="usage">
+          <h2>Usage</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+        </section>
+        <section id="options">
+          <h2>Options</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+        </section>
+        <section id="api">
+          <h2>API</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+        </section>
+      </div>
+    </div>
+  )
+}
