@@ -39,11 +39,13 @@ beforeAll(async () => {
    * that compose plus the group and the controls they contain. */
   await Promise.all([
     import('./checkbox/index.js'),
+    import('./color-picker/index.js'),
     import('./checkbox-group/index.js'),
     import('./color-input/index.js'),
     import('./combobox/index.js'),
     import('./command/index.js'),
     import('./date-input/index.js'),
+    import('./file-input/index.js'),
     import('./input/index.js'),
     import('./listbox/index.js'),
     import('./number-input/index.js'),
@@ -209,7 +211,7 @@ describe('a control that renders a native control', () => {
      `helix-before-toggle`, then `input` from the host with it true.
      `handleChange` had stopped the inner one since it was written and
      `handleInput` never did, so the pair was half applied. */
-  const NATIVE: Array<[string, string, 'check' | 'text']> = [
+  const NATIVE: Array<[string, string, 'bare' | 'check' | 'text']> = [
     ['helix-headless-input', `<helix-headless-input label="L"></helix-headless-input>`, 'text'],
     [
       'helix-headless-textarea',
@@ -228,6 +230,22 @@ describe('a control that renders a native control', () => {
       'check',
     ],
     ['helix-headless-switch', `<helix-headless-switch label="L"></helix-headless-switch>`, 'check'],
+    /* The two the first sweep missed, because it started from the seven that
+       announce through `MixinControllerValue` rather than from every family that
+       renders a native control. File Input declared `input` and sent none, so
+       the only one a consumer received was the inner `<input type="file">`'s;
+       Color Picker stopped its hue and alpha rails since they were written and
+       left the two area axes inline, moving the color and stopping nothing. */
+    [
+      'helix-headless-file-input',
+      `<helix-headless-file-input label="L"></helix-headless-file-input>`,
+      'bare',
+    ],
+    [
+      'helix-headless-color-picker',
+      `<helix-headless-color-picker></helix-headless-color-picker>`,
+      'text',
+    ],
   ]
 
   test.each(NATIVE)('%s announces once, not once per element', async (tag, markup, kind) => {
@@ -244,6 +262,15 @@ describe('a control that renders a native control', () => {
     })
     if (kind === 'check') {
       ;(inner as HTMLInputElement).click()
+    } else if (kind === 'bare') {
+      /* A file input refuses a programmatic `value`, which is the platform
+         protecting the filesystem rather than anything about this element, and
+         it announces off `change` rather than off `input`: the inner control
+         sends both and this element answers the second. Both are dispatched so
+         the assertion sees whatever escapes, which before the fix was the inner
+         `input` and nothing of this element's. */
+      inner.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      inner.dispatchEvent(new Event('change', { bubbles: true }))
     } else {
       inner.value = '7'
       inner.dispatchEvent(new Event('input', { bubbles: true, composed: true }))

@@ -435,6 +435,23 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   }
 
   /**
+   * One axis of the area, taken the way `takeChannel` takes a rail.
+   *
+   * **Named rather than inline because of the first line.** These were two arrow
+   * functions that moved the color and stopped nothing, so the `<input
+   * type="range">` behind each axis sent its own composed `input` straight past
+   * this element to whoever was listening on it: a consumer dragging the area
+   * received the range's event and not this component's. `takeChannel` beside it
+   * has stopped its own since it was written, which is what made the omission
+   * hard to see. Found by sweeping every family that renders a native control.
+   */
+  private takeArea(axis: 'brightness' | 'saturation', event: Event): void {
+    event.stopPropagation()
+    const { value } = event.target as HTMLInputElement
+    this.move({ [axis]: Number(value) })
+  }
+
+  /**
    * A channel's new value, read off the slider that just applied it.
    *
    * **Both native events, because a slider sends both and at different
@@ -527,8 +544,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           aria-label="Saturation"
           .value=${String(color.saturation)}
           ?disabled=${this.isDisabled}
-          @input=${(event: Event) =>
-            this.move({ saturation: Number((event.target as HTMLInputElement).value) })}
+          @input=${(event: Event) => this.takeArea('saturation', event)}
         />
         <input
           part="grid-brightness"
@@ -538,8 +554,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           aria-label="Brightness"
           .value=${String(color.brightness)}
           ?disabled=${this.isDisabled}
-          @input=${(event: Event) =>
-            this.move({ brightness: Number((event.target as HTMLInputElement).value) })}
+          @input=${(event: Event) => this.takeArea('brightness', event)}
         />
       </div>
 

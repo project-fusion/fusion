@@ -244,8 +244,17 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
         value: this.files.map((file) => file.name).join(', '),
       }),
     )
-    /* And under the platform's own name, which is what `onChange` binds and
-       what a native file input sends when the chosen files move. */
+    /* And under the platform's own names, which is what `onChange` and `onInput`
+       bind and what a native file input sends when the chosen files move: both,
+       in that order, the way every other control here does.
+
+       `input` was declared and never sent until 27 Aug 2026. The only one a
+       consumer received was the inner `<input type="file">`'s own, composed out
+       of this shadow root, so the documented event did not exist and an
+       undocumented one arrived in its place. Found by sweeping every family
+       that renders a native control rather than every family the first pass
+       named. See 308. */
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
@@ -420,6 +429,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
           ?multiple=${this.multiple}
           ?required=${this.required}
           @change=${this.handleChange}
+          @input=${this.stopInner}
         />
         <label part="trigger" for="control">
           <slot name="trigger">${this.triggerLabel}</slot>
