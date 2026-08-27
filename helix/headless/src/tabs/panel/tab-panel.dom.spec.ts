@@ -10,7 +10,7 @@ type Panel = HTMLElement & { label: string; selected: boolean; updateComplete: P
 
 const panel = async (attributes = ''): Promise<Panel> =>
   (await mount(
-    `<helix-headless-tabs-panel value="one" ${attributes}>Body</helix-headless-tabs-panel>`,
+    `<helix-headless-tab-panel value="one" ${attributes}>Body</helix-headless-tab-panel>`,
   )) as Panel
 
 /**

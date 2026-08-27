@@ -15,8 +15,8 @@ import '../index.js'
 
 const at = '2020-01-01T00:00:00.000Z'
 const markup = ssr(
-  html`<helix-headless-notifications-item at=${at} dismissible
-    >Something happened</helix-headless-notifications-item
+  html`<helix-headless-notification at=${at} dismissible
+    >Something happened</helix-headless-notification
   >`,
 )
 
@@ -34,9 +34,6 @@ describe('notification server output', () => {
   })
 
   test('the host writes no attributes of its own', () => {
-    expect(hostAttributes(markup, 'helix-headless-notifications-item')).toEqual([
-      'at',
-      'dismissible',
-    ])
+    expect(hostAttributes(markup, 'helix-headless-notification')).toEqual(['at', 'dismissible'])
   })
 })

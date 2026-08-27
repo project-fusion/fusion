@@ -7,9 +7,9 @@ import '../index.js'
    attribute this component has: the line was inert, so every assertion below it
    was made against a set with nothing current at all and still passed. */
 const markup = ssr(html`<helix-headless-tabs default-active="one">
-  <helix-headless-tabs-tab selected value="one">One</helix-headless-tabs-tab>
-  <helix-headless-tabs-panel selected slot="panels" value="one">First</helix-headless-tabs-panel>
-  <helix-headless-tabs-panel slot="panels" value="two">Second</helix-headless-tabs-panel>
+  <helix-headless-tab selected value="one">One</helix-headless-tab>
+  <helix-headless-tab-panel selected slot="panels" value="one">First</helix-headless-tab-panel>
+  <helix-headless-tab-panel slot="panels" value="two">Second</helix-headless-tab-panel>
 </helix-headless-tabs>`)
 
 describe('tabs server output', () => {

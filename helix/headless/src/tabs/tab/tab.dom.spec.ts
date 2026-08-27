@@ -9,9 +9,7 @@ beforeAll(async () => {
 type Tab = HTMLElement & { disabled: boolean; selected: boolean; value: string; select(): void }
 
 const tab = async (attributes = ''): Promise<Tab> =>
-  (await mount(
-    `<helix-headless-tabs-tab value="one" ${attributes}>One</helix-headless-tabs-tab>`,
-  )) as Tab
+  (await mount(`<helix-headless-tab value="one" ${attributes}>One</helix-headless-tab>`)) as Tab
 
 /**
  * One tab, and the contract that is the tab's rather than the strip's.

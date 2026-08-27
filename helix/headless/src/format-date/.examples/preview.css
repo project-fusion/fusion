@@ -1,0 +1,17 @@
+dl {
+  display: grid;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  gap: 4px 16px;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  margin: 0;
+}
+
+dt {
+  color: #6b6b6b;
+}
+
+dd {
+  margin: 0;
+}

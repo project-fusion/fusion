@@ -43,13 +43,13 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-tabs-tab::part(tab) {
+helix-headless-tab::part(tab) {
   background-color: transparent;
   border: 0;
   padding: 0.25rem 0.5rem;
 }
 
-helix-headless-tabs-panel::part(panel) {
+helix-headless-tab-panel::part(panel) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
@@ -65,7 +65,7 @@ helix-headless-icon::part(svg) {
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
-helix-headless-tabs-tab::part(tab):focus-visible {
+helix-headless-tab::part(tab):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }

@@ -2,7 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixHeadlessNotifications } from '@helix-io/headless/notifications'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './notifications-root.css.js'
-import '../item/notifications-item.js'
+import '../notification/notification.js'
 
 /**
  * @summary A feed a reader comes back to, made of notifications they may not have seen.
@@ -23,7 +23,7 @@ import '../item/notifications-item.js'
  * @category feedback
  * @documentation https://helix.fusion.dev/components/notifications
  *
- * @slot - The notifications, as `helix-notifications-item` children.
+ * @slot - The notifications, as `helix-notification` children.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot footer - Below the list, for a link to everything.
  *

@@ -19,8 +19,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart panel - The panel container.
  */
-@customElement('helix-headless-tabs-panel')
-export class HelixHeadlessTabsPanel extends HelixElement {
+@customElement('helix-headless-tab-panel')
+export class HelixHeadlessTabPanel extends HelixElement {
   /** Pairs the panel with the tab of the same value. */
   @property()
   value = ''
@@ -59,7 +59,7 @@ export class HelixHeadlessTabsPanel extends HelixElement {
    * holds it instead, where it is not in the DOM at all.
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-tabs-panel selected>` in a consumer's
+   * seeds the property, which is what `<helix-tab-panel selected>` in a consumer's
    * markup means. What stops is the write back. See 302 and 304.
    */
   protected override willUpdate(changed: PropertyValues): void {
@@ -82,6 +82,6 @@ export class HelixHeadlessTabsPanel extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-headless-tabs-panel': HelixHeadlessTabsPanel
+    'helix-headless-tab-panel': HelixHeadlessTabPanel
   }
 }

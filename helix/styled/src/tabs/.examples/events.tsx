@@ -38,18 +38,18 @@ export function Example() {
         onhelix-before-activate={moving}
         onhelix-select={chosen}
       >
-        <helix-tabs-tab value="usage">Usage</helix-tabs-tab>
-        <helix-tabs-tab value="billing">Billing</helix-tabs-tab>
-        <helix-tabs-tab value="danger">Danger</helix-tabs-tab>
-        <helix-tabs-panel slot="panels" value="usage">
+        <helix-tab value="usage">Usage</helix-tab>
+        <helix-tab value="billing">Billing</helix-tab>
+        <helix-tab value="danger">Danger</helix-tab>
+        <helix-tab-panel slot="panels" value="usage">
           Requests, storage and egress.
-        </helix-tabs-panel>
-        <helix-tabs-panel slot="panels" value="billing">
+        </helix-tab-panel>
+        <helix-tab-panel slot="panels" value="billing">
           Invoices and the card on file.
-        </helix-tabs-panel>
-        <helix-tabs-panel slot="panels" value="danger">
+        </helix-tab-panel>
+        <helix-tab-panel slot="panels" value="danger">
           Nothing reaches here.
-        </helix-tabs-panel>
+        </helix-tab-panel>
       </helix-tabs>
 
       <helix-list divided label="What arrived">

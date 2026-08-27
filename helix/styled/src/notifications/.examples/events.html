@@ -1,0 +1,63 @@
+<!-- @summary Read and dismissed are two different things a feed is told. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-notifications
+    id="feed"
+    label="Notifications"
+    mark-all
+  >
+    <helix-notification dismissible>
+      <strong>Ada Okonjo</strong> approved your deploy.
+    </helix-notification>
+    <helix-notification dismissible>
+      <strong>Grace Hopper</strong> left a comment.
+    </helix-notification>
+  </helix-notifications>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Open one, then dismiss it</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const feed = document.getElementById('feed')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  feed.addEventListener('helix-read', (event) => {
+    say('helix-read', `${event.detail.value}, which is a request the feed answers`)
+  })
+  feed.addEventListener('helix-dismiss', (event) => {
+    say('helix-dismiss', `"${event.detail.label}" asked to go`)
+  })
+</script>

@@ -1,0 +1,52 @@
+<!-- @summary The same readings on the headless tier, where the value is the element's own text. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<dl>
+  <dt>Elapsed:</dt>
+  <dd>
+    <helix-headless-format-date
+      class="stamp"
+      elapsed
+    ></helix-headless-format-date>
+  </dd>
+
+  <dt>Date:</dt>
+  <dd>
+    <helix-headless-format-date
+      class="stamp"
+      day="numeric"
+      month="short"
+      year="numeric"
+    ></helix-headless-format-date>
+  </dd>
+
+  <dt>Time:</dt>
+  <dd>
+    <helix-headless-format-date
+      class="stamp"
+      hour="numeric"
+      minute="2-digit"
+    ></helix-headless-format-date>
+  </dd>
+
+  <dt>Weekday:</dt>
+  <dd>
+    <helix-headless-format-date
+      class="stamp"
+      day="numeric"
+      month="long"
+      weekday="long"
+    ></helix-headless-format-date>
+  </dd>
+</dl>
+
+<script>
+  const at = new Date(Date.now() - 42 * 60_000).toISOString()
+  for (const stamp of document.querySelectorAll('.stamp')) {
+    stamp.date = at
+  }
+</script>

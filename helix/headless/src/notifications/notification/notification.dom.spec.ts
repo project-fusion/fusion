@@ -3,9 +3,10 @@ import { hasState, mount, part, registerDom, role } from '@helix-io/testing/dom'
 
 /* One notification.
  *
- * The timestamp is the part worth the most attention here: it is correct on
- * first render whatever the code does, and the failure is that it stays that way
- * for the life of the page. */
+ * What this element owns is read state, the dismiss, and which of the two things
+ * the trailing column is showing. The reading of the timestamp is not its any
+ * more: it hands the instant to `helix-format-date` and that family's specs
+ * carry the rest. */
 
 beforeAll(async () => {
   registerDom()
@@ -21,7 +22,7 @@ interface Item extends HTMLElement {
 
 const item = async (attributes = '') =>
   (await mount(
-    `<helix-headless-notifications-item ${attributes}>Something happened</helix-headless-notifications-item>`,
+    `<helix-headless-notification ${attributes}>Something happened</helix-headless-notification>`,
   )) as Item
 
 describe('read state', () => {
@@ -90,37 +91,78 @@ describe('read state', () => {
   })
 })
 
+/**
+ * The timestamp is delegated whole, so what is asserted here is the delegation.
+ *
+ * **These tests read the child rather than a `time` part, and two of them passed
+ * for the wrong reason before they were rewritten.** "an item with no `at` shows
+ * no time" asked `part(element, 'time')` for null, and once the timestamp moved
+ * into `helix-format-date` that lookup answers null for every item, timestamped
+ * or not: an assertion that cannot fail. What the reading itself does, and when
+ * it expires, is `format-date-root.dom.spec.ts` and `elapsed-time.pure.spec.ts`.
+ */
 describe('the timestamp', () => {
-  test('an item with no `at` shows no time rather than the epoch', async () => {
-    expect(part(await item(), 'time')).toBeNull()
+  const stamp = (element: HTMLElement) =>
+    element.shadowRoot?.querySelector('helix-headless-format-date') as
+      | (HTMLElement & { date: string; elapsed: boolean; locale: string })
+      | null
+
+  test('it is a format-date of this tier, not a time this element drew itself', async () => {
+    const element = await item(`at="${new Date().toISOString()}"`)
+    expect(stamp(element)).not.toBeNull()
+    expect(part(element, 'time')).toBeNull()
   })
 
-  test('an unparseable `at` shows no time rather than "Invalid Date"', async () => {
-    expect(part(await item('at="not a date"'), 'time')).toBeNull()
-  })
-
-  /**
-   * `datetime` carries the exact instant whatever the text says, so a screen
-   * reader and a copy-paste both get the real time rather than "yesterday".
-   */
-  test('the exact instant is in `datetime`, and the reading is the text', async () => {
+  test('the instant and the locale are handed down, and the mode is elapsed', async () => {
     const when = new Date(Date.now() - 120_000).toISOString()
-    const element = await item(`at="${when}"`)
-    const time = part(element, 'time')
-    expect(time?.getAttribute('datetime')).toBe(when)
-    expect(time?.textContent).toContain('2 minutes ago')
+    const element = await item(`at="${when}" locale="en-GB"`)
+    expect(stamp(element)?.date).toBe(when)
+    expect(stamp(element)?.locale).toBe('en-GB')
+    expect(stamp(element)?.getAttribute('elapsed')).not.toBeNull()
   })
 
-  test('a fresh item reads as now rather than counting seconds at the reader', async () => {
+  test('changing `at` reaches the child', async () => {
     const element = await item(`at="${new Date().toISOString()}"`)
-    expect(part(element, 'time')?.textContent).toContain('now')
-  })
-
-  test('changing `at` redraws the reading', async () => {
-    const element = await item(`at="${new Date().toISOString()}"`)
-    element.at = new Date(Date.now() - 7_200_000).toISOString()
+    const when = new Date(Date.now() - 7_200_000).toISOString()
+    element.at = when
     await element.updateComplete
-    expect(part(element, 'time')?.textContent).toContain('2 hours ago')
+    expect(stamp(element)?.date).toBe(when)
+  })
+
+  /* An item with no timestamp still renders the child, which then renders
+     nothing: the alternative is this element deciding what a valid date is,
+     which is the child's job and is tested there. */
+  test('an item with no `at` hands down an empty string rather than a guess', async () => {
+    expect(stamp(await item())?.date).toBe('')
+  })
+})
+
+/**
+ * Whether there is anything for the time to make way for.
+ *
+ * The trailing column shows one of the two, so a row with nothing to do about it
+ * would hide its timestamp on hover and put nothing in its place. `dismissible`
+ * is known without a DOM; a filled actions slot is not, which is why this is a
+ * state written after the render rather than a property.
+ */
+describe('the trailing swap', () => {
+  test('a row with neither actions nor a dismiss has nothing to swap to', async () => {
+    expect(hasState(await item(), 'controls')).toBe(false)
+  })
+
+  test('a dismiss is enough on its own', async () => {
+    expect(hasState(await item('dismissible'), 'controls')).toBe(true)
+  })
+
+  test('so is an action a consumer slotted', async () => {
+    const element = (await mount(
+      `<helix-headless-notification>
+        Something happened
+        <button slot="actions">View</button>
+      </helix-headless-notification>`,
+    )) as Item
+    await element.updateComplete
+    expect(hasState(element, 'controls')).toBe(true)
   })
 })
 

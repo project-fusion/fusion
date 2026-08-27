@@ -7,8 +7,8 @@ import {
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixHeadlessTabsPanel } from '../panel/tabs-panel.js'
-import { HelixHeadlessTabsTab } from '../tab/tabs-tab.js'
+import { HelixHeadlessTabPanel } from '../panel/tab-panel.js'
+import { HelixHeadlessTab } from '../tab/tab.js'
 
 /**
  * @summary A row of tabs and the panel each one shows.
@@ -108,15 +108,15 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /** Watches for anything that moves a tab, since none of it is a property. */
   private observer: ResizeObserver | undefined
 
-  private get tabs(): HelixHeadlessTabsTab[] {
+  private get tabs(): HelixHeadlessTab[] {
     return [...this.children].filter(
-      (child): child is HelixHeadlessTabsTab => child instanceof HelixHeadlessTabsTab,
+      (child): child is HelixHeadlessTab => child instanceof HelixHeadlessTab,
     )
   }
 
-  private get panels(): HelixHeadlessTabsPanel[] {
+  private get panels(): HelixHeadlessTabPanel[] {
     return [...this.children].filter(
-      (child): child is HelixHeadlessTabsPanel => child instanceof HelixHeadlessTabsPanel,
+      (child): child is HelixHeadlessTabPanel => child instanceof HelixHeadlessTabPanel,
     )
   }
 

@@ -1,10 +1,16 @@
 /**
- * One timer for the page, not one per notification.
+ * One timer for the page, not one per element that shows a time.
  *
  * **Fifty items with fifty intervals is fifty wakeups where one will do**, and
  * the cost is not theoretical: a notification panel is exactly the thing a
  * reader leaves open in a background tab, where every wakeup is a wakeup the
  * browser cannot coalesce away and a laptop pays for.
+ *
+ * *Moved here from `Notifications.Item` on 27 Aug 2026, when the timestamp
+ * became `helix-format-date` and two families needed the same timer.* It was
+ * always page-wide, which is what the `globalThis` key below is for; living in
+ * one family's folder only ever meant the second family would have written its
+ * own and got a second timer, which is the exact failure that note describes.
  *
  * Each subscriber says when it next needs looking at, and this holds a single
  * timeout for the soonest of them. A subscriber that wakes early is harmless,
@@ -29,7 +35,7 @@ interface Ticker {
   waiting: Set<Waiting>
 }
 
-const KEY = Symbol.for('helix.notifications.ticker')
+const KEY = Symbol.for('helix.ticker')
 
 const ticker = (): Ticker => {
   const global = globalThis as unknown as Record<symbol, Ticker | undefined>

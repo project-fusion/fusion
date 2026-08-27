@@ -73,7 +73,7 @@
 
 /* The last item's rule and the footer's rule are the same line drawn twice,
    which reads as a thicker one. */
-::slotted(helix-notifications-item:last-of-type) {
+::slotted(helix-notification:last-of-type) {
   --notifications-rule: transparent;
 }
 

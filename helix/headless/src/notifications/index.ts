@@ -1,2 +1,2 @@
-export { HelixHeadlessNotificationsItem } from './item/notifications-item.js'
+export { HelixHeadlessNotification } from './notification/notification.js'
 export { HelixHeadlessNotifications } from './root/notifications-root.js'

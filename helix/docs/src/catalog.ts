@@ -434,7 +434,7 @@ const examplesOf = (
  *
  * The family a declaration belongs to comes from where its file is rather than
  * from its tag name, which is the same reasoning `place()` carries for the
- * reference: `helix-button-group` is one family and `helix-tabs-tab` is a part
+ * reference: `helix-button-group` is one family and `helix-tab` is a part
  * of another, and nothing in the name says which.
  */
 export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = []): Family[] => {

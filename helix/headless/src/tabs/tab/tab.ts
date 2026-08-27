@@ -24,8 +24,8 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen.
  */
-@customElement('helix-headless-tabs-tab')
-export class HelixHeadlessTabsTab extends HelixElement {
+@customElement('helix-headless-tab')
+export class HelixHeadlessTab extends HelixElement {
   /** Identifies the tab, and pairs it with the panel of the same value. */
   @property()
   value = ''
@@ -63,7 +63,7 @@ export class HelixHeadlessTabsTab extends HelixElement {
    * holds it instead, where it is not in the DOM at all.
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-tabs-tab selected>` in a consumer's
+   * seeds the property, which is what `<helix-tab selected>` in a consumer's
    * markup means. What stops is the write back. See 302 and 304.
    */
   protected override willUpdate(changed: PropertyValues): void {
@@ -100,6 +100,6 @@ export class HelixHeadlessTabsTab extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-headless-tabs-tab': HelixHeadlessTabsTab
+    'helix-headless-tab': HelixHeadlessTab
   }
 }

@@ -7,28 +7,28 @@
 >
   <h2 slot="header">Notifications</h2>
 
-  <helix-notifications-item dismissible>
+  <helix-notification dismissible>
     <strong>Ada Okonjo</strong> approved your deploy to production.
     <helix-button
       emphasis="ghost"
       slot="actions"
     >View</helix-button>
-  </helix-notifications-item>
+  </helix-notification>
 
-  <helix-notifications-item dismissible>
+  <helix-notification dismissible>
     Build <strong>#4821</strong> failed on <code>main</code>
     <helix-button
       emphasis="ghost"
       slot="actions"
     >Logs</helix-button>
-  </helix-notifications-item>
+  </helix-notification>
 
-  <helix-notifications-item
+  <helix-notification
     default-read
     dismissible
   >
     Your invitation to <strong>Fusion Design</strong> was accepted.
-  </helix-notifications-item>
+  </helix-notification>
 
   <a
     data-link
@@ -44,7 +44,7 @@
   const feed = document.getElementById('feed')
   const ago = (minutes) => new Date(Date.now() - minutes * 60_000).toISOString()
 
-  const items = feed.querySelectorAll('helix-notifications-item')
+  const items = feed.querySelectorAll('helix-notification')
   items[0].at = ago(3)
   items[1].at = ago(42)
   items[2].at = ago(1500)

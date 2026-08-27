@@ -1,8 +1,8 @@
 import { customElement } from '@helix-io/core'
-import { HelixHeadlessNotificationsItem } from '@helix-io/headless/notifications'
+import { HelixHeadlessNotification } from '@helix-io/headless/notifications'
 import type { CSSResultGroup } from 'lit'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
-import { styles } from './notifications-item.css.js'
+import { styles } from './notification.css.js'
 
 /**
  * @summary One thing that happened, which a reader may not have seen yet.
@@ -41,17 +41,24 @@ import { styles } from './notifications-item.css.js'
  *
  * @csspart item - The whole notification.
  * @csspart time - When it happened.
+ * @csspart trailing - The column holding the time and the controls.
+ * @csspart controls - The actions and the dismiss, which replace the time.
  * @csspart dismiss - The control that removes it.
  * @csspart dismiss-mark - The glyph on that control, where none is slotted.
  *
  * @cssproperty --notifications-rule - The hairline between items.
  * @cssproperty --notifications-color - Ink in an item that has been read.
- * @cssproperty --notifications-unread-mark - The edge mark on an unread item.
+ * @cssproperty --notifications-unread-mark - Color of the edge mark on an unread item.
+ * @cssproperty --notifications-unread-block-size - How long that mark is.
+ * @cssproperty --notifications-unread-inline-size - How thick that mark is.
+ * @cssproperty --notifications-unread-inset - How far it sits from the row's leading edge.
+ * @cssproperty --notifications-unread-offset - How far it sits from the row's top.
+ * @cssproperty --notifications-unread-radius - Its corner radius, which is what turns it into a dot.
  * @cssproperty --notifications-padding-block - Space above and below an item.
  * @cssproperty --notifications-padding-inline - Space either side of an item.
  */
-@customElement('helix-notifications-item')
-export class HelixNotificationsItem extends HelixHeadlessNotificationsItem {
+@customElement('helix-notification')
+export class HelixNotification extends HelixHeadlessNotification {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [glyphStyles, styles]
@@ -59,6 +66,6 @@ export class HelixNotificationsItem extends HelixHeadlessNotificationsItem {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-notifications-item': HelixNotificationsItem
+    'helix-notification': HelixNotification
   }
 }

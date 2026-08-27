@@ -111,7 +111,7 @@ const table = (depth: number, heading: string, columns: string[], rows: string[]
  * The family and part a declaration belongs to, from where its file is.
  *
  * Not from the tag name. A tag is a string the family prefix can only be
- * guessed out of: `helix-button-group` is one family and `helix-tabs-tab` is a
+ * guessed out of: `helix-button-group` is one family and `helix-tab` is a
  * part of another, and nothing in the name says which. The path says both.
  */
 export const place = (path: string | undefined): { family: string; part: string } => {

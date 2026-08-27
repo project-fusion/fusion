@@ -1,0 +1,53 @@
+<!-- @summary The same instant, read four ways: elapsed, and three arrangements of a date. -->
+
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <helix-text>
+    Elapsed:
+    <helix-format-date
+      class="stamp"
+      elapsed
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Date:
+    <helix-format-date
+      class="stamp"
+      day="numeric"
+      month="short"
+      year="numeric"
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Time:
+    <helix-format-date
+      class="stamp"
+      hour="numeric"
+      minute="2-digit"
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Weekday:
+    <helix-format-date
+      class="stamp"
+      day="numeric"
+      month="long"
+      weekday="long"
+    ></helix-format-date>
+  </helix-text>
+</helix-flex>
+
+<script>
+  /* Set from script rather than written into the markup, because a timestamp in
+     an example is stale the moment it is committed: as a literal, the elapsed
+     reading is "Mar 2026" by the time anybody looks at it. */
+  const at = new Date(Date.now() - 42 * 60_000).toISOString()
+  for (const stamp of document.querySelectorAll('.stamp')) {
+    stamp.date = at
+  }
+</script>

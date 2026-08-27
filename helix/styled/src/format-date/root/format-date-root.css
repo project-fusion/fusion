@@ -1,0 +1,36 @@
+/* A timestamp is a piece of text and takes the text around it: no family, no
+   size, no color. What a design system has to add here is one thing the reader
+   would otherwise see going wrong. */
+:host {
+  display: inline;
+}
+
+/* Tabular figures, but only where the reading changes under the reader.
+ *
+ * A proportional `1` is narrower than a `4`, so an elapsed reading counting up
+ * from `1m` to `42m` moves its own trailing edge as it goes; in a feed those
+ * edges are a column, and the column shifts every time any row in it ticks. An
+ * absolute date is written once and never moves, so it keeps the proportional
+ * figures the surrounding text is set in. */
+:host([elapsed]) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Print: an elapsed reading has no reference point on paper.
+ *
+ * "42m" is measured from the moment somebody looked at the screen, and a sheet
+ * of paper cannot say when that was: the same page read a week later says the
+ * same thing and means something else. The exact instant is already in the
+ * markup, because `<time datetime>` carries it whatever the text says, so print
+ * reveals it rather than inventing a second copy. Machine-readable rather than
+ * pretty, which is the trade: `attr()` hands the string over and CSS has no way
+ * to format a date.
+ *
+ * `@media print` does not cross a shadow boundary, so every family says this for
+ * itself. An absolute reading needs nothing here: it already names its own
+ * instant. */
+@media print {
+  :host([elapsed]) [part="time"]::after {
+    content: " (" attr(datetime) ")";
+  }
+}

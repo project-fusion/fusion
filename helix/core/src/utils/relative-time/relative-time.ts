@@ -77,7 +77,13 @@ export const relativeTime = (locale: string): ((from: Date, now: Date) => Relati
        nothing: nobody acts differently at seven seconds than at four. */
     const size = Math.abs(elapsed)
     if (size < 60_000) {
-      return { next: 60_000 - size, text: found.format(0, 'second') }
+      /* Floored, which `Relative.next` has always said this is and this branch
+         alone was not: at 59,999 milliseconds the remainder is one, so a caller
+         is re-armed inside the callback that fired it. Nothing had noticed
+         because both readers go through the shared ticker, whose own
+         `Math.max(1000, ...)` was absorbing it; a caller scheduling for itself
+         would have had the busy loop the type promised it would not. */
+      return { next: Math.max(1000, 60_000 - size), text: found.format(0, 'second') }
     }
 
     let chosen = UNITS[1] as { ms: number; unit: Intl.RelativeTimeFormatUnit }

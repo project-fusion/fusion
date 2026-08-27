@@ -1,10 +1,10 @@
 import { customElement } from '@helix-io/core'
-import { HelixHeadlessTabsTab } from '@helix-io/headless/tabs'
+import { HelixHeadlessTabPanel } from '@helix-io/headless/tabs'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './tabs-tab.css.js'
+import { styles } from './tab-panel.css.js'
 
 /**
- * @summary One tab in a tab list.
+ * @summary The content shown for one tab.
  *
  * @description
  * Selection is marked with a rule under the active tab rather than a filled
@@ -15,17 +15,17 @@ import { styles } from './tabs-tab.css.js'
  * @status experimental
  * @documentation https://helix.fusion.dev/components/tabs
  *
- * @slot - The tab's label.
+ * @slot - The panel's content.
  *
- * @csspart tab - The tab itself.
+ * @csspart panel - The panel container.
  */
-@customElement('helix-tabs-tab')
-export class HelixTabsTab extends HelixHeadlessTabsTab {
+@customElement('helix-tab-panel')
+export class HelixTabPanel extends HelixHeadlessTabPanel {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-tabs-tab': HelixTabsTab
+    'helix-tab-panel': HelixTabPanel
   }
 }

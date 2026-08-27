@@ -5,13 +5,13 @@
   label="Activity"
   mark-all
 >
-  <helix-notifications-item>
+  <helix-notification>
     <strong>cortex-core</strong> finished indexing.
-  </helix-notifications-item>
+  </helix-notification>
 
-  <helix-notifications-item>
+  <helix-notification>
     A new version of <strong>@helix-io/styled</strong> is available.
-  </helix-notifications-item>
+  </helix-notification>
 </helix-notifications>
 
 <script>
@@ -43,7 +43,7 @@
     }
   })
 
-  for (const item of owned.querySelectorAll('helix-notifications-item')) {
+  for (const item of owned.querySelectorAll('helix-notification')) {
     item.at = new Date(Date.now() - 9 * 60000).toISOString()
     item.addEventListener('click', () => item.markRead(true))
   }

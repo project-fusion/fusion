@@ -153,6 +153,7 @@ export {
 } from './utils/custom-element/custom-element.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export { drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
+export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
 export {
   deepActiveElement,
   deepContains,
@@ -195,6 +196,7 @@ export {
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export { subscribe } from './utils/ticker/ticker.js'
 export {
   type HelixStatusTone,
   TONE_MARKS,

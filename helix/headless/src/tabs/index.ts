@@ -1,3 +1,3 @@
-export * from './panel/tabs-panel.js'
+export * from './panel/tab-panel.js'
 export * from './root/tabs-root.js'
-export * from './tab/tabs-tab.js'
+export * from './tab/tab.js'

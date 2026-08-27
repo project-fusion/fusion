@@ -40,7 +40,7 @@
   border-block-end: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));
   display: grid;
-  grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto;
   padding-block: var(--notifications-padding-block, var(--helix-space-sm));
   padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
   /* The containing block for the unread mark, which is placed against the row
@@ -63,15 +63,36 @@
 
    A pseudo element of a fixed height, on the first line and inset from the edge,
    is the same fact at the same size every time, and does not touch the border it
-   used to be mistaken for. */
+   used to be mistaken for.
+
+   **Every dimension of it is a hook, because the shape is a preference and the
+   fact is not.** A bar down the leading edge is one reading of "unread" and a dot
+   is another, and neither is more correct: what the component owes a consumer is
+   that there is exactly one mark, that it appears only when the item is unread,
+   and that changing its shape does not move a single pixel of the row, the mark
+   being placed against the row rather than flowing in it. A dot is the five
+   defaults set to one value each:
+
+   ```css
+   helix-notification {
+     --notifications-unread-block-size: 8px;
+     --notifications-unread-inline-size: 8px;
+     --notifications-unread-inset: 6px;
+     --notifications-unread-offset: 16px;
+     --notifications-unread-radius: var(--helix-radii-full);
+   }
+   ``` */
 :host(:not(:state(read))) [part="item"]::before {
   background-color: var(--notifications-unread-mark, var(--helix-color-accent));
-  block-size: var(--_notifications-line);
-  border-radius: var(--helix-radii-full);
+  block-size: var(--notifications-unread-block-size, var(--_notifications-line));
+  border-radius: var(--notifications-unread-radius, var(--helix-radii-full));
   content: "";
-  inline-size: var(--helix-border-thick);
-  inset-block-start: var(--notifications-padding-block, var(--helix-space-sm));
-  inset-inline-start: var(--helix-space-2xs);
+  inline-size: var(--notifications-unread-inline-size, var(--helix-border-thick));
+  inset-block-start: var(
+    --notifications-unread-offset,
+    var(--notifications-padding-block, var(--helix-space-sm))
+  );
+  inset-inline-start: var(--notifications-unread-inset, var(--helix-space-2xs));
   position: absolute;
 }
 
@@ -98,11 +119,37 @@
   gap: var(--helix-space-2xs);
 }
 
-[part="content"] {
+/* The label is the thing that happened and the caption qualifies it, so they are
+   two lines rather than one sentence: a feed is scanned, and a reader deciding
+   whether a row is theirs is reading the first few words of the first line. The
+   caption takes the timestamp's old place under the body, the timestamp having
+   moved to the trailing column. */
+[part="label"] {
   color: var(--notifications-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   line-height: var(--_notifications-line);
+}
+
+/* A bare slot and not a box, so a notification without a caption pays nothing
+   for the one it does not have. A `<slot>` is `display: contents` in the UA
+   stylesheet and an unassigned one generates no box at all: no grid row, no gap.
+   A wrapper generates both either way, and there is no way to ask in CSS whether
+   a slot was filled, which is the wall this file already hit once on the media
+   box and the root hit on its header.
+
+   The cost is the rule the library already accepts for this: the region has no
+   `part`, and what a consumer slotted is styled through `::slotted()`. The label
+   above cannot do the same, and the difference is worth knowing: it holds the
+   text a consumer writes inline, and `::slotted()` matches elements rather than
+   text nodes, so a label written as `<strong>Ada</strong> approved it` would
+   have half of itself styled. */
+slot[name="caption"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
 }
 
 /* After the base rule rather than before it, which is not a preference: a
@@ -110,7 +157,7 @@
    rule whose specificity says it wins and whose order says nothing, and
    `noDescendingSpecificity` refuses it because the next person to read the file
    cannot tell which was meant. */
-:host(:not(:state(read))) [part="content"] {
+:host(:not(:state(read))) [part="label"] {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-medium);
 }
@@ -126,10 +173,120 @@
    darkest has no hierarchy left to read. Three pounds now, and they descend:
    `foreground` for unread content, `foreground-muted` for read content,
    `foreground-subtle` for the time in either. */
-[part="time"] {
+/* One column, holding two things in one place.
+ *
+ * The time and the controls are the same cell of a one-cell grid, so they
+ * overlap exactly and neither reserves width the other is not using: a reader
+ * wants one of them at a time, the time while they are scanning the feed and the
+ * controls once they have stopped on a row. Stacking them is also what keeps the
+ * swap from moving anything, which a row that changed width under the pointer
+ * would.
+ *
+ * `> *` rather than the two part names, because one of the two is
+ * `helix-format-date` on this tier and `helix-headless-format-date` on the one
+ * below, and this rule is true of the column rather than of either child. */
+[part="trailing"] {
+  align-items: center;
+  align-self: center;
+  display: grid;
+  grid-template-areas: "swap";
+  justify-items: end;
+  margin-inline-start: var(--helix-space-sm);
+}
+
+[part="trailing"] > * {
+  grid-area: swap;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Which of the two is showing, as one number the host sets and both children
+   read. The inverse falls out of `calc`, so the pair cannot drift into both
+   being visible or neither. Written as rules on the children instead, hover,
+   touch and focus would be a specificity ladder with the case that has to win at
+   the bottom of it, which is the ladder the dismiss reveal was built to avoid. */
+:host {
+  --_notifications-swap: 0;
+}
+
+/* The timestamp: the quietest thing in the row, and never the reason somebody
+   looked, so it takes the smallest size and the subtlest ink.
+
+   **Named by what it is not, and that is not a stylistic choice.** The other
+   child of this column is the format-date element, whose tag is
+   `helix-format-date` here and `helix-headless-format-date` a tier down, so
+   neither tag can be written. `[part="time"]` cannot either, and
+   `check:selectors` is what said so: the part belongs to the child and arrives
+   through `exportparts`, so a rule in this sheet naming it matches nothing at
+   all. Valid CSS, no error, and a timestamp drawn at the inherited size.
+
+   **`foreground-subtle` is lighter than `foreground-muted`, and this had them
+   the wrong way round.** The two are 0.53 and 0.50 in oklch, so the timestamp,
+   the thing the line above calls the quietest in the row, was drawn darker than
+   the content it belongs to: on a read item the ink went `subtle` for the label
+   and `muted` for the time, and a row whose least important element is its
+   darkest has no hierarchy left to read. Three pounds now, and they descend:
+   `foreground` for an unread label, `foreground-muted` for a read one,
+   `foreground-subtle` for the time in either. */
+[part="trailing"] > :not([part="controls"]) {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
+  opacity: calc(1 - var(--_notifications-swap));
+}
+
+[part="controls"] {
+  align-items: center;
+  display: flex;
+  opacity: var(--_notifications-swap);
+}
+
+/* Only where there is something to swap to. A row with no actions and no dismiss
+   would otherwise hide its timestamp on hover and put nothing in its place, and
+   an item cannot ask in CSS whether its actions slot was filled: the element
+   answers that with `:state(controls)`, which is false at rest and on the
+   server. */
+:host(:hover:state(controls)),
+:host(:focus-within:state(controls)) {
+  --_notifications-swap: 1;
+}
+
+/* Untouchable while it is not the one showing. Focus is not affected by this and
+   must not be: the dismiss stays in the tab order at zero opacity, and tabbing
+   to it is what makes `:focus-within` true and swaps it in. */
+[part="controls"] {
+  pointer-events: none;
+}
+
+:host(:hover:state(controls)) [part="controls"],
+:host(:focus-within:state(controls)) [part="controls"] {
+  pointer-events: auto;
+}
+
+/* Where a pointer cannot hover there is no hover to swap on, so nothing is
+   stacked: the column lays the two out side by side and shows both. The
+   alternative, showing the controls and dropping the time, would take a fact off
+   the screen on the devices least able to spare a second glance. */
+@media (hover: none) and (pointer: coarse) {
+  [part="trailing"] {
+    column-gap: var(--helix-space-sm);
+    grid-auto-flow: column;
+    grid-template-areas: none;
+  }
+
+  [part="trailing"] > * {
+    grid-area: auto;
+    opacity: 1;
+  }
+
+  [part="controls"] {
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="trailing"] > * {
+    transition: none;
+  }
 }
 
 /* The seams the grid no longer draws. An empty box still carries its margin, so
@@ -153,10 +310,8 @@
    what decides it. */
 [part="actions"] {
   align-items: center;
-  align-self: center;
   display: flex;
   gap: var(--helix-space-2xs);
-  margin-inline-start: var(--helix-space-sm);
 }
 
 /* A square the size of the row's controls, not a glyph with padding around it.
@@ -170,19 +325,10 @@
    mark is an `<svg>` now and takes the icon step from `glyph.css`, which the
    root has already set to `sm` along with the rest of the row's density.
 
-   **It appears when the row does.** A feed is a column of things that happened,
-   and a cross on every one of them is a column of crosses: the control is
-   offered where a reader is already pointing and is quiet everywhere else.
-
-   `opacity` and not `display` or `visibility`, which is the whole of why this is
-   safe. Both of those take the control out of the tab order and out of the
-   accessibility tree, so a keyboard reader would lose the only way to remove a
-   notification and never be told there had been one. At zero it is still
-   focusable and still announced, the focus rule below brings it back, and
-   nothing in the row moves when it arrives, the box having been laid out the
-   whole time. */
+   It is quiet until the row is pointed at, and that is the trailing column's
+   doing rather than this rule's: the whole column swaps, so a cross appears
+   beside the actions instead of on every row of the feed at once. */
 [part="dismiss"] {
-  align-self: center;
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
@@ -192,35 +338,8 @@
   display: grid;
   inline-size: var(--helix-size-control);
   margin-inline-start: var(--helix-space-2xs);
-  opacity: var(--_notifications-dismiss, 0);
   padding: var(--helix-space-none);
   place-items: center;
-  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* The reveal is a property on the host rather than a rule on the part, so the
-   three things that answer "is it offered" are one declaration each and none of
-   them has to outrank the others. Written as rules on `[part="dismiss"]` they
-   are a specificity ladder that the touch case, which is the least specific and
-   has to win, arrives at the bottom of. */
-:host(:hover) {
-  --_notifications-dismiss: 1;
-}
-
-/* Where a pointer cannot hover there is no hover to reveal it, so it does not
-   hide. The same argument as the carousel's arrows and the opposite conclusion:
-   that control is a second way to do what a swipe already does, and this one is
-   the only way. */
-@media (hover: none) and (pointer: coarse) {
-  :host {
-    --_notifications-dismiss: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="dismiss"] {
-    transition: none;
-  }
 }
 
 /* A mark a consumer slots and the one drawn here come out the same size, on the
@@ -237,23 +356,14 @@
   color: var(--helix-color-foreground);
 }
 
-/* Focus reveals it, and this is the rule that makes the reveal safe rather than
-   the one that decorates it: a reader who tabs to a control that is not painted
-   has been given nothing.
-
-   **`:focus` and not `:focus-visible`**, which is the pair pulled apart. Whether
-   to draw a ring is what `:focus-visible` is for; whether the control is painted
-   at all is a different question, and the pointer is where the two answers come
-   apart. Measured in Chromium against the built bundle: after a click on this
-   control `:focus` is true and `:focus-visible` is false, and it stays that way
-   once the pointer leaves the row. On `:focus-visible` alone the control a reader
-   had just clicked, and still holds focus on, would fade out from under them the
-   moment they moved the mouse. The ring stays on `:focus-visible` below, where
-   it belongs. */
-[part="dismiss"]:focus {
-  opacity: 1;
-}
-
+/* The reveal is `:focus-within` on the host rather than `:focus` here, and the
+   distinction is the same one drawn there: whether to draw a ring is what
+   `:focus-visible` is for, and whether a control is painted at all is not.
+   Measured in Chromium against the built bundle, after a click on this control
+   `:focus` is true and `:focus-visible` is false, and it stays that way once the
+   pointer leaves the row, so a reveal keyed to the ring would fade the control
+   out from under somebody who had just clicked it. `:focus-within` answers to
+   both, and this rule is left with the ring alone. */
 [part="dismiss"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -272,21 +382,25 @@
   }
 }
 
-/* Narrow, the actions go under the body rather than beside it.
+/* Narrow, the trailing column goes under the body rather than beside it.
 
-   The trailing columns take their width whatever is left for the text, so a row
-   in a phone-width feed spent a third of itself on a four character button and
-   wrapped the notification to three lines to pay for it: measured at 390, the
-   body had 168 pixels of a 342 pixel row. Under the body it has all of them, and
-   the dismiss stays on the first line where a reader looks for it.
+   The column takes the width of the wider of the two things it holds, which is
+   the controls, so a phone-width row spent a third of itself on a button that is
+   not even showing: measured at 390 before this, the body had 166 pixels of a
+   342 pixel row. Under the body it has all of them.
 
    26rem is where the body drops under about 300 pixels, which is where the
    wrapping starts to be the row's shape rather than the sentence's length. */
 @container (inline-size < 26rem) {
-  [part="actions"] {
-    block-size: auto;
-    grid-column: 2 / -1;
+  [part="item"] {
+    grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr);
+  }
+
+  [part="trailing"] {
+    align-self: start;
+    grid-column: 2;
     grid-row: 2;
+    justify-items: start;
     margin-block-start: var(--helix-space-2xs);
     margin-inline-start: var(--helix-space-none);
   }

@@ -15,8 +15,8 @@ beforeAll(async () => {
 
 const markup = `
   <helix-notifications label="Activity" mark-all>
-    <helix-notifications-item>One</helix-notifications-item>
-    <helix-notifications-item default-read>Two</helix-notifications-item>
+    <helix-notification>One</helix-notification>
+    <helix-notification default-read>Two</helix-notification>
   </helix-notifications>`
 
 describe('the styled feed', () => {
@@ -32,7 +32,7 @@ describe('the styled feed', () => {
        the consumer's markup and an item served `default-read` may not grow
        anything it was not sent. */
     const element = await mount(markup)
-    const items = element.querySelectorAll('helix-notifications-item')
+    const items = element.querySelectorAll('helix-notification')
     expect(hasState(items[0] as Element, 'read')).toBe(false)
     expect(hasState(items[1] as Element, 'read')).toBe(true)
     expect(items[1]?.hasAttribute('read')).toBe(false)

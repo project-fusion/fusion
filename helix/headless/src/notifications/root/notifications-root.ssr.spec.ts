@@ -18,12 +18,12 @@ import '../index.js'
  */
 
 const markup = ssr(html`<helix-headless-notifications label="Activity" mark-all>
-  <helix-headless-notifications-item at="2026-08-26T09:00:00.000Z">
+  <helix-headless-notification at="2026-08-26T09:00:00.000Z">
     Ada approved your deploy
-  </helix-headless-notifications-item>
-  <helix-headless-notifications-item default-read>
+  </helix-headless-notification>
+  <helix-headless-notification default-read>
     Your invitation was accepted
-  </helix-headless-notifications-item>
+  </helix-headless-notification>
 </helix-headless-notifications>`)
 
 describe('notifications server output', () => {
@@ -39,7 +39,7 @@ describe('notifications server output', () => {
 
   test('the hosts write no attributes of their own, so hydration reconciles nothing', () => {
     expect(hostAttributes(markup, 'helix-headless-notifications')).toEqual(['label', 'mark-all'])
-    expect(hostAttributes(markup, 'helix-headless-notifications-item')).toEqual(['at'])
+    expect(hostAttributes(markup, 'helix-headless-notification')).toEqual(['at'])
   })
 
   /**

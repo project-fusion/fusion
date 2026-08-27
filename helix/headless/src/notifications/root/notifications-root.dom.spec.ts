@@ -22,9 +22,9 @@ interface Feed extends HTMLElement {
 
 const markup = `
   <helix-headless-notifications label="Activity" mark-all>
-    <helix-headless-notifications-item>One</helix-headless-notifications-item>
-    <helix-headless-notifications-item>Two</helix-headless-notifications-item>
-    <helix-headless-notifications-item default-read>Three</helix-headless-notifications-item>
+    <helix-headless-notification>One</helix-headless-notification>
+    <helix-headless-notification>Two</helix-headless-notification>
+    <helix-headless-notification default-read>Three</helix-headless-notification>
   </helix-headless-notifications>`
 
 const feed = async (source = markup) => {
@@ -48,7 +48,7 @@ describe('the list', () => {
   test('a child that is not a notification is not in the list', async () => {
     const element = await feed(`
       <helix-headless-notifications>
-        <helix-headless-notifications-item>One</helix-headless-notifications-item>
+        <helix-headless-notification>One</helix-headless-notification>
         <div>Not a notification</div>
       </helix-headless-notifications>`)
     expect(element.items).toHaveLength(1)
@@ -190,11 +190,11 @@ describe('the media column', () => {
   test('a feed where something has media says so', async () => {
     const element = await feed(`
       <helix-headless-notifications label="Activity">
-        <helix-headless-notifications-item>
+        <helix-headless-notification>
           <span slot="media">A</span>
           One
-        </helix-headless-notifications-item>
-        <helix-headless-notifications-item>Two</helix-headless-notifications-item>
+        </helix-headless-notification>
+        <helix-headless-notification>Two</helix-headless-notification>
       </helix-headless-notifications>`)
     expect(hasState(element, 'media')).toBe(true)
   })

@@ -183,7 +183,7 @@
    tree, so without this it paints over its own tab and the label disappears
    under the pill: measured, "Overview" was invisible in two of three
    appearances. A positioned child is what gives the tab a layer of its own. */
-::slotted(helix-tabs-tab) {
+::slotted(helix-tab) {
   position: relative;
   z-index: var(--helix-layer-raised);
 }

@@ -4,14 +4,21 @@ import {
   HelixElement,
   HelixReadEvent,
   hostAria,
-  relativeTime,
   requestChange,
+  slotFilled,
 } from '@helix-io/core'
 import { x } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { subscribe } from './ticker.js'
+/* `lit/static-html.js`, because this template interpolates a tag name and the
+   plain `html` cannot: it renders the placeholder as the element instead, which
+   shifts every attribute after it by one. See `renderTime`. */
+import { html } from 'lit/static-html.js'
+/* Side-effect import, because this template interpolates the family's tag and a
+   custom element registers on import. Both tiers import it, each resolving to
+   its own; `check:composed` enforces that. */
+import '../../format-date/index.js'
 
 /**
  * @summary One thing that happened, which a reader may not have seen yet.
@@ -24,12 +31,17 @@ import { subscribe } from './ticker.js'
  * unread, a timestamp that has to stay correct, and an action a reader can take
  * later.
  *
- * **The timestamp is the part that is easy to get wrong and impossible to
- * notice.** "2 minutes ago" is correct for sixty seconds, and a feed left open
- * ends up describing when the page loaded rather than when anything happened.
- * Every item's reading is refreshed on a schedule it works out for itself, from
- * one timer the page shares: fifty items with fifty intervals is fifty wakeups a
- * second where one will do.
+ * **The row is a label, a caption under it, and one trailing column that holds
+ * either the time or the controls.** A feed is scanned rather than read, so the
+ * thing that happened gets the first line on its own and everything qualifying
+ * it goes under. The time and the controls occupy the same place because a
+ * reader wants exactly one of them at a time: the time while they are scanning,
+ * and what they can do about it once they have stopped on a row.
+ *
+ * **The timestamp is `helix-format-date`**, which is where the reading, the
+ * `<time datetime>` and the shared timer now live. It was implemented here, and
+ * a component that formats a date is not a fact about notifications: Chat wanted
+ * the same thing and had its own copy of half of it.
  *
  * **Read state is reported, not invented.** Marking something read is usually a
  * round trip, and a component that flips its own state and then hears the
@@ -43,14 +55,19 @@ import { subscribe } from './ticker.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
+ * @slot caption - A second line qualifying it, quieter than the first. A bare
+ * slot rather than a box, so an item without one pays nothing for it; style it
+ * through `::slotted()`.
  * @slot media - An avatar or icon identifying who or what it came from.
  * @slot actions - What a reader can do about it.
  *
  * @csspart item - The whole notification.
  * @csspart media - The leading slot's box.
- * @csspart body - Content and timestamp together.
- * @csspart content - The consumer's own markup.
+ * @csspart body - The label and the caption together.
+ * @csspart label - What happened, on the first line.
+ * @csspart trailing - The column holding the time and the controls.
  * @csspart time - When it happened, read the way a person reads one.
+ * @csspart controls - The actions and the dismiss, which replace the time.
  * @csspart actions - The trailing slot's box.
  * @csspart dismiss - The control that removes it.
  * @csspart dismiss-mark - The glyph on that control, where none is slotted.
@@ -58,8 +75,8 @@ import { subscribe } from './ticker.js'
  * @event {HelixReadEvent} helix-read - Fired when the item is marked read or unread, and cancelable.
  * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
  */
-@customElement('helix-headless-notifications-item')
-export class HelixHeadlessNotificationsItem extends HelixElement {
+@customElement('helix-headless-notification')
+export class HelixHeadlessNotification extends HelixElement {
   /**
    * When it happened, as anything `Date` parses.
    *
@@ -81,7 +98,7 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
    * **Not reflected, and it was until 27 Aug 2026.** The reason given was that
    * unread is a visual state and a stylesheet has no other way to know, which
    * is the same reason the four mixins mirror theirs, and the mirror may not be
-   * the property's own attribute: `<helix-notifications-item default-read>`
+   * the property's own attribute: `<helix-notification default-read>`
    * came back from a server without `read` and gained it on the first update,
    * which React reports as a hydration mismatch, and a copy of the serialized
    * element re-parses that attribute as a declaration. `:state(read)` is what
@@ -125,29 +142,7 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
    */
   readonly isNotification = true
 
-  @state()
-  private stopTicking: (() => void) | undefined = undefined
-
   private readState: boolean | undefined = undefined
-
-  /**
-   * The clock this item last drew against.
-   *
-   * A state field and not a read of `Date.now()` inside `render`, which would
-   * make the template a function of something Lit cannot see change: the item
-   * would draw the right text once and never notice it had gone stale.
-   */
-  @state()
-  private clock: number | undefined = undefined
-
-  /** The timestamp, or nothing where there is not one to read. */
-  private get moment(): Date | undefined {
-    if (this.at === '') {
-      return undefined
-    }
-    const parsed = new Date(this.at)
-    return Number.isNaN(parsed.getTime()) ? undefined : parsed
-  }
 
   /**
    * Asks to be marked read, and reports whether the request stood.
@@ -172,65 +167,32 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
     })
   }
 
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.tick()
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    /* The subscription outlives the element otherwise, and a feed that mounts
-       and unmounts a panel leaks one every time it opens. */
-    this.stopTicking?.()
-    this.stopTicking = undefined
-  }
-
-  /**
-   * Schedules the next reading, and only the next one.
-   *
-   * The formatter says when its own answer expires, so this asks for exactly
-   * that moment rather than polling: an item minutes old wakes once a minute and
-   * an item weeks old wakes once an hour, which is the difference between a
-   * feed that costs nothing to leave open and one that does not.
-   */
-  private tick(): void {
-    this.stopTicking?.()
-    const moment = this.moment
-    if (!moment) {
-      this.stopTicking = undefined
-      return
-    }
-    const now = new Date()
-    this.clock = now.getTime()
-    const { next } = relativeTime(this.locale)(moment, now)
-    if (!Number.isFinite(next)) {
-      this.stopTicking = undefined
-      return
-    }
-    this.stopTicking = subscribe(next, () => this.tick())
-  }
-
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (changed.has('at') || changed.has('locale')) {
-      this.tick()
-    }
     hostAria(this.internals, { role: 'listitem' })
     /* The mirror the stylesheet selects on, kept off the host's attributes for
        the reason on `read` itself. */
     this.toggleState('read', this.read)
   }
 
-  private renderTime(): TemplateResult | typeof nothing {
-    const moment = this.moment
-    if (!moment) {
-      return nothing
-    }
-    /* `datetime` carries the exact instant whatever the text says, so a screen
-       reader and a copy-paste both get the real time rather than "yesterday",
-       and the element remains readable when the locale has no formatter. */
-    const { text } = relativeTime(this.locale)(moment, new Date(this.clock ?? Date.now()))
-    return html`<time part="time" datetime=${moment.toISOString()}>${text}</time>`
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markControls()
+  }
+
+  /**
+   * Says whether there is anything for the time to make way for.
+   *
+   * The trailing column holds the time and the controls in one place and shows
+   * one of them, so a row with nothing to do about it would hide its timestamp
+   * on hover and put nothing there. `dismissible` this element knows on the
+   * server; whether a consumer filled the actions slot it can only find out from
+   * a DOM, so this runs after the render and the resting answer, no controls, is
+   * the one the server writes.
+   */
+  private markControls(): void {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="actions"]')
+    this.toggleState('controls', this.dismissible || slotFilled(slot))
   }
 
   /**
@@ -277,16 +239,53 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
     </button>`
   }
 
+  /**
+   * When it happened, delegated whole.
+   *
+   * The tag is interpolated rather than written, so each tier renders its own:
+   * the base tier may not name a styled element, and a styled item inherits this
+   * template without having a tag of its own to remind anybody. `check:composed`
+   * holds both halves.
+   *
+   * `exportparts` and no `part` of its own, which is the rule about a part
+   * already named for its role: the child publishes `time`, the role here is
+   * `time`, and naming both would leave `::part(time)` matching two elements.
+   * What a consumer wants to reach is the `<time>`, so that is what the name
+   * reaches.
+   */
+  private renderTime(): TemplateResult {
+    const stamp = this.tag('format-date')
+    return html`<${stamp}
+      exportparts="time"
+      elapsed
+      date=${this.at}
+      locale=${this.locale}
+    ></${stamp}>`
+  }
+
   protected override render(): TemplateResult {
     return html`<div part="item">
       <span part="media"><slot name="media"></slot></span>
       <div part="body">
-        <div part="content"><slot></slot></div>
-        ${this.renderTime()}
+        <div part="label"><slot></slot></div>
+        <slot name="caption"></slot>
       </div>
-      <span part="actions"><slot name="actions"></slot></span>
-      ${this.renderDismiss()}
+      <div part="trailing">
+        ${this.renderTime()}
+        <div part="controls">
+          <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
+          ${this.renderDismiss()}
+        </div>
+      </div>
     </div>`
+  }
+
+  /* Content arriving from the light DOM changes no property here, so nothing
+     would schedule the re-read. Bound to the slot rather than to the host,
+     because `slotchange` bubbles and is not composed: it reaches the shadow root
+     that owns the slot and stops there. */
+  private readonly handleActions = (): void => {
+    this.markControls()
   }
 
   private readonly handleDismiss = (event: Event): void => {
@@ -299,6 +298,6 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-headless-notifications-item': HelixHeadlessNotificationsItem
+    'helix-headless-notification': HelixHeadlessNotification
   }
 }

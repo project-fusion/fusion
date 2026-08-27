@@ -8,7 +8,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixHeadlessNotificationsItem } from '../item/notifications-item.js'
+import type { HelixHeadlessNotification } from '../notification/notification.js'
 
 /**
  * @summary A feed a reader comes back to, made of notifications they may not have seen.
@@ -41,7 +41,7 @@ import type { HelixHeadlessNotificationsItem } from '../item/notifications-item.
  * @aliases Notification feed, Inbox, Activity
  * @documentation https://helix.fusion.dev/components/notifications
  *
- * @slot - The notifications, as `helix-notifications-item` children.
+ * @slot - The notifications, as `helix-notification` children.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot footer - Below the list, for a link to everything.
  *
@@ -102,12 +102,12 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /** The notifications declared as children, in the order they are written. */
-  get items(): HelixHeadlessNotificationsItem[] {
+  get items(): HelixHeadlessNotification[] {
     /* `?? []` is the server. Lit's element shim carries attributes and not a
        tree, so `children` is undefined there, and this getter is reached from
        `unread`, which is reflected and therefore read during the first update. */
     return [...(this.children ?? [])].filter(
-      (child): child is HelixHeadlessNotificationsItem =>
+      (child): child is HelixHeadlessNotification =>
         'isNotification' in child && child.isNotification === true,
     )
   }

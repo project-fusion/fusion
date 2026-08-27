@@ -58,7 +58,7 @@ const manifest: HelixManifest = {
 
 describe('place', () => {
   // A tag is a string the family prefix can only be guessed out of:
-  // `helix-button-group` is one family and `helix-tabs-tab` is part of another.
+  // `helix-button-group` is one family and `helix-tab` is part of another.
   test('reads the family and part from the path, not the tag', () => {
     expect(place('src/button-group/root/button-group-root.ts')).toEqual({
       family: 'button-group',

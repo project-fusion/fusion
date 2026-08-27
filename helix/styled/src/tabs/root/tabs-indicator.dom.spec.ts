@@ -10,12 +10,12 @@ type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
 const markup = `
   <helix-tabs default-active="one">
-    <helix-tabs-tab value="one">One</helix-tabs-tab>
-    <helix-tabs-tab value="two">Two</helix-tabs-tab>
-    <helix-tabs-tab disabled value="three">Three</helix-tabs-tab>
-    <helix-tabs-panel slot="panels" value="one">First</helix-tabs-panel>
-    <helix-tabs-panel slot="panels" value="two">Second</helix-tabs-panel>
-    <helix-tabs-panel slot="panels" value="three">Third</helix-tabs-panel>
+    <helix-tab value="one">One</helix-tab>
+    <helix-tab value="two">Two</helix-tab>
+    <helix-tab disabled value="three">Three</helix-tab>
+    <helix-tab-panel slot="panels" value="one">First</helix-tab-panel>
+    <helix-tab-panel slot="panels" value="two">Second</helix-tab-panel>
+    <helix-tab-panel slot="panels" value="three">Third</helix-tab-panel>
   </helix-tabs>`
 
 /* Where the mark lands, which is the stylesheet's answer and so stays on this

@@ -1443,19 +1443,19 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 ref={panelTabs}
                 slot="panel"
               >
-                <helix-tabs-tab value="terminal">Terminal</helix-tabs-tab>
-                <helix-tabs-tab value="specs">Specs</helix-tabs-tab>
-                <helix-tabs-panel slot="panels" value="terminal">
+                <helix-tab value="terminal">Terminal</helix-tab>
+                <helix-tab value="specs">Specs</helix-tab>
+                <helix-tab-panel slot="panels" value="terminal">
                   <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
-                </helix-tabs-panel>
-                <helix-tabs-panel slot="panels" value="specs">
+                </helix-tab-panel>
+                <helix-tab-panel slot="panels" value="specs">
                   {/* The family, not the example: specs belong to a component, and
                   every example of it runs the same ones. */}
                   <helix-sandbox-specs
                     family={family.slug}
                     src="/helix/sandbox/specs"
                   ></helix-sandbox-specs>
-                </helix-tabs-panel>
+                </helix-tab-panel>
               </helix-tabs>
             )}
 

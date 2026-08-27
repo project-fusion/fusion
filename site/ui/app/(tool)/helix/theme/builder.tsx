@@ -1402,20 +1402,20 @@ export function ThemeBuilder({
               onhelix-before-activate={(event) => setAudit(event.detail.value)}
               slot="panel"
             >
-              <helix-tabs-tab value="contrast">
+              <helix-tab value="contrast">
                 Contrast
                 {failures.length > 0 ? ` (${failures.length})` : ''}
-              </helix-tabs-tab>
-              <helix-tabs-tab value="collisions">
+              </helix-tab>
+              <helix-tab value="collisions">
                 Collisions
                 {theme.collisions.length > 0 ? ` (${theme.collisions.length})` : ''}
-              </helix-tabs-tab>
-              <helix-tabs-tab value="unmeasured">
+              </helix-tab>
+              <helix-tab value="unmeasured">
                 Unverifiable
                 {unmeasured.length > 0 ? ` (${unmeasured.length})` : ''}
-              </helix-tabs-tab>
+              </helix-tab>
 
-              <helix-tabs-panel slot="panels" value="contrast">
+              <helix-tab-panel slot="panels" value="contrast">
                 <div className="themeFindings">
                   {failures.length === 0 ? (
                     <helix-text variant="caption">
@@ -1440,9 +1440,9 @@ export function ThemeBuilder({
                     </helix-table>
                   )}
                 </div>
-              </helix-tabs-panel>
+              </helix-tab-panel>
 
-              <helix-tabs-panel slot="panels" value="collisions">
+              <helix-tab-panel slot="panels" value="collisions">
                 <div className="themeFindings">
                   {theme.collisions.length === 0 ? (
                     <helix-text variant="caption">
@@ -1464,9 +1464,9 @@ export function ThemeBuilder({
                     </helix-flex>
                   )}
                 </div>
-              </helix-tabs-panel>
+              </helix-tab-panel>
 
-              <helix-tabs-panel slot="panels" value="unmeasured">
+              <helix-tab-panel slot="panels" value="unmeasured">
                 <div className="themeFindings">
                   <helix-flex direction="column" gap="sm">
                     <helix-text variant="caption">
@@ -1482,7 +1482,7 @@ export function ThemeBuilder({
                     ))}
                   </helix-flex>
                 </div>
-              </helix-tabs-panel>
+              </helix-tab-panel>
             </helix-tabs>
           </helix-sandbox>
         </div>

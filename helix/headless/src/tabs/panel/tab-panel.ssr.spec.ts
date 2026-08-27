@@ -34,14 +34,14 @@ import '../index.js'
 describe('tabs panel server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(
-      withoutStyles(ssr(html`<helix-headless-tabs-panel></helix-headless-tabs-panel>`)),
-    ).toContain('helix-headless-tabs-panel')
+      withoutStyles(ssr(html`<helix-headless-tab-panel></helix-headless-tab-panel>`)),
+    ).toContain('helix-headless-tab-panel')
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {
     const written = hostAttributes(
-      ssr(html`<helix-headless-tabs-panel></helix-headless-tabs-panel>`),
-      'helix-headless-tabs-panel',
+      ssr(html`<helix-headless-tab-panel></helix-headless-tab-panel>`),
+      'helix-headless-tab-panel',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })
