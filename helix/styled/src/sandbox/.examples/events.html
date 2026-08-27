@@ -1,4 +1,4 @@
-<!-- @summary An edit, a caret, a divider and a log, which are four different things. -->
+<!-- @summary An edit, a caret, two dividers and a log, which are five different things. -->
 <!-- @min 420 -->
 <helix-flex
   direction="column"
@@ -11,6 +11,7 @@
       value="<p>Hello</p>"
     ></helix-sandbox-source>
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+    <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
   </helix-sandbox>
 
   <helix-list
@@ -20,7 +21,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Type in the source, then drag the divider</span>
+      <span slot="supporting">Type in the source, then drag either divider</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -58,6 +59,9 @@
   })
   pad.addEventListener('helix-before-split', (event) => {
     say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
+  })
+  pad.addEventListener('helix-before-panel-resize', (event) => {
+    say('helix-before-panel-resize', `the panel settling at ${event.detail.value} pixels`)
   })
   pad.addEventListener('helix-resize', (event) => {
     say('helix-resize', `the frame measured itself at ${event.detail.size}`)

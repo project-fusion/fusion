@@ -38,6 +38,7 @@ beforeAll(async () => {
    * cross-family spec, not an every-family one, and what it needs is the six
    * that compose plus the group and the controls they contain. */
   await Promise.all([
+    import('./chat/index.js'),
     import('./checkbox/index.js'),
     import('./color-picker/index.js'),
     import('./checkbox-group/index.js'),
@@ -49,12 +50,14 @@ beforeAll(async () => {
     import('./input/index.js'),
     import('./listbox/index.js'),
     import('./number-input/index.js'),
+    import('./pin-input/index.js'),
     import('./option/index.js'),
     import('./select/index.js'),
     import('./slider/index.js'),
     import('./switch/index.js'),
     import('./textarea/index.js'),
     import('./time-input/index.js'),
+    import('./video/index.js'),
   ])
 })
 
@@ -328,5 +331,112 @@ describe('the native pair a control sends', () => {
     await settle(host)
 
     expect(flags).toEqual({ bubbles: true, composed: true })
+  })
+})
+
+describe('no family lets an inner native control speak in its name', () => {
+  /* **The population is the shape, which is the whole lesson of 308.** That row
+     was found through one mechanism, a rail forwarding without stopping, and
+     fixed in the seven families that mechanism reached. Sweeping instead by what
+     a family *renders* found two more, File Input and Color Picker. Sweeping by
+     that shape and meaning it found a third, Video, whose scrubber and volume
+     rail are `<input type="range">` in a component that declares no `input` at
+     all: both passes before this one had read "renders a native control" as
+     "is a form control", and a media component with two rails in its chrome is
+     neither a form control nor exempt from the mechanism.
+
+     So every family that renders an `<input>`, `<textarea>` or `<select>` is
+     listed here, and the assertion is the one thing true of all of them however
+     they differ: whatever a consumer hears on the host is the host's. What each
+     family announces of its own is the table above and the two cases either side
+     of it. This is only about what escapes. */
+  const RENDERS_NATIVE: Array<[string, string]> = [
+    [
+      'helix-headless-chat',
+      `<helix-headless-chat label="L"><helix-headless-chat-composer slot="composer"></helix-headless-chat-composer></helix-headless-chat>`,
+    ],
+    ['helix-headless-checkbox', `<helix-headless-checkbox label="L"></helix-headless-checkbox>`],
+    [
+      'helix-headless-checkbox-group',
+      `<helix-headless-checkbox-group label="L"><helix-headless-checkbox label="a" value="a"></helix-headless-checkbox></helix-headless-checkbox-group>`,
+    ],
+    [
+      'helix-headless-color-input',
+      `<helix-headless-color-input label="L"></helix-headless-color-input>`,
+    ],
+    ['helix-headless-color-picker', `<helix-headless-color-picker></helix-headless-color-picker>`],
+    ['helix-headless-combobox', `<helix-headless-combobox label="L"></helix-headless-combobox>`],
+    [
+      'helix-headless-date-input',
+      `<helix-headless-date-input label="L"></helix-headless-date-input>`,
+    ],
+    [
+      'helix-headless-file-input',
+      `<helix-headless-file-input label="L"></helix-headless-file-input>`,
+    ],
+    ['helix-headless-input', `<helix-headless-input label="L"></helix-headless-input>`],
+    [
+      'helix-headless-listbox',
+      `<helix-headless-listbox filterable label="L"></helix-headless-listbox>`,
+    ],
+    [
+      'helix-headless-number-input',
+      `<helix-headless-number-input label="L"></helix-headless-number-input>`,
+    ],
+    ['helix-headless-pin-input', `<helix-headless-pin-input label="L"></helix-headless-pin-input>`],
+    ['helix-headless-slider', `<helix-headless-slider label="L"></helix-headless-slider>`],
+    ['helix-headless-switch', `<helix-headless-switch label="L"></helix-headless-switch>`],
+    ['helix-headless-textarea', `<helix-headless-textarea label="L"></helix-headless-textarea>`],
+    [
+      'helix-headless-time-input',
+      `<helix-headless-time-input label="L"></helix-headless-time-input>`,
+    ],
+    ['helix-headless-video', `<helix-headless-video label="L"></helix-headless-video>`],
+  ]
+
+  test.each(RENDERS_NATIVE)('%s speaks for its own controls', async (_tag, markup) => {
+    const host = (await mount(markup)) as HTMLElement
+    await settle(host)
+    for (const child of host.querySelectorAll('*')) {
+      await settle(child as HTMLElement)
+    }
+    /* Down through every shadow root, not just this element's own. Six of these
+       render their native control inside a child's: Chat's composer, the two
+       groups' members, the two pickers' field, Pagination's size select. That is
+       exactly where a composed `input` starts its journey, so a query that
+       stopped at the host's own root would report those six clean by never
+       looking at them. */
+    const inners: HTMLInputElement[] = []
+    const dig = (root: ParentNode): void => {
+      for (const node of root.querySelectorAll('*')) {
+        if (['input', 'select', 'textarea'].includes(node.localName)) {
+          inners.push(node as HTMLInputElement)
+        }
+        if (node.shadowRoot) {
+          dig(node.shadowRoot)
+        }
+      }
+    }
+    /* Both trees. A group's members are slotted rather than rendered, so they are
+       light-DOM children of the host and are not in its render root at all. */
+    dig(host)
+    dig((host as unknown as { renderRoot: ParentNode }).renderRoot)
+    /* Not an empty list: a family listed here that stops rendering one should
+       say so rather than pass by having nothing to leak. */
+    expect(inners.length).toBeGreaterThan(0)
+
+    const escaped: string[] = []
+    host.addEventListener('input', (event) => {
+      const from = event.composedPath()[0] as Element
+      if (from !== host) {
+        escaped.push(`${from.localName}[${(from as HTMLInputElement).type}]`)
+      }
+    })
+    for (const inner of inners) {
+      inner.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    }
+    await settle(host)
+
+    expect(escaped).toEqual([])
   })
 })

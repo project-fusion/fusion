@@ -761,6 +761,37 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   /**
+   * The scrubber's new position, and the reason these two are named at all.
+   *
+   * **The stop is the first line.** `input` is composed by specification, so a
+   * range inside this shadow root sends its own straight past the host to
+   * whoever is listening on it, and this component declares no `input`: a
+   * consumer binding one received the scrubber's and the volume rail's under a
+   * name Video never promised, carrying a seconds count or a level between zero
+   * and one rather than anything about the element.
+   *
+   * Found by sweeping every family that renders a native control, which is what
+   * 308 said and not what it was read as: the first two passes both took "form
+   * control" as the population and a media component with two rails in its
+   * chrome is neither a form control nor exempt from the mechanism. See 308.
+   */
+  private takeScrub(event: Event): void {
+    event.stopPropagation()
+    this.seek(Number((event.target as HTMLInputElement).value))
+  }
+
+  /** The volume rail's new level, stopped for the reason `takeScrub` carries. */
+  private takeVolume(event: Event): void {
+    event.stopPropagation()
+    const video = this.video
+    if (!video) {
+      return
+    }
+    video.volume = Number((event.target as HTMLInputElement).value)
+    video.muted = false
+  }
+
+  /**
    * Rebuilds the copies from whatever the consumer has slotted.
    *
    * The attribute list is explicit rather than a blind copy of every attribute:
@@ -1634,7 +1665,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label="Seek"
         aria-valuetext=${`${clock(this.position)} of ${clock(this.knownDuration)}`}
         style=${`--video-progress: ${done}`}
-        @input=${(event: Event) => this.seek(Number((event.target as HTMLInputElement).value))}
+        @input=${this.takeScrub}
       />
       <span part="sound">
       <button
@@ -1661,13 +1692,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label="Volume"
         aria-valuetext=${`${Math.round((this.silent ? 0 : this.loudness) * 100)} percent`}
         style=${`--video-level: ${this.silent ? 0 : this.loudness}`}
-        @input=${(event: Event) => {
-          const video = this.video
-          if (video) {
-            video.volume = Number((event.target as HTMLInputElement).value)
-            video.muted = false
-          }
-        }}
+        @input=${this.takeVolume}
       />
       </span>
       ${this.renderCaptions()}

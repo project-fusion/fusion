@@ -31,6 +31,10 @@ export function Example() {
     say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
   }
 
+  const panelDragged = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-panel-resize', `the panel settling at ${event.detail.value} pixels`)
+  }
+
   const measured = (event: CustomEvent<{ size: number }>) => {
     say('helix-resize', `the frame measured itself at ${event.detail.size}`)
   }
@@ -43,6 +47,7 @@ export function Example() {
     <helix-flex direction="column" gap="md">
       <helix-sandbox
         onhelix-before-edit={edited}
+        onhelix-before-panel-resize={panelDragged}
         onhelix-before-split={dragged}
         onhelix-caret={caret}
         onhelix-console={logged}
@@ -50,6 +55,7 @@ export function Example() {
       >
         <helix-sandbox-source name="html" slot="source" value="<p>Hello</p>" />
         <helix-sandbox-preview slot="preview" />
+        <helix-sandbox-terminal slot="panel" />
       </helix-sandbox>
 
       <helix-list divided label="What arrived">
