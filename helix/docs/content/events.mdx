@@ -1,19 +1,32 @@
 ---
-description: Twenty-one events, why every name is prefixed, and which ones bubble.
+description: The request and the notification, why one name is prefixed and the other is not.
 section: Essentials
 title: Events
 ---
 
 # Events
 
-Every Helix event is a named class with a typed `detail`, dispatched under a
-`helix-` prefixed name. Twenty-one of them.
+**Every state change is announced twice, and the two are for different people.**
 
 ```ts
-element.addEventListener('helix-change', (event) => {
-  // `event` is a HelixChangeEvent. The detail is typed.
+// The request. Cancelable, carries what is being proposed, and fires before
+// anything moves. This is how you take the decision.
+element.addEventListener('helix-before-change', (event) => {
+  if (locked) {
+    event.preventDefault()
+  }
+})
+
+// The notification, under the platform's own name. Fires after the value moved,
+// so it is on the target where every handler ever written expects it.
+element.addEventListener('change', (event) => {
+  save(event.target.value)
 })
 ```
+
+Most consumers want the second. Bind `onChange` in React or `onchange=` in HTML
+and read the target, exactly as you would from an `<input>`. Reach for the
+prefixed one when you mean to refuse.
 
 The class exists rather than a bare `CustomEvent` for three reasons, all about
 the type reaching you: the class name is in the manifest, which is what lets the
@@ -22,7 +35,7 @@ package augments `HTMLElementEventMap`, which types `addEventListener` for
 people writing plain HTML; and the name lives on the class, so a dispatch and a
 listener cannot disagree about the string.
 
-## Why events are prefixed
+## Why the request is prefixed and the notification is not
 
 **Retargeting.** An event dispatched inside a shadow root is retargeted to look
 like it came from the host, so a bare `input` from a `<helix-input>` is
@@ -31,8 +44,13 @@ for either.
 
 **React's claimed verbs.** React's synthetic system owns `change`, `input`,
 `submit`, `copy`, `focus` and the rest, and a prop matching one of those is
-wired to the native event instead. `onhelix-change` matches none of them and
-reaches us.
+wired to the native event instead. `onhelix-before-change` matches none of them
+and reaches us, which is exactly what a request needs.
+
+**And the notification wants the opposite.** It is not prefixed precisely
+because React claims the verb: `onChange` on a Helix element goes through the
+synthetic system to the native `change` the element sends, which is why the
+ordinary path costs a consumer nothing to learn.
 
 **The type map is global.** `HTMLElementEventMap` is shared with every element
 in your application. Our classes extend `Event`, so an entry named `select`
@@ -49,7 +67,7 @@ outer one that contains it: a menu closing inside a dialog is not the dialog
 closing.
 
 **Coordination bubbles and is composed.** `helix-select`, `helix-dismiss`,
-`helix-change`. A parent, or a router, can intercept one across a shadow
+`helix-before-change`. A parent, or a router, can intercept one across a shadow
 boundary, which is what makes a `Tree` usable as navigation.
 
 If you are listening on a container and hearing nothing, the event is probably a
@@ -75,11 +93,10 @@ dispatch, so an event you can listen for is an event that is documented.
 
 | Event | Roughly |
 |---|---|
-| `helix-before-open`, `helix-before-close` | An element's open state, before it moves |
-| `helix-change` | A committed value |
-| `helix-input` | An edit in progress |
+| `helix-before-change` | A value about to move, refusable |
+| `helix-before-toggle` | A checked state about to flip, refusable |
+| `helix-before-open`, `helix-before-close` | An open state about to move, refusable |
 | `helix-select` | An item chosen from a set |
-| `helix-toggle` | A two-state control flipped |
 | `helix-dismiss` | The reader asked for something to go away |
 | `helix-next`, `helix-previous` | Movement through a sequence |
 | `helix-filter` | A query changed in a filtering control |
@@ -91,11 +108,18 @@ dispatch, so an event you can listen for is an event that is documented.
 | `helix-console` | The sandbox relaying a log |
 | `helix-tour-ask`, `helix-sample-start`, `helix-sample-end` | Tour and color sampling |
 
+And the native ones every stateful component sends once the change has landed:
+`input` and `change` on a value control, `toggle` on anything that opens,
+carrying `newState` and `oldState` the way `<details>` does, `close` on a dialog,
+and `load` and `error` on an image.
+
 Each component's page lists the events it actually dispatches, with the class
 and the detail.
 
 ## In a framework
 
-The prop is `on` and the event name, verbatim: `onhelix-change`. Nothing strips
-the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
+A native event is `onChange`, `onInput` or `onToggle`, which is what React and
+every framework already understand. A prefixed one is `on` and the name,
+verbatim: `onhelix-before-change`. Nothing strips the prefix and nothing
+camel-cases it, which is React's own behavior rather than a convention here. See [React](./react), [Vue](./vue) and
 [Svelte](./svelte).

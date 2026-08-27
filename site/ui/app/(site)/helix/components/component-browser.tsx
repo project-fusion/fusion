@@ -272,8 +272,8 @@ export function ComponentBrowser({
             default-value={initialQuery}
             label="Search components"
             onInput={(event) => {
-              setQuery(event.detail.value)
-              mirror('q', event.detail.value)
+              setQuery((event.currentTarget as HTMLElement & { value: string }).value)
+              mirror('q', (event.currentTarget as HTMLElement & { value: string }).value)
             }}
             placeholder={`Search ${index.length} components…`}
             ref={search}
@@ -340,8 +340,8 @@ export function ComponentBrowser({
               default-value={category}
               label="Category"
               onChange={(event) => {
-                setCategory(event.detail.value)
-                mirror('category', event.detail.value)
+                setCategory((event.currentTarget as HTMLElement & { value: string }).value)
+                mirror('category', (event.currentTarget as HTMLElement & { value: string }).value)
               }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -369,8 +369,8 @@ export function ComponentBrowser({
                 default-value={status}
                 label="Status"
                 onChange={(event) => {
-                  setStatus(event.detail.value)
-                  mirror('status', event.detail.value)
+                  setStatus((event.currentTarget as HTMLElement & { value: string }).value)
+                  mirror('status', (event.currentTarget as HTMLElement & { value: string }).value)
                 }}
               >
                 <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -399,7 +399,9 @@ export function ComponentBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onChange={(event) => sortBy(event.currentTarget.value)}
+              onChange={(event) =>
+                sortBy((event.currentTarget as HTMLElement & { value: string }).value)
+              }
             >
               {/* A different mark from the filters', because it does a
                   different thing: a funnel takes rows away, and this only

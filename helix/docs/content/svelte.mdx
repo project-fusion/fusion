@@ -13,14 +13,14 @@ import '@helix-io/styled/svelte'
 
 A types-only import, once. It augments `SvelteHTMLElements` so every Helix tag
 is typed in a component, and it does so by re-exporting the JSX types rather
-than emitting a second copy: Svelte binds a handler as `onhelix-input={…}`,
+than emitting a second copy: Svelte binds a handler as `onhelix-before-change={…}`,
 which is the shape those types already describe, and two generated copies of one
 thing are two things that can disagree.
 
 ## Nothing else to configure
 
 ```svelte
-<helix-input label="Name" onhelix-input={(event) => (name = event.detail.value)} value={name} />
+<helix-input label="Name" onchange={(event) => (name = event.target.value)} value={name} />
 ```
 
 Svelte sets a property when the element has one and an attribute otherwise, and

@@ -74,7 +74,7 @@ Seed with the `default-` twin, or answer the event:
 ```
 
 ```tsx
-<helix-input label="Name" onhelix-input={(e) => setName(e.detail.value)} value={name} />
+<helix-input label="Name" onChange={(e) => setName(e.currentTarget.value)} valul.value)} value={name} />
 ```
 
 In TypeScript this is a compile error rather than a surprise. Everywhere else the
@@ -88,7 +88,7 @@ anything that is not React, `addEventListener('helix-before-open', …)`.
 
 **Lifecycle does not bubble and coordination does.** `helix-before-open` and
 `helix-before-close` reach the element and stop, so a menu closing inside a dialog is
-not the dialog closing; `helix-select`, `helix-change` and `helix-dismiss` cross
+not the dialog closing; `helix-select`, `helix-before-change` and `helix-dismiss` cross
 shadow boundaries and can be caught on a container. If a listener on a wrapper
 hears nothing, it is a lifecycle event and belongs on the element.
 

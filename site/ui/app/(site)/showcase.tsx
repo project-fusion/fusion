@@ -279,8 +279,8 @@ export function Showcase(): React.ReactElement {
         class={styles.showcaseSwitch}
         label="Showing"
         label-placement="start"
-        onChange={(event: CustomEvent<{ value: string }>) => {
-          setView(event.detail.value as View)
+        onChange={(event) => {
+          setView((event.currentTarget as HTMLElement & { value: string }).value as View)
         }}
         separation="outlined"
         value={view}
@@ -307,8 +307,8 @@ export function Showcase(): React.ReactElement {
         class={styles.showcaseBrand}
         default-value={BRAND}
         name="brand"
-        onChange={(event: CustomEvent<{ value: string }>) => {
-          setBrand(event.detail.value)
+        onChange={(event) => {
+          setBrand((event.currentTarget as HTMLElement & { value: string }).value)
         }}
         value={brand}
       ></helix-color-input>

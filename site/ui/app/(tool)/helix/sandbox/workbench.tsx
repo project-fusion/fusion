@@ -453,12 +453,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    * unfilterable that way. The native `input` fires after the element applied,
    * so the target is the answer, which is what every handler ever written
    * expects. See 294. */
-  const filterChanged = (event: { currentTarget: { value: string } }) => {
-    setFilter(event.currentTarget.value)
+  const filterChanged = (event: Event) => {
+    setFilter((event.currentTarget as HTMLElement & { value: string }).value)
   }
 
-  const paneChosen = (event: { currentTarget: { value: string } }) => {
-    setPane(event.currentTarget.value as Pane)
+  const paneChosen = (event: Event) => {
+    setPane((event.currentTarget as HTMLElement & { value: string }).value as Pane)
   }
   // Verbatim. What is typed is what is held and what is handed back.
   const paneEdited = (event: HelixChangeEvent) => {

@@ -210,8 +210,8 @@ export function InsightBrowser({
             default-value={initialQuery}
             label="Search insights"
             onInput={(event) => {
-              setQuery(event.detail.value)
-              mirror('q', event.detail.value)
+              setQuery((event.currentTarget as HTMLElement & { value: string }).value)
+              mirror('q', (event.currentTarget as HTMLElement & { value: string }).value)
             }}
             placeholder={`Search ${index.length} posts…`}
             ref={searchField}
@@ -247,8 +247,8 @@ export function InsightBrowser({
               default-value={topic}
               label="Topic"
               onChange={(event) => {
-                setTopic(event.detail.value)
-                mirror('topic', event.detail.value)
+                setTopic((event.currentTarget as HTMLElement & { value: string }).value)
+                mirror('topic', (event.currentTarget as HTMLElement & { value: string }).value)
               }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -271,8 +271,8 @@ export function InsightBrowser({
                 default-value={kind}
                 label="Kind"
                 onChange={(event) => {
-                  setKind(event.detail.value)
-                  mirror('kind', event.detail.value)
+                  setKind((event.currentTarget as HTMLElement & { value: string }).value)
+                  mirror('kind', (event.currentTarget as HTMLElement & { value: string }).value)
                 }}
               >
                 <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -299,7 +299,9 @@ export function InsightBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onChange={(event) => sortBy(event.currentTarget.value)}
+              onChange={(event) =>
+                sortBy((event.currentTarget as HTMLElement & { value: string }).value)
+              }
             >
               {/* A different mark from the filters', because it does a different
                   thing: a funnel takes rows away, and this only changes the

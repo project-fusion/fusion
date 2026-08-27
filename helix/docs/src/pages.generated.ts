@@ -64,7 +64,7 @@ export const docPages: DocPage[] = [
     title: 'Elevation and material',
   },
   {
-    description: 'Twenty-one events, why every name is prefixed, and which ones bubble.',
+    description: 'The request and the notification, why one name is prefixed and the other is not.',
     section: 'Essentials',
     slug: 'events',
     title: 'Events',

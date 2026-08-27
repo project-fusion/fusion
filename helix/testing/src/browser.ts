@@ -559,6 +559,30 @@ export const part = (host: HTMLElement, name: string): Element | null =>
   host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null
 
 /** Elements the consumer assigned to a slot, by slot name. */
+/**
+ * Waits until a component has stopped asking for updates, with a ceiling.
+ *
+ * The same helper `dom.ts` carries and for the same reason: a single
+ * `await host.updateComplete` reads the state from before the last update
+ * landed, and an unbounded loop hangs the whole run when a component never
+ * settles. Written twice because the two harnesses share no code, which is the
+ * arrangement `check:matchers` already exists to police from the other side.
+ * See 299.
+ */
+export const settle = async (host: Updatable, turns = 40): Promise<void> => {
+  let taken = 0
+  while ((await host.updateComplete) === false) {
+    taken += 1
+    if (taken > turns) {
+      throw new Error(
+        `<${host.localName}> asked for another update ${taken} times without settling. ` +
+          'Something it renders is requesting an update from its own update, which is a loop ' +
+          'rather than a slow component.',
+      )
+    }
+  }
+}
+
 export const slotted = (host: HTMLElement, name?: string): Element[] => {
   const selector = name ? `slot[name="${name}"]` : 'slot:not([name])'
   const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null

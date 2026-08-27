@@ -30,7 +30,7 @@ template it is on, so scoping it keeps the check for your own typos.
 
 ```html
 <helix-input
-  (helix-input)="name = $event.detail.value"
+  (change)="name = $event.target.value"
   [value]="name"
 />
 ```

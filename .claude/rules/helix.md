@@ -953,7 +953,7 @@ Events are declared, never inferred, and **names are `helix-{verb}`, lowercase
 and prefixed**:
 
 ```ts
-@event {HelixOpenEvent} helix-open - Fired when it opens.
+@event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
 ```
 
 *Corrected 17 Aug 2026. This section described PascalCase names (`OpenChange`)
@@ -974,7 +974,7 @@ lowercase; it is not wrong, and it was given up for the reason below.
 **Hyphens are not limited, and the rule that said so was wrong.** *Deleted 19
 Aug 2026.* `bindable-events` barred a second hyphen on the grounds that React
 binds no event whose name carries two. It binds them fine. Measured in Chrome
-against React 19.2.8, `ona-b-c-d` binds exactly as `onhelix-open` does, and
+against React 19.2.8, `ona-b-c-d` binds exactly as `onhelix-before-open` does, and
 `react-dom` slices `on` off the prop and hands the remainder to
 `addEventListener` without inspecting it. Web Awesome ships `wa-after-hide` and
 `wa-column-resize` to production, which is the same finding from outside.
@@ -990,7 +990,9 @@ is the argument for re-running it.
 **A verb React has claimed is reachable anyway, because of the prefix.** Its
 synthetic system owns `change`, `input`, `submit`, `copy`, `focus` and the rest,
 and a prop matching one of those is wired to the native event. Nothing strips
-our prefix, so `onhelix-change` matches none of them and arrives.
+our prefix, so `onhelix-before-change` matches none of them and arrives. A
+notification is not prefixed for the same reason inverted: `onChange` is meant to
+reach React's synthetic system, because the element sends the native `change`.
 
 **The same probe is what ended the PascalCase scheme.** Its argument was that
 React strips `on` from a prop and listens for the remainder verbatim, so
@@ -1002,23 +1004,38 @@ branch before reaching the one that would assign it. The DOM event is the
 universal channel, and it needs a name a plain listener can use.
 
 The type in braces is what lets the React generator emit
-`(event: HelixOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
+`(event: HelixBeforeOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
 class in `helix/core/src/events/events.ts` that carries its own name and augments
 `HTMLElementEventMap`. There is no generic `emit(name, detail)` helper: a
 dispatch through one cannot be named by the analyzer.
 
-**A control the reader edits continuously announces `helix-input`; one that
-changes in discrete steps announces `helix-change`.** That is the platform's own
-pair, and we had only half of it: `helix-change` fired on every keystroke while
-the native `change` we relay fired on commit, so an element carried two events
-whose names said the opposite of their timings. A consumer reading "change" as
-"the reader is done" wired a request to `onhelix-change` and sent one per
-character. Web Awesome and Spectrum both use the native names, so anyone
-arriving from either, or from HTML, read ours backwards.
+**Every state change is announced twice, and the two are for different
+people.** *Rewritten 26 Aug 2026; this described one event under two names.* It
+said a continuous control announces `helix-input` and a discrete one
+`helix-change`, which was one mechanism with `announcesInput` choosing a name:
+the name said *phase* and the flag meant *granularity*, so a consumer reading
+"change" as "the reader is done" wired a request to `onhelix-change` and got one
+per character.
 
-Five controls are continuous: Input, Textarea, Number Input, Pin Input and
-Slider. They set `announcesInput` on `MixinControllerValue`, which picks the
-event; everything else changes one step at a time, and a step is a change.
+The request is `helix-before-change`, or `helix-before-toggle` where the state
+is a boolean, or `helix-before-open` and `helix-before-close` where it is an
+overlay. Cancelable, carrying what is being proposed, fired before anything
+moves. Refusing one is how a consumer takes the decision, which is the whole of
+what "controlled" used to mean here.
+
+The notification is the platform's own name and carries no detail, because by
+then the state is on the element: `input` and `change` on a value control,
+`toggle` with `newState` and `oldState` on anything that opens, `close` on a
+dialog. `announcesInput` survives and means something narrower now, picking
+which native event a control sends rather than what its request is called: five
+are continuous, Input, Textarea, Number Input, Pin Input and Slider, and the
+rest send `input` and `change` together the way a native `<select>` does.
+
+**Eleven families still send a generic `helix-change` and want a verb of their
+own**, Chat, Outline, Pagination Size, Sandbox, Splitter, Steps, Tabs, Tour,
+Tree and Video Playlist among them. They are not form controls, so no native
+word applies, and `helix-change` is doing for them what one word for four
+questions did for `appearance`. See 294.
 
 **`@controlled` is deleted, and so is everything that read it.** *Rewritten 26
 Aug 2026, and this section described a tag, two analyzer plugins and a check
@@ -1126,7 +1143,7 @@ twice. `reactPropFor` carries the measurement.
 
 **The prop form still decides event names**, because it is what a consumer
 reaches for first and what has to keep working once React fixes this.
-`onhelix-open` reaches `helix-open`; `onHelixOpen` binds an event called
+`onhelix-before-open` reaches `helix-before-open`; `onHelixOpen` binds an event called
 `HelixOpen` that nobody dispatches, and never reaches the property of that name
 either, because React takes the `on` branch before the one that would assign it.
 
@@ -1136,7 +1153,7 @@ JSX, and why they are gone. They were not dropped:
 
 **There is one channel per fact, and it is the event.** The four callback
 properties on the controller mixins were removed 19 Aug 2026. They duplicated
-`helix-change`, were unreachable from the JSX every React consumer writes, and
+`helix-before-change`, were unreachable from the JSX every React consumer writes, and
 were justified in their own comments by a generated wrapper that had already
 been deleted. A consumer who wrote one now gets a warning naming it, because
 removing a property is silent in a way removing an event is not.
