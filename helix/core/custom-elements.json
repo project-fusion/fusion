@@ -1277,6 +1277,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost & HTMLElement"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
               "name": "options",
               "type": {
                 "text": "PopoverOptions"
@@ -1353,6 +1363,25 @@
                 }
               },
               "description": "Hides the surface and stops everything watching it."
+            },
+            {
+              "kind": "method",
+              "name": "announce",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "newState",
+                  "type": {
+                    "text": "'closed' | 'open'"
+                  }
+                }
+              ],
+              "description": "Says the panel moved, under the platform's own name and in its shape.\n\n**The browser fires this already and nobody can hear it.** A surface shown\nwith `showPopover()` gets a `toggle` from the platform, on the surface, and\n`toggle` on a popover neither bubbles nor is composed: it stops at the\nshadow root the panel is rendered in. So every one of the ten families that\nopens this way had a native event a consumer could not reach. See 296.\n\n**Dispatched here rather than relayed from the surface**, which is the one\nplace the choice is not obvious. Relaying would be the platform doing the\nwork, and it is what `Avatar` does for `load`. It is wrong here because\n`show()` feature-detects: a browser without the popover API still gets a\npositioned panel, deliberately, and would then get no event either. The\ncontroller knows the panel moved whichever branch it took.\n\n**`newState` and `oldState`, because that is the shape the platform uses**,\nand a consumer arriving from `<details>` or from a popover of their own\nreads the same two words. Not cancelable, and this is the half worth\nstating: `helix-open` and `helix-close` are the cancelable request and\nrefusing is how a consumer takes the decision. A second cancelable event\nfor one transition is two answers to one question, which 296 refuses."
             },
             {
               "kind": "method",

@@ -2279,6 +2279,8 @@ reflected none of them. */
   "onhelix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "onhelix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessColorInputElementEvent) => void;
 };
 
 export type HelixHeadlessColorInputSolidJsProps = {
@@ -2426,6 +2428,8 @@ reflected none of them. */
   "on:helix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessColorInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2922,6 +2926,8 @@ reflected none of them. */
   "onhelix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "onhelix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessComboboxElementEvent) => void;
 };
 
 export type HelixHeadlessComboboxSolidJsProps = {
@@ -3106,6 +3112,8 @@ reflected none of them. */
   "on:helix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessComboboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3910,6 +3918,8 @@ reflected none of them. */
   "onhelix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "onhelix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessDateInputElementEvent) => void;
 };
 
 export type HelixHeadlessDateInputSolidJsProps = {
@@ -4122,6 +4132,8 @@ reflected none of them. */
   "on:helix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessDateInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6594,6 +6606,8 @@ helix-close */
   "onhelix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessMegamenuElementEvent) => void;
 };
 
 export type HelixHeadlessMegamenuSolidJsProps = {
@@ -6692,6 +6706,8 @@ helix-close */
   "on:helix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessMegamenuElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6918,6 +6934,8 @@ helix-close */
   "onhelix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
   /** Fired when an item is chosen. */
   "onhelix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessMenuElementEvent) => void;
 };
 
 export type HelixHeadlessMenuSolidJsProps = {
@@ -6980,6 +6998,8 @@ helix-close */
   "on:helix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
   /** Fired when an item is chosen. */
   "on:helix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessMenuElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8576,6 +8596,8 @@ helix-close */
   "onhelix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessPopoverElementEvent) => void;
 };
 
 export type HelixHeadlessPopoverSolidJsProps = {
@@ -8618,6 +8640,8 @@ helix-close */
   "on:helix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessPopoverElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9467,6 +9491,8 @@ reflected none of them. */
   "onhelix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "onhelix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessSelectElementEvent) => void;
 };
 
 export type HelixHeadlessSelectSolidJsProps = {
@@ -9592,6 +9618,8 @@ reflected none of them. */
   "on:helix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10099,6 +10127,8 @@ helix-close */
   "onhelix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessSpeedDialElementEvent) => void;
 };
 
 export type HelixHeadlessSpeedDialSolidJsProps = {
@@ -10144,6 +10174,8 @@ helix-close */
   "on:helix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessSpeedDialElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11642,6 +11674,8 @@ reflected none of them. */
   "onhelix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "onhelix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessTimeInputElementEvent) => void;
 };
 
 export type HelixHeadlessTimeInputSolidJsProps = {
@@ -11809,6 +11843,8 @@ reflected none of them. */
   "on:helix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessTimeInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12744,6 +12780,8 @@ helix-close */
   "onhelix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
   /** Fired before it hides, and cancelable. */
   "onhelix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessTooltipElementEvent) => void;
 };
 
 export type HelixHeadlessTooltipSolidJsProps = {
@@ -12856,6 +12894,8 @@ helix-close */
   "on:helix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
   /** Fired before it hides, and cancelable. */
   "on:helix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessTooltipElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13031,6 +13071,8 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "onhelix-tour-ask"?: (
     e: HelixHeadlessTourStopHelixTourAskElementEvent,
   ) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessTourStopElementEvent) => void;
 };
 
 export type HelixHeadlessTourStopSolidJsProps = {
@@ -13070,6 +13112,8 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "on:helix-tour-ask"?: (
     e: HelixHeadlessTourStopHelixTourAskElementEvent,
   ) => void;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessTourStopElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15997,6 +16041,7 @@ export type CustomElements = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -16568,6 +16613,7 @@ export type CustomElements = {
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -17309,6 +17355,7 @@ export type CustomElements = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the calendar opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -19931,6 +19978,7 @@ export type CustomElements = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -20167,6 +20215,7 @@ export type CustomElements = {
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -21583,6 +21632,7 @@ export type CustomElements = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -22430,6 +22480,7 @@ export type CustomElements = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -23026,6 +23077,7 @@ export type CustomElements = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -24503,6 +24555,7 @@ export type CustomElements = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -25603,6 +25656,7 @@ export type CustomElements = {
    *
    * - `helix-open`: Fired before the bubble shows, and cancelable.
    * - `helix-close`: Fired before it hides, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -25807,6 +25861,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -28748,6 +28803,7 @@ export type CustomElementsSolidJs = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -29321,6 +29377,7 @@ export type CustomElementsSolidJs = {
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -30072,6 +30129,7 @@ export type CustomElementsSolidJs = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the calendar opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -32752,6 +32810,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -32994,6 +33053,7 @@ export type CustomElementsSolidJs = {
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -34433,6 +34493,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -35300,6 +35361,7 @@ export type CustomElementsSolidJs = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -35909,6 +35971,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-open`: Fired before it opens, and cancelable.
    * - `helix-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -37432,6 +37495,7 @@ export type CustomElementsSolidJs = {
    * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -38553,6 +38617,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-open`: Fired before the bubble shows, and cancelable.
    * - `helix-close`: Fired before it hides, and cancelable.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -38763,6 +38828,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
+   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *

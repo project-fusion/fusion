@@ -82,6 +82,7 @@ const dates = (value: string): string[] =>
  * @event {Event} change - Announced once the value has moved.
  * @event {HelixOpenEvent} helix-open - Fired when the calendar opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
+ * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *
  * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.

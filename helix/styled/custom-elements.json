@@ -14428,6 +14428,18 @@
                 "name": "HelixHeadlessColorInput",
                 "module": "src/color-input/root/color-input-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
             }
           ],
           "slots": [
@@ -17859,6 +17871,18 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
               "inheritedFrom": {
                 "name": "HelixHeadlessCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -22727,6 +22751,18 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
               "inheritedFrom": {
                 "name": "HelixHeadlessDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -39989,6 +40025,18 @@
                 "name": "HelixHeadlessMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
             }
           ],
           "modulePath": "src/megamenu/root/megamenu-root.ts",
@@ -41573,6 +41621,18 @@
               "description": "Fired when an item is chosen.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
+              "inheritedFrom": {
+                "name": "HelixHeadlessMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
               "inheritedFrom": {
                 "name": "HelixHeadlessMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -50801,6 +50861,18 @@
                 "name": "HelixHeadlessPopover",
                 "module": "src/popover/root/popover-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPopover",
+                "module": "src/popover/root/popover-root.ts"
+              }
             }
           ],
           "modulePath": "src/popover/root/popover-root.ts",
@@ -58788,6 +58860,18 @@
                 "name": "HelixHeadlessSelect",
                 "module": "src/select/root/select-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
             }
           ],
           "slots": [
@@ -62275,6 +62359,18 @@
               "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
               "inheritedFrom": {
                 "name": "HelixHeadlessSpeedDial",
                 "module": "src/speed-dial/root/speed-dial-root.ts"
@@ -72259,6 +72355,18 @@
                 "name": "HelixHeadlessTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
             }
           ],
           "slots": [
@@ -78455,6 +78563,18 @@
                 "name": "HelixHeadlessTooltip",
                 "module": "src/tooltip/root/tooltip-root.ts"
               }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTooltip",
+                "module": "src/tooltip/root/tooltip-root.ts"
+              }
             }
           ],
           "modulePath": "src/tooltip/root/tooltip-root.ts",
@@ -79818,6 +79938,18 @@
               "description": "A stop asking the tour to move, from its own controls.",
               "name": "helix-tour-ask",
               "reactProp": "onhelix-tour-ask",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTourStop",
+                "module": "src/tour/stop/tour-stop.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle",
               "inheritedFrom": {
                 "name": "HelixHeadlessTourStop",
                 "module": "src/tour/stop/tour-stop.ts"

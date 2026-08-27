@@ -83,6 +83,7 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  *
  * @event {HelixOpenEvent} helix-open - Fired before the bubble shows, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
+ * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *
  * @csspart arrow - The point, resting against the trigger.
  * @csspart tooltip - The bubble.

@@ -1257,6 +1257,8 @@ export type HelixHeadlessColorInputVueEvents = {
   "helix-open": HelixHeadlessColorInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixHeadlessColorInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessColorInputElementEvent;
 };
 
 /** `HelixHeadlessColorPicker` component event */
@@ -1607,6 +1609,8 @@ export type HelixHeadlessComboboxVueEvents = {
   "helix-open": HelixHeadlessComboboxHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixHeadlessComboboxHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessComboboxElementEvent;
 };
 
 /** `HelixHeadlessCommand` component event */
@@ -2137,6 +2141,8 @@ export type HelixHeadlessDateInputVueEvents = {
   "helix-open": HelixHeadlessDateInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixHeadlessDateInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessDateInputElementEvent;
 };
 
 /** `HelixHeadlessDatePicker` component event */
@@ -3464,6 +3470,8 @@ export type HelixHeadlessMegamenuVueEvents = {
   "helix-open": HelixHeadlessMegamenuHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixHeadlessMegamenuHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessMegamenuElementEvent;
 };
 
 /** `HelixHeadlessMenuItem` component event */
@@ -3620,6 +3628,8 @@ export type HelixHeadlessMenuVueEvents = {
   "helix-close": HelixHeadlessMenuHelixCloseElementEvent;
   /** Fired when an item is chosen. */
   "helix-select": HelixHeadlessMenuHelixSelectElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessMenuElementEvent;
 };
 
 export type HelixHeadlessMeterVueProps = {
@@ -4467,6 +4477,8 @@ export type HelixHeadlessPopoverVueEvents = {
   "helix-open": HelixHeadlessPopoverHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixHeadlessPopoverHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessPopoverElementEvent;
 };
 
 export type HelixHeadlessProgressVueProps = {
@@ -4967,6 +4979,8 @@ export type HelixHeadlessSelectVueEvents = {
   "helix-open": HelixHeadlessSelectHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixHeadlessSelectHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessSelectElementEvent;
 };
 
 export type HelixHeadlessSkeletonVueProps = {};
@@ -5253,6 +5267,8 @@ export type HelixHeadlessSpeedDialVueEvents = {
   "helix-open": HelixHeadlessSpeedDialHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixHeadlessSpeedDialHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessSpeedDialElementEvent;
 };
 
 /** `HelixHeadlessSplitter` component event */
@@ -6121,6 +6137,8 @@ export type HelixHeadlessTimeInputVueEvents = {
   "helix-open": HelixHeadlessTimeInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixHeadlessTimeInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessTimeInputElementEvent;
 };
 
 /** `HelixHeadlessTimePicker` component event */
@@ -6660,6 +6678,8 @@ export type HelixHeadlessTooltipVueEvents = {
   "helix-open": HelixHeadlessTooltipHelixOpenElementEvent;
   /** Fired before it hides, and cancelable. */
   "helix-close": HelixHeadlessTooltipHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessTooltipElementEvent;
 };
 
 /** `HelixHeadlessTour` component event */
@@ -6777,6 +6797,8 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
 export type HelixHeadlessTourStopVueEvents = {
   /** A stop asking the tour to move, from its own controls. */
   "helix-tour-ask": HelixHeadlessTourStopHelixTourAskElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessTourStopElementEvent;
 };
 
 /** `HelixHeadlessTreeItem` component event */

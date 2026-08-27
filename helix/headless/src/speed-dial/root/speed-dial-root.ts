@@ -54,6 +54,7 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
+ * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {

@@ -153,6 +153,7 @@ const isInsertion = (event: Event): boolean =>
  * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the panel opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
+ * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-combobox')
 export class HelixHeadlessCombobox extends MixinControllerOpen(

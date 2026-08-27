@@ -107,6 +107,8 @@ export interface PopoverOptions {
  * about surfaces.
  */
 export class PopoverController implements ReactiveController {
+  private readonly host: ReactiveControllerHost & HTMLElement
+
   private readonly options: PopoverOptions
 
   private readonly floating: FloatingController
@@ -117,6 +119,7 @@ export class PopoverController implements ReactiveController {
   private shown = false
 
   constructor(host: ReactiveControllerHost & HTMLElement, options: PopoverOptions) {
+    this.host = host
     this.options = options
     this.floating = new FloatingController(host, {
       anchor: options.anchor,
@@ -182,6 +185,7 @@ export class PopoverController implements ReactiveController {
       this.floating.start()
     }
     this.dismisser.activate()
+    this.announce('open')
   }
 
   /** Hides the surface and stops everything watching it. */
@@ -194,6 +198,36 @@ export class PopoverController implements ReactiveController {
     this.dismisser.deactivate()
     this.floating.stop()
     surface?.hidePopover?.()
+    this.announce('closed')
+  }
+
+  /**
+   * Says the panel moved, under the platform's own name and in its shape.
+   *
+   * **The browser fires this already and nobody can hear it.** A surface shown
+   * with `showPopover()` gets a `toggle` from the platform, on the surface, and
+   * `toggle` on a popover neither bubbles nor is composed: it stops at the
+   * shadow root the panel is rendered in. So every one of the ten families that
+   * opens this way had a native event a consumer could not reach. See 296.
+   *
+   * **Dispatched here rather than relayed from the surface**, which is the one
+   * place the choice is not obvious. Relaying would be the platform doing the
+   * work, and it is what `Avatar` does for `load`. It is wrong here because
+   * `show()` feature-detects: a browser without the popover API still gets a
+   * positioned panel, deliberately, and would then get no event either. The
+   * controller knows the panel moved whichever branch it took.
+   *
+   * **`newState` and `oldState`, because that is the shape the platform uses**,
+   * and a consumer arriving from `<details>` or from a popover of their own
+   * reads the same two words. Not cancelable, and this is the half worth
+   * stating: `helix-open` and `helix-close` are the cancelable request and
+   * refusing is how a consumer takes the decision. A second cancelable event
+   * for one transition is two answers to one question, which 296 refuses.
+   */
+  private announce(newState: 'closed' | 'open'): void {
+    const event = new Event('toggle', { bubbles: false, cancelable: false, composed: false })
+    Object.assign(event, { newState, oldState: newState === 'open' ? 'closed' : 'open' })
+    this.host.dispatchEvent(event)
   }
 
   /** Whichever of the two the surface is not already doing. */

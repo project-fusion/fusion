@@ -1827,6 +1827,8 @@ export type HelixColorInputVueEvents = {
   "helix-open": HelixColorInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixColorInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixColorInputElementEvent;
 };
 
 /** `HelixColorPicker` component event */
@@ -2174,6 +2176,8 @@ export type HelixComboboxVueEvents = {
   "helix-open": HelixComboboxHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixComboboxHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixComboboxElementEvent;
 };
 
 /** `HelixCommand` component event */
@@ -2725,6 +2729,8 @@ export type HelixDateInputVueEvents = {
   "helix-open": HelixDateInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixDateInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixDateInputElementEvent;
 };
 
 /** `HelixDatePicker` component event */
@@ -4317,6 +4323,8 @@ export type HelixMegamenuVueEvents = {
   "helix-open": HelixMegamenuHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixMegamenuHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixMegamenuElementEvent;
 };
 
 /** `HelixMenuItem` component event */
@@ -4467,6 +4475,8 @@ export type HelixMenuVueEvents = {
   "helix-close": HelixMenuHelixCloseElementEvent;
   /** Fired when an item is chosen. */
   "helix-select": HelixMenuHelixSelectElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixMenuElementEvent;
 };
 
 export type HelixMeterVueProps = {
@@ -5328,6 +5338,8 @@ export type HelixPopoverVueEvents = {
   "helix-open": HelixPopoverHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixPopoverHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixPopoverElementEvent;
 };
 
 export type HelixProgressVueProps = {
@@ -6122,6 +6134,8 @@ export type HelixSelectVueEvents = {
   "helix-open": HelixSelectHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixSelectHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixSelectElementEvent;
 };
 
 export type HelixSkeletonVueProps = {
@@ -6468,6 +6482,8 @@ export type HelixSpeedDialVueEvents = {
   "helix-open": HelixSpeedDialHelixOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-close": HelixSpeedDialHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixSpeedDialElementEvent;
 };
 
 /** `HelixSplitter` component event */
@@ -7383,6 +7399,8 @@ export type HelixTimeInputVueEvents = {
   "helix-open": HelixTimeInputHelixOpenElementEvent;
   /** Fired when it closes. */
   "helix-close": HelixTimeInputHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixTimeInputElementEvent;
 };
 
 /** `HelixTimePicker` component event */
@@ -7957,6 +7975,8 @@ export type HelixTooltipVueEvents = {
   "helix-open": HelixTooltipHelixOpenElementEvent;
   /** Fired before it hides, and cancelable. */
   "helix-close": HelixTooltipHelixCloseElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixTooltipElementEvent;
 };
 
 /** `HelixTour` component event */
@@ -8068,6 +8088,8 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
 export type HelixTourStopVueEvents = {
   /** A stop asking the tour to move, from its own controls. */
   "helix-tour-ask": HelixTourStopHelixTourAskElementEvent;
+  /** Says the panel moved, carrying `newState` and `oldState`. */
+  toggle: HelixTourStopElementEvent;
 };
 
 /** `HelixTreeItem` component event */

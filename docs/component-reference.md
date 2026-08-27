@@ -1406,6 +1406,7 @@ pads its own lower rows.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
 | `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -1652,6 +1653,7 @@ Input, Color Input and Date Input all take.
 | `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
 | `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -2005,6 +2007,7 @@ whatever holds it.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the date changes. |
 | `helix-open` | `HelixOpenEvent` | Fired when the calendar opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -3473,6 +3476,7 @@ Everything about what opens it and what closes it is the base class.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -3545,6 +3549,7 @@ one panel and reads the same on a phone as on a desk.
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -4402,6 +4407,7 @@ time.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -5244,6 +5250,7 @@ from the field it came out of.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Relayed from the listbox when the answer changes. |
 | `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -5516,6 +5523,7 @@ moves through it is the base class.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -6453,6 +6461,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the time changes. |
 | `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7015,6 +7024,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before the bubble shows, and cancelable. |
 | `helix-close` | `HelixCloseEvent` | Fired before it hides, and cancelable. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7129,6 +7139,7 @@ name, on purpose.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-tour-ask` | `HelixTourAskEvent` | A stop asking the tour to move, from its own controls. |
+| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 

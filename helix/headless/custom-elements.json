@@ -10138,6 +10138,14 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -12871,6 +12879,14 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -17050,6 +17066,14 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -30200,6 +30224,14 @@
               "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -31396,6 +31428,14 @@
               "description": "Fired when an item is chosen.",
               "name": "helix-select",
               "reactProp": "onhelix-select"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -38605,6 +38645,14 @@
               "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -43257,6 +43305,14 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -45863,6 +45919,14 @@
               "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -53795,6 +53859,14 @@
               "description": "Fired when it closes.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -58620,6 +58692,14 @@
               "description": "Fired before it hides, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -59655,6 +59735,14 @@
               "description": "A stop asking the tour to move, from its own controls.",
               "name": "helix-tour-ask",
               "reactProp": "onhelix-tour-ask"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
