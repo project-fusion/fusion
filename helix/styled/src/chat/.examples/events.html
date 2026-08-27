@@ -1,4 +1,4 @@
-<!-- @summary A turn sent and a transcript pinned, which are the reader’s two asks. -->
+<!-- @summary A turn sent and a transcript pinned, which are the reader's two asks. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -14,7 +14,6 @@
     >How can I help?</helix-chat-message>
     <helix-chat-composer slot="composer"></helix-chat-composer>
   </helix-chat>
-
 
   <helix-list
     divided
@@ -54,9 +53,15 @@
   }
 
   support.addEventListener('helix-send', (event) => {
-    say('helix-send', `"${event.detail.value}" was sent, and posting it is the page’s job`)
+    say('helix-send', `"${event.detail.value}" was sent, and posting it is the page's job`)
+    const turn = document.createElement('helix-chat-message')
+    turn.setAttribute('author', 'me')
+    turn.setAttribute('state', 'sent')
+    turn.at = new Date().toISOString()
+    turn.textContent = event.detail.value
+    support.append(turn)
   })
   support.addEventListener('helix-before-pin', (event) => {
-    say('helix-before-pin', `proposing ${event.detail.value}, which follows the reader’s scrolling`)
+    say('helix-before-pin', `proposing ${event.detail.value}, which follows the reader's scrolling`)
   })
 </script>
