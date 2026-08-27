@@ -210,8 +210,8 @@ export function InsightBrowser({
             default-value={initialQuery}
             label="Search insights"
             onInput={(event) => {
-              setQuery((event.currentTarget as HTMLElement & { value: string }).value)
-              mirror('q', (event.currentTarget as HTMLElement & { value: string }).value)
+              setQuery(event.currentTarget.value)
+              mirror('q', event.currentTarget.value)
             }}
             placeholder={`Search ${index.length} posts…`}
             ref={searchField}
@@ -247,8 +247,8 @@ export function InsightBrowser({
               default-value={topic}
               label="Topic"
               onChange={(event) => {
-                setTopic((event.currentTarget as HTMLElement & { value: string }).value)
-                mirror('topic', (event.currentTarget as HTMLElement & { value: string }).value)
+                setTopic(event.currentTarget.value)
+                mirror('topic', event.currentTarget.value)
               }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -271,8 +271,8 @@ export function InsightBrowser({
                 default-value={kind}
                 label="Kind"
                 onChange={(event) => {
-                  setKind((event.currentTarget as HTMLElement & { value: string }).value)
-                  mirror('kind', (event.currentTarget as HTMLElement & { value: string }).value)
+                  setKind(event.currentTarget.value)
+                  mirror('kind', event.currentTarget.value)
                 }}
               >
                 <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -299,9 +299,7 @@ export function InsightBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onChange={(event) =>
-                sortBy((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => sortBy(event.currentTarget.value)}
             >
               {/* A different mark from the filters', because it does a different
                   thing: a funnel takes rows away, and this only changes the

@@ -197,10 +197,7 @@ export function AuraLab(): React.ReactElement {
               label="Shape"
               label-placement="start"
               onChange={(event) => {
-                const next = SHAPES.findIndex(
-                  (entry) =>
-                    entry.name === (event.currentTarget as HTMLElement & { value: string }).value,
-                )
+                const next = SHAPES.findIndex((entry) => entry.name === event.currentTarget.value)
                 if (next >= 0) {
                   setShape(next)
                 }
@@ -219,9 +216,7 @@ export function AuraLab(): React.ReactElement {
               label="Pointer"
               label-placement="start"
               onChange={(event) => {
-                const next = INTERACTIONS.find(
-                  (one) => one === (event.currentTarget as HTMLElement & { value: string }).value,
-                )
+                const next = INTERACTIONS.find((one) => one === event.currentTarget.value)
                 if (next) {
                   setInteraction(next)
                 }
@@ -245,9 +240,7 @@ export function AuraLab(): React.ReactElement {
               label="Aim"
               label-placement="start"
               onChange={(event) => {
-                const next = AIMS.find(
-                  (one) => one === (event.currentTarget as HTMLElement & { value: string }).value,
-                )
+                const next = AIMS.find((one) => one === event.currentTarget.value)
                 if (next) {
                   setAim(next)
                 }
@@ -268,7 +261,7 @@ export function AuraLab(): React.ReactElement {
               checked={interactive}
               label="Follow"
               onChange={(event) => {
-                setInteractive((event.currentTarget as HTMLElement & { checked: boolean }).checked)
+                setInteractive(event.currentTarget.checked)
               }}
             ></helix-switch>
 
@@ -316,9 +309,7 @@ export function AuraLab(): React.ReactElement {
                     max={knob.max}
                     min={knob.min}
                     onInput={(event) => {
-                      const next = Number(
-                        (event.currentTarget as HTMLElement & { value: string }).value,
-                      )
+                      const next = Number(event.currentTarget.value)
                       setKnobs((held) => ({ ...held, [knob.key]: next }))
                     }}
                     show-value

@@ -843,9 +843,7 @@ export function ThemeBuilder({
               hint="Only the words change. The palette is the same whichever you pick."
               label="Preview"
               name="context"
-              onChange={(event) =>
-                setContext((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setContext(event.currentTarget.value)}
               value={context}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -872,9 +870,7 @@ export function ThemeBuilder({
               hint="How much page there is. Minimal has no chart and nothing that floats."
               label="Layout"
               name="layout"
-              onChange={(event) =>
-                setLayout((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setLayout(event.currentTarget.value)}
               value={layout}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -889,9 +885,7 @@ export function ThemeBuilder({
               hint="The one color you own. Everything else is derived from it."
               label="Brand"
               name="brand"
-              onChange={(event) =>
-                setBrand((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setBrand(event.currentTarget.value)}
               value={brand}
             ></helix-color-input>
 
@@ -931,13 +925,7 @@ export function ThemeBuilder({
               hint="Which half of the palette is derived. Both are emitted; this picks the one you see."
               label="Color scheme"
               name="scheme"
-              onChange={(event) =>
-                setScheme(
-                  (event.currentTarget as HTMLElement & { value: string }).value as
-                    | 'dark'
-                    | 'light',
-                )
-              }
+              onChange={(event) => setScheme(event.currentTarget.value as 'dark' | 'light')}
               value={scheme}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -949,11 +937,7 @@ export function ThemeBuilder({
               hint="The ratio every foreground has to clear against the ground it lands on."
               label="Contrast target"
               name="contrast"
-              onChange={(event) =>
-                setContrastTarget(
-                  Number((event.currentTarget as HTMLElement & { value: string }).value),
-                )
-              }
+              onChange={(event) => setContrastTarget(Number(event.currentTarget.value))}
               value={String(contrastTarget)}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -984,11 +968,7 @@ export function ThemeBuilder({
               hint="How much of the brand’s chroma the palette keeps. Zero is gray."
               label="Saturation"
               name="chroma"
-              onInput={(event) =>
-                setChromaScale(
-                  Number((event.currentTarget as HTMLElement & { value: string }).value),
-                )
-              }
+              onInput={(event) => setChromaScale(Number(event.currentTarget.value))}
               show-value
               style={{ '--slider-track-image': ramps.saturation ?? '' }}
               value={String(chromaScale)}
@@ -1002,9 +982,7 @@ export function ThemeBuilder({
               hint="How far around the wheel the accent sits from the brand, in degrees."
               label="Accent angle"
               name="accent"
-              onInput={(event) =>
-                setAccentHue(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setAccentHue(Number(event.currentTarget.value))}
               show-value
               style={{ '--slider-track-image': ramps.accent ?? '' }}
               value={String(accentHue)}
@@ -1015,9 +993,7 @@ export function ThemeBuilder({
               hint="Control heights and the spacing scale, as a percentage of the shipped one."
               label="Density"
               name="density"
-              onInput={(event) =>
-                setDensity(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setDensity(Number(event.currentTarget.value))}
               show-value
               value={String(density)}
             ></helix-slider>
@@ -1027,9 +1003,7 @@ export function ThemeBuilder({
               hint="As a percentage of the shipped radii. Zero is square."
               label="Corner radius"
               name="radius"
-              onInput={(event) =>
-                setRadius(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setRadius(Number(event.currentTarget.value))}
               show-value
               value={String(radius)}
             ></helix-slider>
@@ -1047,9 +1021,7 @@ export function ThemeBuilder({
             <helix-combobox
               label="Body face"
               name="body-face"
-              onChange={(event) =>
-                setBodyFace((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setBodyFace(event.currentTarget.value)}
               placeholder="System default"
               value={bodyFace}
             >
@@ -1061,9 +1033,7 @@ export function ThemeBuilder({
               hint="Headings. Follows the body face where it is left alone."
               label="Display face"
               name="display-face"
-              onChange={(event) =>
-                setDisplayFace((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setDisplayFace(event.currentTarget.value)}
               placeholder="Same as body"
               value={displayFace}
             >
@@ -1074,9 +1044,7 @@ export function ThemeBuilder({
             <helix-combobox
               label="Mono face"
               name="mono-face"
-              onChange={(event) =>
-                setMonoFace((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => setMonoFace(event.currentTarget.value)}
               placeholder="System mono"
               value={monoFace}
             >
@@ -1094,9 +1062,7 @@ export function ThemeBuilder({
               hint="How far the statuses follow the palette's loudness."
               label="Status harmony"
               name="harmony"
-              onInput={(event) =>
-                setHarmony(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setHarmony(Number(event.currentTarget.value))}
               show-value
               value={String(harmony)}
             ></helix-slider>
@@ -1111,9 +1077,7 @@ export function ThemeBuilder({
               hint="How far a status may rotate, in degrees, to clear a role it collides with."
               label="Status hue allowance"
               name="allowance"
-              onInput={(event) =>
-                setAllowance(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setAllowance(Number(event.currentTarget.value))}
               show-value
               value={String(allowance)}
             ></helix-slider>
@@ -1128,9 +1092,7 @@ export function ThemeBuilder({
               hint="The base size in pixels. Every UI step is measured off it."
               label="Body size"
               name="text-base"
-              onInput={(event) =>
-                setTextBase(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setTextBase(Number(event.currentTarget.value))}
               show-value
               value={String(textBase)}
             ></helix-slider>
@@ -1140,9 +1102,7 @@ export function ThemeBuilder({
               hint="The ratio between the display steps."
               label="Type scale"
               name="text-scale"
-              onInput={(event) =>
-                setTextScale(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setTextScale(Number(event.currentTarget.value))}
               show-value
               value={String(textScale)}
             ></helix-slider>
@@ -1183,11 +1143,7 @@ export function ThemeBuilder({
               hint="The pace and the curve together. Default keeps the stylesheet’s own."
               label="Motion"
               name="motion"
-              onChange={(event) =>
-                setMotion(
-                  (event.currentTarget as HTMLElement & { value: string }).value as Character,
-                )
-              }
+              onChange={(event) => setMotion(event.currentTarget.value as Character)}
               placeholder="Default"
               value={motion}
             >
@@ -1206,11 +1162,7 @@ export function ThemeBuilder({
               offered here and refused there for that reason. */}
             <helix-toggle-group
               label="Separation, in flow"
-              onChange={(event) =>
-                setSurface(
-                  (event.currentTarget as HTMLElement & { value: string }).value as Mechanism,
-                )
-              }
+              onChange={(event) => setSurface(event.currentTarget.value as Mechanism)}
               value={surface}
             >
               <helix-toggle value="border">Border</helix-toggle>
@@ -1221,11 +1173,7 @@ export function ThemeBuilder({
 
             <helix-toggle-group
               label="Separation, floating"
-              onChange={(event) =>
-                setFloating(
-                  (event.currentTarget as HTMLElement & { value: string }).value as Mechanism,
-                )
-              }
+              onChange={(event) => setFloating(event.currentTarget.value as Mechanism)}
               value={floating}
             >
               <helix-toggle value="shadow">Shadow</helix-toggle>
@@ -1252,9 +1200,7 @@ export function ThemeBuilder({
               hint="Pixels behind a translucent surface. Zero is flat."
               label="Material blur"
               name="material-blur"
-              onInput={(event) =>
-                setBlur(Number((event.currentTarget as HTMLElement & { value: string }).value))
-              }
+              onInput={(event) => setBlur(Number(event.currentTarget.value))}
               show-value
               value={String(blur)}
             ></helix-slider>
@@ -1264,11 +1210,7 @@ export function ThemeBuilder({
               hint="How opaque those surfaces are. Below 100 they stop being a known ground."
               label="Material opacity"
               name="material-opacity"
-              onInput={(event) =>
-                setTranslucency(
-                  Number((event.currentTarget as HTMLElement & { value: string }).value),
-                )
-              }
+              onInput={(event) => setTranslucency(Number(event.currentTarget.value))}
               show-value
               value={String(translucency)}
             ></helix-slider>

@@ -272,8 +272,8 @@ export function ComponentBrowser({
             default-value={initialQuery}
             label="Search components"
             onInput={(event) => {
-              setQuery((event.currentTarget as HTMLElement & { value: string }).value)
-              mirror('q', (event.currentTarget as HTMLElement & { value: string }).value)
+              setQuery(event.currentTarget.value)
+              mirror('q', event.currentTarget.value)
             }}
             placeholder={`Search ${index.length} components…`}
             ref={search}
@@ -340,8 +340,8 @@ export function ComponentBrowser({
               default-value={category}
               label="Category"
               onChange={(event) => {
-                setCategory((event.currentTarget as HTMLElement & { value: string }).value)
-                mirror('category', (event.currentTarget as HTMLElement & { value: string }).value)
+                setCategory(event.currentTarget.value)
+                mirror('category', event.currentTarget.value)
               }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -369,8 +369,8 @@ export function ComponentBrowser({
                 default-value={status}
                 label="Status"
                 onChange={(event) => {
-                  setStatus((event.currentTarget as HTMLElement & { value: string }).value)
-                  mirror('status', (event.currentTarget as HTMLElement & { value: string }).value)
+                  setStatus(event.currentTarget.value)
+                  mirror('status', event.currentTarget.value)
                 }}
               >
                 <helix-icon name="funnel-simple" slot="start"></helix-icon>
@@ -399,9 +399,7 @@ export function ComponentBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onChange={(event) =>
-                sortBy((event.currentTarget as HTMLElement & { value: string }).value)
-              }
+              onChange={(event) => sortBy(event.currentTarget.value)}
             >
               {/* A different mark from the filters', because it does a
                   different thing: a funnel takes rows away, and this only

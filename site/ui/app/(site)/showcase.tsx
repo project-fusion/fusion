@@ -280,7 +280,7 @@ export function Showcase(): React.ReactElement {
         label="Showing"
         label-placement="start"
         onChange={(event) => {
-          setView((event.currentTarget as HTMLElement & { value: string }).value as View)
+          setView(event.currentTarget.value as View)
         }}
         separation="outlined"
         value={view}
@@ -308,7 +308,7 @@ export function Showcase(): React.ReactElement {
         default-value={BRAND}
         name="brand"
         onChange={(event) => {
-          setBrand((event.currentTarget as HTMLElement & { value: string }).value)
+          setBrand(event.currentTarget.value)
         }}
         value={brand}
       ></helix-color-input>

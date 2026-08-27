@@ -233,112 +233,112 @@ type BaseProps<T extends HTMLElement> = {
   popovertargetaction?: "show" | "hide" | "toggle";
 };
 
-type BaseEvents = {
+type BaseEvents<T = HTMLElement> = {
   // Mouse Events
 
   /** Triggered when the element is clicked by the user by mouse or keyboard. */
-  onClick?: (event: MouseEvent) => void;
+  onClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the context menu is triggered, often by right-clicking. */
-  onContextMenu?: (event: MouseEvent) => void;
+  onContextMenu?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the element is double-clicked. */
-  onDoubleClick?: (event: MouseEvent) => void;
+  onDoubleClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired repeatedly as the draggable element is being dragged. */
-  onDrag?: (event: DragEvent) => void;
+  onDrag?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when the dragging of a draggable element is finished. */
-  onDragEnd?: (event: DragEvent) => void;
+  onDragEnd?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection enters a valid drop target. */
-  onDragEnter?: (event: DragEvent) => void;
+  onDragEnter?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragExit?: (event: DragEvent) => void;
+  onDragExit?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragLeave?: (event: DragEvent) => void;
+  onDragLeave?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds). */
-  onDragOver?: (event: DragEvent) => void;
+  onDragOver?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a draggable element starts being dragged. */
-  onDragStart?: (event: DragEvent) => void;
+  onDragStart?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element is dropped onto a drop target. */
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is pressed down on the element. */
-  onMouseDown?: (event: MouseEvent) => void;
+  onMouseDown?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the mouse cursor enters the element. */
-  onMouseEnter?: (event: MouseEvent) => void;
+  onMouseEnter?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Triggered when the mouse cursor leaves the element. */
-  onMouseLeave?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an element when a pointing device (usually a mouse) is moved while the cursor's hotspot is inside it. */
-  onMouseMove?: (event: MouseEvent) => void;
+  onMouseMove?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (usually a mouse) is used to move the cursor so that it is no longer contained within the element or one of its children. */
-  onMouseOut?: (event: MouseEvent) => void;
+  onMouseOut?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (such as a mouse or trackpad) is used to move the cursor onto the element or one of its child elements. */
-  onMouseOver?: (event: MouseEvent) => void;
+  onMouseOver?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is released on the element. */
-  onMouseUp?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent & { currentTarget: T }) => void;
 
   // Keyboard Events
 
   /** Fired when a key is pressed down. */
-  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyDown?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is released.. */
-  onKeyUp?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is pressed down. */
-  onKeyPressed?: (event: KeyboardEvent) => void;
+  onKeyPressed?: (event: KeyboardEvent & { currentTarget: T }) => void;
 
   // Focus Events
 
   /** Fired when the element receives focus, often triggered by tab navigation. */
-  onFocus?: (event: FocusEvent) => void;
+  onFocus?: (event: FocusEvent & { currentTarget: T }) => void;
   /** Fired when the element loses focus. */
-  onBlur?: (event: FocusEvent) => void;
+  onBlur?: (event: FocusEvent & { currentTarget: T }) => void;
 
   // Form Events
 
   /** Fired when the value of an input element changes, such as with text inputs or select elements. */
-  onChange?: (event: Event) => void;
+  onChange?: (event: Event & { currentTarget: T }) => void;
   /** Fires when the value of an <input>, <select>, or <textarea> element has been changed. */
-  onInput?: (event: Event) => void;
+  onInput?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is submitted, usually on pressing Enter in a text input. */
-  onSubmit?: (event: Event) => void;
+  onSubmit?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is reset. */
-  onReset?: (event: Event) => void;
+  onReset?: (event: Event & { currentTarget: T }) => void;
 
   // UI Events
 
   /** Fired when the content of an element is scrolled. */
-  onScroll?: (event: UIEvent) => void;
+  onScroll?: (event: UIEvent & { currentTarget: T }) => void;
 
   // Wheel Events
 
   /** Fired when the mouse wheel is scrolled while the element is focused. */
-  onWheel?: (event: WheelEvent) => void;
+  onWheel?: (event: WheelEvent & { currentTarget: T }) => void;
 
   // Animation Events
 
   /** Fired when a CSS animation starts. */
-  onAnimationStart?: (event: AnimationEvent) => void;
+  onAnimationStart?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes. */
-  onAnimationEnd?: (event: AnimationEvent) => void;
+  onAnimationEnd?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes one iteration. */
-  onAnimationIteration?: (event: AnimationEvent) => void;
+  onAnimationIteration?: (event: AnimationEvent & { currentTarget: T }) => void;
 
   // Transition Events
 
   /** Fired when a CSS transition has completed. */
-  onTransitionEnd?: (event: TransitionEvent) => void;
+  onTransitionEnd?: (event: TransitionEvent & { currentTarget: T }) => void;
 
   // Media Events
 
   /** Fired when an element (usually an image) finishes loading */
-  onLoad?: (event: Event) => void;
+  onLoad?: (event: Event & { currentTarget: T }) => void;
   /** Fired when an error occurs during the loading of an element, like an image not being found. */
-  onError?: (event: Event) => void;
+  onError?: (event: Event & { currentTarget: T }) => void;
 
   // Clipboard Events
 
   /** Fires when the user initiates a copy action through the browser's user interface. */
-  onCopy?: (event: ClipboardEvent) => void;
+  onCopy?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "cut" action through the browser's user interface. */
-  onCut?: (event: ClipboardEvent) => void;
+  onCut?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "paste" action through the browser's user interface. */
-  onPaste?: (event: ClipboardEvent) => void;
+  onPaste?: (event: ClipboardEvent & { currentTarget: T }) => void;
 };
 
 /** `HelixHeadlessAccordionItem` component event */
@@ -14247,7 +14247,7 @@ export type CustomElements = {
   "helix-headless-accordion-item": Partial<
     HelixHeadlessAccordionItemProps &
       BaseProps<HelixHeadlessAccordionItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAccordionItem>
   >;
 
   /**
@@ -14290,7 +14290,7 @@ export type CustomElements = {
    * - `(default)`: The accordion's items.
    */
   "helix-headless-accordion": Partial<
-    HelixHeadlessAccordionProps & BaseProps<HelixHeadlessAccordion> & BaseEvents
+    HelixHeadlessAccordionProps & BaseProps<HelixHeadlessAccordion> & BaseEvents<HelixHeadlessAccordion>
   >;
 
   /**
@@ -14378,7 +14378,7 @@ export type CustomElements = {
   "helix-headless-announcement": Partial<
     HelixHeadlessAnnouncementProps &
       BaseProps<HelixHeadlessAnnouncement> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAnnouncement>
   >;
 
   /**
@@ -14444,7 +14444,7 @@ export type CustomElements = {
    * - `end`: The trailing region.
    */
   "helix-headless-app-header": Partial<
-    HelixHeadlessAppHeaderProps & BaseProps<HelixHeadlessAppHeader> & BaseEvents
+    HelixHeadlessAppHeaderProps & BaseProps<HelixHeadlessAppHeader> & BaseEvents<HelixHeadlessAppHeader>
   >;
 
   /**
@@ -14518,7 +14518,7 @@ export type CustomElements = {
   "helix-headless-avatar-group": Partial<
     HelixHeadlessAvatarGroupProps &
       BaseProps<HelixHeadlessAvatarGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAvatarGroup>
   >;
 
   /**
@@ -14561,7 +14561,7 @@ export type CustomElements = {
    * - `initials`: The initials shown when there is no usable image.
    */
   "helix-headless-avatar": Partial<
-    HelixHeadlessAvatarProps & BaseProps<HelixHeadlessAvatar> & BaseEvents
+    HelixHeadlessAvatarProps & BaseProps<HelixHeadlessAvatar> & BaseEvents<HelixHeadlessAvatar>
   >;
 
   /**
@@ -14601,7 +14601,7 @@ export type CustomElements = {
    * - `indicator`: The count, or the dot when there is no value.
    */
   "helix-headless-badge": Partial<
-    HelixHeadlessBadgeProps & BaseProps<HelixHeadlessBadge> & BaseEvents
+    HelixHeadlessBadgeProps & BaseProps<HelixHeadlessBadge> & BaseEvents<HelixHeadlessBadge>
   >;
 
   /**
@@ -14781,7 +14781,7 @@ export type CustomElements = {
    * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-headless-bar-chart": Partial<
-    HelixHeadlessBarChartProps & BaseProps<HelixHeadlessBarChart> & BaseEvents
+    HelixHeadlessBarChartProps & BaseProps<HelixHeadlessBarChart> & BaseEvents<HelixHeadlessBarChart>
   >;
 
   /**
@@ -14816,7 +14816,7 @@ export type CustomElements = {
   "helix-headless-blockquote": Partial<
     HelixHeadlessBlockquoteProps &
       BaseProps<HelixHeadlessBlockquote> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBlockquote>
   >;
 
   /**
@@ -14880,7 +14880,7 @@ export type CustomElements = {
   "helix-headless-breadcrumb": Partial<
     HelixHeadlessBreadcrumbProps &
       BaseProps<HelixHeadlessBreadcrumb> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBreadcrumb>
   >;
 
   /**
@@ -14950,7 +14950,7 @@ export type CustomElements = {
   "helix-headless-breadcrumbs": Partial<
     HelixHeadlessBreadcrumbsProps &
       BaseProps<HelixHeadlessBreadcrumbs> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBreadcrumbs>
   >;
 
   /**
@@ -15001,7 +15001,7 @@ export type CustomElements = {
   "helix-headless-button-group": Partial<
     HelixHeadlessButtonGroupProps &
       BaseProps<HelixHeadlessButtonGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessButtonGroup>
   >;
 
   /**
@@ -15144,7 +15144,7 @@ export type CustomElements = {
    * - `button`: The inner control.
    */
   "helix-headless-button": Partial<
-    HelixHeadlessButtonProps & BaseProps<HelixHeadlessButton> & BaseEvents
+    HelixHeadlessButtonProps & BaseProps<HelixHeadlessButton> & BaseEvents<HelixHeadlessButton>
   >;
 
   /**
@@ -15193,7 +15193,7 @@ export type CustomElements = {
    * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-headless-callout": Partial<
-    HelixHeadlessCalloutProps & BaseProps<HelixHeadlessCallout> & BaseEvents
+    HelixHeadlessCalloutProps & BaseProps<HelixHeadlessCallout> & BaseEvents<HelixHeadlessCallout>
   >;
 
   /**
@@ -15237,7 +15237,7 @@ export type CustomElements = {
    * - `footer`: Actions that conclude the card.
    */
   "helix-headless-card": Partial<
-    HelixHeadlessCardProps & BaseProps<HelixHeadlessCard> & BaseEvents
+    HelixHeadlessCardProps & BaseProps<HelixHeadlessCard> & BaseEvents<HelixHeadlessCard>
   >;
 
   /**
@@ -15370,7 +15370,7 @@ export type CustomElements = {
    * - `track`: The scroller the slides sit in.
    */
   "helix-headless-carousel": Partial<
-    HelixHeadlessCarouselProps & BaseProps<HelixHeadlessCarousel> & BaseEvents
+    HelixHeadlessCarouselProps & BaseProps<HelixHeadlessCarousel> & BaseEvents<HelixHeadlessCarousel>
   >;
 
   /**
@@ -15440,7 +15440,7 @@ export type CustomElements = {
   "helix-headless-chat-composer": Partial<
     HelixHeadlessChatComposerProps &
       BaseProps<HelixHeadlessChatComposer> &
-      BaseEvents
+      BaseEvents<HelixHeadlessChatComposer>
   >;
 
   /**
@@ -15507,7 +15507,7 @@ export type CustomElements = {
   "helix-headless-chat-message": Partial<
     HelixHeadlessChatMessageProps &
       BaseProps<HelixHeadlessChatMessage> &
-      BaseEvents
+      BaseEvents<HelixHeadlessChatMessage>
   >;
 
   /**
@@ -15618,7 +15618,7 @@ export type CustomElements = {
    * - `loading`: Shown while the history is still on its way.
    */
   "helix-headless-chat": Partial<
-    HelixHeadlessChatProps & BaseProps<HelixHeadlessChat> & BaseEvents
+    HelixHeadlessChatProps & BaseProps<HelixHeadlessChat> & BaseEvents<HelixHeadlessChat>
   >;
 
   /**
@@ -15747,7 +15747,7 @@ export type CustomElements = {
   "helix-headless-checkbox-group": Partial<
     HelixHeadlessCheckboxGroupProps &
       BaseProps<HelixHeadlessCheckboxGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCheckboxGroup>
   >;
 
   /**
@@ -15911,7 +15911,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-checkbox": Partial<
-    HelixHeadlessCheckboxProps & BaseProps<HelixHeadlessCheckbox> & BaseEvents
+    HelixHeadlessCheckboxProps & BaseProps<HelixHeadlessCheckbox> & BaseEvents<HelixHeadlessCheckbox>
   >;
 
   /**
@@ -15969,7 +15969,7 @@ export type CustomElements = {
    * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-headless-code-block": Partial<
-    HelixHeadlessCodeBlockProps & BaseProps<HelixHeadlessCodeBlock> & BaseEvents
+    HelixHeadlessCodeBlockProps & BaseProps<HelixHeadlessCodeBlock> & BaseEvents<HelixHeadlessCodeBlock>
   >;
 
   /**
@@ -15998,7 +15998,7 @@ export type CustomElements = {
    * - `code`: The `<code>` element.
    */
   "helix-headless-code": Partial<
-    HelixHeadlessCodeProps & BaseProps<HelixHeadlessCode> & BaseEvents
+    HelixHeadlessCodeProps & BaseProps<HelixHeadlessCode> & BaseEvents<HelixHeadlessCode>
   >;
 
   /**
@@ -16276,7 +16276,7 @@ export type CustomElements = {
   "helix-headless-color-input": Partial<
     HelixHeadlessColorInputProps &
       BaseProps<HelixHeadlessColorInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessColorInput>
   >;
 
   /**
@@ -16512,7 +16512,7 @@ export type CustomElements = {
   "helix-headless-color-picker": Partial<
     HelixHeadlessColorPickerProps &
       BaseProps<HelixHeadlessColorPicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessColorPicker>
   >;
 
   /**
@@ -16826,7 +16826,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    */
   "helix-headless-combobox": Partial<
-    HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents
+    HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents<HelixHeadlessCombobox>
   >;
 
   /**
@@ -16939,7 +16939,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-headless-command": Partial<
-    HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents
+    HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents<HelixHeadlessCommand>
   >;
 
   /**
@@ -17105,7 +17105,7 @@ export type CustomElements = {
   "helix-headless-copy-button": Partial<
     HelixHeadlessCopyButtonProps &
       BaseProps<HelixHeadlessCopyButton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCopyButton>
   >;
 
   /**
@@ -17288,7 +17288,7 @@ export type CustomElements = {
    * - `loading`: Shown while the rows are still on their way.
    */
   "helix-headless-data-table": Partial<
-    HelixHeadlessDataTableProps & BaseProps<HelixHeadlessDataTable> & BaseEvents
+    HelixHeadlessDataTableProps & BaseProps<HelixHeadlessDataTable> & BaseEvents<HelixHeadlessDataTable>
   >;
 
   /**
@@ -17569,7 +17569,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-date-input": Partial<
-    HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents
+    HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents<HelixHeadlessDateInput>
   >;
 
   /**
@@ -17780,7 +17780,7 @@ export type CustomElements = {
   "helix-headless-date-picker": Partial<
     HelixHeadlessDatePickerProps &
       BaseProps<HelixHeadlessDatePicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDatePicker>
   >;
 
   /**
@@ -17904,7 +17904,7 @@ export type CustomElements = {
    * - `dialog`: The native dialog element.
    */
   "helix-headless-dialog": Partial<
-    HelixHeadlessDialogProps & BaseProps<HelixHeadlessDialog> & BaseEvents
+    HelixHeadlessDialogProps & BaseProps<HelixHeadlessDialog> & BaseEvents<HelixHeadlessDialog>
   >;
 
   /**
@@ -17950,7 +17950,7 @@ export type CustomElements = {
    * - `content`: What is set into it.
    */
   "helix-headless-divider": Partial<
-    HelixHeadlessDividerProps & BaseProps<HelixHeadlessDivider> & BaseEvents
+    HelixHeadlessDividerProps & BaseProps<HelixHeadlessDivider> & BaseEvents<HelixHeadlessDivider>
   >;
 
   /**
@@ -18101,7 +18101,7 @@ export type CustomElements = {
   "helix-headless-donut-chart": Partial<
     HelixHeadlessDonutChartProps &
       BaseProps<HelixHeadlessDonutChart> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDonutChart>
   >;
 
   /**
@@ -18219,7 +18219,7 @@ export type CustomElements = {
    * - `content`: The scrolling content region.
    */
   "helix-headless-drawer": Partial<
-    HelixHeadlessDrawerProps & BaseProps<HelixHeadlessDrawer> & BaseEvents
+    HelixHeadlessDrawerProps & BaseProps<HelixHeadlessDrawer> & BaseEvents<HelixHeadlessDrawer>
   >;
 
   /**
@@ -18289,7 +18289,7 @@ export type CustomElements = {
   "helix-headless-drilldown-item": Partial<
     HelixHeadlessDrilldownItemProps &
       BaseProps<HelixHeadlessDrilldownItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDrilldownItem>
   >;
 
   /**
@@ -18364,7 +18364,7 @@ export type CustomElements = {
    * - `loading`: Shown while the entries are still on their way.
    */
   "helix-headless-drilldown": Partial<
-    HelixHeadlessDrilldownProps & BaseProps<HelixHeadlessDrilldown> & BaseEvents
+    HelixHeadlessDrilldownProps & BaseProps<HelixHeadlessDrilldown> & BaseEvents<HelixHeadlessDrilldown>
   >;
 
   /**
@@ -18401,7 +18401,7 @@ export type CustomElements = {
    * - `actions`: The way out.
    */
   "helix-headless-empty": Partial<
-    HelixHeadlessEmptyProps & BaseProps<HelixHeadlessEmpty> & BaseEvents
+    HelixHeadlessEmptyProps & BaseProps<HelixHeadlessEmpty> & BaseEvents<HelixHeadlessEmpty>
   >;
 
   /**
@@ -18580,7 +18580,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-file-input": Partial<
-    HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents
+    HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents<HelixHeadlessFileInput>
   >;
 
   /**
@@ -18732,7 +18732,7 @@ export type CustomElements = {
    * - `empty`: Shown when the table has no readings in it.
    */
   "helix-headless-heatmap": Partial<
-    HelixHeadlessHeatmapProps & BaseProps<HelixHeadlessHeatmap> & BaseEvents
+    HelixHeadlessHeatmapProps & BaseProps<HelixHeadlessHeatmap> & BaseEvents<HelixHeadlessHeatmap>
   >;
 
   /**
@@ -18875,7 +18875,7 @@ export type CustomElements = {
   "helix-headless-icon-button": Partial<
     HelixHeadlessIconButtonProps &
       BaseProps<HelixHeadlessIconButton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessIconButton>
   >;
 
   /**
@@ -18916,7 +18916,7 @@ export type CustomElements = {
    * - `svg`: The rendered SVG.
    */
   "helix-headless-icon": Partial<
-    HelixHeadlessIconProps & BaseProps<HelixHeadlessIcon> & BaseEvents
+    HelixHeadlessIconProps & BaseProps<HelixHeadlessIcon> & BaseEvents<HelixHeadlessIcon>
   >;
 
   /**
@@ -19009,7 +19009,7 @@ export type CustomElements = {
    * - `fallback`: What stands in when it fails.
    */
   "helix-headless-image": Partial<
-    HelixHeadlessImageProps & BaseProps<HelixHeadlessImage> & BaseEvents
+    HelixHeadlessImageProps & BaseProps<HelixHeadlessImage> & BaseEvents<HelixHeadlessImage>
   >;
 
   /**
@@ -19240,7 +19240,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-input": Partial<
-    HelixHeadlessInputProps & BaseProps<HelixHeadlessInput> & BaseEvents
+    HelixHeadlessInputProps & BaseProps<HelixHeadlessInput> & BaseEvents<HelixHeadlessInput>
   >;
 
   /**
@@ -19322,7 +19322,7 @@ export type CustomElements = {
    * - `kbd`: The key.
    */
   "helix-headless-kbd": Partial<
-    HelixHeadlessKbdProps & BaseProps<HelixHeadlessKbd> & BaseEvents
+    HelixHeadlessKbdProps & BaseProps<HelixHeadlessKbd> & BaseEvents<HelixHeadlessKbd>
   >;
 
   /**
@@ -19381,7 +19381,7 @@ export type CustomElements = {
    * - `swatch`: The color a series is drawn in.
    */
   "helix-headless-legend": Partial<
-    HelixHeadlessLegendProps & BaseProps<HelixHeadlessLegend> & BaseEvents
+    HelixHeadlessLegendProps & BaseProps<HelixHeadlessLegend> & BaseEvents<HelixHeadlessLegend>
   >;
 
   /**
@@ -19553,7 +19553,7 @@ export type CustomElements = {
    * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-headless-line-chart": Partial<
-    HelixHeadlessLineChartProps & BaseProps<HelixHeadlessLineChart> & BaseEvents
+    HelixHeadlessLineChartProps & BaseProps<HelixHeadlessLineChart> & BaseEvents<HelixHeadlessLineChart>
   >;
 
   /**
@@ -19610,7 +19610,7 @@ export type CustomElements = {
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-headless-list-item": Partial<
-    HelixHeadlessListItemProps & BaseProps<HelixHeadlessListItem> & BaseEvents
+    HelixHeadlessListItemProps & BaseProps<HelixHeadlessListItem> & BaseEvents<HelixHeadlessListItem>
   >;
 
   /**
@@ -19651,7 +19651,7 @@ export type CustomElements = {
    * - `(default)`: The rows.
    */
   "helix-headless-list": Partial<
-    HelixHeadlessListProps & BaseProps<HelixHeadlessList> & BaseEvents
+    HelixHeadlessListProps & BaseProps<HelixHeadlessList> & BaseEvents<HelixHeadlessList>
   >;
 
   /**
@@ -19915,7 +19915,7 @@ export type CustomElements = {
    * - `loading`: Shown while the options are still on their way.
    */
   "helix-headless-listbox": Partial<
-    HelixHeadlessListboxProps & BaseProps<HelixHeadlessListbox> & BaseEvents
+    HelixHeadlessListboxProps & BaseProps<HelixHeadlessListbox> & BaseEvents<HelixHeadlessListbox>
   >;
 
   /**
@@ -19961,7 +19961,7 @@ export type CustomElements = {
    * - `indicator`: The arc that turns.
    */
   "helix-headless-loader": Partial<
-    HelixHeadlessLoaderProps & BaseProps<HelixHeadlessLoader> & BaseEvents
+    HelixHeadlessLoaderProps & BaseProps<HelixHeadlessLoader> & BaseEvents<HelixHeadlessLoader>
   >;
 
   /**
@@ -20119,7 +20119,7 @@ export type CustomElements = {
    * - `surface`: The floating panel, which is what opens.
    */
   "helix-headless-megamenu": Partial<
-    HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents
+    HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents<HelixHeadlessMegamenu>
   >;
 
   /**
@@ -20250,7 +20250,7 @@ export type CustomElements = {
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-headless-menu-item": Partial<
-    HelixHeadlessMenuItemProps & BaseProps<HelixHeadlessMenuItem> & BaseEvents
+    HelixHeadlessMenuItemProps & BaseProps<HelixHeadlessMenuItem> & BaseEvents<HelixHeadlessMenuItem>
   >;
 
   /**
@@ -20356,7 +20356,7 @@ export type CustomElements = {
    * - `loading`: Shown while the items are still on their way.
    */
   "helix-headless-menu": Partial<
-    HelixHeadlessMenuProps & BaseProps<HelixHeadlessMenu> & BaseEvents
+    HelixHeadlessMenuProps & BaseProps<HelixHeadlessMenu> & BaseEvents<HelixHeadlessMenu>
   >;
 
   /**
@@ -20478,7 +20478,7 @@ export type CustomElements = {
    * - `value`: The reading, under `show-value`.
    */
   "helix-headless-meter": Partial<
-    HelixHeadlessMeterProps & BaseProps<HelixHeadlessMeter> & BaseEvents
+    HelixHeadlessMeterProps & BaseProps<HelixHeadlessMeter> & BaseEvents<HelixHeadlessMeter>
   >;
 
   /**
@@ -20520,7 +20520,7 @@ export type CustomElements = {
   "helix-headless-navigation": Partial<
     HelixHeadlessNavigationProps &
       BaseProps<HelixHeadlessNavigation> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNavigation>
   >;
 
   /**
@@ -20604,7 +20604,7 @@ export type CustomElements = {
   "helix-headless-notifications-item": Partial<
     HelixHeadlessNotificationsItemProps &
       BaseProps<HelixHeadlessNotificationsItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNotificationsItem>
   >;
 
   /**
@@ -20697,7 +20697,7 @@ export type CustomElements = {
   "helix-headless-notifications": Partial<
     HelixHeadlessNotificationsProps &
       BaseProps<HelixHeadlessNotifications> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNotifications>
   >;
 
   /**
@@ -20910,7 +20910,7 @@ export type CustomElements = {
   "helix-headless-number-input": Partial<
     HelixHeadlessNumberInputProps &
       BaseProps<HelixHeadlessNumberInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNumberInput>
   >;
 
   /**
@@ -20945,7 +20945,7 @@ export type CustomElements = {
   "helix-headless-option-group": Partial<
     HelixHeadlessOptionGroupProps &
       BaseProps<HelixHeadlessOptionGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessOptionGroup>
   >;
 
   /**
@@ -21073,7 +21073,7 @@ export type CustomElements = {
    * - `description`: The caption under the words, when there is one.
    */
   "helix-headless-option": Partial<
-    HelixHeadlessOptionProps & BaseProps<HelixHeadlessOption> & BaseEvents
+    HelixHeadlessOptionProps & BaseProps<HelixHeadlessOption> & BaseEvents<HelixHeadlessOption>
   >;
 
   /**
@@ -21168,7 +21168,7 @@ export type CustomElements = {
    * - `indicator`: The mark that travels to the section being read.
    */
   "helix-headless-outline": Partial<
-    HelixHeadlessOutlineProps & BaseProps<HelixHeadlessOutline> & BaseEvents
+    HelixHeadlessOutlineProps & BaseProps<HelixHeadlessOutline> & BaseEvents<HelixHeadlessOutline>
   >;
 
   /**
@@ -21353,7 +21353,7 @@ export type CustomElements = {
   "helix-headless-pagination": Partial<
     HelixHeadlessPaginationProps &
       BaseProps<HelixHeadlessPagination> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPagination>
   >;
 
   /**
@@ -21430,7 +21430,7 @@ export type CustomElements = {
   "helix-headless-pagination-size": Partial<
     HelixHeadlessPaginationSizeProps &
       BaseProps<HelixHeadlessPaginationSize> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPaginationSize>
   >;
 
   /**
@@ -21494,7 +21494,7 @@ export type CustomElements = {
   "helix-headless-pagination-summary": Partial<
     HelixHeadlessPaginationSummaryProps &
       BaseProps<HelixHeadlessPaginationSummary> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPaginationSummary>
   >;
 
   /**
@@ -21691,7 +21691,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-pin-input": Partial<
-    HelixHeadlessPinInputProps & BaseProps<HelixHeadlessPinInput> & BaseEvents
+    HelixHeadlessPinInputProps & BaseProps<HelixHeadlessPinInput> & BaseEvents<HelixHeadlessPinInput>
   >;
 
   /**
@@ -21787,7 +21787,7 @@ export type CustomElements = {
    * - `popover`: The panel.
    */
   "helix-headless-popover": Partial<
-    HelixHeadlessPopoverProps & BaseProps<HelixHeadlessPopover> & BaseEvents
+    HelixHeadlessPopoverProps & BaseProps<HelixHeadlessPopover> & BaseEvents<HelixHeadlessPopover>
   >;
 
   /**
@@ -21887,7 +21887,7 @@ export type CustomElements = {
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-headless-progress": Partial<
-    HelixHeadlessProgressProps & BaseProps<HelixHeadlessProgress> & BaseEvents
+    HelixHeadlessProgressProps & BaseProps<HelixHeadlessProgress> & BaseEvents<HelixHeadlessProgress>
   >;
 
   /**
@@ -21957,7 +21957,7 @@ export type CustomElements = {
    * - `logo`: The box holding the center mark.
    */
   "helix-headless-qr-code": Partial<
-    HelixHeadlessQrCodeProps & BaseProps<HelixHeadlessQrCode> & BaseEvents
+    HelixHeadlessQrCodeProps & BaseProps<HelixHeadlessQrCode> & BaseEvents<HelixHeadlessQrCode>
   >;
 
   /**
@@ -21988,7 +21988,7 @@ export type CustomElements = {
    * - `quote`: The quotation.
    */
   "helix-headless-quote": Partial<
-    HelixHeadlessQuoteProps & BaseProps<HelixHeadlessQuote> & BaseEvents
+    HelixHeadlessQuoteProps & BaseProps<HelixHeadlessQuote> & BaseEvents<HelixHeadlessQuote>
   >;
 
   /**
@@ -22156,7 +22156,7 @@ export type CustomElements = {
   "helix-headless-radio-group": Partial<
     HelixHeadlessRadioGroupProps &
       BaseProps<HelixHeadlessRadioGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessRadioGroup>
   >;
 
   /**
@@ -22213,7 +22213,7 @@ export type CustomElements = {
    * - `label`: The words beside it.
    */
   "helix-headless-radio": Partial<
-    HelixHeadlessRadioProps & BaseProps<HelixHeadlessRadio> & BaseEvents
+    HelixHeadlessRadioProps & BaseProps<HelixHeadlessRadio> & BaseEvents<HelixHeadlessRadio>
   >;
 
   /**
@@ -22421,7 +22421,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-rating": Partial<
-    HelixHeadlessRatingProps & BaseProps<HelixHeadlessRating> & BaseEvents
+    HelixHeadlessRatingProps & BaseProps<HelixHeadlessRating> & BaseEvents<HelixHeadlessRating>
   >;
 
   /**
@@ -22482,7 +22482,7 @@ export type CustomElements = {
   "helix-headless-scroll-area": Partial<
     HelixHeadlessScrollAreaProps &
       BaseProps<HelixHeadlessScrollArea> &
-      BaseEvents
+      BaseEvents<HelixHeadlessScrollArea>
   >;
 
   /**
@@ -22703,7 +22703,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-headless-select": Partial<
-    HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents
+    HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents<HelixHeadlessSelect>
   >;
 
   /**
@@ -22722,7 +22722,7 @@ export type CustomElements = {
    * - `skeleton`: The placeholder surface.
    */
   "helix-headless-skeleton": Partial<
-    HelixHeadlessSkeletonProps & BaseProps<HelixHeadlessSkeleton> & BaseEvents
+    HelixHeadlessSkeletonProps & BaseProps<HelixHeadlessSkeleton> & BaseEvents<HelixHeadlessSkeleton>
   >;
 
   /**
@@ -22943,7 +22943,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-slider": Partial<
-    HelixHeadlessSliderProps & BaseProps<HelixHeadlessSlider> & BaseEvents
+    HelixHeadlessSliderProps & BaseProps<HelixHeadlessSlider> & BaseEvents<HelixHeadlessSlider>
   >;
 
   /**
@@ -23070,7 +23070,7 @@ export type CustomElements = {
    * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-headless-sparkline": Partial<
-    HelixHeadlessSparklineProps & BaseProps<HelixHeadlessSparkline> & BaseEvents
+    HelixHeadlessSparklineProps & BaseProps<HelixHeadlessSparkline> & BaseEvents<HelixHeadlessSparkline>
   >;
 
   /**
@@ -23130,7 +23130,7 @@ export type CustomElements = {
   "helix-headless-speed-dial-item": Partial<
     HelixHeadlessSpeedDialItemProps &
       BaseProps<HelixHeadlessSpeedDialItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSpeedDialItem>
   >;
 
   /**
@@ -23229,7 +23229,7 @@ export type CustomElements = {
    * - `actions`: The region the actions are drawn in.
    */
   "helix-headless-speed-dial": Partial<
-    HelixHeadlessSpeedDialProps & BaseProps<HelixHeadlessSpeedDial> & BaseEvents
+    HelixHeadlessSpeedDialProps & BaseProps<HelixHeadlessSpeedDial> & BaseEvents<HelixHeadlessSpeedDial>
   >;
 
   /**
@@ -23458,7 +23458,7 @@ export type CustomElements = {
    * - `corner`: The handle where two dividers cross, added on the client.
    */
   "helix-headless-splitter": Partial<
-    HelixHeadlessSplitterProps & BaseProps<HelixHeadlessSplitter> & BaseEvents
+    HelixHeadlessSplitterProps & BaseProps<HelixHeadlessSplitter> & BaseEvents<HelixHeadlessSplitter>
   >;
 
   /**
@@ -23479,7 +23479,7 @@ export type CustomElements = {
    * - `(default)`: The stats.
    */
   "helix-headless-stat-group": Partial<
-    HelixHeadlessStatGroupProps & BaseProps<HelixHeadlessStatGroup> & BaseEvents
+    HelixHeadlessStatGroupProps & BaseProps<HelixHeadlessStatGroup> & BaseEvents<HelixHeadlessStatGroup>
   >;
 
   /**
@@ -23532,7 +23532,7 @@ export type CustomElements = {
    * - `unit`: The unit, set beside the value.
    */
   "helix-headless-stat": Partial<
-    HelixHeadlessStatProps & BaseProps<HelixHeadlessStat> & BaseEvents
+    HelixHeadlessStatProps & BaseProps<HelixHeadlessStat> & BaseEvents<HelixHeadlessStat>
   >;
 
   /**
@@ -23635,7 +23635,7 @@ export type CustomElements = {
    * seed and a correction. See 294.
    */
   "helix-headless-steps": Partial<
-    HelixHeadlessStepsProps & BaseProps<HelixHeadlessSteps> & BaseEvents
+    HelixHeadlessStepsProps & BaseProps<HelixHeadlessSteps> & BaseEvents<HelixHeadlessSteps>
   >;
 
   /**
@@ -23732,7 +23732,7 @@ export type CustomElements = {
    * - `label-button`: The inner control.
    */
   "helix-headless-step": Partial<
-    HelixHeadlessStepProps & BaseProps<HelixHeadlessStep> & BaseEvents
+    HelixHeadlessStepProps & BaseProps<HelixHeadlessStep> & BaseEvents<HelixHeadlessStep>
   >;
 
   /**
@@ -23891,7 +23891,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-switch": Partial<
-    HelixHeadlessSwitchProps & BaseProps<HelixHeadlessSwitch> & BaseEvents
+    HelixHeadlessSwitchProps & BaseProps<HelixHeadlessSwitch> & BaseEvents<HelixHeadlessSwitch>
   >;
 
   /**
@@ -23916,7 +23916,7 @@ export type CustomElements = {
    * - `(default)`: The cell's content.
    */
   "helix-headless-table-cell": Partial<
-    HelixHeadlessTableCellProps & BaseProps<HelixHeadlessTableCell> & BaseEvents
+    HelixHeadlessTableCellProps & BaseProps<HelixHeadlessTableCell> & BaseEvents<HelixHeadlessTableCell>
   >;
 
   /**
@@ -24046,7 +24046,7 @@ export type CustomElements = {
   "helix-headless-table-column": Partial<
     HelixHeadlessTableColumnProps &
       BaseProps<HelixHeadlessTableColumn> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTableColumn>
   >;
 
   /**
@@ -24111,7 +24111,7 @@ export type CustomElements = {
    * - `loading`: Shown while the rows are still on their way.
    */
   "helix-headless-table": Partial<
-    HelixHeadlessTableProps & BaseProps<HelixHeadlessTable> & BaseEvents
+    HelixHeadlessTableProps & BaseProps<HelixHeadlessTable> & BaseEvents<HelixHeadlessTable>
   >;
 
   /**
@@ -24127,7 +24127,7 @@ export type CustomElements = {
    * - `(default)`: The row's cells.
    */
   "helix-headless-table-row": Partial<
-    HelixHeadlessTableRowProps & BaseProps<HelixHeadlessTableRow> & BaseEvents
+    HelixHeadlessTableRowProps & BaseProps<HelixHeadlessTableRow> & BaseEvents<HelixHeadlessTableRow>
   >;
 
   /**
@@ -24168,7 +24168,7 @@ export type CustomElements = {
    * - `panel`: The panel container.
    */
   "helix-headless-tabs-panel": Partial<
-    HelixHeadlessTabsPanelProps & BaseProps<HelixHeadlessTabsPanel> & BaseEvents
+    HelixHeadlessTabsPanelProps & BaseProps<HelixHeadlessTabsPanel> & BaseEvents<HelixHeadlessTabsPanel>
   >;
 
   /**
@@ -24266,7 +24266,7 @@ export type CustomElements = {
    * - `panels`: The panel container.
    */
   "helix-headless-tabs": Partial<
-    HelixHeadlessTabsProps & BaseProps<HelixHeadlessTabs> & BaseEvents
+    HelixHeadlessTabsProps & BaseProps<HelixHeadlessTabs> & BaseEvents<HelixHeadlessTabs>
   >;
 
   /**
@@ -24311,7 +24311,7 @@ export type CustomElements = {
    * - `tab`: The tab itself.
    */
   "helix-headless-tabs-tab": Partial<
-    HelixHeadlessTabsTabProps & BaseProps<HelixHeadlessTabsTab> & BaseEvents
+    HelixHeadlessTabsTabProps & BaseProps<HelixHeadlessTabsTab> & BaseEvents<HelixHeadlessTabsTab>
   >;
 
   /**
@@ -24364,7 +24364,7 @@ export type CustomElements = {
    * - `prefix`: The category before the label.
    */
   "helix-headless-tag": Partial<
-    HelixHeadlessTagProps & BaseProps<HelixHeadlessTag> & BaseEvents
+    HelixHeadlessTagProps & BaseProps<HelixHeadlessTag> & BaseEvents<HelixHeadlessTag>
   >;
 
   /**
@@ -24526,7 +24526,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-headless-textarea": Partial<
-    HelixHeadlessTextareaProps & BaseProps<HelixHeadlessTextarea> & BaseEvents
+    HelixHeadlessTextareaProps & BaseProps<HelixHeadlessTextarea> & BaseEvents<HelixHeadlessTextarea>
   >;
 
   /**
@@ -24798,7 +24798,7 @@ export type CustomElements = {
    * - `picker-list-loading`: Shown while the options are still on their way.
    */
   "helix-headless-time-input": Partial<
-    HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents
+    HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents<HelixHeadlessTimeInput>
   >;
 
   /**
@@ -25055,7 +25055,7 @@ export type CustomElements = {
   "helix-headless-time-picker": Partial<
     HelixHeadlessTimePickerProps &
       BaseProps<HelixHeadlessTimePicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimePicker>
   >;
 
   /**
@@ -25107,7 +25107,7 @@ export type CustomElements = {
   "helix-headless-timeline-item": Partial<
     HelixHeadlessTimelineItemProps &
       BaseProps<HelixHeadlessTimelineItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimelineItem>
   >;
 
   /**
@@ -25149,7 +25149,7 @@ export type CustomElements = {
    * - `(default)`: The entries.
    */
   "helix-headless-timeline": Partial<
-    HelixHeadlessTimelineProps & BaseProps<HelixHeadlessTimeline> & BaseEvents
+    HelixHeadlessTimelineProps & BaseProps<HelixHeadlessTimeline> & BaseEvents<HelixHeadlessTimeline>
   >;
 
   /**
@@ -25280,7 +25280,7 @@ export type CustomElements = {
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
   "helix-headless-toast-item": Partial<
-    HelixHeadlessToastItemProps & BaseProps<HelixHeadlessToastItem> & BaseEvents
+    HelixHeadlessToastItemProps & BaseProps<HelixHeadlessToastItem> & BaseEvents<HelixHeadlessToastItem>
   >;
 
   /**
@@ -25343,7 +25343,7 @@ export type CustomElements = {
    * - `region`: The stack the messages are in.
    */
   "helix-headless-toast": Partial<
-    HelixHeadlessToastProps & BaseProps<HelixHeadlessToast> & BaseEvents
+    HelixHeadlessToastProps & BaseProps<HelixHeadlessToast> & BaseEvents<HelixHeadlessToast>
   >;
 
   /**
@@ -25527,7 +25527,7 @@ export type CustomElements = {
   "helix-headless-toggle-group": Partial<
     HelixHeadlessToggleGroupProps &
       BaseProps<HelixHeadlessToggleGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToggleGroup>
   >;
 
   /**
@@ -25582,7 +25582,7 @@ export type CustomElements = {
    * - `item`: The radio button.
    */
   "helix-headless-toggle": Partial<
-    HelixHeadlessToggleProps & BaseProps<HelixHeadlessToggle> & BaseEvents
+    HelixHeadlessToggleProps & BaseProps<HelixHeadlessToggle> & BaseEvents<HelixHeadlessToggle>
   >;
 
   /**
@@ -25616,7 +25616,7 @@ export type CustomElements = {
    * - `toolbar`: The toolbar container.
    */
   "helix-headless-toolbar": Partial<
-    HelixHeadlessToolbarProps & BaseProps<HelixHeadlessToolbar> & BaseEvents
+    HelixHeadlessToolbarProps & BaseProps<HelixHeadlessToolbar> & BaseEvents<HelixHeadlessToolbar>
   >;
 
   /**
@@ -25818,7 +25818,7 @@ export type CustomElements = {
    * - `tooltip`: The bubble.
    */
   "helix-headless-tooltip": Partial<
-    HelixHeadlessTooltipProps & BaseProps<HelixHeadlessTooltip> & BaseEvents
+    HelixHeadlessTooltipProps & BaseProps<HelixHeadlessTooltip> & BaseEvents<HelixHeadlessTooltip>
   >;
 
   /**
@@ -25920,7 +25920,7 @@ export type CustomElements = {
    * - `spotlight`: The box over the current target, which paints the scrim.
    */
   "helix-headless-tour": Partial<
-    HelixHeadlessTourProps & BaseProps<HelixHeadlessTour> & BaseEvents
+    HelixHeadlessTourProps & BaseProps<HelixHeadlessTour> & BaseEvents<HelixHeadlessTour>
   >;
 
   /**
@@ -26004,7 +26004,7 @@ export type CustomElements = {
    * - `skip-button`: The inner control.
    */
   "helix-headless-tour-stop": Partial<
-    HelixHeadlessTourStopProps & BaseProps<HelixHeadlessTourStop> & BaseEvents
+    HelixHeadlessTourStopProps & BaseProps<HelixHeadlessTourStop> & BaseEvents<HelixHeadlessTourStop>
   >;
 
   /**
@@ -26173,7 +26173,7 @@ export type CustomElements = {
    * - `group`: The container for nested items.
    */
   "helix-headless-tree-item": Partial<
-    HelixHeadlessTreeItemProps & BaseProps<HelixHeadlessTreeItem> & BaseEvents
+    HelixHeadlessTreeItemProps & BaseProps<HelixHeadlessTreeItem> & BaseEvents<HelixHeadlessTreeItem>
   >;
 
   /**
@@ -26247,7 +26247,7 @@ export type CustomElements = {
    * - `loading`: Shown while the rows are still on their way.
    */
   "helix-headless-tree": Partial<
-    HelixHeadlessTreeProps & BaseProps<HelixHeadlessTree> & BaseEvents
+    HelixHeadlessTreeProps & BaseProps<HelixHeadlessTree> & BaseEvents<HelixHeadlessTree>
   >;
 
   /**
@@ -26306,7 +26306,7 @@ export type CustomElements = {
    * - `icon`: The arrow.
    */
   "helix-headless-trend": Partial<
-    HelixHeadlessTrendProps & BaseProps<HelixHeadlessTrend> & BaseEvents
+    HelixHeadlessTrendProps & BaseProps<HelixHeadlessTrend> & BaseEvents<HelixHeadlessTrend>
   >;
 
   /**
@@ -26384,7 +26384,7 @@ export type CustomElements = {
   "helix-headless-video-playlist-item": Partial<
     HelixHeadlessVideoPlaylistItemProps &
       BaseProps<HelixHeadlessVideoPlaylistItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylistItem>
   >;
 
   /**
@@ -26468,7 +26468,7 @@ export type CustomElements = {
   "helix-headless-video-playlist-menu": Partial<
     HelixHeadlessVideoPlaylistMenuProps &
       BaseProps<HelixHeadlessVideoPlaylistMenu> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylistMenu>
   >;
 
   /**
@@ -26551,7 +26551,7 @@ export type CustomElements = {
   "helix-headless-video-playlist": Partial<
     HelixHeadlessVideoPlaylistProps &
       BaseProps<HelixHeadlessVideoPlaylist> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylist>
   >;
 
   /**
@@ -26792,7 +26792,7 @@ export type CustomElements = {
    * - `overflow-loading`: Shown while the items are still on their way.
    */
   "helix-headless-video": Partial<
-    HelixHeadlessVideoProps & BaseProps<HelixHeadlessVideo> & BaseEvents
+    HelixHeadlessVideoProps & BaseProps<HelixHeadlessVideo> & BaseEvents<HelixHeadlessVideo>
   >;
 
   /**
@@ -26872,7 +26872,7 @@ export type CustomElements = {
   "helix-headless-virtual-list": Partial<
     HelixHeadlessVirtualListProps &
       BaseProps<HelixHeadlessVirtualList> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVirtualList>
   >;
 };
 
@@ -26971,7 +26971,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAccordionItemProps &
       HelixHeadlessAccordionItemSolidJsProps &
       BaseProps<HelixHeadlessAccordionItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAccordionItem>
   >;
 
   /**
@@ -27017,7 +27017,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAccordionProps &
       HelixHeadlessAccordionSolidJsProps &
       BaseProps<HelixHeadlessAccordion> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAccordion>
   >;
 
   /**
@@ -27106,7 +27106,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAnnouncementProps &
       HelixHeadlessAnnouncementSolidJsProps &
       BaseProps<HelixHeadlessAnnouncement> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAnnouncement>
   >;
 
   /**
@@ -27175,7 +27175,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAppHeaderProps &
       HelixHeadlessAppHeaderSolidJsProps &
       BaseProps<HelixHeadlessAppHeader> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAppHeader>
   >;
 
   /**
@@ -27250,7 +27250,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAvatarGroupProps &
       HelixHeadlessAvatarGroupSolidJsProps &
       BaseProps<HelixHeadlessAvatarGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAvatarGroup>
   >;
 
   /**
@@ -27296,7 +27296,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessAvatarProps &
       HelixHeadlessAvatarSolidJsProps &
       BaseProps<HelixHeadlessAvatar> &
-      BaseEvents
+      BaseEvents<HelixHeadlessAvatar>
   >;
 
   /**
@@ -27339,7 +27339,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessBadgeProps &
       HelixHeadlessBadgeSolidJsProps &
       BaseProps<HelixHeadlessBadge> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBadge>
   >;
 
   /**
@@ -27522,7 +27522,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessBarChartProps &
       HelixHeadlessBarChartSolidJsProps &
       BaseProps<HelixHeadlessBarChart> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBarChart>
   >;
 
   /**
@@ -27558,7 +27558,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessBlockquoteProps &
       HelixHeadlessBlockquoteSolidJsProps &
       BaseProps<HelixHeadlessBlockquote> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBlockquote>
   >;
 
   /**
@@ -27623,7 +27623,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessBreadcrumbProps &
       HelixHeadlessBreadcrumbSolidJsProps &
       BaseProps<HelixHeadlessBreadcrumb> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBreadcrumb>
   >;
 
   /**
@@ -27694,7 +27694,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessBreadcrumbsProps &
       HelixHeadlessBreadcrumbsSolidJsProps &
       BaseProps<HelixHeadlessBreadcrumbs> &
-      BaseEvents
+      BaseEvents<HelixHeadlessBreadcrumbs>
   >;
 
   /**
@@ -27746,7 +27746,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessButtonGroupProps &
       HelixHeadlessButtonGroupSolidJsProps &
       BaseProps<HelixHeadlessButtonGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessButtonGroup>
   >;
 
   /**
@@ -27892,7 +27892,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessButtonProps &
       HelixHeadlessButtonSolidJsProps &
       BaseProps<HelixHeadlessButton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessButton>
   >;
 
   /**
@@ -27944,7 +27944,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCalloutProps &
       HelixHeadlessCalloutSolidJsProps &
       BaseProps<HelixHeadlessCallout> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCallout>
   >;
 
   /**
@@ -27991,7 +27991,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCardProps &
       HelixHeadlessCardSolidJsProps &
       BaseProps<HelixHeadlessCard> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCard>
   >;
 
   /**
@@ -28127,7 +28127,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCarouselProps &
       HelixHeadlessCarouselSolidJsProps &
       BaseProps<HelixHeadlessCarousel> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCarousel>
   >;
 
   /**
@@ -28198,7 +28198,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessChatComposerProps &
       HelixHeadlessChatComposerSolidJsProps &
       BaseProps<HelixHeadlessChatComposer> &
-      BaseEvents
+      BaseEvents<HelixHeadlessChatComposer>
   >;
 
   /**
@@ -28266,7 +28266,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessChatMessageProps &
       HelixHeadlessChatMessageSolidJsProps &
       BaseProps<HelixHeadlessChatMessage> &
-      BaseEvents
+      BaseEvents<HelixHeadlessChatMessage>
   >;
 
   /**
@@ -28380,7 +28380,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessChatProps &
       HelixHeadlessChatSolidJsProps &
       BaseProps<HelixHeadlessChat> &
-      BaseEvents
+      BaseEvents<HelixHeadlessChat>
   >;
 
   /**
@@ -28510,7 +28510,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCheckboxGroupProps &
       HelixHeadlessCheckboxGroupSolidJsProps &
       BaseProps<HelixHeadlessCheckboxGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCheckboxGroup>
   >;
 
   /**
@@ -28677,7 +28677,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCheckboxProps &
       HelixHeadlessCheckboxSolidJsProps &
       BaseProps<HelixHeadlessCheckbox> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCheckbox>
   >;
 
   /**
@@ -28738,7 +28738,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCodeBlockProps &
       HelixHeadlessCodeBlockSolidJsProps &
       BaseProps<HelixHeadlessCodeBlock> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCodeBlock>
   >;
 
   /**
@@ -28770,7 +28770,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCodeProps &
       HelixHeadlessCodeSolidJsProps &
       BaseProps<HelixHeadlessCode> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCode>
   >;
 
   /**
@@ -29049,7 +29049,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessColorInputProps &
       HelixHeadlessColorInputSolidJsProps &
       BaseProps<HelixHeadlessColorInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessColorInput>
   >;
 
   /**
@@ -29286,7 +29286,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessColorPickerProps &
       HelixHeadlessColorPickerSolidJsProps &
       BaseProps<HelixHeadlessColorPicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessColorPicker>
   >;
 
   /**
@@ -29603,7 +29603,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessComboboxProps &
       HelixHeadlessComboboxSolidJsProps &
       BaseProps<HelixHeadlessCombobox> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCombobox>
   >;
 
   /**
@@ -29719,7 +29719,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCommandProps &
       HelixHeadlessCommandSolidJsProps &
       BaseProps<HelixHeadlessCommand> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCommand>
   >;
 
   /**
@@ -29886,7 +29886,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessCopyButtonProps &
       HelixHeadlessCopyButtonSolidJsProps &
       BaseProps<HelixHeadlessCopyButton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessCopyButton>
   >;
 
   /**
@@ -30072,7 +30072,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDataTableProps &
       HelixHeadlessDataTableSolidJsProps &
       BaseProps<HelixHeadlessDataTable> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDataTable>
   >;
 
   /**
@@ -30356,7 +30356,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDateInputProps &
       HelixHeadlessDateInputSolidJsProps &
       BaseProps<HelixHeadlessDateInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDateInput>
   >;
 
   /**
@@ -30568,7 +30568,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDatePickerProps &
       HelixHeadlessDatePickerSolidJsProps &
       BaseProps<HelixHeadlessDatePicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDatePicker>
   >;
 
   /**
@@ -30695,7 +30695,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDialogProps &
       HelixHeadlessDialogSolidJsProps &
       BaseProps<HelixHeadlessDialog> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDialog>
   >;
 
   /**
@@ -30744,7 +30744,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDividerProps &
       HelixHeadlessDividerSolidJsProps &
       BaseProps<HelixHeadlessDivider> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDivider>
   >;
 
   /**
@@ -30896,7 +30896,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDonutChartProps &
       HelixHeadlessDonutChartSolidJsProps &
       BaseProps<HelixHeadlessDonutChart> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDonutChart>
   >;
 
   /**
@@ -31017,7 +31017,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDrawerProps &
       HelixHeadlessDrawerSolidJsProps &
       BaseProps<HelixHeadlessDrawer> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDrawer>
   >;
 
   /**
@@ -31088,7 +31088,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDrilldownItemProps &
       HelixHeadlessDrilldownItemSolidJsProps &
       BaseProps<HelixHeadlessDrilldownItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDrilldownItem>
   >;
 
   /**
@@ -31166,7 +31166,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessDrilldownProps &
       HelixHeadlessDrilldownSolidJsProps &
       BaseProps<HelixHeadlessDrilldown> &
-      BaseEvents
+      BaseEvents<HelixHeadlessDrilldown>
   >;
 
   /**
@@ -31206,7 +31206,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessEmptyProps &
       HelixHeadlessEmptySolidJsProps &
       BaseProps<HelixHeadlessEmpty> &
-      BaseEvents
+      BaseEvents<HelixHeadlessEmpty>
   >;
 
   /**
@@ -31388,7 +31388,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessFileInputProps &
       HelixHeadlessFileInputSolidJsProps &
       BaseProps<HelixHeadlessFileInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessFileInput>
   >;
 
   /**
@@ -31543,7 +31543,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessHeatmapProps &
       HelixHeadlessHeatmapSolidJsProps &
       BaseProps<HelixHeadlessHeatmap> &
-      BaseEvents
+      BaseEvents<HelixHeadlessHeatmap>
   >;
 
   /**
@@ -31687,7 +31687,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessIconButtonProps &
       HelixHeadlessIconButtonSolidJsProps &
       BaseProps<HelixHeadlessIconButton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessIconButton>
   >;
 
   /**
@@ -31731,7 +31731,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessIconProps &
       HelixHeadlessIconSolidJsProps &
       BaseProps<HelixHeadlessIcon> &
-      BaseEvents
+      BaseEvents<HelixHeadlessIcon>
   >;
 
   /**
@@ -31827,7 +31827,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessImageProps &
       HelixHeadlessImageSolidJsProps &
       BaseProps<HelixHeadlessImage> &
-      BaseEvents
+      BaseEvents<HelixHeadlessImage>
   >;
 
   /**
@@ -32061,7 +32061,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessInputProps &
       HelixHeadlessInputSolidJsProps &
       BaseProps<HelixHeadlessInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessInput>
   >;
 
   /**
@@ -32146,7 +32146,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessKbdProps &
       HelixHeadlessKbdSolidJsProps &
       BaseProps<HelixHeadlessKbd> &
-      BaseEvents
+      BaseEvents<HelixHeadlessKbd>
   >;
 
   /**
@@ -32208,7 +32208,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessLegendProps &
       HelixHeadlessLegendSolidJsProps &
       BaseProps<HelixHeadlessLegend> &
-      BaseEvents
+      BaseEvents<HelixHeadlessLegend>
   >;
 
   /**
@@ -32383,7 +32383,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessLineChartProps &
       HelixHeadlessLineChartSolidJsProps &
       BaseProps<HelixHeadlessLineChart> &
-      BaseEvents
+      BaseEvents<HelixHeadlessLineChart>
   >;
 
   /**
@@ -32443,7 +32443,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessListItemProps &
       HelixHeadlessListItemSolidJsProps &
       BaseProps<HelixHeadlessListItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessListItem>
   >;
 
   /**
@@ -32487,7 +32487,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessListProps &
       HelixHeadlessListSolidJsProps &
       BaseProps<HelixHeadlessList> &
-      BaseEvents
+      BaseEvents<HelixHeadlessList>
   >;
 
   /**
@@ -32754,7 +32754,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessListboxProps &
       HelixHeadlessListboxSolidJsProps &
       BaseProps<HelixHeadlessListbox> &
-      BaseEvents
+      BaseEvents<HelixHeadlessListbox>
   >;
 
   /**
@@ -32803,7 +32803,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessLoaderProps &
       HelixHeadlessLoaderSolidJsProps &
       BaseProps<HelixHeadlessLoader> &
-      BaseEvents
+      BaseEvents<HelixHeadlessLoader>
   >;
 
   /**
@@ -32964,7 +32964,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessMegamenuProps &
       HelixHeadlessMegamenuSolidJsProps &
       BaseProps<HelixHeadlessMegamenu> &
-      BaseEvents
+      BaseEvents<HelixHeadlessMegamenu>
   >;
 
   /**
@@ -33098,7 +33098,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessMenuItemProps &
       HelixHeadlessMenuItemSolidJsProps &
       BaseProps<HelixHeadlessMenuItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessMenuItem>
   >;
 
   /**
@@ -33207,7 +33207,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessMenuProps &
       HelixHeadlessMenuSolidJsProps &
       BaseProps<HelixHeadlessMenu> &
-      BaseEvents
+      BaseEvents<HelixHeadlessMenu>
   >;
 
   /**
@@ -33332,7 +33332,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessMeterProps &
       HelixHeadlessMeterSolidJsProps &
       BaseProps<HelixHeadlessMeter> &
-      BaseEvents
+      BaseEvents<HelixHeadlessMeter>
   >;
 
   /**
@@ -33375,7 +33375,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessNavigationProps &
       HelixHeadlessNavigationSolidJsProps &
       BaseProps<HelixHeadlessNavigation> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNavigation>
   >;
 
   /**
@@ -33460,7 +33460,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessNotificationsItemProps &
       HelixHeadlessNotificationsItemSolidJsProps &
       BaseProps<HelixHeadlessNotificationsItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNotificationsItem>
   >;
 
   /**
@@ -33554,7 +33554,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessNotificationsProps &
       HelixHeadlessNotificationsSolidJsProps &
       BaseProps<HelixHeadlessNotifications> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNotifications>
   >;
 
   /**
@@ -33768,7 +33768,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessNumberInputProps &
       HelixHeadlessNumberInputSolidJsProps &
       BaseProps<HelixHeadlessNumberInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessNumberInput>
   >;
 
   /**
@@ -33804,7 +33804,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessOptionGroupProps &
       HelixHeadlessOptionGroupSolidJsProps &
       BaseProps<HelixHeadlessOptionGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessOptionGroup>
   >;
 
   /**
@@ -33935,7 +33935,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessOptionProps &
       HelixHeadlessOptionSolidJsProps &
       BaseProps<HelixHeadlessOption> &
-      BaseEvents
+      BaseEvents<HelixHeadlessOption>
   >;
 
   /**
@@ -34033,7 +34033,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessOutlineProps &
       HelixHeadlessOutlineSolidJsProps &
       BaseProps<HelixHeadlessOutline> &
-      BaseEvents
+      BaseEvents<HelixHeadlessOutline>
   >;
 
   /**
@@ -34219,7 +34219,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessPaginationProps &
       HelixHeadlessPaginationSolidJsProps &
       BaseProps<HelixHeadlessPagination> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPagination>
   >;
 
   /**
@@ -34297,7 +34297,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessPaginationSizeProps &
       HelixHeadlessPaginationSizeSolidJsProps &
       BaseProps<HelixHeadlessPaginationSize> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPaginationSize>
   >;
 
   /**
@@ -34362,7 +34362,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessPaginationSummaryProps &
       HelixHeadlessPaginationSummarySolidJsProps &
       BaseProps<HelixHeadlessPaginationSummary> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPaginationSummary>
   >;
 
   /**
@@ -34562,7 +34562,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessPinInputProps &
       HelixHeadlessPinInputSolidJsProps &
       BaseProps<HelixHeadlessPinInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPinInput>
   >;
 
   /**
@@ -34661,7 +34661,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessPopoverProps &
       HelixHeadlessPopoverSolidJsProps &
       BaseProps<HelixHeadlessPopover> &
-      BaseEvents
+      BaseEvents<HelixHeadlessPopover>
   >;
 
   /**
@@ -34764,7 +34764,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessProgressProps &
       HelixHeadlessProgressSolidJsProps &
       BaseProps<HelixHeadlessProgress> &
-      BaseEvents
+      BaseEvents<HelixHeadlessProgress>
   >;
 
   /**
@@ -34837,7 +34837,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessQrCodeProps &
       HelixHeadlessQrCodeSolidJsProps &
       BaseProps<HelixHeadlessQrCode> &
-      BaseEvents
+      BaseEvents<HelixHeadlessQrCode>
   >;
 
   /**
@@ -34871,7 +34871,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessQuoteProps &
       HelixHeadlessQuoteSolidJsProps &
       BaseProps<HelixHeadlessQuote> &
-      BaseEvents
+      BaseEvents<HelixHeadlessQuote>
   >;
 
   /**
@@ -35040,7 +35040,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessRadioGroupProps &
       HelixHeadlessRadioGroupSolidJsProps &
       BaseProps<HelixHeadlessRadioGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessRadioGroup>
   >;
 
   /**
@@ -35100,7 +35100,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessRadioProps &
       HelixHeadlessRadioSolidJsProps &
       BaseProps<HelixHeadlessRadio> &
-      BaseEvents
+      BaseEvents<HelixHeadlessRadio>
   >;
 
   /**
@@ -35311,7 +35311,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessRatingProps &
       HelixHeadlessRatingSolidJsProps &
       BaseProps<HelixHeadlessRating> &
-      BaseEvents
+      BaseEvents<HelixHeadlessRating>
   >;
 
   /**
@@ -35373,7 +35373,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessScrollAreaProps &
       HelixHeadlessScrollAreaSolidJsProps &
       BaseProps<HelixHeadlessScrollArea> &
-      BaseEvents
+      BaseEvents<HelixHeadlessScrollArea>
   >;
 
   /**
@@ -35597,7 +35597,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSelectProps &
       HelixHeadlessSelectSolidJsProps &
       BaseProps<HelixHeadlessSelect> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSelect>
   >;
 
   /**
@@ -35619,7 +35619,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSkeletonProps &
       HelixHeadlessSkeletonSolidJsProps &
       BaseProps<HelixHeadlessSkeleton> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSkeleton>
   >;
 
   /**
@@ -35843,7 +35843,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSliderProps &
       HelixHeadlessSliderSolidJsProps &
       BaseProps<HelixHeadlessSlider> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSlider>
   >;
 
   /**
@@ -35973,7 +35973,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSparklineProps &
       HelixHeadlessSparklineSolidJsProps &
       BaseProps<HelixHeadlessSparkline> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSparkline>
   >;
 
   /**
@@ -36034,7 +36034,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSpeedDialItemProps &
       HelixHeadlessSpeedDialItemSolidJsProps &
       BaseProps<HelixHeadlessSpeedDialItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSpeedDialItem>
   >;
 
   /**
@@ -36136,7 +36136,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSpeedDialProps &
       HelixHeadlessSpeedDialSolidJsProps &
       BaseProps<HelixHeadlessSpeedDial> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSpeedDial>
   >;
 
   /**
@@ -36368,7 +36368,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSplitterProps &
       HelixHeadlessSplitterSolidJsProps &
       BaseProps<HelixHeadlessSplitter> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSplitter>
   >;
 
   /**
@@ -36392,7 +36392,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessStatGroupProps &
       HelixHeadlessStatGroupSolidJsProps &
       BaseProps<HelixHeadlessStatGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessStatGroup>
   >;
 
   /**
@@ -36448,7 +36448,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessStatProps &
       HelixHeadlessStatSolidJsProps &
       BaseProps<HelixHeadlessStat> &
-      BaseEvents
+      BaseEvents<HelixHeadlessStat>
   >;
 
   /**
@@ -36554,7 +36554,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessStepsProps &
       HelixHeadlessStepsSolidJsProps &
       BaseProps<HelixHeadlessSteps> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSteps>
   >;
 
   /**
@@ -36654,7 +36654,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessStepProps &
       HelixHeadlessStepSolidJsProps &
       BaseProps<HelixHeadlessStep> &
-      BaseEvents
+      BaseEvents<HelixHeadlessStep>
   >;
 
   /**
@@ -36816,7 +36816,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessSwitchProps &
       HelixHeadlessSwitchSolidJsProps &
       BaseProps<HelixHeadlessSwitch> &
-      BaseEvents
+      BaseEvents<HelixHeadlessSwitch>
   >;
 
   /**
@@ -36844,7 +36844,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTableCellProps &
       HelixHeadlessTableCellSolidJsProps &
       BaseProps<HelixHeadlessTableCell> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTableCell>
   >;
 
   /**
@@ -36975,7 +36975,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTableColumnProps &
       HelixHeadlessTableColumnSolidJsProps &
       BaseProps<HelixHeadlessTableColumn> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTableColumn>
   >;
 
   /**
@@ -37043,7 +37043,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTableProps &
       HelixHeadlessTableSolidJsProps &
       BaseProps<HelixHeadlessTable> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTable>
   >;
 
   /**
@@ -37062,7 +37062,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTableRowProps &
       HelixHeadlessTableRowSolidJsProps &
       BaseProps<HelixHeadlessTableRow> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTableRow>
   >;
 
   /**
@@ -37106,7 +37106,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTabsPanelProps &
       HelixHeadlessTabsPanelSolidJsProps &
       BaseProps<HelixHeadlessTabsPanel> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTabsPanel>
   >;
 
   /**
@@ -37207,7 +37207,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTabsProps &
       HelixHeadlessTabsSolidJsProps &
       BaseProps<HelixHeadlessTabs> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTabs>
   >;
 
   /**
@@ -37255,7 +37255,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTabsTabProps &
       HelixHeadlessTabsTabSolidJsProps &
       BaseProps<HelixHeadlessTabsTab> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTabsTab>
   >;
 
   /**
@@ -37311,7 +37311,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTagProps &
       HelixHeadlessTagSolidJsProps &
       BaseProps<HelixHeadlessTag> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTag>
   >;
 
   /**
@@ -37476,7 +37476,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTextareaProps &
       HelixHeadlessTextareaSolidJsProps &
       BaseProps<HelixHeadlessTextarea> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTextarea>
   >;
 
   /**
@@ -37751,7 +37751,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTimeInputProps &
       HelixHeadlessTimeInputSolidJsProps &
       BaseProps<HelixHeadlessTimeInput> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimeInput>
   >;
 
   /**
@@ -38009,7 +38009,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTimePickerProps &
       HelixHeadlessTimePickerSolidJsProps &
       BaseProps<HelixHeadlessTimePicker> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimePicker>
   >;
 
   /**
@@ -38062,7 +38062,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTimelineItemProps &
       HelixHeadlessTimelineItemSolidJsProps &
       BaseProps<HelixHeadlessTimelineItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimelineItem>
   >;
 
   /**
@@ -38107,7 +38107,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTimelineProps &
       HelixHeadlessTimelineSolidJsProps &
       BaseProps<HelixHeadlessTimeline> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTimeline>
   >;
 
   /**
@@ -38241,7 +38241,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessToastItemProps &
       HelixHeadlessToastItemSolidJsProps &
       BaseProps<HelixHeadlessToastItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToastItem>
   >;
 
   /**
@@ -38307,7 +38307,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessToastProps &
       HelixHeadlessToastSolidJsProps &
       BaseProps<HelixHeadlessToast> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToast>
   >;
 
   /**
@@ -38492,7 +38492,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessToggleGroupProps &
       HelixHeadlessToggleGroupSolidJsProps &
       BaseProps<HelixHeadlessToggleGroup> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToggleGroup>
   >;
 
   /**
@@ -38550,7 +38550,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessToggleProps &
       HelixHeadlessToggleSolidJsProps &
       BaseProps<HelixHeadlessToggle> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToggle>
   >;
 
   /**
@@ -38587,7 +38587,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessToolbarProps &
       HelixHeadlessToolbarSolidJsProps &
       BaseProps<HelixHeadlessToolbar> &
-      BaseEvents
+      BaseEvents<HelixHeadlessToolbar>
   >;
 
   /**
@@ -38792,7 +38792,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTooltipProps &
       HelixHeadlessTooltipSolidJsProps &
       BaseProps<HelixHeadlessTooltip> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTooltip>
   >;
 
   /**
@@ -38897,7 +38897,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTourProps &
       HelixHeadlessTourSolidJsProps &
       BaseProps<HelixHeadlessTour> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTour>
   >;
 
   /**
@@ -38984,7 +38984,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTourStopProps &
       HelixHeadlessTourStopSolidJsProps &
       BaseProps<HelixHeadlessTourStop> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTourStop>
   >;
 
   /**
@@ -39156,7 +39156,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTreeItemProps &
       HelixHeadlessTreeItemSolidJsProps &
       BaseProps<HelixHeadlessTreeItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTreeItem>
   >;
 
   /**
@@ -39233,7 +39233,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTreeProps &
       HelixHeadlessTreeSolidJsProps &
       BaseProps<HelixHeadlessTree> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTree>
   >;
 
   /**
@@ -39295,7 +39295,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessTrendProps &
       HelixHeadlessTrendSolidJsProps &
       BaseProps<HelixHeadlessTrend> &
-      BaseEvents
+      BaseEvents<HelixHeadlessTrend>
   >;
 
   /**
@@ -39374,7 +39374,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessVideoPlaylistItemProps &
       HelixHeadlessVideoPlaylistItemSolidJsProps &
       BaseProps<HelixHeadlessVideoPlaylistItem> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylistItem>
   >;
 
   /**
@@ -39459,7 +39459,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessVideoPlaylistMenuProps &
       HelixHeadlessVideoPlaylistMenuSolidJsProps &
       BaseProps<HelixHeadlessVideoPlaylistMenu> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylistMenu>
   >;
 
   /**
@@ -39543,7 +39543,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessVideoPlaylistProps &
       HelixHeadlessVideoPlaylistSolidJsProps &
       BaseProps<HelixHeadlessVideoPlaylist> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideoPlaylist>
   >;
 
   /**
@@ -39787,7 +39787,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessVideoProps &
       HelixHeadlessVideoSolidJsProps &
       BaseProps<HelixHeadlessVideo> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVideo>
   >;
 
   /**
@@ -39868,7 +39868,7 @@ export type CustomElementsSolidJs = {
     HelixHeadlessVirtualListProps &
       HelixHeadlessVirtualListSolidJsProps &
       BaseProps<HelixHeadlessVirtualList> &
-      BaseEvents
+      BaseEvents<HelixHeadlessVirtualList>
   >;
 };
 

@@ -128,9 +128,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             `aria-label`. */}
         <helix-toggle-group
           label="Color mode"
-          onChange={(event) =>
-            choose((event.currentTarget as HTMLElement & { value: string }).value as ColorMode)
-          }
+          onChange={(event) => choose(event.currentTarget.value as ColorMode)}
           value={mode}
         >
           <helix-toggle value="system">System</helix-toggle>
@@ -146,9 +144,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         <helix-toggle-group
           hint="Styled extends headless, so it shows more."
           label="API reference"
-          onChange={(event) =>
-            chooseTier((event.currentTarget as HTMLElement & { value: string }).value as ApiTier)
-          }
+          onChange={(event) => chooseTier(event.currentTarget.value as ApiTier)}
           value={tier}
         >
           <helix-toggle value="headless">Headless</helix-toggle>

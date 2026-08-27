@@ -7,6 +7,7 @@ import { declaredEvents } from './plugins/declared-events.js'
 import { examples } from './plugins/examples.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { jsxImports } from './plugins/jsx-imports.js'
+import { jsxNativeEvents } from './plugins/jsx-native-events.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
@@ -98,6 +99,7 @@ export const createHelixCemConfig = ({
           // Also after the generator: its `ref` type is framework-agnostic and
           // rejects the `useRef` every React consumer reaches for.
           jsxReactRef(),
+          jsxNativeEvents(),
           /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
@@ -169,6 +171,7 @@ export {
   examples,
   helixTier,
   jsxImports,
+  jsxNativeEvents,
   metadata,
   reactEvents,
   references,

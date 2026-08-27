@@ -238,112 +238,112 @@ type BaseProps<T extends HTMLElement> = {
   popovertargetaction?: "show" | "hide" | "toggle";
 };
 
-type BaseEvents = {
+type BaseEvents<T = HTMLElement> = {
   // Mouse Events
 
   /** Triggered when the element is clicked by the user by mouse or keyboard. */
-  onClick?: (event: MouseEvent) => void;
+  onClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the context menu is triggered, often by right-clicking. */
-  onContextMenu?: (event: MouseEvent) => void;
+  onContextMenu?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the element is double-clicked. */
-  onDoubleClick?: (event: MouseEvent) => void;
+  onDoubleClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired repeatedly as the draggable element is being dragged. */
-  onDrag?: (event: DragEvent) => void;
+  onDrag?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when the dragging of a draggable element is finished. */
-  onDragEnd?: (event: DragEvent) => void;
+  onDragEnd?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection enters a valid drop target. */
-  onDragEnter?: (event: DragEvent) => void;
+  onDragEnter?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragExit?: (event: DragEvent) => void;
+  onDragExit?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragLeave?: (event: DragEvent) => void;
+  onDragLeave?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds). */
-  onDragOver?: (event: DragEvent) => void;
+  onDragOver?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a draggable element starts being dragged. */
-  onDragStart?: (event: DragEvent) => void;
+  onDragStart?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element is dropped onto a drop target. */
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is pressed down on the element. */
-  onMouseDown?: (event: MouseEvent) => void;
+  onMouseDown?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the mouse cursor enters the element. */
-  onMouseEnter?: (event: MouseEvent) => void;
+  onMouseEnter?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Triggered when the mouse cursor leaves the element. */
-  onMouseLeave?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an element when a pointing device (usually a mouse) is moved while the cursor's hotspot is inside it. */
-  onMouseMove?: (event: MouseEvent) => void;
+  onMouseMove?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (usually a mouse) is used to move the cursor so that it is no longer contained within the element or one of its children. */
-  onMouseOut?: (event: MouseEvent) => void;
+  onMouseOut?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (such as a mouse or trackpad) is used to move the cursor onto the element or one of its child elements. */
-  onMouseOver?: (event: MouseEvent) => void;
+  onMouseOver?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is released on the element. */
-  onMouseUp?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent & { currentTarget: T }) => void;
 
   // Keyboard Events
 
   /** Fired when a key is pressed down. */
-  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyDown?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is released.. */
-  onKeyUp?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is pressed down. */
-  onKeyPressed?: (event: KeyboardEvent) => void;
+  onKeyPressed?: (event: KeyboardEvent & { currentTarget: T }) => void;
 
   // Focus Events
 
   /** Fired when the element receives focus, often triggered by tab navigation. */
-  onFocus?: (event: FocusEvent) => void;
+  onFocus?: (event: FocusEvent & { currentTarget: T }) => void;
   /** Fired when the element loses focus. */
-  onBlur?: (event: FocusEvent) => void;
+  onBlur?: (event: FocusEvent & { currentTarget: T }) => void;
 
   // Form Events
 
   /** Fired when the value of an input element changes, such as with text inputs or select elements. */
-  onChange?: (event: Event) => void;
+  onChange?: (event: Event & { currentTarget: T }) => void;
   /** Fires when the value of an <input>, <select>, or <textarea> element has been changed. */
-  onInput?: (event: Event) => void;
+  onInput?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is submitted, usually on pressing Enter in a text input. */
-  onSubmit?: (event: Event) => void;
+  onSubmit?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is reset. */
-  onReset?: (event: Event) => void;
+  onReset?: (event: Event & { currentTarget: T }) => void;
 
   // UI Events
 
   /** Fired when the content of an element is scrolled. */
-  onScroll?: (event: UIEvent) => void;
+  onScroll?: (event: UIEvent & { currentTarget: T }) => void;
 
   // Wheel Events
 
   /** Fired when the mouse wheel is scrolled while the element is focused. */
-  onWheel?: (event: WheelEvent) => void;
+  onWheel?: (event: WheelEvent & { currentTarget: T }) => void;
 
   // Animation Events
 
   /** Fired when a CSS animation starts. */
-  onAnimationStart?: (event: AnimationEvent) => void;
+  onAnimationStart?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes. */
-  onAnimationEnd?: (event: AnimationEvent) => void;
+  onAnimationEnd?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes one iteration. */
-  onAnimationIteration?: (event: AnimationEvent) => void;
+  onAnimationIteration?: (event: AnimationEvent & { currentTarget: T }) => void;
 
   // Transition Events
 
   /** Fired when a CSS transition has completed. */
-  onTransitionEnd?: (event: TransitionEvent) => void;
+  onTransitionEnd?: (event: TransitionEvent & { currentTarget: T }) => void;
 
   // Media Events
 
   /** Fired when an element (usually an image) finishes loading */
-  onLoad?: (event: Event) => void;
+  onLoad?: (event: Event & { currentTarget: T }) => void;
   /** Fired when an error occurs during the loading of an element, like an image not being found. */
-  onError?: (event: Event) => void;
+  onError?: (event: Event & { currentTarget: T }) => void;
 
   // Clipboard Events
 
   /** Fires when the user initiates a copy action through the browser's user interface. */
-  onCopy?: (event: ClipboardEvent) => void;
+  onCopy?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "cut" action through the browser's user interface. */
-  onCut?: (event: ClipboardEvent) => void;
+  onCut?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "paste" action through the browser's user interface. */
-  onPaste?: (event: ClipboardEvent) => void;
+  onPaste?: (event: ClipboardEvent & { currentTarget: T }) => void;
 };
 
 /** `HelixAccordionItem` component event */
@@ -16891,7 +16891,7 @@ export type CustomElements = {
    * - `content-inner`: Padding wrapper inside the animated region.
    */
   "helix-accordion-item": Partial<
-    HelixAccordionItemProps & BaseProps<HelixAccordionItem> & BaseEvents
+    HelixAccordionItemProps & BaseProps<HelixAccordionItem> & BaseEvents<HelixAccordionItem>
   >;
 
   /**
@@ -16944,7 +16944,7 @@ export type CustomElements = {
    * - `--accordion-radii`: Corner radius of the stack, when outlined. (default: `undefined`)
    */
   "helix-accordion": Partial<
-    HelixAccordionProps & BaseProps<HelixAccordion> & BaseEvents
+    HelixAccordionProps & BaseProps<HelixAccordion> & BaseEvents<HelixAccordion>
   >;
 
   /**
@@ -17021,7 +17021,7 @@ export type CustomElements = {
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    */
   "helix-announcement": Partial<
-    HelixAnnouncementProps & BaseProps<HelixAnnouncement> & BaseEvents
+    HelixAnnouncementProps & BaseProps<HelixAnnouncement> & BaseEvents<HelixAnnouncement>
   >;
 
   /**
@@ -17141,7 +17141,7 @@ export type CustomElements = {
    * - `end`: The trailing region.
    */
   "helix-app-header": Partial<
-    HelixAppHeaderProps & BaseProps<HelixAppHeader> & BaseEvents
+    HelixAppHeaderProps & BaseProps<HelixAppHeader> & BaseEvents<HelixAppHeader>
   >;
 
   /**
@@ -17288,7 +17288,7 @@ export type CustomElements = {
    *
    * - `canvas`: The surface the shader draws into.
    */
-  "helix-aura": Partial<HelixAuraProps & BaseProps<HelixAura> & BaseEvents>;
+  "helix-aura": Partial<HelixAuraProps & BaseProps<HelixAura> & BaseEvents<HelixAura>>;
 
   /**
    * They overlap by a step of space, which is enough to read as a stack without
@@ -17340,7 +17340,7 @@ export type CustomElements = {
    * - `overflow`: The count of avatars past `max`.
    */
   "helix-avatar-group": Partial<
-    HelixAvatarGroupProps & BaseProps<HelixAvatarGroup> & BaseEvents
+    HelixAvatarGroupProps & BaseProps<HelixAvatarGroup> & BaseEvents<HelixAvatarGroup>
   >;
 
   /**
@@ -17386,7 +17386,7 @@ export type CustomElements = {
    * - `initials`: The initials shown when there is no usable image.
    */
   "helix-avatar": Partial<
-    HelixAvatarProps & BaseProps<HelixAvatar> & BaseEvents
+    HelixAvatarProps & BaseProps<HelixAvatar> & BaseEvents<HelixAvatar>
   >;
 
   /**
@@ -17429,7 +17429,7 @@ export type CustomElements = {
    *
    * - `indicator`: The count, or the dot when there is no value.
    */
-  "helix-badge": Partial<HelixBadgeProps & BaseProps<HelixBadge> & BaseEvents>;
+  "helix-badge": Partial<HelixBadgeProps & BaseProps<HelixBadge> & BaseEvents<HelixBadge>>;
 
   /**
    * The columns take the series palette in order, so a chart of one is series one
@@ -17683,7 +17683,7 @@ export type CustomElements = {
    * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-bar-chart": Partial<
-    HelixBarChartProps & BaseProps<HelixBarChart> & BaseEvents
+    HelixBarChartProps & BaseProps<HelixBarChart> & BaseEvents<HelixBarChart>
   >;
 
   /**
@@ -17719,7 +17719,7 @@ export type CustomElements = {
    * - `attribution`: The footer carrying the source.
    */
   "helix-blockquote": Partial<
-    HelixBlockquoteProps & BaseProps<HelixBlockquote> & BaseEvents
+    HelixBlockquoteProps & BaseProps<HelixBlockquote> & BaseEvents<HelixBlockquote>
   >;
 
   /**
@@ -17771,7 +17771,7 @@ export type CustomElements = {
    * - `separator-mark`: The glyph between this crumb and the next, where none is slotted.
    */
   "helix-breadcrumb": Partial<
-    HelixBreadcrumbProps & BaseProps<HelixBreadcrumb> & BaseEvents
+    HelixBreadcrumbProps & BaseProps<HelixBreadcrumb> & BaseEvents<HelixBreadcrumb>
   >;
 
   /**
@@ -17797,7 +17797,7 @@ export type CustomElements = {
    * - `list`: The ordered list.
    */
   "helix-breadcrumbs": Partial<
-    HelixBreadcrumbsProps & BaseProps<HelixBreadcrumbs> & BaseEvents
+    HelixBreadcrumbsProps & BaseProps<HelixBreadcrumbs> & BaseEvents<HelixBreadcrumbs>
   >;
 
   /**
@@ -17860,7 +17860,7 @@ export type CustomElements = {
    * - `--button-group-gap`: Space between the buttons, when `spaced`. (default: `undefined`)
    */
   "helix-button-group": Partial<
-    HelixButtonGroupProps & BaseProps<HelixButtonGroup> & BaseEvents
+    HelixButtonGroupProps & BaseProps<HelixButtonGroup> & BaseEvents<HelixButtonGroup>
   >;
 
   /**
@@ -18071,7 +18071,7 @@ export type CustomElements = {
    * - `button`: The inner control.
    */
   "helix-button": Partial<
-    HelixButtonProps & BaseProps<HelixButton> & BaseEvents
+    HelixButtonProps & BaseProps<HelixButton> & BaseEvents<HelixButton>
   >;
 
   /**
@@ -18118,7 +18118,7 @@ export type CustomElements = {
    * - `icon-mark`: The tone glyph, where none is slotted.
    */
   "helix-callout": Partial<
-    HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents
+    HelixCalloutProps & BaseProps<HelixCallout> & BaseEvents<HelixCallout>
   >;
 
   /**
@@ -18230,7 +18230,7 @@ export type CustomElements = {
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
    * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
-  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents>;
+  "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents<HelixCard>>;
 
   /**
    * The track scroll-snaps, so a drag and a trackpad swipe move it with the
@@ -18429,7 +18429,7 @@ export type CustomElements = {
    * - `track`: The scroller the slides sit in.
    */
   "helix-carousel": Partial<
-    HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents
+    HelixCarouselProps & BaseProps<HelixCarousel> & BaseEvents<HelixCarousel>
   >;
 
   /**
@@ -18496,7 +18496,7 @@ export type CustomElements = {
    * - `end`: The trailing slot's box.
    */
   "helix-chat-composer": Partial<
-    HelixChatComposerProps & BaseProps<HelixChatComposer> & BaseEvents
+    HelixChatComposerProps & BaseProps<HelixChatComposer> & BaseEvents<HelixChatComposer>
   >;
 
   /**
@@ -18567,7 +18567,7 @@ export type CustomElements = {
    * - `actions`: The trailing slot's box.
    */
   "helix-chat-message": Partial<
-    HelixChatMessageProps & BaseProps<HelixChatMessage> & BaseEvents
+    HelixChatMessageProps & BaseProps<HelixChatMessage> & BaseEvents<HelixChatMessage>
   >;
 
   /**
@@ -18667,7 +18667,7 @@ export type CustomElements = {
    * - `empty`: Shown when the conversation has no turns.
    * - `loading`: Shown while the history is still on its way.
    */
-  "helix-chat": Partial<HelixChatProps & BaseProps<HelixChat> & BaseEvents>;
+  "helix-chat": Partial<HelixChatProps & BaseProps<HelixChat> & BaseEvents<HelixChat>>;
 
   /**
    * A column by default, which is what a list of choices wants: the eye scans one
@@ -18784,7 +18784,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-checkbox-group": Partial<
-    HelixCheckboxGroupProps & BaseProps<HelixCheckboxGroup> & BaseEvents
+    HelixCheckboxGroupProps & BaseProps<HelixCheckboxGroup> & BaseEvents<HelixCheckboxGroup>
   >;
 
   /**
@@ -18962,7 +18962,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-checkbox": Partial<
-    HelixCheckboxProps & BaseProps<HelixCheckbox> & BaseEvents
+    HelixCheckboxProps & BaseProps<HelixCheckbox> & BaseEvents<HelixCheckbox>
   >;
 
   /**
@@ -19012,7 +19012,7 @@ export type CustomElements = {
    * - `copy-tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-code-block": Partial<
-    HelixCodeBlockProps & BaseProps<HelixCodeBlock> & BaseEvents
+    HelixCodeBlockProps & BaseProps<HelixCodeBlock> & BaseEvents<HelixCodeBlock>
   >;
 
   /**
@@ -19038,7 +19038,7 @@ export type CustomElements = {
    *
    * - `code`: The `<code>` element.
    */
-  "helix-code": Partial<HelixCodeProps & BaseProps<HelixCode> & BaseEvents>;
+  "helix-code": Partial<HelixCodeProps & BaseProps<HelixCode> & BaseEvents<HelixCode>>;
 
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
@@ -19311,7 +19311,7 @@ export type CustomElements = {
    * - `picker-channel-label`: The question, over the track.
    */
   "helix-color-input": Partial<
-    HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
+    HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents<HelixColorInput>
   >;
 
   /**
@@ -19539,7 +19539,7 @@ export type CustomElements = {
    * - `channel-label`: The question, over the track.
    */
   "helix-color-picker": Partial<
-    HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents
+    HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents<HelixColorPicker>
   >;
 
   /**
@@ -19799,7 +19799,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    */
   "helix-combobox": Partial<
-    HelixComboboxProps & BaseProps<HelixCombobox> & BaseEvents
+    HelixComboboxProps & BaseProps<HelixCombobox> & BaseEvents<HelixCombobox>
   >;
 
   /**
@@ -19902,7 +19902,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-command": Partial<
-    HelixCommandProps & BaseProps<HelixCommand> & BaseEvents
+    HelixCommandProps & BaseProps<HelixCommand> & BaseEvents<HelixCommand>
   >;
 
   /**
@@ -20067,7 +20067,7 @@ export type CustomElements = {
    * - `tooltip-arrow`: The point, resting against the trigger.
    */
   "helix-copy-button": Partial<
-    HelixCopyButtonProps & BaseProps<HelixCopyButton> & BaseEvents
+    HelixCopyButtonProps & BaseProps<HelixCopyButton> & BaseEvents<HelixCopyButton>
   >;
 
   /**
@@ -20218,7 +20218,7 @@ export type CustomElements = {
    * - `loading`: Shown while the rows are still on their way.
    */
   "helix-data-table": Partial<
-    HelixDataTableProps & BaseProps<HelixDataTable> & BaseEvents
+    HelixDataTableProps & BaseProps<HelixDataTable> & BaseEvents<HelixDataTable>
   >;
 
   /**
@@ -20495,7 +20495,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-date-input": Partial<
-    HelixDateInputProps & BaseProps<HelixDateInput> & BaseEvents
+    HelixDateInputProps & BaseProps<HelixDateInput> & BaseEvents<HelixDateInput>
   >;
 
   /**
@@ -20680,7 +20680,7 @@ export type CustomElements = {
    * - `weekday`: A column header naming a day of the week.
    */
   "helix-date-picker": Partial<
-    HelixDatePickerProps & BaseProps<HelixDatePicker> & BaseEvents
+    HelixDatePickerProps & BaseProps<HelixDatePicker> & BaseEvents<HelixDatePicker>
   >;
 
   /**
@@ -20790,7 +20790,7 @@ export type CustomElements = {
    * - `dialog`: The native dialog element.
    */
   "helix-dialog": Partial<
-    HelixDialogProps & BaseProps<HelixDialog> & BaseEvents
+    HelixDialogProps & BaseProps<HelixDialog> & BaseEvents<HelixDialog>
   >;
 
   /**
@@ -20842,7 +20842,7 @@ export type CustomElements = {
    * - `content`: What is set into it.
    */
   "helix-divider": Partial<
-    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents
+    HelixDividerProps & BaseProps<HelixDivider> & BaseEvents<HelixDivider>
   >;
 
   /**
@@ -21025,7 +21025,7 @@ export type CustomElements = {
    * - `track`: The ring the slices are drawn on.
    */
   "helix-donut-chart": Partial<
-    HelixDonutChartProps & BaseProps<HelixDonutChart> & BaseEvents
+    HelixDonutChartProps & BaseProps<HelixDonutChart> & BaseEvents<HelixDonutChart>
   >;
 
   /**
@@ -21152,7 +21152,7 @@ export type CustomElements = {
    * - `content`: The scrolling content region.
    */
   "helix-drawer": Partial<
-    HelixDrawerProps & BaseProps<HelixDrawer> & BaseEvents
+    HelixDrawerProps & BaseProps<HelixDrawer> & BaseEvents<HelixDrawer>
   >;
 
   /**
@@ -21216,7 +21216,7 @@ export type CustomElements = {
    * - `label`: The words.
    */
   "helix-drilldown-item": Partial<
-    HelixDrilldownItemProps & BaseProps<HelixDrilldownItem> & BaseEvents
+    HelixDrilldownItemProps & BaseProps<HelixDrilldownItem> & BaseEvents<HelixDrilldownItem>
   >;
 
   /**
@@ -21287,7 +21287,7 @@ export type CustomElements = {
    * - `loading`: Shown while the entries are still on their way.
    */
   "helix-drilldown": Partial<
-    HelixDrilldownProps & BaseProps<HelixDrilldown> & BaseEvents
+    HelixDrilldownProps & BaseProps<HelixDrilldown> & BaseEvents<HelixDrilldown>
   >;
 
   /**
@@ -21320,7 +21320,7 @@ export type CustomElements = {
    *
    * - `--empty-inset`: Space around the whole block. (default: `undefined`)
    */
-  "helix-empty": Partial<HelixEmptyProps & BaseProps<HelixEmpty> & BaseEvents>;
+  "helix-empty": Partial<HelixEmptyProps & BaseProps<HelixEmpty> & BaseEvents<HelixEmpty>>;
 
   /**
    * The field is a box rather than a line, because nothing is typed into it: its
@@ -21490,7 +21490,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-file-input": Partial<
-    HelixFileInputProps & BaseProps<HelixFileInput> & BaseEvents
+    HelixFileInputProps & BaseProps<HelixFileInput> & BaseEvents<HelixFileInput>
   >;
 
   /**
@@ -21525,7 +21525,7 @@ export type CustomElements = {
    *
    * - `(default)`: The items to lay out.
    */
-  "helix-flex": Partial<HelixFlexProps & BaseProps<HelixFlex> & BaseEvents>;
+  "helix-flex": Partial<HelixFlexProps & BaseProps<HelixFlex> & BaseEvents<HelixFlex>>;
 
   /**
    * Two ways to declare columns, and only two. `columns` is a fixed count;
@@ -21559,7 +21559,7 @@ export type CustomElements = {
    *
    * - `--grid-columns`: An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. (default: `undefined`)
    */
-  "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents>;
+  "helix-grid": Partial<HelixGridProps & BaseProps<HelixGrid> & BaseEvents<HelixGrid>>;
 
   /**
    * One grid, filled down the column and then across, which is what a calendar
@@ -21688,7 +21688,7 @@ export type CustomElements = {
    * - `empty`: Shown when the table has no readings in it.
    */
   "helix-heatmap": Partial<
-    HelixHeatmapProps & BaseProps<HelixHeatmap> & BaseEvents
+    HelixHeatmapProps & BaseProps<HelixHeatmap> & BaseEvents<HelixHeatmap>
   >;
 
   /**
@@ -21870,7 +21870,7 @@ export type CustomElements = {
    * - `button`: The inner button or anchor.
    */
   "helix-icon-button": Partial<
-    HelixIconButtonProps & BaseProps<HelixIconButton> & BaseEvents
+    HelixIconButtonProps & BaseProps<HelixIconButton> & BaseEvents<HelixIconButton>
   >;
 
   /**
@@ -21898,7 +21898,7 @@ export type CustomElements = {
    *
    * - `svg`: The rendered SVG.
    */
-  "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
+  "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents<HelixIcon>>;
 
   /**
    * Presentation only: the box the picture is given, how it fills it, and the
@@ -21982,7 +21982,7 @@ export type CustomElements = {
    * - `placeholder`: What stands in until it arrives.
    * - `fallback`: What stands in when it fails.
    */
-  "helix-image": Partial<HelixImageProps & BaseProps<HelixImage> & BaseEvents>;
+  "helix-image": Partial<HelixImageProps & BaseProps<HelixImage> & BaseEvents<HelixImage>>;
 
   /**
    * The frame is the field rather than the input, so anything slotted at either
@@ -22188,7 +22188,7 @@ export type CustomElements = {
    * - `hint`: Help under the field, while nothing is wrong.
    * - `feedback`: What is wrong with it.
    */
-  "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents>;
+  "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents<HelixInput>>;
 
   /**
    * Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
@@ -22241,7 +22241,7 @@ export type CustomElements = {
    *
    * - `kbd`: The key.
    */
-  "helix-kbd": Partial<HelixKbdProps & BaseProps<HelixKbd> & BaseEvents>;
+  "helix-kbd": Partial<HelixKbdProps & BaseProps<HelixKbd> & BaseEvents<HelixKbd>>;
 
   /**
    * A row that wraps, because a legend sits under a chart as wide as the chart
@@ -22348,7 +22348,7 @@ export type CustomElements = {
    * - `swatch`: The color a series is drawn in.
    */
   "helix-legend": Partial<
-    HelixLegendProps & BaseProps<HelixLegend> & BaseEvents
+    HelixLegendProps & BaseProps<HelixLegend> & BaseEvents<HelixLegend>
   >;
 
   /**
@@ -22560,7 +22560,7 @@ export type CustomElements = {
    * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-line-chart": Partial<
-    HelixLineChartProps & BaseProps<HelixLineChart> & BaseEvents
+    HelixLineChartProps & BaseProps<HelixLineChart> & BaseEvents<HelixLineChart>
   >;
 
   /**
@@ -22607,7 +22607,7 @@ export type CustomElements = {
    * - `row`: The layout, held off the host so the host can carry a marker.
    */
   "helix-list-item": Partial<
-    HelixListItemProps & BaseProps<HelixListItem> & BaseEvents
+    HelixListItemProps & BaseProps<HelixListItem> & BaseEvents<HelixListItem>
   >;
 
   /**
@@ -22675,7 +22675,7 @@ export type CustomElements = {
    * - `--list-rail-style`: What a rail counts with. Any `list-style-type`. (default: `undefined`)
    * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
-  "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents>;
+  "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents<HelixList>>;
 
   /**
    * A framed, scrolling list with the field's three parts around it. The frame is
@@ -22901,7 +22901,7 @@ export type CustomElements = {
    * - `loading`: Shown while the options are still on their way.
    */
   "helix-listbox": Partial<
-    HelixListboxProps & BaseProps<HelixListbox> & BaseEvents
+    HelixListboxProps & BaseProps<HelixListbox> & BaseEvents<HelixListbox>
   >;
 
   /**
@@ -22954,7 +22954,7 @@ export type CustomElements = {
    * - `indicator`: The arc that turns.
    */
   "helix-loader": Partial<
-    HelixLoaderProps & BaseProps<HelixLoader> & BaseEvents
+    HelixLoaderProps & BaseProps<HelixLoader> & BaseEvents<HelixLoader>
   >;
 
   /**
@@ -23075,7 +23075,7 @@ export type CustomElements = {
    * - `surface`: The floating panel, which is what opens.
    */
   "helix-megamenu": Partial<
-    HelixMegamenuProps & BaseProps<HelixMegamenu> & BaseEvents
+    HelixMegamenuProps & BaseProps<HelixMegamenu> & BaseEvents<HelixMegamenu>
   >;
 
   /**
@@ -23202,7 +23202,7 @@ export type CustomElements = {
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-menu-item": Partial<
-    HelixMenuItemProps & BaseProps<HelixMenuItem> & BaseEvents
+    HelixMenuItemProps & BaseProps<HelixMenuItem> & BaseEvents<HelixMenuItem>
   >;
 
   /**
@@ -23307,7 +23307,7 @@ export type CustomElements = {
    * - `empty`: Shown when there are no items to show.
    * - `loading`: Shown while the items are still on their way.
    */
-  "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents>;
+  "helix-menu": Partial<HelixMenuProps & BaseProps<HelixMenu> & BaseEvents<HelixMenu>>;
 
   /**
    * The bar `Progress` draws, at twice the height and on the house corner rather
@@ -23447,7 +23447,7 @@ export type CustomElements = {
    * - `value`: The reading, under `show-value`.
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    */
-  "helix-meter": Partial<HelixMeterProps & BaseProps<HelixMeter> & BaseEvents>;
+  "helix-meter": Partial<HelixMeterProps & BaseProps<HelixMeter> & BaseEvents<HelixMeter>>;
 
   /**
    * One marker that travels, rather than a background that appears on whichever
@@ -23482,7 +23482,7 @@ export type CustomElements = {
    * - `indicator`: The marker that travels to the current destination.
    */
   "helix-navigation": Partial<
-    HelixNavigationProps & BaseProps<HelixNavigation> & BaseEvents
+    HelixNavigationProps & BaseProps<HelixNavigation> & BaseEvents<HelixNavigation>
   >;
 
   /**
@@ -23564,7 +23564,7 @@ export type CustomElements = {
    * - `actions`: The trailing slot's box.
    */
   "helix-notifications-item": Partial<
-    HelixNotificationsItemProps & BaseProps<HelixNotificationsItem> & BaseEvents
+    HelixNotificationsItemProps & BaseProps<HelixNotificationsItem> & BaseEvents<HelixNotificationsItem>
   >;
 
   /**
@@ -23652,7 +23652,7 @@ export type CustomElements = {
    * - `loading`: Shown while the feed is still on its way.
    */
   "helix-notifications": Partial<
-    HelixNotificationsProps & BaseProps<HelixNotifications> & BaseEvents
+    HelixNotificationsProps & BaseProps<HelixNotifications> & BaseEvents<HelixNotifications>
   >;
 
   /**
@@ -23841,7 +23841,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-number-input": Partial<
-    HelixNumberInputProps & BaseProps<HelixNumberInput> & BaseEvents
+    HelixNumberInputProps & BaseProps<HelixNumberInput> & BaseEvents<HelixNumberInput>
   >;
 
   /**
@@ -23870,7 +23870,7 @@ export type CustomElements = {
    * - `items`: The run itself.
    */
   "helix-option-group": Partial<
-    HelixOptionGroupProps & BaseProps<HelixOptionGroup> & BaseEvents
+    HelixOptionGroupProps & BaseProps<HelixOptionGroup> & BaseEvents<HelixOptionGroup>
   >;
 
   /**
@@ -23993,7 +23993,7 @@ export type CustomElements = {
    * - `description`: The caption under the words, when there is one.
    */
   "helix-option": Partial<
-    HelixOptionProps & BaseProps<HelixOption> & BaseEvents
+    HelixOptionProps & BaseProps<HelixOption> & BaseEvents<HelixOption>
   >;
 
   /**
@@ -24070,7 +24070,7 @@ export type CustomElements = {
    * - `indicator`: The mark that travels to the section being read.
    */
   "helix-outline": Partial<
-    HelixOutlineProps & BaseProps<HelixOutline> & BaseEvents
+    HelixOutlineProps & BaseProps<HelixOutline> & BaseEvents<HelixOutline>
   >;
 
   /**
@@ -24223,7 +24223,7 @@ export type CustomElements = {
    * - `mark`: The glyph on a first, previous, next or last control.
    */
   "helix-pagination": Partial<
-    HelixPaginationProps & BaseProps<HelixPagination> & BaseEvents
+    HelixPaginationProps & BaseProps<HelixPagination> & BaseEvents<HelixPagination>
   >;
 
   /**
@@ -24268,7 +24268,7 @@ export type CustomElements = {
    * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
   "helix-pagination-size": Partial<
-    HelixPaginationSizeProps & BaseProps<HelixPaginationSize> & BaseEvents
+    HelixPaginationSizeProps & BaseProps<HelixPaginationSize> & BaseEvents<HelixPaginationSize>
   >;
 
   /**
@@ -24299,7 +24299,7 @@ export type CustomElements = {
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
    */
   "helix-pagination-summary": Partial<
-    HelixPaginationSummaryProps & BaseProps<HelixPaginationSummary> & BaseEvents
+    HelixPaginationSummaryProps & BaseProps<HelixPaginationSummary> & BaseEvents<HelixPaginationSummary>
   >;
 
   /**
@@ -24493,7 +24493,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-pin-input": Partial<
-    HelixPinInputProps & BaseProps<HelixPinInput> & BaseEvents
+    HelixPinInputProps & BaseProps<HelixPinInput> & BaseEvents<HelixPinInput>
   >;
 
   /**
@@ -24599,7 +24599,7 @@ export type CustomElements = {
    * - `popover`: The panel.
    */
   "helix-popover": Partial<
-    HelixPopoverProps & BaseProps<HelixPopover> & BaseEvents
+    HelixPopoverProps & BaseProps<HelixPopover> & BaseEvents<HelixPopover>
   >;
 
   /**
@@ -24698,7 +24698,7 @@ export type CustomElements = {
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-progress": Partial<
-    HelixProgressProps & BaseProps<HelixProgress> & BaseEvents
+    HelixProgressProps & BaseProps<HelixProgress> & BaseEvents<HelixProgress>
   >;
 
   /**
@@ -24766,7 +24766,7 @@ export type CustomElements = {
    * - `logo`: The box holding the center mark.
    */
   "helix-qr-code": Partial<
-    HelixQrCodeProps & BaseProps<HelixQrCode> & BaseEvents
+    HelixQrCodeProps & BaseProps<HelixQrCode> & BaseEvents<HelixQrCode>
   >;
 
   /**
@@ -24797,7 +24797,7 @@ export type CustomElements = {
    *
    * - `quote`: The quotation.
    */
-  "helix-quote": Partial<HelixQuoteProps & BaseProps<HelixQuote> & BaseEvents>;
+  "helix-quote": Partial<HelixQuoteProps & BaseProps<HelixQuote> & BaseEvents<HelixQuote>>;
 
   /**
    * The field's three parts, laid out the way every other field lays them out: a
@@ -24954,7 +24954,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-radio-group": Partial<
-    HelixRadioGroupProps & BaseProps<HelixRadioGroup> & BaseEvents
+    HelixRadioGroupProps & BaseProps<HelixRadioGroup> & BaseEvents<HelixRadioGroup>
   >;
 
   /**
@@ -25046,7 +25046,7 @@ export type CustomElements = {
    * - `mark`: The dot inside it.
    * - `label`: The words beside it.
    */
-  "helix-radio": Partial<HelixRadioProps & BaseProps<HelixRadio> & BaseEvents>;
+  "helix-radio": Partial<HelixRadioProps & BaseProps<HelixRadio> & BaseEvents<HelixRadio>>;
 
   /**
    * Presentation only: the marks, and the clip that fills them partway.
@@ -25246,7 +25246,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-rating": Partial<
-    HelixRatingProps & BaseProps<HelixRating> & BaseEvents
+    HelixRatingProps & BaseProps<HelixRating> & BaseEvents<HelixRating>
   >;
 
   /**
@@ -25348,7 +25348,7 @@ export type CustomElements = {
    * - `frame`: The iframe.
    */
   "helix-sandbox-preview": Partial<
-    HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
+    HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents<HelixSandboxPreview>
   >;
 
   /**
@@ -25472,7 +25472,7 @@ export type CustomElements = {
    * - `separator`: Either divider.
    */
   "helix-sandbox": Partial<
-    HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
+    HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents<HelixSandbox>
   >;
 
   /**
@@ -25520,7 +25520,7 @@ export type CustomElements = {
    * - `source`: The editable region.
    */
   "helix-sandbox-source": Partial<
-    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents<HelixSandboxSource>
   >;
 
   /**
@@ -25566,7 +25566,7 @@ export type CustomElements = {
    * - `language`: The language readout.
    */
   "helix-sandbox-status-bar": Partial<
-    HelixSandboxStatusBarProps & BaseProps<HelixSandboxStatusBar> & BaseEvents
+    HelixSandboxStatusBarProps & BaseProps<HelixSandboxStatusBar> & BaseEvents<HelixSandboxStatusBar>
   >;
 
   /**
@@ -25619,7 +25619,7 @@ export type CustomElements = {
    * - `empty`: Shown while nothing has been written.
    */
   "helix-sandbox-terminal": Partial<
-    HelixSandboxTerminalProps & BaseProps<HelixSandboxTerminal> & BaseEvents
+    HelixSandboxTerminalProps & BaseProps<HelixSandboxTerminal> & BaseEvents<HelixSandboxTerminal>
   >;
 
   /**
@@ -25649,7 +25649,7 @@ export type CustomElements = {
    * - `--sandbox-toolbar-size`: The bar's height. Defaults to a large control. (default: `undefined`)
    */
   "helix-sandbox-toolbar": Partial<
-    HelixSandboxToolbarProps & BaseProps<HelixSandboxToolbar> & BaseEvents
+    HelixSandboxToolbarProps & BaseProps<HelixSandboxToolbar> & BaseEvents<HelixSandboxToolbar>
   >;
 
   /**
@@ -25706,7 +25706,7 @@ export type CustomElements = {
    * - `edges`: Where the sideways edge cues are drawn.
    */
   "helix-scroll-area": Partial<
-    HelixScrollAreaProps & BaseProps<HelixScrollArea> & BaseEvents
+    HelixScrollAreaProps & BaseProps<HelixScrollArea> & BaseEvents<HelixScrollArea>
   >;
 
   /**
@@ -25930,7 +25930,7 @@ export type CustomElements = {
    * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-select": Partial<
-    HelixSelectProps & BaseProps<HelixSelect> & BaseEvents
+    HelixSelectProps & BaseProps<HelixSelect> & BaseEvents<HelixSelect>
   >;
 
   /**
@@ -25959,7 +25959,7 @@ export type CustomElements = {
    * - `skeleton`: The placeholder surface.
    */
   "helix-skeleton": Partial<
-    HelixSkeletonProps & BaseProps<HelixSkeleton> & BaseEvents
+    HelixSkeletonProps & BaseProps<HelixSkeleton> & BaseEvents<HelixSkeleton>
   >;
 
   /**
@@ -26158,7 +26158,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-slider": Partial<
-    HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
+    HelixSliderProps & BaseProps<HelixSlider> & BaseEvents<HelixSlider>
   >;
 
   /**
@@ -26340,7 +26340,7 @@ export type CustomElements = {
    * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-sparkline": Partial<
-    HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents
+    HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents<HelixSparkline>
   >;
 
   /**
@@ -26397,7 +26397,7 @@ export type CustomElements = {
    * - `label`: The name beside it.
    */
   "helix-speed-dial-item": Partial<
-    HelixSpeedDialItemProps & BaseProps<HelixSpeedDialItem> & BaseEvents
+    HelixSpeedDialItemProps & BaseProps<HelixSpeedDialItem> & BaseEvents<HelixSpeedDialItem>
   >;
 
   /**
@@ -26484,7 +26484,7 @@ export type CustomElements = {
    * - `actions`: The region the actions are drawn in.
    */
   "helix-speed-dial": Partial<
-    HelixSpeedDialProps & BaseProps<HelixSpeedDial> & BaseEvents
+    HelixSpeedDialProps & BaseProps<HelixSpeedDial> & BaseEvents<HelixSpeedDial>
   >;
 
   /**
@@ -26666,7 +26666,7 @@ export type CustomElements = {
    * - `corner`: The handle where a nested splitter's divider crosses this one.
    */
   "helix-splitter": Partial<
-    HelixSplitterProps & BaseProps<HelixSplitter> & BaseEvents
+    HelixSplitterProps & BaseProps<HelixSplitter> & BaseEvents<HelixSplitter>
   >;
 
   /**
@@ -26695,7 +26695,7 @@ export type CustomElements = {
    * - `--stat-group-gap`: Space between figures. (default: `undefined`)
    */
   "helix-stat-group": Partial<
-    HelixStatGroupProps & BaseProps<HelixStatGroup> & BaseEvents
+    HelixStatGroupProps & BaseProps<HelixStatGroup> & BaseEvents<HelixStatGroup>
   >;
 
   /**
@@ -26744,7 +26744,7 @@ export type CustomElements = {
    *
    * - `--stat-value-size`: Size of the figure. (default: `undefined`)
    */
-  "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
+  "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents<HelixStat>>;
 
   /**
    * The numbering is a CSS counter rather than a property, so a step's position
@@ -26836,7 +26836,7 @@ export type CustomElements = {
    * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
    * - `--steps-current-color`: The mark on the current step. (default: `undefined`)
    */
-  "helix-steps": Partial<HelixStepsProps & BaseProps<HelixSteps> & BaseEvents>;
+  "helix-steps": Partial<HelixStepsProps & BaseProps<HelixSteps> & BaseEvents<HelixSteps>>;
 
   /**
    *
@@ -26885,7 +26885,7 @@ export type CustomElements = {
    * - `trail`: The half line running on to the next.
    * - `label-button`: The inner control.
    */
-  "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents>;
+  "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents<HelixStep>>;
 
   /**
    * A thumb traveling in a groove, which is the one place in the library color
@@ -27053,7 +27053,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-switch": Partial<
-    HelixSwitchProps & BaseProps<HelixSwitch> & BaseEvents
+    HelixSwitchProps & BaseProps<HelixSwitch> & BaseEvents<HelixSwitch>
   >;
 
   /**
@@ -27074,7 +27074,7 @@ export type CustomElements = {
    * - `(default)`: The cell's content.
    */
   "helix-table-cell": Partial<
-    HelixTableCellProps & BaseProps<HelixTableCell> & BaseEvents
+    HelixTableCellProps & BaseProps<HelixTableCell> & BaseEvents<HelixTableCell>
   >;
 
   /**
@@ -27175,7 +27175,7 @@ export type CustomElements = {
    * - `column`: The heading cell.
    */
   "helix-table-column": Partial<
-    HelixTableColumnProps & BaseProps<HelixTableColumn> & BaseEvents
+    HelixTableColumnProps & BaseProps<HelixTableColumn> & BaseEvents<HelixTableColumn>
   >;
 
   /**
@@ -27228,7 +27228,7 @@ export type CustomElements = {
    * - `empty`: Shown when there are no rows to show.
    * - `loading`: Shown while the rows are still on their way.
    */
-  "helix-table": Partial<HelixTableProps & BaseProps<HelixTable> & BaseEvents>;
+  "helix-table": Partial<HelixTableProps & BaseProps<HelixTable> & BaseEvents<HelixTable>>;
 
   /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
@@ -27242,7 +27242,7 @@ export type CustomElements = {
    * - `(default)`: The row's cells.
    */
   "helix-table-row": Partial<
-    HelixTableRowProps & BaseProps<HelixTableRow> & BaseEvents
+    HelixTableRowProps & BaseProps<HelixTableRow> & BaseEvents<HelixTableRow>
   >;
 
   /**
@@ -27283,7 +27283,7 @@ export type CustomElements = {
    * - `panel`: The panel container.
    */
   "helix-tabs-panel": Partial<
-    HelixTabsPanelProps & BaseProps<HelixTabsPanel> & BaseEvents
+    HelixTabsPanelProps & BaseProps<HelixTabsPanel> & BaseEvents<HelixTabsPanel>
   >;
 
   /**
@@ -27374,7 +27374,7 @@ export type CustomElements = {
    * - `panels`: The panel container.
    * - `indicator`: The mark that travels to the selected tab.
    */
-  "helix-tabs": Partial<HelixTabsProps & BaseProps<HelixTabs> & BaseEvents>;
+  "helix-tabs": Partial<HelixTabsProps & BaseProps<HelixTabs> & BaseEvents<HelixTabs>>;
 
   /**
    * Selection is marked with a rule under the active tab rather than a filled
@@ -27415,7 +27415,7 @@ export type CustomElements = {
    * - `tab`: The tab itself.
    */
   "helix-tabs-tab": Partial<
-    HelixTabsTabProps & BaseProps<HelixTabsTab> & BaseEvents
+    HelixTabsTabProps & BaseProps<HelixTabsTab> & BaseEvents<HelixTabsTab>
   >;
 
   /**
@@ -27496,7 +27496,7 @@ export type CustomElements = {
    * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `prefix`: The category before the label.
    */
-  "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
+  "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents<HelixTag>>;
 
   /**
    * Two properties, and they answer different questions. `as` is the element,
@@ -27561,7 +27561,7 @@ export type CustomElements = {
    *
    * - `text`: The rendered element.
    */
-  "helix-text": Partial<HelixTextProps & BaseProps<HelixText> & BaseEvents>;
+  "helix-text": Partial<HelixTextProps & BaseProps<HelixText> & BaseEvents<HelixText>>;
 
   /**
    * The same frame an `Input` wears, so a form of mixed fields reads as one set
@@ -27718,7 +27718,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-textarea": Partial<
-    HelixTextareaProps & BaseProps<HelixTextarea> & BaseEvents
+    HelixTextareaProps & BaseProps<HelixTextarea> & BaseEvents<HelixTextarea>
   >;
 
   /**
@@ -27992,7 +27992,7 @@ export type CustomElements = {
    * - `picker-list-loading`: Shown while the options are still on their way.
    */
   "helix-time-input": Partial<
-    HelixTimeInputProps & BaseProps<HelixTimeInput> & BaseEvents
+    HelixTimeInputProps & BaseProps<HelixTimeInput> & BaseEvents<HelixTimeInput>
   >;
 
   /**
@@ -28247,7 +28247,7 @@ export type CustomElements = {
    * - `list-loading`: Shown while the options are still on their way.
    */
   "helix-time-picker": Partial<
-    HelixTimePickerProps & BaseProps<HelixTimePicker> & BaseEvents
+    HelixTimePickerProps & BaseProps<HelixTimePicker> & BaseEvents<HelixTimePicker>
   >;
 
   /**
@@ -28293,7 +28293,7 @@ export type CustomElements = {
    * - `time`: When it happened.
    */
   "helix-timeline-item": Partial<
-    HelixTimelineItemProps & BaseProps<HelixTimelineItem> & BaseEvents
+    HelixTimelineItemProps & BaseProps<HelixTimelineItem> & BaseEvents<HelixTimelineItem>
   >;
 
   /**
@@ -28319,7 +28319,7 @@ export type CustomElements = {
    * - `--timeline-gap`: Space between one entry and the next. (default: `undefined`)
    */
   "helix-timeline": Partial<
-    HelixTimelineProps & BaseProps<HelixTimeline> & BaseEvents
+    HelixTimelineProps & BaseProps<HelixTimeline> & BaseEvents<HelixTimeline>
   >;
 
   /**
@@ -28413,7 +28413,7 @@ export type CustomElements = {
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
   "helix-toast-item": Partial<
-    HelixToastItemProps & BaseProps<HelixToastItem> & BaseEvents
+    HelixToastItemProps & BaseProps<HelixToastItem> & BaseEvents<HelixToastItem>
   >;
 
   /**
@@ -28471,7 +28471,7 @@ export type CustomElements = {
    *
    * - `region`: The stack the messages are in.
    */
-  "helix-toast": Partial<HelixToastProps & BaseProps<HelixToast> & BaseEvents>;
+  "helix-toast": Partial<HelixToastProps & BaseProps<HelixToast> & BaseEvents<HelixToast>>;
 
   /**
    * The indicator travels between items rather than the fill swapping. A fill
@@ -28651,7 +28651,7 @@ export type CustomElements = {
    * - `feedback`: What is wrong with it.
    */
   "helix-toggle-group": Partial<
-    HelixToggleGroupProps & BaseProps<HelixToggleGroup> & BaseEvents
+    HelixToggleGroupProps & BaseProps<HelixToggleGroup> & BaseEvents<HelixToggleGroup>
   >;
 
   /**
@@ -28704,7 +28704,7 @@ export type CustomElements = {
    * - `item`: The button or anchor.
    */
   "helix-toggle": Partial<
-    HelixToggleProps & BaseProps<HelixToggle> & BaseEvents
+    HelixToggleProps & BaseProps<HelixToggle> & BaseEvents<HelixToggle>
   >;
 
   /**
@@ -28737,7 +28737,7 @@ export type CustomElements = {
    * - `toolbar`: The toolbar container.
    */
   "helix-toolbar": Partial<
-    HelixToolbarProps & BaseProps<HelixToolbar> & BaseEvents
+    HelixToolbarProps & BaseProps<HelixToolbar> & BaseEvents<HelixToolbar>
   >;
 
   /**
@@ -28928,7 +28928,7 @@ export type CustomElements = {
    * - `tooltip`: The bubble.
    */
   "helix-tooltip": Partial<
-    HelixTooltipProps & BaseProps<HelixTooltip> & BaseEvents
+    HelixTooltipProps & BaseProps<HelixTooltip> & BaseEvents<HelixTooltip>
   >;
 
   /**
@@ -29001,7 +29001,7 @@ export type CustomElements = {
    *
    * - `spotlight`: The box over the current target, which paints the scrim.
    */
-  "helix-tour": Partial<HelixTourProps & BaseProps<HelixTour> & BaseEvents>;
+  "helix-tour": Partial<HelixTourProps & BaseProps<HelixTour> & BaseEvents<HelixTour>>;
 
   /**
    * The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
@@ -29068,7 +29068,7 @@ export type CustomElements = {
    * - `skip-button`: The inner control.
    */
   "helix-tour-stop": Partial<
-    HelixTourStopProps & BaseProps<HelixTourStop> & BaseEvents
+    HelixTourStopProps & BaseProps<HelixTourStop> & BaseEvents<HelixTourStop>
   >;
 
   /**
@@ -29208,7 +29208,7 @@ export type CustomElements = {
    * - `group`: The container for nested items.
    */
   "helix-tree-item": Partial<
-    HelixTreeItemProps & BaseProps<HelixTreeItem> & BaseEvents
+    HelixTreeItemProps & BaseProps<HelixTreeItem> & BaseEvents<HelixTreeItem>
   >;
 
   /**
@@ -29311,7 +29311,7 @@ export type CustomElements = {
    * - `empty`: Shown when there are no rows to show.
    * - `loading`: Shown while the rows are still on their way.
    */
-  "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
+  "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents<HelixTree>>;
 
   /**
    * The arrow takes the judgment color and the number does not, which is the
@@ -29377,7 +29377,7 @@ export type CustomElements = {
    * - `direction`: The direction as a word, for readers who are not looking.
    * - `icon`: The arrow.
    */
-  "helix-trend": Partial<HelixTrendProps & BaseProps<HelixTrend> & BaseEvents>;
+  "helix-trend": Partial<HelixTrendProps & BaseProps<HelixTrend> & BaseEvents<HelixTrend>>;
 
   /**
    * Presentation only: the row, its thumbnail column, and the mark on the one
@@ -29444,7 +29444,7 @@ export type CustomElements = {
    * - `label`: The name and whatever follows it.
    */
   "helix-video-playlist-item": Partial<
-    HelixVideoPlaylistItemProps & BaseProps<HelixVideoPlaylistItem> & BaseEvents
+    HelixVideoPlaylistItemProps & BaseProps<HelixVideoPlaylistItem> & BaseEvents<HelixVideoPlaylistItem>
   >;
 
   /**
@@ -29518,7 +29518,7 @@ export type CustomElements = {
    * - `menu-loading`: Shown while the items are still on their way.
    */
   "helix-video-playlist-menu": Partial<
-    HelixVideoPlaylistMenuProps & BaseProps<HelixVideoPlaylistMenu> & BaseEvents
+    HelixVideoPlaylistMenuProps & BaseProps<HelixVideoPlaylistMenu> & BaseEvents<HelixVideoPlaylistMenu>
   >;
 
   /**
@@ -29586,7 +29586,7 @@ export type CustomElements = {
    * - `items`: The list of entries.
    */
   "helix-video-playlist": Partial<
-    HelixVideoPlaylistProps & BaseProps<HelixVideoPlaylist> & BaseEvents
+    HelixVideoPlaylistProps & BaseProps<HelixVideoPlaylist> & BaseEvents<HelixVideoPlaylist>
   >;
 
   /**
@@ -29792,7 +29792,7 @@ export type CustomElements = {
    * - `overflow-empty`: Shown when there are no items to show.
    * - `overflow-loading`: Shown while the items are still on their way.
    */
-  "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
+  "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents<HelixVideo>>;
 
   /**
    * The styled tier adds the scrolling box's own treatment and nothing else. Rows
@@ -29824,7 +29824,7 @@ export type CustomElements = {
    * - `viewport`: The scrolling box.
    */
   "helix-virtual-list": Partial<
-    HelixVirtualListProps & BaseProps<HelixVirtualList> & BaseEvents
+    HelixVirtualListProps & BaseProps<HelixVirtualList> & BaseEvents<HelixVirtualList>
   >;
 };
 
@@ -29928,7 +29928,7 @@ export type CustomElementsSolidJs = {
     HelixAccordionItemProps &
       HelixAccordionItemSolidJsProps &
       BaseProps<HelixAccordionItem> &
-      BaseEvents
+      BaseEvents<HelixAccordionItem>
   >;
 
   /**
@@ -29984,7 +29984,7 @@ export type CustomElementsSolidJs = {
     HelixAccordionProps &
       HelixAccordionSolidJsProps &
       BaseProps<HelixAccordion> &
-      BaseEvents
+      BaseEvents<HelixAccordion>
   >;
 
   /**
@@ -30064,7 +30064,7 @@ export type CustomElementsSolidJs = {
     HelixAnnouncementProps &
       HelixAnnouncementSolidJsProps &
       BaseProps<HelixAnnouncement> &
-      BaseEvents
+      BaseEvents<HelixAnnouncement>
   >;
 
   /**
@@ -30187,7 +30187,7 @@ export type CustomElementsSolidJs = {
     HelixAppHeaderProps &
       HelixAppHeaderSolidJsProps &
       BaseProps<HelixAppHeader> &
-      BaseEvents
+      BaseEvents<HelixAppHeader>
   >;
 
   /**
@@ -30335,7 +30335,7 @@ export type CustomElementsSolidJs = {
    * - `canvas`: The surface the shader draws into.
    */
   "helix-aura": Partial<
-    HelixAuraProps & HelixAuraSolidJsProps & BaseProps<HelixAura> & BaseEvents
+    HelixAuraProps & HelixAuraSolidJsProps & BaseProps<HelixAura> & BaseEvents<HelixAura>
   >;
 
   /**
@@ -30391,7 +30391,7 @@ export type CustomElementsSolidJs = {
     HelixAvatarGroupProps &
       HelixAvatarGroupSolidJsProps &
       BaseProps<HelixAvatarGroup> &
-      BaseEvents
+      BaseEvents<HelixAvatarGroup>
   >;
 
   /**
@@ -30440,7 +30440,7 @@ export type CustomElementsSolidJs = {
     HelixAvatarProps &
       HelixAvatarSolidJsProps &
       BaseProps<HelixAvatar> &
-      BaseEvents
+      BaseEvents<HelixAvatar>
   >;
 
   /**
@@ -30487,7 +30487,7 @@ export type CustomElementsSolidJs = {
     HelixBadgeProps &
       HelixBadgeSolidJsProps &
       BaseProps<HelixBadge> &
-      BaseEvents
+      BaseEvents<HelixBadge>
   >;
 
   /**
@@ -30745,7 +30745,7 @@ export type CustomElementsSolidJs = {
     HelixBarChartProps &
       HelixBarChartSolidJsProps &
       BaseProps<HelixBarChart> &
-      BaseEvents
+      BaseEvents<HelixBarChart>
   >;
 
   /**
@@ -30784,7 +30784,7 @@ export type CustomElementsSolidJs = {
     HelixBlockquoteProps &
       HelixBlockquoteSolidJsProps &
       BaseProps<HelixBlockquote> &
-      BaseEvents
+      BaseEvents<HelixBlockquote>
   >;
 
   /**
@@ -30839,7 +30839,7 @@ export type CustomElementsSolidJs = {
     HelixBreadcrumbProps &
       HelixBreadcrumbSolidJsProps &
       BaseProps<HelixBreadcrumb> &
-      BaseEvents
+      BaseEvents<HelixBreadcrumb>
   >;
 
   /**
@@ -30868,7 +30868,7 @@ export type CustomElementsSolidJs = {
     HelixBreadcrumbsProps &
       HelixBreadcrumbsSolidJsProps &
       BaseProps<HelixBreadcrumbs> &
-      BaseEvents
+      BaseEvents<HelixBreadcrumbs>
   >;
 
   /**
@@ -30934,7 +30934,7 @@ export type CustomElementsSolidJs = {
     HelixButtonGroupProps &
       HelixButtonGroupSolidJsProps &
       BaseProps<HelixButtonGroup> &
-      BaseEvents
+      BaseEvents<HelixButtonGroup>
   >;
 
   /**
@@ -31148,7 +31148,7 @@ export type CustomElementsSolidJs = {
     HelixButtonProps &
       HelixButtonSolidJsProps &
       BaseProps<HelixButton> &
-      BaseEvents
+      BaseEvents<HelixButton>
   >;
 
   /**
@@ -31198,7 +31198,7 @@ export type CustomElementsSolidJs = {
     HelixCalloutProps &
       HelixCalloutSolidJsProps &
       BaseProps<HelixCallout> &
-      BaseEvents
+      BaseEvents<HelixCallout>
   >;
 
   /**
@@ -31311,7 +31311,7 @@ export type CustomElementsSolidJs = {
    * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
   "helix-card": Partial<
-    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents
+    HelixCardProps & HelixCardSolidJsProps & BaseProps<HelixCard> & BaseEvents<HelixCard>
   >;
 
   /**
@@ -31514,7 +31514,7 @@ export type CustomElementsSolidJs = {
     HelixCarouselProps &
       HelixCarouselSolidJsProps &
       BaseProps<HelixCarousel> &
-      BaseEvents
+      BaseEvents<HelixCarousel>
   >;
 
   /**
@@ -31584,7 +31584,7 @@ export type CustomElementsSolidJs = {
     HelixChatComposerProps &
       HelixChatComposerSolidJsProps &
       BaseProps<HelixChatComposer> &
-      BaseEvents
+      BaseEvents<HelixChatComposer>
   >;
 
   /**
@@ -31658,7 +31658,7 @@ export type CustomElementsSolidJs = {
     HelixChatMessageProps &
       HelixChatMessageSolidJsProps &
       BaseProps<HelixChatMessage> &
-      BaseEvents
+      BaseEvents<HelixChatMessage>
   >;
 
   /**
@@ -31759,7 +31759,7 @@ export type CustomElementsSolidJs = {
    * - `loading`: Shown while the history is still on its way.
    */
   "helix-chat": Partial<
-    HelixChatProps & HelixChatSolidJsProps & BaseProps<HelixChat> & BaseEvents
+    HelixChatProps & HelixChatSolidJsProps & BaseProps<HelixChat> & BaseEvents<HelixChat>
   >;
 
   /**
@@ -31880,7 +31880,7 @@ export type CustomElementsSolidJs = {
     HelixCheckboxGroupProps &
       HelixCheckboxGroupSolidJsProps &
       BaseProps<HelixCheckboxGroup> &
-      BaseEvents
+      BaseEvents<HelixCheckboxGroup>
   >;
 
   /**
@@ -32061,7 +32061,7 @@ export type CustomElementsSolidJs = {
     HelixCheckboxProps &
       HelixCheckboxSolidJsProps &
       BaseProps<HelixCheckbox> &
-      BaseEvents
+      BaseEvents<HelixCheckbox>
   >;
 
   /**
@@ -32114,7 +32114,7 @@ export type CustomElementsSolidJs = {
     HelixCodeBlockProps &
       HelixCodeBlockSolidJsProps &
       BaseProps<HelixCodeBlock> &
-      BaseEvents
+      BaseEvents<HelixCodeBlock>
   >;
 
   /**
@@ -32141,7 +32141,7 @@ export type CustomElementsSolidJs = {
    * - `code`: The `<code>` element.
    */
   "helix-code": Partial<
-    HelixCodeProps & HelixCodeSolidJsProps & BaseProps<HelixCode> & BaseEvents
+    HelixCodeProps & HelixCodeSolidJsProps & BaseProps<HelixCode> & BaseEvents<HelixCode>
   >;
 
   /**
@@ -32418,7 +32418,7 @@ export type CustomElementsSolidJs = {
     HelixColorInputProps &
       HelixColorInputSolidJsProps &
       BaseProps<HelixColorInput> &
-      BaseEvents
+      BaseEvents<HelixColorInput>
   >;
 
   /**
@@ -32649,7 +32649,7 @@ export type CustomElementsSolidJs = {
     HelixColorPickerProps &
       HelixColorPickerSolidJsProps &
       BaseProps<HelixColorPicker> &
-      BaseEvents
+      BaseEvents<HelixColorPicker>
   >;
 
   /**
@@ -32912,7 +32912,7 @@ export type CustomElementsSolidJs = {
     HelixComboboxProps &
       HelixComboboxSolidJsProps &
       BaseProps<HelixCombobox> &
-      BaseEvents
+      BaseEvents<HelixCombobox>
   >;
 
   /**
@@ -33018,7 +33018,7 @@ export type CustomElementsSolidJs = {
     HelixCommandProps &
       HelixCommandSolidJsProps &
       BaseProps<HelixCommand> &
-      BaseEvents
+      BaseEvents<HelixCommand>
   >;
 
   /**
@@ -33186,7 +33186,7 @@ export type CustomElementsSolidJs = {
     HelixCopyButtonProps &
       HelixCopyButtonSolidJsProps &
       BaseProps<HelixCopyButton> &
-      BaseEvents
+      BaseEvents<HelixCopyButton>
   >;
 
   /**
@@ -33340,7 +33340,7 @@ export type CustomElementsSolidJs = {
     HelixDataTableProps &
       HelixDataTableSolidJsProps &
       BaseProps<HelixDataTable> &
-      BaseEvents
+      BaseEvents<HelixDataTable>
   >;
 
   /**
@@ -33620,7 +33620,7 @@ export type CustomElementsSolidJs = {
     HelixDateInputProps &
       HelixDateInputSolidJsProps &
       BaseProps<HelixDateInput> &
-      BaseEvents
+      BaseEvents<HelixDateInput>
   >;
 
   /**
@@ -33808,7 +33808,7 @@ export type CustomElementsSolidJs = {
     HelixDatePickerProps &
       HelixDatePickerSolidJsProps &
       BaseProps<HelixDatePicker> &
-      BaseEvents
+      BaseEvents<HelixDatePicker>
   >;
 
   /**
@@ -33921,7 +33921,7 @@ export type CustomElementsSolidJs = {
     HelixDialogProps &
       HelixDialogSolidJsProps &
       BaseProps<HelixDialog> &
-      BaseEvents
+      BaseEvents<HelixDialog>
   >;
 
   /**
@@ -33976,7 +33976,7 @@ export type CustomElementsSolidJs = {
     HelixDividerProps &
       HelixDividerSolidJsProps &
       BaseProps<HelixDivider> &
-      BaseEvents
+      BaseEvents<HelixDivider>
   >;
 
   /**
@@ -34162,7 +34162,7 @@ export type CustomElementsSolidJs = {
     HelixDonutChartProps &
       HelixDonutChartSolidJsProps &
       BaseProps<HelixDonutChart> &
-      BaseEvents
+      BaseEvents<HelixDonutChart>
   >;
 
   /**
@@ -34292,7 +34292,7 @@ export type CustomElementsSolidJs = {
     HelixDrawerProps &
       HelixDrawerSolidJsProps &
       BaseProps<HelixDrawer> &
-      BaseEvents
+      BaseEvents<HelixDrawer>
   >;
 
   /**
@@ -34359,7 +34359,7 @@ export type CustomElementsSolidJs = {
     HelixDrilldownItemProps &
       HelixDrilldownItemSolidJsProps &
       BaseProps<HelixDrilldownItem> &
-      BaseEvents
+      BaseEvents<HelixDrilldownItem>
   >;
 
   /**
@@ -34433,7 +34433,7 @@ export type CustomElementsSolidJs = {
     HelixDrilldownProps &
       HelixDrilldownSolidJsProps &
       BaseProps<HelixDrilldown> &
-      BaseEvents
+      BaseEvents<HelixDrilldown>
   >;
 
   /**
@@ -34470,7 +34470,7 @@ export type CustomElementsSolidJs = {
     HelixEmptyProps &
       HelixEmptySolidJsProps &
       BaseProps<HelixEmpty> &
-      BaseEvents
+      BaseEvents<HelixEmpty>
   >;
 
   /**
@@ -34644,7 +34644,7 @@ export type CustomElementsSolidJs = {
     HelixFileInputProps &
       HelixFileInputSolidJsProps &
       BaseProps<HelixFileInput> &
-      BaseEvents
+      BaseEvents<HelixFileInput>
   >;
 
   /**
@@ -34680,7 +34680,7 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The items to lay out.
    */
   "helix-flex": Partial<
-    HelixFlexProps & HelixFlexSolidJsProps & BaseProps<HelixFlex> & BaseEvents
+    HelixFlexProps & HelixFlexSolidJsProps & BaseProps<HelixFlex> & BaseEvents<HelixFlex>
   >;
 
   /**
@@ -34716,7 +34716,7 @@ export type CustomElementsSolidJs = {
    * - `--grid-columns`: An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. (default: `undefined`)
    */
   "helix-grid": Partial<
-    HelixGridProps & HelixGridSolidJsProps & BaseProps<HelixGrid> & BaseEvents
+    HelixGridProps & HelixGridSolidJsProps & BaseProps<HelixGrid> & BaseEvents<HelixGrid>
   >;
 
   /**
@@ -34849,7 +34849,7 @@ export type CustomElementsSolidJs = {
     HelixHeatmapProps &
       HelixHeatmapSolidJsProps &
       BaseProps<HelixHeatmap> &
-      BaseEvents
+      BaseEvents<HelixHeatmap>
   >;
 
   /**
@@ -35034,7 +35034,7 @@ export type CustomElementsSolidJs = {
     HelixIconButtonProps &
       HelixIconButtonSolidJsProps &
       BaseProps<HelixIconButton> &
-      BaseEvents
+      BaseEvents<HelixIconButton>
   >;
 
   /**
@@ -35063,7 +35063,7 @@ export type CustomElementsSolidJs = {
    * - `svg`: The rendered SVG.
    */
   "helix-icon": Partial<
-    HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents
+    HelixIconProps & HelixIconSolidJsProps & BaseProps<HelixIcon> & BaseEvents<HelixIcon>
   >;
 
   /**
@@ -35152,7 +35152,7 @@ export type CustomElementsSolidJs = {
     HelixImageProps &
       HelixImageSolidJsProps &
       BaseProps<HelixImage> &
-      BaseEvents
+      BaseEvents<HelixImage>
   >;
 
   /**
@@ -35363,7 +35363,7 @@ export type CustomElementsSolidJs = {
     HelixInputProps &
       HelixInputSolidJsProps &
       BaseProps<HelixInput> &
-      BaseEvents
+      BaseEvents<HelixInput>
   >;
 
   /**
@@ -35418,7 +35418,7 @@ export type CustomElementsSolidJs = {
    * - `kbd`: The key.
    */
   "helix-kbd": Partial<
-    HelixKbdProps & HelixKbdSolidJsProps & BaseProps<HelixKbd> & BaseEvents
+    HelixKbdProps & HelixKbdSolidJsProps & BaseProps<HelixKbd> & BaseEvents<HelixKbd>
   >;
 
   /**
@@ -35529,7 +35529,7 @@ export type CustomElementsSolidJs = {
     HelixLegendProps &
       HelixLegendSolidJsProps &
       BaseProps<HelixLegend> &
-      BaseEvents
+      BaseEvents<HelixLegend>
   >;
 
   /**
@@ -35744,7 +35744,7 @@ export type CustomElementsSolidJs = {
     HelixLineChartProps &
       HelixLineChartSolidJsProps &
       BaseProps<HelixLineChart> &
-      BaseEvents
+      BaseEvents<HelixLineChart>
   >;
 
   /**
@@ -35794,7 +35794,7 @@ export type CustomElementsSolidJs = {
     HelixListItemProps &
       HelixListItemSolidJsProps &
       BaseProps<HelixListItem> &
-      BaseEvents
+      BaseEvents<HelixListItem>
   >;
 
   /**
@@ -35863,7 +35863,7 @@ export type CustomElementsSolidJs = {
    * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
   "helix-list": Partial<
-    HelixListProps & HelixListSolidJsProps & BaseProps<HelixList> & BaseEvents
+    HelixListProps & HelixListSolidJsProps & BaseProps<HelixList> & BaseEvents<HelixList>
   >;
 
   /**
@@ -36093,7 +36093,7 @@ export type CustomElementsSolidJs = {
     HelixListboxProps &
       HelixListboxSolidJsProps &
       BaseProps<HelixListbox> &
-      BaseEvents
+      BaseEvents<HelixListbox>
   >;
 
   /**
@@ -36149,7 +36149,7 @@ export type CustomElementsSolidJs = {
     HelixLoaderProps &
       HelixLoaderSolidJsProps &
       BaseProps<HelixLoader> &
-      BaseEvents
+      BaseEvents<HelixLoader>
   >;
 
   /**
@@ -36273,7 +36273,7 @@ export type CustomElementsSolidJs = {
     HelixMegamenuProps &
       HelixMegamenuSolidJsProps &
       BaseProps<HelixMegamenu> &
-      BaseEvents
+      BaseEvents<HelixMegamenu>
   >;
 
   /**
@@ -36403,7 +36403,7 @@ export type CustomElementsSolidJs = {
     HelixMenuItemProps &
       HelixMenuItemSolidJsProps &
       BaseProps<HelixMenuItem> &
-      BaseEvents
+      BaseEvents<HelixMenuItem>
   >;
 
   /**
@@ -36509,7 +36509,7 @@ export type CustomElementsSolidJs = {
    * - `loading`: Shown while the items are still on their way.
    */
   "helix-menu": Partial<
-    HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents
+    HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents<HelixMenu>
   >;
 
   /**
@@ -36654,7 +36654,7 @@ export type CustomElementsSolidJs = {
     HelixMeterProps &
       HelixMeterSolidJsProps &
       BaseProps<HelixMeter> &
-      BaseEvents
+      BaseEvents<HelixMeter>
   >;
 
   /**
@@ -36693,7 +36693,7 @@ export type CustomElementsSolidJs = {
     HelixNavigationProps &
       HelixNavigationSolidJsProps &
       BaseProps<HelixNavigation> &
-      BaseEvents
+      BaseEvents<HelixNavigation>
   >;
 
   /**
@@ -36778,7 +36778,7 @@ export type CustomElementsSolidJs = {
     HelixNotificationsItemProps &
       HelixNotificationsItemSolidJsProps &
       BaseProps<HelixNotificationsItem> &
-      BaseEvents
+      BaseEvents<HelixNotificationsItem>
   >;
 
   /**
@@ -36869,7 +36869,7 @@ export type CustomElementsSolidJs = {
     HelixNotificationsProps &
       HelixNotificationsSolidJsProps &
       BaseProps<HelixNotifications> &
-      BaseEvents
+      BaseEvents<HelixNotifications>
   >;
 
   /**
@@ -37061,7 +37061,7 @@ export type CustomElementsSolidJs = {
     HelixNumberInputProps &
       HelixNumberInputSolidJsProps &
       BaseProps<HelixNumberInput> &
-      BaseEvents
+      BaseEvents<HelixNumberInput>
   >;
 
   /**
@@ -37093,7 +37093,7 @@ export type CustomElementsSolidJs = {
     HelixOptionGroupProps &
       HelixOptionGroupSolidJsProps &
       BaseProps<HelixOptionGroup> &
-      BaseEvents
+      BaseEvents<HelixOptionGroup>
   >;
 
   /**
@@ -37219,7 +37219,7 @@ export type CustomElementsSolidJs = {
     HelixOptionProps &
       HelixOptionSolidJsProps &
       BaseProps<HelixOption> &
-      BaseEvents
+      BaseEvents<HelixOption>
   >;
 
   /**
@@ -37299,7 +37299,7 @@ export type CustomElementsSolidJs = {
     HelixOutlineProps &
       HelixOutlineSolidJsProps &
       BaseProps<HelixOutline> &
-      BaseEvents
+      BaseEvents<HelixOutline>
   >;
 
   /**
@@ -37455,7 +37455,7 @@ export type CustomElementsSolidJs = {
     HelixPaginationProps &
       HelixPaginationSolidJsProps &
       BaseProps<HelixPagination> &
-      BaseEvents
+      BaseEvents<HelixPagination>
   >;
 
   /**
@@ -37503,7 +37503,7 @@ export type CustomElementsSolidJs = {
     HelixPaginationSizeProps &
       HelixPaginationSizeSolidJsProps &
       BaseProps<HelixPaginationSize> &
-      BaseEvents
+      BaseEvents<HelixPaginationSize>
   >;
 
   /**
@@ -37537,7 +37537,7 @@ export type CustomElementsSolidJs = {
     HelixPaginationSummaryProps &
       HelixPaginationSummarySolidJsProps &
       BaseProps<HelixPaginationSummary> &
-      BaseEvents
+      BaseEvents<HelixPaginationSummary>
   >;
 
   /**
@@ -37734,7 +37734,7 @@ export type CustomElementsSolidJs = {
     HelixPinInputProps &
       HelixPinInputSolidJsProps &
       BaseProps<HelixPinInput> &
-      BaseEvents
+      BaseEvents<HelixPinInput>
   >;
 
   /**
@@ -37843,7 +37843,7 @@ export type CustomElementsSolidJs = {
     HelixPopoverProps &
       HelixPopoverSolidJsProps &
       BaseProps<HelixPopover> &
-      BaseEvents
+      BaseEvents<HelixPopover>
   >;
 
   /**
@@ -37945,7 +37945,7 @@ export type CustomElementsSolidJs = {
     HelixProgressProps &
       HelixProgressSolidJsProps &
       BaseProps<HelixProgress> &
-      BaseEvents
+      BaseEvents<HelixProgress>
   >;
 
   /**
@@ -38016,7 +38016,7 @@ export type CustomElementsSolidJs = {
     HelixQrCodeProps &
       HelixQrCodeSolidJsProps &
       BaseProps<HelixQrCode> &
-      BaseEvents
+      BaseEvents<HelixQrCode>
   >;
 
   /**
@@ -38051,7 +38051,7 @@ export type CustomElementsSolidJs = {
     HelixQuoteProps &
       HelixQuoteSolidJsProps &
       BaseProps<HelixQuote> &
-      BaseEvents
+      BaseEvents<HelixQuote>
   >;
 
   /**
@@ -38212,7 +38212,7 @@ export type CustomElementsSolidJs = {
     HelixRadioGroupProps &
       HelixRadioGroupSolidJsProps &
       BaseProps<HelixRadioGroup> &
-      BaseEvents
+      BaseEvents<HelixRadioGroup>
   >;
 
   /**
@@ -38308,7 +38308,7 @@ export type CustomElementsSolidJs = {
     HelixRadioProps &
       HelixRadioSolidJsProps &
       BaseProps<HelixRadio> &
-      BaseEvents
+      BaseEvents<HelixRadio>
   >;
 
   /**
@@ -38512,7 +38512,7 @@ export type CustomElementsSolidJs = {
     HelixRatingProps &
       HelixRatingSolidJsProps &
       BaseProps<HelixRating> &
-      BaseEvents
+      BaseEvents<HelixRating>
   >;
 
   /**
@@ -38617,7 +38617,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxPreviewProps &
       HelixSandboxPreviewSolidJsProps &
       BaseProps<HelixSandboxPreview> &
-      BaseEvents
+      BaseEvents<HelixSandboxPreview>
   >;
 
   /**
@@ -38744,7 +38744,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxProps &
       HelixSandboxSolidJsProps &
       BaseProps<HelixSandbox> &
-      BaseEvents
+      BaseEvents<HelixSandbox>
   >;
 
   /**
@@ -38795,7 +38795,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxSourceProps &
       HelixSandboxSourceSolidJsProps &
       BaseProps<HelixSandboxSource> &
-      BaseEvents
+      BaseEvents<HelixSandboxSource>
   >;
 
   /**
@@ -38844,7 +38844,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxStatusBarProps &
       HelixSandboxStatusBarSolidJsProps &
       BaseProps<HelixSandboxStatusBar> &
-      BaseEvents
+      BaseEvents<HelixSandboxStatusBar>
   >;
 
   /**
@@ -38900,7 +38900,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxTerminalProps &
       HelixSandboxTerminalSolidJsProps &
       BaseProps<HelixSandboxTerminal> &
-      BaseEvents
+      BaseEvents<HelixSandboxTerminal>
   >;
 
   /**
@@ -38933,7 +38933,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxToolbarProps &
       HelixSandboxToolbarSolidJsProps &
       BaseProps<HelixSandboxToolbar> &
-      BaseEvents
+      BaseEvents<HelixSandboxToolbar>
   >;
 
   /**
@@ -38993,7 +38993,7 @@ export type CustomElementsSolidJs = {
     HelixScrollAreaProps &
       HelixScrollAreaSolidJsProps &
       BaseProps<HelixScrollArea> &
-      BaseEvents
+      BaseEvents<HelixScrollArea>
   >;
 
   /**
@@ -39220,7 +39220,7 @@ export type CustomElementsSolidJs = {
     HelixSelectProps &
       HelixSelectSolidJsProps &
       BaseProps<HelixSelect> &
-      BaseEvents
+      BaseEvents<HelixSelect>
   >;
 
   /**
@@ -39252,7 +39252,7 @@ export type CustomElementsSolidJs = {
     HelixSkeletonProps &
       HelixSkeletonSolidJsProps &
       BaseProps<HelixSkeleton> &
-      BaseEvents
+      BaseEvents<HelixSkeleton>
   >;
 
   /**
@@ -39454,7 +39454,7 @@ export type CustomElementsSolidJs = {
     HelixSliderProps &
       HelixSliderSolidJsProps &
       BaseProps<HelixSlider> &
-      BaseEvents
+      BaseEvents<HelixSlider>
   >;
 
   /**
@@ -39639,7 +39639,7 @@ export type CustomElementsSolidJs = {
     HelixSparklineProps &
       HelixSparklineSolidJsProps &
       BaseProps<HelixSparkline> &
-      BaseEvents
+      BaseEvents<HelixSparkline>
   >;
 
   /**
@@ -39699,7 +39699,7 @@ export type CustomElementsSolidJs = {
     HelixSpeedDialItemProps &
       HelixSpeedDialItemSolidJsProps &
       BaseProps<HelixSpeedDialItem> &
-      BaseEvents
+      BaseEvents<HelixSpeedDialItem>
   >;
 
   /**
@@ -39789,7 +39789,7 @@ export type CustomElementsSolidJs = {
     HelixSpeedDialProps &
       HelixSpeedDialSolidJsProps &
       BaseProps<HelixSpeedDial> &
-      BaseEvents
+      BaseEvents<HelixSpeedDial>
   >;
 
   /**
@@ -39974,7 +39974,7 @@ export type CustomElementsSolidJs = {
     HelixSplitterProps &
       HelixSplitterSolidJsProps &
       BaseProps<HelixSplitter> &
-      BaseEvents
+      BaseEvents<HelixSplitter>
   >;
 
   /**
@@ -40006,7 +40006,7 @@ export type CustomElementsSolidJs = {
     HelixStatGroupProps &
       HelixStatGroupSolidJsProps &
       BaseProps<HelixStatGroup> &
-      BaseEvents
+      BaseEvents<HelixStatGroup>
   >;
 
   /**
@@ -40056,7 +40056,7 @@ export type CustomElementsSolidJs = {
    * - `--stat-value-size`: Size of the figure. (default: `undefined`)
    */
   "helix-stat": Partial<
-    HelixStatProps & HelixStatSolidJsProps & BaseProps<HelixStat> & BaseEvents
+    HelixStatProps & HelixStatSolidJsProps & BaseProps<HelixStat> & BaseEvents<HelixStat>
   >;
 
   /**
@@ -40153,7 +40153,7 @@ export type CustomElementsSolidJs = {
     HelixStepsProps &
       HelixStepsSolidJsProps &
       BaseProps<HelixSteps> &
-      BaseEvents
+      BaseEvents<HelixSteps>
   >;
 
   /**
@@ -40204,7 +40204,7 @@ export type CustomElementsSolidJs = {
    * - `label-button`: The inner control.
    */
   "helix-step": Partial<
-    HelixStepProps & HelixStepSolidJsProps & BaseProps<HelixStep> & BaseEvents
+    HelixStepProps & HelixStepSolidJsProps & BaseProps<HelixStep> & BaseEvents<HelixStep>
   >;
 
   /**
@@ -40376,7 +40376,7 @@ export type CustomElementsSolidJs = {
     HelixSwitchProps &
       HelixSwitchSolidJsProps &
       BaseProps<HelixSwitch> &
-      BaseEvents
+      BaseEvents<HelixSwitch>
   >;
 
   /**
@@ -40400,7 +40400,7 @@ export type CustomElementsSolidJs = {
     HelixTableCellProps &
       HelixTableCellSolidJsProps &
       BaseProps<HelixTableCell> &
-      BaseEvents
+      BaseEvents<HelixTableCell>
   >;
 
   /**
@@ -40504,7 +40504,7 @@ export type CustomElementsSolidJs = {
     HelixTableColumnProps &
       HelixTableColumnSolidJsProps &
       BaseProps<HelixTableColumn> &
-      BaseEvents
+      BaseEvents<HelixTableColumn>
   >;
 
   /**
@@ -40561,7 +40561,7 @@ export type CustomElementsSolidJs = {
     HelixTableProps &
       HelixTableSolidJsProps &
       BaseProps<HelixTable> &
-      BaseEvents
+      BaseEvents<HelixTable>
   >;
 
   /**
@@ -40579,7 +40579,7 @@ export type CustomElementsSolidJs = {
     HelixTableRowProps &
       HelixTableRowSolidJsProps &
       BaseProps<HelixTableRow> &
-      BaseEvents
+      BaseEvents<HelixTableRow>
   >;
 
   /**
@@ -40623,7 +40623,7 @@ export type CustomElementsSolidJs = {
     HelixTabsPanelProps &
       HelixTabsPanelSolidJsProps &
       BaseProps<HelixTabsPanel> &
-      BaseEvents
+      BaseEvents<HelixTabsPanel>
   >;
 
   /**
@@ -40715,7 +40715,7 @@ export type CustomElementsSolidJs = {
    * - `indicator`: The mark that travels to the selected tab.
    */
   "helix-tabs": Partial<
-    HelixTabsProps & HelixTabsSolidJsProps & BaseProps<HelixTabs> & BaseEvents
+    HelixTabsProps & HelixTabsSolidJsProps & BaseProps<HelixTabs> & BaseEvents<HelixTabs>
   >;
 
   /**
@@ -40760,7 +40760,7 @@ export type CustomElementsSolidJs = {
     HelixTabsTabProps &
       HelixTabsTabSolidJsProps &
       BaseProps<HelixTabsTab> &
-      BaseEvents
+      BaseEvents<HelixTabsTab>
   >;
 
   /**
@@ -40842,7 +40842,7 @@ export type CustomElementsSolidJs = {
    * - `prefix`: The category before the label.
    */
   "helix-tag": Partial<
-    HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents
+    HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents<HelixTag>
   >;
 
   /**
@@ -40909,7 +40909,7 @@ export type CustomElementsSolidJs = {
    * - `text`: The rendered element.
    */
   "helix-text": Partial<
-    HelixTextProps & HelixTextSolidJsProps & BaseProps<HelixText> & BaseEvents
+    HelixTextProps & HelixTextSolidJsProps & BaseProps<HelixText> & BaseEvents<HelixText>
   >;
 
   /**
@@ -41070,7 +41070,7 @@ export type CustomElementsSolidJs = {
     HelixTextareaProps &
       HelixTextareaSolidJsProps &
       BaseProps<HelixTextarea> &
-      BaseEvents
+      BaseEvents<HelixTextarea>
   >;
 
   /**
@@ -41347,7 +41347,7 @@ export type CustomElementsSolidJs = {
     HelixTimeInputProps &
       HelixTimeInputSolidJsProps &
       BaseProps<HelixTimeInput> &
-      BaseEvents
+      BaseEvents<HelixTimeInput>
   >;
 
   /**
@@ -41605,7 +41605,7 @@ export type CustomElementsSolidJs = {
     HelixTimePickerProps &
       HelixTimePickerSolidJsProps &
       BaseProps<HelixTimePicker> &
-      BaseEvents
+      BaseEvents<HelixTimePicker>
   >;
 
   /**
@@ -41654,7 +41654,7 @@ export type CustomElementsSolidJs = {
     HelixTimelineItemProps &
       HelixTimelineItemSolidJsProps &
       BaseProps<HelixTimelineItem> &
-      BaseEvents
+      BaseEvents<HelixTimelineItem>
   >;
 
   /**
@@ -41683,7 +41683,7 @@ export type CustomElementsSolidJs = {
     HelixTimelineProps &
       HelixTimelineSolidJsProps &
       BaseProps<HelixTimeline> &
-      BaseEvents
+      BaseEvents<HelixTimeline>
   >;
 
   /**
@@ -41780,7 +41780,7 @@ export type CustomElementsSolidJs = {
     HelixToastItemProps &
       HelixToastItemSolidJsProps &
       BaseProps<HelixToastItem> &
-      BaseEvents
+      BaseEvents<HelixToastItem>
   >;
 
   /**
@@ -41842,7 +41842,7 @@ export type CustomElementsSolidJs = {
     HelixToastProps &
       HelixToastSolidJsProps &
       BaseProps<HelixToast> &
-      BaseEvents
+      BaseEvents<HelixToast>
   >;
 
   /**
@@ -42026,7 +42026,7 @@ export type CustomElementsSolidJs = {
     HelixToggleGroupProps &
       HelixToggleGroupSolidJsProps &
       BaseProps<HelixToggleGroup> &
-      BaseEvents
+      BaseEvents<HelixToggleGroup>
   >;
 
   /**
@@ -42082,7 +42082,7 @@ export type CustomElementsSolidJs = {
     HelixToggleProps &
       HelixToggleSolidJsProps &
       BaseProps<HelixToggle> &
-      BaseEvents
+      BaseEvents<HelixToggle>
   >;
 
   /**
@@ -42118,7 +42118,7 @@ export type CustomElementsSolidJs = {
     HelixToolbarProps &
       HelixToolbarSolidJsProps &
       BaseProps<HelixToolbar> &
-      BaseEvents
+      BaseEvents<HelixToolbar>
   >;
 
   /**
@@ -42312,7 +42312,7 @@ export type CustomElementsSolidJs = {
     HelixTooltipProps &
       HelixTooltipSolidJsProps &
       BaseProps<HelixTooltip> &
-      BaseEvents
+      BaseEvents<HelixTooltip>
   >;
 
   /**
@@ -42386,7 +42386,7 @@ export type CustomElementsSolidJs = {
    * - `spotlight`: The box over the current target, which paints the scrim.
    */
   "helix-tour": Partial<
-    HelixTourProps & HelixTourSolidJsProps & BaseProps<HelixTour> & BaseEvents
+    HelixTourProps & HelixTourSolidJsProps & BaseProps<HelixTour> & BaseEvents<HelixTour>
   >;
 
   /**
@@ -42457,7 +42457,7 @@ export type CustomElementsSolidJs = {
     HelixTourStopProps &
       HelixTourStopSolidJsProps &
       BaseProps<HelixTourStop> &
-      BaseEvents
+      BaseEvents<HelixTourStop>
   >;
 
   /**
@@ -42600,7 +42600,7 @@ export type CustomElementsSolidJs = {
     HelixTreeItemProps &
       HelixTreeItemSolidJsProps &
       BaseProps<HelixTreeItem> &
-      BaseEvents
+      BaseEvents<HelixTreeItem>
   >;
 
   /**
@@ -42704,7 +42704,7 @@ export type CustomElementsSolidJs = {
    * - `loading`: Shown while the rows are still on their way.
    */
   "helix-tree": Partial<
-    HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents
+    HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents<HelixTree>
   >;
 
   /**
@@ -42775,7 +42775,7 @@ export type CustomElementsSolidJs = {
     HelixTrendProps &
       HelixTrendSolidJsProps &
       BaseProps<HelixTrend> &
-      BaseEvents
+      BaseEvents<HelixTrend>
   >;
 
   /**
@@ -42846,7 +42846,7 @@ export type CustomElementsSolidJs = {
     HelixVideoPlaylistItemProps &
       HelixVideoPlaylistItemSolidJsProps &
       BaseProps<HelixVideoPlaylistItem> &
-      BaseEvents
+      BaseEvents<HelixVideoPlaylistItem>
   >;
 
   /**
@@ -42923,7 +42923,7 @@ export type CustomElementsSolidJs = {
     HelixVideoPlaylistMenuProps &
       HelixVideoPlaylistMenuSolidJsProps &
       BaseProps<HelixVideoPlaylistMenu> &
-      BaseEvents
+      BaseEvents<HelixVideoPlaylistMenu>
   >;
 
   /**
@@ -42994,7 +42994,7 @@ export type CustomElementsSolidJs = {
     HelixVideoPlaylistProps &
       HelixVideoPlaylistSolidJsProps &
       BaseProps<HelixVideoPlaylist> &
-      BaseEvents
+      BaseEvents<HelixVideoPlaylist>
   >;
 
   /**
@@ -43204,7 +43204,7 @@ export type CustomElementsSolidJs = {
     HelixVideoProps &
       HelixVideoSolidJsProps &
       BaseProps<HelixVideo> &
-      BaseEvents
+      BaseEvents<HelixVideo>
   >;
 
   /**
@@ -43240,7 +43240,7 @@ export type CustomElementsSolidJs = {
     HelixVirtualListProps &
       HelixVirtualListSolidJsProps &
       BaseProps<HelixVirtualList> &
-      BaseEvents
+      BaseEvents<HelixVirtualList>
   >;
 };
 
