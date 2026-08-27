@@ -6,7 +6,7 @@
 >
   <helix-pin-input
     hint="Sent to your phone"
-    id="it"
+    id="code"
     label="Verification code"
   ></helix-pin-input>
 
@@ -24,9 +24,12 @@
 </helix-flex>
 
 <script type="module">
-  const it = document.getElementById('it')
+  const code = document.getElementById('code')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
 
   const say = (name, carried) => {
     if (empty) {
@@ -40,21 +43,21 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
 
-  it.addEventListener('helix-before-change', (event) => {
+  code.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   })
-  it.addEventListener('input', (event) => {
+  code.addEventListener('input', (event) => {
     say('input', `"${event.currentTarget.value}" so far`)
   })
-  it.addEventListener('helix-complete', (event) => {
+  code.addEventListener('helix-complete', (event) => {
     say('helix-complete', `"${event.detail.value}", every box is filled`)
   })
-  it.addEventListener('change', (event) => {
+  code.addEventListener('change', (event) => {
     say('change', `"${event.currentTarget.value}", a filled code is the commit`)
   })
 </script>

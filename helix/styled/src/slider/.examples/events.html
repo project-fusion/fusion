@@ -5,7 +5,7 @@
 >
   <helix-slider
     default-value="40"
-    id="it"
+    id="quality"
     label="Quality"
     show-value
   ></helix-slider>
@@ -24,9 +24,12 @@
 </helix-flex>
 
 <script type="module">
-  const it = document.getElementById('it')
+  const quality = document.getElementById('quality')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
 
   const say = (name, carried) => {
     if (empty) {
@@ -40,18 +43,18 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
 
-  it.addEventListener('helix-before-change', (event) => {
+  quality.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing ${event.detail.value}, refusable`)
   })
-  it.addEventListener('input', (event) => {
+  quality.addEventListener('input', (event) => {
     say('input', `${event.currentTarget.value} while the thumb moves`)
   })
-  it.addEventListener('change', (event) => {
+  quality.addEventListener('change', (event) => {
     say('change', `${event.currentTarget.value}, once it is let go`)
   })
 </script>

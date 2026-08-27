@@ -39,6 +39,9 @@
   const unsaved = document.getElementById('unsaved')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
   let refused = false
 
   const say = (name, carried) => {
@@ -53,7 +56,7 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }

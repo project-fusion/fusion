@@ -4,7 +4,7 @@
   gap="md"
 >
   <helix-textarea
-    id="it"
+    id="notes"
     label="Notes"
     placeholder="Type, then click away"
   ></helix-textarea>
@@ -23,9 +23,12 @@
 </helix-flex>
 
 <script type="module">
-  const it = document.getElementById('it')
+  const notes = document.getElementById('notes')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
 
   const say = (name, carried) => {
     if (empty) {
@@ -39,18 +42,18 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
 
-  it.addEventListener('helix-before-change', (event) => {
+  notes.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing ${event.detail.value.length} characters, refusable`)
   })
-  it.addEventListener('input', (event) => {
+  notes.addEventListener('input', (event) => {
     say('input', `${event.currentTarget.value.length} characters so far`)
   })
-  it.addEventListener('change', (event) => {
+  notes.addEventListener('change', (event) => {
     say('change', `${event.currentTarget.value.length} characters, the reader is done`)
   })
 </script>

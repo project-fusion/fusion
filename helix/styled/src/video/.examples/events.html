@@ -4,6 +4,7 @@
   gap="md"
 >
   <helix-video
+    extra-controls="previous next"
     id="clip"
     label="A short clip"
     poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
@@ -27,6 +28,9 @@
   const log = document.getElementById('log')
   let empty = true
 
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
   const say = (name, carried) => {
     if (empty) {
       log.replaceChildren()
@@ -39,7 +43,7 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
@@ -49,4 +53,10 @@
   clip.addEventListener('play', () => say('play', at()))
   clip.addEventListener('pause', () => say('pause', at()))
   clip.addEventListener('ended', () => say('ended', at()))
+  clip.addEventListener('helix-previous', () => {
+    say('helix-previous', 'the reader asked for the one before')
+  })
+  clip.addEventListener('helix-next', () => {
+    say('helix-next', 'the reader asked for the one after')
+  })
 </script>

@@ -26,20 +26,22 @@
   const log = document.getElementById('log')
   let empty = true
 
-  const say = (name, detail) => {
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
+
+  const say = (name, carried) => {
     if (empty) {
       log.replaceChildren()
       empty = false
     }
     const row = document.createElement('helix-list-item')
     row.textContent = name
-    const carried = document.createElement('span')
-    carried.slot = 'supporting'
-    carried.textContent = detail
-    row.append(carried)
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
     log.append(row)
-    // The last few, so a long sentence does not push the field off the preview.
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }

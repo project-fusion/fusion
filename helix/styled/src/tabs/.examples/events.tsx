@@ -2,13 +2,19 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
+// How many rows the log holds, which is a choice about this preview's height.
+const KEEP = 6
+
 const RESTING: Arrival[] = [{ carried: 'Move between the tabs', name: 'Nothing yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
   const say = (name: string, carried: string) => {
-    setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+    setHeard((before) => {
+      const kept = before === RESTING ? [] : before
+      return [...kept, { carried, name }].slice(-KEEP)
+    })
   }
 
   const moving = (event: CustomEvent<{ value: string }>) => {
@@ -20,9 +26,18 @@ export function Example() {
     say('helix-before-activate', `moving to "${event.detail.value}"`)
   }
 
+  const chosen = (event: CustomEvent<{ value: string }>) => {
+    say('helix-select', `"${event.detail.value}" was chosen, which a container can catch`)
+  }
+
   return (
     <helix-flex direction="column" gap="md">
-      <helix-tabs default-active="usage" label="Account" onhelix-before-activate={moving}>
+      <helix-tabs
+        default-active="usage"
+        label="Account"
+        onhelix-before-activate={moving}
+        onhelix-select={chosen}
+      >
         <helix-tabs-tab value="usage">Usage</helix-tabs-tab>
         <helix-tabs-tab value="billing">Billing</helix-tabs-tab>
         <helix-tabs-tab value="danger">Danger</helix-tabs-tab>

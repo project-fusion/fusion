@@ -1,4 +1,4 @@
-<!-- @summary One choice, one announcement, whatever this control renders inside itself. -->
+<!-- @summary A panel opening and a value moving, which are two things and say so. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -20,7 +20,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Choose a plan</span>
+      <span slot="supporting">Open it and choose a plan</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -29,6 +29,9 @@
   const choice = document.getElementById('choice')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 8
 
   const say = (name, carried) => {
     if (empty) {
@@ -42,11 +45,20 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
 
+  choice.addEventListener('helix-before-open', () => {
+    say('helix-before-open', 'the panel is about to show, refusable')
+  })
+  choice.addEventListener('helix-before-close', () => {
+    say('helix-before-close', 'the panel is about to go, refusable')
+  })
+  choice.addEventListener('toggle', (event) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+  })
   choice.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   })

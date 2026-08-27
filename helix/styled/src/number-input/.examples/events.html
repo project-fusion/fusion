@@ -5,7 +5,7 @@
 >
   <helix-number-input
     default-value="3"
-    id="it"
+    id="guests"
     label="Guests"
     min="1"
   ></helix-number-input>
@@ -24,9 +24,12 @@
 </helix-flex>
 
 <script type="module">
-  const it = document.getElementById('it')
+  const guests = document.getElementById('guests')
   const log = document.getElementById('log')
   let empty = true
+
+  // How many rows the log holds, which is a choice about this preview's height.
+  const KEEP = 6
 
   const say = (name, carried) => {
     if (empty) {
@@ -40,18 +43,18 @@
     under.textContent = carried
     row.append(under)
     log.append(row)
-    while (log.children.length > 6) {
+    while (log.children.length > KEEP) {
       log.firstElementChild.remove()
     }
   }
 
-  it.addEventListener('helix-before-change', (event) => {
+  guests.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   })
-  it.addEventListener('input', (event) => {
+  guests.addEventListener('input', (event) => {
     say('input', `${event.currentTarget.valueAsNumber} so far`)
   })
-  it.addEventListener('change', (event) => {
+  guests.addEventListener('change', (event) => {
     say('change', `${event.currentTarget.valueAsNumber}, the reader is done`)
   })
 </script>
