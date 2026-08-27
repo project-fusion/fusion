@@ -2001,6 +2001,50 @@
         },
         {
           "kind": "class",
+          "description": "A value is about to change, and the change can be refused.\n\n**The request half of every value control.** It announces the value being\n*proposed*, before anything moves, so a listener calling `preventDefault()`\nrefuses it and the control stays where it was. That is how a consumer takes\none decision without declaring a mode, which is what 294 settled: the element\nalways owns and applies its state, and refusing is the way to take it over.\n\n**The notification is native and separate.** Once this has gone out and the\nvalue has moved, the control announces it again under the platform's own\nname, `input` while a reader is editing and `change` when they are done, so\n`onChange` in React and `onchange=` in HTML both reach it and\n`currentTarget.value` is correct by the time a handler reads it. This event\ncarries the detail because at the moment it fires the value is not on the\nelement yet.\n\n**It replaced `helix-change` and `helix-input` on the value controls**, which\nwere one mechanism under two names chosen by `announcesInput`. The name said\n*phase* and the flag meant *granularity*, so a consumer reading \"change\" as\n\"the reader is done\" wired a request to `onhelix-change` and got one per\ncharacter. Granularity is now what the platform already says it is, `input`\nagainst `change`, and `announcesInput` picks which native one fires rather\nthan which name this carries. See 294.",
+          "name": "HelixBeforeChangeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-change'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "A checked state is about to change, and the change can be refused.\n\n**Its own event rather than a `helix-before-change` carrying a boolean**, and\nthe reason is recorded rather than aesthetic. Reported through the value\nevent the state arrived as `String(checked)`, so a consumer received the\nstring `\"false\"`, which is truthy, and this library's own checkbox group\ndecoded it with `detail.value === 'true'`. A test asserting the value would\nhave passed on that bug. A control whose state is a boolean wants an event\nwith a typed boolean in it.\n\nThe notification is native, as it is for a value: the control relays `change`\nfrom the inner input and announces `input` beside it, so `onChange` reads\n`currentTarget.checked` and gets a boolean from the platform.",
+          "name": "HelixBeforeToggleEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-toggle'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when a value changes on something that is not a native input.\n\n`helix-change` rather than the `helix-value-change` this was called. The\nrename was made on the belief that React binds no event whose name carries\ntwo hyphens, which is false: it binds them fine, measured in Chrome against\n19.2.8. The shorter name stays for being shorter and for naming the thing\nrather than the thing's field, and not for the reason it was chosen.\n\nThe prefix is what keeps it clear of the native `change`. A consumer writes\n`onhelix-change` for this and `onChange` for a real input's own, and the two\ncannot be confused for each other. A control wrapping a native input relays\nthat input's `change` under its own name as well.",
           "name": "HelixChangeEvent",
           "members": [
@@ -2423,6 +2467,22 @@
           "name": "HelixDismissEvent",
           "declaration": {
             "name": "HelixDismissEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeChangeEvent",
+          "declaration": {
+            "name": "HelixBeforeChangeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeToggleEvent",
+          "declaration": {
+            "name": "HelixBeforeToggleEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3296,6 +3356,22 @@
           "name": "FilterDetail",
           "declaration": {
             "name": "FilterDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeChangeEvent",
+          "declaration": {
+            "name": "HelixBeforeChangeEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeToggleEvent",
+          "declaration": {
+            "name": "HelixBeforeToggleEvent",
             "module": "./events/events.js"
           }
         },
@@ -5063,6 +5139,14 @@
               "description": "Drops the uncontrolled state, so the control reads `defaultChecked`\nagain.\n\nA form reset has to return a control to what its markup declared, and\nclearing `checked` alone only leaves controlled mode. The value the\nelement has been keeping lives here, so this is where it is dropped."
             }
           ],
+          "events": [
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              }
+            }
+          ],
           "attributes": [
             {
               "name": "checked",
@@ -5405,7 +5489,18 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise."
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise."
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke."
             },
             {
               "kind": "method",
@@ -5452,6 +5547,20 @@
                 }
               ],
               "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one."
+            }
+          ],
+          "events": [
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              }
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              }
             }
           ],
           "attributes": [

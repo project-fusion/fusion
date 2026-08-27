@@ -127,7 +127,8 @@ import type {
   HelixSelectEvent,
   HelixSendEvent,
   HelixChangeEvent,
-  HelixToggleEvent,
+  HelixBeforeChangeEvent,
+  HelixBeforeToggleEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixCopyEvent,
@@ -136,7 +137,6 @@ import type {
   HelixFilterEvent,
   HelixNavigateEvent,
   HelixResizeEvent,
-  HelixInputEvent,
   HelixShortcutEvent,
   HelixReadEvent,
   HelixCompleteEvent,
@@ -933,9 +933,9 @@ export type HelixHeadlessCheckboxGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCheckboxGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessCheckboxGroupHelixChangeElementEvent =
-  HelixHeadlessCheckboxGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessCheckboxGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessCheckboxGroupVueProps = {
   /** The checked values, comma separated. */
@@ -981,7 +981,11 @@ reflected none of them. */
 
 export type HelixHeadlessCheckboxGroupVueEvents = {
   /** Fired when any box changes, with the whole set. */
-  "helix-change": HelixHeadlessCheckboxGroupHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessCheckboxGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessCheckboxGroupElementEvent;
 };
 
 /** `HelixHeadlessCheckbox` component event */
@@ -989,9 +993,9 @@ export type HelixHeadlessCheckboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCheckbox,
   E
 >;
-/** `helix-toggle` event type */
-export type HelixHeadlessCheckboxHelixToggleElementEvent =
-  HelixHeadlessCheckboxElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixHeadlessCheckboxHelixBeforeToggleElementEvent =
+  HelixHeadlessCheckboxElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixHeadlessCheckboxVueProps = {
   /** Value submitted when the box is checked. */
@@ -1056,7 +1060,9 @@ reflected none of them. */
 
 export type HelixHeadlessCheckboxVueEvents = {
   /** Fired before the state changes, and cancelable. */
-  "helix-toggle": HelixHeadlessCheckboxHelixToggleElementEvent;
+  "helix-before-toggle": HelixHeadlessCheckboxHelixBeforeToggleElementEvent;
+  /** Announced once the state has moved. */
+  input: HelixHeadlessCheckboxElementEvent;
   /** Relayed from the input once the state has changed. */
   change: HelixHeadlessCheckboxElementEvent;
 };
@@ -1095,9 +1101,9 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessColorInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessColorInputHelixChangeElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessColorInputHelixOpenElementEvent =
   HelixHeadlessColorInputElementEvent<HelixOpenEvent>;
@@ -1242,7 +1248,11 @@ reflected none of them. */
 
 export type HelixHeadlessColorInputVueEvents = {
   /** Fired when the color changes. */
-  "helix-change": HelixHeadlessColorInputHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessColorInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessColorInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessColorInputElementEvent;
   /** Fired when the panel opens. */
   "helix-open": HelixHeadlessColorInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -1260,9 +1270,9 @@ export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
 /** `helix-sample-start` event type */
 export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
-/** `helix-change` event type */
-export type HelixHeadlessColorPickerHelixChangeElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessColorPickerHelixBeforeChangeElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-copy` event type */
 export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
@@ -1387,7 +1397,11 @@ export type HelixHeadlessColorPickerVueEvents = {
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "helix-sample-start": HelixHeadlessColorPickerHelixSampleStartElementEvent;
   /** Fired when the color changes. */
-  "helix-change": HelixHeadlessColorPickerHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessColorPickerHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessColorPickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessColorPickerElementEvent;
   /** Fired when the color is put on the clipboard. */
   "helix-copy": HelixHeadlessColorPickerHelixCopyElementEvent;
 };
@@ -1397,9 +1411,9 @@ export type HelixHeadlessComboboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCombobox,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessComboboxHelixChangeElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-create` event type */
 export type HelixHeadlessComboboxHelixCreateElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
@@ -1582,7 +1596,11 @@ reflected none of them. */
 
 export type HelixHeadlessComboboxVueEvents = {
   /** Fired when the chosen option changes. */
-  "helix-change": HelixHeadlessComboboxHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessComboboxHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessComboboxElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessComboboxElementEvent;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "helix-create": HelixHeadlessComboboxHelixCreateElementEvent;
   /** Fired when the panel opens. */
@@ -1898,9 +1916,9 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDateInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessDateInputHelixChangeElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessDateInputHelixOpenElementEvent =
   HelixHeadlessDateInputElementEvent<HelixOpenEvent>;
@@ -2110,7 +2128,11 @@ reflected none of them. */
 
 export type HelixHeadlessDateInputVueEvents = {
   /** Fired when the date changes. */
-  "helix-change": HelixHeadlessDateInputHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessDateInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessDateInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessDateInputElementEvent;
   /** Fired when the calendar opens. */
   "helix-open": HelixHeadlessDateInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -2122,9 +2144,9 @@ export type HelixHeadlessDatePickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDatePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessDatePickerHelixChangeElementEvent =
-  HelixHeadlessDatePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessDatePickerHelixBeforeChangeElementEvent =
+  HelixHeadlessDatePickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-navigate` event type */
 export type HelixHeadlessDatePickerHelixNavigateElementEvent =
   HelixHeadlessDatePickerElementEvent<HelixNavigateEvent>;
@@ -2239,7 +2261,11 @@ reflected none of them. */
 
 export type HelixHeadlessDatePickerVueEvents = {
   /** Fired before the dates change, and cancelable. */
-  "helix-change": HelixHeadlessDatePickerHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessDatePickerHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessDatePickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessDatePickerElementEvent;
   /** Fired before the month on show changes, and cancelable. */
   "helix-navigate": HelixHeadlessDatePickerHelixNavigateElementEvent;
 };
@@ -2561,9 +2587,9 @@ export type HelixHeadlessFileInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessFileInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessFileInputHelixChangeElementEvent =
-  HelixHeadlessFileInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessFileInputHelixBeforeChangeElementEvent =
+  HelixHeadlessFileInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessFileInputVueProps = {
   /** Which files the picker offers, as a native `accept` list. */
@@ -2622,8 +2648,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessFileInputVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixHeadlessFileInputElementEvent;
   /** Fired when the chosen files change, with their names. */
-  "helix-change": HelixHeadlessFileInputHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessFileInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessFileInputElementEvent;
 };
 
 /** `HelixHeadlessHeatmap` component event */
@@ -2844,9 +2874,9 @@ export type HelixHeadlessInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessInputHelixInputElementEvent =
-  HelixHeadlessInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessInputHelixBeforeChangeElementEvent =
+  HelixHeadlessInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -2975,7 +3005,9 @@ reflected none of them. */
 
 export type HelixHeadlessInputVueEvents = {
   /** Fired as the text changes, and cancelable. */
-  "helix-input": HelixHeadlessInputHelixInputElementEvent;
+  "helix-before-change": HelixHeadlessInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessInputElementEvent;
   /** Relayed from the input once the reader has finished. */
   change: HelixHeadlessInputElementEvent;
 };
@@ -3177,9 +3209,9 @@ export type HelixHeadlessListboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessListbox,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessListboxHelixChangeElementEvent =
-  HelixHeadlessListboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessListboxHelixBeforeChangeElementEvent =
+  HelixHeadlessListboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-filter` event type */
 export type HelixHeadlessListboxHelixFilterElementEvent =
   HelixHeadlessListboxElementEvent<HelixFilterEvent>;
@@ -3301,7 +3333,11 @@ reflected none of them. */
 
 export type HelixHeadlessListboxVueEvents = {
   /** Fired when the answer changes, and cancelable. */
-  "helix-change": HelixHeadlessListboxHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessListboxHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessListboxElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessListboxElementEvent;
   /** Fired before the list narrows, and cancelable. */
   "helix-filter": HelixHeadlessListboxHelixFilterElementEvent;
 };
@@ -3771,9 +3807,9 @@ export type HelixHeadlessNumberInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessNumberInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessNumberInputHelixInputElementEvent =
-  HelixHeadlessNumberInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessNumberInputHelixBeforeChangeElementEvent =
+  HelixHeadlessNumberInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessNumberInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -3883,7 +3919,9 @@ reflected none of them. */
 
 export type HelixHeadlessNumberInputVueEvents = {
   /** Fired as the value changes, and cancelable. */
-  "helix-input": HelixHeadlessNumberInputHelixInputElementEvent;
+  "helix-before-change": HelixHeadlessNumberInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessNumberInputElementEvent;
   /** Relayed from the field once the reader has finished. */
   change: HelixHeadlessNumberInputElementEvent;
 };
@@ -4241,9 +4279,9 @@ export type HelixHeadlessPinInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPinInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessPinInputHelixInputElementEvent =
-  HelixHeadlessPinInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessPinInputHelixBeforeChangeElementEvent =
+  HelixHeadlessPinInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-complete` event type */
 export type HelixHeadlessPinInputHelixCompleteElementEvent =
   HelixHeadlessPinInputElementEvent<HelixCompleteEvent>;
@@ -4360,8 +4398,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessPinInputVueEvents = {
+  /** Announced with it, a filled code being the commit. */
+  change: HelixHeadlessPinInputElementEvent;
   /** Fired as the code changes, and cancelable. */
-  "helix-input": HelixHeadlessPinInputHelixInputElementEvent;
+  "helix-before-change": HelixHeadlessPinInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessPinInputElementEvent;
   /** Fired when the last box is filled. */
   "helix-complete": HelixHeadlessPinInputHelixCompleteElementEvent;
 };
@@ -4541,9 +4583,9 @@ export type HelixHeadlessRadioGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessRadioGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessRadioGroupHelixChangeElementEvent =
-  HelixHeadlessRadioGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessRadioGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessRadioGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessRadioGroupVueProps = {
   /** Which way the choices run. A column reads one line per answer.
@@ -4614,7 +4656,11 @@ reflected none of them. */
 
 export type HelixHeadlessRadioGroupVueEvents = {
   /** Fired when the answer changes, and cancelable. */
-  "helix-change": HelixHeadlessRadioGroupHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessRadioGroupHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessRadioGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessRadioGroupElementEvent;
 };
 
 /** `HelixHeadlessRadio` component event */
@@ -4645,9 +4691,9 @@ export type HelixHeadlessRatingElementEvent<E = Event> = TypedEvent<
   HelixHeadlessRating,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessRatingHelixChangeElementEvent =
-  HelixHeadlessRatingElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessRatingHelixBeforeChangeElementEvent =
+  HelixHeadlessRatingElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessRatingVueProps = {
   /** How many marks there are. */
@@ -4762,7 +4808,11 @@ reflected none of them. */
 
 export type HelixHeadlessRatingVueEvents = {
   /** Fired before the score changes, and cancelable. */
-  "helix-change": HelixHeadlessRatingHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessRatingHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessRatingElementEvent;
+  /** Announced with it, the choice being the commit. */
+  change: HelixHeadlessRatingElementEvent;
 };
 
 export type HelixHeadlessScrollAreaVueProps = {
@@ -4779,9 +4829,9 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSelect,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessSelectHelixChangeElementEvent =
-  HelixHeadlessSelectElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessSelectHelixOpenElementEvent =
   HelixHeadlessSelectElementEvent<HelixOpenEvent>;
@@ -4904,7 +4954,11 @@ reflected none of them. */
 
 export type HelixHeadlessSelectVueEvents = {
   /** Relayed from the listbox when the answer changes. */
-  "helix-change": HelixHeadlessSelectHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessSelectHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessSelectElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessSelectElementEvent;
   /** Fired when the list opens. */
   "helix-open": HelixHeadlessSelectHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -4920,9 +4974,9 @@ export type HelixHeadlessSliderElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSlider,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessSliderHelixInputElementEvent =
-  HelixHeadlessSliderElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessSliderHelixBeforeChangeElementEvent =
+  HelixHeadlessSliderElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessSliderVueProps = {
   /** Whether there are two thumbs and the value is a pair.
@@ -5029,7 +5083,9 @@ reflected none of them. */
 
 export type HelixHeadlessSliderVueEvents = {
   /** Fired as the value changes, and cancelable. */
-  "helix-input": HelixHeadlessSliderHelixInputElementEvent;
+  "helix-before-change": HelixHeadlessSliderHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessSliderElementEvent;
   /** Relayed once the reader has let go. */
   change: HelixHeadlessSliderElementEvent;
 };
@@ -5433,9 +5489,9 @@ export type HelixHeadlessSwitchElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSwitch,
   E
 >;
-/** `helix-toggle` event type */
-export type HelixHeadlessSwitchHelixToggleElementEvent =
-  HelixHeadlessSwitchElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixHeadlessSwitchHelixBeforeToggleElementEvent =
+  HelixHeadlessSwitchElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixHeadlessSwitchVueProps = {
   /** Value submitted when the switch is on. */
@@ -5496,7 +5552,9 @@ reflected none of them. */
 
 export type HelixHeadlessSwitchVueEvents = {
   /** Fired before the state changes, and cancelable. */
-  "helix-toggle": HelixHeadlessSwitchHelixToggleElementEvent;
+  "helix-before-toggle": HelixHeadlessSwitchHelixBeforeToggleElementEvent;
+  /** Announced once the state has moved. */
+  input: HelixHeadlessSwitchElementEvent;
   /** Relayed from the input once the state has changed. */
   change: HelixHeadlessSwitchElementEvent;
 };
@@ -5772,9 +5830,9 @@ export type HelixHeadlessTextareaElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTextarea,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessTextareaHelixInputElementEvent =
-  HelixHeadlessTextareaElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTextareaHelixBeforeChangeElementEvent =
+  HelixHeadlessTextareaElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessTextareaVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -5871,7 +5929,9 @@ reflected none of them. */
 
 export type HelixHeadlessTextareaVueEvents = {
   /** Fired as the text changes, and cancelable. */
-  "helix-input": HelixHeadlessTextareaHelixInputElementEvent;
+  "helix-before-change": HelixHeadlessTextareaHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessTextareaElementEvent;
   /** Relayed from the textarea once the reader has finished. */
   change: HelixHeadlessTextareaElementEvent;
 };
@@ -5881,9 +5941,9 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTimeInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTimeInputHelixChangeElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessTimeInputHelixOpenElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixOpenEvent>;
@@ -6048,7 +6108,11 @@ reflected none of them. */
 
 export type HelixHeadlessTimeInputVueEvents = {
   /** Fired when the time changes. */
-  "helix-change": HelixHeadlessTimeInputHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessTimeInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessTimeInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessTimeInputElementEvent;
   /** Fired when the list opens. */
   "helix-open": HelixHeadlessTimeInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -6060,9 +6124,9 @@ export type HelixHeadlessTimePickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTimePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTimePickerHelixChangeElementEvent =
-  HelixHeadlessTimePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTimePickerHelixBeforeChangeElementEvent =
+  HelixHeadlessTimePickerElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessTimePickerVueProps = {
   /** Whether the current selection fails validation.
@@ -6204,7 +6268,11 @@ reflected none of them. */
 
 export type HelixHeadlessTimePickerVueEvents = {
   /** Fired when the time changes. */
-  "helix-change": HelixHeadlessTimePickerHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessTimePickerHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessTimePickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessTimePickerElementEvent;
 };
 
 export type HelixHeadlessTimelineItemVueProps = {
@@ -6317,9 +6385,9 @@ export type HelixHeadlessToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessToggleGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessToggleGroupHelixChangeElementEvent =
-  HelixHeadlessToggleGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessToggleGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessToggleGroupElementEvent<HelixBeforeChangeEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessToggleGroupHelixSelectElementEvent =
   HelixHeadlessToggleGroupElementEvent<HelixSelectEvent>;
@@ -6414,7 +6482,11 @@ reflected none of them. */
 
 export type HelixHeadlessToggleGroupVueEvents = {
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixHeadlessToggleGroupHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessToggleGroupHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessToggleGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixHeadlessToggleGroupElementEvent;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "helix-select": HelixHeadlessToggleGroupHelixSelectElementEvent;
 };

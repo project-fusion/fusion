@@ -2,6 +2,8 @@ import type {
   EDGES,
   FOLDS_UP_TO,
   Helix,
+  HelixBeforeChangeEvent,
+  HelixBeforeToggleEvent,
   HelixChangeEvent,
   HelixCloseEvent,
   HelixCompleteEvent,
@@ -125,7 +127,6 @@ import type {
   HelixHeadlessVideoPlaylistItem,
   HelixHeadlessVideoPlaylistMenu,
   HelixHeadlessVirtualList,
-  HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,
@@ -138,7 +139,6 @@ import type {
   HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
-  HelixToggleEvent,
   HelixTourAskEvent,
   fromMinutes,
   initialsOf,
@@ -1795,9 +1795,9 @@ export type HelixHeadlessCheckboxGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCheckboxGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessCheckboxGroupHelixChangeElementEvent =
-  HelixHeadlessCheckboxGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessCheckboxGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessCheckboxGroupProps = {
   /** The checked values, comma separated. */
@@ -1841,9 +1841,13 @@ reflected none of them. */
   name?: HelixHeadlessCheckboxGroup["name"];
 
   /** Fired when any box changes, with the whole set. */
-  "onhelix-change"?: (
-    e: HelixHeadlessCheckboxGroupHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
 };
 
 export type HelixHeadlessCheckboxGroupSolidJsProps = {
@@ -1887,9 +1891,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessCheckboxGroup["name"];
   /** Fired when any box changes, with the whole set. */
-  "on:helix-change"?: (
-    e: HelixHeadlessCheckboxGroupHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1902,9 +1910,9 @@ export type HelixHeadlessCheckboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCheckbox,
   E
 >;
-/** `helix-toggle` event type */
-export type HelixHeadlessCheckboxHelixToggleElementEvent =
-  HelixHeadlessCheckboxElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixHeadlessCheckboxHelixBeforeToggleElementEvent =
+  HelixHeadlessCheckboxElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixHeadlessCheckboxProps = {
   /** Value submitted when the box is checked. */
@@ -1967,7 +1975,11 @@ reflected none of them. */
   name?: HelixHeadlessCheckbox["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-toggle"?: (e: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
+  "onhelix-before-toggle"?: (
+    e: HelixHeadlessCheckboxHelixBeforeToggleElementEvent,
+  ) => void;
+  /** Announced once the state has moved. */
+  oninput?: (e: HelixHeadlessCheckboxElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   onchange?: (e: HelixHeadlessCheckboxElementEvent) => void;
 };
@@ -2032,7 +2044,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessCheckbox["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-toggle"?: (e: HelixHeadlessCheckboxHelixToggleElementEvent) => void;
+  "on:helix-before-toggle"?: (
+    e: HelixHeadlessCheckboxHelixBeforeToggleElementEvent,
+  ) => void;
+  /** Announced once the state has moved. */
+  "on:input"?: (e: HelixHeadlessCheckboxElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixHeadlessCheckboxElementEvent) => void;
 
@@ -2107,9 +2123,9 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessColorInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessColorInputHelixChangeElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessColorInputHelixOpenElementEvent =
   HelixHeadlessColorInputElementEvent<HelixOpenEvent>;
@@ -2252,9 +2268,13 @@ reflected none of them. */
   name?: HelixHeadlessColorInput["name"];
 
   /** Fired when the color changes. */
-  "onhelix-change"?: (
-    e: HelixHeadlessColorInputHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessColorInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the panel opens. */
   "onhelix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -2395,9 +2415,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessColorInput["name"];
   /** Fired when the color changes. */
-  "on:helix-change"?: (
-    e: HelixHeadlessColorInputHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessColorInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the panel opens. */
   "on:helix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -2420,9 +2444,9 @@ export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
 /** `helix-sample-start` event type */
 export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
-/** `helix-change` event type */
-export type HelixHeadlessColorPickerHelixChangeElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessColorPickerHelixBeforeChangeElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-copy` event type */
 export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
@@ -2549,9 +2573,13 @@ reflected none of them. */
     e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
   /** Fired when the color changes. */
-  "onhelix-change"?: (
-    e: HelixHeadlessColorPickerHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessColorPickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessColorPickerElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
   "onhelix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 };
@@ -2677,9 +2705,13 @@ reflected none of them. */
     e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
   /** Fired when the color changes. */
-  "on:helix-change"?: (
-    e: HelixHeadlessColorPickerHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessColorPickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessColorPickerElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
   "on:helix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 
@@ -2694,9 +2726,9 @@ export type HelixHeadlessComboboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCombobox,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessComboboxHelixChangeElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-create` event type */
 export type HelixHeadlessComboboxHelixCreateElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
@@ -2877,7 +2909,13 @@ reflected none of them. */
   name?: HelixHeadlessCombobox["name"];
 
   /** Fired when the chosen option changes. */
-  "onhelix-change"?: (e: HelixHeadlessComboboxHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessComboboxElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "onhelix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
@@ -3055,7 +3093,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessCombobox["name"];
   /** Fired when the chosen option changes. */
-  "on:helix-change"?: (e: HelixHeadlessComboboxHelixChangeElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessComboboxElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "on:helix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
@@ -3645,9 +3689,9 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDateInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessDateInputHelixChangeElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessDateInputHelixOpenElementEvent =
   HelixHeadlessDateInputElementEvent<HelixOpenEvent>;
@@ -3855,7 +3899,13 @@ reflected none of them. */
   name?: HelixHeadlessDateInput["name"];
 
   /** Fired when the date changes. */
-  "onhelix-change"?: (e: HelixHeadlessDateInputHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessDateInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the calendar opens. */
   "onhelix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -4061,9 +4111,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessDateInput["name"];
   /** Fired when the date changes. */
-  "on:helix-change"?: (
-    e: HelixHeadlessDateInputHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessDateInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the calendar opens. */
   "on:helix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -4080,9 +4134,9 @@ export type HelixHeadlessDatePickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDatePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessDatePickerHelixChangeElementEvent =
-  HelixHeadlessDatePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessDatePickerHelixBeforeChangeElementEvent =
+  HelixHeadlessDatePickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-navigate` event type */
 export type HelixHeadlessDatePickerHelixNavigateElementEvent =
   HelixHeadlessDatePickerElementEvent<HelixNavigateEvent>;
@@ -4195,9 +4249,13 @@ reflected none of them. */
   name?: HelixHeadlessDatePicker["name"];
 
   /** Fired before the dates change, and cancelable. */
-  "onhelix-change"?: (
-    e: HelixHeadlessDatePickerHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessDatePickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessDatePickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the month on show changes, and cancelable. */
   "onhelix-navigate"?: (
     e: HelixHeadlessDatePickerHelixNavigateElementEvent,
@@ -4311,9 +4369,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessDatePicker["name"];
   /** Fired before the dates change, and cancelable. */
-  "on:helix-change"?: (
-    e: HelixHeadlessDatePickerHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessDatePickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessDatePickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the month on show changes, and cancelable. */
   "on:helix-navigate"?: (
     e: HelixHeadlessDatePickerHelixNavigateElementEvent,
@@ -4921,9 +4983,9 @@ export type HelixHeadlessFileInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessFileInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessFileInputHelixChangeElementEvent =
-  HelixHeadlessFileInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessFileInputHelixBeforeChangeElementEvent =
+  HelixHeadlessFileInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessFileInputProps = {
   /** Which files the picker offers, as a native `accept` list. */
@@ -4980,8 +5042,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessFileInput["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Fired when the chosen files change, with their names. */
-  "onhelix-change"?: (e: HelixHeadlessFileInputHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessFileInputElementEvent) => void;
 };
 
 export type HelixHeadlessFileInputSolidJsProps = {
@@ -5038,10 +5106,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessFileInput["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Fired when the chosen files change, with their names. */
-  "on:helix-change"?: (
-    e: HelixHeadlessFileInputHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessFileInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5467,9 +5539,9 @@ export type HelixHeadlessInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessInputHelixInputElementEvent =
-  HelixHeadlessInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessInputHelixBeforeChangeElementEvent =
+  HelixHeadlessInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -5596,7 +5668,11 @@ reflected none of them. */
   name?: HelixHeadlessInput["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-input"?: (e: HelixHeadlessInputHelixInputElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
   onchange?: (e: HelixHeadlessInputElementEvent) => void;
 };
@@ -5725,7 +5801,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessInput["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-input"?: (e: HelixHeadlessInputHelixInputElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
   "on:change"?: (e: HelixHeadlessInputElementEvent) => void;
 
@@ -6119,9 +6199,9 @@ export type HelixHeadlessListboxElementEvent<E = Event> = TypedEvent<
   HelixHeadlessListbox,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessListboxHelixChangeElementEvent =
-  HelixHeadlessListboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessListboxHelixBeforeChangeElementEvent =
+  HelixHeadlessListboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-filter` event type */
 export type HelixHeadlessListboxHelixFilterElementEvent =
   HelixHeadlessListboxElementEvent<HelixFilterEvent>;
@@ -6241,7 +6321,13 @@ reflected none of them. */
   name?: HelixHeadlessListbox["name"];
 
   /** Fired when the answer changes, and cancelable. */
-  "onhelix-change"?: (e: HelixHeadlessListboxHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessListboxHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessListboxElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
   "onhelix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
 };
@@ -6360,7 +6446,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessListbox["name"];
   /** Fired when the answer changes, and cancelable. */
-  "on:helix-change"?: (e: HelixHeadlessListboxHelixChangeElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessListboxHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessListboxElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
   "on:helix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
 
@@ -7251,9 +7343,9 @@ export type HelixHeadlessNumberInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessNumberInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessNumberInputHelixInputElementEvent =
-  HelixHeadlessNumberInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessNumberInputHelixBeforeChangeElementEvent =
+  HelixHeadlessNumberInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessNumberInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -7361,7 +7453,11 @@ reflected none of them. */
   name?: HelixHeadlessNumberInput["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-input"?: (e: HelixHeadlessNumberInputHelixInputElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessNumberInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessNumberInputElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
   onchange?: (e: HelixHeadlessNumberInputElementEvent) => void;
 };
@@ -7471,9 +7567,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessNumberInput["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-input"?: (
-    e: HelixHeadlessNumberInputHelixInputElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessNumberInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessNumberInputElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
   "on:change"?: (e: HelixHeadlessNumberInputElementEvent) => void;
 
@@ -8158,9 +8256,9 @@ export type HelixHeadlessPinInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPinInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessPinInputHelixInputElementEvent =
-  HelixHeadlessPinInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessPinInputHelixBeforeChangeElementEvent =
+  HelixHeadlessPinInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-complete` event type */
 export type HelixHeadlessPinInputHelixCompleteElementEvent =
   HelixHeadlessPinInputElementEvent<HelixCompleteEvent>;
@@ -8275,8 +8373,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessPinInput["name"];
 
+  /** Announced with it, a filled code being the commit. */
+  onchange?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired as the code changes, and cancelable. */
-  "onhelix-input"?: (e: HelixHeadlessPinInputHelixInputElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessPinInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "onhelix-complete"?: (
     e: HelixHeadlessPinInputHelixCompleteElementEvent,
@@ -8392,8 +8496,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessPinInput["name"];
+  /** Announced with it, a filled code being the commit. */
+  "on:change"?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired as the code changes, and cancelable. */
-  "on:helix-input"?: (e: HelixHeadlessPinInputHelixInputElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessPinInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "on:helix-complete"?: (
     e: HelixHeadlessPinInputHelixCompleteElementEvent,
@@ -8741,9 +8851,9 @@ export type HelixHeadlessRadioGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessRadioGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessRadioGroupHelixChangeElementEvent =
-  HelixHeadlessRadioGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessRadioGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessRadioGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessRadioGroupProps = {
   /** Which way the choices run. A column reads one line per answer.
@@ -8812,9 +8922,13 @@ reflected none of them. */
   name?: HelixHeadlessRadioGroup["name"];
 
   /** Fired when the answer changes, and cancelable. */
-  "onhelix-change"?: (
-    e: HelixHeadlessRadioGroupHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessRadioGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessRadioGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessRadioGroupElementEvent) => void;
 };
 
 export type HelixHeadlessRadioGroupSolidJsProps = {
@@ -8883,9 +8997,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessRadioGroup["name"];
   /** Fired when the answer changes, and cancelable. */
-  "on:helix-change"?: (
-    e: HelixHeadlessRadioGroupHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessRadioGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessRadioGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessRadioGroupElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8935,9 +9053,9 @@ export type HelixHeadlessRatingElementEvent<E = Event> = TypedEvent<
   HelixHeadlessRating,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessRatingHelixChangeElementEvent =
-  HelixHeadlessRatingElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessRatingHelixBeforeChangeElementEvent =
+  HelixHeadlessRatingElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessRatingProps = {
   /** How many marks there are. */
@@ -9050,7 +9168,13 @@ reflected none of them. */
   name?: HelixHeadlessRating["name"];
 
   /** Fired before the score changes, and cancelable. */
-  "onhelix-change"?: (e: HelixHeadlessRatingHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessRatingHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessRatingElementEvent) => void;
+  /** Announced with it, the choice being the commit. */
+  onchange?: (e: HelixHeadlessRatingElementEvent) => void;
 };
 
 export type HelixHeadlessRatingSolidJsProps = {
@@ -9163,7 +9287,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessRating["name"];
   /** Fired before the score changes, and cancelable. */
-  "on:helix-change"?: (e: HelixHeadlessRatingHelixChangeElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessRatingHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessRatingElementEvent) => void;
+  /** Announced with it, the choice being the commit. */
+  "on:change"?: (e: HelixHeadlessRatingElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9195,9 +9325,9 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSelect,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessSelectHelixChangeElementEvent =
-  HelixHeadlessSelectElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessSelectHelixOpenElementEvent =
   HelixHeadlessSelectElementEvent<HelixOpenEvent>;
@@ -9318,7 +9448,13 @@ reflected none of them. */
   name?: HelixHeadlessSelect["name"];
 
   /** Relayed from the listbox when the answer changes. */
-  "onhelix-change"?: (e: HelixHeadlessSelectHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessSelectElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Fired when the list opens. */
   "onhelix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -9437,7 +9573,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessSelect["name"];
   /** Relayed from the listbox when the answer changes. */
-  "on:helix-change"?: (e: HelixHeadlessSelectHelixChangeElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessSelectElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Fired when the list opens. */
   "on:helix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -9463,9 +9605,9 @@ export type HelixHeadlessSliderElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSlider,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessSliderHelixInputElementEvent =
-  HelixHeadlessSliderElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessSliderHelixBeforeChangeElementEvent =
+  HelixHeadlessSliderElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessSliderProps = {
   /** Whether there are two thumbs and the value is a pair.
@@ -9570,7 +9712,11 @@ reflected none of them. */
   name?: HelixHeadlessSlider["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-input"?: (e: HelixHeadlessSliderHelixInputElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessSliderHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessSliderElementEvent) => void;
   /** Relayed once the reader has let go. */
   onchange?: (e: HelixHeadlessSliderElementEvent) => void;
 };
@@ -9677,7 +9823,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessSlider["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-input"?: (e: HelixHeadlessSliderHelixInputElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessSliderHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessSliderElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixHeadlessSliderElementEvent) => void;
 
@@ -10439,9 +10589,9 @@ export type HelixHeadlessSwitchElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSwitch,
   E
 >;
-/** `helix-toggle` event type */
-export type HelixHeadlessSwitchHelixToggleElementEvent =
-  HelixHeadlessSwitchElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixHeadlessSwitchHelixBeforeToggleElementEvent =
+  HelixHeadlessSwitchElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixHeadlessSwitchProps = {
   /** Value submitted when the switch is on. */
@@ -10500,7 +10650,11 @@ reflected none of them. */
   name?: HelixHeadlessSwitch["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-toggle"?: (e: HelixHeadlessSwitchHelixToggleElementEvent) => void;
+  "onhelix-before-toggle"?: (
+    e: HelixHeadlessSwitchHelixBeforeToggleElementEvent,
+  ) => void;
+  /** Announced once the state has moved. */
+  oninput?: (e: HelixHeadlessSwitchElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   onchange?: (e: HelixHeadlessSwitchElementEvent) => void;
 };
@@ -10561,7 +10715,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessSwitch["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-toggle"?: (e: HelixHeadlessSwitchHelixToggleElementEvent) => void;
+  "on:helix-before-toggle"?: (
+    e: HelixHeadlessSwitchHelixBeforeToggleElementEvent,
+  ) => void;
+  /** Announced once the state has moved. */
+  "on:input"?: (e: HelixHeadlessSwitchElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixHeadlessSwitchElementEvent) => void;
 
@@ -11083,9 +11241,9 @@ export type HelixHeadlessTextareaElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTextarea,
   E
 >;
-/** `helix-input` event type */
-export type HelixHeadlessTextareaHelixInputElementEvent =
-  HelixHeadlessTextareaElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTextareaHelixBeforeChangeElementEvent =
+  HelixHeadlessTextareaElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessTextareaProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -11180,7 +11338,11 @@ reflected none of them. */
   name?: HelixHeadlessTextarea["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-input"?: (e: HelixHeadlessTextareaHelixInputElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessTextareaHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessTextareaElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   onchange?: (e: HelixHeadlessTextareaElementEvent) => void;
 };
@@ -11277,7 +11439,11 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessTextarea["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-input"?: (e: HelixHeadlessTextareaHelixInputElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixHeadlessTextareaHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessTextareaElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   "on:change"?: (e: HelixHeadlessTextareaElementEvent) => void;
 
@@ -11292,9 +11458,9 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTimeInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTimeInputHelixChangeElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixHeadlessTimeInputHelixOpenElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixOpenEvent>;
@@ -11457,7 +11623,13 @@ reflected none of them. */
   name?: HelixHeadlessTimeInput["name"];
 
   /** Fired when the time changes. */
-  "onhelix-change"?: (e: HelixHeadlessTimeInputHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessTimeInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the list opens. */
   "onhelix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -11618,9 +11790,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessTimeInput["name"];
   /** Fired when the time changes. */
-  "on:helix-change"?: (
-    e: HelixHeadlessTimeInputHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessTimeInputElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the list opens. */
   "on:helix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -11637,9 +11813,9 @@ export type HelixHeadlessTimePickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTimePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTimePickerHelixChangeElementEvent =
-  HelixHeadlessTimePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessTimePickerHelixBeforeChangeElementEvent =
+  HelixHeadlessTimePickerElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessTimePickerProps = {
   /** Whether the current selection fails validation.
@@ -11779,9 +11955,13 @@ reflected none of them. */
   name?: HelixHeadlessTimePicker["name"];
 
   /** Fired when the time changes. */
-  "onhelix-change"?: (
-    e: HelixHeadlessTimePickerHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessTimePickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessTimePickerElementEvent) => void;
 };
 
 export type HelixHeadlessTimePickerSolidJsProps = {
@@ -11921,9 +12101,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessTimePicker["name"];
   /** Fired when the time changes. */
-  "on:helix-change"?: (
-    e: HelixHeadlessTimePickerHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessTimePickerElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessTimePickerElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12144,9 +12328,9 @@ export type HelixHeadlessToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixHeadlessToggleGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessToggleGroupHelixChangeElementEvent =
-  HelixHeadlessToggleGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessToggleGroupHelixBeforeChangeElementEvent =
+  HelixHeadlessToggleGroupElementEvent<HelixBeforeChangeEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessToggleGroupHelixSelectElementEvent =
   HelixHeadlessToggleGroupElementEvent<HelixSelectEvent>;
@@ -12239,9 +12423,13 @@ reflected none of them. */
   name?: HelixHeadlessToggleGroup["name"];
 
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (
-    e: HelixHeadlessToggleGroupHelixChangeElementEvent,
+  "onhelix-before-change"?: (
+    e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessToggleGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
@@ -12335,9 +12523,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessToggleGroup["name"];
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (
-    e: HelixHeadlessToggleGroupHelixChangeElementEvent,
+  "on:helix-before-change"?: (
+    e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
@@ -15333,7 +15525,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when any box changes, with the whole set.
+   * - `helix-before-change`: Fired when any box changes, with the whole set.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -15472,7 +15666,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-toggle`: Fired before the state changes, and cancelable.
+   * - `helix-before-toggle`: Fired before the state changes, and cancelable.
+   * - `input`: Announced once the state has moved.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -15789,7 +15984,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -16049,7 +16246,9 @@ export type CustomElements = {
    *
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
-   * - `helix-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Methods
@@ -16355,7 +16554,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-before-change`: Fired when the chosen option changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
@@ -17095,7 +17296,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the date changes.
+   * - `helix-before-change`: Fired when the date changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the calendar opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -17329,7 +17532,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-before-change`: Fired before the dates change, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
    * ## Methods
@@ -18120,7 +18325,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the chosen files change, with their names.
+   * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the chosen files change, with their names.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -18788,7 +18995,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the text changes, and cancelable.
+   * - `helix-before-change`: Fired as the text changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
@@ -19428,7 +19636,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-filter`: Fired before the list narrows, and cancelable.
    *
    * ## Slots
@@ -20446,7 +20656,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the value changes, and cancelable.
+   * - `helix-before-change`: Fired as the value changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
@@ -21224,7 +21435,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the code changes, and cancelable.
+   * - `change`: Announced with it, a filled code being the commit.
+   * - `helix-before-change`: Fired as the code changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `helix-complete`: Fired when the last box is filled.
    *
    * ## Methods
@@ -21681,7 +21894,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -21940,7 +22155,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable.
+   * - `helix-before-change`: Fired before the score changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced with it, the choice being the commit.
    *
    * ## Methods
    *
@@ -22198,7 +22415,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Relayed from the listbox when the answer changes.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -22458,7 +22677,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the value changes, and cancelable.
+   * - `helix-before-change`: Fired as the value changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
@@ -23404,7 +23624,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-toggle`: Fired before the state changes, and cancelable.
+   * - `helix-before-toggle`: Fired before the state changes, and cancelable.
+   * - `input`: Announced once the state has moved.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -24051,7 +24272,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the text changes, and cancelable.
+   * - `helix-before-change`: Fired as the text changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
@@ -24266,7 +24488,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired when the time changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -24535,7 +24759,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired when the time changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -25037,7 +25263,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
+   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots
@@ -28036,7 +28264,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when any box changes, with the whole set.
+   * - `helix-before-change`: Fired when any box changes, with the whole set.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -28176,7 +28406,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-toggle`: Fired before the state changes, and cancelable.
+   * - `helix-before-toggle`: Fired before the state changes, and cancelable.
+   * - `input`: Announced once the state has moved.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -28502,7 +28733,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -28763,7 +28996,9 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
-   * - `helix-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Methods
@@ -29070,7 +29305,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-before-change`: Fired when the chosen option changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
@@ -29820,7 +30057,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the date changes.
+   * - `helix-before-change`: Fired when the date changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the calendar opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -30057,7 +30296,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-before-change`: Fired before the dates change, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
    * ## Methods
@@ -30866,7 +31107,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the chosen files change, with their names.
+   * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the chosen files change, with their names.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -31547,7 +31790,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the text changes, and cancelable.
+   * - `helix-before-change`: Fired as the text changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
@@ -32205,7 +32449,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-filter`: Fired before the list narrows, and cancelable.
    *
    * ## Slots
@@ -33244,7 +33490,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the value changes, and cancelable.
+   * - `helix-before-change`: Fired as the value changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
@@ -34033,7 +34280,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the code changes, and cancelable.
+   * - `change`: Announced with it, a filled code being the commit.
+   * - `helix-before-change`: Fired as the code changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `helix-complete`: Fired when the last box is filled.
    *
    * ## Methods
@@ -34505,7 +34754,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the answer changes, and cancelable.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -34768,7 +35019,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable.
+   * - `helix-before-change`: Fired before the score changes, and cancelable.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced with it, the choice being the commit.
    *
    * ## Methods
    *
@@ -35030,7 +35283,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Relayed from the listbox when the answer changes.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -35296,7 +35551,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the value changes, and cancelable.
+   * - `helix-before-change`: Fired as the value changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
@@ -36267,7 +36523,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-toggle`: Fired before the state changes, and cancelable.
+   * - `helix-before-toggle`: Fired before the state changes, and cancelable.
+   * - `input`: Announced once the state has moved.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -36939,7 +37196,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-input`: Fired as the text changes, and cancelable.
+   * - `helix-before-change`: Fired as the text changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
@@ -37157,7 +37415,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired when the time changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-open`: Fired when the list opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -37429,7 +37689,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired when the time changes.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -37942,7 +38204,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
+   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
+   * - `input`: Announced once the value has moved.
+   * - `change`: Announced once the value has moved.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
    *
    * ## Slots

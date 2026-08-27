@@ -7401,11 +7401,27 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when any box changes, with the whole set.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "name": "input",
+              "reactProp": "oninput"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "name": "change",
+              "reactProp": "onchange"
             }
           ],
           "attributes": [
@@ -8279,11 +8295,23 @@
           "events": [
             {
               "type": {
-                "text": "HelixToggleEvent"
+                "text": "HelixBeforeToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-toggle",
-              "reactProp": "onhelix-toggle"
+              "name": "helix-before-toggle",
+              "reactProp": "onhelix-before-toggle"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the state has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "reactProp": "oninput"
             },
             {
               "type": {
@@ -9517,7 +9545,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -10050,11 +10093,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the color changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -10930,7 +10997,7 @@
                   }
                 }
               ],
-              "description": "A channel's new value, from whichever of the two events carried it.\n\n**Both, because a slider announces both and at different moments.** It is\none of the five controls a reader edits continuously, so it sends\n`helix-input` all the way through a drag and `helix-change` when the drag\nends. Listening only for the commit meant the picker heard nothing while a\nhandle moved, and since it binds `.value` the slider is controlled: asked\nand not answered, it snapped back to the value the picker still held. The\nhue and alpha handles did not move at all.\n\nTaking both is not belt and braces. The drag needs the first and a keyboard\nstep or a programmatic set is only guaranteed the second, and the handler\nis idempotent: the same value applied twice is the same color."
+              "description": "A channel's new value, read off the slider that just applied it.\n\n**Both native events, because a slider sends both and at different\nmoments.** It is one of the controls a reader edits continuously, so it\nannounces `input` all the way through a drag and `change` when the drag\nends. Listening only for the commit meant the picker heard nothing while a\nhandle moved and the hue and alpha handles did not move at all.\n\n**Read off the target rather than out of a detail**, which is what changed\non 26 Aug 2026. This bound `helix-input` and `helix-change` and took the\nproposed value out of the event. Those are requests: they announce what the\nslider is *about* to do, before anything has moved and while a listener may\nstill refuse it. The native pair fires after the slider applied, so the\nvalue is on the element and cannot disagree with it. See 294.\n\nIdempotent, so taking both costs nothing: the same value applied twice is\nthe same color."
             },
             {
               "kind": "method",
@@ -10993,7 +11060,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -11318,11 +11400,35 @@
             },
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the color changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -12164,7 +12270,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -12697,11 +12818,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the chosen option changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -16312,7 +16457,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -16845,11 +17005,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the date changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -17704,7 +17888,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -18013,11 +18212,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired before the dates change, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -21855,12 +22078,28 @@
           ],
           "events": [
             {
+              "name": "change",
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "reactProp": "onchange"
+            },
+            {
+              "type": {
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the chosen files change, with their names.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "name": "input",
+              "reactProp": "oninput"
             }
           ],
           "attributes": [
@@ -25099,6 +25338,21 @@
             },
             {
               "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "requestValue",
               "return": {
                 "type": {
@@ -25624,18 +25878,34 @@
           "events": [
             {
               "type": {
-                "text": "HelixInputEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired as the text changes, and cancelable.",
-              "name": "helix-input",
-              "reactProp": "onhelix-input"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
             },
             {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
               "type": {
                 "text": "Event"
               },
               "description": "Relayed from the input once the reader has finished.",
-              "name": "change",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
               "reactProp": "onchange"
             }
           ],
@@ -28317,7 +28587,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -28850,11 +29135,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the answer changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -33504,6 +33813,21 @@
             },
             {
               "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "requestValue",
               "return": {
                 "type": {
@@ -34014,18 +34338,34 @@
           "events": [
             {
               "type": {
-                "text": "HelixInputEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired as the value changes, and cancelable.",
-              "name": "helix-input",
-              "reactProp": "onhelix-input"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
             },
             {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
               "type": {
                 "text": "Event"
               },
               "description": "Relayed from the field once the reader has finished.",
-              "name": "change",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
               "reactProp": "onchange"
             }
           ],
@@ -37093,6 +37433,21 @@
             },
             {
               "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "requestValue",
               "return": {
                 "type": {
@@ -37617,12 +37972,36 @@
           ],
           "events": [
             {
+              "name": "change",
               "type": {
-                "text": "HelixInputEvent"
+                "text": "Event"
+              },
+              "description": "Announced with it, a filled code being the commit.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
+            },
+            {
+              "type": {
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired as the code changes, and cancelable.",
-              "name": "helix-input",
-              "reactProp": "onhelix-input"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
             },
             {
               "type": {
@@ -39361,7 +39740,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -39894,11 +40288,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the answer changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             }
           ],
           "attributes": [
@@ -40470,7 +40888,7 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -40742,6 +41160,21 @@
               "privacy": "private",
               "default": "undefined",
               "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -41274,11 +41707,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired before the score changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced with it, the choice being the commit.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             }
           ],
           "attributes": [
@@ -42191,7 +42648,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -42724,11 +43196,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Relayed from the listbox when the answer changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -43533,6 +44029,21 @@
             },
             {
               "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "requestValue",
               "return": {
                 "type": {
@@ -44058,18 +44569,34 @@
           "events": [
             {
               "type": {
-                "text": "HelixInputEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired as the value changes, and cancelable.",
-              "name": "helix-input",
-              "reactProp": "onhelix-input"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
             },
             {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
               "type": {
                 "text": "Event"
               },
               "description": "Relayed once the reader has let go.",
-              "name": "change",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
               "reactProp": "onchange"
             }
           ],
@@ -48197,11 +48724,23 @@
           "events": [
             {
               "type": {
-                "text": "HelixToggleEvent"
+                "text": "HelixBeforeToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-toggle",
-              "reactProp": "onhelix-toggle"
+              "name": "helix-before-toggle",
+              "reactProp": "onhelix-before-toggle"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the state has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerChecked",
+                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
+              },
+              "reactProp": "oninput"
             },
             {
               "type": {
@@ -51142,6 +51681,21 @@
             },
             {
               "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "requestValue",
               "return": {
                 "type": {
@@ -51667,18 +52221,34 @@
           "events": [
             {
               "type": {
-                "text": "HelixInputEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired as the text changes, and cancelable.",
-              "name": "helix-input",
-              "reactProp": "onhelix-input"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
             },
             {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
               "type": {
                 "text": "Event"
               },
               "description": "Relayed from the textarea once the reader has finished.",
-              "name": "change",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
               "reactProp": "onchange"
             }
           ],
@@ -52616,7 +53186,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -53149,11 +53734,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the time changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {
@@ -54085,7 +54694,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -54394,11 +55018,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired when the time changes.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             }
           ],
           "attributes": [
@@ -56008,7 +56656,22 @@
               "privacy": "protected",
               "readonly": true,
               "default": "false",
-              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
+              "description": "Whether a reader edits this continuously, which decides the native name.\n\n**It used to pick between `helix-input` and `helix-change`**, which was\none mechanism under two names and said *phase* where it meant\n*granularity*. The request event is `helix-before-change` whatever the\nanswer; this decides which native event announces the result, `input`\nwhile a reader is editing against `change` when they are done, which is\nthe distinction the platform already draws. See 294.\n\nDiscrete by default: only a control the reader edits continuously says\notherwise.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceNatively",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the applied value under the platform's own name.\n\n**After `apply`, never before**, which is the whole reason this is\nseparate from the request event: a native handler reads\n`event.target.value`, and it has to be the value that was just applied.\n\n**Both, for a discrete control, because that is what the platform does.**\nA native `<select>` sends `input` and then `change` from one choice: the\nvalue moved, and the reader is also done. A continuous control announces\n`input` here and relays `change` from its inner control when the reader\nis done, so the pair keeps the platform's timings rather than reporting a\ncommit on every keystroke.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -56541,11 +57204,35 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeChangeEvent"
               },
               "description": "Fired before the answer moves, and cancelable. The only way to refuse one.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-change",
+              "reactProp": "onhelix-before-change"
+            },
+            {
+              "name": "input",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "oninput"
+            },
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "Announced once the value has moved.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "reactProp": "onchange"
             },
             {
               "type": {

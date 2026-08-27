@@ -130,7 +130,8 @@ import type {
   HelixSelectEvent,
   HelixSendEvent,
   HelixChangeEvent,
-  HelixToggleEvent,
+  HelixBeforeChangeEvent,
+  HelixBeforeToggleEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixCopyEvent,
@@ -139,7 +140,6 @@ import type {
   HelixFilterEvent,
   HelixNavigateEvent,
   HelixResizeEvent,
-  HelixInputEvent,
   HelixShortcutEvent,
   HelixReadEvent,
   HelixCompleteEvent,
@@ -1491,9 +1491,9 @@ export type HelixCheckboxGroupElementEvent<E = Event> = TypedEvent<
   HelixCheckboxGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixCheckboxGroupHelixChangeElementEvent =
-  HelixCheckboxGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixCheckboxGroupHelixBeforeChangeElementEvent =
+  HelixCheckboxGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixCheckboxGroupVueProps = {
   /** Which way the boxes run. */
@@ -1541,14 +1541,18 @@ reflected none of them. */
 
 export type HelixCheckboxGroupVueEvents = {
   /** Fired when any box changes, with the whole set. */
-  "helix-change": HelixCheckboxGroupHelixChangeElementEvent;
+  "helix-before-change": HelixCheckboxGroupHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixCheckboxGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixCheckboxGroupElementEvent;
 };
 
 /** `HelixCheckbox` component event */
 export type HelixCheckboxElementEvent<E = Event> = TypedEvent<HelixCheckbox, E>;
-/** `helix-toggle` event type */
-export type HelixCheckboxHelixToggleElementEvent =
-  HelixCheckboxElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixCheckboxHelixBeforeToggleElementEvent =
+  HelixCheckboxElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixCheckboxVueProps = {
   /** How the choice presents itself.
@@ -1625,8 +1629,10 @@ reflected none of them. */
 };
 
 export type HelixCheckboxVueEvents = {
+  /** Announced once the state has moved. */
+  input: HelixCheckboxElementEvent;
   /** Fired before the state changes, and cancelable. */
-  "helix-toggle": HelixCheckboxHelixToggleElementEvent;
+  "helix-before-toggle": HelixCheckboxHelixBeforeToggleElementEvent;
   /** Relayed from the input once the state has changed. */
   change: HelixCheckboxElementEvent;
 };
@@ -1665,9 +1671,9 @@ export type HelixColorInputElementEvent<E = Event> = TypedEvent<
   HelixColorInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixColorInputHelixChangeElementEvent =
-  HelixColorInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixColorInputHelixBeforeChangeElementEvent =
+  HelixColorInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixColorInputHelixOpenElementEvent =
   HelixColorInputElementEvent<HelixOpenEvent>;
@@ -1811,8 +1817,12 @@ reflected none of them. */
 };
 
 export type HelixColorInputVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixColorInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixColorInputElementEvent;
   /** Fired when the color changes. */
-  "helix-change": HelixColorInputHelixChangeElementEvent;
+  "helix-before-change": HelixColorInputHelixBeforeChangeElementEvent;
   /** Fired when the panel opens. */
   "helix-open": HelixColorInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -1830,9 +1840,9 @@ export type HelixColorPickerHelixSampleEndElementEvent =
 /** `helix-sample-start` event type */
 export type HelixColorPickerHelixSampleStartElementEvent =
   HelixColorPickerElementEvent<HelixSampleStartEvent>;
-/** `helix-change` event type */
-export type HelixColorPickerHelixChangeElementEvent =
-  HelixColorPickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixColorPickerHelixBeforeChangeElementEvent =
+  HelixColorPickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-copy` event type */
 export type HelixColorPickerHelixCopyElementEvent =
   HelixColorPickerElementEvent<HelixCopyEvent>;
@@ -1952,21 +1962,25 @@ reflected none of them. */
 };
 
 export type HelixColorPickerVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixColorPickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixColorPickerElementEvent;
   /** The eyedropper has closed, whether or not a color was taken. */
   "helix-sample-end": HelixColorPickerHelixSampleEndElementEvent;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "helix-sample-start": HelixColorPickerHelixSampleStartElementEvent;
   /** Fired when the color changes. */
-  "helix-change": HelixColorPickerHelixChangeElementEvent;
+  "helix-before-change": HelixColorPickerHelixBeforeChangeElementEvent;
   /** Fired when the color is put on the clipboard. */
   "helix-copy": HelixColorPickerHelixCopyElementEvent;
 };
 
 /** `HelixCombobox` component event */
 export type HelixComboboxElementEvent<E = Event> = TypedEvent<HelixCombobox, E>;
-/** `helix-change` event type */
-export type HelixComboboxHelixChangeElementEvent =
-  HelixComboboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixComboboxHelixBeforeChangeElementEvent =
+  HelixComboboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-create` event type */
 export type HelixComboboxHelixCreateElementEvent =
   HelixComboboxElementEvent<HelixCreateEvent>;
@@ -2148,8 +2162,12 @@ reflected none of them. */
 };
 
 export type HelixComboboxVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixComboboxElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixComboboxElementEvent;
   /** Fired when the chosen option changes. */
-  "helix-change": HelixComboboxHelixChangeElementEvent;
+  "helix-before-change": HelixComboboxHelixBeforeChangeElementEvent;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "helix-create": HelixComboboxHelixCreateElementEvent;
   /** Fired when the panel opens. */
@@ -2486,9 +2504,9 @@ export type HelixDateInputElementEvent<E = Event> = TypedEvent<
   HelixDateInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixDateInputHelixChangeElementEvent =
-  HelixDateInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixDateInputHelixBeforeChangeElementEvent =
+  HelixDateInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixDateInputHelixOpenElementEvent =
   HelixDateInputElementEvent<HelixOpenEvent>;
@@ -2697,8 +2715,12 @@ reflected none of them. */
 };
 
 export type HelixDateInputVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixDateInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixDateInputElementEvent;
   /** Fired when the date changes. */
-  "helix-change": HelixDateInputHelixChangeElementEvent;
+  "helix-before-change": HelixDateInputHelixBeforeChangeElementEvent;
   /** Fired when the calendar opens. */
   "helix-open": HelixDateInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -2710,9 +2732,9 @@ export type HelixDatePickerElementEvent<E = Event> = TypedEvent<
   HelixDatePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixDatePickerHelixChangeElementEvent =
-  HelixDatePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixDatePickerHelixBeforeChangeElementEvent =
+  HelixDatePickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-navigate` event type */
 export type HelixDatePickerHelixNavigateElementEvent =
   HelixDatePickerElementEvent<HelixNavigateEvent>;
@@ -2826,8 +2848,12 @@ reflected none of them. */
 };
 
 export type HelixDatePickerVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixDatePickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixDatePickerElementEvent;
   /** Fired before the dates change, and cancelable. */
-  "helix-change": HelixDatePickerHelixChangeElementEvent;
+  "helix-before-change": HelixDatePickerHelixBeforeChangeElementEvent;
   /** Fired before the month on show changes, and cancelable. */
   "helix-navigate": HelixDatePickerHelixNavigateElementEvent;
 };
@@ -3211,9 +3237,9 @@ export type HelixFileInputElementEvent<E = Event> = TypedEvent<
   HelixFileInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixFileInputHelixChangeElementEvent =
-  HelixFileInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixFileInputHelixBeforeChangeElementEvent =
+  HelixFileInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixFileInputVueProps = {
   /** Help under the control, shown while there is nothing wrong. */
@@ -3272,8 +3298,12 @@ reflected none of them. */
 };
 
 export type HelixFileInputVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixFileInputElementEvent;
   /** Fired when the chosen files change, with their names. */
-  "helix-change": HelixFileInputHelixChangeElementEvent;
+  "helix-before-change": HelixFileInputHelixBeforeChangeElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixFileInputElementEvent;
 };
 
 export type HelixFlexVueProps = {
@@ -3571,9 +3601,9 @@ export type HelixImageVueEvents = {
 
 /** `HelixInput` component event */
 export type HelixInputElementEvent<E = Event> = TypedEvent<HelixInput, E>;
-/** `helix-input` event type */
-export type HelixInputHelixInputElementEvent =
-  HelixInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixInputHelixBeforeChangeElementEvent =
+  HelixInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixInputVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -3701,10 +3731,12 @@ reflected none of them. */
 };
 
 export type HelixInputVueEvents = {
-  /** Fired as the text changes, and cancelable. */
-  "helix-input": HelixInputHelixInputElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixInputElementEvent;
   /** Relayed from the input once the reader has finished. */
   change: HelixInputElementEvent;
+  /** Fired as the text changes, and cancelable. */
+  "helix-before-change": HelixInputHelixBeforeChangeElementEvent;
 };
 
 /** `HelixKbd` component event */
@@ -4027,9 +4059,9 @@ export type HelixListVueEvents = {};
 
 /** `HelixListbox` component event */
 export type HelixListboxElementEvent<E = Event> = TypedEvent<HelixListbox, E>;
-/** `helix-change` event type */
-export type HelixListboxHelixChangeElementEvent =
-  HelixListboxElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixListboxHelixBeforeChangeElementEvent =
+  HelixListboxElementEvent<HelixBeforeChangeEvent>;
 /** `helix-filter` event type */
 export type HelixListboxHelixFilterElementEvent =
   HelixListboxElementEvent<HelixFilterEvent>;
@@ -4140,8 +4172,12 @@ reflected none of them. */
 };
 
 export type HelixListboxVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixListboxElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixListboxElementEvent;
   /** Fired when the answer changes, and cancelable. */
-  "helix-change": HelixListboxHelixChangeElementEvent;
+  "helix-before-change": HelixListboxHelixBeforeChangeElementEvent;
   /** Fired before the list narrows, and cancelable. */
   "helix-filter": HelixListboxHelixFilterElementEvent;
 };
@@ -4633,9 +4669,9 @@ export type HelixNumberInputElementEvent<E = Event> = TypedEvent<
   HelixNumberInput,
   E
 >;
-/** `helix-input` event type */
-export type HelixNumberInputHelixInputElementEvent =
-  HelixNumberInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixNumberInputHelixBeforeChangeElementEvent =
+  HelixNumberInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixNumberInputVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -4744,10 +4780,12 @@ reflected none of them. */
 };
 
 export type HelixNumberInputVueEvents = {
-  /** Fired as the value changes, and cancelable. */
-  "helix-input": HelixNumberInputHelixInputElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixNumberInputElementEvent;
   /** Relayed from the field once the reader has finished. */
   change: HelixNumberInputElementEvent;
+  /** Fired as the value changes, and cancelable. */
+  "helix-before-change": HelixNumberInputHelixBeforeChangeElementEvent;
 };
 
 export type HelixOptionGroupVueProps = {
@@ -5094,9 +5132,9 @@ export type HelixPaginationSummaryVueEvents = {};
 
 /** `HelixPinInput` component event */
 export type HelixPinInputElementEvent<E = Event> = TypedEvent<HelixPinInput, E>;
-/** `helix-input` event type */
-export type HelixPinInputHelixInputElementEvent =
-  HelixPinInputElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixPinInputHelixBeforeChangeElementEvent =
+  HelixPinInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-complete` event type */
 export type HelixPinInputHelixCompleteElementEvent =
   HelixPinInputElementEvent<HelixCompleteEvent>;
@@ -5213,8 +5251,12 @@ reflected none of them. */
 };
 
 export type HelixPinInputVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixPinInputElementEvent;
+  /** Announced with it, a filled code being the commit. */
+  change: HelixPinInputElementEvent;
   /** Fired as the code changes, and cancelable. */
-  "helix-input": HelixPinInputHelixInputElementEvent;
+  "helix-before-change": HelixPinInputHelixBeforeChangeElementEvent;
   /** Fired when the last box is filled. */
   "helix-complete": HelixPinInputHelixCompleteElementEvent;
 };
@@ -5417,9 +5459,9 @@ export type HelixRadioGroupElementEvent<E = Event> = TypedEvent<
   HelixRadioGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixRadioGroupHelixChangeElementEvent =
-  HelixRadioGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixRadioGroupHelixBeforeChangeElementEvent =
+  HelixRadioGroupElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixRadioGroupVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -5489,8 +5531,12 @@ reflected none of them. */
 };
 
 export type HelixRadioGroupVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixRadioGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixRadioGroupElementEvent;
   /** Fired when the answer changes, and cancelable. */
-  "helix-change": HelixRadioGroupHelixChangeElementEvent;
+  "helix-before-change": HelixRadioGroupHelixBeforeChangeElementEvent;
 };
 
 /** `HelixRadio` component event */
@@ -5564,9 +5610,9 @@ export type HelixRadioVueEvents = {
 
 /** `HelixRating` component event */
 export type HelixRatingElementEvent<E = Event> = TypedEvent<HelixRating, E>;
-/** `helix-change` event type */
-export type HelixRatingHelixChangeElementEvent =
-  HelixRatingElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixRatingHelixBeforeChangeElementEvent =
+  HelixRatingElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixRatingVueProps = {
   /** Which mark the row is drawn with.
@@ -5698,8 +5744,12 @@ reflected none of them. */
 };
 
 export type HelixRatingVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixRatingElementEvent;
+  /** Announced with it, the choice being the commit. */
+  change: HelixRatingElementEvent;
   /** Fired before the score changes, and cancelable. */
-  "helix-change": HelixRatingHelixChangeElementEvent;
+  "helix-before-change": HelixRatingHelixBeforeChangeElementEvent;
 };
 
 /** `HelixSandboxPreview` component event */
@@ -5934,9 +5984,9 @@ export type HelixScrollAreaVueEvents = {};
 
 /** `HelixSelect` component event */
 export type HelixSelectElementEvent<E = Event> = TypedEvent<HelixSelect, E>;
-/** `helix-change` event type */
-export type HelixSelectHelixChangeElementEvent =
-  HelixSelectElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixSelectHelixBeforeChangeElementEvent =
+  HelixSelectElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixSelectHelixOpenElementEvent =
   HelixSelectElementEvent<HelixOpenEvent>;
@@ -6058,8 +6108,12 @@ reflected none of them. */
 };
 
 export type HelixSelectVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixSelectElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixSelectElementEvent;
   /** Relayed from the listbox when the answer changes. */
-  "helix-change": HelixSelectHelixChangeElementEvent;
+  "helix-before-change": HelixSelectHelixBeforeChangeElementEvent;
   /** Fired when the list opens. */
   "helix-open": HelixSelectHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -6077,9 +6131,9 @@ export type HelixSkeletonVueEvents = {};
 
 /** `HelixSlider` component event */
 export type HelixSliderElementEvent<E = Event> = TypedEvent<HelixSlider, E>;
-/** `helix-input` event type */
-export type HelixSliderHelixInputElementEvent =
-  HelixSliderElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixSliderHelixBeforeChangeElementEvent =
+  HelixSliderElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixSliderVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -6185,10 +6239,12 @@ reflected none of them. */
 };
 
 export type HelixSliderVueEvents = {
-  /** Fired as the value changes, and cancelable. */
-  "helix-input": HelixSliderHelixInputElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixSliderElementEvent;
   /** Relayed once the reader has let go. */
   change: HelixSliderElementEvent;
+  /** Fired as the value changes, and cancelable. */
+  "helix-before-change": HelixSliderHelixBeforeChangeElementEvent;
 };
 
 export type HelixSparklineVueProps = {
@@ -6654,9 +6710,9 @@ export type HelixStepVueEvents = {
 
 /** `HelixSwitch` component event */
 export type HelixSwitchElementEvent<E = Event> = TypedEvent<HelixSwitch, E>;
-/** `helix-toggle` event type */
-export type HelixSwitchHelixToggleElementEvent =
-  HelixSwitchElementEvent<HelixToggleEvent>;
+/** `helix-before-toggle` event type */
+export type HelixSwitchHelixBeforeToggleElementEvent =
+  HelixSwitchElementEvent<HelixBeforeToggleEvent>;
 
 export type HelixSwitchVueProps = {
   /** Whether the control is checked.
@@ -6716,8 +6772,10 @@ reflected none of them. */
 };
 
 export type HelixSwitchVueEvents = {
+  /** Announced once the state has moved. */
+  input: HelixSwitchElementEvent;
   /** Fired before the state changes, and cancelable. */
-  "helix-toggle": HelixSwitchHelixToggleElementEvent;
+  "helix-before-toggle": HelixSwitchHelixBeforeToggleElementEvent;
   /** Relayed from the input once the state has changed. */
   change: HelixSwitchElementEvent;
 };
@@ -7034,9 +7092,9 @@ export type HelixTextVueEvents = {};
 
 /** `HelixTextarea` component event */
 export type HelixTextareaElementEvent<E = Event> = TypedEvent<HelixTextarea, E>;
-/** `helix-input` event type */
-export type HelixTextareaHelixInputElementEvent =
-  HelixTextareaElementEvent<HelixInputEvent>;
+/** `helix-before-change` event type */
+export type HelixTextareaHelixBeforeChangeElementEvent =
+  HelixTextareaElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixTextareaVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -7132,10 +7190,12 @@ reflected none of them. */
 };
 
 export type HelixTextareaVueEvents = {
-  /** Fired as the text changes, and cancelable. */
-  "helix-input": HelixTextareaHelixInputElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixTextareaElementEvent;
   /** Relayed from the textarea once the reader has finished. */
   change: HelixTextareaElementEvent;
+  /** Fired as the text changes, and cancelable. */
+  "helix-before-change": HelixTextareaHelixBeforeChangeElementEvent;
 };
 
 /** `HelixTimeInput` component event */
@@ -7143,9 +7203,9 @@ export type HelixTimeInputElementEvent<E = Event> = TypedEvent<
   HelixTimeInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixTimeInputHelixChangeElementEvent =
-  HelixTimeInputElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixTimeInputHelixBeforeChangeElementEvent =
+  HelixTimeInputElementEvent<HelixBeforeChangeEvent>;
 /** `helix-open` event type */
 export type HelixTimeInputHelixOpenElementEvent =
   HelixTimeInputElementEvent<HelixOpenEvent>;
@@ -7309,8 +7369,12 @@ reflected none of them. */
 };
 
 export type HelixTimeInputVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixTimeInputElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixTimeInputElementEvent;
   /** Fired when the time changes. */
-  "helix-change": HelixTimeInputHelixChangeElementEvent;
+  "helix-before-change": HelixTimeInputHelixBeforeChangeElementEvent;
   /** Fired when the list opens. */
   "helix-open": HelixTimeInputHelixOpenElementEvent;
   /** Fired when it closes. */
@@ -7322,9 +7386,9 @@ export type HelixTimePickerElementEvent<E = Event> = TypedEvent<
   HelixTimePicker,
   E
 >;
-/** `helix-change` event type */
-export type HelixTimePickerHelixChangeElementEvent =
-  HelixTimePickerElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixTimePickerHelixBeforeChangeElementEvent =
+  HelixTimePickerElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixTimePickerVueProps = {
   /** The value the markup declared, which is where a reset returns to. */
@@ -7465,8 +7529,12 @@ reflected none of them. */
 };
 
 export type HelixTimePickerVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixTimePickerElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixTimePickerElementEvent;
   /** Fired when the time changes. */
-  "helix-change": HelixTimePickerHelixChangeElementEvent;
+  "helix-before-change": HelixTimePickerHelixBeforeChangeElementEvent;
 };
 
 export type HelixTimelineItemVueProps = {
@@ -7579,9 +7647,9 @@ export type HelixToggleGroupElementEvent<E = Event> = TypedEvent<
   HelixToggleGroup,
   E
 >;
-/** `helix-change` event type */
-export type HelixToggleGroupHelixChangeElementEvent =
-  HelixToggleGroupElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixToggleGroupHelixBeforeChangeElementEvent =
+  HelixToggleGroupElementEvent<HelixBeforeChangeEvent>;
 /** `helix-select` event type */
 export type HelixToggleGroupHelixSelectElementEvent =
   HelixToggleGroupElementEvent<HelixSelectEvent>;
@@ -7687,8 +7755,12 @@ reflected none of them. */
 };
 
 export type HelixToggleGroupVueEvents = {
+  /** Announced once the value has moved. */
+  input: HelixToggleGroupElementEvent;
+  /** Announced once the value has moved. */
+  change: HelixToggleGroupElementEvent;
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixToggleGroupHelixChangeElementEvent;
+  "helix-before-change": HelixToggleGroupHelixBeforeChangeElementEvent;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "helix-select": HelixToggleGroupHelixSelectElementEvent;
 };
