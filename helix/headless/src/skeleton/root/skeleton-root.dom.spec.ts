@@ -21,7 +21,13 @@ describe('skeleton', () => {
   test("the shape is the styled tier's, not the headless tier's", async () => {
     // An appearance property on the headless tier is the one thing that tier
     // exists for not having.
-    const { HelixHeadlessSkeleton } = await import('@helix-io/headless')
+    /* From `src`, not from the package name. `@helix-io/headless` resolves
+       through `exports` to `dist`, which puts a second copy of every element
+       class in the run: `customElement` declines a taken tag quietly, so the
+       winner is decided by file order and never announced, and after any edit
+       to `src` this file registers the previous build for everybody. Nine tests
+       in three other families failed exactly that way. See 298. */
+    const { HelixHeadlessSkeleton } = await import('../index.js')
     expect('shape' in HelixHeadlessSkeleton.prototype).toBe(false)
     const skeleton = await mount(
       '<helix-headless-skeleton shape="circle"></helix-headless-skeleton>',

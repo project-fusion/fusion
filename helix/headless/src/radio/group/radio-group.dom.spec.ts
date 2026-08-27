@@ -1,16 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, part, registerDom, type Updatable } from '@helix-io/testing/dom'
+import { formValue, part, registerDom, settle, type Updatable } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
 })
-
-const settle = async (host: Updatable): Promise<void> => {
-  while ((await host.updateComplete) === false) {
-    // Validity moves outside the property system, so this takes two passes.
-  }
-}
 
 const group = async (extra = '', chosen = ''): Promise<Updatable> => {
   document.body.innerHTML = `<helix-headless-radio-group label="Label" name="choice" ${extra} default-value="${chosen}">

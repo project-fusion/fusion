@@ -1,17 +1,18 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasLayout, part, registerDom, type Updatable } from '@helix-io/testing/dom'
+import {
+  formValue,
+  hasLayout,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../option/index.js')
 })
-
-const settle = async (host: Updatable): Promise<void> => {
-  while ((await host.updateComplete) === false) {
-    // Validity and slot assignment both move outside the property system.
-  }
-}
 
 const combobox = async (extra = ''): Promise<Updatable> => {
   document.body.innerHTML = `<helix-headless-combobox label="L" name="c" ${extra}>

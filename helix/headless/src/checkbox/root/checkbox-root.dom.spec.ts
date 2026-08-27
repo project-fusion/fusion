@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom, settle } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -161,18 +161,6 @@ describe('checkbox label fallback', () => {
 })
 
 describe('checkbox validation message', () => {
-  /* Awaited until it stops, not once. Validity moves through
-     `ElementInternals` rather than through a property, so the control reports
-     it after rendering and the mixin schedules one further update to show what
-     changed. Lit's `updateComplete` resolves `false` when that happens, which
-     is the platform telling you there is more; a single await reads the state
-     from before the message cleared. */
-  const settle = async (host: Updatable): Promise<void> => {
-    while ((await host.updateComplete) === false) {
-      // Another update was requested while the last one was finishing.
-    }
-  }
-
   const required = async (): Promise<Updatable> => {
     document.body.innerHTML =
       '<form><helix-headless-checkbox label="Accept" hint="Hint" name="terms" required></helix-headless-checkbox></form>'

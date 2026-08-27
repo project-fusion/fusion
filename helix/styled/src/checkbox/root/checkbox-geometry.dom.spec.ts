@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, readyToMove, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, readyToMove, registerDom, settle } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -70,9 +70,7 @@ if (hasLayout()) {
         '<helix-checkbox label="Accept" name="t" required></helix-checkbox>',
       )) as Updatable
       host.dispatchEvent(new Event('invalid'))
-      while ((await host.updateComplete) === false) {
-        // Validity moves outside the property system, so this takes two passes.
-      }
+      await settle(host)
       const box = getComputedStyle(part(host, 'control') as HTMLElement)
       const message = getComputedStyle(part(host, 'feedback') as HTMLElement)
 

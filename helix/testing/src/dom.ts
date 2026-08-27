@@ -233,6 +233,41 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
 }
 
 /**
+ * Waits until a component has stopped asking for updates, with a ceiling.
+ *
+ * **A single `await host.updateComplete` reads the state from before the last
+ * update landed**, because validity and slot assignment both move outside the
+ * property system: Lit resolves that promise to `false` when another update was
+ * requested while the last one was finishing, which is the platform telling you
+ * there is more. So the loop is right and every spec that settles needs one.
+ *
+ * **The ceiling is what ten hand-written copies were missing.** Without it a
+ * component that asks for another update every time is an infinite await: it
+ * blocks nothing, allocates nothing, prints nothing and never returns. The
+ * runner's own `--timeout` does not save the reader either, because a file's
+ * output is buffered until the file ends, so the whole suite reports nothing
+ * about which test it was. Bounded, the same component fails one test in the
+ * ordinary way and names itself. See 299.
+ *
+ * Forty is far past anything real. The most any component in this library takes
+ * is three, and a number chosen against a laptop would be the wrong kind of
+ * number anyway: this is a backstop against never, not a budget.
+ */
+export const settle = async (host: Updatable, turns = 40): Promise<void> => {
+  let taken = 0
+  while ((await host.updateComplete) === false) {
+    taken += 1
+    if (taken > turns) {
+      throw new Error(
+        `<${host.localName}> asked for another update ${taken} times without settling. ` +
+          'Something it renders is requesting an update from its own update, which is a loop ' +
+          'rather than a slow component.',
+      )
+    }
+  }
+}
+
+/**
  * Waits for an element's own animations to finish, and returns at once where
  * there are none.
  *

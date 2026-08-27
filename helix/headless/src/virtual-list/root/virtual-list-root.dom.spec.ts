@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, type Updatable } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom, settle, type Updatable } from '@helix-io/testing/dom'
 
 /**
  * The box the headless tier does not draw, and the list cannot work without.
@@ -31,32 +31,6 @@ beforeAll(async () => {
   sheet.textContent = VIEWPORT
   document.head.append(sheet)
 })
-
-/**
- * Waits for the list to stop asking for another update, and gives up if it will
- * not.
- *
- * **Bounded, and yielding to a task rather than to a microtask.** The plain
- * `while ((await host.updateComplete) === false) {}` that every other spec uses
- * is safe only where the loop ends: a promise that resolves immediately keeps
- * the microtask queue full, so `setTimeout` never runs, and the harness's own
- * 2000ms timeout is a `setTimeout`. In a browser this list re-renders after
- * measuring, so the loop did not end and could not be interrupted: the family
- * ran past five minutes where every other one finishes in under two seconds,
- * and it was the whole reason the suite appeared to hang.
- *
- * Failing here is better than hanging anywhere. A list that has not settled in
- * fifty passes is a list that is not going to.
- */
-const settle = async (host: Updatable): Promise<void> => {
-  for (let pass = 0; pass < 50; pass += 1) {
-    if ((await host.updateComplete) !== false) {
-      return
-    }
-    await new Promise((done) => setTimeout(done, 0))
-  }
-  throw new Error('the list never settled: fifty updates and it still wanted another')
-}
 
 /** A list of `count` rows, with the data as JSON the way a consumer writes it. */
 const list = async (count: number, extra = ''): Promise<Updatable> => {

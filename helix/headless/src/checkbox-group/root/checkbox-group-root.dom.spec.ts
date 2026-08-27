@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, slotted } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role, settle, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -114,12 +114,6 @@ describe('checkbox group', () => {
 })
 
 describe('checkbox group as a field', () => {
-  const settle = async (host: Updatable): Promise<void> => {
-    while ((await host.updateComplete) === false) {
-      // Another update was requested while the last one was finishing.
-    }
-  }
-
   test('the group is named and described by its own nodes', async () => {
     /* Through `ElementInternals`, which is the only form that works here: the
        host is in the light DOM and its label is in the shadow root, so an IDREF

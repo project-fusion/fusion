@@ -5,6 +5,7 @@ import {
   mount,
   part,
   registerDom,
+  settle,
   type Updatable,
 } from '@helix-io/testing/dom'
 
@@ -13,12 +14,6 @@ beforeAll(async () => {
   await import('../index.js')
   await import('../../option/index.js')
 })
-
-const settle = async (host: Updatable): Promise<void> => {
-  while ((await host.updateComplete) === false) {
-    // Validity and slot assignment both move outside the property system.
-  }
-}
 
 const select = async (extra = ''): Promise<Updatable> => {
   document.body.innerHTML = `<helix-headless-select label="L" name="c" ${extra}>

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@helix-io/testing/dom'
+import { formValue, mount, part, registerDom, settle, type Updatable } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -46,15 +46,11 @@ describe('switch', () => {
     const host = (await mount(
       '<helix-headless-switch name="a" required>A</helix-headless-switch>',
     )) as Updatable
-    while ((await host.updateComplete) === false) {
-      // Validity moves outside the property system, so this takes two passes.
-    }
+    await settle(host)
     expect(part(host, 'feedback')).toBeNull()
 
     host.dispatchEvent(new Event('invalid'))
-    while ((await host.updateComplete) === false) {
-      // Again.
-    }
+    await settle(host)
     expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe(
       'Turn this on to continue.',
     )
