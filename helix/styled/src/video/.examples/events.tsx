@@ -16,13 +16,25 @@ export function Example() {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
   }
 
+  const started = () => {
+    say('play')
+  }
+
+  const paused = () => {
+    say('pause')
+  }
+
+  const finished = () => {
+    say('ended')
+  }
+
   return (
     <helix-flex direction="column" gap="md">
       <helix-video
         label="A short clip"
-        onEnded={() => say('ended')}
-        onPause={() => say('pause')}
-        onPlay={() => say('play')}
+        onEnded={finished}
+        onPause={paused}
+        onPlay={started}
         poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
         ref={clip}
         src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"

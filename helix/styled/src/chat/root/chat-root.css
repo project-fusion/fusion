@@ -36,9 +36,22 @@
   grid-row: 5;
 }
 
+/* The transcript is a scrollport, so it takes the treatment `ScrollArea` settled
+   on for one: `thin` rather than a width in pixels, because the two engines that
+   implement it disagree about what a number means, and the color is the part
+   worth setting. A default bar inside a rounded panel is the one piece of the
+   platform this component would otherwise let through.
+
+   No `scrollbar-gutter: stable`, deliberately. It would reserve the track on
+   every platform, including the ones with overlay scrollbars, and the reserved
+   strip comes off the inline end: the reader's own turns would stop short of the
+   trailing edge that the header's controls and the send button both sit on, and
+   that column is the whole alignment of this component. */
 [part="log"] {
   display: flex;
   flex-direction: column;
+  scrollbar-color: var(--helix-color-border) transparent;
+  scrollbar-width: thin;
   gap: var(--chat-gap, var(--helix-space-md));
   overflow-y: auto;
   padding-block: var(--helix-space-md);
@@ -100,7 +113,15 @@
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }
 
+/* The same step down the turn's own controls take, and for the same reason:
+   these are the conversation's chrome rather than its subject, and two controls
+   at the full 40 pixel step beside a 21 pixel title read as the header's
+   subject. `Announcement`'s note applies here too, so the icon step comes down
+   with the control step. */
 [part="header"] > [part="actions"] {
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+
   align-items: center;
   display: flex;
   flex: 0 0 auto;
@@ -123,6 +144,18 @@
 
 [part="resume"] > * {
   pointer-events: auto;
+}
+
+/* **A control over content is a surface over content, and takes the lift.**
+   That is the separation policy's own rule: this library leads with the edge on
+   the page and with the lift above it, and the way back is the one part of this
+   component that is genuinely above the page rather than on it. Without it a
+   subtle control floated over a bubble with the sentence showing through it.
+
+   On what is slotted rather than on the region, because the region is a
+   full-width band and a shadow on that is a line across the transcript. */
+[part="resume"] slot::slotted(*) {
+  box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
 }
 
 /* The status band sits between the transcript and the composer and had no block

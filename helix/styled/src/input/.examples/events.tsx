@@ -8,18 +8,29 @@ export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
   // The last few, so a long sentence does not push the field off the preview.
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const proposed = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  }
+
+  const typed = (event: Event & { currentTarget: HelixInput }) => {
+    say('input', `"${event.currentTarget.value}" so far`)
+  }
+
+  const committed = (event: Event & { currentTarget: HelixInput }) => {
+    say('change', `"${event.currentTarget.value}", the reader is done`)
+  }
 
   return (
     <helix-flex direction="column" gap="md">
       <helix-input
         label="Name"
-        onChange={(event) => say('change', `"${event.currentTarget.value}", the reader is done`)}
-        onhelix-before-change={(event) =>
-          say('helix-before-change', `proposing "${event.detail.value}", refusable`)
-        }
-        onInput={(event) => say('input', `"${event.currentTarget.value}" so far`)}
+        onChange={committed}
+        onhelix-before-change={proposed}
+        onInput={typed}
         placeholder="Type, then click away"
       />
 

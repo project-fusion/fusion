@@ -1,0 +1,56 @@
+<!-- @summary The pair a field sends, and why one of them is not the other. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-textarea
+    id="it"
+    label="Notes"
+    placeholder="Type, then click away"
+  ></helix-textarea>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type in the field</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const it = document.getElementById('it')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  it.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing ${event.detail.value.length} characters, refusable`)
+  })
+  it.addEventListener('input', (event) => {
+    say('input', `${event.currentTarget.value.length} characters so far`)
+  })
+  it.addEventListener('change', (event) => {
+    say('change', `${event.currentTarget.value.length} characters, the reader is done`)
+  })
+</script>

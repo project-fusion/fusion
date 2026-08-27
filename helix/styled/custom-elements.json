@@ -11297,6 +11297,10 @@
             {
               "description": "Space either side of every region.",
               "name": "--chat-padding-inline"
+            },
+            {
+              "description": "The lift under the way back, which floats over the transcript.",
+              "name": "--chat-resume-shadow"
             }
           ],
           "cssParts": [
@@ -51475,6 +51479,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A step and a keystroke arrive the same way, and the commit is separate from both.",
+                "slug": "events"
+              },
+              {
                 "description": "A number outside its range, and what the field says.",
                 "slug": "invalid"
               },
@@ -56672,6 +56680,11 @@
               {
                 "description": "Disabled, with the code still readable.",
                 "slug": "disabled"
+              },
+              {
+                "description": "One event per character, and a different one the moment the code is whole.",
+                "layout": "hug",
+                "slug": "events"
               },
               {
                 "description": "A code the field will not accept.",
@@ -68445,6 +68458,10 @@
                 "slug": "disabled"
               },
               {
+                "description": "A drag is a stream of one event, and the other arrives once, at the end.",
+                "slug": "events"
+              },
+              {
                 "description": "A value the control will not accept, and what it says.",
                 "slug": "invalid"
               },
@@ -79851,6 +79868,10 @@
               {
                 "description": "Disabled, filled and empty.",
                 "slug": "disabled"
+              },
+              {
+                "description": "The pair a field sends, and why one of them is not the other.",
+                "slug": "events"
               },
               {
                 "description": "A box reporting what is wrong with what is in it.",

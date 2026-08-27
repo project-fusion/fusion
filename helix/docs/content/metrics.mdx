@@ -62,7 +62,7 @@ repository does that. The per-component tables are what a page pays.
 | `@helix-io/headless` | 502,781 | 127,912 | 100,428 | Every headless family, which is what the barrel means. |
 | `@helix-io/icons` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
 | `@helix-io/theme` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@helix-io/styled` | 1,653,558 | 474,489 | 332,415 | Every styled family. |
+| `@helix-io/styled` | 1,660,156 | 476,604 | 334,077 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -83,9 +83,9 @@ is the whole cost of adopting the base layer on its own.
 
 ## What the numbers say
 
-**Most of a first component is the runtime under it.** The median styled family is 19,707 bytes gzipped alone and adds 6,374 to a page that already has Helix on it, so 68 percent of the first one is shared and 32 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
+**Most of a first component is the runtime under it.** The median styled family is 20,302 bytes gzipped alone and adds 6,374 to a page that already has Helix on it, so 69 percent of the first one is shared and 31 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `quote` at 9,497 gzipped alone, the dearest `color-input` at 65,600, over 92 components. Every family at once is 474,489.
+Across the tier: the cheapest is `quote` at 9,497 gzipped alone, the dearest `color-input` at 65,600, over 92 components. Every family at once is 476,604.
 
 **No family imports a barrel, and `check:barrels` is what keeps it that way.** `@helix-io/headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@helix-io/headless'` costs 127,912 bytes gzipped whatever else the page does, which is 6 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
@@ -290,7 +290,7 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `callout` | 76,100 | 26,090 | 21,764 | 5,726 | 2,362 | 1,735 |
 | `card` | 37,695 | 13,389 | 11,695 | 12,245 | 4,789 | 3,944 |
 | `carousel` | 103,754 | 34,573 | 28,968 | 33,412 | 10,659 | 8,805 |
-| `chat` | 61,359 | 19,778 | 17,323 | 33,736 | 10,500 | 8,746 |
+| `chat` | 65,012 | 20,969 | 18,362 | 37,389 | 11,681 | 9,814 |
 | `checkbox` | 55,390 | 18,163 | 15,882 | 24,824 | 8,539 | 7,029 |
 | `checkbox-group` | 45,400 | 14,935 | 13,060 | 14,341 | 5,320 | 4,092 |
 | `code` | 31,352 | 11,330 | 9,923 | 7,069 | 3,064 | 2,451 |
@@ -327,7 +327,7 @@ The headless tier plus presentation. This is what `bun add @helix-io/styled` giv
 | `menu` | 125,771 | 42,774 | 36,164 | 27,783 | 8,838 | 7,179 |
 | `meter` | 44,031 | 14,897 | 12,978 | 18,583 | 6,260 | 5,183 |
 | `navigation` | 30,330 | 10,508 | 9,220 | 3,809 | 1,621 | 936 |
-| `notifications` | 96,343 | 32,737 | 27,235 | 23,939 | 7,993 | 6,565 |
+| `notifications` | 99,288 | 33,797 | 28,185 | 26,884 | 9,034 | 7,484 |
 | `number-input` | 99,437 | 33,377 | 27,707 | 23,527 | 7,976 | 6,475 |
 | `option` | 38,493 | 13,385 | 11,693 | 13,048 | 4,826 | 3,834 |
 | `outline` | 42,566 | 14,532 | 12,686 | 15,997 | 5,647 | 4,375 |
@@ -384,7 +384,7 @@ column is what was removed rather than part of what remains.
 | `@helix-io/icons` | 63,768 | 11 | 19,847 | none |
 | `@helix-io/styles` | 80,307 | 5 | 0 | none |
 | `@helix-io/theme` | 465,772 | 8 | 4,793 | none |
-| `@helix-io/styled` | 10,397,241 | 711 | 292,169 | `@helix-io/core`, `@helix-io/headless`, `@helix-io/styles` |
+| `@helix-io/styled` | 10,405,385 | 711 | 292,295 | `@helix-io/core`, `@helix-io/headless`, `@helix-io/styles` |
 
 ## Not measured yet
 

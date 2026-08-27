@@ -7,23 +7,22 @@ const RESTING: Arrival[] = [{ carried: 'Move between the tabs', name: 'Nothing y
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const moving = (event: CustomEvent<{ value: string }>) => {
+    if (event.detail.value === 'danger') {
+      event.preventDefault()
+      say('helix-before-activate', 'refused, so the strip did not move')
+      return
+    }
+    say('helix-before-activate', `moving to "${event.detail.value}"`)
+  }
 
   return (
     <helix-flex direction="column" gap="md">
-      <helix-tabs
-        default-active="usage"
-        label="Account"
-        onhelix-before-activate={(event) => {
-          if (event.detail.value === 'danger') {
-            event.preventDefault()
-            say('helix-before-activate', 'refused, so the strip did not move')
-            return
-          }
-          say('helix-before-activate', `moving to "${event.detail.value}"`)
-        }}
-      >
+      <helix-tabs default-active="usage" label="Account" onhelix-before-activate={moving}>
         <helix-tabs-tab value="usage">Usage</helix-tabs-tab>
         <helix-tabs-tab value="billing">Billing</helix-tabs-tab>
         <helix-tabs-tab value="danger">Danger</helix-tabs-tab>

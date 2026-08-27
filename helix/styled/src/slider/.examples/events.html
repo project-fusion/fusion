@@ -1,0 +1,57 @@
+<!-- @summary A drag is a stream of one event, and the other arrives once, at the end. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-slider
+    default-value="40"
+    id="it"
+    label="Quality"
+    show-value
+  ></helix-slider>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Drag the thumb, then let go</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const it = document.getElementById('it')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  it.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing ${event.detail.value}, refusable`)
+  })
+  it.addEventListener('input', (event) => {
+    say('input', `${event.currentTarget.value} while the thumb moves`)
+  })
+  it.addEventListener('change', (event) => {
+    say('change', `${event.currentTarget.value}, once it is let go`)
+  })
+</script>

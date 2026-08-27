@@ -227,12 +227,12 @@ helix-sandbox-editor {
   visibility: hidden;
 }
 
-.themeFaceSample[data-face-ready] + .themeFaceWaiting {
-  display: none;
-}
-
 .themeFaceWaiting {
   --skeleton-size: var(--helix-text-md);
 
   inline-size: 100%;
+}
+
+.themeFaceSample[data-face-ready] + .themeFaceWaiting {
+  display: none;
 }

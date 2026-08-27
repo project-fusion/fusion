@@ -8,7 +8,11 @@
 [part="composer"] {
   align-items: end;
   display: grid;
-  gap: var(--helix-space-2xs);
+  /* A step up from `2xs`, which had the send control touching whatever was
+     slotted before it: four pixels between a solid fill and a ghost button reads
+     as one control that lost its left half. Eight separates them and still reads
+     as one row. */
+  gap: var(--helix-space-xs);
   grid-template-columns: auto minmax(0, 1fr) auto auto;
 }
 
@@ -44,7 +48,14 @@
      the floor a one-line composer rests at, and `field-sizing` takes it up from
      there. */
   min-block-size: var(--helix-size-control);
-  padding-block: var(--helix-space-xs);
+  /* **Derived rather than picked, so the one line in an empty composer sits on
+     the same center as everything beside it.** A textarea top-aligns its text,
+     so `padding-block: xs` with a `min-block-size` floor left the box at 40 and
+     the text at the top of it: measured, the placeholder's center was 287 while
+     the send label's and the attach glyph's were both 289. Splitting whatever is
+     left of the control's height after one line and two borders puts it at 289
+     too, and keeps the field symmetric as it grows to two lines and three. */
+  padding-block: calc((var(--helix-size-control) - 1lh - var(--helix-border-thin) * 2) / 2);
   padding-inline: var(--helix-space-sm);
   resize: none;
 }

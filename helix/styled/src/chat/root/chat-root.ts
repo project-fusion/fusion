@@ -39,6 +39,7 @@ import '../message/chat-message.js'
  * @cssproperty --chat-gap - Space between turns.
  * @cssproperty --chat-rule - The hairline above the composer and under the header.
  * @cssproperty --chat-padding-inline - Space either side of every region.
+ * @cssproperty --chat-resume-shadow - The lift under the way back, which floats over the transcript.
  */
 @customElement('helix-chat')
 export class HelixChat extends HelixHeadlessChat {

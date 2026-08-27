@@ -8,8 +8,31 @@ export function Example() {
   const [heard, setHeard] = useState(RESTING)
   const refused = useRef(false)
 
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const opening = () => {
+    say('helix-before-open', 'about to open, refusable')
+  }
+
+  const closing = (event: Event) => {
+    if (refused.current) {
+      say('helix-before-close', 'let through this time')
+      return
+    }
+    refused.current = true
+    event.preventDefault()
+    say('helix-before-close', 'refused, so nothing moved')
+  }
+
+  const moved = (event: Event & { newState?: string; oldState?: string }) => {
+    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+  }
+
+  const shut = () => {
+    say('close', 'the platform name, once it is shut')
+  }
 
   return (
     <helix-flex direction="column" gap="md">
@@ -20,20 +43,10 @@ export function Example() {
       <helix-dialog
         id="unsaved"
         label="Unsaved work"
-        onClose={() => say('close', 'the platform name, once it is shut')}
-        onhelix-before-close={(event) => {
-          if (refused.current) {
-            say('helix-before-close', 'let through this time')
-            return
-          }
-          refused.current = true
-          event.preventDefault()
-          say('helix-before-close', 'refused, so nothing moved')
-        }}
-        onhelix-before-open={() => say('helix-before-open', 'about to open, refusable')}
-        onToggle={(event) =>
-          say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
-        }
+        onClose={shut}
+        onhelix-before-close={closing}
+        onhelix-before-open={opening}
+        onToggle={moved}
       >
         <helix-text>There are changes that have not been written yet.</helix-text>
         <helix-button command="--close" commandfor="unsaved" slot="footer">

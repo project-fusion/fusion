@@ -9499,6 +9499,8 @@ export type CustomCssProperties = {
   "--chat-rule"?: string;
   /** Space either side of every region. */
   "--chat-padding-inline"?: string;
+  /** The lift under the way back, which floats over the transcript. */
+  "--chat-resume-shadow"?: string;
   /** Space between the boxes. */
   "--checkbox-group-gap"?: string;
   /** Width and height of the box. */

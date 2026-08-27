@@ -65,6 +65,12 @@ site/ui/public/sandbox
 # Measurement scratch: pages written to probe layout and paint, never shipped.
 site/ui/public/.probe/
 
+# The visual lab: pages generated from a component's own source so a drawing can
+# be measured with real fonts and real tokens. Served by the dev server, which is
+# why it sits under public, and regenerated on demand, which is why it is never
+# committed.
+site/ui/public/_lab/
+
 # The artifact a failed visual comparison leaves behind, marked with the pixels
 # that moved. What belongs in the history is the baseline a reviewer approved,
 # not the picture of a run that disagreed with it.

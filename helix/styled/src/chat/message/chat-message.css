@@ -41,8 +41,25 @@
    placement the body slid into the avatar's column the moment a me-turn hid it,
    and the 1fr column was left holding the empty actions box: measured at 640,
    the reader's own bubbles sat at 16 and 52 with the container's edge at 640. */
+/* **The avatar centers on the first line of the turn, not on the top of its
+   box.** `align-items: start` puts it at the row's top edge, which is where the
+   bubble's padding is rather than where its words are: measured, the avatar's
+   center sat at 199 and the first line's at 205, so every avatar in a transcript
+   floated six pixels above the sentence it belonged to.
+
+   The box is made exactly as tall as a one-line turn, padding and all, and the
+   avatar is centered in it. Centering on a one-line bubble is centering on its
+   only line, and because the box is one line tall it goes on centering on the
+   *first* line of a turn that runs to five. The font and leading are restated
+   because `1lh` resolves against this box's own line-height, and the bubble sets
+   its own. Measured after: 205 against 205. */
 [part="avatar"] {
+  align-items: center;
+  display: flex;
+  font-size: var(--helix-text-sm);
   grid-column: 1;
+  line-height: var(--helix-leading-normal);
+  min-block-size: calc(1lh + var(--helix-space-xs) * 2);
 }
 
 [part="body"] {
@@ -206,7 +223,14 @@
   );
 }
 
+/* **Centered, because this line holds two things of different heights.** It is
+   the turn's time and the turn's controls together, and a flex line defaults to
+   `stretch`: the `<time>` grew to the 32 pixels the controls are tall and its
+   text rendered at the top of that, so the timestamp sat eight pixels above the
+   glyphs it shares a line with. Measured: text center 306 against glyph center
+   314. */
 [part="meta"] {
+  align-items: center;
   color: var(--helix-color-foreground-muted);
   display: flex;
   font-family: var(--helix-font-sans);

@@ -219,7 +219,6 @@ export function SiteMenu({
  */
 export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const pathname = usePathname()
-  const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
 
   const [prefsOpen, setPrefsOpen] = useState(false)
@@ -283,14 +282,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
     watch.observe(panel)
     return () => watch.disconnect()
   }, [panelDown])
-
-  useEffect(() => {
-    const query = window.matchMedia('(max-width: 48rem)')
-    const sync = () => setNarrow(query.matches)
-    sync()
-    query.addEventListener('change', sync)
-    return () => query.removeEventListener('change', sync)
-  }, [])
 
   const within = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 

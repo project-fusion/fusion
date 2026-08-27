@@ -7,21 +7,30 @@ const RESTING: Arrival[] = [{ carried: 'Choose a plan', name: 'Nothing yet' }]
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const proposed = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  }
+
+  const moved = (event: Event & { currentTarget: HelixSelect }) => {
+    say('input', `"${event.currentTarget.value}", once and not once per element`)
+  }
+
+  const chosen = (event: Event & { currentTarget: HelixSelect }) => {
+    say('change', `"${event.currentTarget.value}", the choice is made`)
+  }
 
   return (
     <helix-flex direction="column" gap="md">
       <helix-select
         label="Plan"
         name="plan"
-        onChange={(event) => say('change', `"${event.currentTarget.value}", the choice is made`)}
-        onhelix-before-change={(event) =>
-          say('helix-before-change', `proposing "${event.detail.value}", refusable`)
-        }
-        onInput={(event) =>
-          say('input', `"${event.currentTarget.value}", once and not once per element`)
-        }
+        onChange={chosen}
+        onhelix-before-change={proposed}
+        onInput={moved}
       >
         <helix-option value="free">Free</helix-option>
         <helix-option value="team">Team</helix-option>

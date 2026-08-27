@@ -11,9 +11,9 @@
    publishes whether anything in it has media and every item holds the column
    open by that much. */
 :host {
-  /* One line of body text, which is what both trailing controls are centered on
-     and what the body itself is set in, so the two cannot drift apart. Private
-     because this package is the only reader: it is a measurement of this
+  /* One line of body text, which is what the body is set in and what the unread
+     mark is drawn to, so the mark cannot drift off the line it belongs to.
+     Private because this package is the only reader: it is a measurement of this
      stylesheet's own type, not a setting a consumer would reach for. */
   --_notifications-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
 
@@ -137,16 +137,23 @@
    moves: the trailing controls are placed by the item's own padding, not by what
    is to their left.
 
-   **Both trailing boxes are one line tall and their contents overflow it
-   evenly**, which is what puts them on an axis. `align-items: start` hangs a box
+   **Both trailing boxes are centered on the row**, which is what puts them on an
+   axis with each other and on the row's own. `align-items: start` hangs a box
    from the top of the content, so a 32 pixel button in a 20 pixel line sat with
    its label between the first line of text and the timestamp, aligned to
    neither, while the dismiss beside it sat at the top: two controls in one row
-   on two different centers. Giving each the line's height and centering inside
-   it lets both hang off the same axis whatever they hold. */
+   on two different centers.
+
+   Centered on the row rather than on its first line, which was the first answer
+   to that. They act on the whole notification and not on the sentence at the top
+   of it, and the row a feed is made of is two lines, the notification and when it
+   happened: hung off the first of the two they sit high in a box whose other half
+   is empty. The cost is a long notification, where the middle of five lines is a
+   way from the text the control belongs to; the row that is actually common is
+   what decides it. */
 [part="actions"] {
   align-items: center;
-  block-size: var(--_notifications-line);
+  align-self: center;
   display: flex;
   gap: var(--helix-space-2xs);
   margin-inline-start: var(--helix-space-sm);
@@ -161,8 +168,21 @@
 
    No `font-size` and no `line-height`, which is what a text glyph needed. The
    mark is an `<svg>` now and takes the icon step from `glyph.css`, which the
-   root has already set to `sm` along with the rest of the row's density. */
+   root has already set to `sm` along with the rest of the row's density.
+
+   **It appears when the row does.** A feed is a column of things that happened,
+   and a cross on every one of them is a column of crosses: the control is
+   offered where a reader is already pointing and is quiet everywhere else.
+
+   `opacity` and not `display` or `visibility`, which is the whole of why this is
+   safe. Both of those take the control out of the tab order and out of the
+   accessibility tree, so a keyboard reader would lose the only way to remove a
+   notification and never be told there had been one. At zero it is still
+   focusable and still announced, the focus rule below brings it back, and
+   nothing in the row moves when it arrives, the box having been laid out the
+   whole time. */
 [part="dismiss"] {
+  align-self: center;
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
@@ -171,10 +191,36 @@
   cursor: pointer;
   display: grid;
   inline-size: var(--helix-size-control);
-  margin-block-start: calc((var(--_notifications-line) - var(--helix-size-control)) / 2);
   margin-inline-start: var(--helix-space-2xs);
+  opacity: var(--_notifications-dismiss, 0);
   padding: var(--helix-space-none);
   place-items: center;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The reveal is a property on the host rather than a rule on the part, so the
+   three things that answer "is it offered" are one declaration each and none of
+   them has to outrank the others. Written as rules on `[part="dismiss"]` they
+   are a specificity ladder that the touch case, which is the least specific and
+   has to win, arrives at the bottom of. */
+:host(:hover) {
+  --_notifications-dismiss: 1;
+}
+
+/* Where a pointer cannot hover there is no hover to reveal it, so it does not
+   hide. The same argument as the carousel's arrows and the opposite conclusion:
+   that control is a second way to do what a swipe already does, and this one is
+   the only way. */
+@media (hover: none) and (pointer: coarse) {
+  :host {
+    --_notifications-dismiss: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="dismiss"] {
+    transition: none;
+  }
 }
 
 /* A mark a consumer slots and the one drawn here come out the same size, on the
@@ -189,6 +235,23 @@
 [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
+}
+
+/* Focus reveals it, and this is the rule that makes the reveal safe rather than
+   the one that decorates it: a reader who tabs to a control that is not painted
+   has been given nothing.
+
+   **`:focus` and not `:focus-visible`**, which is the pair pulled apart. Whether
+   to draw a ring is what `:focus-visible` is for; whether the control is painted
+   at all is a different question, and the pointer is where the two answers come
+   apart. Measured in Chromium against the built bundle: after a click on this
+   control `:focus` is true and `:focus-visible` is false, and it stays that way
+   once the pointer leaves the row. On `:focus-visible` alone the control a reader
+   had just clicked, and still holds focus on, would fade out from under them the
+   moment they moved the mouse. The ring stays on `:focus-visible` below, where
+   it belongs. */
+[part="dismiss"]:focus {
+  opacity: 1;
 }
 
 [part="dismiss"]:focus-visible {

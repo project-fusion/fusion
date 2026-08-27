@@ -7,23 +7,30 @@ const RESTING: Arrival[] = [{ carried: 'Tick a scope', name: 'Nothing yet' }]
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const proposed = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  }
+
+  const moved = (event: Event & { currentTarget: HelixCheckboxGroup }) => {
+    say('input', `"${event.currentTarget.value || 'nothing'}", the group and not the box`)
+  }
+
+  const settled = (event: Event & { currentTarget: HelixCheckboxGroup }) => {
+    say('change', `"${event.currentTarget.value || 'nothing'}", the whole set`)
+  }
 
   return (
     <helix-flex direction="column" gap="md">
       <helix-checkbox-group
         label="Scopes"
         name="scopes"
-        onChange={(event) =>
-          say('change', `"${event.currentTarget.value || 'nothing'}", the whole set`)
-        }
-        onhelix-before-change={(event) =>
-          say('helix-before-change', `proposing "${event.detail.value}", refusable`)
-        }
-        onInput={(event) =>
-          say('input', `"${event.currentTarget.value || 'nothing'}", the group and not the box`)
-        }
+        onChange={settled}
+        onhelix-before-change={proposed}
+        onInput={moved}
       >
         <helix-checkbox value="read">Read</helix-checkbox>
         <helix-checkbox value="write">Write</helix-checkbox>

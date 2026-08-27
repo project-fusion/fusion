@@ -9,23 +9,28 @@ const RESTING: Arrival[] = [
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
 
-  const say = (name: string, carried: string) =>
+  const say = (name: string, carried: string) => {
     setHeard((before) => [...(before === RESTING ? [] : before), { carried, name }].slice(-6))
+  }
+
+  const settling = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-resize', `settling at ${event.detail.value} percent`)
+  }
+
+  const shutting = (event: CustomEvent<{ value: string }>) => {
+    say(
+      'helix-before-collapse',
+      event.detail.value === '' ? 'reopened' : `shut the ${event.detail.value} pane`,
+    )
+  }
 
   return (
     <helix-flex direction="column" gap="md">
       <helix-splitter
         collapsed-size="8"
         default-position="50"
-        onhelix-before-collapse={(event) =>
-          say(
-            'helix-before-collapse',
-            event.detail.value === '' ? 'reopened' : `shut the ${event.detail.value} pane`,
-          )
-        }
-        onhelix-before-resize={(event) =>
-          say('helix-before-resize', `settling at ${event.detail.value} percent`)
-        }
+        onhelix-before-collapse={shutting}
+        onhelix-before-resize={settling}
         style={{ blockSize: '10rem' }}
       >
         <helix-card separation="plain" slot="start">

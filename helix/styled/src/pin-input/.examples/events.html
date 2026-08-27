@@ -1,0 +1,60 @@
+<!-- @summary One event per character, and a different one the moment the code is whole. -->
+<!-- @layout hug -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-pin-input
+    hint="Sent to your phone"
+    id="it"
+    label="Verification code"
+  ></helix-pin-input>
+
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type six characters</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const it = document.getElementById('it')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > 6) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  it.addEventListener('helix-before-change', (event) => {
+    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+  })
+  it.addEventListener('input', (event) => {
+    say('input', `"${event.currentTarget.value}" so far`)
+  })
+  it.addEventListener('helix-complete', (event) => {
+    say('helix-complete', `"${event.detail.value}", every box is filled`)
+  })
+  it.addEventListener('change', (event) => {
+    say('change', `"${event.currentTarget.value}", a filled code is the commit`)
+  })
+</script>

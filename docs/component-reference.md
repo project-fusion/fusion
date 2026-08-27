@@ -997,6 +997,7 @@ offering it.
 | `--chat-gap` | Space between turns. |
 | `--chat-rule` | The hairline above the composer and under the header. |
 | `--chat-padding-inline` | Space either side of every region. |
+| `--chat-resume-shadow` | The lift under the way back, which floats over the transcript. |
 
 ### Composer (`helix-chat-composer`)
 

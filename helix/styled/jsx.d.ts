@@ -20720,6 +20720,7 @@ export type CustomElements = {
    * - `--chat-gap`: Space between turns. (default: `undefined`)
    * - `--chat-rule`: The hairline above the composer and under the header. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
+   * - `--chat-resume-shadow`: The lift under the way back, which floats over the transcript. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -37438,6 +37439,7 @@ export type CustomElementsSolidJs = {
    * - `--chat-gap`: Space between turns. (default: `undefined`)
    * - `--chat-rule`: The hairline above the composer and under the header. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
+   * - `--chat-resume-shadow`: The lift under the way back, which floats over the transcript. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -52162,6 +52164,8 @@ export type CustomCssProperties = {
   "--chat-rule"?: string;
   /** Space either side of every region. */
   "--chat-padding-inline"?: string;
+  /** The lift under the way back, which floats over the transcript. */
+  "--chat-resume-shadow"?: string;
   /** Space between the boxes. */
   "--checkbox-group-gap"?: string;
   /** Width and height of the box. */
