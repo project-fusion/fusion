@@ -1362,9 +1362,15 @@ export class HelixHeadlessVideo extends HelixElement {
    * and hid it always, including on a paused video, which is the one state it
    * was written to keep it in.
    *
-   * `data-open` is set the same way and for the same reason. It is a fact about
-   * this element at runtime and never appears in a server's markup, so there is
-   * nothing for hydration to disagree with.
+   * **A `data-` attribute is right here because of when it is written.** A fact
+   * that can be true on the first update mirrors to a custom state instead, or
+   * a consumer's server sends markup the element then grows an attribute on and
+   * React reports a mismatch it will not patch up. Nothing plays until somebody
+   * presses play, so this one is written long past hydration and there is
+   * nothing for it to disagree with. `data-closed` on `Toast.Item` and
+   * `data-scrolled` on `AppHeader` are the same case; `:state(open)` and
+   * `:state(checked)` are the other one, and were `data-` attributes until
+   * 27 Aug 2026.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)

@@ -367,6 +367,24 @@ to, which wrote a destination onto a host that is not a link and put a bare
 `variant`, `orientation`, `disabled`, and the `size` that survives on avatar and
 loader; the rest do not.
 
+**Read it the other way as well, which nothing did for months.** The sentence is
+a biconditional and only one side of it was ever enforced: a property a
+stylesheet *does* select on and that does *not* reflect is the same fault, and it
+is the quieter one. The rule matches for whoever wrote the attribute in markup,
+which is every example, and silently does nothing for anybody who sets the
+property, which is every script and every React consumer by default. Four had
+drifted: `avatar-group.max` folded nothing, `breadcrumb.href` lost 8px from every
+crumb, `code-block.noCopy` dropped the button and kept the 40px it stood in, and
+`breadcrumb.href`'s own docblock gave the reason as "nothing selects on it" while
+`breadcrumb.css` selected on it.
+
+`check:reachable` holds it now, and the three checks on this one rule are worth
+naming together because each sees a different half: `check:reachable` asks
+whether a selected-on property reflects, `check:reflected` bans a default on one
+that does, and `check:reflected-defaults` bans a default that writes an
+attribute. Three of the four above were found by `check:visual-parity` rendering
+a React twin, not by reading, which is the argument for all of them.
+
 **And a reflected property takes no default.** The two together are what write
 onto every host: `Tree.chevronPlacement` reflected and defaulted to `'start'`,
 so the server's markup carried `chevron-placement="start"` for every tree
@@ -1067,11 +1085,17 @@ which native event a control sends rather than what its request is called: five
 are continuous, Input, Textarea, Number Input, Pin Input and Slider, and the
 rest send `input` and `change` together the way a native `<select>` does.
 
-**Eleven families still send a generic `helix-change` and want a verb of their
-own**, Chat, Outline, Pagination Size, Sandbox, Splitter, Steps, Tabs, Tour,
-Tree and Video Playlist among them. They are not form controls, so no native
-word applies, and `helix-change` is doing for them what one word for four
-questions did for `appearance`. See 294.
+**The eleven families that sent a generic `helix-change` have verbs of their
+own.** *Rewritten 27 Aug 2026, and this said they still wanted them.* They are
+not form controls, so no native word applied, and one word was doing for them
+what one word for four questions did for `appearance`. What they took: Chat
+`helix-before-pin`, Outline, Steps, Tabs, Tour, Tree and Video Playlist
+`helix-before-activate`, Splitter `helix-before-resize` and
+`helix-before-collapse`, Sandbox `helix-before-split` and
+`helix-before-panel-resize` for its two dividers and `helix-before-edit` for a
+source pane. Pagination Size kept `helix-before-change`, being the one of the
+eleven that really is a value control. See 294, and 306 for the field the
+sandbox's pair was the last caller of.
 
 **`@controlled` is deleted, and so is everything that read it.** *Rewritten 26
 Aug 2026, and this section described a tag, two analyzer plugins and a check
@@ -1169,6 +1193,33 @@ exist by the time somebody interacts; a property has to be right before the firs
 paint. `connectedCallback` is the obvious early moment and is the wrong one,
 measured: an element upgrades when its definition loads, which falls either side
 of hydration depending on how the consumer imported it.
+
+**A same-named attribute with a converter is the other half, and no repair in
+`core` can reach it.** React prefers a property whenever the prop name matches
+one, and it assigns the value *verbatim*, so Lit's converter never runs:
+`value="42"` on a meter arrives as the string `"42"` and the bar draws 0%,
+`split="35"` on a sandbox fails `Number.isFinite` and falls back to the default,
+`modal="false"` on a drawer is the truthy string `"false"` and the scrim renders.
+A hyphenated attribute is safe, `page-size` being no property name at all, so
+this is exactly the single-word ones: **ninety attributes carry a converter and
+share their name with their property.**
+
+There is nothing to fix in the component. The value the consumer wrote is a
+string and JSX is where it has to stop being one, so an example, a page or an
+app writes `value={42}` and `modal={false}`. `check:visual-parity` is what holds
+it: it renders every example from its HTML and from its TSX and compares the two
+pictures, which is the only way a converter that quietly did not run shows up.
+
+**And a property a stylesheet selects on has to reflect, or setting it does
+nothing at all.** That is the older rule below about reflection, met from this
+direction: React writes the property and no attribute appears, so `:host([max])`,
+`:host(:not([href]))` and `:host(:not([no-copy]))` match the wrong way round and
+the component works while looking wrong. Four had drifted, three of them found by
+rendering pictures rather than by reading. `check:reachable` reads every
+host-attribute selector against whether its property reflects, and it is the
+third check on that one rule: `check:reflected` and `check:reflected-defaults`
+both ask about properties that already reflect, and neither notices one that
+should and does not.
 
 `useHelixEvent` is deleted. It existed to bind from an effect because the prop
 did not survive hydration, and all twenty-one of its call sites were binding to
@@ -1480,8 +1531,9 @@ one client component.
   color, and the preview would be a worse likeness the more the design system
   does.
 - **Source and preview never speak directly.** The source pane dispatches
-  `helix-change` and the root hands the value to whatever preview is slotted
-  into it, the same event-not-registration shape the accordion uses.
+  `helix-before-edit` and the root hands the value to whatever preview is
+  slotted into it, the same event-not-registration shape the accordion uses.
+  *It was `helix-change` until 294 gave the eleven generic families verbs.*
 - **The divider is a real `role="separator"`** with `aria-valuenow`, moved by
   arrow keys as well as by pointer. A divider only a mouse can move is unusable
   without one.
@@ -1595,8 +1647,27 @@ read out underneath it and the rail points at sections that are not shown.
 Styled is expressed as the *absence* of the attribute, so the document's resting
 state is the common answer.
 
-Examples are `.examples/*.html` beside the component. `default.html` is the
+Examples are `.examples/<slug>.html` and `.examples/<slug>.tsx` beside the
+component, plus a `<slug>.css` where one is needed. `default.html` is the
 headline preview and reads as "Preview"; every other slug is a named variant.
+
+**Both syntaxes are authored, and neither is derived from the other.** The
+sandbox used to convert the HTML with `htmlToJsx` when a reader asked for TSX,
+which is the mistake `build-headless-examples.mjs` made one axis over and this
+repository already rejected once: a derived example is a function of its twin
+rather than a thing anybody wrote. It also did not work. Every example carrying a
+`<script>` converted to a JSX fragment with a `<script>` in it, which is a
+*syntax error* rather than a bad example, and three faults hit the script-free
+ones too: a leading comment was not counted as a root so no fragment was emitted,
+the stylesheet-to-import rule required `rel` before `href` and every example
+writes them alphabetically so it had never once fired, and `for` was renamed to
+`htmlFor` on custom elements, where React writes the attribute verbatim and the
+browser lowercases it to something no component reads.
+
+`htmlToJsx` is deleted. `jsxToHtml` survives for one job, converting a reader's
+live edit in the TSX pane, which by definition has no authored twin.
+`check:examples-paired` holds the two files to each other and
+`check:visual-parity` holds the two pictures to each other.
 
 **An example shows the component. It never explains it.** Slot content is
 whatever a real page would hold, which usually means a label and lorem, and the

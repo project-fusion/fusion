@@ -127,7 +127,11 @@ export class HelixHeadlessImage extends HelixElement {
    * back declares that a picture has arrived which this element has never
    * fetched. The `data-` name is the library's answer to both, being a
    * different name a re-parse cannot mistake for a declaration, and it is what
-   * `data-open` and `data-checked` already do.
+   * `data-closed` on `Toast.Item` and `data-scrolled` on `AppHeader` already do.
+   * A picture arrives after somebody fetched it, which puts this on the safe
+   * side of hydration: a fact that can be true on the *first* update mirrors to
+   * a custom state instead, which is what `:state(open)` and `:state(checked)`
+   * became on 27 Aug 2026 for exactly that reason.
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence.
