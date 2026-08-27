@@ -58,9 +58,18 @@ const CONFIRM = 1600
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
-  /** What goes on the clipboard. */
+  /**
+   * What goes on the clipboard.
+   *
+   * **Narrows `Button.value`, which is the submit value, and the two agree.**
+   * A copy button is `type="button"` and never submits, so the inherited
+   * meaning has nothing to act on; where a consumer changes the type, what it
+   * submits is what it copies, which is the reading anybody would expect of one
+   * property called `value`. Declared here rather than inherited because the
+   * clipboard is what this component is about and its own page should say so.
+   */
   @property()
-  value = ''
+  override value = ''
 
   /**
    * What it is called, and says, before a press.

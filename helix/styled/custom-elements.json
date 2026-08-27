@@ -6696,6 +6696,90 @@
             },
             {
               "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this button submits under its own `name`, the way a native submitter does.\n\n**Reported for exactly the submission this button starts and not otherwise.**\nA native submit button contributes `name=value` only when it is the one\nthat submitted, and every other button on the form contributes nothing. A\nform-associated element reporting a value continuously would contribute on\nevery submission whoever started it, which is a different feature wearing\nthe same name, so `submit` below sets it, submits, and clears it inside one\nsynchronous call.\n\n`CopyButton` has a `value` of its own meaning the text to put on the\nclipboard, which is not this and is why it is declared there rather than\ninherited.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "attribute": "formaction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formEnctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "attribute": "formenctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formMethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "attribute": "formmethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formNoValidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "attribute": "formnovalidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formTarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "attribute": "formtarget",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -6791,6 +6875,41 @@
             },
             {
               "kind": "method",
+              "name": "submit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "form",
+                  "type": {
+                    "text": "HTMLFormElement"
+                  }
+                }
+              ],
+              "description": "Submits the form as this button, for the length of one call.\n\nEverything a native submitter carries is written onto the form, the\nsubmission is started, and everything is put back. See `formAction` for why\n`requestSubmit(submitter)` is not available to a control inside a shadow\nroot.\n\n`novalidate` is in the same list rather than reached by `form.submit()`,\nwhich looks like the shortcut and is not: `submit()` skips the `submit`\nevent as well as the validation, so a consumer's handler would stop running\nthe moment somebody wrote `formnovalidate`. Turning the flag on and calling\n`requestSubmit()` skips the validation alone, which is what the attribute\nmeans.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "commandForElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "description": "The element this button's command is sent to, resolved.\n\nThe platform's own accessor, and this element had the resolution and kept\nit to itself: `linkCommand` writes the target onto the inner `<button>`,\nwhere a consumer cannot reach it, and `commandFor` answers with an id\nrather than an element. Writing assigns the inner control directly, which\nis what an invoker without an id in the same tree needs.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "linkCommand",
               "privacy": "private",
               "return": {
@@ -6798,7 +6917,6 @@
                   "text": "void"
                 }
               },
-              "description": "Points the inner button at the command's target, by reference.\n\n**The attribute cannot do this and it fails silently.** `commandfor` is an\nIDREF, and an IDREF resolves inside the tree it is written in: forwarded\nonto a button in this shadow root it looks for the id *here*, finds\nnothing, and the trigger does nothing at all. Measured before this existed:\nthe button clicked, no `command` event was dispatched, and there was\nnothing anywhere to say why.\n\n`commandForElement` takes an element instead, and an element reference\nresolves outward: a node in a shadow root may point at one in the document.\nThe same asymmetry the listbox relies on for `aria-activedescendant`, and\nthe second place in this library where the id form is the one that cannot\nwork.\n\nThe id is looked up in the host's own root rather than the document, so a\nbutton inside somebody else's shadow root finds a target in that same root\nand not a coincidence in the page.",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"
@@ -7135,6 +7253,84 @@
               "default": "'button'",
               "description": "What activating the button does to its form.",
               "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this button submits under its own `name`, the way a native submitter does.\n\n**Reported for exactly the submission this button starts and not otherwise.**\nA native submit button contributes `name=value` only when it is the one\nthat submitted, and every other button on the form contributes nothing. A\nform-associated element reporting a value continuously would contribute on\nevery submission whoever started it, which is a different feature wearing\nthe same name, so `submit` below sets it, submits, and clears it inside one\nsynchronous call.\n\n`CopyButton` has a `value` of its own meaning the text to put on the\nclipboard, which is not this and is why it is declared there rather than\ninherited.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formaction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "fieldName": "formAction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formenctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "fieldName": "formEnctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formmethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "fieldName": "formMethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formnovalidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "fieldName": "formNoValidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formtarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "fieldName": "formTarget",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"
@@ -19818,11 +20014,11 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What goes on the clipboard.",
+              "description": "What goes on the clipboard.\n\n**Narrows `Button.value`, which is the submit value, and the two agree.**\nA copy button is `type=\"button\"` and never submits, so the inherited\nmeaning has nothing to act on; where a consumer changes the type, what it\nsubmits is what it copies, which is the reading anybody would expect of one\nproperty called `value`. Declared here rather than inherited because the\nclipboard is what this component is about and its own page should say so.",
               "attribute": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessCopyButton",
-                "module": "src/copy-button/root/copy-button-root.ts"
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
               }
             },
             {
@@ -20006,6 +20202,76 @@
             },
             {
               "kind": "field",
+              "name": "formAction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "attribute": "formaction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formEnctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "attribute": "formenctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formMethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "attribute": "formmethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formNoValidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "attribute": "formnovalidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formTarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "attribute": "formtarget",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "command",
               "type": {
                 "text": "string"
@@ -20087,6 +20353,41 @@
             },
             {
               "kind": "method",
+              "name": "submit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "form",
+                  "type": {
+                    "text": "HTMLFormElement"
+                  }
+                }
+              ],
+              "description": "Submits the form as this button, for the length of one call.\n\nEverything a native submitter carries is written onto the form, the\nsubmission is started, and everything is put back. See `formAction` for why\n`requestSubmit(submitter)` is not available to a control inside a shadow\nroot.\n\n`novalidate` is in the same list rather than reached by `form.submit()`,\nwhich looks like the shortcut and is not: `submit()` skips the `submit`\nevent as well as the validation, so a consumer's handler would stop running\nthe moment somebody wrote `formnovalidate`. Turning the flag on and calling\n`requestSubmit()` skips the validation alone, which is what the attribute\nmeans.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "commandForElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "description": "The element this button's command is sent to, resolved.\n\nThe platform's own accessor, and this element had the resolution and kept\nit to itself: `linkCommand` writes the target onto the inner `<button>`,\nwhere a consumer cannot reach it, and `commandFor` answers with an id\nrather than an element. Writing assigns the inner control directly, which\nis what an invoker without an id in the same tree needs.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "linkCommand",
               "privacy": "private",
               "return": {
@@ -20094,7 +20395,6 @@
                   "text": "void"
                 }
               },
-              "description": "Points the inner button at the command's target, by reference.\n\n**The attribute cannot do this and it fails silently.** `commandfor` is an\nIDREF, and an IDREF resolves inside the tree it is written in: forwarded\nonto a button in this shadow root it looks for the id *here*, finds\nnothing, and the trigger does nothing at all. Measured before this existed:\nthe button clicked, no `command` event was dispatched, and there was\nnothing anywhere to say why.\n\n`commandForElement` takes an element instead, and an element reference\nresolves outward: a node in a shadow root may point at one in the document.\nThe same asymmetry the listbox relies on for `aria-activedescendant`, and\nthe second place in this library where the id form is the one that cannot\nwork.\n\nThe id is looked up in the host's own root rather than the document, so a\nbutton inside somebody else's shadow root finds a target in that same root\nand not a coincidence in the page.",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"
@@ -20436,11 +20736,11 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "What goes on the clipboard.",
+              "description": "What goes on the clipboard.\n\n**Narrows `Button.value`, which is the submit value, and the two agree.**\nA copy button is `type=\"button\"` and never submits, so the inherited\nmeaning has nothing to act on; where a consumer changes the type, what it\nsubmits is what it copies, which is the reading anybody would expect of one\nproperty called `value`. Declared here rather than inherited because the\nclipboard is what this component is about and its own page should say so.",
               "fieldName": "value",
               "inheritedFrom": {
-                "name": "HelixHeadlessCopyButton",
-                "module": "src/copy-button/root/copy-button-root.ts"
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
               }
             },
             {
@@ -20477,6 +20777,71 @@
               "default": "'button'",
               "description": "What activating the button does to its form.",
               "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formaction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "fieldName": "formAction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formenctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "fieldName": "formEnctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formmethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "fieldName": "formMethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formnovalidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "fieldName": "formNoValidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formtarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "fieldName": "formTarget",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"
@@ -32409,6 +32774,90 @@
             },
             {
               "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this button submits under its own `name`, the way a native submitter does.\n\n**Reported for exactly the submission this button starts and not otherwise.**\nA native submit button contributes `name=value` only when it is the one\nthat submitted, and every other button on the form contributes nothing. A\nform-associated element reporting a value continuously would contribute on\nevery submission whoever started it, which is a different feature wearing\nthe same name, so `submit` below sets it, submits, and clears it inside one\nsynchronous call.\n\n`CopyButton` has a `value` of its own meaning the text to put on the\nclipboard, which is not this and is why it is declared there rather than\ninherited.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "attribute": "formaction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formEnctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "attribute": "formenctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formMethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "attribute": "formmethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formNoValidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "attribute": "formnovalidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formTarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "attribute": "formtarget",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -32504,6 +32953,41 @@
             },
             {
               "kind": "method",
+              "name": "submit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "form",
+                  "type": {
+                    "text": "HTMLFormElement"
+                  }
+                }
+              ],
+              "description": "Submits the form as this button, for the length of one call.\n\nEverything a native submitter carries is written onto the form, the\nsubmission is started, and everything is put back. See `formAction` for why\n`requestSubmit(submitter)` is not available to a control inside a shadow\nroot.\n\n`novalidate` is in the same list rather than reached by `form.submit()`,\nwhich looks like the shortcut and is not: `submit()` skips the `submit`\nevent as well as the validation, so a consumer's handler would stop running\nthe moment somebody wrote `formnovalidate`. Turning the flag on and calling\n`requestSubmit()` skips the validation alone, which is what the attribute\nmeans.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "commandForElement",
+              "type": {
+                "text": "Element | null"
+              },
+              "description": "The element this button's command is sent to, resolved.\n\nThe platform's own accessor, and this element had the resolution and kept\nit to itself: `linkCommand` writes the target onto the inner `<button>`,\nwhere a consumer cannot reach it, and `commandFor` answers with an id\nrather than an element. Writing assigns the inner control directly, which\nis what an invoker without an id in the same tree needs.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "linkCommand",
               "privacy": "private",
               "return": {
@@ -32511,7 +32995,6 @@
                   "text": "void"
                 }
               },
-              "description": "Points the inner button at the command's target, by reference.\n\n**The attribute cannot do this and it fails silently.** `commandfor` is an\nIDREF, and an IDREF resolves inside the tree it is written in: forwarded\nonto a button in this shadow root it looks for the id *here*, finds\nnothing, and the trigger does nothing at all. Measured before this existed:\nthe button clicked, no `command` event was dispatched, and there was\nnothing anywhere to say why.\n\n`commandForElement` takes an element instead, and an element reference\nresolves outward: a node in a shadow root may point at one in the document.\nThe same asymmetry the listbox relies on for `aria-activedescendant`, and\nthe second place in this library where the id form is the one that cannot\nwork.\n\nThe id is looked up in the host's own root rather than the document, so a\nbutton inside somebody else's shadow root finds a target in that same root\nand not a coincidence in the page.",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"
@@ -32857,6 +33340,84 @@
               "default": "'button'",
               "description": "What activating the button does to its form.",
               "fieldName": "type",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this button submits under its own `name`, the way a native submitter does.\n\n**Reported for exactly the submission this button starts and not otherwise.**\nA native submit button contributes `name=value` only when it is the one\nthat submitted, and every other button on the form contributes nothing. A\nform-associated element reporting a value continuously would contribute on\nevery submission whoever started it, which is a different feature wearing\nthe same name, so `submit` below sets it, submits, and clears it inside one\nsynchronous call.\n\n`CopyButton` has a `value` of its own meaning the text to put on the\nclipboard, which is not this and is why it is declared there rather than\ninherited.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formaction",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this button's submission goes, overriding the form's own.\n\n**The five `form*` overrides work by writing the form and putting it back**,\nwhich is the only mechanism available and is closer to the platform than it\nsounds. `requestSubmit(submitter)` is how a native submitter carries these,\nand it refuses ours twice over: the inner `<button>` is `type=\"button\"` so\nit is not a submit button, and it sits in this shadow root so its form owner\nis not the consumer's form. Both throw. So the submission is started with no\nsubmitter and the overrides are applied to the form for the duration of it.\n\nThe whole submit algorithm runs synchronously inside `requestSubmit()`, so\nthe window is one call and a `finally` closes it whether or not a listener\nrefused. What a `submit` handler observes during that window is the form a\nnative submitter would have given it, which is the point.",
+              "fieldName": "formAction",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formenctype",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How the submission is encoded, overriding the form's own.",
+              "fieldName": "formEnctype",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formmethod",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which HTTP method the submission uses, overriding the form's own.",
+              "fieldName": "formMethod",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formnovalidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this submission skips the form's validation.",
+              "fieldName": "formNoValidate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "name": "formtarget",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Which browsing context the response lands in, overriding the form's own.",
+              "fieldName": "formTarget",
               "inheritedFrom": {
                 "name": "HelixHeadlessButton",
                 "module": "src/button/root/button-root.ts"

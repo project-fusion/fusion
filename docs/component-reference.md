@@ -648,17 +648,24 @@ ring is declared here rather than inherited, because the base layer's
 | --- | --- | --- | --- | --- | --- |
 | `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
+| `commandForElement` | - | `Element \| null` | - | `HelixHeadlessButton` | The element this button's command is sent to, resolved. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `formEnctype` | `formenctype` | `string` | `''` | `HelixHeadlessButton` | How the submission is encoded, overriding the form's own. |
+| `formMethod` | `formmethod` | `string` | `''` | `HelixHeadlessButton` | Which HTTP method the submission uses, overriding the form's own. |
+| `formNoValidate` | `formnovalidate` | `boolean` | `false` | `HelixHeadlessButton` | Whether this submission skips the form's validation. |
+| `formTarget` | `formtarget` | `string` | `''` | `HelixHeadlessButton` | Which browsing context the response lands in, overriding the form's own. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessButton` | What this button submits under its own `name`, the way a native submitter does. |
 | `width` | `width` | `'auto' \| 'full' \| 'standard' \| undefined` | - | - | How much of the space available to it the button takes. |
 
 #### Methods
@@ -1804,19 +1811,25 @@ it for reassurance reads as a second, accidental press.
 | --- | --- | --- | --- | --- | --- |
 | `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
+| `commandForElement` | - | `Element \| null` | - | `HelixHeadlessButton` | The element this button's command is sent to, resolved. |
 | `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixHeadlessCopyButton` | What it is called, and says, after one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `formEnctype` | `formenctype` | `string` | `''` | `HelixHeadlessButton` | How the submission is encoded, overriding the form's own. |
+| `formMethod` | `formmethod` | `string` | `''` | `HelixHeadlessButton` | Which HTTP method the submission uses, overriding the form's own. |
+| `formNoValidate` | `formnovalidate` | `boolean` | `false` | `HelixHeadlessButton` | Whether this submission skips the form's validation. |
+| `formTarget` | `formtarget` | `string` | `''` | `HelixHeadlessButton` | Which browsing context the response lands in, overriding the form's own. |
 | `label` | `label` | `string` | `'Copy'` | `HelixHeadlessButton` | What it is called, and says, before a press. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
-| `value` | `value` | `string` | `''` | `HelixHeadlessCopyButton` | What goes on the clipboard. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessButton` | What goes on the clipboard. |
 
 #### Methods
 
@@ -2879,11 +2892,17 @@ common way a toolbar becomes unusable without sight.
 | --- | --- | --- | --- | --- | --- |
 | `command` | `command` | `string` | `''` | `HelixHeadlessButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixHeadlessButton` | The id of the element the command is sent to. |
+| `commandForElement` | - | `Element \| null` | - | `HelixHeadlessButton` | The element this button's command is sent to, resolved. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `formEnctype` | `formenctype` | `string` | `''` | `HelixHeadlessButton` | How the submission is encoded, overriding the form's own. |
+| `formMethod` | `formmethod` | `string` | `''` | `HelixHeadlessButton` | Which HTTP method the submission uses, overriding the form's own. |
+| `formNoValidate` | `formnovalidate` | `boolean` | `false` | `HelixHeadlessButton` | Whether this submission skips the form's validation. |
+| `formTarget` | `formtarget` | `string` | `''` | `HelixHeadlessButton` | Which browsing context the response lands in, overriding the form's own. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
@@ -2892,6 +2911,7 @@ common way a toolbar becomes unusable without sight.
 | `shape` | `shape` | `'circle' \| undefined` | - | - | The outline it is cut to, which is an axis of its own and not a value on one. |
 | `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | `MixinControlSurface` | What it means. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixHeadlessButton` | What activating the button does to its form. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessButton` | What this button submits under its own `name`, the way a native submitter does. |
 
 #### Methods
 

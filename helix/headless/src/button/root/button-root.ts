@@ -59,6 +59,59 @@ export class HelixHeadlessButton extends HelixFormElement {
   type: 'button' | 'submit' | 'reset' = 'button'
 
   /**
+   * What this button submits under its own `name`, the way a native submitter does.
+   *
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
+   *
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
+   */
+  @property()
+  value = ''
+
+  /**
+   * Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   */
+  @property({ attribute: 'formaction' })
+  formAction = ''
+
+  /** How the submission is encoded, overriding the form's own. */
+  @property({ attribute: 'formenctype' })
+  formEnctype = ''
+
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  @property({ attribute: 'formmethod' })
+  formMethod = ''
+
+  /** Whether this submission skips the form's validation. */
+  @property({ attribute: 'formnovalidate', type: Boolean })
+  formNoValidate = false
+
+  /** Which browsing context the response lands in, overriding the form's own. */
+  @property({ attribute: 'formtarget' })
+  formTarget = ''
+
+  /**
    * Accessible name, for a button whose content is not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
@@ -148,7 +201,7 @@ export class HelixHeadlessButton extends HelixFormElement {
     }
 
     if (this.type === 'submit') {
-      form.requestSubmit()
+      this.submit(form)
     } else {
       form.reset()
     }
@@ -168,6 +221,83 @@ export class HelixHeadlessButton extends HelixFormElement {
    */
   @property({ attribute: false })
   focusable = true
+
+  /**
+   * Submits the form as this button, for the length of one call.
+   *
+   * Everything a native submitter carries is written onto the form, the
+   * submission is started, and everything is put back. See `formAction` for why
+   * `requestSubmit(submitter)` is not available to a control inside a shadow
+   * root.
+   *
+   * `novalidate` is in the same list rather than reached by `form.submit()`,
+   * which looks like the shortcut and is not: `submit()` skips the `submit`
+   * event as well as the validation, so a consumer's handler would stop running
+   * the moment somebody wrote `formnovalidate`. Turning the flag on and calling
+   * `requestSubmit()` skips the validation alone, which is what the attribute
+   * means.
+   */
+  private submit(form: HTMLFormElement): void {
+    const undo: (() => void)[] = []
+    const override = (attribute: string, value: string | null): void => {
+      if (value === null) {
+        return
+      }
+      const had = form.getAttribute(attribute)
+      form.setAttribute(attribute, value)
+      undo.push(() => {
+        if (had === null) {
+          form.removeAttribute(attribute)
+        } else {
+          form.setAttribute(attribute, had)
+        }
+      })
+    }
+    override('action', this.formAction || null)
+    override('enctype', this.formEnctype || null)
+    override('method', this.formMethod || null)
+    override('novalidate', this.formNoValidate ? '' : null)
+    override('target', this.formTarget || null)
+    const reports = this.name !== ''
+    if (reports) {
+      this.internals.setFormValue(this.value)
+    }
+    try {
+      form.requestSubmit()
+    } finally {
+      for (const put of undo) {
+        put()
+      }
+      if (reports) {
+        this.internals.setFormValue(null)
+      }
+    }
+  }
+
+  /**
+   * The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs.
+   */
+  get commandForElement(): Element | null {
+    const button = this.renderRoot?.querySelector('button') as
+      | (HTMLButtonElement & { commandForElement?: Element | null })
+      | null
+    return button?.commandForElement ?? this.commandTarget()
+  }
+
+  set commandForElement(target: Element | null) {
+    const button = this.renderRoot?.querySelector('button') as
+      | (HTMLButtonElement & { commandForElement?: Element | null })
+      | null
+    if (button) {
+      button.commandForElement = target
+    }
+  }
 
   /**
    * Points the inner button at the command's target, by reference.

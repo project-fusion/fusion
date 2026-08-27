@@ -253,11 +253,21 @@ const NATIVE = {
 /**
  * What a shadow component cannot mirror, whatever the element.
  *
- * Live collections and the validity surface are the two groups. `rows` and
- * `options` hand back a live `HTMLCollection` of light-DOM children, which a
+ * Live collections and the validity surface are two of the three groups. `rows`
+ * and `options` hand back a live `HTMLCollection` of light-DOM children, which a
  * component that renders its own tree does not have; `validity` and
  * `validationMessage` belong to `ElementInternals`, which `HelixFormElement`
  * already owns. Neither is a fidelity question and reporting them is noise.
+ *
+ * **The third is an IDREF, and `list` is the whole of it.** `<input list="x">`
+ * resolves `x` in the input's own tree, and the input is inside a shadow root
+ * while the `<datalist>` a consumer wrote is not, so forwarding the attribute
+ * resolves nothing and would look exactly like support. This repository already
+ * states the rule for `aria-labelledby`, which is the same wall; the difference
+ * is that a component can put the label inside and cannot put the consumer's
+ * datalist there. Eleven families were reported for it, and what they should
+ * reach for is `Combobox`, which is this library's answer to the same question
+ * and works across the boundary because it renders the list itself.
  */
 const UNMIRRORABLE = new Set([
   'audioTracks',
@@ -267,6 +277,7 @@ const UNMIRRORABLE = new Set([
   'form',
   'labels',
   'length',
+  'list',
   'mediaKeys',
   'networkState',
   'options',

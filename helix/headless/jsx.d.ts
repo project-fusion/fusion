@@ -1081,6 +1081,66 @@ column. */
 export type HelixHeadlessButtonProps = {
   /** What activating the button does to its form. */
   type?: HelixHeadlessButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
+
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
+
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  value?: HelixHeadlessButton["value"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formaction?: HelixHeadlessButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formAction?: HelixHeadlessButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  formenctype?: HelixHeadlessButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  formEnctype?: HelixHeadlessButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formmethod?: HelixHeadlessButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formMethod?: HelixHeadlessButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  formnovalidate?: HelixHeadlessButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  formNoValidate?: HelixHeadlessButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formtarget?: HelixHeadlessButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formTarget?: HelixHeadlessButton["formTarget"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
@@ -1147,11 +1207,79 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  commandForElement?: HelixHeadlessButton["commandForElement"];
 };
 
 export type HelixHeadlessButtonSolidJsProps = {
   /** What activating the button does to its form. */
   "prop:type"?: HelixHeadlessButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
+
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
+
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  "prop:value"?: HelixHeadlessButton["value"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "attr:formaction"?: HelixHeadlessButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "prop:formAction"?: HelixHeadlessButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  "attr:formenctype"?: HelixHeadlessButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  "prop:formEnctype"?: HelixHeadlessButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "attr:formmethod"?: HelixHeadlessButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "prop:formMethod"?: HelixHeadlessButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  "bool:formnovalidate"?: HelixHeadlessButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  "prop:formNoValidate"?: HelixHeadlessButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "attr:formtarget"?: HelixHeadlessButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "prop:formTarget"?: HelixHeadlessButton["formTarget"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
@@ -1218,6 +1346,14 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  "prop:commandForElement"?: HelixHeadlessButton["commandForElement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3289,7 +3425,14 @@ export type HelixHeadlessCopyButtonHelixCopyElementEvent =
   HelixHeadlessCopyButtonElementEvent<HelixCopyEvent>;
 
 export type HelixHeadlessCopyButtonProps = {
-  /** What goes on the clipboard. */
+  /** What goes on the clipboard.
+
+**Narrows `Button.value`, which is the submit value, and the two agree.**
+A copy button is `type="button"` and never submits, so the inherited
+meaning has nothing to act on; where a consumer changes the type, what it
+submits is what it copies, which is the reading anybody would expect of one
+property called `value`. Declared here rather than inherited because the
+clipboard is what this component is about and its own page should say so. */
   value?: HelixHeadlessCopyButton["value"];
   /** What it is called, and says, before a press.
 
@@ -3309,6 +3452,52 @@ dash-casing it, and `copiedlabel` is not what anyone would type. */
   copiedLabel?: HelixHeadlessCopyButton["copiedLabel"];
   /** What activating the button does to its form. */
   type?: HelixHeadlessCopyButton["type"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formaction?: HelixHeadlessCopyButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formAction?: HelixHeadlessCopyButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  formenctype?: HelixHeadlessCopyButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  formEnctype?: HelixHeadlessCopyButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formmethod?: HelixHeadlessCopyButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formMethod?: HelixHeadlessCopyButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  formnovalidate?: HelixHeadlessCopyButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  formNoValidate?: HelixHeadlessCopyButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formtarget?: HelixHeadlessCopyButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formTarget?: HelixHeadlessCopyButton["formTarget"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -3369,13 +3558,28 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessCopyButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  commandForElement?: HelixHeadlessCopyButton["commandForElement"];
 
   /** Fired after the clipboard write succeeds. */
   "onhelix-copy"?: (e: HelixHeadlessCopyButtonHelixCopyElementEvent) => void;
 };
 
 export type HelixHeadlessCopyButtonSolidJsProps = {
-  /** What goes on the clipboard. */
+  /** What goes on the clipboard.
+
+**Narrows `Button.value`, which is the submit value, and the two agree.**
+A copy button is `type="button"` and never submits, so the inherited
+meaning has nothing to act on; where a consumer changes the type, what it
+submits is what it copies, which is the reading anybody would expect of one
+property called `value`. Declared here rather than inherited because the
+clipboard is what this component is about and its own page should say so. */
   "prop:value"?: HelixHeadlessCopyButton["value"];
   /** What it is called, and says, before a press.
 
@@ -3395,6 +3599,52 @@ dash-casing it, and `copiedlabel` is not what anyone would type. */
   "prop:copiedLabel"?: HelixHeadlessCopyButton["copiedLabel"];
   /** What activating the button does to its form. */
   "prop:type"?: HelixHeadlessCopyButton["type"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "attr:formaction"?: HelixHeadlessCopyButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "prop:formAction"?: HelixHeadlessCopyButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  "attr:formenctype"?: HelixHeadlessCopyButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  "prop:formEnctype"?: HelixHeadlessCopyButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "attr:formmethod"?: HelixHeadlessCopyButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "prop:formMethod"?: HelixHeadlessCopyButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  "bool:formnovalidate"?: HelixHeadlessCopyButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  "prop:formNoValidate"?: HelixHeadlessCopyButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "attr:formtarget"?: HelixHeadlessCopyButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "prop:formTarget"?: HelixHeadlessCopyButton["formTarget"];
   /** What to send when the button is activated, and what to send it to.
 
 The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -3455,6 +3705,14 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessCopyButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  "prop:commandForElement"?: HelixHeadlessCopyButton["commandForElement"];
   /** Fired after the clipboard write succeeds. */
   "on:helix-copy"?: (e: HelixHeadlessCopyButtonHelixCopyElementEvent) => void;
 
@@ -5326,6 +5584,66 @@ words and is already written. */
 export type HelixHeadlessIconButtonProps = {
   /** What activating the button does to its form. */
   type?: HelixHeadlessIconButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
+
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
+
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  value?: HelixHeadlessIconButton["value"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formaction?: HelixHeadlessIconButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  formAction?: HelixHeadlessIconButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  formenctype?: HelixHeadlessIconButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  formEnctype?: HelixHeadlessIconButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formmethod?: HelixHeadlessIconButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  formMethod?: HelixHeadlessIconButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  formnovalidate?: HelixHeadlessIconButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  formNoValidate?: HelixHeadlessIconButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formtarget?: HelixHeadlessIconButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  formTarget?: HelixHeadlessIconButton["formTarget"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
@@ -5392,11 +5710,79 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessIconButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  commandForElement?: HelixHeadlessIconButton["commandForElement"];
 };
 
 export type HelixHeadlessIconButtonSolidJsProps = {
   /** What activating the button does to its form. */
   "prop:type"?: HelixHeadlessIconButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
+
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
+
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  "prop:value"?: HelixHeadlessIconButton["value"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "attr:formaction"?: HelixHeadlessIconButton["formAction"];
+  /** Where this button's submission goes, overriding the form's own.
+
+**The five `form*` overrides work by writing the form and putting it back**,
+which is the only mechanism available and is closer to the platform than it
+sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+and it refuses ours twice over: the inner `<button>` is `type="button"` so
+it is not a submit button, and it sits in this shadow root so its form owner
+is not the consumer's form. Both throw. So the submission is started with no
+submitter and the overrides are applied to the form for the duration of it.
+
+The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+the window is one call and a `finally` closes it whether or not a listener
+refused. What a `submit` handler observes during that window is the form a
+native submitter would have given it, which is the point. */
+  "prop:formAction"?: HelixHeadlessIconButton["formAction"];
+  /** How the submission is encoded, overriding the form's own. */
+  "attr:formenctype"?: HelixHeadlessIconButton["formEnctype"];
+  /** How the submission is encoded, overriding the form's own. */
+  "prop:formEnctype"?: HelixHeadlessIconButton["formEnctype"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "attr:formmethod"?: HelixHeadlessIconButton["formMethod"];
+  /** Which HTTP method the submission uses, overriding the form's own. */
+  "prop:formMethod"?: HelixHeadlessIconButton["formMethod"];
+  /** Whether this submission skips the form's validation. */
+  "bool:formnovalidate"?: HelixHeadlessIconButton["formNoValidate"];
+  /** Whether this submission skips the form's validation. */
+  "prop:formNoValidate"?: HelixHeadlessIconButton["formNoValidate"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "attr:formtarget"?: HelixHeadlessIconButton["formTarget"];
+  /** Which browsing context the response lands in, overriding the form's own. */
+  "prop:formTarget"?: HelixHeadlessIconButton["formTarget"];
   /** Accessible name, for a button whose content is not text.
 
 Lives here rather than only on `IconButton` so the two share one render.
@@ -5463,6 +5849,14 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessIconButton["focusable"];
+  /** The element this button's command is sent to, resolved.
+
+The platform's own accessor, and this element had the resolution and kept
+it to itself: `linkCommand` writes the target onto the inner `<button>`,
+where a consumer cannot reach it, and `commandFor` answers with an id
+rather than an element. Writing assigns the inner control directly, which
+is what an invoker without an id in the same tree needs. */
+  "prop:commandForElement"?: HelixHeadlessIconButton["commandForElement"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15595,6 +15989,37 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   *
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
+   *
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `label`: Accessible name, for a button whose content is not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
@@ -15653,6 +16078,13 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -17910,6 +18342,13 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: What goes on the clipboard.
+   *
+   * **Narrows `Button.value`, which is the submit value, and the two agree.**
+   * A copy button is `type="button"` and never submits, so the inherited
+   * meaning has nothing to act on; where a consumer changes the type, what it
+   * submits is what it copies, which is the reading anybody would expect of one
+   * property called `value`. Declared here rather than inherited because the
+   * clipboard is what this component is about and its own page should say so.
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
@@ -17920,6 +18359,24 @@ export type CustomElements = {
    * `attribute` written out, because Lit lowercases a property name rather than
    * dash-casing it, and `copiedlabel` is not what anyone would type.
    * - `type`: What activating the button does to its form.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -17973,6 +18430,13 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -20014,6 +20478,37 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   *
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
+   *
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `label`: Accessible name, for a button whose content is not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
@@ -20072,6 +20567,13 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -31255,6 +31757,37 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   *
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
+   *
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `label`: Accessible name, for a button whose content is not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
@@ -31313,6 +31846,13 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -33605,6 +34145,13 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: What goes on the clipboard.
+   *
+   * **Narrows `Button.value`, which is the submit value, and the two agree.**
+   * A copy button is `type="button"` and never submits, so the inherited
+   * meaning has nothing to act on; where a consumer changes the type, what it
+   * submits is what it copies, which is the reading anybody would expect of one
+   * property called `value`. Declared here rather than inherited because the
+   * clipboard is what this component is about and its own page should say so.
    * - `label`: What it is called, and says, before a press.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
@@ -33615,6 +34162,24 @@ export type CustomElementsSolidJs = {
    * `attribute` written out, because Lit lowercases a property name rather than
    * dash-casing it, and `copiedlabel` is not what anyone would type.
    * - `type`: What activating the button does to its form.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `command`: What to send when the button is activated, and what to send it to.
    *
    * The platform's invoker attributes, forwarded onto the inner `<button>`
@@ -33668,6 +34233,13 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -35740,6 +36312,37 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   *
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
+   *
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
+   * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
+   *
+   * **The five `form*` overrides work by writing the form and putting it back**,
+   * which is the only mechanism available and is closer to the platform than it
+   * sounds. `requestSubmit(submitter)` is how a native submitter carries these,
+   * and it refuses ours twice over: the inner `<button>` is `type="button"` so
+   * it is not a submit button, and it sits in this shadow root so its form owner
+   * is not the consumer's form. Both throw. So the submission is started with no
+   * submitter and the overrides are applied to the form for the duration of it.
+   *
+   * The whole submit algorithm runs synchronously inside `requestSubmit()`, so
+   * the window is one call and a `finally` closes it whether or not a listener
+   * refused. What a `submit` handler observes during that window is the form a
+   * native submitter would have given it, which is the point.
+   * - `formenctype`/`formEnctype`: How the submission is encoded, overriding the form's own.
+   * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
+   * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
+   * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
    * - `label`: Accessible name, for a button whose content is not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
@@ -35798,6 +36401,13 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `commandForElement`: The element this button's command is sent to, resolved.
+   *
+   * The platform's own accessor, and this element had the resolution and kept
+   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
+   * where a consumer cannot reach it, and `commandFor` answers with an id
+   * rather than an element. Writing assigns the inner control directly, which
+   * is what an invoker without an id in the same tree needs. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.

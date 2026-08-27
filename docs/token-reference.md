@@ -243,7 +243,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 161 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 162 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 33 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
