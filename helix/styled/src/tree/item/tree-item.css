@@ -175,7 +175,7 @@ slot[name="children"]::slotted(*) {
    said it would not patch it up. The row is inside this shadow root and is not
    part of the tree React hydrates, which is where `level` already puts its
    indent for the same reason. */
-[part="row"][data-selected] {
+:host(:state(selected)) [part="row"] {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }

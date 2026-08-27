@@ -17,7 +17,7 @@
 [part="message"] {
   align-items: start;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 /* **The space beside an avatar belongs to the avatar, not to the column.** This
@@ -36,10 +36,6 @@
   margin-inline-end: var(--helix-space-sm);
 }
 
-[part="actions"] > slot::slotted(*) {
-  margin-inline-start: var(--helix-space-sm);
-}
-
 /* **Each part names its own column**, so hiding one does not move the others.
    A `display: none` grid item leaves the grid entirely, so with implicit
    placement the body slid into the avatar's column the moment a me-turn hid it,
@@ -51,10 +47,6 @@
 
 [part="body"] {
   grid-column: 2;
-}
-
-[part="actions"] {
-  grid-column: 3;
 }
 
 /* The reader's own turns sit against the trailing edge, which is the one piece
@@ -104,6 +96,47 @@
 :host([author="me"]) [part="body"] {
   justify-items: end;
   justify-self: end;
+}
+
+/* The controls sit on the line under the turn, inside `meta` rather than in a
+   column of their own. A column was tried and is worse: `content` spans the
+   body, and a spanning grid item inflates every track it spans, so the controls
+   came to rest under the middle of the bubble rather than under its edge.
+   Measured at 36rem: the bubble started at 58 and the copy control at 232. */
+[part="actions"] {
+  /* **A dense row declares the size once, so nothing slotted has to be told.**
+     A control takes `--helix-size-control` unless something says otherwise, and
+     the default is 40 pixels: two icon buttons on the line under a turn made
+     that line 40 tall beside a 12 pixel timestamp, so a copy control was three
+     times the height of the text it sat next to. The icon step comes down with
+     it, for `Announcement`'s reason: a container that sets the control size and
+     stops there draws `md` glyphs inside `sm` boxes.
+
+     `sm` rather than a number, so a consumer reading this line at another
+     density still gets the step below their own. */
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+[part="actions"][hidden] {
+  display: none;
+}
+
+/* What the turn was drawn from, under the bubble rather than in it: a citation
+   is about the answer rather than part of what was said, and a consumer that
+   puts it inside the bubble is quoting its own footnotes. */
+[part="sources"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+}
+
+[part="sources"][hidden] {
+  display: none;
 }
 
 /* **A wash of the foreground, not a rung on the surface ladder**, which is the
@@ -193,6 +226,81 @@
   max-inline-size: 100%;
 }
 
+/* **The wait before the first token, which is the one moment a transcript has
+   nothing to show.** A turn marked `streaming` with nothing in it yet renders an
+   empty bubble, and an empty bubble is indistinguishable from a bug.
+
+   Three dots rather than a spinner, and the difference is what each one means. A
+   spinner says the system is busy, which is what a page load says; three dots
+   say somebody is composing a reply, which is what is actually true and is the
+   convention every messaging surface has used for twenty years. The dots also
+   sit where the words will be, so the bubble does not jump when they arrive.
+
+   Painted rather than rendered, because it is nothing but paint: no part, no
+   node, and the headless tier keeps saying the whole of the accessible story
+   with `aria-busy`. One element and three background layers, each grown in turn,
+   which is the only way to stagger three dots without three boxes to stagger. */
+:host([state="streaming"]) [part="content"][data-empty]::after {
+  animation: helix-chat-typing 1.4s infinite ease-in-out;
+  background-image:
+    radial-gradient(circle closest-side, currentColor 90%, transparent),
+    radial-gradient(circle closest-side, currentColor 90%, transparent),
+    radial-gradient(circle closest-side, currentColor 90%, transparent);
+  background-position:
+    0% 50%,
+    50% 50%,
+    100% 50%;
+  background-repeat: no-repeat;
+  background-size:
+    20% 30%,
+    20% 30%,
+    20% 30%;
+  block-size: 1lh;
+  content: "";
+  display: block;
+  inline-size: 1.75em;
+  opacity: 0.7;
+}
+
+@keyframes helix-chat-typing {
+  0%,
+  100% {
+    background-size:
+      20% 30%,
+      20% 30%,
+      20% 30%;
+  }
+
+  25% {
+    background-size:
+      20% 60%,
+      20% 30%,
+      20% 30%;
+  }
+
+  50% {
+    background-size:
+      20% 30%,
+      20% 60%,
+      20% 30%;
+  }
+
+  75% {
+    background-size:
+      20% 30%,
+      20% 30%,
+      20% 60%;
+  }
+}
+
+/* Still three dots, and they stop moving. A reader who asked not to be moved is
+   not asking to be told less, and the dots say "composing" standing still. */
+@media (prefers-reduced-motion: reduce) {
+  :host([state="streaming"]) [part="content"][data-empty]::after {
+    animation: none;
+  }
+}
+
 /* A failure is the one state that has to be found rather than noticed, so it is
    the only one that takes a tone. `sending` is quieter than a settled turn and
    `streaming` is left alone: the text arriving is the signal. */
@@ -221,6 +329,12 @@
 
 @media print {
   [part="retry"] {
+    display: none;
+  }
+
+  /* A turn that was still arriving when the page was printed arrives as an empty
+     bubble, and three dots on paper are three dots forever. */
+  :host([state="streaming"]) [part="content"][data-empty]::after {
     display: none;
   }
 }

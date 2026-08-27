@@ -55,8 +55,8 @@
   color: var(--helix-color-foreground);
 }
 
-:host([selected]) [part="tab"],
-:host([selected]) [part="tab"]:hover {
+:host(:state(selected)) [part="tab"],
+:host(:state(selected)) [part="tab"]:hover {
   background-color: var(--_tab-selected-surface, transparent);
   box-shadow: var(--_tab-selected-shadow, none);
   color: var(--helix-color-foreground);

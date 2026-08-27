@@ -4,8 +4,9 @@ import {
   HelixResizeEvent,
   hostAria,
   MixinChartSource,
+  slotFilled,
 } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { fits, numbers, toneOf, words } from './buckets.js'
 
@@ -37,6 +38,19 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * already knows a day was degraded does not have to encode that as a number for
  * this component to decode again.
  *
+ * **A tone is a name this tier never resolves.** `tone="success"` writes
+ * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
+ * so what a name is worth is the answering tier's to say: `helix/styled` points
+ * the semantic names at the theme's status colours and the numbered ones at a
+ * ramp, and a consumer on `headless` declares the same names as whatever they
+ * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
+ * dependency the tiers exist to prevent and which failed loudly rather than
+ * quietly: off-tier that property is not undefined, it is *invalid*, so
+ * `background-color: var(--heatmap-tone, …)` declined its own fallback and every
+ * cell came out transparent. The headless baseline was a blank page under a row
+ * of footer text. `shared/chart/series.css` records Bar Chart having had the
+ * same fault for the same reason.
+ *
  * **On a narrow container it draws fewer cells rather than thinner ones.**
  * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
  * and not a strip. The cells it drops are the oldest, and it reflects `visible`
@@ -65,7 +79,13 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  *
  * @cssproperty --heatmap-cell-size - The size a cell wants. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells.
+ * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
+ * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
+ * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
+ * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.
+ * @cssproperty --heatmap-tone-4 - The fourth step of the magnitude ramp.
+ * @cssproperty --heatmap-tone-5 - The loudest step of the magnitude ramp.
  *
  * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, carrying that number.
  */
@@ -85,16 +105,26 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
    * Lower bounds for the tone buckets, in the order the tones are given.
    *
-   * `thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-   * `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-   * A value below the first bound gets no tone at all: an empty day in a
+   * `thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+   * first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+   * fourth. A value below the first bound gets no tone at all: an empty day in a
    * contribution graph is a day with nothing in it, and painting it as the
    * lowest bucket claims a reading that does not exist.
    */
   @property()
   thresholds = ''
 
-  /** Tone per bucket, in the same order as `thresholds`. */
+  /**
+   * Tone per bucket, in the same order as `thresholds`.
+   *
+   * A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+   * **`"1"` through `"5"` are a ramp and everything else is a category**, which
+   * is the distinction a heatmap lives or dies on: magnitude has to be one hue
+   * getting louder, because a reader compares two cells by weight and cannot
+   * compare two hues at all. This shipped demonstrating the opposite,
+   * `tones="surface info accent success primary"` for a commit count, and five
+   * unrelated hues for five amounts is confetti with no order in it.
+   */
   @property()
   tones = ''
 
@@ -102,8 +132,19 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * The smallest a cell may get before the strip draws fewer of them.
    *
    * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves. Zero turns the dropping off
-   * altogether, which is right for a strip in a container that cannot get narrow.
+   * than a length the stylesheet resolves.
+   *
+   * **Which makes it a statement about the sheet, and it has to agree with
+   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
+   * both because it draws something bigger: it was 8 and 2 against a sheet
+   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+   * width measured. `visible` said 59 the whole time, so the one number a
+   * summary is told to trust was the number that was wrong. A consumer who moves
+   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
    */
   @property({ attribute: 'min-cell', type: Number })
   minCell = 8
@@ -161,9 +202,20 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     return this.series[0]?.points ?? []
   }
 
-  /** How many cells the container has room for. */
+  /**
+   * `rows` as a usable count, which is not always what the attribute says.
+   *
+   * One place rather than two: the fit arithmetic and the grid template both
+   * need it, and a `rows="0"` or a `rows="2.5"` that reached one of them and not
+   * the other would draw a strip whose columns and whose capacity disagreed.
+   */
+  private get rowCount(): number {
+    return Math.max(1, Math.floor(this.rows) || 1)
+  }
+
+  /** How many cells the container has room for, as a whole number of columns. */
   private get room(): number {
-    return fits(this.points.length, this.width ?? Number.NaN, this.minCell, this.gap)
+    return fits(this.points.length, this.width ?? Number.NaN, this.minCell, this.gap, this.rowCount)
   }
 
   /**
@@ -203,8 +255,43 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     hostAria(this.internals, { label: this.label || 'Heatmap', role: 'img' })
   }
 
+  /**
+   * Says on the footer whether any of its three slots holds anything.
+   *
+   * **The stylesheet used to ask, and could not.** It read
+   * `[part="footer"]:not(:has(slot:has(*)))`, which is two faults at once:
+   * `:has()` may not be nested inside `:has()`, so the selector failed to parse
+   * and the rule was discarded whole; and a slot's assigned nodes are not its
+   * DOM children, so `slot:has(*)` reports fallback content rather than the
+   * fill, and would have been false either way. Both verified in a browser. A
+   * heatmap with no legend and no summary still reserved the row for one.
+   */
+  private markEmpty(): void {
+    this.markRegion('footer', ['start', 'summary', 'end'])
+  }
+
+  /**
+   * One region, hidden when its slot holds nothing and nothing of ours fills it.
+   *
+   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+   * sheet reads, and this tier ships no sheet, so an empty region left in the box
+   * tree would be a gap a headless consumer cannot close without knowing to look
+   * for it. The styled rule stays too, because that sheet sets `display` on these
+   * parts and therefore outranks the UA's `[hidden]` one.
+   */
+  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
+    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
+    const empty =
+      !slots.some((name) =>
+        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
+      ) && !(occupied && this.renderRoot?.querySelector(occupied))
+    region?.toggleAttribute('data-empty', empty)
+    region?.toggleAttribute('hidden', empty)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.markEmpty()
     /* Written here rather than reflected, and announced only on a change: a
        consumer recomputing a summary from this is doing work, and an event per
        resize frame is work per frame.
@@ -238,21 +325,32 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const palette = words(this.tones)
     const cells = this.drawn
 
-    return html`<div part="strip" style=${`--_heatmap-rows: ${Math.max(1, Math.floor(this.rows) || 1)}`}>
+    return html`<div part="strip" style="--_heatmap-rows: ${this.rowCount}">
         ${
           cells.length === 0
             ? html`<p part="empty">${this.emptyText}</p>`
             : cells.map((reading) => {
                 const tone = toneOf(reading, bounds, palette)
+                const title = `${reading.label}: ${reading.value}`
                 /* The title is the only tooltip here, and one delegated handler
                  would still be ninety elements' worth of markup to hang it on.
                  Ninety `helix-tooltip` elements is what this avoids; the native
                  one costs nothing and works on a touch device's long press. */
-                return html`<span
+                /* **Two templates rather than one with a conditional style, and
+                   the reason is that an absent tone has to mean an absent
+                   declaration.** `--heatmap-tone: var(--heatmap-tone-undefined)`
+                   is not an unset property, it is a property set to the
+                   guaranteed-invalid value, and `var(--heatmap-tone, …)` then
+                   declines to use its own fallback because the property *is*
+                   set. An untoned cell came out transparent rather than taking
+                   the quiet ground the sheet has for it. */
+                return tone === undefined
+                  ? html`<span part="cell" title=${title}></span>`
+                  : html`<span
                 part="cell"
-                title=${`${reading.label}: ${reading.value}`}
-                data-tone=${tone ?? nothing}
-                style=${tone ? `--heatmap-tone: var(--helix-color-${tone})` : nothing}
+                title=${title}
+                data-tone=${tone}
+                style="--heatmap-tone: var(--heatmap-tone-${tone})"
               ></span>`
               })
         }

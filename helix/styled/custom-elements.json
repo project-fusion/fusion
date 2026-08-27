@@ -10696,6 +10696,14 @@
               }
             },
             {
+              "description": "What the turn was drawn from, under it and outside the bubble.",
+              "name": "sources",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
               "description": "When it was said.",
               "name": "time",
               "inheritedFrom": {
@@ -10720,7 +10728,7 @@
               }
             },
             {
-              "description": "The trailing slot's box.",
+              "description": "The controls offered on the turn, beside its time.",
               "name": "actions",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatMessage",
@@ -10748,6 +10756,14 @@
             {
               "description": "What can be done with it.",
               "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "description": "What it was said from: citations, documents, a retrieved page.",
+              "name": "sources",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatMessage",
                 "module": "src/chat/message/chat-message.ts"
@@ -10904,6 +10920,32 @@
                 }
               },
               "description": "What has happened to it, in words, and the way back from a failure.\n\nA seam of its own, because the styled tier draws a failure as an icon and a\nconsumer may want neither. `sent` says nothing: every settled message is\nsent, and a transcript that labels each one is a transcript of the word\n\"sent\".",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each region whether anything is in it.\n\nThree of them need the answer and no selector can give it: a slot's assigned\nnodes are not its DOM children, so `:empty` and `:has(*)` both describe the\nfallback rather than the fill. `sources` and `actions` are regions that cost\na gap when they are boxes at all, which most turns should not pay. `content`\nis the one that is not about space: a turn that is `streaming` with nothing\nin it yet is what the typing indicator is drawn for, and \"nothing in it yet\"\nis exactly this question.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFill",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A turn's own content arrives and changes no property here.\n\nIt is the streaming case that needs this rather than a tidiness one: the\nfirst token of an answer is a light-DOM child appearing under an element\nnothing else told to look again, and it is exactly the moment the typing\nindicator has to stop being drawn.",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatMessage",
                 "module": "src/chat/message/chat-message.ts"
@@ -11283,6 +11325,14 @@
               }
             },
             {
+              "description": "The controls for the conversation, at the header's trailing edge.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
               "description": "The affordance offered while the reader is away from the bottom.",
               "name": "resume",
               "inheritedFrom": {
@@ -11351,6 +11401,14 @@
             {
               "description": "The way back to the bottom.",
               "name": "resume",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChat",
+                "module": "src/chat/root/chat-root.ts"
+              }
+            },
+            {
+              "description": "Beside the header: what can be done to the conversation itself.",
+              "name": "actions",
               "inheritedFrom": {
                 "name": "HelixHeadlessChat",
                 "module": "src/chat/root/chat-root.ts"
@@ -11930,7 +11988,7 @@
                 "slug": "preview"
               },
               {
-                "description": "An assistant answering, with one turn still arriving and the controls that belong to a model.",
+                "description": "An assistant answering: what it drew the answer from, what can be done with it, and the wait before the first token.",
                 "min": 480,
                 "slug": "assistant"
               },
@@ -23120,6 +23178,57 @@
               }
             },
             {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the toolbar and the footer whether anything is in them.\n\n**The stylesheet used to ask, and could not.** It read\n`[part=\"toolbar\"]:has(> slot:not(:has(*)))`, which is two faults at once:\n`:has()` may not be nested inside `:has()`, so the selector failed to parse\nand the whole rule was discarded; and `slot:not(:has(*))` is as true of a\nfilled slot as of an empty one, because assigned nodes are not a slot's DOM\nchildren. Both verified in a browser. A table with no toolbar paid the gap\nabove the grid for one that was not there.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDataTable",
+                "module": "src/data-table/root/data-table-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDataTable",
+                "module": "src/data-table/root/data-table-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleSlotChange",
               "privacy": "private",
@@ -34036,7 +34145,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "One grid, filled down the column and then across, which is what a calendar\nheatmap is: a week is a column, so the strip reads left to right in weeks and\ntop to bottom in days. `rows=\"1\"` makes it a single row without a second\nlayout.\n\nAn empty cell takes the quietest ground the palette has rather than being\ntransparent. A strip of holes reads as a broken picture; a strip of empty\ncells reads as a period with nothing in it, which is what it is.",
+          "description": "One grid, filled down the column and then across, which is what a calendar\nheatmap is: a week is a column, so the strip reads left to right in weeks and\ntop to bottom in days. `rows=\"1\"` makes it a single row without a second\nlayout.\n\nAn empty cell takes the quietest ground the palette has rather than being\ntransparent. A strip of holes reads as a broken picture; a strip of empty\ncells reads as a period with nothing in it, which is what it is.\n\n**This tier is what a tone name is worth.** `tones=\"success\"` and\n`data-tone=\"danger\"` reach the theme's status colours; `tones=\"1 2 3 4 5\"`\nreaches a five step ramp of one hue, which is the only thing a reader can\ncompare two cells by. Both are hooks, so a page may answer differently.",
           "name": "HelixHeatmap",
           "cssProperties": [
             {
@@ -34050,6 +34159,54 @@
             {
               "description": "Space between cells.",
               "name": "--heatmap-gap",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "How far a cell's corners are rounded.",
+              "name": "--heatmap-cell-radius",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The quietest step of the magnitude ramp, reached by `tones=\"1 …\"`.",
+              "name": "--heatmap-tone-1",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The second step of the magnitude ramp.",
+              "name": "--heatmap-tone-2",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The third step of the magnitude ramp.",
+              "name": "--heatmap-tone-3",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The fourth step of the magnitude ramp.",
+              "name": "--heatmap-tone-4",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "The loudest step of the magnitude ramp.",
+              "name": "--heatmap-tone-5",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34165,6 +34322,34 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "gap",
+              "type": {
+                "text": "number"
+              },
+              "default": "4",
+              "description": "What the sheet beside this actually draws, in the pixels the fit arithmetic\ncounts in.\n\n**The base tier's numbers are a bare strip's and this tier draws something\nbigger, so somebody has to say so.** `fits()` works against a measured width\nand cannot resolve `--helix-space-2xs`; this sheet chose that gap and a\n`0.75rem` cell, so this is the one place that knows both halves. Left at the\ninherited 8 and 2, the arithmetic believed a cell cost 10 pixels where it\ncost 16: measured 27 Aug 2026, a ninety day strip drew 940 pixels of cells\ninto a 592 pixel box at 640 and 540 into 342 at 390, overflowing the\ndocument both times, while `visible` reported 59 and 34. The number a\nsummary is told to trust was the number that was wrong, which is the exact\nfailure the property exists to prevent.\n\nA consumer who moves `--heatmap-cell-size` or `--heatmap-gap` sets `min-cell`\nand `gap` to match, and the attributes are how they say it.",
+              "attribute": "gap",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "minCell",
+              "type": {
+                "text": "number"
+              },
+              "default": "12",
+              "description": "The drawn cell, for the reason `gap` is the drawn gap. `0.75rem` at the root font size.",
+              "attribute": "min-cell",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
               }
             },
             {
@@ -34291,7 +34476,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"1 3 6 9\"` with `tones=\"1 2 3 4\"` puts 1 and 2 in the ramp's\nfirst step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the\nfourth. A value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
               "attribute": "thresholds",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34305,36 +34490,8 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "description": "Tone per bucket, in the same order as `thresholds`.\n\nA name, resolved as `--heatmap-tone-<name>` by whichever tier answers.\n**`\"1\"` through `\"5\"` are a ramp and everything else is a category**, which\nis the distinction a heatmap lives or dies on: magnitude has to be one hue\ngetting louder, because a reader compares two cells by weight and cannot\ncompare two hues at all. This shipped demonstrating the opposite,\n`tones=\"surface info accent success primary\"` for a commit count, and five\nunrelated hues for five amounts is confetti with no order in it.",
               "attribute": "tones",
-              "inheritedFrom": {
-                "name": "HelixHeadlessHeatmap",
-                "module": "src/heatmap/root/heatmap-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "minCell",
-              "type": {
-                "text": "number"
-              },
-              "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
-              "attribute": "min-cell",
-              "inheritedFrom": {
-                "name": "HelixHeadlessHeatmap",
-                "module": "src/heatmap/root/heatmap-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "gap",
-              "type": {
-                "text": "number"
-              },
-              "default": "2",
-              "description": "Space between cells, in CSS pixels, for the same reason `min-cell` is a number.",
-              "attribute": "gap",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34423,12 +34580,26 @@
             },
             {
               "kind": "field",
+              "name": "rowCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "`rows` as a usable count, which is not always what the attribute says.\n\nOne place rather than two: the fit arithmetic and the grid template both\nneed it, and a `rows=\"0\"` or a `rows=\"2.5\"` that reached one of them and not\nthe other would draw a strip whose columns and whose capacity disagreed.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "room",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
-              "description": "How many cells the container has room for.",
+              "description": "How many cells the container has room for, as a whole number of columns.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34444,6 +34615,57 @@
               "privacy": "private",
               "description": "The readings actually drawn, newest kept.\n\nThe tail rather than the head: a status strip that drops the newest days to\nkeep the oldest is answering a question nobody asked.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the footer whether any of its three slots holds anything.\n\n**The stylesheet used to ask, and could not.** It read\n`[part=\"footer\"]:not(:has(slot:has(*)))`, which is two faults at once:\n`:has()` may not be nested inside `:has()`, so the selector failed to parse\nand the rule was discarded whole; and a slot's assigned nodes are not its\nDOM children, so `slot:has(*)` reports fallback content rather than the\nfill, and would have been false either way. Both verified in a browser. A\nheatmap with no legend and no summary still reserved the row for one.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one.",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -34682,7 +34904,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"1 3 6 9\"` with `tones=\"1 2 3 4\"` puts 1 and 2 in the ramp's\nfirst step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the\nfourth. A value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
               "fieldName": "thresholds",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34695,7 +34917,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "description": "Tone per bucket, in the same order as `thresholds`.\n\nA name, resolved as `--heatmap-tone-<name>` by whichever tier answers.\n**`\"1\"` through `\"5\"` are a ramp and everything else is a category**, which\nis the distinction a heatmap lives or dies on: magnitude has to be one hue\ngetting louder, because a reader compares two cells by weight and cannot\ncompare two hues at all. This shipped demonstrating the opposite,\n`tones=\"surface info accent success primary\"` for a commit count, and five\nunrelated hues for five amounts is confetti with no order in it.",
               "fieldName": "tones",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -34708,7 +34930,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "fieldName": "minCell",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -49138,6 +49360,10 @@
               "name": "--notifications-max-height"
             },
             {
+              "description": "The gutter every item holds open where something in the feed has media.",
+              "name": "--notifications-media-column"
+            },
+            {
               "description": "The hairline between items and around the regions.",
               "name": "--notifications-rule"
             },
@@ -49497,6 +49723,72 @@
                   "text": "void"
                 }
               },
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotifications",
+                "module": "src/notifications/root/notifications-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markMedia",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says whether anything in the feed has media, so every item can hold the\ncolumn open whether or not it has one of its own.\n\n**A fact no item can answer for itself**, which is why it is here. An item\nknows about its own media slot and nothing about its neighbors, so a feed\nwhere some rows have an avatar and some do not drew two different left\nedges for its text and had no way to notice: measured on a four item feed,\nthe rows without media started their text 32 pixels to the left of the rows\nwith it. The styled tier turns this into a width; this tier ships no\nstylesheet and is unaffected.\n\nRead off the light DOM rather than off the items, so it does not depend on\nwhich children have upgraded by the time this runs.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotifications",
+                "module": "src/notifications/root/notifications-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each region whether anything is in it.\n\n**The stylesheet used to ask, and could not.** The rule read\n`[part=\"header\"]:not(:has(> slot:has(*)))`, which is two faults at once.\n`:has()` may not be nested inside `:has()`, so the selector fails to parse\nand the whole rule is discarded; and a slot's assigned nodes are not its DOM\nchildren, so `slot:has(*)` reports whether the slot has *fallback* rather\nthan whether a consumer filled it, and would have been false either way.\nBoth verified in a browser: `insertRule` throws a `SyntaxError` on the\nfirst, and an assigned element still leaves `slot.matches(':has(*)')` false.\nA feed with no header drew its rule under nothing, and one with no footer\ndrew another over nothing.\n\n`slotFilled` is what the rest of the library already asks with. It is said\non the region inside this shadow root rather than on the host, because an\nattribute written onto the host is a change to markup the consumer rendered,\nwhich React reports on hydration and does not patch up.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessNotifications",
+                "module": "src/notifications/root/notifications-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one.",
               "inheritedFrom": {
                 "name": "HelixHeadlessNotifications",
                 "module": "src/notifications/root/notifications-root.ts"
@@ -51872,7 +52164,6 @@
               "default": "false",
               "description": "Whether this choice is currently chosen. Written by the listbox.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessOption",
                 "module": "src/option/root/option-root.ts"
@@ -59903,7 +60194,6 @@
               "default": "false",
               "description": "Whether this is the current choice. Written by the group.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessRadio",
                 "module": "src/radio/root/radio-root.ts"
@@ -76190,7 +76480,6 @@
               "default": "false",
               "description": "Whether this panel is the visible one.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessTabsPanel",
                 "module": "src/tabs/panel/tabs-panel.ts"
@@ -77180,7 +77469,6 @@
               "default": "false",
               "description": "Whether this tab is the current one.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessTabsTab",
                 "module": "src/tabs/tab/tabs-tab.ts"
@@ -86645,7 +86933,6 @@
               "default": "false",
               "description": "Whether this item is the current one.",
               "attribute": "selected",
-              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessToggle",
                 "module": "src/toggle/root/toggle-root.ts"

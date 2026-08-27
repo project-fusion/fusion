@@ -5863,25 +5863,55 @@ in weeks and top to bottom in days. */
   rows?: HelixHeadlessHeatmap["rows"];
   /** Lower bounds for the tone buckets, in the order the tones are given.
 
-`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-A value below the first bound gets no tone at all: an empty day in a
+`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+fourth. A value below the first bound gets no tone at all: an empty day in a
 contribution graph is a day with nothing in it, and painting it as the
 lowest bucket claims a reading that does not exist. */
   thresholds?: HelixHeadlessHeatmap["thresholds"];
-  /** Tone per bucket, in the same order as `thresholds`. */
+  /** Tone per bucket, in the same order as `thresholds`.
+
+A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+**`"1"` through `"5"` are a ramp and everything else is a category**, which
+is the distinction a heatmap lives or dies on: magnitude has to be one hue
+getting louder, because a reader compares two cells by weight and cannot
+compare two hues at all. This shipped demonstrating the opposite,
+`tones="surface info accent success primary"` for a commit count, and five
+unrelated hues for five amounts is confetti with no order in it. */
   tones?: HelixHeadlessHeatmap["tones"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   "min-cell"?: HelixHeadlessHeatmap["minCell"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   minCell?: HelixHeadlessHeatmap["minCell"];
   /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
   gap?: HelixHeadlessHeatmap["gap"];
@@ -5918,25 +5948,55 @@ in weeks and top to bottom in days. */
   "prop:rows"?: HelixHeadlessHeatmap["rows"];
   /** Lower bounds for the tone buckets, in the order the tones are given.
 
-`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-A value below the first bound gets no tone at all: an empty day in a
+`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+fourth. A value below the first bound gets no tone at all: an empty day in a
 contribution graph is a day with nothing in it, and painting it as the
 lowest bucket claims a reading that does not exist. */
   "prop:thresholds"?: HelixHeadlessHeatmap["thresholds"];
-  /** Tone per bucket, in the same order as `thresholds`. */
+  /** Tone per bucket, in the same order as `thresholds`.
+
+A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+**`"1"` through `"5"` are a ramp and everything else is a category**, which
+is the distinction a heatmap lives or dies on: magnitude has to be one hue
+getting louder, because a reader compares two cells by weight and cannot
+compare two hues at all. This shipped demonstrating the opposite,
+`tones="surface info accent success primary"` for a commit count, and five
+unrelated hues for five amounts is confetti with no order in it. */
   "prop:tones"?: HelixHeadlessHeatmap["tones"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   "attr:min-cell"?: HelixHeadlessHeatmap["minCell"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   "prop:minCell"?: HelixHeadlessHeatmap["minCell"];
   /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
   "prop:gap"?: HelixHeadlessHeatmap["gap"];
@@ -17430,6 +17490,7 @@ export type CustomElements = {
    *
    * - `(default)`: What was said.
    * - `avatar`: Who said it.
+   * - `sources`: What it was said from: citations, documents, a retrieved page.
    * - `actions`: What can be done with it: copy, retry, react.
    *
    * ## CSS Parts
@@ -17440,11 +17501,12 @@ export type CustomElements = {
    * - `avatar`: The leading slot's box.
    * - `body`: What was said, and the line under it.
    * - `content`: The consumer's own markup.
-   * - `meta`: The time and the state together.
+   * - `sources`: What the turn was drawn from, under it and outside the bubble.
+   * - `meta`: The line under a turn: its time, its state, and its controls.
    * - `time`: When it was said.
    * - `state`: What has happened to it, where that is worth saying.
    * - `retry`: The control offered on a failed message.
-   * - `actions`: The trailing slot's box.
+   * - `actions`: The controls offered on the turn, beside its time.
    */
   "helix-headless-chat-message": Partial<
     HelixHeadlessChatMessageProps &
@@ -17556,7 +17618,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The turns, as `helix-chat-message` children.
-   * - `header`: Above the transcript.
+   * - `header`: Above the transcript: what this conversation is.
+   * - `actions`: Beside the header: what can be done to the conversation itself.
    * - `composer`: Below the transcript, where the reader writes.
    * - `status`: Beside the composer: somebody typing, connection lost.
    * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
@@ -17576,6 +17639,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `header`: The region above the transcript.
+   * - `actions`: The controls for the conversation, at the header's trailing edge.
    * - `log`: The transcript, which is the thing that scrolls.
    * - `resume`: The affordance offered while the reader is away from the bottom.
    * - `status`: The status region, which is not part of the log.
@@ -21214,6 +21278,19 @@ export type CustomElements = {
    * already knows a day was degraded does not have to encode that as a number for
    * this component to decode again.
    *
+   * **A tone is a name this tier never resolves.** `tone="success"` writes
+   * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
+   * so what a name is worth is the answering tier's to say: `helix/styled` points
+   * the semantic names at the theme's status colours and the numbered ones at a
+   * ramp, and a consumer on `headless` declares the same names as whatever they
+   * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
+   * dependency the tiers exist to prevent and which failed loudly rather than
+   * quietly: off-tier that property is not undefined, it is *invalid*, so
+   * `background-color: var(--heatmap-tone, …)` declined its own fallback and every
+   * cell came out transparent. The headless baseline was a blank page under a row
+   * of footer text. `shared/chart/series.css` records Bar Chart having had the
+   * same fault for the same reason.
+   *
    * **On a narrow container it draws fewer cells rather than thinner ones.**
    * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
    * and not a strip. The cells it drops are the oldest, and it reflects `visible`
@@ -21234,17 +21311,36 @@ export type CustomElements = {
    * in weeks and top to bottom in days.
    * - `thresholds`: Lower bounds for the tone buckets, in the order the tones are given.
    *
-   * `thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-   * `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-   * A value below the first bound gets no tone at all: an empty day in a
+   * `thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+   * first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+   * fourth. A value below the first bound gets no tone at all: an empty day in a
    * contribution graph is a day with nothing in it, and painting it as the
    * lowest bucket claims a reading that does not exist.
    * - `tones`: Tone per bucket, in the same order as `thresholds`.
+   *
+   * A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+   * **`"1"` through `"5"` are a ramp and everything else is a category**, which
+   * is the distinction a heatmap lives or dies on: magnitude has to be one hue
+   * getting louder, because a reader compares two cells by weight and cannot
+   * compare two hues at all. This shipped demonstrating the opposite,
+   * `tones="surface info accent success primary"` for a commit count, and five
+   * unrelated hues for five amounts is confetti with no order in it.
    * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
    *
    * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves. Zero turns the dropping off
-   * altogether, which is right for a strip in a container that cannot get narrow.
+   * than a length the stylesheet resolves.
+   *
+   * **Which makes it a statement about the sheet, and it has to agree with
+   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
+   * both because it draws something bigger: it was 8 and 2 against a sheet
+   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+   * width measured. `visible` said 59 the whole time, so the one number a
+   * summary is told to trust was the number that was wrong. A consumer who moves
+   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
    * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
    * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `for`: The id of the table to read.
@@ -21347,7 +21443,13 @@ export type CustomElements = {
    *
    * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
+   * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-4`: The fourth step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-5`: The loudest step of the magnitude ramp. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33491,6 +33593,7 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: What was said.
    * - `avatar`: Who said it.
+   * - `sources`: What it was said from: citations, documents, a retrieved page.
    * - `actions`: What can be done with it: copy, retry, react.
    *
    * ## CSS Parts
@@ -33501,11 +33604,12 @@ export type CustomElementsSolidJs = {
    * - `avatar`: The leading slot's box.
    * - `body`: What was said, and the line under it.
    * - `content`: The consumer's own markup.
-   * - `meta`: The time and the state together.
+   * - `sources`: What the turn was drawn from, under it and outside the bubble.
+   * - `meta`: The line under a turn: its time, its state, and its controls.
    * - `time`: When it was said.
    * - `state`: What has happened to it, where that is worth saying.
    * - `retry`: The control offered on a failed message.
-   * - `actions`: The trailing slot's box.
+   * - `actions`: The controls offered on the turn, beside its time.
    */
   "helix-headless-chat-message": Partial<
     HelixHeadlessChatMessageProps &
@@ -33618,7 +33722,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The turns, as `helix-chat-message` children.
-   * - `header`: Above the transcript.
+   * - `header`: Above the transcript: what this conversation is.
+   * - `actions`: Beside the header: what can be done to the conversation itself.
    * - `composer`: Below the transcript, where the reader writes.
    * - `status`: Beside the composer: somebody typing, connection lost.
    * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
@@ -33638,6 +33743,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `header`: The region above the transcript.
+   * - `actions`: The controls for the conversation, at the header's trailing edge.
    * - `log`: The transcript, which is the thing that scrolls.
    * - `resume`: The affordance offered while the reader is away from the bottom.
    * - `status`: The status region, which is not part of the log.
@@ -37325,6 +37431,19 @@ export type CustomElementsSolidJs = {
    * already knows a day was degraded does not have to encode that as a number for
    * this component to decode again.
    *
+   * **A tone is a name this tier never resolves.** `tone="success"` writes
+   * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
+   * so what a name is worth is the answering tier's to say: `helix/styled` points
+   * the semantic names at the theme's status colours and the numbered ones at a
+   * ramp, and a consumer on `headless` declares the same names as whatever they
+   * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
+   * dependency the tiers exist to prevent and which failed loudly rather than
+   * quietly: off-tier that property is not undefined, it is *invalid*, so
+   * `background-color: var(--heatmap-tone, …)` declined its own fallback and every
+   * cell came out transparent. The headless baseline was a blank page under a row
+   * of footer text. `shared/chart/series.css` records Bar Chart having had the
+   * same fault for the same reason.
+   *
    * **On a narrow container it draws fewer cells rather than thinner ones.**
    * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
    * and not a strip. The cells it drops are the oldest, and it reflects `visible`
@@ -37345,17 +37464,36 @@ export type CustomElementsSolidJs = {
    * in weeks and top to bottom in days.
    * - `thresholds`: Lower bounds for the tone buckets, in the order the tones are given.
    *
-   * `thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-   * `muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-   * A value below the first bound gets no tone at all: an empty day in a
+   * `thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+   * first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+   * fourth. A value below the first bound gets no tone at all: an empty day in a
    * contribution graph is a day with nothing in it, and painting it as the
    * lowest bucket claims a reading that does not exist.
    * - `tones`: Tone per bucket, in the same order as `thresholds`.
+   *
+   * A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+   * **`"1"` through `"5"` are a ramp and everything else is a category**, which
+   * is the distinction a heatmap lives or dies on: magnitude has to be one hue
+   * getting louder, because a reader compares two cells by weight and cannot
+   * compare two hues at all. This shipped demonstrating the opposite,
+   * `tones="surface info accent success primary"` for a commit count, and five
+   * unrelated hues for five amounts is confetti with no order in it.
    * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them.
    *
    * In CSS pixels, because this is arithmetic against a measured width rather
-   * than a length the stylesheet resolves. Zero turns the dropping off
-   * altogether, which is right for a strip in a container that cannot get narrow.
+   * than a length the stylesheet resolves.
+   *
+   * **Which makes it a statement about the sheet, and it has to agree with
+   * one.** These two defaults are a bare strip's, and `helix/styled` overrides
+   * both because it draws something bigger: it was 8 and 2 against a sheet
+   * drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+   * cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+   * width measured. `visible` said 59 the whole time, so the one number a
+   * summary is told to trust was the number that was wrong. A consumer who moves
+   * `--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
    * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
    * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `for`: The id of the table to read.
@@ -37458,7 +37596,13 @@ export type CustomElementsSolidJs = {
    *
    * - `--heatmap-cell-size`: The size a cell wants. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. (default: `undefined`)
+   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
+   * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
+   * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-4`: The fourth step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-5`: The loudest step of the magnitude ramp. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -47955,8 +48099,20 @@ export type CustomCssProperties = {
   "--heatmap-cell-size"?: string;
   /** Space between cells. */
   "--heatmap-gap"?: string;
+  /** How far a cell's corners are rounded. */
+  "--heatmap-cell-radius"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
+  /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
+  "--heatmap-tone-1"?: string;
+  /** The second step of the magnitude ramp. */
+  "--heatmap-tone-2"?: string;
+  /** The third step of the magnitude ramp. */
+  "--heatmap-tone-3"?: string;
+  /** The fourth step of the magnitude ramp. */
+  "--heatmap-tone-4"?: string;
+  /** The loudest step of the magnitude ramp. */
+  "--heatmap-tone-5"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Where a bound sits on the arc, as a length along it. */

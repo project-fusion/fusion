@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -26,9 +26,9 @@ const panels = (host: HTMLElement) =>
 describe('tabs selection', () => {
   test('shows the panel matching the selected tab', async () => {
     const host = await mount(markup)
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
-    expect(panels(host)[0]?.hasAttribute('selected')).toBe(true)
-    expect(panels(host)[1]?.hasAttribute('selected')).toBe(false)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
+    expect(hasState(panels(host)[0] as Element, 'selected')).toBe(true)
+    expect(hasState(panels(host)[1] as Element, 'selected')).toBe(false)
   })
 
   test('choosing a tab moves the panel with it', async () => {
@@ -37,9 +37,9 @@ describe('tabs selection', () => {
     second.select()
     await host.updateComplete
 
-    expect(second.hasAttribute('selected')).toBe(true)
-    expect(panels(host)[1]?.hasAttribute('selected')).toBe(true)
-    expect(panels(host)[0]?.hasAttribute('selected')).toBe(false)
+    expect(hasState(second, 'selected')).toBe(true)
+    expect(hasState(panels(host)[1] as Element, 'selected')).toBe(true)
+    expect(hasState(panels(host)[0] as Element, 'selected')).toBe(false)
   })
 
   test('a disabled tab cannot be chosen', async () => {
@@ -47,7 +47,7 @@ describe('tabs selection', () => {
     const third = tabs(host)[2] as Updatable & { select(): void }
     third.select()
     await host.updateComplete
-    expect(third.hasAttribute('selected')).toBe(false)
+    expect(hasState(third, 'selected')).toBe(false)
   })
 
   test('the panel is named by its tab, since an IDREF cannot reach one', async () => {
@@ -94,18 +94,18 @@ describe('tabs keyboard', () => {
     return event
   }
   const press = (host: HTMLElement, key: string) =>
-    pressFrom(tabs(host).find((tab) => tab.hasAttribute('selected')) as HTMLElement, key)
+    pressFrom(tabs(host).find((tab) => hasState(tab, 'selected')) as HTMLElement, key)
 
   test('arrows move selection and wrap past the ends', async () => {
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowRight')
     await host.updateComplete
-    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     // Three is disabled, so right from two wraps to one rather than stopping.
     press(host, 'ArrowRight')
     await host.updateComplete
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
   test('both axes move the row, not only the one it is laid out on', async () => {
@@ -116,22 +116,22 @@ describe('tabs keyboard', () => {
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowDown')
     await host.updateComplete
-    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     press(host, 'ArrowUp')
     await host.updateComplete
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
   test('Home and End reach the ends', async () => {
     const host = (await mount(markup)) as Updatable
     press(host, 'End')
     await host.updateComplete
-    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
 
     press(host, 'Home')
     await host.updateComplete
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
   test('manual holds selection until the tab is chosen', async () => {
@@ -141,7 +141,7 @@ describe('tabs keyboard', () => {
     press(host, 'ArrowRight')
     await host.updateComplete
     // Focus moved; selection did not.
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
   test('manual can be traversed, because a move starts from focus', async () => {
@@ -170,8 +170,8 @@ describe('tabs keyboard', () => {
     // Two moves, and the second wrapped past the disabled third.
     expect(reached).toEqual(['two', 'one'])
     // And nothing was chosen on the way.
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
-    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(false)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(false)
   })
 
   test('an arrow pressed while reading a panel leaves the tabs alone', async () => {
@@ -183,7 +183,7 @@ describe('tabs keyboard', () => {
     const event = pressFrom(panels(host)[0] as HTMLElement, 'ArrowRight')
     await host.updateComplete
 
-    expect(tabs(host)[0]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
     expect(event.defaultPrevented).toBe(false)
   })
 
@@ -257,7 +257,7 @@ describe('tabs, controlled and uncontrolled', () => {
 
     // Announced and applied: a declared `active` is a seed. See 294.
     expect(host.active).toBe('two')
-    expect(tabs(host)[1]?.hasAttribute('selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
   })
 
   test('the change is still announced, so the consumer knows what to set', async () => {

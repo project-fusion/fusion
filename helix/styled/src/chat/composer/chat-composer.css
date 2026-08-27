@@ -31,6 +31,19 @@
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
   max-block-size: var(--chat-composer-max-height, 12rem);
+  /* **One row, one height.** The field, the send control and whatever a consumer
+     slots beside them are the same row and have to agree, and they did not: the
+     field came out 38 pixels from its own padding, the send control 33 from a
+     different padding, and an `IconButton` in the `start` slot 40 from
+     `--helix-size-control`, which is what every other control in the library
+     takes. Measured in a 34rem panel, the composer grew from 38 to 40 the moment
+     an attachment button was slotted, and the send control sat five pixels short
+     of the field it belongs to for as long as the component existed.
+
+     `min-block-size` rather than `block-size`, because the field grows: this is
+     the floor a one-line composer rests at, and `field-sizing` takes it up from
+     there. */
+  min-block-size: var(--helix-size-control);
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
   resize: none;
@@ -53,6 +66,8 @@
   cursor: pointer;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  /* The same floor as the field, for the same reason. See the note above. */
+  min-block-size: var(--helix-size-control);
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
 }

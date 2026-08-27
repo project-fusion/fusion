@@ -363,6 +363,20 @@
      `tokens.css` already says about this whole path. A theme that wants the
      guarantee rather than the approximation takes `deriveTheme`. */
   --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.13) c h);
+  /* **The dark side of the ramp, and the reason it did not exist.**
+     600 and 700 step down from the seed for a light page, where pressing a
+     control should sink it into the ground. A dark page needs the mirror of
+     that, and there was nothing above 400 to point at, so
+     `color-primary-hover` and `color-primary-active` were left without a
+     `light-dark()` while every sibling had one: on a dark page, primary sat at
+     400 and its own hover jumped two rungs *down* to 600, so a button got
+     darker against a dark ground the moment a pointer touched it.
+
+     `+ 0.18` and `+ 0.23` mirror the `- 0.05` and `- 0.10` the light side
+     takes, measured from 400 rather than from the seed, so the two directions
+     move by the same amount from the rung each scheme actually starts on. */
+  --_helix-brand-300: oklch(from var(--_helix-seed-brand) calc(l + 0.18) c h);
+  --_helix-brand-200: oklch(from var(--_helix-seed-brand) calc(l + 0.23) c h);
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
 

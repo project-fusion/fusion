@@ -1,38 +1,96 @@
-/* The item is a three-column grid: media, body, actions. A grid rather than
-   flex, because the media column has to line up down the feed whether or not
-   every item has one: a flex row collapses the empty ones and every line of text
-   starts somewhere different. */
+/* The item is a four-column grid: media, body, actions, dismiss. A grid rather
+   than flex, because the media column has to line up down the feed whether or
+   not every item has one, and a flex row collapses the empty ones so every line
+   of text starts somewhere different.
+
+   **The grid did not achieve that on its own, which is the part that was
+   wrong.** Each item is its own grid, so nothing about one row's tracks reaches
+   the row below it: a feed where some items had an avatar and some did not drew
+   its text at two different left edges, exactly the fault the comment above
+   claimed a grid prevents. The feed is what can see across its rows, so the root
+   publishes whether anything in it has media and every item holds the column
+   open by that much. */
 :host {
+  /* One line of body text, which is what both trailing controls are centered on
+     and what the body itself is set in, so the two cannot drift apart. Private
+     because this package is the only reader: it is a measurement of this
+     stylesheet's own type, not a setting a consumer would reach for. */
+  --_notifications-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+
+  /* The row reflows on how much room the row was given, which is a fact about
+     this box and about nothing else: a feed in a 320 pixel side panel is narrow
+     inside a 1400 pixel window, and a `@media` rule would hand it the wide
+     branch. See the responsiveness rules, which name this mechanism for exactly
+     this category and record that nothing had used it yet. This is the first
+     `@container` rule in the library; the two families that already declare
+     `container-type` still query nothing. */
+  container-type: inline-size;
+
   display: block;
 }
 
+/* No `column-gap`, and the seams are margins instead. A gap is drawn between two
+   tracks whether or not anything is in either of them, so a feed where nothing
+   has media still paid the media gutter on every row: measured, twelve pixels of
+   nothing between the padding edge and the first character. The media gutter is
+   the reserved track's own slack now, and the trailing seams are margins on the
+   parts that need them, so the resting feed pays for neither. */
 [part="item"] {
   align-items: start;
   border-block-end: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));
-  column-gap: var(--helix-space-sm);
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto auto;
   padding-block: var(--notifications-padding-block, var(--helix-space-sm));
+  /* The containing block for the unread mark, which is placed against the row
+     rather than flowing in it. */
+  position: relative;
   padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
 }
 
 /* Unread is a state a reader scans for, so it is weight and a mark rather than
    a fill: a filled row is elevation spelled differently, and a feed of them is a
    striped list nobody can read. The mark is on the inline start edge, which is
-   where the eye already is. */
-:host(:not(:state(read))) [part="item"] {
-  box-shadow: inset var(--helix-border-thick) 0 0 0
-    var(--notifications-unread-mark, var(--helix-color-accent));
+   where the eye already is.
+
+   **It was `box-shadow: inset`, and that spelling made it read as an artifact
+   rather than as a mark.** An inset shadow paints inside the padding box, which
+   stops short of the rule under the row, so two unread items in a row drew one
+   line broken by a hairline every 67 pixels; and it ran the whole height of the
+   item, so the mark grew with the length of the notification and said something
+   about the text rather than about the state. Measured on a three line item, 106
+   pixels of accent against 67 for the row above it, for the same fact.
+
+   A pseudo element of a fixed height, on the first line and inset from the edge,
+   is the same fact at the same size every time, and does not touch the border it
+   used to be mistaken for. */
+:host(:not(:state(read))) [part="item"]::before {
+  background-color: var(--notifications-unread-mark, var(--helix-color-accent));
+  block-size: var(--_notifications-line);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  inline-size: var(--helix-border-thick);
+  inset-block-start: var(--notifications-padding-block, var(--helix-space-sm));
+  inset-inline-start: var(--helix-space-2xs);
+  position: absolute;
 }
 
+/* The box fills its track and the mark sits at the start of it, so the space
+   the reservation buys is trailing space rather than an indent. An item with
+   nothing in the media slot is that space and nothing else, which is what puts
+   every line of text down the feed on the same edge.
+
+   **`[part="media"]:not(:has(*)) { display: none }` was here and could never
+   match.** The box's child is the `<slot>`, not what a consumer assigned to it,
+   so `:has(*)` is true of an empty one and true of a filled one alike: valid
+   CSS, no error, and a rule that had never once applied. It is the same wall the
+   root hit and wrote up in `markEmpty`, which is where `slotFilled` came from.
+   Nothing asks the question now, because the reservation answers it feed-wide
+   and an item has no reason to care whether it is the one holding the column
+   open. */
 [part="media"] {
   display: grid;
-  place-items: center;
-}
-
-[part="media"]:not(:has(*)) {
-  display: none;
+  place-items: center start;
 }
 
 [part="body"] {
@@ -41,10 +99,10 @@
 }
 
 [part="content"] {
-  color: var(--notifications-color, var(--helix-color-foreground-subtle));
+  color: var(--notifications-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  line-height: var(--helix-leading-normal);
+  line-height: var(--_notifications-line);
 }
 
 /* The timestamp is the quietest thing in the row and is never the reason
@@ -59,30 +117,66 @@
   font-weight: var(--helix-weight-medium);
 }
 
+/* **`foreground-subtle` is lighter than `foreground-muted`, and this had them
+   the wrong way round.** The two are 0.53 and 0.50 in oklch, so the timestamp,
+   the thing this file calls the quietest in the row, was drawn darker than the
+   content it belongs to: on a read item the ink went `subtle` for the content
+   and `muted` for the time, and a row whose least important element is its
+   darkest has no hierarchy left to read. Three pounds now, and they descend:
+   `foreground` for unread content, `foreground-muted` for read content,
+   `foreground-subtle` for the time in either. */
 [part="time"] {
-  color: var(--helix-color-foreground-muted);
+  color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
 }
 
+/* The seams the grid no longer draws. An empty box still carries its margin, so
+   a row with no actions gives twelve pixels of its body width away and nothing
+   moves: the trailing controls are placed by the item's own padding, not by what
+   is to their left.
+
+   **Both trailing boxes are one line tall and their contents overflow it
+   evenly**, which is what puts them on an axis. `align-items: start` hangs a box
+   from the top of the content, so a 32 pixel button in a 20 pixel line sat with
+   its label between the first line of text and the timestamp, aligned to
+   neither, while the dismiss beside it sat at the top: two controls in one row
+   on two different centers. Giving each the line's height and centering inside
+   it lets both hang off the same axis whatever they hold. */
 [part="actions"] {
+  align-items: center;
+  block-size: var(--_notifications-line);
   display: flex;
   gap: var(--helix-space-2xs);
+  margin-inline-start: var(--helix-space-sm);
 }
 
+/* A square the size of the row's controls, not a glyph with padding around it.
+   It measured 15 by 22, which is under any target anybody recommends and under
+   half the area of the button sitting next to it; the mark inside it is centered
+   rather than laid out, so a consumer replacing it with an icon gets the same
+   box. The negative start margin is what centers that box on the first line,
+   the trailing boxes being one line tall by the rule above. */
 [part="dismiss"] {
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
+  block-size: var(--helix-size-control);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
+  display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
+  inline-size: var(--helix-size-control);
   line-height: 1;
-  padding: var(--helix-space-2xs);
+  margin-block-start: calc((var(--_notifications-line) - var(--helix-size-control)) / 2);
+  margin-inline-start: var(--helix-space-2xs);
+  padding: var(--helix-space-none);
+  place-items: center;
 }
 
 [part="dismiss"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 
@@ -99,7 +193,27 @@
     display: none;
   }
 
-  :host(:not(:state(read))) [part="item"] {
-    box-shadow: none;
+  :host(:not(:state(read))) [part="item"]::before {
+    display: none;
+  }
+}
+
+/* Narrow, the actions go under the body rather than beside it.
+
+   The trailing columns take their width whatever is left for the text, so a row
+   in a phone-width feed spent a third of itself on a four character button and
+   wrapped the notification to three lines to pay for it: measured at 390, the
+   body had 168 pixels of a 342 pixel row. Under the body it has all of them, and
+   the dismiss stays on the first line where a reader looks for it.
+
+   26rem is where the body drops under about 300 pixels, which is where the
+   wrapping starts to be the row's shape rather than the sentence's length. */
+@container (inline-size < 26rem) {
+  [part="actions"] {
+    block-size: auto;
+    grid-column: 2 / -1;
+    grid-row: 2;
+    margin-block-start: var(--helix-space-xs);
+    margin-inline-start: var(--helix-space-none);
   }
 }

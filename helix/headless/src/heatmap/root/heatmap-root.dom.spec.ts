@@ -57,6 +57,36 @@ const cells = (element: HTMLElement) => [
   ...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? []),
 ]
 
+describe('the footer', () => {
+  /**
+   * A footer nobody filled is not laid out, and the element is what says so.
+   *
+   * The stylesheet asked with `:not(:has(slot:has(*)))` and could not: `:has()`
+   * may not be nested inside `:has()`, so the rule never parsed at all, and a
+   * slot's assigned nodes are not its DOM children, so the inner test was about
+   * fallback content rather than the fill. A strip with no legend still reserved
+   * the row for one.
+   */
+  test('is hidden while none of its three slots holds anything', async () => {
+    const element = await strip('', [['Mon', 1]])
+    expect(part(element, 'footer')?.hasAttribute('data-empty')).toBe(true)
+    expect(part(element, 'footer')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('is laid out as soon as one of them does', async () => {
+    const host = (await mount(
+      `<div><table id="uptime" data-hidden-visually><caption>Uptime</caption><tbody>
+        <tr><th scope="row">Mon</th><td data-value="1">1</td></tr>
+      </tbody></table>
+      <helix-headless-heatmap for="uptime"><span slot="summary">Last week</span></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-heatmap') as Strip
+    await element.updateComplete
+    expect(part(element, 'footer')?.hasAttribute('data-empty')).toBe(false)
+    expect(part(element, 'footer')?.hasAttribute('hidden')).toBe(false)
+  })
+})
+
 describe('the data comes from the table', () => {
   test('one cell per reading', async () => {
     const element = await strip('', [

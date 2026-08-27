@@ -7,6 +7,7 @@ import {
   hostAria,
   MixinCollection,
   requestChange,
+  slotFilled,
 } from '@helix-io/core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -493,8 +494,46 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
   }
 
+  /**
+   * Says on the toolbar and the footer whether anything is in them.
+   *
+   * **The stylesheet used to ask, and could not.** It read
+   * `[part="toolbar"]:has(> slot:not(:has(*)))`, which is two faults at once:
+   * `:has()` may not be nested inside `:has()`, so the selector failed to parse
+   * and the whole rule was discarded; and `slot:not(:has(*))` is as true of a
+   * filled slot as of an empty one, because assigned nodes are not a slot's DOM
+   * children. Both verified in a browser. A table with no toolbar paid the gap
+   * above the grid for one that was not there.
+   */
+  private markEmpty(): void {
+    this.markRegion('toolbar', ['toolbar'])
+    /* The footer is not empty while this element is drawing its own pagination
+       into it, which is the case the old selector spelled with a second `:not`. */
+    this.markRegion('footer', ['footer'], '[part="pagination"]')
+  }
+
+  /**
+   * One region, hidden when its slot holds nothing and nothing of ours fills it.
+   *
+   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+   * sheet reads, and this tier ships no sheet, so an empty region left in the box
+   * tree would be a gap a headless consumer cannot close without knowing to look
+   * for it. The styled rule stays too, because that sheet sets `display` on these
+   * parts and therefore outranks the UA's `[hidden]` one.
+   */
+  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
+    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
+    const empty =
+      !slots.some((name) =>
+        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
+      ) && !(occupied && this.renderRoot?.querySelector(occupied))
+    region?.toggleAttribute('data-empty', empty)
+    region?.toggleAttribute('hidden', empty)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.markEmpty()
     this.assign()
   }
 

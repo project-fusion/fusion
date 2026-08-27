@@ -974,6 +974,7 @@ offering it.
 | `composer` | Below the transcript, where the reader writes. |
 | `status` | Beside the composer: somebody typing, connection lost. |
 | `resume` | The way back to the bottom. |
+| `actions` | Beside the header: what can be done to the conversation itself. |
 
 #### Parts
 
@@ -982,6 +983,7 @@ offering it.
 | `log` | The transcript, which is the thing that scrolls. |
 | `composer` | The region the composer sits in. |
 | `header` | The region above the transcript. |
+| `actions` | The controls for the conversation, at the header's trailing edge. |
 | `resume` | The affordance offered while the reader is away from the bottom. |
 | `status` | The status region, which is not part of the log. |
 | `empty` | Shown when the conversation has no turns. |
@@ -1094,6 +1096,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | *(default)* | What was said. |
 | `avatar` | Who said it. |
 | `actions` | What can be done with it. |
+| `sources` | What it was said from: citations, documents, a retrieved page. |
 
 #### Parts
 
@@ -1104,10 +1107,11 @@ is the signal, and decorating it competes with the thing it is decorating.
 | `message` | The whole turn. |
 | `avatar` | The leading slot's box. |
 | `body` | What was said, and the line under it. |
+| `sources` | What the turn was drawn from, under it and outside the bubble. |
 | `time` | When it was said. |
 | `state` | What has happened to it, where that is worth saying. |
 | `retry` | The control offered on a failed message. |
-| `actions` | The trailing slot's box. |
+| `actions` | The controls offered on the turn, beside its time. |
 
 #### Custom properties
 
@@ -2799,15 +2803,20 @@ An empty cell takes the quietest ground the palette has rather than being
 transparent. A strip of holes reads as a broken picture; a strip of empty
 cells reads as a period with nothing in it, which is what it is.
 
+**This tier is what a tone name is worth.** `tones="success"` and
+`data-tone="danger"` reach the theme's status colours; `tones="1 2 3 4 5"`
+reaches a five step ramp of one hue, which is the only thing a reader can
+compare two cells by. Both are hooks, so a page may answer differently.
+
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `emptyText` | `empty-text` | `string` | `'No readings'` | `HelixHeadlessHeatmap` | Shown when the table has no readings in it. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `gap` | `gap` | `number` | `2` | `HelixHeadlessHeatmap` | Space between cells, in CSS pixels, for the same reason `min-cell` is a number. |
+| `gap` | `gap` | `number` | `4` | `HelixHeadlessHeatmap` | What the sheet beside this actually draws, in the pixels the fit arithmetic counts in. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
-| `minCell` | `min-cell` | `number` | `8` | `HelixHeadlessHeatmap` | The smallest a cell may get before the strip draws fewer of them. |
+| `minCell` | `min-cell` | `number` | `12` | `HelixHeadlessHeatmap` | The drawn cell, for the reason `gap` is the drawn gap. `0.75rem` at the root font size. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -2851,6 +2860,12 @@ cells reads as a period with nothing in it, which is what it is.
 | --- | --- |
 | `--heatmap-cell-size` | The size a cell wants. The strip fits as many as the container allows. |
 | `--heatmap-gap` | Space between cells. |
+| `--heatmap-cell-radius` | How far a cell's corners are rounded. |
+| `--heatmap-tone-1` | The quietest step of the magnitude ramp, reached by `tones="1 …"`. |
+| `--heatmap-tone-2` | The second step of the magnitude ramp. |
+| `--heatmap-tone-3` | The third step of the magnitude ramp. |
+| `--heatmap-tone-4` | The fourth step of the magnitude ramp. |
+| `--heatmap-tone-5` | The loudest step of the magnitude ramp. |
 | `--heatmap-tone` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
 
 ## Icon
@@ -3898,6 +3913,7 @@ holds thousands wants `helix-data-table` with a custom cell.
 | Property | Description |
 | --- | --- |
 | `--notifications-max-height` | How tall the feed may get before the list scrolls. |
+| `--notifications-media-column` | The gutter every item holds open where something in the feed has media. |
 | `--notifications-rule` | The hairline between items and around the regions. |
 | `--notifications-padding-inline` | Space either side of the header and footer. |
 

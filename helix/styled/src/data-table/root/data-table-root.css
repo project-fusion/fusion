@@ -76,9 +76,15 @@
 
 /* The toolbar and the footer are regions rather than content, so they carry the
    space between themselves and the grid and nothing else. Empty, they take none:
-   a consumer with no toolbar should not pay for the gap where one would go. */
-[part="toolbar"]:has(> slot:not(:has(*))),
-[part="footer"]:has(> slot:not(:has(*))):not(:has([part="pagination"])) {
+   a consumer with no toolbar should not pay for the gap where one would go.
+
+   **Asked by the element, because this rule could not ask it.** `:has()` may not
+   be nested inside `:has()`, so `[part="toolbar"]:has(> slot:not(:has(*)))`
+   failed to parse and the whole rule was dropped; and `slot:not(:has(*))` is
+   true of a filled slot as readily as an empty one, since assigned nodes are not
+   a slot's DOM children. See `slotFilled` and `data-table-root.ts`. */
+[part="toolbar"][data-empty],
+[part="footer"][data-empty] {
   display: none;
 }
 

@@ -3706,25 +3706,55 @@ in weeks and top to bottom in days. */
   rows?: HelixHeatmap["rows"];
   /** Lower bounds for the tone buckets, in the order the tones are given.
 
-`thresholds="0 1 3 6"` with `tones="muted info accent success"` puts 0 in
-`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.
-A value below the first bound gets no tone at all: an empty day in a
+`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+fourth. A value below the first bound gets no tone at all: an empty day in a
 contribution graph is a day with nothing in it, and painting it as the
 lowest bucket claims a reading that does not exist. */
   thresholds?: HelixHeatmap["thresholds"];
-  /** Tone per bucket, in the same order as `thresholds`. */
+  /** Tone per bucket, in the same order as `thresholds`.
+
+A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+**`"1"` through `"5"` are a ramp and everything else is a category**, which
+is the distinction a heatmap lives or dies on: magnitude has to be one hue
+getting louder, because a reader compares two cells by weight and cannot
+compare two hues at all. This shipped demonstrating the opposite,
+`tones="surface info accent success primary"` for a commit count, and five
+unrelated hues for five amounts is confetti with no order in it. */
   tones?: HelixHeatmap["tones"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   "min-cell"?: HelixHeatmap["minCell"];
   /** The smallest a cell may get before the strip draws fewer of them.
 
 In CSS pixels, because this is arithmetic against a measured width rather
-than a length the stylesheet resolves. Zero turns the dropping off
-altogether, which is right for a strip in a container that cannot get narrow. */
+than a length the stylesheet resolves.
+
+**Which makes it a statement about the sheet, and it has to agree with
+one.** These two defaults are a bare strip's, and `helix/styled` overrides
+both because it draws something bigger: it was 8 and 2 against a sheet
+drawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it
+cost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every
+width measured. `visible` said 59 the whole time, so the one number a
+summary is told to trust was the number that was wrong. A consumer who moves
+`--heatmap-cell-size` or `--heatmap-gap` sets these to match.
+
+Zero turns the dropping off altogether, which is right for a strip in a
+container that cannot get narrow. */
   minCell?: HelixHeatmap["minCell"];
   /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
   gap?: HelixHeatmap["gap"];
@@ -9655,6 +9685,18 @@ export type CustomCssProperties = {
   "--heatmap-cell-size"?: string;
   /** Space between cells. */
   "--heatmap-gap"?: string;
+  /** How far a cell's corners are rounded. */
+  "--heatmap-cell-radius"?: string;
+  /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
+  "--heatmap-tone-1"?: string;
+  /** The second step of the magnitude ramp. */
+  "--heatmap-tone-2"?: string;
+  /** The third step of the magnitude ramp. */
+  "--heatmap-tone-3"?: string;
+  /** The fourth step of the magnitude ramp. */
+  "--heatmap-tone-4"?: string;
+  /** The loudest step of the magnitude ramp. */
+  "--heatmap-tone-5"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
   /** Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. */
@@ -9795,6 +9837,8 @@ export type CustomCssProperties = {
   "--notifications-padding-inline"?: string;
   /** How tall the feed may get before the list scrolls. */
   "--notifications-max-height"?: string;
+  /** The gutter every item holds open where something in the feed has media. */
+  "--notifications-media-column"?: string;
   /** Space before the label, shared with a group heading. */
   "--option-inset"?: string;
   /** Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. */
@@ -10431,7 +10475,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixGridVueProps,
     HelixGridVueEvents
   >;
-  /** One grid, filled down the column and then across, which is what a calendar heatmap is: a week is a column, so the strip reads left to right in weeks and top to bottom in days. 'rows="1"' makes it a single row without a second layout.  An empty cell takes the quietest ground the palette has rather than being transparent. A strip of holes reads as a broken picture; a strip of empty cells reads as a period with nothing in it, which is what it is. */
+  /** One grid, filled down the column and then across, which is what a calendar heatmap is: a week is a column, so the strip reads left to right in weeks and top to bottom in days. 'rows="1"' makes it a single row without a second layout.  An empty cell takes the quietest ground the palette has rather than being transparent. A strip of holes reads as a broken picture; a strip of empty cells reads as a period with nothing in it, which is what it is.  **This tier is what a tone name is worth.** 'tones="success"' and 'data-tone="danger"' reach the theme's status colours; 'tones="1 2 3 4 5"' reaches a five step ramp of one hue, which is the only thing a reader can compare two cells by. Both are hooks, so a page may answer differently. */
   "helix-heatmap": DefineCustomElement<
     HelixHeatmap,
     HelixHeatmapVueProps,

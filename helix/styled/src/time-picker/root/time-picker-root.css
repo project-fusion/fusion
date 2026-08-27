@@ -45,7 +45,7 @@
  * The label color goes with the fill. A foreground picked to sit on a surface
  * does not sit on the accent, and this is the one place in this component where
  * a row stops being a row on the panel. */
-:host([mode="range"]) [part="option"][selected]::part(item) {
+:host([mode="range"]) [part="option"]:state(selected)::part(item) {
   /* **The inverse pair, because the muted one was measured in light only.**
      This was `foreground-muted` carrying `foreground-on-accent`, on the
      reasoning that `foreground` was a slab of near-black in a list of gray rows
@@ -271,7 +271,7 @@
    `foreground-on-accent` for the digits, which is the token for words on a
    filled control. The list appearance already reads this way for its range
    termini, so all three surfaces now say "chosen" with one mark. */
-[part="column"] [part="option"][selected]::part(label) {
+[part="column"] [part="option"]:state(selected)::part(label) {
   background-color: var(--time-picker-selected-color, var(--helix-color-foreground-muted));
   color: var(--helix-color-foreground-on-accent);
 }
@@ -301,8 +301,8 @@
  * concentric ones. Input records the longer version of this: a red border inside
  * a blue ring is the double-struck look the focus rule exists to prevent,
  * arriving by another route. */
-:host([invalid]) [part="option"][selected]::part(item),
-:host([invalid]) [part="column"] [part="option"][selected]::part(label) {
+:host([invalid]) [part="option"]:state(selected)::part(item),
+:host([invalid]) [part="column"] [part="option"]:state(selected)::part(label) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
 }

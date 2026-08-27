@@ -299,6 +299,26 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
       <slot name="end"></slot>`
   }
 
+  /**
+   * Mirrors the chosen state where a stylesheet can select on it.
+   *
+   * **A custom state and not the `selected` attribute it used to reflect.** The
+   * parent writes this: a listbox choosing a row, a tab strip moving the tab, a
+   * radio group answering for its set. Reflected, that put the element's own
+   * bookkeeping onto markup a consumer wrote and a consumer's server never sent,
+   * which React reconciles and reports as a mismatch, and which a serialized
+   * element pasted back declares as a choice nobody made. `ElementInternals`
+   * holds it instead, where it is not in the DOM at all.
+   *
+   * Reading `selected` is unaffected and so is writing it: the attribute still
+   * seeds the property, which is what `<helix-tree-item selected>` in a consumer's
+   * markup means. What stops is the write back. See 302 and 304.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('selected', this.selected)
+  }
+
   protected override render(): TemplateResult {
     /* Where the semantics sit, which `href` decides.
      *
@@ -336,13 +356,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
                 aria-selected=${this.selected ? 'true' : 'false'}
                 aria-level=${level}
                 tabindex=${tabIndex}
-                data-selected=${this.selected ? '' : nothing}
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
               >${this.renderRow()}</a>`
             : html`<div
                 part="row"
-                data-selected=${this.selected ? '' : nothing}
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
               >${this.renderRow()}</div>`

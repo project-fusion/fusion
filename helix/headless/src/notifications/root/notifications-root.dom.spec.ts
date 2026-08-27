@@ -132,6 +132,27 @@ describe('marking everything read', () => {
     expect(element.unread).toBe(2)
   })
 
+  /**
+   * A region nobody filled is not laid out, and the element is what says so.
+   *
+   * The stylesheet asked this with `:not(:has(> slot:has(*)))` and could not:
+   * `:has()` may not be nested inside `:has()`, so the rule never parsed, and a
+   * slot's assigned nodes are not its DOM children, so the inner test was about
+   * fallback content rather than the fill. A feed with no footer drew its rule
+   * over nothing.
+   */
+  test('an empty region is hidden, and a filled one is not', async () => {
+    const element = await feed()
+    expect(part(element, 'footer')?.hasAttribute('data-empty')).toBe(true)
+    expect(part(element, 'footer')?.hasAttribute('hidden')).toBe(true)
+    /* The header holds no slotted content either, and is not empty: this element
+       is drawing its own mark-all control into it. */
+    expect(part(element, 'header')?.hasAttribute('data-empty')).toBe(false)
+    element.markEveryoneRead()
+    await element.updateComplete
+    expect(part(element, 'header')?.hasAttribute('data-empty')).toBe(true)
+  })
+
   test('the control is drawn only while something is unread', async () => {
     const element = await feed()
     expect(part(element, 'mark-all')).not.toBeNull()

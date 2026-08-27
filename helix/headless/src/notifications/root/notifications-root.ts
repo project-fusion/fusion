@@ -4,6 +4,7 @@ import {
   HelixReadEvent,
   hostAria,
   MixinCollection,
+  slotFilled,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -182,9 +183,83 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     hostAria(this.internals, { label: this.label || 'Notifications', role: 'region' })
   }
 
+  /**
+   * Says whether anything in the feed has media, so every item can hold the
+   * column open whether or not it has one of its own.
+   *
+   * **A fact no item can answer for itself**, which is why it is here. An item
+   * knows about its own media slot and nothing about its neighbors, so a feed
+   * where some rows have an avatar and some do not drew two different left
+   * edges for its text and had no way to notice: measured on a four item feed,
+   * the rows without media started their text 32 pixels to the left of the rows
+   * with it. The styled tier turns this into a width; this tier ships no
+   * stylesheet and is unaffected.
+   *
+   * Read off the light DOM rather than off the items, so it does not depend on
+   * which children have upgraded by the time this runs.
+   */
+  private markMedia(): void {
+    this.toggleState(
+      'media',
+      this.items.some((item) => item.querySelector(':scope > [slot="media"]') !== null),
+    )
+  }
+
+  /**
+   * Says on each region whether anything is in it.
+   *
+   * **The stylesheet used to ask, and could not.** The rule read
+   * `[part="header"]:not(:has(> slot:has(*)))`, which is two faults at once.
+   * `:has()` may not be nested inside `:has()`, so the selector fails to parse
+   * and the whole rule is discarded; and a slot's assigned nodes are not its DOM
+   * children, so `slot:has(*)` reports whether the slot has *fallback* rather
+   * than whether a consumer filled it, and would have been false either way.
+   * Both verified in a browser: `insertRule` throws a `SyntaxError` on the
+   * first, and an assigned element still leaves `slot.matches(':has(*)')` false.
+   * A feed with no header drew its rule under nothing, and one with no footer
+   * drew another over nothing.
+   *
+   * `slotFilled` is what the rest of the library already asks with. It is said
+   * on the region inside this shadow root rather than on the host, because an
+   * attribute written onto the host is a change to markup the consumer rendered,
+   * which React reports on hydration and does not patch up.
+   */
+  private markEmpty(): void {
+    /* The header is not empty while this element is drawing its own control into
+       it, which is the case the old selector spelled with a second `:not`. */
+    this.markRegion('header', ['header'], '[part="mark-all"]')
+    this.markRegion('footer', ['footer'])
+  }
+
+  /**
+   * One region, hidden when its slot holds nothing and nothing of ours fills it.
+   *
+   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+   * sheet reads, and this tier ships no sheet, so an empty region left in the box
+   * tree would be a gap a headless consumer cannot close without knowing to look
+   * for it. The styled rule stays too, because that sheet sets `display` on these
+   * parts and therefore outranks the UA's `[hidden]` one.
+   */
+  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
+    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
+    const empty =
+      !slots.some((name) =>
+        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
+      ) && !(occupied && this.renderRoot?.querySelector(occupied))
+    region?.toggleAttribute('data-empty', empty)
+    region?.toggleAttribute('hidden', empty)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* Before `markEmpty`, which reads what is assigned: on a feed with no items
+       nothing else ever schedules a second update, so a header asked about
+       before its slot was filled stayed hidden for the life of the element. The
+       empty feed is the one state where the header is the only thing on screen,
+       and it was the one state that lost it. */
     this.assign()
+    this.markEmpty()
+    this.markMedia()
     /* Written after the render rather than reflected during it, so it follows
        every change rather than only the first, and so the server's output and a
        hydrating consumer's markup agree that neither has it yet. */

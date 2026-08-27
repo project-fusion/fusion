@@ -283,8 +283,8 @@ export const TOKENS: Token[] = [
   ['color-border', 'light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))'],
   /* Interaction. */
   ['color-primary', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
-  ['color-primary-hover', 'var(--_helix-brand-600)'],
-  ['color-primary-active', 'var(--_helix-brand-700)'],
+  ['color-primary-hover', 'light-dark(var(--_helix-brand-600), var(--_helix-brand-300))'],
+  ['color-primary-active', 'light-dark(var(--_helix-brand-700), var(--_helix-brand-200))'],
   ['color-primary-subtle', 'light-dark(var(--_helix-brand-50), var(--_helix-brand-900))'],
   /* A fill that carries `--helix-color-foreground-on-accent`, which is the one
      job no accent token in this set was doing.

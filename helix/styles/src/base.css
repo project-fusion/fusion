@@ -907,7 +907,7 @@ helix-toggle-group helix-toggle::part(item):hover {
    thumb measures the item it marks. Measured, the same text came out 94.2px
    selected against 92.34 unselected, so choosing a file nudged the row it was
    in. The thumb is the emphasis, and it does not need help. */
-helix-toggle[selected]::part(item) {
+helix-toggle:state(selected)::part(item) {
   background-color: transparent;
   color: var(--helix-color-foreground);
 }

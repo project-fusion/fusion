@@ -111,7 +111,7 @@
  * land on the same row, which for a listbox opening on its own answer is
  * immediately and always. A mark beside the label is legible under both.
  */
-:host([selected]) [part="item"]::after {
+:host(:state(selected)) [part="item"]::after {
   content: "";
   background-color: currentColor;
   block-size: var(--helix-size-icon-sm);

@@ -75,14 +75,33 @@ export const words = (source: string): string[] =>
  * reader something false about the picture in front of them, and nothing about
  * the picture says so. That is the one fault in this component that a screenshot
  * cannot show, which is why the element reflects the number and announces it.
+ *
+ * **What crosses the width is a column, and `rows` is how many cells are in
+ * one.** This counted cells until 27 Aug 2026, which is the same number only
+ * while `rows` is 1. At `rows="7"` a ten week graph came out at fifty-nine
+ * readings in a 592px box: eleven days dropped to fit a strip that wanted 156
+ * pixels, and the fifty-nine were not a multiple of seven, so every column after
+ * the cut was offset by a day and the day-of-week rows stopped meaning anything.
+ * A calendar heatmap that silently rotates its own weekdays is worse than one
+ * that drops a week, and both came from dividing by the wrong thing.
+ *
+ * The count is therefore always a whole number of columns, which is what keeps
+ * the tail slice aligned.
  */
-export const fits = (total: number, width: number, minimum: number, gap: number): number => {
+export const fits = (
+  total: number,
+  width: number,
+  minimum: number,
+  gap: number,
+  rows = 1,
+): number => {
   if (!Number.isFinite(width) || width <= 0 || minimum <= 0) {
     return total
   }
-  /* n cells need n widths and n-1 gaps, so solving for n gives the +gap on both
-     sides. Written as `width / (minimum + gap)` it is short by one cell at every
-     size, which is the off-by-one that reads as "the strip has a margin". */
-  const room = Math.floor((width + gap) / (minimum + gap))
-  return Math.max(1, Math.min(total, room))
+  /* n columns need n widths and n-1 gaps, so solving for n gives the +gap on
+     both sides. Written as `width / (minimum + gap)` it is short by one column
+     at every size, which is the off-by-one that reads as "the strip has a
+     margin". */
+  const columns = Math.max(1, Math.floor((width + gap) / (minimum + gap)))
+  return Math.min(total, columns * Math.max(1, rows))
 }

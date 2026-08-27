@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -44,16 +44,34 @@ describe('one tab', () => {
     expect(ignored).toBe(0)
   })
 
-  /* Both states reflect, so a document rule can select them and a server can
-     emit them. A tab that knew it was selected and did not say so on the host
-     would be a tab a stylesheet cannot draw. */
-  test('mirrors selected and disabled to the host, where a stylesheet reads them', async () => {
+  /* **The two are kept in different places now, and the split is the point.**
+     `disabled` is a consumer's declaration and reflects, so a document rule can
+     select it and a server can emit it. `selected` is the tab strip's own
+     bookkeeping: reflected, it wrote a choice onto markup a consumer's server
+     never sent, which React reconciles and reports. It is an
+     `ElementInternals.states` entry now, which is not in the DOM at all, and
+     `:host(:state(selected))` is what the stylesheet reads. See 302 and 304.
+
+     **What is asserted is that the attribute does not follow.** A consumer who
+     typed `selected` still has it: removing reflection stops the element writing
+     the attribute, not the consumer. So the test types one, moves the property
+     the other way, and asks for the state to have moved while the markup stayed
+     exactly as it was written. Asserting the attribute merely absent would have
+     been asserting the opposite of what a seed does, and did, until the run
+     failed. */
+  test('moves its own state and leaves the markup a consumer wrote alone', async () => {
     const host = await tab('selected disabled')
-    expect(host.hasAttribute('selected')).toBe(true)
+    expect(hasState(host, 'selected')).toBe(true)
     expect(host.hasAttribute('disabled')).toBe(true)
+
     host.selected = false
     await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
-    expect(host.hasAttribute('selected')).toBe(false)
+
+    expect(hasState(host, 'selected')).toBe(false)
+    /* Still there, and untouched: the seed is the consumer's and this element
+       has no business editing it. Before 302 this read `false`, because the
+       element reflected its own answer back over what was typed. */
+    expect(host.hasAttribute('selected')).toBe(true)
   })
 
   test('draws the tab part that carries its label', async () => {

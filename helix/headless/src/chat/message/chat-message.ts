@@ -1,4 +1,11 @@
-import { customElement, HelixElement, HelixSendEvent, hostAria, relativeTime } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  HelixSendEvent,
+  hostAria,
+  relativeTime,
+  slotFilled,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -25,17 +32,19 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot - What was said.
  * @slot avatar - Who said it.
+ * @slot sources - What it was said from: citations, documents, a retrieved page.
  * @slot actions - What can be done with it: copy, retry, react.
  *
  * @csspart message - The whole turn.
  * @csspart avatar - The leading slot's box.
  * @csspart body - What was said, and the line under it.
  * @csspart content - The consumer's own markup.
- * @csspart meta - The time and the state together.
+ * @csspart sources - What the turn was drawn from, under it and outside the bubble.
+ * @csspart meta - The line under a turn: its time, its state, and its controls.
  * @csspart time - When it was said.
  * @csspart state - What has happened to it, where that is worth saying.
  * @csspart retry - The control offered on a failed message.
- * @csspart actions - The trailing slot's box.
+ * @csspart actions - The controls offered on the turn, beside its time.
  *
  * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again, and cancelable.
  */
@@ -157,15 +166,79 @@ export class HelixHeadlessChatMessage extends HelixElement {
     </span>`
   }
 
+  /**
+   * Says on each region whether anything is in it.
+   *
+   * Three of them need the answer and no selector can give it: a slot's assigned
+   * nodes are not its DOM children, so `:empty` and `:has(*)` both describe the
+   * fallback rather than the fill. `sources` and `actions` are regions that cost
+   * a gap when they are boxes at all, which most turns should not pay. `content`
+   * is the one that is not about space: a turn that is `streaming` with nothing
+   * in it yet is what the typing indicator is drawn for, and "nothing in it yet"
+   * is exactly this question.
+   */
+  private markEmpty(): void {
+    for (const name of ['content', 'sources', 'actions'] as const) {
+      const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${name}"]`)
+      const slot =
+        name === 'content'
+          ? this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+          : this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+      const empty = !slotFilled(slot)
+      region?.toggleAttribute('data-empty', empty)
+      /* `content` keeps its box when empty, because the typing indicator is
+         painted into it. The other two are gaps nobody asked for. */
+      if (name !== 'content') {
+        region?.toggleAttribute('hidden', empty)
+      }
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.markEmpty()
+  }
+
+  /**
+   * The turn: who said it, what was said, what it was drawn from, and its line.
+   *
+   * **`sources` and `actions` are inside the body rather than beside it**, and
+   * the second of those moved twice. `actions` was a third grid column, so a
+   * copy control on a fifteen-word turn sat at the container's trailing edge
+   * with a hundred and fifty pixels of nothing between it and the bubble it
+   * acted on, on both sides of the conversation. Moved into the body as a
+   * column of its own it was no better: a bubble spanning two auto tracks
+   * inflates both, so the controls landed under the middle of the turn.
+   *
+   * So they are inside `meta`, which is the line under a turn rather than only
+   * its timestamp, and that line is one flex row: time, state, controls, all
+   * hugging whichever edge the turn is against. Nothing has to be sized against
+   * anything else for that to hold at every width.
+   */
   protected override render(): TemplateResult {
     return html`<div part="message">
       <span part="avatar"><slot name="avatar"></slot></span>
       <div part="body">
-        <div part="content"><slot></slot></div>
-        <span part="meta">${this.renderTime()} ${this.renderState()}</span>
+        <div part="content"><slot @slotchange=${this.handleFill}></slot></div>
+        <div part="sources"><slot name="sources" @slotchange=${this.handleFill}></slot></div>
+        <span part="meta"
+          >${this.renderTime()} ${this.renderState()}
+          <span part="actions"><slot name="actions" @slotchange=${this.handleFill}></slot></span>
+        </span>
       </div>
-      <span part="actions"><slot name="actions"></slot></span>
     </div>`
+  }
+
+  /**
+   * A turn's own content arrives and changes no property here.
+   *
+   * It is the streaming case that needs this rather than a tidiness one: the
+   * first token of an answer is a light-DOM child appearing under an element
+   * nothing else told to look again, and it is exactly the moment the typing
+   * indicator has to stop being drawn.
+   */
+  private readonly handleFill = (): void => {
+    this.markEmpty()
   }
 
   /**

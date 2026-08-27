@@ -3,9 +3,34 @@
    and the mark-all control sliding away as a reader scrolls is the control they
    were reaching for. */
 :host {
+  /* Dense by nature, and it says so once, the way the toolbar and the app header
+     already do. A feed is a list of rows: a control put in one takes the row's
+     height without being told, so a row cannot end up with one member the wrong
+     height because somebody slotted it later. Measured before this line, a
+     ghost button in a row drew at the `md` step, 40 pixels inside a 43 pixel
+     row, which is what left it nothing to align to. */
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   max-block-size: var(--notifications-max-height, none);
+}
+
+/* Something in the feed has media, so every item holds the column open by this
+   much and the text down the feed starts on one edge. Set here rather than on
+   the item because an item cannot see its neighbors: the value inherits through
+   the light DOM to the items and into their shadow roots, which is the one
+   channel that crosses that boundary without either tier importing the other.
+
+   The gutter is in the value, media and the space after it together, so the
+   track a filled item needs and the track an empty one reserves are the same
+   number. `minmax` at the other end lets a larger mark than this grow the track
+   rather than be clipped. */
+:host(:state(media)) {
+  --notifications-media-column: calc(var(--helix-size-avatar) + var(--helix-space-sm));
 }
 
 [part="header"] {
@@ -19,11 +44,19 @@
   padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
 }
 
-/* Empty, the regions take no space. A consumer with no header should not pay
-   for the rule under one, and `:has` is what makes that answerable in CSS
-   rather than by an attribute the component would have to write. */
-[part="header"]:not(:has(> slot:has(*))):not(:has([part="mark-all"])),
-[part="footer"]:not(:has(> slot:has(*))) {
+/* Empty, the regions take no space: a consumer with no header should not pay for
+   the rule under one.
+
+   **The element says so, because `:has` cannot.** This asked in CSS, with
+   `:not(:has(> slot:has(*)))`, and the note here claimed that was the point.
+   Both halves of it were wrong. `:has()` may not be nested inside `:has()`, so
+   the selector never parsed and the rule was discarded whole; and a slot's
+   assigned nodes are not its DOM children, so `slot:has(*)` asks about fallback
+   content rather than about the fill. `slotFilled` is the library's answer to
+   this question and `data-empty` is how it reaches a stylesheet. See
+   `notifications-root.ts`. */
+[part="header"][data-empty],
+[part="footer"][data-empty] {
   display: none;
 }
 

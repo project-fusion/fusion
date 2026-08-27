@@ -17,7 +17,7 @@ import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
  * a child in the region its `slot` names, and the emptiness each region is
  * hidden on. They went out of step the first time they were written twice.
  */
-const REGIONS = ['header', 'resume', 'status', 'composer'] as const
+const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
 
 /**
  * @summary A conversation: the turns, and where the reader is in them.
@@ -61,12 +61,14 @@ const REGIONS = ['header', 'resume', 'status', 'composer'] as const
  * @documentation https://helix.fusion.dev/components/chat
  *
  * @slot - The turns, as `helix-chat-message` children.
- * @slot header - Above the transcript.
+ * @slot header - Above the transcript: what this conversation is.
+ * @slot actions - Beside the header: what can be done to the conversation itself.
  * @slot composer - Below the transcript, where the reader writes.
  * @slot status - Beside the composer: somebody typing, connection lost.
  * @slot resume - The way back to the bottom, shown while the reader has scrolled away.
  *
  * @csspart header - The region above the transcript.
+ * @csspart actions - The controls for the conversation, at the header's trailing edge.
  * @csspart log - The transcript, which is the thing that scrolls.
  * @csspart resume - The affordance offered while the reader is away from the bottom.
  * @csspart status - The status region, which is not part of the log.
@@ -344,8 +346,14 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const away = !this.pinned
-    return html`<div part="header" ?hidden=${!this.has('header')}>
+    /* The header stands while either half of it is filled: a conversation with
+       no title and a single control still needs the row that control sits in. */
+    const titled = this.has('header') || this.has('actions')
+    return html`<div part="header" ?hidden=${!titled}>
         <slot name="header"></slot>
+        <span part="actions" ?hidden=${!this.has('actions')}>
+          <slot name="actions"></slot>
+        </span>
       </div>
       <div
         part="log"

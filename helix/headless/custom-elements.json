@@ -7202,7 +7202,11 @@
               "name": "content"
             },
             {
-              "description": "The time and the state together.",
+              "description": "What the turn was drawn from, under it and outside the bubble.",
+              "name": "sources"
+            },
+            {
+              "description": "The line under a turn: its time, its state, and its controls.",
               "name": "meta"
             },
             {
@@ -7218,7 +7222,7 @@
               "name": "retry"
             },
             {
-              "description": "The trailing slot's box.",
+              "description": "The controls offered on the turn, beside its time.",
               "name": "actions"
             }
           ],
@@ -7230,6 +7234,10 @@
             {
               "description": "Who said it.",
               "name": "avatar"
+            },
+            {
+              "description": "What it was said from: citations, documents, a retrieved page.",
+              "name": "sources"
             },
             {
               "description": "What can be done with it: copy, retry, react.",
@@ -7336,6 +7344,24 @@
                 }
               },
               "description": "What has happened to it, in words, and the way back from a failure.\n\nA seam of its own, because the styled tier draws a failure as an icon and a\nconsumer may want neither. `sent` says nothing: every settled message is\nsent, and a transcript that labels each one is a transcript of the word\n\"sent\"."
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each region whether anything is in it.\n\nThree of them need the answer and no selector can give it: a slot's assigned\nnodes are not its DOM children, so `:empty` and `:has(*)` both describe the\nfallback rather than the fill. `sources` and `actions` are regions that cost\na gap when they are boxes at all, which most turns should not pay. `content`\nis the one that is not about space: a turn that is `streaming` with nothing\nin it yet is what the typing indicator is drawn for, and \"nothing in it yet\"\nis exactly this question."
+            },
+            {
+              "kind": "field",
+              "name": "handleFill",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A turn's own content arrives and changes no property here.\n\nIt is the streaming case that needs this rather than a tidiness one: the\nfirst token of an answer is a light-DOM child appearing under an element\nnothing else told to look again, and it is exactly the moment the typing\nindicator has to stop being drawn."
             },
             {
               "kind": "field",
@@ -7640,6 +7666,10 @@
               "name": "header"
             },
             {
+              "description": "The controls for the conversation, at the header's trailing edge.",
+              "name": "actions"
+            },
+            {
               "description": "The transcript, which is the thing that scrolls.",
               "name": "log"
             },
@@ -7670,8 +7700,12 @@
               "name": ""
             },
             {
-              "description": "Above the transcript.",
+              "description": "Above the transcript: what this conversation is.",
               "name": "header"
+            },
+            {
+              "description": "Beside the header: what can be done to the conversation itself.",
+              "name": "actions"
             },
             {
               "description": "Below the transcript, where the reader writes.",
@@ -17391,6 +17425,49 @@
               "description": "The columns into the header row, everything else into the toolbar and footer.\n\nManual assignment, so a consumer's own markup is never written to."
             },
             {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the toolbar and the footer whether anything is in them.\n\n**The stylesheet used to ask, and could not.** It read\n`[part=\"toolbar\"]:has(> slot:not(:has(*)))`, which is two faults at once:\n`:has()` may not be nested inside `:has()`, so the selector failed to parse\nand the whole rule was discarded; and `slot:not(:has(*))` is as true of a\nfilled slot as of an empty one, because assigned nodes are not a slot's DOM\nchildren. Both verified in a browser. A table with no toolbar paid the gap\nabove the grid for one that was not there."
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one."
+            },
+            {
               "kind": "field",
               "name": "handleSlotChange",
               "privacy": "private",
@@ -25950,9 +26027,13 @@
               "type": {
                 "text": "number"
               }
+            },
+            {
+              "name": "rows",
+              "default": "1"
             }
           ],
-          "description": "How many readings fit across a given width, and which ones they are.\n\n**Ninety cells in 320 pixels is three and a half pixels each**, which is not a\nstrip, it is a smear. So a narrow container shows fewer cells rather than\nthinner ones, and it shows the *most recent* ones, because a status strip that\ndrops the newest days to keep the oldest is answering a question nobody asked.\n\n**The count it returns is what the summary has to be recomputed against.** A\nstrip labeled \"99.2% over 90 days\" that is drawing 45 of them is telling the\nreader something false about the picture in front of them, and nothing about\nthe picture says so. That is the one fault in this component that a screenshot\ncannot show, which is why the element reflects the number and announces it."
+          "description": "How many readings fit across a given width, and which ones they are.\n\n**Ninety cells in 320 pixels is three and a half pixels each**, which is not a\nstrip, it is a smear. So a narrow container shows fewer cells rather than\nthinner ones, and it shows the *most recent* ones, because a status strip that\ndrops the newest days to keep the oldest is answering a question nobody asked.\n\n**The count it returns is what the summary has to be recomputed against.** A\nstrip labeled \"99.2% over 90 days\" that is drawing 45 of them is telling the\nreader something false about the picture in front of them, and nothing about\nthe picture says so. That is the one fault in this component that a screenshot\ncannot show, which is why the element reflects the number and announces it.\n\n**What crosses the width is a column, and `rows` is how many cells are in\none.** This counted cells until 27 Aug 2026, which is the same number only\nwhile `rows` is 1. At `rows=\"7\"` a ten week graph came out at fifty-nine\nreadings in a 592px box: eleven days dropped to fit a strip that wanted 156\npixels, and the fifty-nine were not a multiple of seven, so every column after\nthe cut was offset by a day and the day-of-week rows stopped meaning anything.\nA calendar heatmap that silently rotates its own weekdays is worse than one\nthat drops a week, and both came from dividing by the wrong thing.\n\nThe count is therefore always a whole number of columns, which is what keeps\nthe tail slice aligned."
         }
       ],
       "exports": [
@@ -25996,7 +26077,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**One family covers both readings, and the split people expect does not\nexist.** It was filed as two on the argument that a contribution graph needs a\ncontinuous ramp where uptime needs a category. GitHub's contribution graph is\nfive discrete levels rather than a gradient, so a cell that takes a tone\ncovers both: `rows=\"1\"` is a status strip, `rows=\"7\"` is a contribution graph,\nand heatmap is the name of that.\n\n**What it cannot be is a bar chart with flat values**, and the data model is\nwhat closes that rather than taste: chart color is per *series* everywhere\nelse here, `--chart-series-1` through `-15`, so ninety differently coloured\ncells would be ninety series.\n\nThe data is a real `<table>` named by `for`, the same convention every chart\nin this library uses, which also answers the accessibility question without\ninventing anything: **the table is the accessible representation**, it is\nalready in the markup, and the drawing is a picture of it. Hide it with\n`data-hidden-visually` and the reading is still there for anyone who needs it.\n\nA cell takes its tone from its own `data-tone`, or from `thresholds` and\n`tones` bucketing its value. The first is what a status page wants and the\nsecond is what a contribution graph wants; the cell's own wins, so a page that\nalready knows a day was degraded does not have to encode that as a number for\nthis component to decode again.\n\n**On a narrow container it draws fewer cells rather than thinner ones.**\nNinety cells in 320 pixels is three and a half pixels each, which is a smear\nand not a strip. The cells it drops are the oldest, and it reflects `visible`\nand fires `helix-resize` when the number changes, because **a summary saying\n\"99.2% over 90 days\" above a strip drawing 45 of them is telling the reader\nsomething false about the picture in front of them** and nothing about the\npicture says so.",
+          "description": "**One family covers both readings, and the split people expect does not\nexist.** It was filed as two on the argument that a contribution graph needs a\ncontinuous ramp where uptime needs a category. GitHub's contribution graph is\nfive discrete levels rather than a gradient, so a cell that takes a tone\ncovers both: `rows=\"1\"` is a status strip, `rows=\"7\"` is a contribution graph,\nand heatmap is the name of that.\n\n**What it cannot be is a bar chart with flat values**, and the data model is\nwhat closes that rather than taste: chart color is per *series* everywhere\nelse here, `--chart-series-1` through `-15`, so ninety differently coloured\ncells would be ninety series.\n\nThe data is a real `<table>` named by `for`, the same convention every chart\nin this library uses, which also answers the accessibility question without\ninventing anything: **the table is the accessible representation**, it is\nalready in the markup, and the drawing is a picture of it. Hide it with\n`data-hidden-visually` and the reading is still there for anyone who needs it.\n\nA cell takes its tone from its own `data-tone`, or from `thresholds` and\n`tones` bucketing its value. The first is what a status page wants and the\nsecond is what a contribution graph wants; the cell's own wins, so a page that\nalready knows a day was degraded does not have to encode that as a number for\nthis component to decode again.\n\n**A tone is a name this tier never resolves.** `tone=\"success\"` writes\n`--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,\nso what a name is worth is the answering tier's to say: `helix/styled` points\nthe semantic names at the theme's status colours and the numbered ones at a\nramp, and a consumer on `headless` declares the same names as whatever they\nlike. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the\ndependency the tiers exist to prevent and which failed loudly rather than\nquietly: off-tier that property is not undefined, it is *invalid*, so\n`background-color: var(--heatmap-tone, …)` declined its own fallback and every\ncell came out transparent. The headless baseline was a blank page under a row\nof footer text. `shared/chart/series.css` records Bar Chart having had the\nsame fault for the same reason.\n\n**On a narrow container it draws fewer cells rather than thinner ones.**\nNinety cells in 320 pixels is three and a half pixels each, which is a smear\nand not a strip. The cells it drops are the oldest, and it reflects `visible`\nand fires `helix-resize` when the number changes, because **a summary saying\n\"99.2% over 90 days\" above a strip drawing 45 of them is telling the reader\nsomething false about the picture in front of them** and nothing about the\npicture says so.",
           "name": "HelixHeadlessHeatmap",
           "cssProperties": [
             {
@@ -26008,8 +26089,32 @@
               "name": "--heatmap-gap"
             },
             {
+              "description": "How far a cell's corners are rounded.",
+              "name": "--heatmap-cell-radius"
+            },
+            {
               "description": "The tone of the cell this is set on. Written by the component, read by the sheet that paints.",
               "name": "--heatmap-tone"
+            },
+            {
+              "description": "The quietest step of the magnitude ramp, reached by `tones=\"1 …\"`.",
+              "name": "--heatmap-tone-1"
+            },
+            {
+              "description": "The second step of the magnitude ramp.",
+              "name": "--heatmap-tone-2"
+            },
+            {
+              "description": "The third step of the magnitude ramp.",
+              "name": "--heatmap-tone-3"
+            },
+            {
+              "description": "The fourth step of the magnitude ramp.",
+              "name": "--heatmap-tone-4"
+            },
+            {
+              "description": "The loudest step of the magnitude ramp.",
+              "name": "--heatmap-tone-5"
             }
           ],
           "cssParts": [
@@ -26074,7 +26179,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"1 3 6 9\"` with `tones=\"1 2 3 4\"` puts 1 and 2 in the ramp's\nfirst step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the\nfourth. A value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
               "attribute": "thresholds"
             },
             {
@@ -26084,7 +26189,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "description": "Tone per bucket, in the same order as `thresholds`.\n\nA name, resolved as `--heatmap-tone-<name>` by whichever tier answers.\n**`\"1\"` through `\"5\"` are a ramp and everything else is a category**, which\nis the distinction a heatmap lives or dies on: magnitude has to be one hue\ngetting louder, because a reader compares two cells by weight and cannot\ncompare two hues at all. This shipped demonstrating the opposite,\n`tones=\"surface info accent success primary\"` for a commit count, and five\nunrelated hues for five amounts is confetti with no order in it.",
               "attribute": "tones"
             },
             {
@@ -26094,7 +26199,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "attribute": "min-cell"
             },
             {
@@ -26166,12 +26271,22 @@
             },
             {
               "kind": "field",
+              "name": "rowCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "`rows` as a usable count, which is not always what the attribute says.\n\nOne place rather than two: the fit arithmetic and the grid template both\nneed it, and a `rows=\"0\"` or a `rows=\"2.5\"` that reached one of them and not\nthe other would draw a strip whose columns and whose capacity disagreed.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "room",
               "type": {
                 "text": "number"
               },
               "privacy": "private",
-              "description": "How many cells the container has room for.",
+              "description": "How many cells the container has room for, as a whole number of columns.",
               "readonly": true
             },
             {
@@ -26183,6 +26298,49 @@
               "privacy": "private",
               "description": "The readings actually drawn, newest kept.\n\nThe tail rather than the head: a status strip that drops the newest days to\nkeep the oldest is answering a question nobody asked.",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on the footer whether any of its three slots holds anything.\n\n**The stylesheet used to ask, and could not.** It read\n`[part=\"footer\"]:not(:has(slot:has(*)))`, which is two faults at once:\n`:has()` may not be nested inside `:has()`, so the selector failed to parse\nand the rule was discarded whole; and a slot's assigned nodes are not its\nDOM children, so `slot:has(*)` reports fallback content rather than the\nfill, and would have been false either way. Both verified in a browser. A\nheatmap with no legend and no summary still reserved the row for one."
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one."
             },
             {
               "kind": "field",
@@ -26487,7 +26645,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"0 1 3 6\"` with `tones=\"muted info accent success\"` puts 0 in\n`muted`, 1 and 2 in `info`, 3 to 5 in `accent`, and 6 upward in `success`.\nA value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
+              "description": "Lower bounds for the tone buckets, in the order the tones are given.\n\n`thresholds=\"1 3 6 9\"` with `tones=\"1 2 3 4\"` puts 1 and 2 in the ramp's\nfirst step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the\nfourth. A value below the first bound gets no tone at all: an empty day in a\ncontribution graph is a day with nothing in it, and painting it as the\nlowest bucket claims a reading that does not exist.",
               "fieldName": "thresholds"
             },
             {
@@ -26496,7 +26654,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Tone per bucket, in the same order as `thresholds`.",
+              "description": "Tone per bucket, in the same order as `thresholds`.\n\nA name, resolved as `--heatmap-tone-<name>` by whichever tier answers.\n**`\"1\"` through `\"5\"` are a ramp and everything else is a category**, which\nis the distinction a heatmap lives or dies on: magnitude has to be one hue\ngetting louder, because a reader compares two cells by weight and cannot\ncompare two hues at all. This shipped demonstrating the opposite,\n`tones=\"surface info accent success primary\"` for a commit count, and five\nunrelated hues for five amounts is confetti with no order in it.",
               "fieldName": "tones"
             },
             {
@@ -26505,7 +26663,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves. Zero turns the dropping off\naltogether, which is right for a strip in a container that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them.\n\nIn CSS pixels, because this is arithmetic against a measured width rather\nthan a length the stylesheet resolves.\n\n**Which makes it a statement about the sheet, and it has to agree with\none.** These two defaults are a bare strip's, and `helix/styled` overrides\nboth because it draws something bigger: it was 8 and 2 against a sheet\ndrawing 12 and 4, so the arithmetic believed a cell cost 10 pixels where it\ncost 16, and the strip ran 940 pixels wide out of a 592 pixel box at every\nwidth measured. `visible` said 59 the whole time, so the one number a\nsummary is told to trust was the number that was wrong. A consumer who moves\n`--heatmap-cell-size` or `--heatmap-gap` sets these to match.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "fieldName": "minCell"
             },
             {
@@ -38123,6 +38281,60 @@
               }
             },
             {
+              "kind": "method",
+              "name": "markMedia",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says whether anything in the feed has media, so every item can hold the\ncolumn open whether or not it has one of its own.\n\n**A fact no item can answer for itself**, which is why it is here. An item\nknows about its own media slot and nothing about its neighbors, so a feed\nwhere some rows have an avatar and some do not drew two different left\nedges for its text and had no way to notice: measured on a four item feed,\nthe rows without media started their text 32 pixels to the left of the rows\nwith it. The styled tier turns this into a width; this tier ships no\nstylesheet and is unaffected.\n\nRead off the light DOM rather than off the items, so it does not depend on\nwhich children have upgraded by the time this runs."
+            },
+            {
+              "kind": "method",
+              "name": "markEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Says on each region whether anything is in it.\n\n**The stylesheet used to ask, and could not.** The rule read\n`[part=\"header\"]:not(:has(> slot:has(*)))`, which is two faults at once.\n`:has()` may not be nested inside `:has()`, so the selector fails to parse\nand the whole rule is discarded; and a slot's assigned nodes are not its DOM\nchildren, so `slot:has(*)` reports whether the slot has *fallback* rather\nthan whether a consumer filled it, and would have been false either way.\nBoth verified in a browser: `insertRule` throws a `SyntaxError` on the\nfirst, and an assigned element still leaves `slot.matches(':has(*)')` false.\nA feed with no header drew its rule under nothing, and one with no footer\ndrew another over nothing.\n\n`slotFilled` is what the rest of the library already asks with. It is said\non the region inside this shadow root rather than on the host, because an\nattribute written onto the host is a change to markup the consumer rendered,\nwhich React reports on hydration and does not patch up."
+            },
+            {
+              "kind": "method",
+              "name": "markRegion",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "slots",
+                  "type": {
+                    "text": "readonly string[]"
+                  }
+                },
+                {
+                  "name": "occupied",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One region, hidden when its slot holds nothing and nothing of ours fills it.\n\n`hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled\nsheet reads, and this tier ships no sheet, so an empty region left in the box\ntree would be a gap a headless consumer cannot close without knowing to look\nfor it. The styled rule stays too, because that sheet sets `display` on these\nparts and therefore outranks the UA's `[hidden]` one."
+            },
+            {
               "kind": "field",
               "name": "handleMarkAll",
               "privacy": "private",
@@ -40307,8 +40519,7 @@
               },
               "default": "false",
               "description": "Whether this choice is currently chosen. Written by the listbox.",
-              "attribute": "selected",
-              "reflects": true
+              "attribute": "selected"
             },
             {
               "kind": "field",
@@ -46765,8 +46976,7 @@
               },
               "default": "false",
               "description": "Whether this is the current choice. Written by the group.",
-              "attribute": "selected",
-              "reflects": true
+              "attribute": "selected"
             },
             {
               "kind": "field",
@@ -57759,8 +57969,7 @@
               },
               "default": "false",
               "description": "Whether this panel is the visible one.",
-              "attribute": "selected",
-              "reflects": true
+              "attribute": "selected"
             },
             {
               "kind": "field",
@@ -58586,8 +58795,7 @@
               },
               "default": "false",
               "description": "Whether this tab is the current one.",
-              "attribute": "selected",
-              "reflects": true
+              "attribute": "selected"
             },
             {
               "kind": "field",
@@ -66155,8 +66363,7 @@
               },
               "default": "false",
               "description": "Whether this item is the current one.",
-              "attribute": "selected",
-              "reflects": true
+              "attribute": "selected"
             },
             {
               "kind": "field",

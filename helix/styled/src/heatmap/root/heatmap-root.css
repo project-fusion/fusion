@@ -4,23 +4,88 @@
    `rows="1"` makes it a single row without a second layout. */
 :host {
   display: block;
+
+  /* Read by the three rules that draw a cell: the track it sits in, the row it
+     sits on, and the box itself. One name so a consumer moving the hook moves
+     all three, and so the fallback is written once rather than three times. */
+  --_heatmap-cell: var(--heatmap-cell-size, 0.75rem);
+
+  /* **What a tone name is worth, which the tier below cannot say.**
+     `helix/headless` writes `--heatmap-tone: var(--heatmap-tone-success)` onto a
+     cell and stops, exactly as the charts write `--chart-series-3`, because that
+     tier knows which bucket a reading fell in and has no tokens to spend on it.
+     Answering here is what lets a headless consumer answer differently.
+
+     The semantic names are the theme's status colours, so a strip that already
+     knows a day was degraded gets the same red as everything else that means
+     degraded, and a page that restyles danger restyles this with it. */
+  --heatmap-tone-accent: var(--helix-color-accent);
+  --heatmap-tone-danger: var(--helix-color-danger);
+  --heatmap-tone-info: var(--helix-color-info);
+  --heatmap-tone-muted: var(--helix-color-surface-sunken);
+  --heatmap-tone-primary: var(--helix-color-primary);
+  --heatmap-tone-success: var(--helix-color-success);
+  --heatmap-tone-warning: var(--helix-color-warning);
+
+  /* **The numbered ones are a ramp, and a ramp is one hue getting louder.**
+     A reader compares two cells by weight and cannot compare two hues at all,
+     so magnitude has to be a single colour walked toward the ground it sits on.
+     Mixed rather than picked off the scale because the steps have to be even:
+     the nearest four semantic tokens are `primary-subtle`, `primary`,
+     `primary-hover` and `primary-active`, which is the 50 then 500, 600, 700 of
+     the ramp, one chasm and three hairs.
+
+     Both ends resolve through `light-dark()`, so the mix inverts with the page
+     and the ramp runs quiet-to-loud in either mode without a second declaration. */
+  --heatmap-tone-1: color-mix(in oklab, var(--helix-color-primary) 22%, var(--helix-color-surface-sunken));
+  --heatmap-tone-2: color-mix(in oklab, var(--helix-color-primary) 44%, var(--helix-color-surface-sunken));
+  --heatmap-tone-3: color-mix(in oklab, var(--helix-color-primary) 66%, var(--helix-color-surface-sunken));
+  --heatmap-tone-4: color-mix(in oklab, var(--helix-color-primary) 88%, var(--helix-color-surface-sunken));
+  --heatmap-tone-5: var(--helix-color-primary);
 }
 
+/* **`grid-auto-columns`, or the weeks splay.** Implicit tracks are `auto`, and
+   `auto` in a grid with room to spare absorbs every pixel of it: a ten week
+   graph in a 592px box came out as nine tracks of 62 holding 12px cells, so the
+   cells were correct, the columns were 50px apart, and nothing read as a week.
+   A track the size of a cell is what makes the strip a block, and
+   `justify-content` says the leftover belongs at the end rather than between. */
 [part="strip"] {
   display: grid;
   gap: var(--heatmap-gap, var(--helix-space-2xs));
+  grid-auto-columns: var(--_heatmap-cell);
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--heatmap-cell-size, 0.75rem));
+  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--_heatmap-cell));
+  justify-content: start;
 }
 
 /* A cell is a square with a tone in it and nothing else. The default is the
    quietest ground the palette has rather than transparent: a strip of holes
    reads as a broken picture, where a strip of empty cells reads as a period
-   with nothing in it, which is what it is. */
+   with nothing in it, which is what it is.
+
+   **Half of `radii-sm`, because a corner is a fraction of the box it rounds.**
+   The scale's smallest step is 4px, which is a third of a 12px cell, and a third
+   is a dot: ninety of them read as beads on a string rather than as a row of
+   days. Halved they read as cells, and the value still comes off the seed, so a
+   theme that squares its corners squares these too. */
 [part="cell"] {
   background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
-  border-radius: var(--helix-radii-sm);
-  inline-size: var(--heatmap-cell-size, 0.75rem);
+  border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
+  inline-size: var(--_heatmap-cell);
+}
+
+/* Every cell carries a `title` and nothing said so. A ring on hover is what
+   ties the tooltip that appears to the day it came from, which on a strip of
+   ninety near-identical squares is the whole difficulty. `outline` rather than a
+   border or an inset shadow: it is outside the box model, so a cell does not
+   move or change size when the pointer reaches it, and one token of offset keeps
+   the ring clear of both neighbours inside the gap. */
+@media (hover: hover) {
+  [part="cell"]:hover {
+    outline: var(--helix-border-thin) solid var(--helix-color-foreground);
+    outline-offset: var(--helix-border-thin);
+  }
 }
 
 /* The footer is `meter`'s three-slot arrangement: start, summary, end. The
@@ -34,7 +99,7 @@
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-xs);
   grid-template-columns: auto minmax(0, 1fr) auto;
-  padding-block-start: var(--helix-space-2xs);
+  padding-block-start: var(--helix-space-xs);
 }
 
 [part="summary"] {
@@ -45,7 +110,11 @@
   text-align: end;
 }
 
-[part="footer"]:not(:has(slot:has(*))) {
+/* Empty, the footer takes no space. Asked by the element rather than by this
+   rule: `:has()` may not be nested inside `:has()`, so what was here failed to
+   parse and was discarded, and `slot:has(*)` reports fallback content rather
+   than what a consumer slotted. See `slotFilled` and `heatmap-root.ts`. */
+[part="footer"][data-empty] {
   display: none;
 }
 

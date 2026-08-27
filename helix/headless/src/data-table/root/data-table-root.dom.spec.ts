@@ -72,6 +72,32 @@ const SCHEMA = `
     <helix-headless-table-column field="size" sortable align="end">Size</helix-headless-table-column>
   </helix-headless-data-table>`
 
+describe('the regions around the grid', () => {
+  /**
+   * A region nobody filled is not laid out, and the element is what says so.
+   *
+   * The stylesheet asked with `:has(> slot:not(:has(*)))` and could not:
+   * `:has()` may not be nested inside `:has()`, so the rule was discarded whole,
+   * and assigned nodes are not a slot's DOM children, so the inner test was true
+   * of a filled slot as readily as an empty one. A table with no toolbar paid
+   * the gap above the grid for one that was not there.
+   */
+  test('an empty toolbar is hidden and a filled one is not', async () => {
+    const { element } = await mount(SCHEMA)
+    expect(part(element, 'toolbar')?.hasAttribute('data-empty')).toBe(true)
+    expect(part(element, 'toolbar')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('the footer is not empty while this element draws its own pagination', async () => {
+    const { element } = await mount(SCHEMA)
+    expect(part(element, 'footer')?.hasAttribute('data-empty')).toBe(true)
+    element.pageSize = 1
+    await settled(element)
+    expect(part(element, 'pagination')).not.toBeNull()
+    expect(part(element, 'footer')?.hasAttribute('data-empty')).toBe(false)
+  })
+})
+
 describe('the schema comes from the columns', () => {
   test('a cell per column per row, read by field', async () => {
     const { element, remove } = await mount(SCHEMA)

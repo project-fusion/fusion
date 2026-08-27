@@ -19,6 +19,15 @@ const message = async (attributes = '') =>
     `<helix-headless-chat-message ${attributes}>What was said</helix-headless-chat-message>`,
   )) as Message
 
+/** A turn built from whole markup, for the cases that are about what is slotted. */
+const turn = async (inner: string, attributes = '') => {
+  const element = (await mount(
+    `<helix-headless-chat-message ${attributes}>${inner}</helix-headless-chat-message>`,
+  )) as Message
+  await element.updateComplete
+  return element
+}
+
 describe('the states', () => {
   test('a settled turn says nothing about itself', async () => {
     expect(part(await message('state="sent"'), 'state')).toBeNull()
@@ -92,5 +101,60 @@ describe('structure', () => {
 
   test('the author is an attribute, since which side a turn sits on is paint', async () => {
     expect((await message('author="me"')).getAttribute('author')).toBe('me')
+  })
+})
+
+describe('what a turn was drawn from, and what can be done with it', () => {
+  /**
+   * Both are regions that cost a gap when they are boxes at all, and most turns
+   * should pay for neither. No selector can ask whether a slot was filled, since
+   * assigned nodes are not a slot's DOM children, so the element asks with
+   * `slotFilled` and says so where a stylesheet can read it.
+   */
+  test('sources and actions are laid out only when something is in them', async () => {
+    const bare = await turn('What was said')
+    expect(part(bare, 'sources')?.hasAttribute('hidden')).toBe(true)
+    expect(part(bare, 'actions')?.hasAttribute('hidden')).toBe(true)
+
+    const cited = await turn(
+      'What was said<span slot="sources">runbook.md</span><button slot="actions">Copy</button>',
+    )
+    expect(part(cited, 'sources')?.hasAttribute('hidden')).toBe(false)
+    expect(part(cited, 'actions')?.hasAttribute('hidden')).toBe(false)
+  })
+
+  /**
+   * The controls sit inside `meta`, which is the line under a turn rather than
+   * only its timestamp. A column of their own put them under the middle of the
+   * bubble, because a spanning grid item inflates every track it spans.
+   */
+  test('the controls are on the line under the turn, beside its time', async () => {
+    const element = await turn(
+      'Said<button slot="actions">Copy</button>',
+      'at="2026-08-27T09:00:00.000Z"',
+    )
+    expect(part(element, 'meta')?.querySelector('[part="actions"]')).not.toBeNull()
+  })
+})
+
+describe('the wait before the first token', () => {
+  /**
+   * A turn marked `streaming` with nothing in it yet is the one moment a
+   * transcript has nothing to show, and an empty bubble is indistinguishable
+   * from a bug. `data-empty` on the content is what the typing indicator is
+   * drawn from, and it has to clear the moment the first token lands.
+   */
+  test('an empty streaming turn marks its content, and stops when content arrives', async () => {
+    const element = await turn('', 'state="streaming"')
+    expect(part(element, 'content')?.hasAttribute('data-empty')).toBe(true)
+    /* And the content box stays, unlike the other two: the indicator is painted
+       into it. */
+    expect(part(element, 'content')?.hasAttribute('hidden')).toBe(false)
+
+    element.append(document.createTextNode('The migration is waiting'))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    expect(part(element, 'content')?.hasAttribute('data-empty')).toBe(false)
   })
 })
