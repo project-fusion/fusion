@@ -22,7 +22,7 @@
      "the page owns this and it is currently false" as markup: `read="false"` is
      a present attribute and therefore true, which is the trap `helix-toggle`
      carries the same warning about.
-     
+
      So the page refuses instead. `preventDefault` stops the item applying
      anything whatever mode it is in, the request goes to the server, and the
      property is written only once the server agreed. A failed request leaves the
