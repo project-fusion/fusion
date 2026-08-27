@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -397,7 +397,17 @@ describe('pagination count', () => {
       '<helix-headless-pagination default-page="4" page-size="25" total="248"></helix-headless-pagination>',
     )
     expect(part(nav, 'count')).toBeNull()
-    expect(nav.shadowRoot?.querySelector('slot')).toBeNull()
+    /* Narrowed 26 Aug 2026, when the four end controls gained icon slots. This
+       read `querySelector('slot')` and meant "nothing here offers a place for
+       content", which is the decision the comment above records: a summary
+       slotted into this row can sit at one end of one axis and nowhere else. A
+       slot standing in for a caret offers no such place, so what the assertion
+       is about is an unnamed slot and a slot holding content, not the element. */
+    expect(nav.shadowRoot?.querySelector('slot:not([name])')).toBeNull()
+    const named = [...(nav.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) =>
+      one.getAttribute('name'),
+    )
+    expect(named.every((name) => name?.endsWith('-icon'))).toBe(true)
   })
 })
 
@@ -501,5 +511,33 @@ describe('pagination announcements', () => {
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(live(nav)?.textContent?.trim()).toBe('Page 9')
+  })
+
+  describe('the marks on the ends', () => {
+    /* Four names rather than one. A single `<slot name="icon">` is assigned
+       once, so three of a consumer's four marks would go quietly missing. */
+    const NAMES = ['first-icon', 'previous-icon', 'next-icon', 'last-icon']
+
+    test('the caret is a fallback, so a page can hand over its own icon set', async () => {
+      const nav = await mount(
+        `<helix-headless-pagination default-page="4" ends pages="12">${NAMES.map(
+          (name) => `<span slot="${name}">x</span>`,
+        ).join('')}</helix-headless-pagination>`,
+      )
+      for (const name of NAMES) {
+        expect(slotted(nav, name).length).toBe(1)
+      }
+    })
+
+    test('and draws its own where nothing is handed over', async () => {
+      const nav = await mount(
+        '<helix-headless-pagination default-page="4" ends pages="12"></helix-headless-pagination>',
+      )
+      for (const name of NAMES) {
+        expect(slotted(nav, name).length).toBe(0)
+      }
+      // The shared part is what those four fall back to, and it renders.
+      expect(part(nav, 'mark')).not.toBeNull()
+    })
   })
 })

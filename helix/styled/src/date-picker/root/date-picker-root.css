@@ -101,8 +101,17 @@
   color: var(--helix-color-foreground);
 }
 
+/* Both selectors, and that is the point.
+ *
+ * `::slotted()` never matches fallback content and a `[part=]` rule never
+ * reaches an assigned node, so the shadow-tree caret and a consumer's own mark
+ * need one rule each or the swap changes the size of the control. The area
+ * notes carry the measurement: `CopyButton` shipped two correctly coloured
+ * glyphs at 0x0 for exactly this. */
 [part="previous"] svg,
-[part="next"] svg {
+[part="next"] svg,
+::slotted([slot="previous-icon"]),
+::slotted([slot="next-icon"]) {
   block-size: 1em;
   inline-size: 1em;
 }
@@ -281,9 +290,15 @@
  * Written out in each component rather than shared, because there is no sheet a
  * shadow root can compose for this and no way for one to know which of a
  * component's glyphs are directional. `Pagination` carries the same rule and the
- * same argument. */
+ * same argument.
+ *
+ * A slotted mark is mirrored too, because the rule is about what the mark means
+ * in the reading direction rather than about who drew it: a consumer's caret
+ * points the wrong way for exactly the same reason ours does. */
 :host(:dir(rtl)) [part="previous"] svg,
-:host(:dir(rtl)) [part="next"] svg {
+:host(:dir(rtl)) [part="next"] svg,
+:host(:dir(rtl)) ::slotted([slot="previous-icon"]),
+:host(:dir(rtl)) ::slotted([slot="next-icon"]) {
   scale: -1 1;
 }
 

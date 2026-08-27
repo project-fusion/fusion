@@ -23,12 +23,13 @@ element.items = tabs
 ```
 
 **Events bind with `addEventListener`, and the name is the event's own.** Helix
-events are `helix-before-open`, `helix-change`, `helix-input` and so on: lowercase,
+events are `helix-before-open`, `helix-before-change`, `helix-select` and so on:
+lowercase,
 hyphenated, no camel-case variant. Whatever your framework's `on*` syntax is, it
 should end up passing that string through.
 
 ```js
-element.addEventListener('helix-change', (event) => console.log(event.detail))
+element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 ```
 
 **A declared `value`, `open`, `checked` or `active` is a claim of ownership.**
@@ -43,7 +44,7 @@ its own state. This is the rule most likely to look like a bug, and
 |---|---|
 | Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-change` binds the literal name |
 | Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
-| Lit | `.prop=`, `?bool=` and `@helix-change=` are already the right three channels |
+| Lit | `.prop=`, `?bool=` and `@helix-before-change=` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
 | Alpine, htmx | Markup and attributes only, which reaches every component. Refusing a change needs script |
 

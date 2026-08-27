@@ -7,7 +7,7 @@
  * already argues why: a preview is not a deployment, the Sovereignty Constraint
  * governs what a Fusion product does to a *consumer's* page, and the emitted
  * artifact names the family and leaves the loading to whoever pastes it. That
- * policy does not change shape at 1,942 families. What changes is that a reader
+ * policy does not change shape at two thousand families. What changes is that a reader
  * stops being offered nine.
  *
  * **The weights are the work.** A family's `google` request has to name weights
@@ -23,7 +23,7 @@
  * and because the catalog changes on Google's schedule rather than ours. Run
  * `bun run faces` to refresh it; nothing calls it during a build.
  *
- * The shape is a tuple per family rather than an object, which is 1,942 of
+ * The shape is a tuple per family rather than an object, which is two thousand of
  * them: measured, objects cost roughly three times the bytes for the same three
  * fields, and this file ships to a browser.
  */
@@ -31,7 +31,19 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const OUT = join(import.meta.dirname, '../../site/ui/content/faces/faces.ts')
+/* **`.generated.` is load-bearing, not decoration.** Seven scripts here find a
+   generated file by that segment in its name, and this was called `faces.ts`
+   and caught by none of them.
+
+   `check:dialect` is the one that showed it. Google ships a family called
+   `Grey Qo`, which the sweep reads as a British color and refuses. dialect:quoted
+
+   The fix that had been applied was that marker, hand-written into a row of the
+   generated file, under a header saying not to edit it. It survived until
+   somebody ran this script, which is precisely the failure the check's own
+   comment predicts: a fix in generated output is undone by the next build. The
+   name is the fix, because the exemption is what the name is for. */
+const OUT = join(import.meta.dirname, '../../site/ui/content/faces/faces.generated.ts')
 const SOURCE = 'https://fonts.google.com/metadata/fonts'
 
 /* What the token layer asks for. `--helix-weight-*` resolves to these three, so
@@ -59,6 +71,38 @@ const weightsFor = (family) => {
   return WANTED.filter((weight) => has.has(weight))
 }
 
+/**
+ * Google's five categories, as digits.
+ *
+ * **Monospace keeps the 1 it already had.** The third field was
+ * `category === 'Monospace' ? 1 : 0`, a flag, and every consumer testing it for
+ * mono tests `=== 1`; giving the other four the remaining numbers leaves those
+ * tests correct and turns the proportional test from `=== 0` into `!== 1`. A
+ * flag widened into an enumeration rather than a second field, so the row stays
+ * three long and the file stays the size it was.
+ *
+ * **The counts in this file's prose are deliberately round.** The exact one is
+ * Google's and moves on their schedule rather than ours: it was 1,942 when this
+ * was written, 1,939 when the catalog was last refreshed before that, and 1,943
+ * now, and every one of those was written into a comment by hand. The arguments
+ * here are about scale and hold at any of them. The generated file states the
+ * real figure, because it is regenerated when the figure changes.
+ *
+ * A digit rather than the word, for the reason the tuple exists at all: two thousand
+ * rows ship to a browser, and `'Handwriting'` is twelve bytes against one.
+ *
+ * An unknown category falls to sans-serif rather than throwing. These five have
+ * been stable for years, and a sixth appearing should put a face in the wrong
+ * group rather than fail a build on a Tuesday.
+ */
+const CATEGORIES = {
+  Display: 3,
+  Handwriting: 4,
+  Monospace: 1,
+  'Sans Serif': 0,
+  Serif: 2,
+}
+
 const rows = []
 let skipped = 0
 for (const family of families) {
@@ -69,13 +113,13 @@ for (const family of families) {
     skipped += 1
     continue
   }
-  rows.push([family.family, weights.join(';'), family.category === 'Monospace' ? 1 : 0])
+  rows.push([family.family, weights.join(';'), CATEGORIES[family.category] ?? 0])
 }
 
 rows.sort((a, b) => a[0].localeCompare(b[0]))
 
 const body = rows.map(
-  ([name, weights, mono]) => `  ['${name.replace(/'/g, "\\'")}', '${weights}', ${mono}],`,
+  ([name, weights, category]) => `  ['${name.replace(/'/g, "\\'")}', '${weights}', ${category}],`,
 )
 
 writeFileSync(
@@ -95,8 +139,17 @@ writeFileSync(
    the declarations under it carry their own. \`check:orphans\` caught the first
    version claiming to document the blank line beneath it. */
 
-/** \`[family, weights, 1 when monospace]\`. */
-export type FaceRow = readonly [string, string, 0 | 1]
+/**
+ * \`[family, weights, category]\`, where the category is one of Google's five:
+ * 0 sans-serif, 1 monospace, 2 serif, 3 display, 4 handwriting.
+ *
+ * Monospace is 1 because the field used to be a monospace flag, so every test
+ * for it reads the same as it did. Proportional is \`!== 1\` rather than \`=== 0\`.
+ */
+export type FaceRow = readonly [string, string, FaceCategory]
+
+/** The five, so a consumer can name one rather than remembering a digit. */
+export type FaceCategory = 0 | 1 | 2 | 3 | 4
 
 /** Every family, alphabetical, monospace and proportional together. */
 export const GOOGLE_FACES: readonly FaceRow[] = [

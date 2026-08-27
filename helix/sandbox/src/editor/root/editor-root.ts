@@ -8,8 +8,8 @@ import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import {
   type CaretDetail,
   customElement,
+  HelixBeforeEditEvent,
   HelixCaretEvent,
-  HelixChangeEvent,
   HelixElement,
 } from '@helix-io/core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
@@ -54,7 +54,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * @aliases Code editor, Source pane
  * @documentation https://helix.fusion.dev/sandbox/editor
  *
- * @event {HelixChangeEvent} helix-change - Fired when the source is edited.
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired when the source is edited.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.
  *
  * @csspart editor - The element CodeMirror is mounted into.
@@ -149,7 +149,7 @@ export class HelixSandboxEditor extends HelixElement {
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               this.value = update.state.doc.toString()
-              this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
+              this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
             }
             if (update.selectionSet || update.docChanged || update.focusChanged) {
               this.dispatchEvent(new HelixCaretEvent(this.caret))

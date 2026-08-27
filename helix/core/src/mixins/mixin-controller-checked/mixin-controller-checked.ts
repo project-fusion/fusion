@@ -31,7 +31,7 @@ export declare class MixinControllerCheckedInterface {
    * Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
-   * `helix-change` refuses the change, and nothing moves.
+   * `helix-before-toggle` refuses the change, and nothing moves.
    */
   requestChecked(next: boolean): boolean
 
@@ -120,7 +120,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Requests a checked change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
-     * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+     * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
      * declared the property: a declared property is a seed and a correction,
      * the way `<input value>` is, and a consumer who wants the change for
      * themselves refuses it and assigns their own. See 294.

@@ -12,7 +12,7 @@
 <script>
   const panes = document.getElementById('panes')
 
-  panes.addEventListener('helix-change', (event) => {
+  panes.addEventListener('helix-before-resize', (event) => {
     panes.position = event.detail.position
     panes.collapsed = event.detail.collapsed
   })

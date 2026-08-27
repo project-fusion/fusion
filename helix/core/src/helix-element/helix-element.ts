@@ -145,17 +145,37 @@ const SCROLLER = css`
  * inside the shadow tree it is also the only weight that outranks a consumer's
  * document rule, which would otherwise re-introduce the flash from outside.
  *
- * The attribute is set a frame after the first update rather than in
+ * The state is set a frame after the first update rather than in
  * `firstUpdated`, and that is the whole mechanism rather than a detail. Lit's
- * upgrade, render and `firstUpdated` all run in one microtask checkpoint, so an
- * attribute set there lands in the same style resolution as the adopted sheets
- * and the transition runs anyway. A frame later, the resting value has already
- * been resolved with transitions off, so enabling them changes nothing and
- * there is nothing left to animate.
+ * upgrade, render and `firstUpdated` all run in one microtask checkpoint, so a
+ * flag set there lands in the same style resolution as the adopted sheets and
+ * the transition runs anyway. A frame later, the resting value has already been
+ * resolved with transitions off, so enabling them changes nothing and there is
+ * nothing left to animate.
+ *
+ * **`:state()` and not an attribute, and that was a bug for three routes before
+ * it was a preference.** This was `[data-settled]`, written onto the host with
+ * `setAttribute`, and the host is the element React owns. A definition that
+ * lands during module evaluation has a frame to spend before React arrives, so
+ * the element wrote its own bookkeeping onto itself and React then hydrated a
+ * DOM that had gained an attribute since the server wrote it. Measured across
+ * three routes at the time: `/helix` clean, `/helix/theme` one diff and
+ * `/helix/sandbox` three, every one of them a `data-settled=""` no server sent.
+ *
+ * It was worked around three times, in `use-sandbox-editor.ts`, in the sandbox
+ * barrel and again on the reference pages, each deferring a registration so the
+ * frame fell the other side of hydration. Every one of those is a fix for the
+ * timing rather than for the cause: the cause is that a component's private
+ * bookkeeping was being kept somewhere React reconciles.
+ *
+ * A custom state is not in the DOM. It carries the fact to this stylesheet and
+ * nothing to the markup, so a server's output and a hydrated client's agree by
+ * construction. Pagination reached the same conclusion for `:state(empty)` and
+ * says so in its own sheet.
  */
 const SETTLED = css`
-  :host(:not([data-settled])),
-  :host(:not([data-settled])) * {
+  :host(:not(:state(settled))),
+  :host(:not(:state(settled))) * {
     transition: none !important;
   }
 `
@@ -319,7 +339,7 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * getting it wrong doubles every call.** Measured against React 19.2.8:
  *
  * ```
- * onhelix-change <- helix-change  REACHED    (React binds it with addEventListener)
+ * onhelix-before-change <- helix-before-change  REACHED (React binds it with addEventListener)
  * onChange       <- change        REACHED    (React's delegated root listener)
  * onLoad         <- load          not reached
  * onError        <- error         not reached
@@ -471,9 +491,43 @@ export class HelixElement extends LitElement {
    */
   protected readonly internals: ElementInternals
 
+  /**
+   * Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that.
+   */
+  readonly whenSettled: Promise<void>
+
+  /** Resolves `whenSettled`, once, from the frame that records the state. */
+  private resolveSettled: () => void = () => {}
+
   constructor() {
     super()
     this.internals = this.attachInternals()
+    this.whenSettled = new Promise<void>((resolve) => {
+      this.resolveSettled = resolve
+    })
   }
 
   /**
@@ -543,14 +597,21 @@ export class HelixElement extends LitElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     requestAnimationFrame(() => {
-      this.setAttribute('data-settled', '')
+      /* Guarded the way `Pagination` guards its own state, because the shim in
+         `@helix-io/testing` supplies `states` and older engines do not. A
+         component that cannot record the state keeps its transitions suppressed,
+         which is the safe direction to fail: nothing animates that should not. */
+      if ('states' in this.internals) {
+        this.internals.states.add('settled')
+      }
+      this.resolveSettled()
       /* **Audited here as well as at dispatch, and this is the half that catches
          the real mistake.** The audit ran only from inside `dispatchEvent`, so an
          element holding a handler prop and sending nothing was never looked at.
          A prop on the wrong element is exactly the case where that element has no
          reason to dispatch, so the check could not reach the thing it is for.
 
-         A frame late, alongside `data-settled`, because React has to have
+         A frame late, alongside the settled state, because React has to have
          committed its props for there to be anything to read. Once per element
          either way: the audit holds its own set. */
       const props = reactPropsOf(this)

@@ -203,7 +203,7 @@ describe('tabs selection can be refused', () => {
     await host.updateComplete
     const started = host.active
 
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     const other = [...host.querySelectorAll('helix-headless-tabs-tab')].find(
       (tab) => tab.getAttribute('value') !== started,
     ) as HTMLElement
@@ -269,7 +269,7 @@ describe('tabs, controlled and uncontrolled', () => {
     )) as Updatable & { active: string }
     await host.updateComplete
     let asked = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     ;(tabs(host)[1] as unknown as { select(): void }).select()

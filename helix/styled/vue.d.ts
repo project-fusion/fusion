@@ -129,7 +129,7 @@ import type {
   HelixDismissEvent,
   HelixSelectEvent,
   HelixSendEvent,
-  HelixChangeEvent,
+  HelixBeforePinEvent,
   HelixBeforeChangeEvent,
   HelixBeforeToggleEvent,
   HelixSampleEndEvent,
@@ -142,9 +142,13 @@ import type {
   HelixResizeEvent,
   HelixShortcutEvent,
   HelixReadEvent,
+  HelixBeforeActivateEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
+  HelixBeforeResizeEvent,
   HelixCaretEvent,
+  HelixBeforeEditEvent,
+  HelixBeforeCollapseEvent,
   HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -1431,9 +1435,9 @@ export type HelixChatMessageVueEvents = {
 
 /** `HelixChat` component event */
 export type HelixChatElementEvent<E = Event> = TypedEvent<HelixChat, E>;
-/** `helix-change` event type */
-export type HelixChatHelixChangeElementEvent =
-  HelixChatElementEvent<HelixChangeEvent>;
+/** `helix-before-pin` event type */
+export type HelixChatHelixBeforePinElementEvent =
+  HelixChatElementEvent<HelixBeforePinEvent>;
 
 export type HelixChatVueProps = {
   /** Whether the rows are still on their way.
@@ -1484,7 +1488,7 @@ it. Measured rather than assumed: `label, pinned` after upgrade against
 
 export type HelixChatVueEvents = {
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
-  "helix-change": HelixChatHelixChangeElementEvent;
+  "helix-before-pin": HelixChatHelixBeforePinElementEvent;
 };
 
 /** `HelixCheckboxGroup` component event */
@@ -4886,9 +4890,9 @@ export type HelixOptionVueEvents = {
 
 /** `HelixOutline` component event */
 export type HelixOutlineElementEvent<E = Event> = TypedEvent<HelixOutline, E>;
-/** `helix-change` event type */
-export type HelixOutlineHelixChangeElementEvent =
-  HelixOutlineElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixOutlineHelixBeforeActivateElementEvent =
+  HelixOutlineElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixOutlineVueProps = {
   /** Accessible name for the navigation. */
@@ -4923,7 +4927,7 @@ JavaScript rather than CSS decides. */
 
 export type HelixOutlineVueEvents = {
   /** The section being read has changed, carrying its id as the value. */
-  "helix-change": HelixOutlineHelixChangeElementEvent;
+  "helix-before-activate": HelixOutlineHelixBeforeActivateElementEvent;
 };
 
 /** `HelixPagination` component event */
@@ -5082,9 +5086,9 @@ export type HelixPaginationSizeElementEvent<E = Event> = TypedEvent<
   HelixPaginationSize,
   E
 >;
-/** `helix-change` event type */
-export type HelixPaginationSizeHelixChangeElementEvent =
-  HelixPaginationSizeElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixPaginationSizeHelixBeforeChangeElementEvent =
+  HelixPaginationSizeElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixPaginationSizeVueProps = {
   /** The sizes offered, comma separated.
@@ -5111,7 +5115,7 @@ Reading gives the real one; writing declares it the consumer's, and
 
 export type HelixPaginationSizeVueEvents = {
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
-  "helix-change": HelixPaginationSizeHelixChangeElementEvent;
+  "helix-before-change": HelixPaginationSizeHelixBeforeChangeElementEvent;
 };
 
 export type HelixPaginationSummaryVueProps = {
@@ -5830,9 +5834,9 @@ export type HelixSandboxPreviewVueEvents = {
 
 /** `HelixSandbox` component event */
 export type HelixSandboxElementEvent<E = Event> = TypedEvent<HelixSandbox, E>;
-/** `helix-change` event type */
-export type HelixSandboxHelixChangeElementEvent =
-  HelixSandboxElementEvent<HelixChangeEvent>;
+/** `helix-before-resize` event type */
+export type HelixSandboxHelixBeforeResizeElementEvent =
+  HelixSandboxElementEvent<HelixBeforeResizeEvent>;
 
 export type HelixSandboxVueProps = {
   /** Whether the panes sit side by side or stacked. */
@@ -5919,7 +5923,7 @@ and only whoever slotted it knows how tall that is. */
 
 export type HelixSandboxVueEvents = {
   /** Fired when a divider is let go, with the new arrangement. */
-  "helix-change": HelixSandboxHelixChangeElementEvent;
+  "helix-before-resize": HelixSandboxHelixBeforeResizeElementEvent;
 };
 
 /** `HelixSandboxSource` component event */
@@ -5930,14 +5934,14 @@ export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
 /** `helix-caret` event type */
 export type HelixSandboxSourceHelixCaretElementEvent =
   HelixSandboxSourceElementEvent<HelixCaretEvent>;
-/** `helix-change` event type */
-export type HelixSandboxSourceHelixChangeElementEvent =
-  HelixSandboxSourceElementEvent<HelixChangeEvent>;
+/** `helix-before-edit` event type */
+export type HelixSandboxSourceHelixBeforeEditElementEvent =
+  HelixSandboxSourceElementEvent<HelixBeforeEditEvent>;
 
 export type HelixSandboxSourceVueProps = {
   /** The source being edited. */
   value?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `helix-change`.
+  /** Which source this pane holds, echoed in every `helix-before-edit`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
 passed through untouched for a consumer wiring their own panes.
@@ -5958,7 +5962,7 @@ export type HelixSandboxSourceVueEvents = {
   /** Fired when the cursor moves. */
   "helix-caret": HelixSandboxSourceHelixCaretElementEvent;
   /** Fired when the source is edited. */
-  "helix-change": HelixSandboxSourceHelixChangeElementEvent;
+  "helix-before-edit": HelixSandboxSourceHelixBeforeEditElementEvent;
 };
 
 export type HelixSandboxStatusBarVueProps = {
@@ -6484,9 +6488,12 @@ export type HelixSpeedDialVueEvents = {
 
 /** `HelixSplitter` component event */
 export type HelixSplitterElementEvent<E = Event> = TypedEvent<HelixSplitter, E>;
-/** `helix-change` event type */
-export type HelixSplitterHelixChangeElementEvent =
-  HelixSplitterElementEvent<HelixChangeEvent>;
+/** `helix-before-resize` event type */
+export type HelixSplitterHelixBeforeResizeElementEvent =
+  HelixSplitterElementEvent<HelixBeforeResizeEvent>;
+/** `helix-before-collapse` event type */
+export type HelixSplitterHelixBeforeCollapseElementEvent =
+  HelixSplitterElementEvent<HelixBeforeCollapseEvent>;
 
 export type HelixSplitterVueProps = {
   /** Whether the divider carries a grip.
@@ -6602,8 +6609,10 @@ passes through. */
 };
 
 export type HelixSplitterVueEvents = {
-  /** Fired when the divider settles, named `position` or `collapsed`. */
-  "helix-change": HelixSplitterHelixChangeElementEvent;
+  /** Fired before the divider settles, and cancelable. */
+  "helix-before-resize": HelixSplitterHelixBeforeResizeElementEvent;
+  /** Fired before a pane shuts or reopens, and cancelable. */
+  "helix-before-collapse": HelixSplitterHelixBeforeCollapseElementEvent;
 };
 
 export type HelixStatGroupVueProps = {
@@ -6644,9 +6653,9 @@ export type HelixStatVueEvents = {};
 
 /** `HelixSteps` component event */
 export type HelixStepsElementEvent<E = Event> = TypedEvent<HelixSteps, E>;
-/** `helix-change` event type */
-export type HelixStepsHelixChangeElementEvent =
-  HelixStepsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixStepsHelixBeforeActivateElementEvent =
+  HelixStepsElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixStepsVueProps = {
   /** Which item is current, by its `value`.
@@ -6699,7 +6708,7 @@ a reader is told to come back to by number. */
 
 export type HelixStepsVueEvents = {
   /** Fired when the active step changes. */
-  "helix-change": HelixStepsHelixChangeElementEvent;
+  "helix-before-activate": HelixStepsHelixBeforeActivateElementEvent;
 };
 
 /** `HelixStep` component event */
@@ -6936,9 +6945,9 @@ export type HelixTabsPanelVueEvents = {};
 
 /** `HelixTabs` component event */
 export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
-/** `helix-change` event type */
-export type HelixTabsHelixChangeElementEvent =
-  HelixTabsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTabsHelixBeforeActivateElementEvent =
+  HelixTabsElementEvent<HelixBeforeActivateEvent>;
 /** `helix-select` event type */
 export type HelixTabsHelixSelectElementEvent =
   HelixTabsElementEvent<HelixSelectEvent>;
@@ -6998,7 +7007,7 @@ panels on the way. */
 
 export type HelixTabsVueEvents = {
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixTabsHelixChangeElementEvent;
+  "helix-before-activate": HelixTabsHelixBeforeActivateElementEvent;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "helix-select": HelixTabsHelixSelectElementEvent;
 };
@@ -7975,9 +7984,9 @@ export type HelixTooltipVueEvents = {
 
 /** `HelixTour` component event */
 export type HelixTourElementEvent<E = Event> = TypedEvent<HelixTour, E>;
-/** `helix-change` event type */
-export type HelixTourHelixChangeElementEvent =
-  HelixTourElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTourHelixBeforeActivateElementEvent =
+  HelixTourElementEvent<HelixBeforeActivateEvent>;
 /** `helix-complete` event type */
 export type HelixTourHelixCompleteElementEvent =
   HelixTourElementEvent<HelixCompleteEvent>;
@@ -8031,7 +8040,7 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 
 export type HelixTourVueEvents = {
   /** Fired when the current stop moves, carrying the new index. */
-  "helix-change": HelixTourHelixChangeElementEvent;
+  "helix-before-activate": HelixTourHelixBeforeActivateElementEvent;
   /** Fired when the last stop is finished. */
   "helix-complete": HelixTourHelixCompleteElementEvent;
   /** Fired when the reader leaves early. */
@@ -8184,9 +8193,9 @@ export type HelixTreeElementEvent<E = Event> = TypedEvent<HelixTree, E>;
 /** `helix-select` event type */
 export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
-/** `helix-change` event type */
-export type HelixTreeHelixChangeElementEvent =
-  HelixTreeElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTreeHelixBeforeActivateElementEvent =
+  HelixTreeElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixTreeVueProps = {
   /** Which end of the row the branch chevron sits at.
@@ -8277,7 +8286,7 @@ export type HelixTreeVueEvents = {
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "helix-select": HelixTreeHelixSelectElementEvent;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixTreeHelixChangeElementEvent;
+  "helix-before-activate": HelixTreeHelixBeforeActivateElementEvent;
 };
 
 export type HelixTrendVueProps = {
@@ -8370,9 +8379,9 @@ export type HelixVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixVideoPlaylist,
   E
 >;
-/** `helix-change` event type */
-export type HelixVideoPlaylistHelixChangeElementEvent =
-  HelixVideoPlaylistElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixVideoPlaylistHelixBeforeActivateElementEvent =
+  HelixVideoPlaylistElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixVideoPlaylistVueProps = {
   /** Which item is current, by its `value`.
@@ -8399,7 +8408,7 @@ how markup says where to start. */
 
 export type HelixVideoPlaylistVueEvents = {
   /** Fired before the current entry changes, and cancelable. */
-  "helix-change": HelixVideoPlaylistHelixChangeElementEvent;
+  "helix-before-activate": HelixVideoPlaylistHelixBeforeActivateElementEvent;
 };
 
 /** `HelixVideo` component event */
@@ -9928,7 +9937,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixSandboxPreviewVueProps,
     HelixSandboxPreviewVueEvents
   >;
-  /** Coordination is by event, the same way the accordion does it: a source pane dispatches 'helix-change', which bubbles, and the sandbox hands the value to whatever preview is slotted into it. Neither child knows the other exists, so either can be replaced or used alone.  The event carries the pane's 'name', which is what lets one sandbox hold several panes without the root identifying senders by reference. 'html' is the preview's markup and 'css' is its stylesheet. A pane named anything else is showing something rather than driving it, and is ignored: the sandbox has a pane rendering the example as JSX, and guessing would have put the text of a React component into the preview.  **The dividers are two nested 'helix-splitter's, not a grid this element drags itself.** It had its own: a five row grid, a stylesheet written to on every pointer move, three pointer handlers, a keyboard handler reading which axes each divider was allowed to move, and a corner placed by hand into the cell where two tracks met. All of it is the splitter's now, including the corner, which arrives on its own wherever a nested splitter crosses the one it is in.  The panes are the inner splitter and the panel is the outer one, which is the order that makes the panel span the full width: the outer divider runs edge to edge and the inner stops at it.  **Both are controlled from here, so 'split' and 'panel-size' stay the truth.** A splitter that owned its own position would leave this element reporting one arrangement and showing another, and a consumer restoring a saved layout writes to these two properties. Each splitter announces where it wants to go and this answers, which is the same contract a form control has with a framework.  **The panel is in pixels here and a percentage in the splitter, and the conversion belongs here.** A terminal wants a number of lines rather than a share of the window, so its height should not change when the window does. A splitter has no business knowing that, so it stays percentage-pure and this element, which does know what is in the panel, holds the box and converts. That is also what keeps a stored 'panelSize' from a previous visit meaning what it meant when it was written. */
+  /** Coordination is by event, the same way the accordion does it: a source pane dispatches 'helix-before-edit', which bubbles, and the sandbox hands the value to whatever preview is slotted into it. Neither child knows the other exists, so either can be replaced or used alone.  The event carries the pane's 'name', which is what lets one sandbox hold several panes without the root identifying senders by reference. 'html' is the preview's markup and 'css' is its stylesheet. A pane named anything else is showing something rather than driving it, and is ignored: the sandbox has a pane rendering the example as JSX, and guessing would have put the text of a React component into the preview.  **The dividers are two nested 'helix-splitter's, not a grid this element drags itself.** It had its own: a five row grid, a stylesheet written to on every pointer move, three pointer handlers, a keyboard handler reading which axes each divider was allowed to move, and a corner placed by hand into the cell where two tracks met. All of it is the splitter's now, including the corner, which arrives on its own wherever a nested splitter crosses the one it is in.  The panes are the inner splitter and the panel is the outer one, which is the order that makes the panel span the full width: the outer divider runs edge to edge and the inner stops at it.  **Both are controlled from here, so 'split' and 'panel-size' stay the truth.** A splitter that owned its own position would leave this element reporting one arrangement and showing another, and a consumer restoring a saved layout writes to these two properties. Each splitter announces where it wants to go and this answers, which is the same contract a form control has with a framework.  **The panel is in pixels here and a percentage in the splitter, and the conversion belongs here.** A terminal wants a number of lines rather than a share of the window, so its height should not change when the window does. A splitter has no business knowing that, so it stays percentage-pure and this element, which does know what is in the panel, holds the box and converts. That is also what keeps a stored 'panelSize' from a previous visit meaning what it meant when it was written. */
   "helix-sandbox": DefineCustomElement<
     HelixSandbox,
     HelixSandboxVueProps,

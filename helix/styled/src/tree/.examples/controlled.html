@@ -13,7 +13,7 @@
 <script>
   const packages = document.getElementById('packages')
 
-  packages.addEventListener('helix-change', (event) => {
+  packages.addEventListener('helix-before-activate', (event) => {
     packages.active = event.detail.value
   })
 </script>

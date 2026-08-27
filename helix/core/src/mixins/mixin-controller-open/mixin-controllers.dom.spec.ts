@@ -73,10 +73,10 @@ const KINDS: Kind[] = [
     tag: 'probe-checked',
   },
   {
-    closing: 'helix-change',
+    closing: 'helix-before-activate',
     fallback: 'default-active',
     moved: 'one',
-    opening: 'helix-change',
+    opening: 'helix-before-activate',
     request: 'requestActive',
     resting: '',
     state: 'active',

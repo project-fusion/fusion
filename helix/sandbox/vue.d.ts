@@ -1,7 +1,7 @@
 import type {
   HelixSandboxEditor,
   HelixSandboxSpecs,
-  HelixChangeEvent,
+  HelixBeforeEditEvent,
   HelixCaretEvent,
 } from "@helix-io/sandbox";
 import type { HTMLAttributes, PublicProps, EmitFn, EmitsToProps } from "vue";
@@ -48,9 +48,9 @@ export type HelixSandboxEditorElementEvent<E = Event> = TypedEvent<
   HelixSandboxEditor,
   E
 >;
-/** `helix-change` event type */
-export type HelixSandboxEditorHelixChangeElementEvent =
-  HelixSandboxEditorElementEvent<HelixChangeEvent>;
+/** `helix-before-edit` event type */
+export type HelixSandboxEditorHelixBeforeEditElementEvent =
+  HelixSandboxEditorElementEvent<HelixBeforeEditEvent>;
 /** `helix-caret` event type */
 export type HelixSandboxEditorHelixCaretElementEvent =
   HelixSandboxEditorElementEvent<HelixCaretEvent>;
@@ -82,7 +82,7 @@ cursor in it to read a long line. What it stops is the typing. */
 
 export type HelixSandboxEditorVueEvents = {
   /** Fired when the source is edited. */
-  "helix-change": HelixSandboxEditorHelixChangeElementEvent;
+  "helix-before-edit": HelixSandboxEditorHelixBeforeEditElementEvent;
   /** Fired when the cursor moves, with its line and column. */
   "helix-caret": HelixSandboxEditorHelixCaretElementEvent;
 };

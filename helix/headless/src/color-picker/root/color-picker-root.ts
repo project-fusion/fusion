@@ -90,6 +90,8 @@ interface EyeDropperConstructor {
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *
+ * @slot eyedropper-icon - The glyph on the screen-sampling control, usually a dropper.
+ *
  * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
  * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
  *
@@ -484,7 +486,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
-                        ${drawIcon(eyedropper)}
+                        <slot name="eyedropper-icon">${drawIcon(eyedropper)}</slot>
                       </${this.tag('button')}>`
                     : nothing
                 }

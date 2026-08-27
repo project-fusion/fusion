@@ -136,7 +136,7 @@ describe('a handler prop attached to nothing', () => {
   test('a removed callback property says it was removed', () => {
     const element = hydrated({ onCheckedChange: () => {} })
 
-    element.dispatchEvent(new CustomEvent('helix-change'))
+    element.dispatchEvent(new CustomEvent('helix-before-change'))
 
     expect(warnings[0]).toContain('onCheckedChange')
     expect(warnings[0]).toContain('removed')
@@ -231,22 +231,63 @@ describe('a relayed native event', () => {
 describe('the settled mark', () => {
   const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
 
-  test('is absent through the first update, so an arriving sheet has nothing to transition', async () => {
-    const element = document.createElement(tag) as HTMLElement & {
-      updateComplete: Promise<unknown>
-    }
+  type Settling = HTMLElement & {
+    internals: { states: Set<string> }
+    whenSettled: Promise<void>
+    updateComplete: Promise<unknown>
+  }
+
+  const mounted = (): Settling => {
+    const element = document.createElement(tag) as Settling
     document.body.append(element)
+    return element
+  }
+
+  test('is absent through the first update, so an arriving sheet has nothing to transition', async () => {
+    const element = mounted()
     await element.updateComplete
-    expect(element.hasAttribute('data-settled')).toBe(false)
+    expect(element.internals.states.has('settled')).toBe(false)
   })
 
   test('lands a frame later, by which point the resting value is already resolved', async () => {
-    const element = document.createElement(tag) as HTMLElement & {
-      updateComplete: Promise<unknown>
-    }
-    document.body.append(element)
+    const element = mounted()
     await element.updateComplete
     await frame()
-    expect(element.hasAttribute('data-settled')).toBe(true)
+    expect(element.internals.states.has('settled')).toBe(true)
+  })
+
+  test('is a state and never an attribute, which is what hydration reads', async () => {
+    /* **The regression this exists for was reported three times as three bugs.**
+       The mark was `setAttribute('data-settled', '')` on the host, and the host
+       is the element React owns: a definition landing during module evaluation
+       has a frame to spend before React arrives, so the element wrote onto
+       itself and React then hydrated a DOM that had gained an attribute since
+       the server wrote it. Measured at the time across three routes: `/helix`
+       clean, `/helix/theme` one and `/helix/sandbox` three.
+
+       Three deferred imports were added to move that frame to the other side of
+       hydration. Each fixed a route and none fixed the cause, which is that
+       private bookkeeping was being kept where React reconciles. */
+    const element = mounted()
+    await element.updateComplete
+    await frame()
+    expect(element.internals.states.has('settled')).toBe(true)
+    expect(element.getAttributeNames()).not.toContain('data-settled')
+  })
+
+  test('resolves its `whenSettled` promise from the same frame', async () => {
+    /* A custom state cannot be observed and an attribute could, so the promise
+       is the signal anything waiting on the old attribute now takes.
+       `readyToMove` in `@helix-io/testing` is the caller this is for. */
+    const element = mounted()
+    let resolved = false
+    void element.whenSettled.then(() => {
+      resolved = true
+    })
+    await element.updateComplete
+    expect(resolved).toBe(false)
+    await frame()
+    await Promise.resolve()
+    expect(resolved).toBe(true)
   })
 })

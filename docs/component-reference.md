@@ -955,7 +955,7 @@ offering it.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the reader pins or unpins the transcript by scrolling. Cancelable. |
+| `helix-before-pin` | `HelixBeforePinEvent` | Fired when the reader pins or unpins the transcript by scrolling. Cancelable. |
 
 #### Slots
 
@@ -1545,6 +1545,12 @@ brought its own card would be a card inside a card there.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
 | `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
 
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `eyedropper-icon` | The glyph on the screen-sampling control, usually a dropper. |
+
 #### Parts
 
 | Part | Description |
@@ -2123,6 +2129,13 @@ grid reads as a continuous run of dates.
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the dates change, and cancelable. |
 | `helix-navigate` | `HelixNavigateEvent` | Fired before the month on show changes, and cancelable. |
 
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `previous-icon` | The glyph on the control that moves back a month, usually a caret. |
+| `next-icon` | The glyph on the control that moves forward a month, usually a caret. |
+
 #### Parts
 
 | Part | Description |
@@ -2135,9 +2148,9 @@ grid reads as a continuous run of dates.
 | `month` | One month, its header and its grid. |
 | `months` | The run of months. |
 | `next` | The control that moves to the next month. |
-| `next-mark` | The glyph on the next month control. |
+| `next-mark` | The glyph on the next month control, where none is slotted. |
 | `previous` | The control that moves to the previous month. |
-| `previous-mark` | The glyph on the previous month control. |
+| `previous-mark` | The glyph on the previous month control, where none is slotted. |
 | `week` | One row of days. |
 | `weekday` | A column header naming a day of the week. |
 
@@ -4120,7 +4133,7 @@ document is not always where the headings are.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | The section being read has changed, carrying its id as the value. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | The section being read has changed, carrying its id as the value. |
 
 #### Slots
 
@@ -4204,6 +4217,15 @@ is a way through rather than a destination, so it does not compete.
 | --- | --- | --- |
 | `helix-navigate` | `HelixNavigateEvent` | Fired before the page changes, and cancelable. The only way to refuse one. |
 
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `first-icon` | The glyph on the jump-to-first control, usually a double caret. |
+| `previous-icon` | The glyph on the back-one-page control, usually a caret. |
+| `next-icon` | The glyph on the forward-one-page control, usually a caret. |
+| `last-icon` | The glyph on the jump-to-last control, usually a double caret. |
+
 #### Parts
 
 | Part | Description |
@@ -4218,7 +4240,7 @@ is a way through rather than a destination, so it does not compete.
 | `last` | The control that jumps to the last page, under `ends`. |
 | `status` | The reading of where you are, in `compact`. |
 | `live` | The region that says the page changed. Clipped, not hidden. |
-| `mark` | The glyph on a first, previous, next or last control. |
+| `mark` | The glyph on a first, previous, next or last control, where none is slotted. |
 
 #### Custom properties
 
@@ -4256,7 +4278,7 @@ reach through both boundaries and a consumer styles it as the select it is.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the size changes, and cancelable. The only way to refuse one. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the size changes, and cancelable. The only way to refuse one. |
 
 #### Parts
 
@@ -4809,7 +4831,7 @@ Pairs an editable source pane with a live preview.
 Extends `HelixElement`.
 
 Coordination is by event, the same way the accordion does it: a source pane
-dispatches `helix-change`, which bubbles, and the sandbox hands the value to
+dispatches `helix-before-edit`, which bubbles, and the sandbox hands the value to
 whatever preview is slotted into it. Neither child knows the other exists, so
 either can be replaced or used alone.
 
@@ -4866,7 +4888,7 @@ what it meant when it was written.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when a divider is let go, with the new arrangement. |
+| `helix-before-resize` | `HelixBeforeResizeEvent` | Fired when a divider is let go, with the new arrangement. |
 
 #### Slots
 
@@ -4996,7 +5018,7 @@ is the documented escape hatch for exactly this trade.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `fieldLabel` | `field-label` | `string` | `'Example source'` | - | Accessible name for the editable region. |
-| `name` | `name` | `string` | `'html'` | - | Which source this pane holds, echoed in every `helix-change`. |
+| `name` | `name` | `string` | `'html'` | - | Which source this pane holds, echoed in every `helix-before-edit`. |
 | `tabIndents` | `tab-indents` | `boolean` | `true` | - | Whether Tab indents rather than moving focus. |
 | `value` | `value` | `string` | `''` | - | The source being edited. |
 
@@ -5005,7 +5027,7 @@ is the documented escape hatch for exactly this trade.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-caret` | `HelixCaretEvent` | Fired when the cursor moves. |
-| `helix-change` | `HelixChangeEvent` | Fired when the source is edited. |
+| `helix-before-edit` | `HelixBeforeEditEvent` | Fired when the source is edited. |
 
 #### Parts
 
@@ -5668,7 +5690,8 @@ gesture.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the divider settles, named `position` or `collapsed`. |
+| `helix-before-resize` | `HelixBeforeResizeEvent` | Fired before the divider settles, and cancelable. |
+| `helix-before-collapse` | `HelixBeforeCollapseEvent` | Fired before a pane shuts or reopens, and cancelable. |
 
 #### Slots
 
@@ -5800,7 +5823,7 @@ second name for it here would be a second thing to keep in step.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the active step changes. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the active step changes. |
 
 #### Slots
 
@@ -6115,7 +6138,7 @@ a movement instead of two separate fills.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the current tab moves, and cancelable. The only way to refuse one. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current tab moves, and cancelable. The only way to refuse one. |
 | `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. |
 
 #### Slots
@@ -7091,7 +7114,7 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the current stop moves, carrying the new index. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the current stop moves, carrying the new index. |
 | `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when the reader leaves early. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
@@ -7213,7 +7236,7 @@ to it is one more thing between the reader and the label.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. |
-| `helix-change` | `HelixChangeEvent` | Fired before the current node moves, and cancelable. The only way to refuse one. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current node moves, and cancelable. The only way to refuse one. |
 
 #### Slots
 
@@ -7548,7 +7571,7 @@ entries sit in. Everything about which clip is current is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the current entry changes, and cancelable. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current entry changes, and cancelable. |
 
 #### Slots
 

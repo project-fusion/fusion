@@ -298,8 +298,8 @@ export const settled = async (element: Element | null): Promise<void> => {
  * Waits until a component's transitions are switched on.
  *
  * **`HelixElement` suppresses every transition until it has settled**, with
- * `:host(:not([data-settled])) *  { transition: none !important }`, and sets
- * `data-settled` a frame after `firstUpdated` rather than in it. That is
+ * `:host(:not(:state(settled))) *  { transition: none !important }`, and records
+ * that state a frame after `firstUpdated` rather than in it. That is
  * deliberate and is what stops a component animating its own arrival. It also
  * means `await mount(...)` is not enough for any spec that asserts a transition:
  * `updateComplete` resolves in the same microtask checkpoint the suppression is
@@ -313,31 +313,32 @@ export const settled = async (element: Element | null): Promise<void> => {
  * declaration, while the mark computed `transition-property: none`. The only
  * rule that reached it was the settle guard.
  *
- * Waits on the attribute rather than on a frame count, so it is right whether
- * the component settles in one frame or the runner is busy. `settled()` is the
+ * **Waits on the element's own `settled` promise**, rather than on a frame count,
+ * so it is right whether the component settles in one frame or the runner is
+ * busy. It used to watch `[data-settled]` with a `MutationObserver`, which is
+ * not available any more and should not be: the flag is an
+ * `ElementInternals.states` entry now, deliberately outside the DOM, because on
+ * the host it was an attribute React had not rendered and hydration said so.
+ * A promise is the better signal in any case, being what this wanted rather
+ * than a mutation it had to interpret. `settled()` is the
  * other half and is not this: that one waits for animations to *finish*, where
  * this one waits for them to become possible at all.
  */
 export const readyToMove = async (element: Element | null): Promise<void> => {
-  if (!element || element.hasAttribute('data-settled')) {
+  const settled = (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
+  if (!settled) {
     return
   }
   await new Promise<void>((resolve) => {
-    const watching = new MutationObserver(() => {
-      if (element.hasAttribute('data-settled')) {
-        watching.disconnect()
-        resolve()
-      }
-    })
-    watching.observe(element, { attributeFilter: ['data-settled'], attributes: true })
+    void settled.then(resolve)
     /* happy-dom never calls `requestAnimationFrame`'s callback the way a browser
-       does, so the observer alone would hang there. A macrotask is enough in
-       both: a browser has painted by then and happy-dom has nothing to wait
-       for. */
-    setTimeout(() => {
-      watching.disconnect()
-      resolve()
-    }, 50)
+       does, so the promise alone would hang there: it is resolved from that
+       frame and that frame never comes. A macrotask is enough in both, a browser
+       having painted by then and happy-dom having nothing to wait for.
+
+       `Promise.resolve` is idempotent, so whichever arrives first wins and the
+       loser is a no-op. Nothing to tear down now that there is no observer. */
+    setTimeout(resolve, 50)
   })
 }
 

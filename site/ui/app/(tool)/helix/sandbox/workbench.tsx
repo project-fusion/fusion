@@ -4,7 +4,8 @@ import { scrollItemIntoView } from '@helix-io/core'
 import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
-  HelixChangeEvent,
+  HelixBeforeEditEvent,
+  HelixBeforeResizeEvent,
   HelixDialog,
   HelixInput,
   HelixMenu,
@@ -288,7 +289,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      back from nothing without reaching for the toggle. */
   const railHome = bodyWidth > 0 ? Math.max(0, 100 - (RAIL_OPEN / bodyWidth) * 100) : 100
 
-  const railMoved = (event: HelixChangeEvent) => {
+  const railMoved = (event: HelixBeforeResizeEvent) => {
     if (event.detail.property !== 'position' || bodyWidth <= 0) {
       return
     }
@@ -337,7 +338,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   // Written back when a divider is let go, not while it is moving: a drag is a
   // stream of positions and only the one it ends at is a preference.
-  const sandboxChanged = (event: HelixChangeEvent) => {
+  const sandboxChanged = (event: HelixBeforeResizeEvent) => {
     /* Both dividers report themselves now, where this was one `arrangement`
        event carrying a JSON blob nothing read: the handler has always taken the
        numbers off the element below. */
@@ -461,7 +462,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setPane(event.currentTarget.value as Pane)
   }
   // Verbatim. What is typed is what is held and what is handed back.
-  const paneEdited = (event: HelixChangeEvent) => {
+  const paneEdited = (event: HelixBeforeEditEvent) => {
     const pane = event.composedPath()[0] as { name?: string }
     if (pane?.name === 'source') {
       setMarkup(event.detail.value)
@@ -1192,7 +1193,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         className={styles.workbenchBody}
         default-position={railHome}
         min="20rem"
-        onhelix-change={railMoved}
+        onhelix-before-resize={railMoved}
         position={railPosition}
         ref={setRailSplitter}
       >
@@ -1204,10 +1205,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                already carries this, so it is a value rather than a layout
                written here. */
             lead={narrow ? 'preview' : 'source'}
-            onhelix-change={(event) => {
-              sandboxChanged(event)
-              paneEdited(event)
-            }}
+            onhelix-before-edit={paneEdited}
+            onhelix-before-resize={sandboxChanged}
             orientation={narrow ? 'vertical' : 'horizontal'}
             ref={sandbox}
             split={showEditor ? split : 0}

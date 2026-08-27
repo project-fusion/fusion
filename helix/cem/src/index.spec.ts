@@ -68,7 +68,7 @@ describe('toReactProp', () => {
   // the name binds an event nobody dispatches.
   test('is `on` and the event name verbatim', () => {
     expect(toReactProp('helix-open')).toBe('onhelix-open')
-    expect(toReactProp('helix-change')).toBe('onhelix-change')
+    expect(toReactProp('helix-before-change')).toBe('onhelix-before-change')
   })
 
   test('a relayed native event keeps its own name', () => {

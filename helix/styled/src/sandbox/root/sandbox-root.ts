@@ -1,7 +1,8 @@
 import {
   customElement,
+  type HelixBeforeEditEvent,
+  HelixBeforeResizeEvent,
   type HelixCaretEvent,
-  HelixChangeEvent,
   type HelixConsoleEvent,
   HelixElement,
 } from '@helix-io/core'
@@ -33,7 +34,7 @@ const PANEL_MAX = 0.8
  *
  * @description
  * Coordination is by event, the same way the accordion does it: a source pane
- * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
+ * dispatches `helix-before-edit`, which bubbles, and the sandbox hands the value to
  * whatever preview is slotted into it. Neither child knows the other exists, so
  * either can be replaced or used alone.
  *
@@ -77,7 +78,7 @@ const PANEL_MAX = 0.8
  * @aliases Playground, REPL, Editor
  * @documentation https://helix.fusion.dev/sandbox
  *
- * @event {HelixChangeEvent} helix-change - Fired when a divider is let go, with the new arrangement.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired when a divider is let go, with the new arrangement.
  *
  * @slot source - The editable source pane. First unless `lead` says otherwise.
  * @slot preview - The live preview. Second unless `lead` says otherwise.
@@ -281,7 +282,7 @@ export class HelixSandbox extends HelixElement {
   /**
    * Takes a change from one of this sandbox's own source panes.
    *
-   * The origin is checked, and has to be. `helix-change` bubbles and composes,
+   * The origin is checked, and has to be. `helix-before-edit` bubbles and composes,
    * so anything a consumer slots into a sandbox sends one up here too. A
    * sandbox hears a great deal that is not its source.
    */
@@ -289,7 +290,7 @@ export class HelixSandbox extends HelixElement {
     if (!this.fromSource(event.target)) {
       return
     }
-    const { value } = (event as HelixChangeEvent).detail
+    const { value } = (event as HelixBeforeEditEvent).detail
     /* Which pane is the element, and the element is `composedPath()[0]` rather
        than `event.target`, which is retargeted to the outermost host once the
        event has crossed a shadow boundary.
@@ -401,7 +402,7 @@ export class HelixSandbox extends HelixElement {
    */
   private settled(property: 'panelSize' | 'split'): void {
     this.dispatchEvent(
-      new HelixChangeEvent({
+      new HelixBeforeResizeEvent({
         property,
         value: String(property === 'split' ? this.split : this.panelSize),
       }),
@@ -425,7 +426,7 @@ export class HelixSandbox extends HelixElement {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { property, value } = (event as HelixChangeEvent).detail
+    const { property, value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
     if (property !== 'position') {
       return
@@ -438,7 +439,7 @@ export class HelixSandbox extends HelixElement {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { property, value } = (event as HelixChangeEvent).detail
+    const { property, value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
     if (property !== 'position' || this.bodyHeight <= 0) {
       return
@@ -454,7 +455,7 @@ export class HelixSandbox extends HelixElement {
     super.connectedCallback()
     this.addEventListener('helix-caret', this.handleCaret)
     this.addEventListener('helix-console', this.handleConsole)
-    this.addEventListener('helix-change', this.handleSourceChange)
+    this.addEventListener('helix-before-edit', this.handleSourceChange)
     /* And the body is watched again, because `disconnectedCallback` stopped
        watching it. The observer itself survives, being a field rather than
        something `firstUpdated` built, but a disconnected one reports nothing
@@ -505,7 +506,7 @@ export class HelixSandbox extends HelixElement {
     super.disconnectedCallback()
     this.removeEventListener('helix-caret', this.handleCaret)
     this.removeEventListener('helix-console', this.handleConsole)
-    this.removeEventListener('helix-change', this.handleSourceChange)
+    this.removeEventListener('helix-before-edit', this.handleSourceChange)
     this.watch?.disconnect()
   }
 
@@ -540,7 +541,7 @@ export class HelixSandbox extends HelixElement {
         default-position=${this.homePanelPosition}
         min=${100 - PANEL_MAX * 100}
         .position=${this.panelPosition}
-        @helix-change=${this.handlePanelChange}
+        @helix-before-resize=${this.handlePanelChange}
       >
         <helix-splitter
           slot="start"
@@ -550,7 +551,7 @@ export class HelixSandbox extends HelixElement {
           label=${this.separatorLabel}
           orientation=${vertical ? 'vertical' : 'horizontal'}
           .position=${split}
-          @helix-change=${this.handlePanesChange}
+          @helix-before-resize=${this.handlePanesChange}
         >
           ${
             /* The slot names swap with the panes, so each pane keeps its own

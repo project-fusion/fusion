@@ -47,7 +47,7 @@ const KEYS = new Set([
  * @csspart empty - Shown when there are no rows to show.
  * @csspart loading - Shown while the rows are still on their way.
  *
- * @event {HelixChangeEvent} helix-change - Fired before the current node moves, and cancelable. The only way to refuse one.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  */
 @customElement('helix-headless-tree')
@@ -92,7 +92,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   }
 
   /* Through the mixin, so a consumer can refuse the change. It was written
-     straight from the event, the same way Tabs did, which made `helix-change`
+     straight from the event, the same way Tabs did, which made `helix-before-activate`
      an announcement nobody could answer. */
   private readonly handleSelection = (event: Event): void => {
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)

@@ -87,7 +87,7 @@ describe('pagination size', () => {
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
     )) as Size
     const heard: string[] = []
-    it.addEventListener('helix-change', (event) => {
+    it.addEventListener('helix-before-change', (event) => {
       heard.push(
         `${(event as CustomEvent<{ property: string }>).detail.property}=${
           (event as CustomEvent<{ value: string }>).detail.value
@@ -104,7 +104,7 @@ describe('pagination size', () => {
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
     )) as Size
     let announced = ''
-    it.addEventListener('helix-change', (event) => {
+    it.addEventListener('helix-before-change', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
       event.preventDefault()
     })
@@ -121,7 +121,7 @@ describe('pagination size', () => {
     const it = (await mount(
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
     )) as Size
-    it.addEventListener('helix-change', (event) => event.preventDefault())
+    it.addEventListener('helix-before-change', (event) => event.preventDefault())
     control(it).value = '25'
     control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
@@ -138,7 +138,7 @@ describe('pagination size', () => {
       '<helix-headless-pagination-size sizes="10,25" value="10"></helix-headless-pagination-size>',
     )) as Size
     let announced = ''
-    it.addEventListener('helix-change', (event) => {
+    it.addEventListener('helix-before-change', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     control(it).dispatchEvent(choose(it, '25'))

@@ -86,7 +86,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * every keystroke or pixel on its way to the one meant. A rating does not. A
    * press picks a score, an arrow picks the next one, and the drag deliberately
    * asks for nothing until it is let go, so there is exactly one value and it
-   * is the chosen one. That is `helix-change`, the same as the radio group this
+   * is the chosen one. That is `helix-before-change`, the same as the radio group this
    * announces itself as.
    */
   protected override readonly announcesInput = false

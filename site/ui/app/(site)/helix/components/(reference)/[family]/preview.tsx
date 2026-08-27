@@ -1,7 +1,7 @@
 'use client'
 
 import type {
-  HelixChangeEvent,
+  HelixBeforeEditEvent,
   HelixResizeEvent,
   HelixSandbox,
   HelixSandboxPreview,
@@ -137,7 +137,18 @@ export function ComponentPreview({
      it. This one was never named in the row, and the reference pages went on
      reporting a `data-settled` the server never sent while `/helix/theme` and
      `/helix/sandbox` had gone quiet. Found by probing a route the row had not
-     listed. */
+     listed.
+
+     **The fourth report is what settled it, and the cause is fixed rather than
+     avoided.** Three routes were patched one at a time by moving a registration
+     to the other side of hydration, which is three fixes for a timing and none
+     for the cause: the element was keeping private bookkeeping on the host,
+     where React reconciles. `HelixElement` records it as an
+     `ElementInternals.states` entry now, which is not in the DOM at all, so no
+     route can report it whenever its definitions happen to land.
+
+     The effect stays because the reason above it stands on its own: this page
+     has one sandbox and the editor is worth deferring on its own weight. */
   useSandboxEditor()
 
   const preview = useRef<HelixSandboxPreview>(null)
@@ -174,7 +185,7 @@ export function ComponentPreview({
   const source = edits.html ?? html
   const styles = edits.css ?? css
 
-  const sourceEdited = (event: HelixChangeEvent) => {
+  const sourceEdited = (event: HelixBeforeEditEvent) => {
     /* Which pane is the element, not the detail: every pane reports `value`,
        and `composedPath()[0]` is what survives the shadow boundary the event
        crossed to get here. */
@@ -209,7 +220,7 @@ export function ComponentPreview({
     <helix-sandbox
       class={docs.docsPreview}
       lead="preview"
-      onhelix-change={sourceEdited}
+      onhelix-before-edit={sourceEdited}
       orientation="vertical"
       ref={sandbox}
       split={Math.round((previewSize(drawn, min) / (previewSize(drawn, min) + EDITOR)) * 100)}

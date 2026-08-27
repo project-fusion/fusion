@@ -103,7 +103,7 @@
     tour.index = 0
     tour.open = true
   })
-  tour.addEventListener('helix-change', (event) => {
+  tour.addEventListener('helix-before-activate', (event) => {
     tour.index = Number(event.detail.value)
   })
 </script>

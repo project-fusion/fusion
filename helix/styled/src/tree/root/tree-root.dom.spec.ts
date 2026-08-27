@@ -62,7 +62,7 @@ describe('tree selection can be refused', () => {
     await host.updateComplete
     const started = host.active
 
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     const other = [...host.querySelectorAll('helix-tree-item')].find(
       (item) => item.getAttribute('value') !== started && item.getAttribute('value'),
     ) as HTMLElement

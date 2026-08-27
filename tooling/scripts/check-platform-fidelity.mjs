@@ -169,6 +169,24 @@ const COLOR = ['list', 'autocomplete', 'value', 'defaultValue']
 const FILE = ['accept', 'capture', 'multiple', 'required', 'files', 'value']
 
 /**
+ * What to call an interface in a message, where stripping the name gets it wrong.
+ *
+ * The tag is derived from the interface (`HTMLTextAreaElement` is `<textarea>`)
+ * and three do not survive it. `HTMLImageElement` came out `<image>`, which is
+ * not a misspelling of `<img>` but `SVGImageElement`, a different element with a
+ * different surface: a reader sent to look up `x` and `y` would have found them
+ * on the wrong spec and concluded the check was reading SVG. `HTMLOListElement`
+ * came out `<olist>`, which is nothing. `HTMLMediaElement` has no element at
+ * all, being the base `<video>` and `<audio>` share, and saying so is more use
+ * than inventing `<media>` for it.
+ */
+const TAGS = {
+  HTMLImageElement: 'img',
+  HTMLMediaElement: 'video> or <audio',
+  HTMLOListElement: 'ol',
+}
+
+/**
  * The native element each family stands in for, and the scope to read of it.
  *
  * **`Radio` and `Toggle` are options rather than inputs, and mapping them at
@@ -436,6 +454,10 @@ const EXPECTED_EVENTS = {
 const EXCUSED_EVENTS = {
   'helix-copy':
     'A copy button announcing that it copied, which is not the clipboard `copy` event that fires when a selection is copied.',
+  'helix-resize':
+    'A component reporting its own new size, which no native element event means: `resize` fires on the window and on an iframe, and `ResizeObserver` is not an event at all. `helix-before-resize` on Splitter is the request to move a divider and is a different fact again.',
+  'helix-select':
+    "Native `select` is text selection inside an editable control, which is a different fact about a different thing. 294 measured the cost of taking it: `HTMLElementEventMap` is global, our classes extend `Event`, so an entry named `select` silently retypes every `textarea.addEventListener('select')` in a consumer's application as carrying our detail, which at runtime is undefined. Web Awesome keeps theirs prefixed for the same reason.",
 }
 
 const library = domLibrary()
@@ -467,7 +489,14 @@ for (const module of manifest.modules ?? []) {
     }
     const names = new Set()
     for (const member of declaration.members ?? []) {
-      if (member.kind === 'field') {
+      /* Public only, and the omission of this was hiding the fault it is meant
+         to find. A private field satisfies a name comparison while a consumer
+         cannot reach it, so `Video` counted as having `duration` on the strength
+         of a `private duration` it paints and never publishes, and was flagged
+         for `currentTime` only because its own mirror happens to be spelled
+         `position`. Getting the name wrong was the whole of what the check
+         could see. Thirty-nine of Video's fifty-nine fields are private. */
+      if (member.kind === 'field' && member.privacy !== 'private' && member.privacy !== 'protected') {
         names.add(member.name)
       }
     }
@@ -530,7 +559,7 @@ for (const [tag, [name, scope, extra]] of Object.entries(NATIVE)) {
       forced
         ? `${tag}: \`${property}\` is not a property and the template hardcodes \`${forced[0]}\`, so ` +
             'a consumer cannot reach it at all. Expose it, defaulting to what the template forces.'
-        : `${tag}: \`<${name.replace(/^HTML|Element$/g, '').toLowerCase()}>\` has \`${property}\` and this ` +
+        : `${tag}: \`<${TAGS[name] ?? name.replace(/^HTML|Element$/g, '').toLowerCase()}>\` has \`${property}\` and this ` +
             'does not. Mirror it, or add it to `EXCUSED` with the reason it is not wanted.',
     )
   }

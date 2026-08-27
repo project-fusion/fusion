@@ -1,6 +1,6 @@
 import type {
+  HelixBeforeEditEvent,
   HelixCaretEvent,
-  HelixChangeEvent,
   HelixSandboxEditor,
   HelixSandboxSpecs,
 } from '@helix-io/sandbox';
@@ -91,112 +91,112 @@ type BaseProps<T extends HTMLElement> = {
   popovertargetaction?: "show" | "hide" | "toggle";
 };
 
-type BaseEvents = {
+type BaseEvents<T = HTMLElement> = {
   // Mouse Events
 
   /** Triggered when the element is clicked by the user by mouse or keyboard. */
-  onClick?: (event: MouseEvent) => void;
+  onClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the context menu is triggered, often by right-clicking. */
-  onContextMenu?: (event: MouseEvent) => void;
+  onContextMenu?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the element is double-clicked. */
-  onDoubleClick?: (event: MouseEvent) => void;
+  onDoubleClick?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired repeatedly as the draggable element is being dragged. */
-  onDrag?: (event: DragEvent) => void;
+  onDrag?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when the dragging of a draggable element is finished. */
-  onDragEnd?: (event: DragEvent) => void;
+  onDragEnd?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection enters a valid drop target. */
-  onDragEnter?: (event: DragEvent) => void;
+  onDragEnter?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragExit?: (event: DragEvent) => void;
+  onDragExit?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element or text selection leaves a valid drop target. */
-  onDragLeave?: (event: DragEvent) => void;
+  onDragLeave?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when an element or text selection is being dragged over a valid drop target (every few hundred milliseconds). */
-  onDragOver?: (event: DragEvent) => void;
+  onDragOver?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a draggable element starts being dragged. */
-  onDragStart?: (event: DragEvent) => void;
+  onDragStart?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a dragged element is dropped onto a drop target. */
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is pressed down on the element. */
-  onMouseDown?: (event: MouseEvent) => void;
+  onMouseDown?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when the mouse cursor enters the element. */
-  onMouseEnter?: (event: MouseEvent) => void;
+  onMouseEnter?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Triggered when the mouse cursor leaves the element. */
-  onMouseLeave?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an element when a pointing device (usually a mouse) is moved while the cursor's hotspot is inside it. */
-  onMouseMove?: (event: MouseEvent) => void;
+  onMouseMove?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (usually a mouse) is used to move the cursor so that it is no longer contained within the element or one of its children. */
-  onMouseOut?: (event: MouseEvent) => void;
+  onMouseOut?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired at an Element when a pointing device (such as a mouse or trackpad) is used to move the cursor onto the element or one of its child elements. */
-  onMouseOver?: (event: MouseEvent) => void;
+  onMouseOver?: (event: MouseEvent & { currentTarget: T }) => void;
   /** Fired when a mouse button is released on the element. */
-  onMouseUp?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent & { currentTarget: T }) => void;
 
   // Keyboard Events
 
   /** Fired when a key is pressed down. */
-  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyDown?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is released.. */
-  onKeyUp?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent & { currentTarget: T }) => void;
   /** Fired when a key is pressed down. */
-  onKeyPressed?: (event: KeyboardEvent) => void;
+  onKeyPressed?: (event: KeyboardEvent & { currentTarget: T }) => void;
 
   // Focus Events
 
   /** Fired when the element receives focus, often triggered by tab navigation. */
-  onFocus?: (event: FocusEvent) => void;
+  onFocus?: (event: FocusEvent & { currentTarget: T }) => void;
   /** Fired when the element loses focus. */
-  onBlur?: (event: FocusEvent) => void;
+  onBlur?: (event: FocusEvent & { currentTarget: T }) => void;
 
   // Form Events
 
   /** Fired when the value of an input element changes, such as with text inputs or select elements. */
-  onChange?: (event: Event) => void;
+  onChange?: (event: Event & { currentTarget: T }) => void;
   /** Fires when the value of an <input>, <select>, or <textarea> element has been changed. */
-  onInput?: (event: Event) => void;
+  onInput?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is submitted, usually on pressing Enter in a text input. */
-  onSubmit?: (event: Event) => void;
+  onSubmit?: (event: Event & { currentTarget: T }) => void;
   /** Fired when a form is reset. */
-  onReset?: (event: Event) => void;
+  onReset?: (event: Event & { currentTarget: T }) => void;
 
   // UI Events
 
   /** Fired when the content of an element is scrolled. */
-  onScroll?: (event: UIEvent) => void;
+  onScroll?: (event: UIEvent & { currentTarget: T }) => void;
 
   // Wheel Events
 
   /** Fired when the mouse wheel is scrolled while the element is focused. */
-  onWheel?: (event: WheelEvent) => void;
+  onWheel?: (event: WheelEvent & { currentTarget: T }) => void;
 
   // Animation Events
 
   /** Fired when a CSS animation starts. */
-  onAnimationStart?: (event: AnimationEvent) => void;
+  onAnimationStart?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes. */
-  onAnimationEnd?: (event: AnimationEvent) => void;
+  onAnimationEnd?: (event: AnimationEvent & { currentTarget: T }) => void;
   /** Fired when a CSS animation completes one iteration. */
-  onAnimationIteration?: (event: AnimationEvent) => void;
+  onAnimationIteration?: (event: AnimationEvent & { currentTarget: T }) => void;
 
   // Transition Events
 
   /** Fired when a CSS transition has completed. */
-  onTransitionEnd?: (event: TransitionEvent) => void;
+  onTransitionEnd?: (event: TransitionEvent & { currentTarget: T }) => void;
 
   // Media Events
 
   /** Fired when an element (usually an image) finishes loading */
-  onLoad?: (event: Event) => void;
+  onLoad?: (event: Event & { currentTarget: T }) => void;
   /** Fired when an error occurs during the loading of an element, like an image not being found. */
-  onError?: (event: Event) => void;
+  onError?: (event: Event & { currentTarget: T }) => void;
 
   // Clipboard Events
 
   /** Fires when the user initiates a copy action through the browser's user interface. */
-  onCopy?: (event: ClipboardEvent) => void;
+  onCopy?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "cut" action through the browser's user interface. */
-  onCut?: (event: ClipboardEvent) => void;
+  onCut?: (event: ClipboardEvent & { currentTarget: T }) => void;
   /** Fired when the user has initiated a "paste" action through the browser's user interface. */
-  onPaste?: (event: ClipboardEvent) => void;
+  onPaste?: (event: ClipboardEvent & { currentTarget: T }) => void;
 };
 
 /** `HelixSandboxEditor` component event */
@@ -204,9 +204,9 @@ export type HelixSandboxEditorElementEvent<E = Event> = TypedEvent<
   HelixSandboxEditor,
   E
 >;
-/** `helix-change` event type */
-export type HelixSandboxEditorHelixChangeElementEvent =
-  HelixSandboxEditorElementEvent<HelixChangeEvent>;
+/** `helix-before-edit` event type */
+export type HelixSandboxEditorHelixBeforeEditElementEvent =
+  HelixSandboxEditorElementEvent<HelixBeforeEditEvent>;
 /** `helix-caret` event type */
 export type HelixSandboxEditorHelixCaretElementEvent =
   HelixSandboxEditorElementEvent<HelixCaretEvent>;
@@ -236,7 +236,9 @@ cursor in it to read a long line. What it stops is the typing. */
   readOnly?: HelixSandboxEditor["readOnly"];
 
   /** Fired when the source is edited. */
-  "onhelix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+  "onhelix-before-edit"?: (
+    e: HelixSandboxEditorHelixBeforeEditElementEvent,
+  ) => void;
   /** Fired when the cursor moves, with its line and column. */
   "onhelix-caret"?: (e: HelixSandboxEditorHelixCaretElementEvent) => void;
 };
@@ -265,7 +267,9 @@ keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   "prop:readOnly"?: HelixSandboxEditor["readOnly"];
   /** Fired when the source is edited. */
-  "on:helix-change"?: (e: HelixSandboxEditorHelixChangeElementEvent) => void;
+  "on:helix-before-edit"?: (
+    e: HelixSandboxEditorHelixBeforeEditElementEvent,
+  ) => void;
   /** Fired when the cursor moves, with its line and column. */
   "on:helix-caret"?: (e: HelixSandboxEditorHelixCaretElementEvent) => void;
 
@@ -330,12 +334,36 @@ export type CustomElements = {
    * keymap: a reader still needs to select the text, scroll it, and put a
    * cursor in it to read a long line. What it stops is the typing.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired when the source is edited.
    * - `helix-caret`: Fired when the cursor moves, with its line and column.
    *
    * ## Methods
@@ -355,7 +383,7 @@ export type CustomElements = {
    * - `editor`: The element CodeMirror is mounted into.
    */
   "helix-sandbox-editor": Partial<
-    HelixSandboxEditorProps & BaseProps<HelixSandboxEditor> & BaseEvents
+    HelixSandboxEditorProps & BaseProps<HelixSandboxEditor> & BaseEvents<HelixSandboxEditor>
   >;
 
   /**
@@ -390,6 +418,30 @@ export type CustomElements = {
    * - `family`: Which family's specs to run. Changing it runs them.
    * - `src`: The document that runs them. Same origin, and it must stay that way.
    * - `label`: Accessible name for the results.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Methods
    *
@@ -417,7 +469,7 @@ export type CustomElements = {
    * - `empty`: Shown when there is nothing to report.
    */
   "helix-sandbox-specs": Partial<
-    HelixSandboxSpecsProps & BaseProps<HelixSandboxSpecs> & BaseEvents
+    HelixSandboxSpecsProps & BaseProps<HelixSandboxSpecs> & BaseEvents<HelixSandboxSpecs>
   >;
 };
 
@@ -453,12 +505,36 @@ export type CustomElementsSolidJs = {
    * keymap: a reader still needs to select the text, scroll it, and put a
    * cursor in it to read a long line. What it stops is the typing.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired when the source is edited.
    * - `helix-caret`: Fired when the cursor moves, with its line and column.
    *
    * ## Methods
@@ -481,7 +557,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxEditorProps &
       HelixSandboxEditorSolidJsProps &
       BaseProps<HelixSandboxEditor> &
-      BaseEvents
+      BaseEvents<HelixSandboxEditor>
   >;
 
   /**
@@ -516,6 +592,30 @@ export type CustomElementsSolidJs = {
    * - `family`: Which family's specs to run. Changing it runs them.
    * - `src`: The document that runs them. Same origin, and it must stay that way.
    * - `label`: Accessible name for the results.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Methods
    *
@@ -546,7 +646,7 @@ export type CustomElementsSolidJs = {
     HelixSandboxSpecsProps &
       HelixSandboxSpecsSolidJsProps &
       BaseProps<HelixSandboxSpecs> &
-      BaseEvents
+      BaseEvents<HelixSandboxSpecs>
   >;
 };
 

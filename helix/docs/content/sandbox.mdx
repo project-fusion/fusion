@@ -33,7 +33,7 @@ document the page cannot reach into and which cannot reach back out.
 
 ## Coordination is by event
 
-A source pane dispatches `helix-change`, which bubbles, and the sandbox hands
+A source pane dispatches `helix-before-edit`, which bubbles, and the sandbox hands
 the value to whatever preview is slotted into it. Neither child knows the other
 exists, so either can be replaced or used alone.
 

@@ -58,11 +58,13 @@ interface Case {
 
 const cases: Case[] = []
 const hooks: { body: () => unknown; depth: number }[] = []
+const teardowns: { body: () => unknown; depth: number }[] = []
 let suite: string[] = []
 
 /** How much of the above a previous bundle has already claimed. */
 let claimedCases = 0
 let claimedHooks = 0
+let claimedTeardowns = 0
 
 /** Groups tests. Nests, and the names join for reporting. */
 export const describe = (name: string, body: () => void): void => {
@@ -123,6 +125,25 @@ export const it = test
 /** Runs once before the tests in the block it was declared in. */
 export const beforeAll = (body: () => unknown): void => {
   hooks.push({ body, depth: suite.length })
+}
+
+/**
+ * Runs after every test in the block it was declared in, passed or failed.
+ *
+ * **The rules require one and this harness did not have it**, which is a gap of
+ * exactly the shape `check:matchers` exists to police from the other side: a
+ * spec importing `afterEach` compiled under happy-dom, where it comes from
+ * `bun:test`, and failed to bundle for the browser, where `build-specs.mjs`
+ * points `bun:test` at this file. The error names the missing export rather than
+ * the spec's own line, so it reads as a harness fault and is one.
+ *
+ * After the test rather than before the next one, and in a `finally`, because
+ * what it is for is putting a global back: a spec that shadows
+ * `document.activeElement` and fails would otherwise leave the shadow standing
+ * for every file that runs after it in the same page.
+ */
+export const afterEach = (body: () => unknown): void => {
+  teardowns.push({ body, depth: suite.length })
 }
 
 const show = (value: unknown): string => {
@@ -389,9 +410,11 @@ export const expect = (actual: unknown): Matchers & { not: Matchers } =>
 export const claim = (): (() => Promise<SpecResult[]>) => {
   const mine = cases.slice(claimedCases)
   const myHooks = hooks.slice(claimedHooks)
+  const myTeardowns = teardowns.slice(claimedTeardowns)
   claimedCases = cases.length
   claimedHooks = hooks.length
-  return () => runThese(myHooks, mine)
+  claimedTeardowns = teardowns.length
+  return () => runThese(myHooks, myTeardowns, mine)
 }
 
 /**
@@ -402,6 +425,7 @@ export const claim = (): (() => Promise<SpecResult[]>) => {
  */
 const runThese = async (
   ownHooks: { body: () => unknown; depth: number }[],
+  ownTeardowns: { body: () => unknown; depth: number }[],
   ownCases: Case[],
 ): Promise<SpecResult[]> => {
   for (const hook of ownHooks) {
@@ -418,6 +442,7 @@ const runThese = async (
   const results: SpecResult[] = []
   for (const entry of ownCases) {
     const started = performance.now()
+    let failure: string | undefined
     try {
       await Promise.race([
         entry.body(),
@@ -425,21 +450,30 @@ const runThese = async (
           setTimeout(() => reject(new Error(`timed out after ${TIMEOUT}ms`)), TIMEOUT)
         }),
       ])
-      results.push({
-        duration: performance.now() - started,
-        name: entry.name,
-        passed: true,
-        suite: entry.suite,
-      })
     } catch (error) {
-      results.push({
-        duration: performance.now() - started,
-        error: error instanceof Error ? error.message : String(error),
-        name: entry.name,
-        passed: false,
-        suite: entry.suite,
-      })
+      failure = error instanceof Error ? error.message : String(error)
     }
+    /* Whatever the test did, because what a teardown is for is putting a global
+       back and the failing test is the one most likely to have left it. A
+       teardown that throws fails the test it followed rather than being
+       swallowed: a restore that did not happen is the fault that shows up three
+       files later as somebody else's failure. */
+    for (const teardown of ownTeardowns) {
+      try {
+        await teardown.body()
+      } catch (error) {
+        failure ??= `an afterEach hook threw: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      }
+    }
+    results.push({
+      duration: performance.now() - started,
+      ...(failure === undefined ? {} : { error: failure }),
+      name: entry.name,
+      passed: failure === undefined,
+      suite: entry.suite,
+    })
   }
   return results
 }
@@ -558,7 +592,6 @@ export const label = (host: HTMLElement): string | null =>
 export const part = (host: HTMLElement, name: string): Element | null =>
   host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null
 
-/** Elements the consumer assigned to a slot, by slot name. */
 /**
  * Waits until a component has stopped asking for updates, with a ceiling.
  *
@@ -583,6 +616,7 @@ export const settle = async (host: Updatable, turns = 40): Promise<void> => {
   }
 }
 
+/** Elements the consumer assigned to a slot, by slot name. */
 export const slotted = (host: HTMLElement, name?: string): Element[] => {
   const selector = name ? `slot[name="${name}"]` : 'slot:not([name])'
   const slot = host.shadowRoot?.querySelector(selector) as HTMLSlotElement | null
@@ -633,8 +667,8 @@ export const settled = async (element: Element | null): Promise<void> => {
  * Waits until a component's transitions are switched on.
  *
  * **`HelixElement` suppresses every transition until it has settled**, with
- * `:host(:not([data-settled])) *  { transition: none !important }`, and sets
- * `data-settled` a frame after `firstUpdated` rather than in it. That is
+ * `:host(:not(:state(settled))) *  { transition: none !important }`, and records
+ * that state a frame after `firstUpdated` rather than in it. That is
  * deliberate and is what stops a component animating its own arrival. It also
  * means `await mount(...)` is not enough for any spec that asserts a transition:
  * `updateComplete` resolves in the same microtask checkpoint the suppression is
@@ -648,30 +682,31 @@ export const settled = async (element: Element | null): Promise<void> => {
  * declaration, while the mark computed `transition-property: none`. The only
  * rule that reached it was the settle guard.
  *
- * Waits on the attribute rather than on a frame count, so it is right whether
- * the component settles in one frame or the runner is busy. `settled()` is the
+ * **Waits on the element's own `settled` promise**, rather than on a frame count,
+ * so it is right whether the component settles in one frame or the runner is
+ * busy. It used to watch `[data-settled]` with a `MutationObserver`, which is
+ * not available any more and should not be: the flag is an
+ * `ElementInternals.states` entry now, deliberately outside the DOM, because on
+ * the host it was an attribute React had not rendered and hydration said so.
+ * A promise is the better signal in any case, being what this wanted rather
+ * than a mutation it had to interpret. `settled()` is the
  * other half and is not this: that one waits for animations to *finish*, where
  * this one waits for them to become possible at all.
  */
 export const readyToMove = async (element: Element | null): Promise<void> => {
-  if (!element || element.hasAttribute('data-settled')) {
+  const settled = (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
+  if (!settled) {
     return
   }
   await new Promise<void>((resolve) => {
-    const watching = new MutationObserver(() => {
-      if (element.hasAttribute('data-settled')) {
-        watching.disconnect()
-        resolve()
-      }
-    })
-    watching.observe(element, { attributeFilter: ['data-settled'], attributes: true })
+    void settled.then(resolve)
     /* happy-dom never calls `requestAnimationFrame`'s callback the way a browser
-       does, so the observer alone would hang there. A macrotask is enough in
-       both: a browser has painted by then and happy-dom has nothing to wait
-       for. */
-    setTimeout(() => {
-      watching.disconnect()
-      resolve()
-    }, 50)
+       does, so the promise alone would hang there: it is resolved from that
+       frame and that frame never comes. A macrotask is enough in both, a browser
+       having painted by then and happy-dom having nothing to wait for.
+
+       `Promise.resolve` is idempotent, so whichever arrives first wins and the
+       loser is a no-op. Nothing to tear down now that there is no observer. */
+    setTimeout(resolve, 50)
   })
 }

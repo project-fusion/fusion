@@ -154,7 +154,7 @@ template it is on, so scoping it keeps the check for your own typos.
 
 \`\`\`html
 <helix-input
-  (helix-input)="name = $event.detail.value"
+  (change)="name = $event.target.value"
   [value]="name"
 />
 \`\`\`
@@ -162,9 +162,9 @@ template it is on, so scoping it keeps the check for your own typos.
 \`[prop]\` sets a property, which is what a non-string value needs, and \`(event)\`
 binds with \`addEventListener\`, so the event name is its own.
 
-**Do not use \`attr.\` for a controlled property.** \`[attr.value]="name"\` writes
-the attribute, which Helix reads once as a claim of ownership and then ignores;
-the property is the live channel.
+**Do not use \`attr.\` for a stateful property.** \`[attr.value]="name"\` writes
+the attribute, which seeds the control and is then out of date the moment a
+reader types; the property is the live channel.
 
 ## No typings ship for Angular
 
@@ -177,12 +177,11 @@ own codebase from it.
 The practical consequence is that a misspelled property fails silently here
 where it is a compile error in React, Vue and Svelte. Worth a note in review.
 
-## The controlled-property rule still applies
+## Taking a decision
 
-A declared \`value\`, \`open\`, \`checked\` or \`active\` hands ownership to you: the
-element announces the change and applies none of it. Use \`default-value\` and its
-siblings for a control that owns its own state. See [State and
-control](./state-and-control).
+\`value\`, \`open\`, \`checked\` and \`active\` are seeds: the element applies its own
+changes from there. To take one decision, listen for the \`helix-before-*\` event
+and call \`preventDefault()\`. See [State and control](./state-and-control).
 `,
   'browser-support': `---
 description: The platform features this is built on, and what is actually tested.
@@ -421,7 +420,6 @@ These are the difference between code that looks right and code that passes:
 
 | Rule | Check |
 |---|---|
-| A controlled property must be answered | \`check:controlled\`, a type error |
 | A dispatched event must be declared | \`check:events\` |
 | A documented part must be rendered | \`check:parts\` |
 | A documented CSS hook must be read | \`check:hooks\` |
@@ -946,21 +944,34 @@ from what is behind it, so on a busy background it has no edge at all. The
 border token is what keeps it a shape.
 `,
   events: `---
-description: Twenty-one events, why every name is prefixed, and which ones bubble.
+description: The request and the notification, why one name is prefixed and the other is not.
 section: Essentials
 title: Events
 ---
 
 # Events
 
-Every Helix event is a named class with a typed \`detail\`, dispatched under a
-\`helix-\` prefixed name. Twenty-one of them.
+**Every state change is announced twice, and the two are for different people.**
 
 \`\`\`ts
-element.addEventListener('helix-change', (event) => {
-  // \`event\` is a HelixChangeEvent. The detail is typed.
+// The request. Cancelable, carries what is being proposed, and fires before
+// anything moves. This is how you take the decision.
+element.addEventListener('helix-before-change', (event) => {
+  if (locked) {
+    event.preventDefault()
+  }
+})
+
+// The notification, under the platform's own name. Fires after the value moved,
+// so it is on the target where every handler ever written expects it.
+element.addEventListener('change', (event) => {
+  save(event.target.value)
 })
 \`\`\`
+
+Most consumers want the second. Bind \`onChange\` in React or \`onchange=\` in HTML
+and read the target, exactly as you would from an \`<input>\`. Reach for the
+prefixed one when you mean to refuse.
 
 The class exists rather than a bare \`CustomEvent\` for three reasons, all about
 the type reaching you: the class name is in the manifest, which is what lets the
@@ -969,7 +980,7 @@ package augments \`HTMLElementEventMap\`, which types \`addEventListener\` for
 people writing plain HTML; and the name lives on the class, so a dispatch and a
 listener cannot disagree about the string.
 
-## Why events are prefixed
+## Why the request is prefixed and the notification is not
 
 **Retargeting.** An event dispatched inside a shadow root is retargeted to look
 like it came from the host, so a bare \`input\` from a \`<helix-input>\` is
@@ -978,8 +989,13 @@ for either.
 
 **React's claimed verbs.** React's synthetic system owns \`change\`, \`input\`,
 \`submit\`, \`copy\`, \`focus\` and the rest, and a prop matching one of those is
-wired to the native event instead. \`onhelix-change\` matches none of them and
-reaches us.
+wired to the native event instead. \`onhelix-before-change\` matches none of them
+and reaches us, which is exactly what a request needs.
+
+**And the notification wants the opposite.** It is not prefixed precisely
+because React claims the verb: \`onChange\` on a Helix element goes through the
+synthetic system to the native \`change\` the element sends, which is why the
+ordinary path costs a consumer nothing to learn.
 
 **The type map is global.** \`HTMLElementEventMap\` is shared with every element
 in your application. Our classes extend \`Event\`, so an entry named \`select\`
@@ -990,13 +1006,13 @@ notice, it is one you would.
 
 ## Propagation follows the event's role
 
-**Lifecycle does not bubble and is not composed.** \`helix-open\` and
-\`helix-close\`. Overlays nest, and an inner one's lifecycle must never reach the
+**Lifecycle does not bubble and is not composed.** \`helix-before-open\` and
+\`helix-before-close\`. Overlays nest, and an inner one's lifecycle must never reach the
 outer one that contains it: a menu closing inside a dialog is not the dialog
 closing.
 
 **Coordination bubbles and is composed.** \`helix-select\`, \`helix-dismiss\`,
-\`helix-change\`. A parent, or a router, can intercept one across a shadow
+\`helix-before-change\`. A parent, or a router, can intercept one across a shadow
 boundary, which is what makes a \`Tree\` usable as navigation.
 
 If you are listening on a container and hearing nothing, the event is probably a
@@ -1008,7 +1024,7 @@ The events that precede a state change are cancelable, and that is the only way
 to refuse one:
 
 \`\`\`ts
-dialog.addEventListener('helix-close', (event) => {
+dialog.addEventListener('helix-before-close', (event) => {
   if (unsaved) {
     event.preventDefault()
   }
@@ -1022,11 +1038,10 @@ dispatch, so an event you can listen for is an event that is documented.
 
 | Event | Roughly |
 |---|---|
-| \`helix-open\`, \`helix-close\` | An element's open state, before it moves |
-| \`helix-change\` | A committed value |
-| \`helix-input\` | An edit in progress |
+| \`helix-before-change\` | A value about to move, refusable |
+| \`helix-before-toggle\` | A checked state about to flip, refusable |
+| \`helix-before-open\`, \`helix-before-close\` | An open state about to move, refusable |
 | \`helix-select\` | An item chosen from a set |
-| \`helix-toggle\` | A two-state control flipped |
 | \`helix-dismiss\` | The reader asked for something to go away |
 | \`helix-next\`, \`helix-previous\` | Movement through a sequence |
 | \`helix-filter\` | A query changed in a filtering control |
@@ -1038,13 +1053,20 @@ dispatch, so an event you can listen for is an event that is documented.
 | \`helix-console\` | The sandbox relaying a log |
 | \`helix-tour-ask\`, \`helix-sample-start\`, \`helix-sample-end\` | Tour and color sampling |
 
+And the native ones every stateful component sends once the change has landed:
+\`input\` and \`change\` on a value control, \`toggle\` on anything that opens,
+carrying \`newState\` and \`oldState\` the way \`<details>\` does, \`close\` on a dialog,
+and \`load\` and \`error\` on an image.
+
 Each component's page lists the events it actually dispatches, with the class
 and the detail.
 
 ## In a framework
 
-The prop is \`on\` and the event name, verbatim: \`onhelix-change\`. Nothing strips
-the prefix and nothing camel-cases it. See [React](./react), [Vue](./vue) and
+A native event is \`onChange\`, \`onInput\` or \`onToggle\`, which is what React and
+every framework already understand. A prefixed one is \`on\` and the name,
+verbatim: \`onhelix-before-change\`. Nothing strips the prefix and nothing
+camel-cases it, which is React's own behavior rather than a convention here. See [React](./react), [Vue](./vue) and
 [Svelte](./svelte).
 `,
   forms: `---
@@ -1202,11 +1224,11 @@ the same reasoning applies to yours.
 the accessibility tree, so a screen reader can still announce that the control
 exists and is currently off.
 
-## Controlled and uncontrolled
+## Seeding a form
 
-Every form control follows the ownership rule: a declared \`value\` or \`checked\`
-is a claim, and the element will announce and wait rather than apply. In a form
-you usually want the uncontrolled shape and to read the values at submit:
+A declared \`value\` or \`checked\` is a seed and the control goes on managing
+itself, so a form needs nothing wired to work. \`default-value\` is what a reset
+returns to, which is usually what a seed in a form means:
 
 \`\`\`html
 <helix-input
@@ -1748,7 +1770,7 @@ nobody ever downloads this floor on its own.
 
 | | Raw | Gzip | Brotli |
 |---|---|---|---|
-| Lit and \`@helix-io/core\` | 127,653 | 42,531 | 36,575 |
+| Lit and \`@helix-io/core\` | 127,344 | 42,323 | 36,334 |
 
 ## Whole packages
 
@@ -1759,11 +1781,11 @@ repository does that. The per-component tables are what a page pays.
 
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`@helix-io/core\` | 127,207 | 42,075 | 36,239 | Element base class, mixins, decorators, floating positioning. |
-| \`@helix-io/headless\` | 489,281 | 124,734 | 98,249 | Every headless family, which is what the barrel means. |
+| \`@helix-io/core\` | 126,898 | 41,892 | 36,088 | Element base class, mixins, decorators, floating positioning. |
+| \`@helix-io/headless\` | 488,119 | 124,134 | 97,852 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/styled\` | 1,604,288 | 458,642 | 321,525 | Every styled family. |
+| \`@helix-io/styled\` | 1,606,740 | 459,202 | 321,931 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1784,13 +1806,13 @@ is the whole cost of adopting the base layer on its own.
 
 ## What the numbers say
 
-**Most of a first component is the runtime under it.** The median styled family is 18,692 bytes gzipped alone and adds 6,158 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
+**Most of a first component is the runtime under it.** The median styled family is 18,495 bytes gzipped alone and adds 6,175 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 9,234 gzipped alone, the dearest \`color-input\` at 65,039, over 92 components. Every family at once is 458,642.
+Across the tier: the cheapest is \`quote\` at 9,370 gzipped alone, the dearest \`color-input\` at 65,195, over 92 components. Every family at once is 459,202.
 
-**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs 124,734 bytes gzipped whatever else the page does, which is 7 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
+**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs 124,134 bytes gzipped whatever else the page does, which is 7 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
-The headless tier never had the problem, and it is the control: \`@helix-io/core\` is \`sideEffects: false\`, and a headless family is a median of 12,049 bytes gzipped alone.
+The headless tier never had the problem, and it is the control: \`@helix-io/core\` is \`sideEffects: false\`, and a headless family is a median of 11,852 bytes gzipped alone.
 
 ## Against other systems
 
@@ -1802,43 +1824,43 @@ Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`
 
 | Component | System | Raw | Gzip | Brotli |
 |---|---|---|---|---|
-| \`button\` | **Helix** | 44,388 | 14,925 | 13,052 |
+| \`button\` | **Helix** | 45,328 | 15,055 | 13,140 |
 | | Carbon | 133,058 | 20,959 | 17,685 |
 | | Material Web | 47,060 | 14,173 | 12,591 |
 | | Shoelace | 62,628 | 18,287 | 15,805 |
 | | Spectrum | 98,792 | 22,045 | 18,674 |
-| \`checkbox\` | **Helix** | 55,362 | 18,247 | 15,949 |
+| \`checkbox\` | **Helix** | 55,308 | 18,042 | 15,753 |
 | | Carbon | 60,255 | 15,609 | 13,550 |
 | | Material Web | 43,785 | 13,556 | 12,015 |
 | | Shoelace | 47,614 | 15,177 | 13,301 |
 | | Spectrum | 62,492 | 15,437 | 13,481 |
-| \`dialog\` | **Helix** | 46,698 | 16,311 | 14,227 |
+| \`dialog\` | **Helix** | 46,837 | 16,184 | 14,104 |
 | | Carbon | 510,866 | 67,390 | 39,189 |
 | | Material Web | 34,238 | 11,510 | 10,229 |
 | | Shoelace | 52,754 | 17,698 | 15,554 |
 | | Spectrum | 155,708 | 31,899 | 26,262 |
-| \`radio\` | **Helix** | 59,214 | 19,136 | 16,749 |
+| \`radio\` | **Helix** | 59,255 | 18,947 | 16,510 |
 | | Carbon | 63,055 | 16,887 | 14,605 |
 | | Material Web | 41,044 | 13,234 | 11,757 |
 | | Shoelace | 34,865 | 12,027 | 10,559 |
 | | Spectrum | 38,685 | 10,660 | 9,370 |
-| \`switch\` | **Helix** | 47,630 | 15,819 | 13,850 |
+| \`switch\` | **Helix** | 47,576 | 15,603 | 13,658 |
 | | Carbon | 69,423 | 17,127 | 14,764 |
 | | Material Web | 50,155 | 14,577 | 12,935 |
 | | Shoelace | 37,833 | 11,814 | 10,568 |
 | | Spectrum | 62,322 | 15,059 | 13,321 |
-| \`tabs\` | **Helix** | 51,125 | 16,757 | 14,635 |
+| \`tabs\` | **Helix** | 50,970 | 16,534 | 14,455 |
 | | Carbon | 578,766 | 73,537 | 43,235 |
 | | Material Web | 38,883 | 12,820 | 11,368 |
 | | Shoelace | 54,573 | 17,140 | 15,068 |
 | | Spectrum | 64,875 | 18,298 | 16,283 |
-| \`tooltip\` | **Helix** | 66,605 | 23,460 | 20,679 |
+| \`tooltip\` | **Helix** | 66,718 | 23,328 | 20,518 |
 | | Carbon | 189,382 | 30,354 | 22,273 |
 | | Material Web | | not shipped | |
 | | Shoelace | 57,412 | 20,220 | 17,933 |
 | | Spectrum | 136,599 | 40,552 | 35,286 |
 
-**Where Helix loses**, which is the half of a comparison table worth reading: \`button\`, \`checkbox\`, \`dialog\`, \`radio\`, \`switch\`, \`tabs\`, \`tooltip\`. The largest gap is radio against Spectrum, by 8,476 bytes gzipped. 15 of 28 peer measurements come in under ours.
+**Where Helix loses**, which is the half of a comparison table worth reading: \`button\`, \`checkbox\`, \`dialog\`, \`radio\`, \`switch\`, \`tabs\`, \`tooltip\`. The largest gap is radio against Spectrum, by 8,287 bytes gzipped. 15 of 28 peer measurements come in under ours.
 
 - **Carbon** \`@carbon/web-components@2.61.0\`. Its dialog is Modal, its radio is Radio Button, and its switch is Toggle.
 - **Material Web** \`@material/web@2.5.0\`. Ships no tooltip. Its button is measured as the filled one, there being no single button element.
@@ -1883,93 +1905,93 @@ Structure, accessibility, state and form participation. No presentation, and no 
 
 | Family | Alone raw | Alone gzip | Alone brotli | Added raw | Added gzip | Added brotli |
 |---|---|---|---|---|---|---|
-| \`accordion\` | 74,066 | 25,314 | 20,878 | 3,002 | 1,282 | 601 |
-| \`announcement\` | 71,486 | 24,446 | 20,227 | 1,374 | 727 | 194 |
-| \`app-header\` | 25,621 | 8,957 | 7,894 | 1,216 | 614 | 97 |
-| \`avatar\` | 27,091 | 9,450 | 8,340 | 2,641 | 1,174 | 596 |
-| \`badge\` | 25,152 | 8,898 | 7,855 | 1,120 | 609 | 187 |
-| \`bar-chart\` | 69,744 | 24,139 | 21,352 | 12,176 | 4,275 | 2,961 |
-| \`blockquote\` | 25,072 | 8,883 | 7,843 | 917 | 536 | 126 |
-| \`breadcrumbs\` | 71,098 | 24,098 | 20,160 | 1,947 | 778 | 322 |
-| \`button\` | 27,788 | 9,637 | 8,489 | 1,836 | 872 | 323 |
-| \`button-group\` | 25,065 | 8,826 | 7,785 | 661 | 400 | 22 |
-| \`callout\` | 70,237 | 23,970 | 20,004 | 912 | 543 | 151 |
-| \`card\` | 25,099 | 8,838 | 7,818 | 694 | 414 | 96 |
-| \`carousel\` | 77,560 | 26,292 | 21,848 | 7,453 | 2,549 | 1,531 |
-| \`chat\` | 34,925 | 11,582 | 10,220 | 7,655 | 2,505 | 1,532 |
-| \`checkbox\` | 32,662 | 10,751 | 9,500 | 2,134 | 1,056 | 417 |
-| \`checkbox-group\` | 35,127 | 11,354 | 9,989 | 4,101 | 1,643 | 749 |
-| \`code\` | 23,684 | 8,409 | 7,437 | 451 | 306 | -22 |
-| \`code-block\` | 107,715 | 36,676 | 31,119 | 11,094 | 3,356 | 2,218 |
-| \`color-input\` | 124,962 | 41,362 | 35,073 | 23,927 | 6,909 | 5,352 |
-| \`color-picker\` | 95,054 | 31,465 | 26,089 | 17,570 | 5,486 | 4,207 |
-| \`combobox\` | 121,594 | 39,947 | 33,731 | 19,443 | 5,503 | 4,029 |
-| \`command\` | 95,299 | 30,857 | 25,466 | 16,017 | 4,667 | 3,309 |
-| \`copy-button\` | 106,407 | 36,407 | 30,828 | 9,786 | 3,102 | 2,003 |
-| \`data-table\` | 138,122 | 44,161 | 37,199 | 36,596 | 9,634 | 7,434 |
-| \`date-input\` | 117,153 | 39,008 | 32,974 | 17,583 | 5,336 | 3,960 |
-| \`date-picker\` | 81,216 | 27,452 | 22,675 | 8,731 | 3,042 | 2,049 |
-| \`dialog\` | 28,802 | 9,966 | 8,785 | 1,963 | 948 | 365 |
-| \`divider\` | 25,269 | 8,964 | 7,889 | 1,115 | 629 | 139 |
-| \`donut-chart\` | 65,651 | 22,733 | 20,100 | 9,436 | 3,438 | 2,276 |
-| \`drawer\` | 28,050 | 9,754 | 8,576 | 1,503 | 752 | 256 |
-| \`drilldown\` | 76,691 | 26,101 | 21,595 | 5,014 | 1,895 | 1,032 |
-| \`empty\` | 25,221 | 8,881 | 7,855 | 816 | 478 | 121 |
-| \`file-input\` | 80,129 | 27,068 | 22,290 | 5,977 | 2,312 | 1,400 |
-| \`heatmap\` | 32,651 | 11,129 | 9,828 | 2,981 | 1,339 | 591 |
-| \`icon\` | 69,643 | 23,725 | 19,898 | 850 | 500 | 67 |
-| \`icon-button\` | 28,187 | 9,671 | 8,519 | 2,234 | 900 | 425 |
-| \`image\` | 26,369 | 9,202 | 8,134 | 2,288 | 960 | 412 |
-| \`input\` | 80,128 | 27,051 | 22,330 | 4,272 | 1,749 | 902 |
-| \`kbd\` | 26,467 | 9,401 | 8,295 | 2,427 | 1,264 | 580 |
-| \`legend\` | 27,420 | 9,727 | 8,574 | 1,097 | 637 | 130 |
-| \`line-chart\` | 67,767 | 23,552 | 20,838 | 10,201 | 3,690 | 2,417 |
-| \`list\` | 26,074 | 9,022 | 7,945 | 1,679 | 638 | 324 |
-| \`listbox\` | 87,977 | 29,313 | 24,108 | 10,214 | 3,372 | 2,275 |
-| \`loader\` | 25,305 | 8,944 | 7,896 | 900 | 510 | 100 |
-| \`megamenu\` | 53,677 | 18,984 | 16,897 | 4,983 | 1,905 | 1,024 |
-| \`menu\` | 105,733 | 36,088 | 30,720 | 7,961 | 2,518 | 1,589 |
-| \`meter\` | 28,197 | 9,737 | 8,592 | 3,801 | 1,408 | 803 |
-| \`navigation\` | 27,054 | 9,470 | 8,345 | 1,582 | 755 | 263 |
-| \`notifications\` | 33,460 | 11,340 | 9,995 | 6,166 | 2,272 | 1,261 |
-| \`number-input\` | 82,513 | 27,617 | 22,806 | 6,827 | 2,426 | 1,375 |
-| \`option\` | 26,759 | 9,194 | 8,144 | 2,361 | 842 | 283 |
-| \`outline\` | 30,077 | 10,474 | 9,231 | 4,556 | 1,930 | 1,031 |
-| \`pagination\` | 127,220 | 41,089 | 34,676 | 25,775 | 6,743 | 5,029 |
-| \`pin-input\` | 34,839 | 11,441 | 10,123 | 4,394 | 1,799 | 1,004 |
-| \`popover\` | 50,815 | 18,236 | 16,146 | 1,875 | 885 | 311 |
-| \`progress\` | 26,346 | 9,222 | 8,137 | 1,951 | 849 | 302 |
-| \`qr-code\` | 36,820 | 13,212 | 11,679 | 12,808 | 5,099 | 3,964 |
-| \`quote\` | 24,588 | 8,694 | 7,666 | 552 | 390 | -1 |
-| \`radio\` | 34,947 | 11,399 | 10,065 | 2,952 | 1,200 | 491 |
-| \`rating\` | 36,934 | 12,146 | 10,698 | 5,446 | 2,159 | 1,243 |
-| \`scroll-area\` | 26,696 | 9,398 | 8,240 | 2,611 | 1,223 | 613 |
-| \`select\` | 115,963 | 38,685 | 32,652 | 14,641 | 4,406 | 3,016 |
-| \`skeleton\` | 23,777 | 8,442 | 7,461 | 544 | 365 | 36 |
-| \`slider\` | 35,530 | 11,579 | 10,264 | 4,837 | 1,841 | 1,073 |
-| \`sparkline\` | 29,878 | 10,747 | 9,505 | 2,531 | 1,198 | 601 |
-| \`speed-dial\` | 98,519 | 34,143 | 29,101 | 3,902 | 1,463 | 719 |
-| \`splitter\` | 36,052 | 11,783 | 10,422 | 10,846 | 3,180 | 2,264 |
-| \`stat\` | 25,553 | 8,881 | 7,807 | 1,151 | 471 | 46 |
-| \`steps\` | 78,239 | 26,378 | 21,837 | 4,974 | 1,663 | 993 |
-| \`switch\` | 32,321 | 10,694 | 9,454 | 1,670 | 886 | 261 |
-| \`table\` | 29,842 | 9,866 | 8,745 | 4,119 | 1,360 | 640 |
-| \`tabs\` | 33,046 | 11,025 | 9,701 | 4,344 | 1,407 | 745 |
-| \`tag\` | 70,521 | 24,061 | 19,926 | 897 | 503 | 66 |
-| \`textarea\` | 33,856 | 11,092 | 9,786 | 2,925 | 1,266 | 540 |
-| \`time-input\` | 128,554 | 41,878 | 35,391 | 26,407 | 7,410 | 5,652 |
-| \`time-picker\` | 94,312 | 31,158 | 25,769 | 16,561 | 5,252 | 3,756 |
-| \`timeline\` | 71,053 | 24,067 | 20,070 | 1,897 | 744 | 289 |
-| \`toast\` | 75,289 | 25,559 | 21,177 | 4,236 | 1,445 | 753 |
-| \`toggle\` | 37,169 | 12,049 | 10,644 | 3,743 | 1,396 | 631 |
-| \`toolbar\` | 26,967 | 9,486 | 8,359 | 2,932 | 1,390 | 592 |
-| \`tooltip\` | 54,875 | 19,351 | 17,170 | 5,868 | 2,233 | 1,293 |
-| \`tour\` | 58,723 | 20,179 | 17,879 | 9,201 | 2,818 | 1,826 |
-| \`tree\` | 81,559 | 27,457 | 22,621 | 7,069 | 2,500 | 1,506 |
-| \`trend\` | 69,846 | 23,823 | 19,994 | 1,056 | 593 | 198 |
-| \`video\` | 127,243 | 41,417 | 35,279 | 29,218 | 7,522 | 6,062 |
-| \`video-playlist\` | 113,381 | 37,807 | 32,147 | 13,999 | 3,815 | 2,624 |
-| \`virtual-list\` | 27,947 | 9,904 | 8,705 | 2,090 | 1,078 | 455 |
+| \`accordion\` | 74,179 | 25,161 | 20,724 | 3,001 | 1,267 | 586 |
+| \`announcement\` | 72,426 | 24,599 | 20,447 | 1,374 | 739 | 305 |
+| \`app-header\` | 26,561 | 9,089 | 8,019 | 1,216 | 623 | 197 |
+| \`avatar\` | 28,031 | 9,586 | 8,442 | 2,643 | 1,185 | 588 |
+| \`badge\` | 26,092 | 9,036 | 7,939 | 1,120 | 624 | 250 |
+| \`bar-chart\` | 69,857 | 24,019 | 21,237 | 12,177 | 4,280 | 3,052 |
+| \`blockquote\` | 26,012 | 9,018 | 7,934 | 917 | 540 | 192 |
+| \`breadcrumbs\` | 72,038 | 24,249 | 20,220 | 1,946 | 774 | 394 |
+| \`button\` | 28,728 | 9,773 | 8,618 | 1,835 | 871 | 379 |
+| \`button-group\` | 26,005 | 8,958 | 7,906 | 661 | 415 | 113 |
+| \`callout\` | 71,177 | 24,119 | 20,088 | 912 | 548 | 207 |
+| \`card\` | 26,039 | 8,971 | 7,918 | 694 | 423 | 116 |
+| \`carousel\` | 77,422 | 26,047 | 21,729 | 7,184 | 2,524 | 1,582 |
+| \`chat\` | 34,804 | 11,359 | 10,036 | 7,402 | 2,454 | 1,612 |
+| \`checkbox\` | 32,608 | 10,533 | 9,299 | 2,133 | 1,066 | 385 |
+| \`checkbox-group\` | 35,152 | 11,139 | 9,826 | 4,182 | 1,682 | 958 |
+| \`code\` | 24,624 | 8,545 | 7,549 | 451 | 314 | -14 |
+| \`code-block\` | 107,828 | 36,537 | 30,914 | 11,095 | 3,373 | 2,359 |
+| \`color-input\` | 125,186 | 41,252 | 34,883 | 24,129 | 6,949 | 5,438 |
+| \`color-picker\` | 95,204 | 31,291 | 25,974 | 17,680 | 5,510 | 4,230 |
+| \`combobox\` | 121,628 | 39,777 | 33,551 | 19,455 | 5,509 | 4,021 |
+| \`command\` | 95,280 | 30,681 | 25,387 | 15,977 | 4,698 | 3,344 |
+| \`copy-button\` | 106,520 | 36,277 | 30,828 | 9,787 | 3,126 | 2,078 |
+| \`data-table\` | 137,052 | 43,854 | 36,997 | 35,501 | 9,487 | 7,486 |
+| \`date-input\` | 117,184 | 38,847 | 32,927 | 17,592 | 5,339 | 3,966 |
+| \`date-picker\` | 81,176 | 27,249 | 22,576 | 8,649 | 3,072 | 2,096 |
+| \`dialog\` | 28,941 | 9,831 | 8,676 | 1,989 | 969 | 452 |
+| \`divider\` | 26,209 | 9,097 | 7,997 | 1,115 | 639 | 239 |
+| \`donut-chart\` | 65,764 | 22,600 | 19,959 | 9,435 | 3,453 | 2,376 |
+| \`drawer\` | 28,189 | 9,611 | 8,453 | 1,529 | 770 | 313 |
+| \`drilldown\` | 77,631 | 26,243 | 21,686 | 5,013 | 1,897 | 1,174 |
+| \`empty\` | 26,161 | 9,011 | 7,958 | 816 | 486 | 135 |
+| \`file-input\` | 81,134 | 27,228 | 22,468 | 6,044 | 2,367 | 1,524 |
+| \`heatmap\` | 33,591 | 11,262 | 9,964 | 2,980 | 1,354 | 702 |
+| \`icon\` | 70,583 | 23,870 | 19,921 | 850 | 507 | 173 |
+| \`icon-button\` | 29,127 | 9,805 | 8,630 | 2,234 | 912 | 512 |
+| \`image\` | 27,372 | 9,338 | 8,218 | 2,352 | 1,014 | 449 |
+| \`input\` | 80,277 | 26,861 | 22,097 | 4,380 | 1,784 | 1,097 |
+| \`kbd\` | 27,407 | 9,540 | 8,419 | 2,427 | 1,264 | 608 |
+| \`legend\` | 28,360 | 9,858 | 8,716 | 1,097 | 640 | 231 |
+| \`line-chart\` | 67,880 | 23,422 | 20,705 | 10,202 | 3,684 | 2,516 |
+| \`list\` | 27,014 | 9,153 | 8,100 | 1,678 | 627 | 301 |
+| \`listbox\` | 87,935 | 29,086 | 23,922 | 10,134 | 3,372 | 2,242 |
+| \`loader\` | 26,245 | 9,078 | 7,990 | 900 | 522 | 154 |
+| \`megamenu\` | 53,790 | 18,843 | 16,694 | 4,982 | 1,916 | 1,121 |
+| \`menu\` | 105,846 | 35,962 | 30,509 | 7,960 | 2,517 | 1,620 |
+| \`meter\` | 29,137 | 9,863 | 8,687 | 3,800 | 1,409 | 933 |
+| \`navigation\` | 27,994 | 9,603 | 8,461 | 1,582 | 769 | 352 |
+| \`notifications\` | 33,361 | 11,106 | 9,779 | 5,938 | 2,214 | 1,337 |
+| \`number-input\` | 82,635 | 27,413 | 22,561 | 6,908 | 2,443 | 1,512 |
+| \`option\` | 27,784 | 9,362 | 8,274 | 2,448 | 899 | 412 |
+| \`outline\` | 31,017 | 10,611 | 9,352 | 4,558 | 1,927 | 1,062 |
+| \`pagination\` | 126,864 | 40,862 | 34,508 | 25,393 | 6,681 | 5,166 |
+| \`pin-input\` | 35,027 | 11,260 | 9,976 | 4,540 | 1,843 | 1,025 |
+| \`popover\` | 50,928 | 18,094 | 16,031 | 1,874 | 879 | 467 |
+| \`progress\` | 27,286 | 9,348 | 8,251 | 1,949 | 859 | 391 |
+| \`qr-code\` | 37,760 | 13,350 | 11,782 | 12,807 | 5,090 | 4,082 |
+| \`quote\` | 25,528 | 8,831 | 7,773 | 552 | 400 | 64 |
+| \`radio\` | 34,988 | 11,210 | 9,876 | 2,952 | 1,199 | 556 |
+| \`rating\` | 36,975 | 11,954 | 10,563 | 5,445 | 2,150 | 1,327 |
+| \`scroll-area\` | 27,636 | 9,532 | 8,368 | 2,610 | 1,235 | 612 |
+| \`select\` | 115,912 | 38,519 | 32,517 | 14,568 | 4,421 | 3,143 |
+| \`skeleton\` | 24,717 | 8,578 | 7,574 | 544 | 372 | 113 |
+| \`slider\` | 35,571 | 11,370 | 10,081 | 4,836 | 1,847 | 1,128 |
+| \`sparkline\` | 30,818 | 10,878 | 9,586 | 2,530 | 1,210 | 658 |
+| \`speed-dial\` | 98,632 | 34,014 | 28,884 | 3,901 | 1,463 | 818 |
+| \`splitter\` | 35,541 | 11,495 | 10,178 | 10,206 | 3,098 | 2,209 |
+| \`stat\` | 26,493 | 9,016 | 7,936 | 1,150 | 462 | 121 |
+| \`steps\` | 78,084 | 26,134 | 21,664 | 4,974 | 1,668 | 970 |
+| \`switch\` | 32,267 | 10,472 | 9,247 | 1,670 | 910 | 378 |
+| \`table\` | 30,782 | 9,997 | 8,843 | 4,118 | 1,354 | 725 |
+| \`tabs\` | 32,891 | 10,786 | 9,482 | 4,343 | 1,401 | 759 |
+| \`tag\` | 71,461 | 24,200 | 20,048 | 897 | 518 | 225 |
+| \`textarea\` | 34,006 | 10,896 | 9,614 | 3,033 | 1,290 | 599 |
+| \`time-input\` | 128,599 | 41,722 | 35,200 | 26,429 | 7,425 | 5,822 |
+| \`time-picker\` | 94,286 | 30,946 | 25,622 | 16,495 | 5,261 | 3,847 |
+| \`timeline\` | 71,993 | 24,213 | 20,235 | 1,896 | 724 | 322 |
+| \`toast\` | 75,188 | 25,315 | 20,948 | 4,004 | 1,397 | 869 |
+| \`toggle\` | 37,210 | 11,852 | 10,471 | 3,742 | 1,403 | 793 |
+| \`toolbar\` | 27,907 | 9,622 | 8,489 | 2,932 | 1,384 | 676 |
+| \`tooltip\` | 54,988 | 19,212 | 17,017 | 5,867 | 2,229 | 1,318 |
+| \`tour\` | 58,612 | 19,960 | 17,644 | 8,960 | 2,795 | 1,834 |
+| \`tree\` | 81,415 | 27,280 | 22,457 | 7,096 | 2,517 | 1,538 |
+| \`trend\` | 70,786 | 23,973 | 20,039 | 1,056 | 580 | 276 |
+| \`video\` | 127,356 | 41,286 | 35,162 | 29,219 | 7,537 | 6,098 |
+| \`video-playlist\` | 113,223 | 37,650 | 31,955 | 14,014 | 3,824 | 2,700 |
+| \`virtual-list\` | 28,887 | 10,040 | 8,804 | 2,089 | 1,078 | 544 |
 
 ### Styled tier
 
@@ -1977,98 +1999,98 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 
 | Family | Alone raw | Alone gzip | Alone brotli | Added raw | Added gzip | Added brotli |
 |---|---|---|---|---|---|---|
-| \`accordion\` | 85,434 | 29,484 | 24,404 | 14,355 | 5,418 | 4,223 |
-| \`announcement\` | 81,444 | 28,017 | 23,315 | 11,316 | 4,306 | 3,229 |
-| \`app-header\` | 35,713 | 12,558 | 10,938 | 11,293 | 4,329 | 3,236 |
-| \`aura\` | 91,776 | 32,487 | 28,095 | 66,578 | 23,548 | 20,166 |
-| \`avatar\` | 34,545 | 11,899 | 10,422 | 10,085 | 3,720 | 2,671 |
-| \`badge\` | 32,520 | 11,639 | 10,106 | 8,471 | 3,457 | 2,481 |
-| \`bar-chart\` | 115,073 | 38,025 | 33,213 | 57,487 | 18,261 | 14,903 |
-| \`blockquote\` | 28,703 | 10,299 | 9,003 | 4,532 | 2,130 | 1,317 |
-| \`breadcrumbs\` | 80,836 | 27,748 | 23,222 | 11,670 | 4,443 | 3,339 |
-| \`button\` | 44,388 | 14,925 | 13,052 | 18,417 | 6,249 | 4,893 |
-| \`button-group\` | 29,625 | 10,467 | 9,168 | 5,204 | 2,236 | 1,442 |
-| \`callout\` | 75,067 | 25,808 | 21,517 | 5,726 | 2,427 | 1,615 |
-| \`card\` | 36,662 | 13,128 | 11,471 | 12,245 | 4,832 | 3,861 |
-| \`carousel\` | 103,799 | 34,699 | 29,066 | 33,681 | 10,820 | 8,587 |
-| \`chat\` | 44,629 | 14,025 | 12,327 | 17,345 | 4,933 | 3,609 |
-| \`checkbox\` | 55,362 | 18,247 | 15,949 | 24,818 | 8,610 | 6,854 |
-| \`checkbox-group\` | 44,920 | 14,959 | 13,049 | 13,880 | 5,293 | 3,821 |
-| \`code\` | 29,369 | 10,686 | 9,342 | 6,119 | 2,736 | 2,034 |
-| \`code-block\` | 142,139 | 46,863 | 39,771 | 45,500 | 13,250 | 10,987 |
-| \`color-input\` | 212,673 | 65,039 | 55,358 | 111,618 | 30,615 | 25,735 |
-| \`color-picker\` | 171,579 | 52,949 | 44,345 | 94,081 | 26,706 | 22,389 |
-| \`combobox\` | 163,109 | 52,520 | 44,743 | 60,941 | 17,951 | 14,933 |
-| \`command\` | 134,742 | 43,487 | 36,567 | 55,445 | 17,106 | 14,300 |
-| \`copy-button\` | 134,870 | 44,913 | 38,076 | 38,231 | 11,350 | 9,198 |
-| \`data-table\` | 210,703 | 64,343 | 54,040 | 109,158 | 29,923 | 24,316 |
-| \`date-input\` | 162,992 | 53,409 | 45,625 | 63,401 | 19,574 | 16,531 |
-| \`date-picker\` | 95,793 | 32,431 | 26,923 | 23,290 | 7,896 | 6,247 |
-| \`dialog\` | 46,698 | 16,311 | 14,227 | 19,844 | 7,394 | 5,976 |
-| \`divider\` | 30,606 | 10,922 | 9,529 | 6,435 | 2,713 | 1,883 |
-| \`donut-chart\` | 106,678 | 35,498 | 31,138 | 50,444 | 16,381 | 13,319 |
-| \`drawer\` | 45,303 | 15,896 | 13,875 | 18,739 | 7,021 | 5,659 |
-| \`drilldown\` | 85,701 | 29,139 | 24,021 | 14,011 | 4,878 | 3,493 |
-| \`empty\` | 27,613 | 9,777 | 8,595 | 3,192 | 1,489 | 822 |
-| \`file-input\` | 117,084 | 39,086 | 32,797 | 42,927 | 14,135 | 11,725 |
-| \`flex\` | 27,927 | 9,952 | 8,702 | 3,882 | 1,767 | 1,066 |
-| \`grid\` | 31,718 | 11,400 | 9,949 | 7,670 | 3,263 | 2,342 |
-| \`heatmap\` | 35,496 | 12,176 | 10,716 | 5,808 | 2,460 | 1,506 |
-| \`icon\` | 70,718 | 24,142 | 20,068 | 1,908 | 920 | 372 |
-| \`icon-button\` | 41,828 | 13,807 | 12,026 | 15,861 | 5,132 | 3,959 |
-| \`image\` | 31,434 | 11,072 | 9,690 | 7,335 | 2,931 | 2,011 |
-| \`input\` | 100,017 | 33,556 | 27,902 | 24,154 | 8,184 | 6,504 |
-| \`kbd\` | 31,147 | 11,288 | 9,873 | 7,092 | 3,168 | 2,222 |
-| \`legend\` | 38,348 | 13,260 | 11,551 | 12,018 | 4,355 | 3,219 |
-| \`line-chart\` | 107,999 | 35,994 | 31,576 | 50,414 | 16,264 | 13,239 |
-| \`list\` | 41,599 | 14,456 | 12,656 | 17,191 | 6,172 | 4,974 |
-| \`listbox\` | 102,119 | 34,168 | 28,266 | 24,340 | 8,087 | 6,312 |
-| \`loader\` | 35,529 | 12,607 | 10,987 | 11,109 | 4,283 | 3,284 |
-| \`megamenu\` | 74,593 | 26,267 | 23,179 | 25,884 | 9,209 | 7,492 |
-| \`menu\` | 125,574 | 42,812 | 36,231 | 27,782 | 8,921 | 7,172 |
-| \`meter\` | 42,998 | 14,638 | 12,748 | 18,584 | 6,331 | 4,984 |
-| \`navigation\` | 29,297 | 10,253 | 8,986 | 3,809 | 1,624 | 842 |
-| \`notifications\` | 40,422 | 13,212 | 11,610 | 13,115 | 4,196 | 3,012 |
-| \`number-input\` | 99,058 | 33,385 | 27,674 | 23,358 | 8,029 | 6,306 |
-| \`option\` | 37,133 | 13,030 | 11,354 | 12,723 | 4,784 | 3,610 |
-| \`outline\` | 41,533 | 14,281 | 12,465 | 15,995 | 5,719 | 4,308 |
-| \`pagination\` | 180,163 | 56,383 | 48,083 | 78,700 | 21,970 | 18,355 |
-| \`pin-input\` | 46,657 | 15,658 | 13,691 | 16,193 | 6,060 | 4,692 |
-| \`popover\` | 60,530 | 21,722 | 19,128 | 11,572 | 4,562 | 3,374 |
-| \`progress\` | 43,766 | 15,320 | 13,366 | 19,353 | 6,990 | 5,664 |
-| \`qr-code\` | 41,455 | 14,972 | 13,137 | 17,426 | 6,859 | 5,485 |
-| \`quote\` | 26,008 | 9,234 | 8,103 | 1,956 | 1,014 | 426 |
-| \`radio\` | 59,214 | 19,136 | 16,749 | 27,212 | 8,972 | 7,233 |
-| \`rating\` | 44,727 | 15,109 | 13,285 | 13,221 | 5,117 | 3,799 |
-| \`sandbox\` | 81,957 | 24,994 | 21,768 | 56,708 | 16,404 | 13,634 |
-| \`scroll-area\` | 32,262 | 11,089 | 9,675 | 8,160 | 2,978 | 1,948 |
-| \`select\` | 155,087 | 50,411 | 42,882 | 53,745 | 15,896 | 13,173 |
-| \`skeleton\` | 28,288 | 10,076 | 8,818 | 4,235 | 1,899 | 1,252 |
-| \`slider\` | 71,054 | 22,199 | 19,290 | 40,344 | 12,456 | 10,107 |
-| \`sparkline\` | 48,424 | 17,451 | 15,260 | 21,065 | 7,885 | 6,517 |
-| \`speed-dial\` | 114,048 | 39,044 | 33,069 | 19,409 | 6,144 | 4,767 |
-| \`splitter\` | 55,054 | 17,627 | 15,498 | 29,830 | 8,993 | 7,405 |
-| \`stat\` | 33,307 | 11,717 | 10,273 | 8,892 | 3,439 | 2,581 |
-| \`steps\` | 111,344 | 36,137 | 30,333 | 38,064 | 11,330 | 9,408 |
-| \`switch\` | 47,630 | 15,819 | 13,850 | 16,964 | 6,124 | 4,823 |
-| \`table\` | 39,560 | 13,060 | 11,394 | 13,824 | 4,628 | 3,467 |
-| \`tabs\` | 51,125 | 16,757 | 14,635 | 22,410 | 7,193 | 5,705 |
-| \`tag\` | 83,153 | 28,997 | 24,129 | 13,514 | 5,445 | 4,249 |
-| \`text\` | 30,549 | 10,476 | 9,149 | 6,505 | 2,355 | 1,508 |
-| \`textarea\` | 45,729 | 15,132 | 13,224 | 14,779 | 5,408 | 4,096 |
-| \`time-input\` | 194,949 | 61,346 | 52,440 | 92,782 | 26,960 | 22,711 |
-| \`time-picker\` | 135,087 | 43,706 | 36,606 | 57,326 | 17,634 | 14,651 |
-| \`timeline\` | 79,933 | 27,223 | 22,670 | 10,763 | 3,927 | 2,972 |
-| \`toast\` | 100,685 | 34,026 | 28,475 | 29,616 | 9,802 | 8,022 |
-| \`toggle\` | 58,935 | 19,650 | 17,210 | 25,501 | 8,984 | 7,294 |
-| \`toolbar\` | 28,924 | 10,251 | 8,978 | 4,872 | 2,245 | 1,270 |
-| \`tooltip\` | 66,605 | 23,460 | 20,679 | 17,580 | 6,284 | 4,745 |
-| \`tour\` | 82,936 | 27,229 | 24,014 | 33,402 | 9,898 | 7,937 |
-| \`tree\` | 103,228 | 35,056 | 29,291 | 28,724 | 9,920 | 8,023 |
-| \`trend\` | 76,507 | 26,144 | 21,720 | 7,708 | 2,918 | 2,135 |
-| \`video\` | 179,927 | 57,109 | 48,933 | 81,881 | 23,198 | 19,648 |
-| \`video-playlist\` | 147,380 | 48,126 | 40,915 | 47,979 | 13,835 | 11,489 |
-| \`virtual-list\` | 30,652 | 11,014 | 9,612 | 4,778 | 2,304 | 1,388 |
+| \`accordion\` | 85,547 | 29,325 | 24,329 | 14,357 | 5,428 | 4,136 |
+| \`announcement\` | 82,384 | 28,172 | 23,425 | 11,316 | 4,304 | 3,296 |
+| \`app-header\` | 36,653 | 12,690 | 11,061 | 11,293 | 4,341 | 3,246 |
+| \`aura\` | 92,716 | 32,618 | 28,190 | 66,577 | 23,564 | 20,265 |
+| \`avatar\` | 35,485 | 12,029 | 10,519 | 10,084 | 3,738 | 2,726 |
+| \`badge\` | 33,460 | 11,773 | 10,227 | 8,471 | 3,466 | 2,538 |
+| \`bar-chart\` | 115,186 | 37,900 | 33,037 | 57,488 | 18,270 | 14,996 |
+| \`blockquote\` | 29,643 | 10,436 | 9,122 | 4,532 | 2,126 | 1,376 |
+| \`breadcrumbs\` | 81,776 | 27,892 | 23,183 | 11,672 | 4,460 | 3,447 |
+| \`button\` | 45,328 | 15,055 | 13,140 | 18,417 | 6,273 | 5,006 |
+| \`button-group\` | 30,565 | 10,599 | 9,283 | 5,204 | 2,247 | 1,552 |
+| \`callout\` | 76,007 | 25,948 | 21,678 | 5,726 | 2,452 | 1,746 |
+| \`card\` | 37,602 | 13,262 | 11,584 | 12,245 | 4,848 | 3,867 |
+| \`carousel\` | 103,661 | 34,440 | 28,832 | 33,412 | 10,773 | 8,750 |
+| \`chat\` | 44,508 | 13,796 | 12,104 | 17,096 | 4,909 | 3,717 |
+| \`checkbox\` | 55,308 | 18,042 | 15,753 | 24,817 | 8,616 | 6,945 |
+| \`checkbox-group\` | 44,945 | 14,761 | 12,919 | 13,961 | 5,346 | 3,970 |
+| \`code\` | 31,259 | 11,203 | 9,789 | 7,069 | 3,117 | 2,423 |
+| \`code-block\` | 142,252 | 46,724 | 39,649 | 45,501 | 13,257 | 11,070 |
+| \`color-input\` | 213,723 | 65,195 | 55,517 | 112,646 | 30,907 | 26,032 |
+| \`color-picker\` | 172,552 | 53,013 | 44,429 | 95,016 | 26,986 | 22,681 |
+| \`combobox\` | 163,143 | 52,352 | 44,528 | 60,950 | 17,934 | 14,979 |
+| \`command\` | 134,723 | 43,301 | 36,385 | 55,405 | 17,113 | 14,357 |
+| \`copy-button\` | 134,983 | 44,780 | 38,011 | 38,232 | 11,366 | 9,361 |
+| \`data-table\` | 210,646 | 64,314 | 54,124 | 109,076 | 30,033 | 24,601 |
+| \`date-input\` | 163,810 | 53,525 | 45,623 | 64,197 | 19,846 | 16,829 |
+| \`date-picker\` | 96,540 | 32,483 | 27,092 | 23,995 | 8,190 | 6,583 |
+| \`dialog\` | 46,837 | 16,184 | 14,104 | 19,870 | 7,413 | 6,101 |
+| \`divider\` | 31,546 | 11,049 | 9,612 | 6,435 | 2,740 | 1,869 |
+| \`donut-chart\` | 106,791 | 35,357 | 30,998 | 50,445 | 16,370 | 13,368 |
+| \`drawer\` | 45,442 | 15,767 | 13,732 | 18,765 | 7,033 | 5,679 |
+| \`drilldown\` | 86,641 | 29,289 | 24,097 | 14,010 | 4,889 | 3,617 |
+| \`empty\` | 28,553 | 9,910 | 8,699 | 3,192 | 1,499 | 900 |
+| \`file-input\` | 118,089 | 39,252 | 32,825 | 42,992 | 14,185 | 11,825 |
+| \`flex\` | 28,867 | 10,086 | 8,808 | 3,881 | 1,767 | 1,137 |
+| \`grid\` | 32,658 | 11,533 | 10,042 | 7,670 | 3,269 | 2,397 |
+| \`heatmap\` | 36,436 | 12,305 | 10,805 | 5,807 | 2,480 | 1,577 |
+| \`icon\` | 71,658 | 24,290 | 20,169 | 1,908 | 933 | 498 |
+| \`icon-button\` | 42,768 | 13,935 | 12,142 | 15,861 | 5,162 | 4,043 |
+| \`image\` | 32,437 | 11,208 | 9,786 | 7,399 | 2,994 | 2,025 |
+| \`input\` | 100,170 | 33,371 | 27,720 | 24,264 | 8,213 | 6,697 |
+| \`kbd\` | 32,087 | 11,420 | 10,006 | 7,092 | 3,174 | 2,278 |
+| \`legend\` | 39,288 | 13,389 | 11,624 | 12,017 | 4,360 | 3,259 |
+| \`line-chart\` | 108,112 | 35,865 | 31,448 | 50,415 | 16,274 | 13,202 |
+| \`list\` | 42,539 | 14,585 | 12,747 | 17,193 | 6,199 | 5,060 |
+| \`listbox\` | 102,077 | 33,956 | 28,054 | 24,260 | 8,084 | 6,378 |
+| \`loader\` | 36,469 | 12,733 | 11,106 | 11,109 | 4,292 | 3,373 |
+| \`megamenu\` | 74,706 | 26,142 | 23,080 | 25,883 | 9,236 | 7,526 |
+| \`menu\` | 125,687 | 42,672 | 36,069 | 27,783 | 8,923 | 7,130 |
+| \`meter\` | 43,938 | 14,771 | 12,879 | 18,583 | 6,353 | 5,188 |
+| \`navigation\` | 30,237 | 10,384 | 9,099 | 3,809 | 1,636 | 937 |
+| \`notifications\` | 40,323 | 12,998 | 11,426 | 12,887 | 4,153 | 2,981 |
+| \`number-input\` | 99,181 | 33,177 | 27,540 | 23,439 | 8,065 | 6,399 |
+| \`option\` | 38,158 | 13,201 | 11,524 | 12,807 | 4,841 | 3,758 |
+| \`outline\` | 42,473 | 14,409 | 12,577 | 15,997 | 5,729 | 4,457 |
+| \`pagination\` | 180,820 | 56,452 | 48,072 | 79,331 | 22,157 | 18,665 |
+| \`pin-input\` | 46,845 | 15,486 | 13,520 | 16,341 | 6,102 | 4,712 |
+| \`popover\` | 60,643 | 21,594 | 19,008 | 11,571 | 4,564 | 3,491 |
+| \`progress\` | 44,706 | 15,446 | 13,453 | 19,351 | 7,009 | 5,751 |
+| \`qr-code\` | 42,395 | 15,110 | 13,280 | 17,425 | 6,855 | 5,560 |
+| \`quote\` | 26,948 | 9,370 | 8,223 | 1,956 | 1,022 | 549 |
+| \`radio\` | 59,255 | 18,947 | 16,510 | 27,211 | 8,993 | 7,300 |
+| \`rating\` | 44,768 | 14,920 | 13,100 | 13,220 | 5,133 | 3,850 |
+| \`sandbox\` | 81,473 | 24,723 | 21,546 | 56,093 | 16,296 | 13,573 |
+| \`scroll-area\` | 33,202 | 11,223 | 9,810 | 8,159 | 2,993 | 2,038 |
+| \`select\` | 155,036 | 50,252 | 42,630 | 53,672 | 15,893 | 13,228 |
+| \`skeleton\` | 29,228 | 10,207 | 8,922 | 4,235 | 1,902 | 1,249 |
+| \`slider\` | 71,095 | 22,011 | 19,097 | 40,343 | 12,461 | 10,220 |
+| \`sparkline\` | 49,364 | 17,577 | 15,399 | 21,064 | 7,902 | 6,584 |
+| \`speed-dial\` | 114,161 | 38,916 | 32,973 | 19,408 | 6,150 | 4,870 |
+| \`splitter\` | 54,543 | 17,334 | 15,244 | 29,190 | 8,893 | 7,379 |
+| \`stat\` | 34,247 | 11,845 | 10,361 | 8,894 | 3,441 | 2,564 |
+| \`steps\` | 111,189 | 35,889 | 30,031 | 38,063 | 11,348 | 9,490 |
+| \`switch\` | 47,576 | 15,603 | 13,658 | 16,964 | 6,139 | 4,859 |
+| \`table\` | 40,500 | 13,192 | 11,527 | 13,825 | 4,653 | 3,485 |
+| \`tabs\` | 50,970 | 16,534 | 14,455 | 22,411 | 7,203 | 5,776 |
+| \`tag\` | 84,093 | 29,151 | 24,298 | 13,514 | 5,460 | 4,379 |
+| \`text\` | 31,489 | 10,610 | 9,271 | 6,504 | 2,381 | 1,660 |
+| \`textarea\` | 45,879 | 14,956 | 13,028 | 14,889 | 5,438 | 4,226 |
+| \`time-input\` | 194,994 | 61,193 | 52,366 | 92,804 | 26,942 | 22,843 |
+| \`time-picker\` | 135,059 | 43,490 | 36,473 | 57,260 | 17,642 | 14,665 |
+| \`timeline\` | 80,873 | 27,362 | 22,881 | 10,765 | 3,929 | 3,118 |
+| \`toast\` | 100,584 | 33,767 | 28,286 | 29,387 | 9,761 | 8,104 |
+| \`toggle\` | 58,976 | 19,455 | 16,994 | 25,500 | 9,006 | 7,366 |
+| \`toolbar\` | 29,864 | 10,383 | 9,088 | 4,872 | 2,273 | 1,374 |
+| \`tooltip\` | 66,718 | 23,328 | 20,518 | 17,579 | 6,308 | 4,883 |
+| \`tour\` | 82,825 | 27,031 | 23,832 | 33,160 | 9,856 | 8,057 |
+| \`tree\` | 103,084 | 34,865 | 29,108 | 28,753 | 9,953 | 8,228 |
+| \`trend\` | 77,447 | 26,289 | 21,963 | 7,710 | 2,930 | 2,133 |
+| \`video\` | 180,040 | 56,972 | 48,846 | 81,882 | 23,195 | 19,897 |
+| \`video-playlist\` | 147,222 | 47,963 | 40,822 | 47,994 | 13,852 | 11,502 |
+| \`virtual-list\` | 31,592 | 11,148 | 9,739 | 4,777 | 2,323 | 1,484 |
 
 ## What lands in \`node_modules\`
 
@@ -2080,12 +2102,12 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@helix-io/core\` | 815,095 | 105 | 145,800 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 8,099,284 | 420 | 692,326 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/core\` | 825,359 | 105 | 145,414 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
+| \`@helix-io/headless\` | 8,794,068 | 420 | 689,355 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 79,995 | 5 | 0 | none |
 | \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
-| \`@helix-io/styled\` | 8,753,307 | 711 | 290,239 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/styled\` | 9,479,095 | 711 | 291,003 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 
@@ -2214,12 +2236,13 @@ element.items = tabs
 \`\`\`
 
 **Events bind with \`addEventListener\`, and the name is the event's own.** Helix
-events are \`helix-open\`, \`helix-change\`, \`helix-input\` and so on: lowercase,
+events are \`helix-before-open\`, \`helix-before-change\`, \`helix-select\` and so on:
+lowercase,
 hyphenated, no camel-case variant. Whatever your framework's \`on*\` syntax is, it
 should end up passing that string through.
 
 \`\`\`js
-element.addEventListener('helix-change', (event) => console.log(event.detail))
+element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 \`\`\`
 
 **A declared \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.**
@@ -2234,9 +2257,9 @@ its own state. This is the rule most likely to look like a bug, and
 |---|---|
 | Solid | Sets properties on custom elements by default. Use \`prop:\` to force one and \`attr:\` to force the other. \`on:helix-change\` binds the literal name |
 | Qwik | Works as JSX. Bind with \`document:on…\` or a ref, since a plain \`on*\` prop is normalized |
-| Lit | \`.prop=\`, \`?bool=\` and \`@helix-change=\` are already the right three channels |
+| Lit | \`.prop=\`, \`?bool=\` and \`@helix-before-change=\` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
-| Alpine, htmx | Markup and attributes only, which reaches every uncontrolled component. A controlled one needs script |
+| Alpine, htmx | Markup and attributes only, which reaches every component. Refusing a change needs script |
 
 Nothing here is tested by us, which is the honest reason it is one page. If your
 framework needs something the three rules above do not cover, that is worth
@@ -2308,8 +2331,8 @@ tree is reported as the element containing that tree, so a naive "is focus still
 inside me" check never matches and closes the overlay the moment anything inside
 it is focused. Every dismissal path here walks through the roots instead.
 
-**Nesting works because lifecycle events do not bubble.** \`helix-open\` and
-\`helix-close\` are neither bubbling nor composed, so a menu closing inside a
+**Nesting works because lifecycle events do not bubble.** \`helix-before-open\` and
+\`helix-before-close\` are neither bubbling nor composed, so a menu closing inside a
 dialog is not the dialog closing. \`Escape\` closes the innermost overlay and
 leaves the rest.
 
@@ -2328,7 +2351,7 @@ something with a button in it, that is a \`Popover\`.
 The close is announced before it happens:
 
 \`\`\`ts
-dialog.addEventListener('helix-close', (event) => {
+dialog.addEventListener('helix-before-close', (event) => {
   if (unsaved) {
     event.preventDefault()
   }
@@ -2524,7 +2547,7 @@ escape hatch: \`helix-headless-select\` is a registered element, not an abstract
 class.
 `,
   react: `---
-description: The typings, the hydration bridge, and the controlled-property constraint.
+description: The typings, the hydration bridge, and how state moves.
 parent: installation
 section: Getting started
 title: React
@@ -2547,7 +2570,7 @@ component does not accept is a compile error rather than a runtime shrug.
 ## Bind events with \`onhelix-*\`
 
 \`\`\`tsx
-<helix-accordion-item onhelix-open={(event) => track(event.detail.open)} />
+<helix-accordion-item onhelix-before-open={(event) => track(event.detail.open)} />
 \`\`\`
 
 The prop is \`on\` and the event name, verbatim. Not \`onHelixOpen\`, not \`onOpen\`.
@@ -2579,28 +2602,40 @@ it is a compile error rather than a surprise at runtime:
 <helix-input label="Name" value="Ada" />
 \`\`\`
 
-In React, \`value\` on a native \`<input>\` without \`onChange\` is a warning. In
-Helix it is a type error, and for the same underlying reason stated more
-strictly: **writing a controlled property hands ownership to you.** From then on
-the element announces changes and applies none of them. A consumer who meant to
-seed a value gets a control that ignores every keystroke, with nothing logged
-and nothing visibly wrong.
-
-Two ways to write it, depending on which you meant:
+In React, \`value\` on a native \`<input>\` without \`onChange\` renders a read-only
+field and warns. **A Helix element is not read-only**: \`value\` is a seed and the
+element goes on applying its own changes, so the markup below works and needs no
+handler beside it.
 
 \`\`\`tsx
-// Controlled: you own it, so you answer it.
-<helix-input label="Name" onhelix-input={(event) => setName(event.detail.value)} value={name} />
-
-// Uncontrolled: the element owns it, and you say where it starts.
+// Seeded: the element owns it from there.
 <helix-input default-value="Ada" label="Name" />
+
+// Mirrored: bind the notification and let the element apply.
+<helix-input label="Name" onChange={(event) => setName(event.currentTarget.value)} />
+
+// Refused: you take the decision for this one change.
+<helix-input
+  label="Name"
+  onhelix-before-change={(event) => {
+    event.preventDefault()
+    setName(clean(event.detail.value))
+  }}
+  value={name}
+/>
 \`\`\`
 
-The constraint is generated from the manifest and covers every controlled
-property in the library. It is regression tested in both directions, so an error
-here is real and an absent one means you answered.
+**The one habit to unlearn is refusing by not answering.** React force-restores
+a native \`<input>\` whose state did not move and does not do this for a custom
+element, so a handler that declines to call \`setState\` leaves the element
+holding the new value. \`preventDefault()\` is the refusal.
 
-See [State and control](./state-and-control) for what the two modes actually do.
+*Until 26 Aug 2026 this page described the opposite, and the typings enforced
+it: writing \`value\` was a claim of ownership, the element applied nothing until
+told, and \`<helix-input value="Ada" />\` was a compile error without an answering
+handler. The constraint is deleted along with the mode.*
+
+See [State and control](./state-and-control) for the whole of it.
 
 ## Register in a client component
 
@@ -3002,7 +3037,7 @@ document the page cannot reach into and which cannot reach back out.
 
 ## Coordination is by event
 
-A source pane dispatches \`helix-change\`, which bubbles, and the sandbox hands
+A source pane dispatches \`helix-before-edit\`, which bubbles, and the sandbox hands
 the value to whatever preview is slotted into it. Neither child knows the other
 exists, so either can be replaced or used alone.
 
@@ -3407,124 +3442,64 @@ usually a sign the two things being separated belong at different levels of the
 layout.
 `,
   'state-and-control': `---
-description: Why writing a property hands the element to you, and what to write instead.
+description: Why a declared property is a seed, and how to take a decision when you want it.
 section: Essentials
 title: State and control
 ---
 
 # State and control
 
-**A declared property is a claim of ownership.** Write \`value\`, \`open\`,
-\`checked\` or \`active\` on a Helix element and the element stops applying its own
-changes: from then on it announces what happened and waits to be told what to
-do.
-
-That is one rule, it covers thirty-odd families, and it is the single thing
-about this library most likely to look like a bug.
-
-\`\`\`text
-<!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
-<helix-input label="Name" value="Ada"></helix-input>
-\`\`\`
-
-Do not paste it. It is plain text rather than a live example because a reader
-copies what is in front of them, and this is the one page that has to show the
-mistake in order to name it.
-
-## The two modes
-
-Every controlled property comes in a pair.
-
-| Uncontrolled | Controlled |
-|---|---|
-| \`default-value\`, \`default-open\`, \`default-checked\`, \`default-active\` | \`value\`, \`open\`, \`checked\`, \`active\` |
-| The element owns the state and moves it | You own the state and move it |
-| The element announces, and applies | The element announces, and waits |
-
-**Which mode an element is in is read once, at its first update**, from whether
-anything had set the controlled property by then. Markup, a hydrating server's
-attributes and a framework's initial properties have all arrived by that point
-and nothing else has happened yet, so the reading is stable. Set, and you own
-it. Unset, and the element does, and the \`default-\` property says where it
-starts.
-
-Reading is the same in both modes. \`dialog.open\` answers the question anyone
-asking it meant, whichever mode the dialog is in, which is why there is one
-property rather than an \`isOpen\` beside it: there is no such second word for a
-value or an active item, so all four of these have the same shape instead of
-four shapes.
-
-## Controlled, written correctly
-
-\`\`\`tsx
-<helix-input
-  label="Name"
-  onhelix-input={(event) => setName(event.detail.value)}
-  value={name}
-/>
-\`\`\`
-
-\`\`\`tsx
-<helix-dialog
-  label="Confirm"
-  onhelix-close={() => setOpen(false)}
-  open={open}
-/>
-\`\`\`
-
-The event is what carries the request. Answer it by moving your own state, and
-the element renders what you hand back.
-
-## Uncontrolled
+**A declared property is a seed and a correction.** Write \`value\`, \`open\`,
+\`checked\` or \`active\` on a Helix element and it starts there and goes on
+managing itself, exactly as \`<input value="Ada">\` does.
 
 \`\`\`html
 <helix-input
-  default-value="Ada"
   label="Name"
+  value="Ada"
 ></helix-input>
-<helix-accordion-item default-open>…</helix-accordion-item>
 \`\`\`
 
-Nothing to wire. Read the value off the element or off the form when you need
-it, and let it manage itself in between.
+That works. Type in it and the value moves. Assign to it later and the value
+moves to what you assigned. There is no mode to be in and nothing to wire before
+the control responds.
 
-**Reach for controlled when something outside the element decides the state**:
-two controls that have to agree, a value that comes from a route, a dialog whose
-open state is in a store. Not by default, and not because it feels more
-explicit.
+*This page said the opposite until 26 Aug 2026, and the sample above was printed
+as plain text with an instruction not to paste it. Writing a property was a
+claim of ownership, so the element announced its changes and applied none of
+them until it was told, and that markup produced a field that ignored every
+keystroke with nothing logged and nothing visibly wrong.*
 
-## State is on the host as \`data-\`
+## Taking a decision
 
-\`\`\`css
-helix-accordion-item[data-open] { … }
-\`\`\`
-
-\`open\` is not reflected, and that is required rather than tidy. Reflection would
-write the resolved state back as an attribute, and writing the attribute is how
-a consumer claims ownership: an uncontrolled element that opened itself would
-put \`open\` on its own host and, to anything that read it next, be
-indistinguishable from one you control. Cloned, serialised for hydration, or
-diffed by a framework, it would come back controlled and stop responding.
-
-So \`data-open\` carries the resolved state for stylesheets, in both modes, and
-the plain attribute stays yours to write.
-
-## Refusing a change
-
-Every controlled change announces before it acts, and the announcement is
-cancelable:
+Control is an action rather than a mode. Every change announces before it acts,
+and the announcement is cancelable:
 
 \`\`\`ts
-item.addEventListener('helix-open', (event) => {
-  if (unsaved) {
+input.addEventListener('helix-before-change', (event) => {
+  if (locked) {
     event.preventDefault()
   }
 })
 \`\`\`
 
-\`preventDefault()\` refuses the change and nothing moves. This is the only way to
-refuse one. Which events are cancelable is on each component's page, and every
-one that is says so.
+\`preventDefault()\` refuses that one change and nothing moves. To own the state
+outright, refuse and assign your own:
+
+\`\`\`tsx
+<helix-input
+  label="Name"
+  onhelix-before-change={(event) => {
+    event.preventDefault()
+    setName(sanitize(event.detail.value))
+  }}
+  value={name}
+/>
+\`\`\`
+
+This is the same shape the platform uses everywhere else: \`preventDefault()\` on
+a form submit, on a link click, on \`beforeinput\`. Nothing is declared in advance
+and nothing is inferred from which properties you happened to set.
 
 The imperative form reports the same thing:
 
@@ -3532,30 +3507,57 @@ The imperative form reports the same thing:
 const applied = item.requestOpen(true)
 \`\`\`
 
-\`false\` means something refused it, or that you own the state and nothing has
-answered yet.
+\`false\` means something refused it.
 
-## What catches the mistake
+## Mirroring the state instead
 
-**In TypeScript, the constraint is a compile error.** The types intersect every
-controlled tag with a union that requires an answering handler, so \`<helix-input
-value="Ada" />\` does not compile. The constraint is generated, and regression
-tested in both directions, so an error here is real and an absent one means you
-answered.
+Most consumers want neither of the above. Bind the notification and let the
+element apply:
 
-**At runtime, the control says so on the console.** A controlled element that
-asks for something and gets no answer warns once, naming itself and the
-property. It is judged on the second unanswered request rather than on a timer,
-which matters: an earlier version waited one task, on the reasoning that React
-commits a \`setState\` from a handler before the next one. True of React, false of
-anything slower, and a consumer answering by navigating was accused of not
-listening. A warning that is sometimes wrong is one people learn to ignore, and
-this one has to be believed the day it is right.
+\`\`\`tsx
+<helix-input label="Name" onChange={(event) => setName(event.currentTarget.value)} />
+\`\`\`
 
-So there is no deadline: if the state has not moved between two requests, nothing
-answered either of them, whatever the timing. A control asked once and never again
-is never accused, which is the right trade, because the symptom this exists for is
-a control that ignores everything.
+\`\`\`html
+<helix-input
+  label="Name"
+  onchange="save(this.value)"
+></helix-input>
+\`\`\`
+
+The native event carries no detail because it does not need one: the element has
+already applied the change by the time it fires, so the value is on the target
+where every handler ever written expects to find it.
+
+## \`default-\` still means something
+
+\`\`\`html
+<helix-input
+  default-value="Ada"
+  label="Name"
+></helix-input>
+\`\`\`
+
+\`default-value\` is what a reset returns to. \`value\` is where the control is now.
+The pair is the platform's, where a native input reflects its \`value\` *content
+attribute* to \`defaultValue\` and carries a dirty flag that stops the attribute
+affecting the value once a reader has typed.
+
+## State is on the host as \`data-\`
+
+\`\`\`css
+helix-accordion-item[data-open] { … }
+\`\`\`
+
+\`open\` is not reflected, and neither is \`value\`. A payload written back as an
+attribute leaks whatever the last reader typed into the markup, so a serialized
+host comes back holding their text rather than the author's seed, with no way to
+tell the two apart. \`helix-input\` takes \`type="password"\`, which a reflected
+\`value\` would carry straight past every session-replay masker that knows to mask
+\`.value\` and \`input[value]\`.
+
+So \`data-open\` and \`data-checked\` carry the resolved boolean for stylesheets,
+and the plain attribute stays what you wrote.
 `,
   'surfaces-and-separation': `---
 description: The four ways a surface is told apart, and the ground a component is not.
@@ -3672,14 +3674,14 @@ import '@helix-io/styled/svelte'
 
 A types-only import, once. It augments \`SvelteHTMLElements\` so every Helix tag
 is typed in a component, and it does so by re-exporting the JSX types rather
-than emitting a second copy: Svelte binds a handler as \`onhelix-input={…}\`,
+than emitting a second copy: Svelte binds a handler as \`onhelix-before-change={…}\`,
 which is the shape those types already describe, and two generated copies of one
 thing are two things that can disagree.
 
 ## Nothing else to configure
 
 \`\`\`svelte
-<helix-input label="Name" onhelix-input={(event) => (name = event.detail.value)} value={name} />
+<helix-input label="Name" onchange={(event) => (name = event.target.value)} value={name} />
 \`\`\`
 
 Svelte sets a property when the element has one and an attribute otherwise, and
@@ -4325,7 +4327,7 @@ Seed with the \`default-\` twin, or answer the event:
 \`\`\`
 
 \`\`\`tsx
-<helix-input label="Name" onhelix-input={(e) => setName(e.detail.value)} value={name} />
+<helix-input label="Name" onChange={(e) => setName(e.currentTarget.value)} value={name} />
 \`\`\`
 
 In TypeScript this is a compile error rather than a surprise. Everywhere else the
@@ -4333,13 +4335,13 @@ element warns on its second unanswered request.
 
 ### 2. The event name is the event's own
 
-\`onhelix-open\`, not \`onHelixOpen\` and not \`onOpen\`. React slices \`on\` off the
+\`onhelix-before-open\`, not \`onHelixOpen\` and not \`onOpen\`. React slices \`on\` off the
 prop and listens for exactly what is left, so the casing is not negotiable. From
-anything that is not React, \`addEventListener('helix-open', …)\`.
+anything that is not React, \`addEventListener('helix-before-open', …)\`.
 
-**Lifecycle does not bubble and coordination does.** \`helix-open\` and
-\`helix-close\` reach the element and stop, so a menu closing inside a dialog is
-not the dialog closing; \`helix-select\`, \`helix-change\` and \`helix-dismiss\` cross
+**Lifecycle does not bubble and coordination does.** \`helix-before-open\` and
+\`helix-before-close\` reach the element and stop, so a menu closing inside a dialog is
+not the dialog closing; \`helix-select\`, \`helix-before-change\` and \`helix-dismiss\` cross
 shadow boundaries and can be caught on a container. If a listener on a wrapper
 hears nothing, it is a lifecycle event and belongs on the element.
 
@@ -4510,7 +4512,7 @@ advice.
 ## Bind Helix events with \`onhelix-*\`
 
 \`\`\`tsx
-<helix-tabs onhelix-change={(event) => setPane(event.detail.value)} />
+<helix-tabs onhelix-before-activate={(event) => setPane(event.detail.value)} />
 \`\`\`
 
 There is a real bug underneath this, and the elements work around it for you.
@@ -4541,7 +4543,7 @@ Video) reach nothing React sets up. The elements bind those for you, so
 React slices \`on\` off the prop and listens for exactly what is left, without
 inspecting it.
 
-- \`onhelix-open\` reaches \`helix-open\`. ✅
+- \`onhelix-before-open\` reaches \`helix-before-open\`. ✅
 - \`onhelix-sample-start\` reaches \`helix-sample-start\`. ✅
 - \`onHelixOpen\` binds an event called \`HelixOpen\`, which nobody dispatches. ❌
 
@@ -4800,10 +4802,10 @@ otherwise, which is exactly right for these: a string goes through either path
 and an array or an object goes through the property.
 
 \`\`\`vue
-<helix-tabs :items="items" @helix-change="onChange" />
+<helix-tabs :items="items" @helix-before-activate="onActivate" />
 \`\`\`
 
-\`@helix-change\` binds with \`addEventListener\`, so the name is the event's own.
+\`@helix-before-activate\` binds with \`addEventListener\`, so the name is the event's own.
 Vue is the framework this works most quietly in, which is why this page is
 short: there is no bridge and no wrapper, only the compiler setting above.
 
@@ -4816,19 +4818,25 @@ string would be ambiguous:
 
 Rarely necessary, and it exists so you do not go looking for it.
 
-## The controlled-property rule still applies
+## Seeding, mirroring and refusing
 
-\`value\`, \`open\`, \`checked\` and \`active\` are claims of ownership in Helix, and
-declaring one without answering it gives you a control that ignores input. Vue
-has no type-level constraint for this the way the React types do, so read
-[State and control](./state-and-control) before writing a form.
+\`value\`, \`open\`, \`checked\` and \`active\` are seeds. The element applies its own
+changes from there, so all three of these work. See [State and
+control](./state-and-control).
 
 \`\`\`vue
-<!-- Uncontrolled: the element owns it. -->
+<!-- Seeded: the element owns it from there. -->
 <helix-input default-value="Ada" label="Name" />
 
-<!-- Controlled: you own it, so you answer it. -->
-<helix-input :value="name" label="Name" @helix-input="name = $event.detail.value" />
+<!-- Mirrored: bind the notification and let the element apply. -->
+<helix-input label="Name" @change="name = $event.target.value" />
+
+<!-- Refused: you take the decision for this one change. -->
+<helix-input
+  :value="name"
+  label="Name"
+  @helix-before-change="$event.preventDefault(); name = clean($event.detail.value)"
+/>
 \`\`\`
 `,
   'without-a-bundler': `---
@@ -4914,9 +4922,10 @@ import '@helix-io/styled/dialog'
 Each still pulls its own dependencies, so this is a reduction rather than a
 minimum, but for a page using five components it is a large one.
 
-**No TypeScript, so no controlled-property constraint.** The type error that
-catches \`value\` without a handler is a compile-time thing, and there is no
-compile. The rule still applies, silently: see [State and
+**No TypeScript, so no typings.** A misspelled property is silent here where it
+is a compile error in React, Vue and Svelte, which is worth a note in review.
+Nothing else about writing Helix changes: a declared property is a seed and the
+element applies its own changes. See [State and
 control](./state-and-control).
 
 ## The stylesheets are the same

@@ -50,8 +50,15 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * `me` and `them` are the conventional values and the stylesheet knows them;
    * anything else is a name the consumer styles.
    */
+  /* **No initialiser, because a reflected default is an attribute.**
+     `check:reflected-defaults` permits an empty string on the stated grounds
+     that it "writes nothing", which is measurably untrue: Lit writes
+     `author=""`, and a consumer who server-renders this gets an attribute React
+     never sent. Undefined reflects nothing at all, which is what the resting
+     state should be. The stylesheet only ever selects `[author="me"]`, so
+     nothing downstream moves. */
   @property({ reflect: true })
-  author = ''
+  author?: string
 
   /**
    * What has happened to it.
@@ -60,8 +67,11 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * has no other way to know. Empty is a settled message with nothing to report,
    * which is what most of a transcript is.
    */
+  /* The same, and for the same reason. Empty was "a settled message with
+     nothing to report", which is the resting state and so is the absence of the
+     attribute rather than a value of it. */
   @property({ reflect: true })
-  state: '' | 'failed' | 'sending' | 'sent' | 'streaming' = ''
+  state?: 'failed' | 'sending' | 'sent' | 'streaming'
 
   /** When it was said, as anything `Date` parses. */
   @property()

@@ -9,9 +9,14 @@ import type {
   HelixAvatarGroup,
   HelixBadge,
   HelixBarChart,
+  HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
+  HelixBeforeCollapseEvent,
+  HelixBeforeEditEvent,
   HelixBeforeOpenEvent,
+  HelixBeforePinEvent,
+  HelixBeforeResizeEvent,
   HelixBeforeToggleEvent,
   HelixBlockquote,
   HelixBreadcrumb,
@@ -22,7 +27,6 @@ import type {
   HelixCard,
   HelixCaretEvent,
   HelixCarousel,
-  HelixChangeEvent,
   HelixChat,
   HelixChatComposer,
   HelixChatMessage,
@@ -2803,9 +2807,9 @@ which is what most of a transcript is. */
 
 /** `HelixChat` component event */
 export type HelixChatElementEvent<E = Event> = TypedEvent<HelixChat, E>;
-/** `helix-change` event type */
-export type HelixChatHelixChangeElementEvent =
-  HelixChatElementEvent<HelixChangeEvent>;
+/** `helix-before-pin` event type */
+export type HelixChatHelixBeforePinElementEvent =
+  HelixChatElementEvent<HelixBeforePinEvent>;
 
 export type HelixChatProps = {
   /** Whether the rows are still on their way.
@@ -2854,7 +2858,7 @@ it. Measured rather than assumed: `label, pinned` after upgrade against
   defaultPinned?: HelixChat["defaultPinned"];
 
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
-  "onhelix-change"?: (e: HelixChatHelixChangeElementEvent) => void;
+  "onhelix-before-pin"?: (e: HelixChatHelixBeforePinElementEvent) => void;
 };
 
 export type HelixChatSolidJsProps = {
@@ -2903,7 +2907,7 @@ it. Measured rather than assumed: `label, pinned` after upgrade against
   /** Whether to open pinned, where nothing declared it. */
   "prop:defaultPinned"?: HelixChat["defaultPinned"];
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
-  "on:helix-change"?: (e: HelixChatHelixChangeElementEvent) => void;
+  "on:helix-before-pin"?: (e: HelixChatHelixBeforePinElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9552,9 +9556,9 @@ fact about what pressing a key would do, which is what a description is. */
 
 /** `HelixOutline` component event */
 export type HelixOutlineElementEvent<E = Event> = TypedEvent<HelixOutline, E>;
-/** `helix-change` event type */
-export type HelixOutlineHelixChangeElementEvent =
-  HelixOutlineElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixOutlineHelixBeforeActivateElementEvent =
+  HelixOutlineElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixOutlineProps = {
   /** Accessible name for the navigation. */
@@ -9587,7 +9591,9 @@ JavaScript rather than CSS decides. */
   behavior?: HelixOutline["behavior"];
 
   /** The section being read has changed, carrying its id as the value. */
-  "onhelix-change"?: (e: HelixOutlineHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixOutlineHelixBeforeActivateElementEvent,
+  ) => void;
 };
 
 export type HelixOutlineSolidJsProps = {
@@ -9620,7 +9626,9 @@ the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   "prop:behavior"?: HelixOutline["behavior"];
   /** The section being read has changed, carrying its id as the value. */
-  "on:helix-change"?: (e: HelixOutlineHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixOutlineHelixBeforeActivateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9926,9 +9934,9 @@ export type HelixPaginationSizeElementEvent<E = Event> = TypedEvent<
   HelixPaginationSize,
   E
 >;
-/** `helix-change` event type */
-export type HelixPaginationSizeHelixChangeElementEvent =
-  HelixPaginationSizeElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixPaginationSizeHelixBeforeChangeElementEvent =
+  HelixPaginationSizeElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixPaginationSizeProps = {
   /** The sizes offered, comma separated.
@@ -9953,7 +9961,9 @@ Reading gives the real one; writing declares it the consumer's, and
   locale?: HelixPaginationSize["locale"];
 
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixPaginationSizeHelixChangeElementEvent) => void;
+  "onhelix-before-change"?: (
+    e: HelixPaginationSizeHelixBeforeChangeElementEvent,
+  ) => void;
 };
 
 export type HelixPaginationSizeSolidJsProps = {
@@ -9978,7 +9988,9 @@ Reading gives the real one; writing declares it the consumer's, and
   /** Locale for the numbers. Absent uses the runtime's own. */
   "prop:locale"?: HelixPaginationSize["locale"];
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixPaginationSizeHelixChangeElementEvent) => void;
+  "on:helix-before-change"?: (
+    e: HelixPaginationSizeHelixBeforeChangeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11385,9 +11397,9 @@ including every one of the 24 series colours a chart reads. */
 
 /** `HelixSandbox` component event */
 export type HelixSandboxElementEvent<E = Event> = TypedEvent<HelixSandbox, E>;
-/** `helix-change` event type */
-export type HelixSandboxHelixChangeElementEvent =
-  HelixSandboxElementEvent<HelixChangeEvent>;
+/** `helix-before-resize` event type */
+export type HelixSandboxHelixBeforeResizeElementEvent =
+  HelixSandboxElementEvent<HelixBeforeResizeEvent>;
 
 export type HelixSandboxProps = {
   /** Whether the panes sit side by side or stacked. */
@@ -11472,7 +11484,9 @@ and only whoever slotted it knows how tall that is. */
   separatorLabel?: HelixSandbox["separatorLabel"];
 
   /** Fired when a divider is let go, with the new arrangement. */
-  "onhelix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
+  "onhelix-before-resize"?: (
+    e: HelixSandboxHelixBeforeResizeElementEvent,
+  ) => void;
 };
 
 export type HelixSandboxSolidJsProps = {
@@ -11557,7 +11571,9 @@ and only whoever slotted it knows how tall that is. */
   /** Accessible name for the divider. */
   "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
   /** Fired when a divider is let go, with the new arrangement. */
-  "on:helix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
+  "on:helix-before-resize"?: (
+    e: HelixSandboxHelixBeforeResizeElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11573,14 +11589,14 @@ export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
 /** `helix-caret` event type */
 export type HelixSandboxSourceHelixCaretElementEvent =
   HelixSandboxSourceElementEvent<HelixCaretEvent>;
-/** `helix-change` event type */
-export type HelixSandboxSourceHelixChangeElementEvent =
-  HelixSandboxSourceElementEvent<HelixChangeEvent>;
+/** `helix-before-edit` event type */
+export type HelixSandboxSourceHelixBeforeEditElementEvent =
+  HelixSandboxSourceElementEvent<HelixBeforeEditEvent>;
 
 export type HelixSandboxSourceProps = {
   /** The source being edited. */
   value?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `helix-change`.
+  /** Which source this pane holds, echoed in every `helix-before-edit`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
 passed through untouched for a consumer wiring their own panes.
@@ -11599,13 +11615,15 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   /** Fired when the cursor moves. */
   "onhelix-caret"?: (e: HelixSandboxSourceHelixCaretElementEvent) => void;
   /** Fired when the source is edited. */
-  "onhelix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
+  "onhelix-before-edit"?: (
+    e: HelixSandboxSourceHelixBeforeEditElementEvent,
+  ) => void;
 };
 
 export type HelixSandboxSourceSolidJsProps = {
   /** The source being edited. */
   "prop:value"?: HelixSandboxSource["value"];
-  /** Which source this pane holds, echoed in every `helix-change`.
+  /** Which source this pane holds, echoed in every `helix-before-edit`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
 passed through untouched for a consumer wiring their own panes.
@@ -11623,7 +11641,9 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
   /** Fired when the cursor moves. */
   "on:helix-caret"?: (e: HelixSandboxSourceHelixCaretElementEvent) => void;
   /** Fired when the source is edited. */
-  "on:helix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
+  "on:helix-before-edit"?: (
+    e: HelixSandboxSourceHelixBeforeEditElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12660,9 +12680,12 @@ bottom of the window and there is nothing below it to fan into. */
 
 /** `HelixSplitter` component event */
 export type HelixSplitterElementEvent<E = Event> = TypedEvent<HelixSplitter, E>;
-/** `helix-change` event type */
-export type HelixSplitterHelixChangeElementEvent =
-  HelixSplitterElementEvent<HelixChangeEvent>;
+/** `helix-before-resize` event type */
+export type HelixSplitterHelixBeforeResizeElementEvent =
+  HelixSplitterElementEvent<HelixBeforeResizeEvent>;
+/** `helix-before-collapse` event type */
+export type HelixSplitterHelixBeforeCollapseElementEvent =
+  HelixSplitterElementEvent<HelixBeforeCollapseEvent>;
 
 export type HelixSplitterProps = {
   /** Whether the divider carries a grip.
@@ -12776,8 +12799,14 @@ passes through. */
   /** Accessible name for the handle where two dividers cross. */
   cornerLabel?: HelixSplitter["cornerLabel"];
 
-  /** Fired when the divider settles, named `position` or `collapsed`. */
-  "onhelix-change"?: (e: HelixSplitterHelixChangeElementEvent) => void;
+  /** Fired before the divider settles, and cancelable. */
+  "onhelix-before-resize"?: (
+    e: HelixSplitterHelixBeforeResizeElementEvent,
+  ) => void;
+  /** Fired before a pane shuts or reopens, and cancelable. */
+  "onhelix-before-collapse"?: (
+    e: HelixSplitterHelixBeforeCollapseElementEvent,
+  ) => void;
 };
 
 export type HelixSplitterSolidJsProps = {
@@ -12891,8 +12920,14 @@ passes through. */
   "attr:corner-label"?: HelixSplitter["cornerLabel"];
   /** Accessible name for the handle where two dividers cross. */
   "prop:cornerLabel"?: HelixSplitter["cornerLabel"];
-  /** Fired when the divider settles, named `position` or `collapsed`. */
-  "on:helix-change"?: (e: HelixSplitterHelixChangeElementEvent) => void;
+  /** Fired before the divider settles, and cancelable. */
+  "on:helix-before-resize"?: (
+    e: HelixSplitterHelixBeforeResizeElementEvent,
+  ) => void;
+  /** Fired before a pane shuts or reopens, and cancelable. */
+  "on:helix-before-collapse"?: (
+    e: HelixSplitterHelixBeforeCollapseElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12976,9 +13011,9 @@ being the one that asserts the host carries nothing nobody wrote. */
 
 /** `HelixSteps` component event */
 export type HelixStepsElementEvent<E = Event> = TypedEvent<HelixSteps, E>;
-/** `helix-change` event type */
-export type HelixStepsHelixChangeElementEvent =
-  HelixStepsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixStepsHelixBeforeActivateElementEvent =
+  HelixStepsElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixStepsProps = {
   /** Which item is current, by its `value`.
@@ -13029,7 +13064,9 @@ a reader is told to come back to by number. */
   variant?: HelixSteps["variant"];
 
   /** Fired when the active step changes. */
-  "onhelix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixStepsHelixBeforeActivateElementEvent,
+  ) => void;
 };
 
 export type HelixStepsSolidJsProps = {
@@ -13080,7 +13117,9 @@ order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
   "prop:variant"?: HelixSteps["variant"];
   /** Fired when the active step changes. */
-  "on:helix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixStepsHelixBeforeActivateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13551,9 +13590,9 @@ pattern names one anyway. */
 
 /** `HelixTabs` component event */
 export type HelixTabsElementEvent<E = Event> = TypedEvent<HelixTabs, E>;
-/** `helix-change` event type */
-export type HelixTabsHelixChangeElementEvent =
-  HelixTabsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTabsHelixBeforeActivateElementEvent =
+  HelixTabsElementEvent<HelixBeforeActivateEvent>;
 /** `helix-select` event type */
 export type HelixTabsHelixSelectElementEvent =
   HelixTabsElementEvent<HelixSelectEvent>;
@@ -13611,7 +13650,9 @@ panels on the way. */
   manual?: HelixTabs["manual"];
 
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixTabsHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixTabsHelixBeforeActivateElementEvent,
+  ) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "onhelix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 };
@@ -13668,7 +13709,9 @@ where it is not, so a reader arrowing past four tabs does not load four
 panels on the way. */
   "prop:manual"?: HelixTabs["manual"];
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixTabsHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixTabsHelixBeforeActivateElementEvent,
+  ) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "on:helix-select"?: (e: HelixTabsHelixSelectElementEvent) => void;
 
@@ -15575,9 +15618,9 @@ keyboard reader arriving on a control has already committed to it. */
 
 /** `HelixTour` component event */
 export type HelixTourElementEvent<E = Event> = TypedEvent<HelixTour, E>;
-/** `helix-change` event type */
-export type HelixTourHelixChangeElementEvent =
-  HelixTourElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTourHelixBeforeActivateElementEvent =
+  HelixTourElementEvent<HelixBeforeActivateEvent>;
 /** `helix-complete` event type */
 export type HelixTourHelixCompleteElementEvent =
   HelixTourElementEvent<HelixCompleteEvent>;
@@ -15629,7 +15672,9 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   skipLabel?: HelixTour["skipLabel"];
 
   /** Fired when the current stop moves, carrying the new index. */
-  "onhelix-change"?: (e: HelixTourHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixTourHelixBeforeActivateElementEvent,
+  ) => void;
   /** Fired when the last stop is finished. */
   "onhelix-complete"?: (e: HelixTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
@@ -15681,7 +15726,9 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   /** Label for the control that leaves the tour. */
   "prop:skipLabel"?: HelixTour["skipLabel"];
   /** Fired when the current stop moves, carrying the new index. */
-  "on:helix-change"?: (e: HelixTourHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixTourHelixBeforeActivateElementEvent,
+  ) => void;
   /** Fired when the last stop is finished. */
   "on:helix-complete"?: (e: HelixTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
@@ -15966,9 +16013,9 @@ export type HelixTreeElementEvent<E = Event> = TypedEvent<HelixTree, E>;
 /** `helix-select` event type */
 export type HelixTreeHelixSelectElementEvent =
   HelixTreeElementEvent<HelixSelectEvent>;
-/** `helix-change` event type */
-export type HelixTreeHelixChangeElementEvent =
-  HelixTreeElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixTreeHelixBeforeActivateElementEvent =
+  HelixTreeElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixTreeProps = {
   /** Which end of the row the branch chevron sits at.
@@ -16057,7 +16104,9 @@ how markup says where to start. */
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "onhelix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "onhelix-change"?: (e: HelixTreeHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixTreeHelixBeforeActivateElementEvent,
+  ) => void;
 };
 
 export type HelixTreeSolidJsProps = {
@@ -16146,7 +16195,9 @@ how markup says where to start. */
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "on:helix-select"?: (e: HelixTreeHelixSelectElementEvent) => void;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "on:helix-change"?: (e: HelixTreeHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixTreeHelixBeforeActivateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -16316,9 +16367,9 @@ export type HelixVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixVideoPlaylist,
   E
 >;
-/** `helix-change` event type */
-export type HelixVideoPlaylistHelixChangeElementEvent =
-  HelixVideoPlaylistElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixVideoPlaylistHelixBeforeActivateElementEvent =
+  HelixVideoPlaylistElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixVideoPlaylistProps = {
   /** Which item is current, by its `value`.
@@ -16343,7 +16394,9 @@ how markup says where to start. */
   label?: HelixVideoPlaylist["label"];
 
   /** Fired before the current entry changes, and cancelable. */
-  "onhelix-change"?: (e: HelixVideoPlaylistHelixChangeElementEvent) => void;
+  "onhelix-before-activate"?: (
+    e: HelixVideoPlaylistHelixBeforeActivateElementEvent,
+  ) => void;
 };
 
 export type HelixVideoPlaylistSolidJsProps = {
@@ -16368,7 +16421,9 @@ how markup says where to start. */
   /** Accessible name for the list, which usually has no visible heading. */
   "prop:label"?: HelixVideoPlaylist["label"];
   /** Fired before the current entry changes, and cancelable. */
-  "on:helix-change"?: (e: HelixVideoPlaylistHelixChangeElementEvent) => void;
+  "on:helix-before-activate"?: (
+    e: HelixVideoPlaylistHelixBeforeActivateElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -16839,6 +16894,30 @@ export type CustomElements = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -16929,6 +17008,30 @@ export type CustomElements = {
    * A union rather than a mode plus a `collapsible` boolean, which would make
    * `collapsible` alongside `multiple` expressible and meaningless.
    * - `items`: Direct items, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -16984,6 +17087,30 @@ export type CustomElements = {
    * one value that is not a color: it lifts the band onto the surface step
    * instead of the sunken one, for a strip carrying something that is not a
    * state at all.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -17109,6 +17236,30 @@ export type CustomElements = {
    * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17281,6 +17432,30 @@ export type CustomElements = {
    * folds widen or even out. `braid`, `waves` and `flow` have a
    * single subject and nothing to vary, and `threads` is even on purpose, so on
    * those four this is inert.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -17319,6 +17494,30 @@ export type CustomElements = {
    * returning a number is a type error, and had it been assignable it would
    * have been worse, because a group with three extra members would have set
    * the attribute that hides the whole group. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17357,6 +17556,30 @@ export type CustomElements = {
    * - `size`: Edge length of the avatar.
    * - `src`: Image to show. Falls back to the slot, or to initials, if it fails.
    * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -17408,6 +17631,30 @@ export type CustomElements = {
    * - `value`: The count or short text to show. Absent shows a dot, zero shows nothing.
    * - `max`: Cap for a numeric value. Past it the indicator reads `{max}+`.
    * - `label`: Accessible name. Required for a dot, which has no text to read.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17639,6 +17886,30 @@ export type CustomElements = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -17697,6 +17968,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `cite`: URL identifying where the passage came from.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17744,6 +18039,30 @@ export type CustomElements = {
    * one, and nothing selects on it.
    * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17777,6 +18096,35 @@ export type CustomElements = {
   /**
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -17846,6 +18194,30 @@ export type CustomElements = {
    * a first row into a second. Stacked, the same three keep one shape and one
    * column.
    * - `appearance`: Whether the buttons are one bar or a spaced row. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -18001,6 +18373,30 @@ export type CustomElements = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -18093,6 +18489,30 @@ export type CustomElements = {
    * brand role, so it takes four of the seven. One word per axis is the whole
    * of the registry, and two words for one axis is how `tone` had drifted into
    * five incompatible value sets before anything held it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -18205,6 +18625,30 @@ export type CustomElements = {
    *
    * Reflected and undefaulted, so a card that has not asked reads as a card
    * with no attribute on it and the stylesheet only describes the departure.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -18386,6 +18830,30 @@ export type CustomElements = {
    * 2 to 5. One at minimum, since a carousel showing everything it has still
    * has the one place to be. (property only) (readonly)
    * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -18454,6 +18922,30 @@ export type CustomElements = {
    * - `label`: Accessible name for the field.
    * - `send-label`/`sendLabel`: Label for the control that sends.
    * - `rows`: How many rows the field opens at. It grows from there.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -18528,6 +19020,30 @@ export type CustomElements = {
    * - `locale`: Locale for the timestamp. Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -18619,12 +19135,36 @@ export type CustomElements = {
    * `label` from the server.
    * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
    * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+   * - `helix-before-pin`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
    *
    * ## Slots
    *
@@ -18713,6 +19253,30 @@ export type CustomElements = {
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -18859,6 +19423,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -18881,7 +19469,7 @@ export type CustomElements = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
    * declared the property: a declared property is a seed and a correction,
    * the way `<input value>` is, and a consumer who wants the change for
    * themselves refuses it and assigns their own. See 294.
@@ -18983,6 +19571,30 @@ export type CustomElements = {
    * present, which is true. Measured, and it is why this is named the other way
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -19018,6 +19630,35 @@ export type CustomElements = {
   /**
    * A step down the scale, because a monospace face reads larger than the prose
    * around it at the same nominal size. `--code-size` overrides it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -19168,6 +19809,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -19205,7 +19870,7 @@ export type CustomElements = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -19423,6 +20088,30 @@ export type CustomElements = {
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -19435,13 +20124,19 @@ export type CustomElements = {
    * - `helix-before-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `eyedropper-icon`: The glyph on the screen-sampling control, usually a dropper.
+   *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -19670,6 +20365,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -19707,7 +20426,7 @@ export type CustomElements = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -19845,6 +20564,30 @@ export type CustomElements = {
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
    * with: one key, said once.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20003,6 +20746,30 @@ export type CustomElements = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20159,6 +20926,30 @@ export type CustomElements = {
    * this one, because a consumer's array may be the same object their own state
    * holds and reordering it under them is a mutation they did not ask for. (property only)
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20367,6 +21158,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20402,7 +21217,7 @@ export type CustomElements = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -20583,6 +21398,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20593,13 +21432,20 @@ export type CustomElements = {
    * - `helix-before-change`: Fired before the dates change, and cancelable.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
+   * - `next-icon`: The glyph on the control that moves forward a month, usually a caret.
+   *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -20673,9 +21519,9 @@ export type CustomElements = {
    * - `month`: One month, its header and its grid.
    * - `months`: The run of months.
    * - `next`: The control that moves to the next month.
-   * - `next-mark`: The glyph on the next month control.
+   * - `next-mark`: The glyph on the next month control, where none is slotted.
    * - `previous`: The control that moves to the previous month.
-   * - `previous-mark`: The glyph on the previous month control.
+   * - `previous-mark`: The glyph on the previous month control, where none is slotted.
    * - `week`: One row of days.
    * - `weekday`: A column header naming a day of the week.
    */
@@ -20735,6 +21581,30 @@ export type CustomElements = {
    * A persistent dialog does not ignore that press. It answers it: see
    * `refuse`, which is the only way a dialog that will not be dismissed can say
    * so at the moment a reader asks.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -20816,6 +21686,30 @@ export type CustomElements = {
    * quiet default out of reach from HTML and leave it settable only as a
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -20991,6 +21885,30 @@ export type CustomElements = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -21097,6 +22015,30 @@ export type CustomElements = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -21179,6 +22121,30 @@ export type CustomElements = {
    * elements, and writing `tabindex` onto a host the consumer rendered is a
    * change a React consumer's hydration reports and does not patch up. The stop
    * lands inside this shadow root instead. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -21243,6 +22209,30 @@ export type CustomElements = {
    * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -21304,6 +22294,30 @@ export type CustomElements = {
    * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -21385,6 +22399,30 @@ export type CustomElements = {
    * disagree with it. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -21518,6 +22556,30 @@ export type CustomElements = {
    * - `justify`: Distribution along the direction.
    * - `wrap`: Whether items wrap onto more lines.
    * - `inline`: Flows with surrounding text instead of taking the full width.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -21546,6 +22608,30 @@ export type CustomElements = {
    * is two intentions in one element.
    * - `gap`: Space between cells, named on the space scale.
    * - `align`: Alignment of each cell within its row.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -21651,6 +22737,30 @@ export type CustomElements = {
    * attribute would be right on load and wrong from the first resize, which is
    * the exact failure the count exists to prevent, arriving through the
    * mechanism meant to prevent it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -21808,6 +22918,30 @@ export type CustomElements = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -21885,6 +23019,30 @@ export type CustomElements = {
    *
    * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -21949,6 +23107,30 @@ export type CustomElements = {
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -22094,6 +23276,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -22116,7 +23322,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -22215,6 +23421,30 @@ export type CustomElements = {
    * attribute belonging to `<th>`, so putting one on anything else is both a
    * lint failure and a word in the DOM that already means something narrower.
    * `within` says the same thing and says it about this element.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -22328,6 +23558,30 @@ export type CustomElements = {
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -22524,6 +23778,30 @@ export type CustomElements = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -22580,6 +23858,30 @@ export type CustomElements = {
    * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision rather
    * than one derived from `target`, for the reason `Tree.Item` gives.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -22659,6 +23961,30 @@ export type CustomElements = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -22773,6 +24099,30 @@ export type CustomElements = {
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -22797,7 +24147,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -22929,6 +24279,30 @@ export type CustomElements = {
    * no longer called Spinner: the old name described one appearance of two.
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -23024,6 +24398,30 @@ export type CustomElements = {
    * whatever the stylesheet says. Writing the width in both places would be one
    * number in two languages, drifting the first time either moved. This sets
    * `data-narrow` on the host and the stylesheet arranges itself off that.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23157,6 +24555,30 @@ export type CustomElements = {
    * because focus moves for reasons this element is not told about: a press, a
    * Tab, the drilldown putting the reader on the first row of a page it has
    * just opened. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23251,6 +24673,30 @@ export type CustomElements = {
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23421,6 +24867,30 @@ export type CustomElements = {
    * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -23460,6 +24930,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the landmark.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -23515,6 +25009,30 @@ export type CustomElements = {
    * - `dismissible`: Whether a reader may remove it.
    * - `locale`: Locale for the timestamp. Empty is the runtime's own.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23606,6 +25124,30 @@ export type CustomElements = {
    * and the attribute still said 2, so a badge reading the attribute showed a
    * count for an item the reader had just opened. (property only) (readonly)
    * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23746,6 +25288,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -23768,7 +25334,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -23854,6 +25420,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The heading over the run.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -23953,6 +25543,30 @@ export type CustomElements = {
    * the platform applies at assignment. Asking the same question here rather
    * than a second one is what stops the two disagreeing. Text nodes are
    * always the default slot's and cannot say otherwise. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -24042,12 +25656,36 @@ export type CustomElements = {
    * writable property in this library that a component also writes is state a
    * consumer can own; this one cannot be, and saying so with the type is better
    * than saying it in a sentence nobody reads. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: The section being read has changed, carrying its id as the value.
+   * - `helix-before-activate`: The section being read has changed, carrying its id as the value.
    *
    * ## Slots
    *
@@ -24190,12 +25828,45 @@ export type CustomElements = {
    * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
    * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `first-icon`: The glyph on the jump-to-first control, usually a double caret.
+   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
+   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
+   * - `last-icon`: The glyph on the jump-to-last control, usually a double caret.
    *
    * ## CSS Custom Properties
    *
@@ -24220,7 +25891,7 @@ export type CustomElements = {
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
    * - `live`: The region that says the page changed. Clipped, not hidden.
-   * - `mark`: The glyph on a first, previous, next or last control.
+   * - `mark`: The glyph on a first, previous, next or last control, where none is slotted.
    */
   "helix-pagination": Partial<
     HelixPaginationProps & BaseProps<HelixPagination> & BaseEvents<HelixPagination>
@@ -24251,12 +25922,36 @@ export type CustomElements = {
    * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
+   * - `helix-before-change`: Fired before the size changes, and cancelable. The only way to refuse one.
    *
    * ## CSS Parts
    *
@@ -24297,6 +25992,30 @@ export type CustomElements = {
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    */
   "helix-pagination-summary": Partial<
     HelixPaginationSummaryProps & BaseProps<HelixPaginationSummary> & BaseEvents<HelixPaginationSummary>
@@ -24408,6 +26127,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -24424,7 +26167,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -24548,6 +26291,30 @@ export type CustomElements = {
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -24676,6 +26443,30 @@ export type CustomElements = {
    * number, because assistive technology that ignores the text still has to
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -24738,6 +26529,30 @@ export type CustomElements = {
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -24778,6 +26593,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `cite`: URL identifying where the quotation came from.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -24865,6 +26704,30 @@ export type CustomElements = {
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -24888,7 +26751,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -25003,6 +26866,30 @@ export type CustomElements = {
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -25146,6 +27033,30 @@ export type CustomElements = {
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -25167,7 +27078,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -25316,6 +27227,30 @@ export type CustomElements = {
    * - `label`: Accessible name for the frame.
    * - `direction`: Writing direction inside the frame.
    * - `layout`: How the example is placed in the frame.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -25353,7 +27288,7 @@ export type CustomElements = {
 
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
-   * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
+   * dispatches `helix-before-edit`, which bubbles, and the sandbox hands the value to
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
@@ -25435,12 +27370,36 @@ export type CustomElements = {
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   * - `helix-before-resize`: Fired when a divider is let go, with the new arrangement.
    *
    * ## Slots
    *
@@ -25490,7 +27449,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `helix-change`.
+   * - `name`: Which source this pane holds, echoed in every `helix-before-edit`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
@@ -25498,13 +27457,37 @@ export type CustomElements = {
    * Not reflected: nothing selects on it, so it keeps a real default instead.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-caret`: Fired when the cursor moves.
-   * - `helix-change`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired when the source is edited.
    *
    * ## CSS Custom Properties
    *
@@ -25544,6 +27527,30 @@ export type CustomElements = {
    * - `column`: One-based column of the cursor. Absent shows no readout.
    * - `language`: The language being edited, as a name or one the editor knows.
    * - `line`: One-based line of the cursor. Absent shows no readout.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -25589,6 +27596,30 @@ export type CustomElements = {
    *
    * - `empty-label`/`emptyLabel`: What to show before anything has been written.
    * - `label`: Accessible name for the log.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Methods
    *
@@ -25634,6 +27665,35 @@ export type CustomElements = {
    *
    * Both slots are bare, so an unfilled one generates no box and costs no gap.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -25677,6 +27737,30 @@ export type CustomElements = {
    * The element rather than a method of our own, because the utilities that
    * want it already take one, and `Tree`, `Combobox` and anything windowing a
    * long list all want the same thing from it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -25809,6 +27893,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -25847,7 +27955,7 @@ export type CustomElements = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -25945,6 +28053,30 @@ export type CustomElements = {
    * - `shape`: What the missing content is shaped like.
    *
    * Unset is a block, which is what most missing things are.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -26058,6 +28190,30 @@ export type CustomElements = {
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -26073,7 +28229,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -26310,6 +28466,30 @@ export type CustomElements = {
    * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
    * and a string is what survives React's hydration where an array property
    * does not.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -26360,6 +28540,30 @@ export type CustomElements = {
    * control inside this element and the platform retargets it, so from outside
    * `activeElement` already is this element. `Menu.Item` records the same, and
    * the reading it replaced is one that does not survive happy-dom. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -26439,6 +28643,30 @@ export type CustomElements = {
    * Up by default, because the control this hangs off is usually docked to the
    * bottom of the window and there is nothing below it to fan into.
    * - `offset`: Space between the trigger and the actions, in pixels.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -26609,12 +28837,37 @@ export type CustomElements = {
    * The one place the axis is decided, which is why `auto` costs a single line
    * here rather than a pass over seventeen readers: the drag, the arrow keys and
    * `aria-orientation` all ask this and all turn together. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the divider settles, named `position` or `collapsed`.
+   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
+   * - `helix-before-collapse`: Fired before a pane shuts or reopens, and cancelable.
    *
    * ## Slots
    *
@@ -26681,6 +28934,30 @@ export type CustomElements = {
    *
    * - `divided`: Whether the figures are separated by a rule as well as by space.
    * - `label`: Accessible name for the set.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -26729,6 +29006,30 @@ export type CustomElements = {
    * reports a hydration mismatch. The absent attribute is the column, which the
    * stylesheet reads as the base case. The existing server spec caught this,
    * being the one that asserts the host carries nothing nobody wrote.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -26799,12 +29100,36 @@ export type CustomElements = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the active step changes.
+   * - `helix-before-activate`: Fired when the active step changes.
    *
    * ## Slots
    *
@@ -26818,7 +29143,7 @@ export type CustomElements = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -26849,6 +29174,30 @@ export type CustomElements = {
    * - `current`: Whether this is the stage the reader is in.
    * - `disabled`: Whether the reader may go to this stage.
    * - `value`: What this stage is called when it announces itself.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -26954,6 +29303,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -26976,7 +29349,7 @@ export type CustomElements = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
    * declared the property: a declared property is a seed and a correction,
    * the way `<input value>` is, and a consumer who wants the change for
    * themselves refuses it and assigns their own. See 294.
@@ -27066,6 +29439,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `header`: Whether the cell heads its column.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27150,6 +29547,30 @@ export type CustomElements = {
    * correct default: the raw value is what an API sorted by. (property only)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    * - `canSort`: Whether a reader can actually reorder by this column. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27205,6 +29626,30 @@ export type CustomElements = {
    * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27234,6 +29679,35 @@ export type CustomElements = {
    * Hairline rules between rows and no fill, per the rule that depth comes from a
    * single border rather than from elevation. A dense table earns its density by
    * decorating none of it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27269,6 +29743,30 @@ export type CustomElements = {
    * shadow tree being neither the same tree nor an ancestor of it. A name is
    * the one form that crosses, and `aria-label` on a `tabpanel` is how the
    * pattern names one anyway. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27338,12 +29836,36 @@ export type CustomElements = {
    * Automatic is the default because showing a panel is usually cheap. Set this
    * where it is not, so a reader arrowing past four tabs does not load four
    * panels on the way.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
+   * - `helix-before-activate`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -27359,7 +29881,7 @@ export type CustomElements = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -27388,6 +29910,30 @@ export type CustomElements = {
    * - `value`: Identifies the tab, and pairs it with the panel of the same value.
    * - `selected`: Whether this tab is the current one.
    * - `disabled`: Whether the tab can be chosen.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -27459,6 +30005,30 @@ export type CustomElements = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -27548,6 +30118,30 @@ export type CustomElements = {
    * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
    * quiet ink. That is #141's to derive, and until it does, folding the two
    * halves apart would leave three of the four combinations unsayable.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -27635,6 +30229,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -27650,7 +30268,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -27849,6 +30467,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -27884,7 +30526,7 @@ export type CustomElements = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -28120,6 +30762,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -28135,7 +30801,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -28264,6 +30930,30 @@ export type CustomElements = {
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
    * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -28305,6 +30995,30 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Names the record, for a reader arriving at it out of context.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -28365,6 +31079,30 @@ export type CustomElements = {
    * only one starting state that makes sense: a message that has been rendered
    * is showing. An attribute whose only legal value is the default is an
    * attribute nobody can use.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -28450,6 +31188,30 @@ export type CustomElements = {
    *
    * The SSR spec could never have caught it: it passed a placement explicitly,
    * so the attribute it asserted was one the consumer had written.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -28560,6 +31322,30 @@ export type CustomElements = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -28582,7 +31368,7 @@ export type CustomElements = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -28673,6 +31459,30 @@ export type CustomElements = {
    * by the group, with no attribute: it is coordination between elements, and
    * `tabindex` on a host the consumer rendered is the change a React consumer's
    * hydration reports and does not patch up. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -28717,6 +31527,30 @@ export type CustomElements = {
    *
    * - `label`: Accessible name for the toolbar.
    * - `orientation`: Which way the arrow keys move.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -28868,6 +31702,30 @@ export type CustomElements = {
    * of them, which is noise rather than help. Focus opens with no delay: a
    * keyboard reader arriving on a control has already committed to it.
    * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -28960,12 +31818,36 @@ export type CustomElements = {
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `stops`: The stops, in the order they were written. (property only) (readonly)
    * - `length`: How many stops there are. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the current stop moves, carrying the new index.
+   * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
    * - `helix-complete`: Fired when the last stop is finished.
    * - `helix-before-close`: Fired when the reader leaves early.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
@@ -29027,6 +31909,30 @@ export type CustomElements = {
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29141,6 +32047,30 @@ export type CustomElements = {
    * report it. The indent it drives is written onto the row instead, inside the
    * shadow root, which is not part of the tree React hydrates.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29265,13 +32195,37 @@ export type CustomElements = {
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the tree.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
-   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
+   * - `helix-before-activate`: Fired before the current node moves, and cancelable. The only way to refuse one.
    *
    * ## Slots
    *
@@ -29285,7 +32239,7 @@ export type CustomElements = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -29355,6 +32309,30 @@ export type CustomElements = {
    * revenue up is good news and latency up is bad news, and only the consumer
    * knows which one this is. Set it once per metric and it holds while the
    * direction changes underneath.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -29411,6 +32389,30 @@ export type CustomElements = {
    *
    * Light DOM rather than `assignedNodes`, so it answers on the server too,
    * where there is no slot to ask. `Option.text` reads its own the same way. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29476,6 +32478,30 @@ export type CustomElements = {
    *
    * `top-end` because a control bar sits at the foot of the picture, and a menu
    * opening downward from there opens off the player.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29544,12 +32570,36 @@ export type CustomElements = {
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the list, which usually has no visible heading.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the current entry changes, and cancelable.
+   * - `helix-before-activate`: Fired before the current entry changes, and cancelable.
    *
    * ## Slots
    *
@@ -29564,7 +32614,7 @@ export type CustomElements = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -29690,6 +32740,30 @@ export type CustomElements = {
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
    * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29808,6 +32882,30 @@ export type CustomElements = {
    * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
    * - `for`: Id of the element holding the rows, as JSON in a script.
    * - `label`: What the list is called, since the rendered rows are only a window on it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -29873,6 +32971,30 @@ export type CustomElementsSolidJs = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -29966,6 +33088,30 @@ export type CustomElementsSolidJs = {
    * A union rather than a mode plus a `collapsible` boolean, which would make
    * `collapsible` alongside `multiple` expressible and meaningless.
    * - `items`: Direct items, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30024,6 +33170,30 @@ export type CustomElementsSolidJs = {
    * one value that is not a color: it lifts the band onto the surface step
    * instead of the sunken one, for a strip carrying something that is not a
    * state at all.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -30152,6 +33322,30 @@ export type CustomElementsSolidJs = {
    * breadcrumb trail as readily as a nav, and a header that centered its search
    * box would have been setting `nav-align` to do it. The part is called
    * `content`, so the property is too.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30327,6 +33521,30 @@ export type CustomElementsSolidJs = {
    * folds widen or even out. `braid`, `waves` and `flow` have a
    * single subject and nothing to vary, and `threads` is even on purpose, so on
    * those four this is inert.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -30367,6 +33585,30 @@ export type CustomElementsSolidJs = {
    * returning a number is a type error, and had it been assignable it would
    * have been worse, because a group with three extra members would have set
    * the attribute that hides the whole group. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30408,6 +33650,30 @@ export type CustomElementsSolidJs = {
    * - `size`: Edge length of the avatar.
    * - `src`: Image to show. Falls back to the slot, or to initials, if it fails.
    * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -30462,6 +33728,30 @@ export type CustomElementsSolidJs = {
    * - `value`: The count or short text to show. Absent shows a dot, zero shows nothing.
    * - `max`: Cap for a numeric value. Past it the indicator reads `{max}+`.
    * - `label`: Accessible name. Required for a dot, which has no text to read.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30698,6 +33988,30 @@ export type CustomElementsSolidJs = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -30759,6 +34073,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `cite`: URL identifying where the passage came from.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30809,6 +34147,30 @@ export type CustomElementsSolidJs = {
    * one, and nothing selects on it.
    * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30845,6 +34207,35 @@ export type CustomElementsSolidJs = {
   /**
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -30917,6 +34308,30 @@ export type CustomElementsSolidJs = {
    * a first row into a second. Stacked, the same three keep one shape and one
    * column.
    * - `appearance`: Whether the buttons are one bar or a spaced row. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -31075,6 +34490,30 @@ export type CustomElementsSolidJs = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -31170,6 +34609,30 @@ export type CustomElementsSolidJs = {
    * brand role, so it takes four of the seven. One word per axis is the whole
    * of the registry, and two words for one axis is how `tone` had drifted into
    * five incompatible value sets before anything held it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -31285,6 +34748,30 @@ export type CustomElementsSolidJs = {
    *
    * Reflected and undefaulted, so a card that has not asked reads as a card
    * with no attribute on it and the stylesheet only describes the departure.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -31468,6 +34955,30 @@ export type CustomElementsSolidJs = {
    * 2 to 5. One at minimum, since a carousel showing everything it has still
    * has the one place to be. (property only) (readonly)
    * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -31539,6 +35050,30 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for the field.
    * - `send-label`/`sendLabel`: Label for the control that sends.
    * - `rows`: How many rows the field opens at. It grows from there.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -31616,6 +35151,30 @@ export type CustomElementsSolidJs = {
    * - `locale`: Locale for the timestamp. Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -31710,12 +35269,36 @@ export type CustomElementsSolidJs = {
    * `label` from the server.
    * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
    * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+   * - `helix-before-pin`: Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
    *
    * ## Slots
    *
@@ -31806,6 +35389,30 @@ export type CustomElementsSolidJs = {
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -31955,6 +35562,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -31977,7 +35608,7 @@ export type CustomElementsSolidJs = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
    * declared the property: a declared property is a seed and a correction,
    * the way `<input value>` is, and a consumer who wants the change for
    * themselves refuses it and assigns their own. See 294.
@@ -32082,6 +35713,30 @@ export type CustomElementsSolidJs = {
    * present, which is true. Measured, and it is why this is named the other way
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -32120,6 +35775,35 @@ export type CustomElementsSolidJs = {
   /**
    * A step down the scale, because a monospace face reads larger than the prose
    * around it at the same nominal size. `--code-size` overrides it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -32272,6 +35956,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -32309,7 +36017,7 @@ export type CustomElementsSolidJs = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -32530,6 +36238,30 @@ export type CustomElementsSolidJs = {
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -32542,13 +36274,19 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `eyedropper-icon`: The glyph on the screen-sampling control, usually a dropper.
+   *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -32780,6 +36518,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -32817,7 +36579,7 @@ export type CustomElementsSolidJs = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -32958,6 +36720,30 @@ export type CustomElementsSolidJs = {
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
    * with: one key, said once.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33119,6 +36905,30 @@ export type CustomElementsSolidJs = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33278,6 +37088,30 @@ export type CustomElementsSolidJs = {
    * this one, because a consumer's array may be the same object their own state
    * holds and reordering it under them is a mutation they did not ask for. (property only)
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33489,6 +37323,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33524,7 +37382,7 @@ export type CustomElementsSolidJs = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -33708,6 +37566,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33718,13 +37600,20 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Fired before the dates change, and cancelable.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
    *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
+   * - `next-icon`: The glyph on the control that moves forward a month, usually a caret.
+   *
    * ## Methods
    *
    * Methods that can be called to access component functionality.
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -33798,9 +37687,9 @@ export type CustomElementsSolidJs = {
    * - `month`: One month, its header and its grid.
    * - `months`: The run of months.
    * - `next`: The control that moves to the next month.
-   * - `next-mark`: The glyph on the next month control.
+   * - `next-mark`: The glyph on the next month control, where none is slotted.
    * - `previous`: The control that moves to the previous month.
-   * - `previous-mark`: The glyph on the previous month control.
+   * - `previous-mark`: The glyph on the previous month control, where none is slotted.
    * - `week`: One row of days.
    * - `weekday`: A column header naming a day of the week.
    */
@@ -33863,6 +37752,30 @@ export type CustomElementsSolidJs = {
    * A persistent dialog does not ignore that press. It answers it: see
    * `refuse`, which is the only way a dialog that will not be dismissed can say
    * so at the moment a reader asks.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -33947,6 +37860,30 @@ export type CustomElementsSolidJs = {
    * quiet default out of reach from HTML and leave it settable only as a
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -34125,6 +38062,30 @@ export type CustomElementsSolidJs = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -34234,6 +38195,30 @@ export type CustomElementsSolidJs = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -34319,6 +38304,30 @@ export type CustomElementsSolidJs = {
    * elements, and writing `tabindex` onto a host the consumer rendered is a
    * change a React consumer's hydration reports and does not patch up. The stop
    * lands inside this shadow root instead. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -34386,6 +38395,30 @@ export type CustomElementsSolidJs = {
    * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -34450,6 +38483,30 @@ export type CustomElementsSolidJs = {
    * On by default: an empty view almost always replaces something that was
    * loading. Turn it off for one that was on the page from the start, which
    * has nothing to announce because nothing changed.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -34536,6 +38593,30 @@ export type CustomElementsSolidJs = {
    * disagree with it. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -34672,6 +38753,30 @@ export type CustomElementsSolidJs = {
    * - `justify`: Distribution along the direction.
    * - `wrap`: Whether items wrap onto more lines.
    * - `inline`: Flows with surrounding text instead of taking the full width.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -34702,6 +38807,30 @@ export type CustomElementsSolidJs = {
    * is two intentions in one element.
    * - `gap`: Space between cells, named on the space scale.
    * - `align`: Alignment of each cell within its row.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -34809,6 +38938,30 @@ export type CustomElementsSolidJs = {
    * attribute would be right on load and wrong from the first resize, which is
    * the exact failure the count exists to prevent, arriving through the
    * mechanism meant to prevent it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -34969,6 +39122,30 @@ export type CustomElementsSolidJs = {
    * anything a consumer sets. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -35049,6 +39226,30 @@ export type CustomElementsSolidJs = {
    *
    * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -35115,6 +39316,30 @@ export type CustomElementsSolidJs = {
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -35265,6 +39490,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -35287,7 +39536,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -35391,6 +39640,30 @@ export type CustomElementsSolidJs = {
    * attribute belonging to `<th>`, so putting one on anything else is both a
    * lint failure and a word in the DOM that already means something narrower.
    * `within` says the same thing and says it about this element.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -35506,6 +39779,30 @@ export type CustomElementsSolidJs = {
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -35705,6 +40002,30 @@ export type CustomElementsSolidJs = {
    * consumer's data property. Name the member for what it holds rather than
    * for the shortest word available. (property only) (readonly)
    * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -35764,6 +40085,30 @@ export type CustomElementsSolidJs = {
    * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision rather
    * than one derived from `target`, for the reason `Tree.Item` gives.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -35846,6 +40191,30 @@ export type CustomElementsSolidJs = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -35962,6 +40331,30 @@ export type CustomElementsSolidJs = {
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -35986,7 +40379,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -36121,6 +40514,30 @@ export type CustomElementsSolidJs = {
    * no longer called Spinner: the old name described one appearance of two.
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -36219,6 +40636,30 @@ export type CustomElementsSolidJs = {
    * whatever the stylesheet says. Writing the width in both places would be one
    * number in two languages, drifting the first time either moved. This sets
    * `data-narrow` on the host and the stylesheet arranges itself off that.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36355,6 +40796,30 @@ export type CustomElementsSolidJs = {
    * because focus moves for reasons this element is not told about: a press, a
    * Tab, the drilldown putting the reader on the first row of a page it has
    * just opened. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36452,6 +40917,30 @@ export type CustomElementsSolidJs = {
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36624,6 +41113,30 @@ export type CustomElementsSolidJs = {
    * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -36668,6 +41181,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the landmark.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -36726,6 +41263,30 @@ export type CustomElementsSolidJs = {
    * - `dismissible`: Whether a reader may remove it.
    * - `locale`: Locale for the timestamp. Empty is the runtime's own.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36820,6 +41381,30 @@ export type CustomElementsSolidJs = {
    * and the attribute still said 2, so a badge reading the attribute showed a
    * count for an item the reader had just opened. (property only) (readonly)
    * - `items`: The notifications declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36963,6 +41548,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -36985,7 +41594,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -37074,6 +41683,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The heading over the run.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -37176,6 +41809,30 @@ export type CustomElementsSolidJs = {
    * the platform applies at assignment. Asking the same question here rather
    * than a second one is what stops the two disagreeing. Text nodes are
    * always the default slot's and cannot say otherwise. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -37268,12 +41925,36 @@ export type CustomElementsSolidJs = {
    * writable property in this library that a component also writes is state a
    * consumer can own; this one cannot be, and saying so with the type is better
    * than saying it in a sentence nobody reads. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: The section being read has changed, carrying its id as the value.
+   * - `helix-before-activate`: The section being read has changed, carrying its id as the value.
    *
    * ## Slots
    *
@@ -37419,12 +42100,45 @@ export type CustomElementsSolidJs = {
    * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
    * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
    * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `first-icon`: The glyph on the jump-to-first control, usually a double caret.
+   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
+   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
+   * - `last-icon`: The glyph on the jump-to-last control, usually a double caret.
    *
    * ## CSS Custom Properties
    *
@@ -37449,7 +42163,7 @@ export type CustomElementsSolidJs = {
    * - `last`: The control that jumps to the last page, under `ends`.
    * - `status`: The reading of where you are, in `compact`.
    * - `live`: The region that says the page changed. Clipped, not hidden.
-   * - `mark`: The glyph on a first, previous, next or last control.
+   * - `mark`: The glyph on a first, previous, next or last control, where none is slotted.
    */
   "helix-pagination": Partial<
     HelixPaginationProps &
@@ -37483,12 +42197,36 @@ export type CustomElementsSolidJs = {
    * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
+   * - `helix-before-change`: Fired before the size changes, and cancelable. The only way to refuse one.
    *
    * ## CSS Parts
    *
@@ -37532,6 +42270,30 @@ export type CustomElementsSolidJs = {
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    */
   "helix-pagination-summary": Partial<
     HelixPaginationSummaryProps &
@@ -37646,6 +42408,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -37662,7 +42448,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -37789,6 +42575,30 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
    * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -37920,6 +42730,30 @@ export type CustomElementsSolidJs = {
    * number, because assistive technology that ignores the text still has to
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -37985,6 +42819,30 @@ export type CustomElementsSolidJs = {
    * chosen automatically when the slot is filled: it is the level that makes
    * covering safe, and a consumer who fills the slot has said what they want
    * without having to know that.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -38028,6 +42886,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `cite`: URL identifying where the quotation came from.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -38120,6 +43002,30 @@ export type CustomElementsSolidJs = {
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -38143,7 +43049,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -38261,6 +43167,30 @@ export type CustomElementsSolidJs = {
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -38409,6 +43339,30 @@ export type CustomElementsSolidJs = {
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -38430,7 +43384,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -38582,6 +43536,30 @@ export type CustomElementsSolidJs = {
    * - `label`: Accessible name for the frame.
    * - `direction`: Writing direction inside the frame.
    * - `layout`: How the example is placed in the frame.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -38622,7 +43600,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * Coordination is by event, the same way the accordion does it: a source pane
-   * dispatches `helix-change`, which bubbles, and the sandbox hands the value to
+   * dispatches `helix-before-edit`, which bubbles, and the sandbox hands the value to
    * whatever preview is slotted into it. Neither child knows the other exists, so
    * either can be replaced or used alone.
    *
@@ -38704,12 +43682,36 @@ export type CustomElementsSolidJs = {
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
    * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   * - `helix-before-resize`: Fired when a divider is let go, with the new arrangement.
    *
    * ## Slots
    *
@@ -38762,7 +43764,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every `helix-change`.
+   * - `name`: Which source this pane holds, echoed in every `helix-before-edit`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
@@ -38770,13 +43772,37 @@ export type CustomElementsSolidJs = {
    * Not reflected: nothing selects on it, so it keeps a real default instead.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-caret`: Fired when the cursor moves.
-   * - `helix-change`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired when the source is edited.
    *
    * ## CSS Custom Properties
    *
@@ -38819,6 +43845,30 @@ export type CustomElementsSolidJs = {
    * - `column`: One-based column of the cursor. Absent shows no readout.
    * - `language`: The language being edited, as a name or one the editor knows.
    * - `line`: One-based line of the cursor. Absent shows no readout.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -38867,6 +43917,30 @@ export type CustomElementsSolidJs = {
    *
    * - `empty-label`/`emptyLabel`: What to show before anything has been written.
    * - `label`: Accessible name for the log.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Methods
    *
@@ -38915,6 +43989,35 @@ export type CustomElementsSolidJs = {
    *
    * Both slots are bare, so an unfilled one generates no box and costs no gap.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -38961,6 +44064,30 @@ export type CustomElementsSolidJs = {
    * The element rather than a method of our own, because the utilities that
    * want it already take one, and `Tree`, `Combobox` and anything windowing a
    * long list all want the same thing from it. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -39096,6 +44223,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -39134,7 +44285,7 @@ export type CustomElementsSolidJs = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -39235,6 +44386,30 @@ export type CustomElementsSolidJs = {
    * - `shape`: What the missing content is shaped like.
    *
    * Unset is a block, which is what most missing things are.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -39351,6 +44526,30 @@ export type CustomElementsSolidJs = {
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -39366,7 +44565,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -39606,6 +44805,30 @@ export type CustomElementsSolidJs = {
    * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
    * and a string is what survives React's hydration where an array property
    * does not.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *
@@ -39659,6 +44882,30 @@ export type CustomElementsSolidJs = {
    * control inside this element and the platform retargets it, so from outside
    * `activeElement` already is this element. `Menu.Item` records the same, and
    * the reading it replaced is one that does not survive happy-dom. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -39741,6 +44988,30 @@ export type CustomElementsSolidJs = {
    * Up by default, because the control this hangs off is usually docked to the
    * bottom of the window and there is nothing below it to fan into.
    * - `offset`: Space between the trigger and the actions, in pixels.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -39914,12 +45185,37 @@ export type CustomElementsSolidJs = {
    * The one place the axis is decided, which is why `auto` costs a single line
    * here rather than a pass over seventeen readers: the drag, the arrow keys and
    * `aria-orientation` all ask this and all turn together. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the divider settles, named `position` or `collapsed`.
+   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
+   * - `helix-before-collapse`: Fired before a pane shuts or reopens, and cancelable.
    *
    * ## Slots
    *
@@ -39989,6 +45285,30 @@ export type CustomElementsSolidJs = {
    *
    * - `divided`: Whether the figures are separated by a rule as well as by space.
    * - `label`: Accessible name for the set.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40040,6 +45360,30 @@ export type CustomElementsSolidJs = {
    * reports a hydration mismatch. The absent attribute is the column, which the
    * stylesheet reads as the base case. The existing server spec caught this,
    * being the one that asserts the host carries nothing nobody wrote.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40112,12 +45456,36 @@ export type CustomElementsSolidJs = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the active step changes.
+   * - `helix-before-activate`: Fired when the active step changes.
    *
    * ## Slots
    *
@@ -40131,7 +45499,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -40167,6 +45535,30 @@ export type CustomElementsSolidJs = {
    * - `current`: Whether this is the stage the reader is in.
    * - `disabled`: Whether the reader may go to this stage.
    * - `value`: What this stage is called when it announces itself.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -40274,6 +45666,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -40296,7 +45712,7 @@ export type CustomElementsSolidJs = {
    * - `requestChecked(next: boolean) => boolean`: Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the
-   * `helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
+   * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
    * declared the property: a declared property is a seed and a correction,
    * the way `<input value>` is, and a consumer who wants the change for
    * themselves refuses it and assigns their own. See 294.
@@ -40389,6 +45805,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `header`: Whether the cell heads its column.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40476,6 +45916,30 @@ export type CustomElementsSolidJs = {
    * correct default: the raw value is what an API sorted by. (property only)
    * - `track`: The track this column contributes, resolved. (property only) (readonly)
    * - `canSort`: Whether a reader can actually reorder by this column. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40534,6 +45998,30 @@ export type CustomElementsSolidJs = {
    * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40568,6 +46056,35 @@ export type CustomElementsSolidJs = {
    * Hairline rules between rows and no fill, per the rule that depth comes from a
    * single border rather than from elevation. A dense table earns its density by
    * decorating none of it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40606,6 +46123,30 @@ export type CustomElementsSolidJs = {
    * shadow tree being neither the same tree nor an ancestor of it. A name is
    * the one form that crosses, and `aria-label` on a `tabpanel` is how the
    * pattern names one anyway. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40678,12 +46219,36 @@ export type CustomElementsSolidJs = {
    * Automatic is the default because showing a panel is usually cheap. Set this
    * where it is not, so a reader arrowing past four tabs does not load four
    * panels on the way.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the current tab moves, and cancelable. The only way to refuse one.
+   * - `helix-before-activate`: Fired before the current tab moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
    *
    * ## Slots
@@ -40699,7 +46264,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -40730,6 +46295,30 @@ export type CustomElementsSolidJs = {
    * - `value`: Identifies the tab, and pairs it with the panel of the same value.
    * - `selected`: Whether this tab is the current one.
    * - `disabled`: Whether the tab can be chosen.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -40804,6 +46393,30 @@ export type CustomElementsSolidJs = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -40895,6 +46508,30 @@ export type CustomElementsSolidJs = {
    * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
    * quiet ink. That is #141's to derive, and until it does, folding the two
    * halves apart would leave three of the four combinations unsayable.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -40984,6 +46621,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -40999,7 +46660,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -41201,6 +46862,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -41236,7 +46921,7 @@ export type CustomElementsSolidJs = {
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -41475,6 +47160,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -41490,7 +47199,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -41622,6 +47331,30 @@ export type CustomElementsSolidJs = {
    * week. Unset, the label is written as it was given and nothing claims to
    * know what instant it names.
    * - `tone`: What kind of event it was, which decides the mark's color and nothing else.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -41666,6 +47399,30 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Names the record, for a reader arriving at it out of context.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -41729,6 +47486,30 @@ export type CustomElementsSolidJs = {
    * only one starting state that makes sense: a message that has been rendered
    * is showing. An attribute whose only legal value is the default is an
    * attribute nobody can use.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -41817,6 +47598,30 @@ export type CustomElementsSolidJs = {
    *
    * The SSR spec could never have caught it: it passed a placement explicitly,
    * so the attribute it asserted was one the consumer had written.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -41932,6 +47737,30 @@ export type CustomElementsSolidJs = {
    * reflected none of them.
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -41954,7 +47783,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
    * a refusal and nothing moves. Nobody refusing means the control updates
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
@@ -42048,6 +47877,30 @@ export type CustomElementsSolidJs = {
    * by the group, with no attribute: it is coordination between elements, and
    * `tabindex` on a host the consumer rendered is the change a React consumer's
    * hydration reports and does not patch up. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42095,6 +47948,30 @@ export type CustomElementsSolidJs = {
    *
    * - `label`: Accessible name for the toolbar.
    * - `orientation`: Which way the arrow keys move.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -42249,6 +48126,30 @@ export type CustomElementsSolidJs = {
    * of them, which is noise rather than help. Focus opens with no delay: a
    * keyboard reader arriving on a control has already committed to it.
    * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42344,12 +48245,36 @@ export type CustomElementsSolidJs = {
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `stops`: The stops, in the order they were written. (property only) (readonly)
    * - `length`: How many stops there are. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the current stop moves, carrying the new index.
+   * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
    * - `helix-complete`: Fired when the last stop is finished.
    * - `helix-before-close`: Fired when the reader leaves early.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
@@ -42413,6 +48338,30 @@ export type CustomElementsSolidJs = {
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42530,6 +48479,30 @@ export type CustomElementsSolidJs = {
    * report it. The indent it drives is written onto the row instead, inside the
    * shadow root, which is not part of the tree React hydrates.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42657,13 +48630,37 @@ export type CustomElementsSolidJs = {
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the tree.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
-   * - `helix-change`: Fired before the current node moves, and cancelable. The only way to refuse one.
+   * - `helix-before-activate`: Fired before the current node moves, and cancelable. The only way to refuse one.
    *
    * ## Slots
    *
@@ -42677,7 +48674,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -42749,6 +48746,30 @@ export type CustomElementsSolidJs = {
    * revenue up is good news and latency up is bad news, and only the consumer
    * knows which one this is. Set it once per metric and it holds while the
    * direction changes underneath.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Slots
    *
@@ -42810,6 +48831,30 @@ export type CustomElementsSolidJs = {
    *
    * Light DOM rather than `assignedNodes`, so it answers on the server too,
    * where there is no slot to ask. `Option.text` reads its own the same way. (property only) (readonly)
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42878,6 +48923,30 @@ export type CustomElementsSolidJs = {
    *
    * `top-end` because a control bar sits at the foot of the picture, and a menu
    * opening downward from there opens off the player.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -42949,12 +49018,36 @@ export type CustomElementsSolidJs = {
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the list, which usually has no visible heading.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the current entry changes, and cancelable.
+   * - `helix-before-activate`: Fired before the current entry changes, and cancelable.
    *
    * ## Slots
    *
@@ -42969,7 +49062,7 @@ export type CustomElementsSolidJs = {
    *
    * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
@@ -43098,6 +49191,30 @@ export type CustomElementsSolidJs = {
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
    * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## Events
    *
@@ -43221,6 +49338,30 @@ export type CustomElementsSolidJs = {
    * - `estimate`: How tall one row is, in pixels, used to map scroll offset to an index.
    * - `for`: Id of the element holding the rows, as JSON in a script.
    * - `label`: What the list is called, since the rendered rows are only a window on it.
+   * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
+   *
+   * **Named `whenSettled` because `settled` was taken four times over.** Image
+   * and Splitter each have a private `settle`, and both color controls carry a
+   * `settled` of their own, all of them older than this and none of them about
+   * transitions. A base class takes the name every subclass then cannot use, so
+   * it takes the one nobody wanted.
+   *
+   * **The state it reports cannot be watched, which is why this exists.** A
+   * `MutationObserver` could see `[data-settled]` arrive and there is no
+   * equivalent for `ElementInternals.states`: a custom state is deliberately not
+   * in the DOM, which is the whole reason it replaced the attribute. Anything
+   * that used to wait on the attribute waits on this instead, and gets a better
+   * signal for it, an awaited promise being what the callers wanted rather than
+   * a mutation they had to interpret.
+   *
+   * Separate from `updateComplete`, which resolves in the microtask checkpoint
+   * the suppression is still active in. That is the distinction `readyToMove`
+   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * were misread as a token fault for days.
+   *
+   * It never resolves where `requestAnimationFrame` never fires, which is a
+   * server, a hidden tab, and happy-dom. Callers that must not hang race it
+   * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
    * ## CSS Custom Properties
    *

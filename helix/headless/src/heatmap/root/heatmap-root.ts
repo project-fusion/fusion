@@ -212,9 +212,20 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        The attribute is set after the first render rather than during it, so a
        hydrating consumer's markup and the server's output agree: neither has it,
        and it appears once the element has measured something. */
+    /* **Nothing measured yet is the absence of the attribute.** The comment
+       above claimed writing here made the server's output and a hydrating
+       consumer's markup agree, and it does the reverse: `updated` runs in the
+       same microtask checkpoint as `firstUpdated`, before React need have
+       reached the node, so `visible="0"` was an attribute no server sent. That
+       is the fault `data-settled` was found for four times. */
     const showing = this.visible
-    if (this.getAttribute('visible') !== String(showing)) {
-      this.setAttribute('visible', String(showing))
+    const written = showing > 0 ? String(showing) : null
+    if (this.getAttribute('visible') !== written) {
+      if (written === null) {
+        this.removeAttribute('visible')
+      } else {
+        this.setAttribute('visible', written)
+      }
     }
     if (this.announced !== undefined && this.announced !== showing) {
       this.dispatchEvent(new HelixResizeEvent({ size: showing }))

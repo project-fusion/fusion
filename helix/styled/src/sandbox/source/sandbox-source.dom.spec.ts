@@ -92,7 +92,7 @@ describe('the source pane', () => {
     const host = await source('name="css"')
     const field = part(host, 'source') as HTMLTextAreaElement
     let heard: { property: string; value: unknown } | undefined
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-edit', (event) => {
       heard = (event as CustomEvent<{ property: string; value: unknown }>).detail
     })
 

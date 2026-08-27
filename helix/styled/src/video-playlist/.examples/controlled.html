@@ -17,7 +17,7 @@
 <script>
   const episodes = document.getElementById('episodes')
 
-  episodes.addEventListener('helix-change', (event) => {
+  episodes.addEventListener('helix-before-activate', (event) => {
     episodes.active = event.detail.value
   })
 </script>

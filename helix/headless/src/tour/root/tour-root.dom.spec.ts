@@ -70,7 +70,7 @@ describe('moving through it', () => {
   test('goes on, and says so rather than assuming', async () => {
     const tour = await run()
     let heard: string | undefined
-    tour.addEventListener('helix-change', (event) => {
+    tour.addEventListener('helix-before-activate', (event) => {
       heard = (event as CustomEvent<{ value: string }>).detail.value
     })
     tour.next()
@@ -173,7 +173,7 @@ describe('a stop', () => {
 describe('moving between stops', () => {
   test('announces before it moves, so a refusal is a refusal', async () => {
     const tour = await run()
-    tour.addEventListener('helix-change', (event) => {
+    tour.addEventListener('helix-before-activate', (event) => {
       event.preventDefault()
     })
     tour.next()
@@ -184,7 +184,7 @@ describe('moving between stops', () => {
   test('and moves where nothing refused', async () => {
     const tour = await run()
     const seen: string[] = []
-    tour.addEventListener('helix-change', () => {
+    tour.addEventListener('helix-before-activate', () => {
       seen.push(`heard at ${tour.index}`)
     })
     tour.next()
@@ -214,7 +214,7 @@ describe('a tour whose stop the consumer owns', () => {
     )) as Tour
     await host.updateComplete
     let heard = 0
-    host.addEventListener('helix-change', () => {
+    host.addEventListener('helix-before-activate', () => {
       heard += 1
     })
     host.next()

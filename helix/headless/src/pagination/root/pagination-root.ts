@@ -138,13 +138,18 @@ const fill = (
  * @aliases Pager, Page nav
  * @documentation https://helix.fusion.dev/components/pagination
  *
+ * @slot first-icon - The glyph on the jump-to-first control, usually a double caret.
+ * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
+ * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
+ * @slot last-icon - The glyph on the jump-to-last control, usually a double caret.
+ *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control standing over pages not shown, which jumps into them.
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart list - The run of pages.
  * @csspart live - The region that says the page changed. Clipped, not hidden.
- * @csspart mark - The glyph on a first, previous, next or last control.
+ * @csspart mark - The glyph on a first, previous, next or last control, where none is slotted.
  * @csspart next - The control that moves forward one page.
  * @csspart page - The control for one page.
  * @csspart previous - The control that moves back one page.
@@ -617,30 +622,43 @@ export class HelixHeadlessPagination extends HelixElement {
    * link mode the inert one is an `<a>` with no `href`, which is not a link and
    * is not focusable, and is the platform's own way of saying there is nowhere
    * to go.
+   *
+   * **Each glyph is a slot fallback, and each method is a seam**, which answer
+   * two different people: the slot is how a page swaps a caret for its own icon
+   * set, and `protected` is how the tier above swaps all four without
+   * reimplementing a template that renders eight controls across two shapes.
+   * `Select` and `Listbox` carry the same pairing on one mark each.
+   *
+   * **Four slot names rather than one**, even though the four controls draw
+   * from the same shared `mark` part. A single `<slot name="icon">` is assigned
+   * once and the other three occurrences of it get nothing, so a consumer
+   * replacing the caret would silently lose three of their four marks.
    */
-  private renderFirst(): TemplateResult {
+  protected renderFirst(): TemplateResult {
     const { address, click, glyph, name, off, spent } = this.step(
       1,
       this.current <= 1,
       caretDoubleLeft,
       this.firstLabel,
     )
+    const mark = html`<slot name="first-icon">${glyph}</slot>`
     return this.href
       ? html`<a part="first" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
-          >${glyph}</a
+          >${mark}</a
         >`
       : html`<button part="first" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
-          ${glyph}
+          ${mark}
         </button>`
   }
 
-  private renderPrevious(): TemplateResult {
+  protected renderPrevious(): TemplateResult {
     const { address, click, glyph, name, off, spent } = this.step(
       this.current - 1,
       this.current <= 1,
       caretLeft,
       this.previousLabel,
     )
+    const mark = html`<slot name="previous-icon">${glyph}</slot>`
     return this.href
       ? html`<a
           part="previous"
@@ -648,7 +666,7 @@ export class HelixHeadlessPagination extends HelixElement {
           aria-disabled=${off}
           aria-label=${name}
           @click=${click}
-          >${glyph}</a
+          >${mark}</a
         >`
       : html`<button
           part="previous"
@@ -657,39 +675,41 @@ export class HelixHeadlessPagination extends HelixElement {
           aria-label=${name}
           @click=${click}
         >
-          ${glyph}
+          ${mark}
         </button>`
   }
 
-  private renderNext(): TemplateResult {
+  protected renderNext(): TemplateResult {
     const { address, click, glyph, name, off, spent } = this.step(
       this.current + 1,
       this.current >= this.count,
       caretRight,
       this.nextLabel,
     )
+    const mark = html`<slot name="next-icon">${glyph}</slot>`
     return this.href
       ? html`<a part="next" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
-          >${glyph}</a
+          >${mark}</a
         >`
       : html`<button part="next" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
-          ${glyph}
+          ${mark}
         </button>`
   }
 
-  private renderLast(): TemplateResult {
+  protected renderLast(): TemplateResult {
     const { address, click, glyph, name, off, spent } = this.step(
       this.count,
       this.current >= this.count,
       caretDoubleRight,
       this.lastLabel,
     )
+    const mark = html`<slot name="last-icon">${glyph}</slot>`
     return this.href
       ? html`<a part="last" href=${address} aria-disabled=${off} aria-label=${name} @click=${click}
-          >${glyph}</a
+          >${mark}</a
         >`
       : html`<button part="last" type="button" ?disabled=${spent} aria-label=${name} @click=${click}>
-          ${glyph}
+          ${mark}
         </button>`
   }
 

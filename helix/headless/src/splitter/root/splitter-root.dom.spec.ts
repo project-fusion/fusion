@@ -111,7 +111,7 @@ describe('splitter settling', () => {
   test('says so when a key move settles', async () => {
     const host = await splitter('default-position="50" step="5"')
     let settled = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-resize', (event) => {
       settled = (event as CustomEvent<{ value: string }>).detail.value
     })
     await press(host, 'ArrowRight')
@@ -125,7 +125,7 @@ describe('splitter settling', () => {
        See 294. */
     const host = await splitter('position="50" step="5"')
     let asked = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-resize', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     await press(host, 'ArrowRight')
@@ -462,7 +462,7 @@ describe('splitter collapsing', () => {
     const host = await splitter('default-position="40"')
     let named = ''
     let value = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-collapse', (event) => {
       const detail = (event as CustomEvent<{ property: string; value: string }>).detail
       if (detail.property === 'collapsed') {
         named = detail.property
@@ -527,7 +527,7 @@ describe('splitter collapsing', () => {
        See 294. */
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-collapse', (event) => {
       const detail = (event as CustomEvent<{ property: string; value: string }>).detail
       if (detail.property === 'collapsed') {
         asked = detail.value
@@ -578,7 +578,7 @@ describe('splitter under a consumer that owns the position', () => {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
     })
     let asked = ''
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-resize', (event) => {
       const detail = (event as CustomEvent<{ property: string; value: string }>).detail
       if (detail.property === 'position') {
         asked = detail.value
@@ -600,7 +600,7 @@ describe('splitter under a consumer that owns the position', () => {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
     })
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-resize', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     const bar = separator(host)
@@ -696,7 +696,7 @@ describe('a press that moves nothing', () => {
        click rewrote a stored size from a gesture that moved nothing. */
     const host = await splitter('default-position="40"')
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-resize', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     const bar = separator(host)

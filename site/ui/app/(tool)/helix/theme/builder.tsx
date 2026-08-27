@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixChangeEvent, HelixSandboxPreview } from '@helix-io/styled'
+import type { HelixBeforeResizeEvent, HelixSandboxPreview } from '@helix-io/styled'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
@@ -374,13 +374,13 @@ export function ThemeBuilder({
      form. A sliver is left so the preview says it is still there. */
   const controlsPosition = controlsShown ? (narrow ? 88 : 24) : 0
 
-  /* **Declared, so the consumer owns it and answers `helix-change`**, which is
-     the contract the typings state and refuse a `position` without. A reader
+  /* **Declared as a correction, and answered so it stays one.** The splitter
+     moves itself; this hears where it went and agrees. A reader
      dragging the separator to the edge has shut the pane, and the toggle has to
      hear that or it goes on saying "Hide controls" over a pane that is already
      gone. Two per cent rather than zero, because a drag that lands a pixel short
      of the edge is still a reader shutting it. */
-  const controlsMoved = (event: HelixChangeEvent) => {
+  const controlsMoved = (event: HelixBeforeResizeEvent) => {
     if (event.detail.property === 'position') {
       setControlsShown(Number(event.detail.value) > 2)
     }
@@ -435,7 +435,7 @@ export function ThemeBuilder({
    *
    * `active` on Tabs is a seed and a correction rather than a strict controlled
    * property, so the set still moves itself on a click and this only has to
-   * agree with it. Answering `helix-change` is what keeps them agreeing.
+   * agree with it. Answering `helix-before-activate` is what keeps them agreeing.
    */
   const [audit, setAudit] = useState('contrast')
 
@@ -807,7 +807,7 @@ export function ThemeBuilder({
       <helix-splitter
         className={styles.workbenchBody}
         default-position={24}
-        onhelix-change={controlsMoved}
+        onhelix-before-resize={controlsMoved}
         position={controlsPosition}
       >
         <section className="themeControls" ref={controls} slot="start">
@@ -1241,7 +1241,7 @@ export function ThemeBuilder({
                one word to a line, which is the same measurement 244 made of the
                sandbox's source pane. Only the axis changes: `lead` above already says
                preview, at every width, because that is what this tool is for. */
-            onhelix-change={(event) => {
+            onhelix-before-resize={(event) => {
               if (event.detail.property === 'split') {
                 setSplit((event.target as HTMLElement & { split: number }).split)
               }
@@ -1399,7 +1399,7 @@ export function ThemeBuilder({
               active={audit}
               data-density="sm"
               label="The audit"
-              onhelix-change={(event) => setAudit(event.detail.value)}
+              onhelix-before-activate={(event) => setAudit(event.detail.value)}
               slot="panel"
             >
               <helix-tabs-tab value="contrast">

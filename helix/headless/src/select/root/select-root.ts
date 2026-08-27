@@ -224,7 +224,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     }
     /* Closed on a choice, unless more than one can be made: a multi-select that
        shut after each pick would be a control the reader has to reopen to use
-       again. `helix-change` is left to travel, since it came from the listbox
+       again. `helix-before-change` is left to travel, since it came from the listbox
        and says the same thing this would. */
     if (!this.multiple) {
       this.close()

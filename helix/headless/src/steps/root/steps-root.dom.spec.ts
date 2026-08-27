@@ -214,7 +214,7 @@ describe('the list can hold which step is current', () => {
        See 294. */
     const host = await seq('active="one"')
     const said: string[] = []
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement

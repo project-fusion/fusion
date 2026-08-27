@@ -1,7 +1,7 @@
 import {
   customElement,
+  HelixBeforeActivateEvent,
   HelixBeforeCloseEvent,
-  HelixChangeEvent,
   HelixCompleteEvent,
   HelixElement,
   hostAria,
@@ -62,7 +62,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * @csspart spotlight - The box over the current target, which paints the scrim.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the current stop moves,
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired when the current stop moves,
  * carrying the new index.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
@@ -204,7 +204,7 @@ export class HelixHeadlessTour extends HelixElement {
       apply: (value) => {
         this.index = value
       },
-      event: (value) => new HelixChangeEvent({ property: 'index', value: String(value) }),
+      event: (value) => new HelixBeforeActivateEvent({ property: 'index', value: String(value) }),
       host: this,
       next: to,
     })

@@ -1,10 +1,11 @@
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../../content/catalog/catalog'
+import { GOOGLE_FACES } from '../../../../content/faces/faces.generated'
 import { INSIGHTS } from '../../../../content/insights'
 import { serverTheme } from '../../../../utils/theme-engine/theme-engine.server'
 import { ThemeBuilder } from './builder'
-import { INITIAL, intentFrom, SCOPE } from './defaults'
-import { THEMED_PAGE_MARKUP } from './themed-page-markup.generated'
+import { intentFrom, type Params, SCOPE, settingsFrom } from './defaults'
+import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-markup.generated'
 
 /**
  * The theme builder.
@@ -26,7 +27,36 @@ export const metadata = pageMetadata({
   title: 'Theme builder',
 })
 
-export default async function ThemePage() {
+export default async function ThemePage({ searchParams }: { searchParams: Promise<Params> }) {
+  /* **The theme somebody sent, derived here rather than after hydration.**
+
+     A reader who has built a palette wants to come back to it and to send it to
+     somebody, and the whole of a theme is nineteen values, so the link can
+     simply carry them. What it carries is only the departures from what ships,
+     so a reader who changed a brand and a scheme sends two parameters and a
+     reader who changed nothing sends none.
+
+     **The query and not the fragment**, because a fragment never reaches a
+     server: a shared link would arrive carrying the default palette in its HTML
+     and jump to the sent one a moment after hydration, which is the exact
+     first-paint property `serverTheme` was written to hold. `settingsFrom`
+     validates every value on the way in, each falling back on its own, because
+     these arrive from whatever was in somebody's address bar and two of them
+     (the brand and the three faces) are interpolated into a stylesheet.
+
+     Reading `searchParams` makes this route dynamic. That costs a `derive` per
+     request and not a WebAssembly instantiation, `serverTheme` holding the
+     engine for the life of the process. */
+  const params = await searchParams
+  const settings = settingsFrom(params, GOOGLE_FACES)
+  /* Validated here rather than in the builder, so an unknown axis value never
+     reaches a component that would have to decide what to do with it. Both fall
+     back to their list's first entry, which is each axis's resting one. */
+  const chosen = (
+    offered: readonly { value: string }[],
+    raw: string | string[] | undefined,
+  ): string | undefined =>
+    typeof raw === 'string' && offered.some((entry) => entry.value === raw) ? raw : undefined
   /* Built here, on a server, and handed down, the way the sandbox page and the
      site layout both already do it: the catalog reads the manifest off disk
      and the insight registry is the whole of the writing, so a palette that
@@ -56,19 +86,32 @@ export default async function ThemePage() {
      Rendered by `bun run themed-page` rather than here, because a server
      component resolves under the `react-server` condition and `react-dom/server`
      is not exported there: Next refuses the import outright. `check:themed-page`
-     holds the string and the JSX to each other. */
+     holds the strings and the JSX to each other.
+
+     **Nine of them, on two axes.** A context is whose page it is, because a
+     reader theming a magazine should not be reading about berth windows to find
+     out what their headings will look like; a layout is how much page there is,
+     because a palette that holds on a dense dashboard can be washed out on a
+     landing page with four things on it. The two are independent, which is the
+     area rules' own test for whether something is one question or two.
+
+     The lists carry their own labels for the same reason they carry their own
+     markup: the builder is a client component, and importing the layouts to
+     read three labels would send three unrendered pages to the browser. */
 
   /* **The default theme, derived before anything renders.** The engine used to
      be synchronous JavaScript and did this without being asked, which is what
      put a real palette in the builder's first paint; it is WebAssembly now, so
-     the server has to do it deliberately. The intent is the one in `defaults`,
-     which is also what the builder's sliders start at, so the palette that
-     arrives in the HTML is the palette the browser would derive a moment later
-     rather than a stand-in for it. */
-  const theme = (await serverTheme()).derive(intentFrom(INITIAL), [SCOPE, ':root'])
+     the server has to do it deliberately. The intent is whatever the link
+     described, defaulting to the one in `defaults`, which is also what the
+     builder's sliders start at, so the palette that arrives in the HTML is the
+     palette the browser would derive a moment later rather than a stand-in for
+     it. */
+  const theme = (await serverTheme()).derive(intentFrom(settings), [SCOPE, ':root'])
 
   return (
     <ThemeBuilder
+      contexts={THEMED_CONTEXTS}
       findable={[
         {
           group: 'Components',
@@ -87,8 +130,12 @@ export default async function ThemePage() {
           })),
         },
       ]}
+      initialContext={chosen(THEMED_CONTEXTS, params.preview)}
+      initialLayout={chosen(THEMED_LAYOUTS, params.layout)}
+      initialSettings={settings}
       initialTheme={theme}
-      pageMarkup={THEMED_PAGE_MARKUP}
+      layouts={THEMED_LAYOUTS}
+      markup={THEMED_MARKUP}
     />
   )
 }

@@ -44,7 +44,7 @@ import type { HelixHeadlessStep } from '../step/step.js'
  *
  * @slot - The steps, which are `helix-step` elements.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the active step changes.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired when the active step changes.
  */
 @customElement('helix-headless-steps')
 export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {

@@ -39,9 +39,9 @@ export declare class MixinControllerValueInterface {
    * change in discrete steps where a step *is* the change.
    *
    * It selects the event rather than the timing. `requestValue` is called
-   * whenever the value moves either way; this decides whether that arrives as
-   * `helix-input` or `helix-change`, so a consumer can read the name and know
-   * how often to expect it.
+   * whenever the value moves either way; this decides whether the control sends
+   * `input` alone or `input` and `change` together, so a consumer can read the
+   * name and know how often to expect it.
    */
   protected readonly announcesInput: boolean
 
@@ -164,7 +164,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     /**
      * Requests a new value, and reports whether the request stood.
      *
-     * Announces before it acts, so `preventDefault()` on the `helix-change` is
+     * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
      * a refusal and nothing moves. Nobody refusing means the control updates
      * itself, whether or not a consumer declared `value`: a declared property
      * is a seed and a correction, the way `<input value>` is, and a consumer

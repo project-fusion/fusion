@@ -160,7 +160,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
    * Takes what the list announced and says it under this element's name.
    *
-   * The listbox says `helix-change`, which is the right word for a control that
+   * The listbox says `helix-before-change`, which is the right word for a control that
    * holds a value and the wrong one for a palette: nothing here changed, a
    * command ran. It is stopped and re-announced rather than relayed, so a
    * consumer hears one event naming the element they put on the page.
@@ -184,7 +184,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * one event name and distinguishable only by looking at the target.
    *
    * The one this element dispatches has itself as the target and is let past.
-   * Combobox stops the listbox's `helix-change` for the same reason.
+   * Combobox stops the listbox's `helix-before-change` for the same reason.
    *
    * `stopImmediatePropagation`, not `stopPropagation`. The consumer's listener
    * is on this same element, and stopping propagation only keeps an event off
@@ -210,7 +210,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    *
    * **Command intercepts rather than Listbox reporting, and that is the whole
    * design.** Enter belongs to the listbox: it owns the active row, it decides
-   * what choosing means, and it announces `helix-change`. Teaching it about a
+   * what choosing means, and it announces `helix-before-change`. Teaching it about a
    * modifier would put a palette's idea of a second destination inside a
    * control that is also a select and a combobox, neither of which has one.
    *

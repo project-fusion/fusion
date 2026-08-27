@@ -12,7 +12,7 @@
 <script>
   const flow = document.getElementById('flow')
 
-  flow.addEventListener('helix-change', (event) => {
+  flow.addEventListener('helix-before-activate', (event) => {
     flow.active = event.detail.value
   })
 </script>

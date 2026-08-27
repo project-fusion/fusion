@@ -88,7 +88,7 @@
 
      The tour owns the order and the light. What it deliberately does not know
      is that stop two is inside a menu and stop three is inside a drawer, which
-     is the consumer's own state and stays theirs: `helix-change` says where the
+     is the consumer's own state and stays theirs: `helix-before-activate` says where the
      reader now is, and this decides what has to be open for that to make sense.
 
      Written as "what should be open at index N" rather than as a list of things
@@ -120,7 +120,7 @@
     tour.open = true
   })
 
-  tour.addEventListener('helix-change', (event) => {
+  tour.addEventListener('helix-before-activate', (event) => {
     const index = Number(event.detail.value)
     tour.index = index
     arrange(index)

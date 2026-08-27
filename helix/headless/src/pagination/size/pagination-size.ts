@@ -1,7 +1,7 @@
 import {
   customElement,
   formatNumbers,
-  HelixChangeEvent,
+  HelixBeforeChangeEvent,
   HelixElement,
   requestChange,
 } from '@helix-io/core'
@@ -52,7 +52,7 @@ import '../../select/index.js'
  *
  * `value` is the controlled property and `default-value` seeds one this owns,
  * the same contract every other stateful element here carries. Changing it
- * announces `helix-change`; what a consumer does with that is re-query and move
+ * announces `helix-before-change`; what a consumer does with that is re-query and move
  * back to page one, which is theirs to decide because only they know whether
  * the reader's position should survive it.
  *
@@ -66,7 +66,7 @@ import '../../select/index.js'
  * @csspart trigger - The closed control, forwarded from the select.
  * @csspart value - The chosen size inside the trigger, forwarded from the select.
  *
- * @event {HelixChangeEvent} helix-change - Fired before the size changes, and cancelable. The only way to refuse one.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
  */
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {
@@ -136,7 +136,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
 
   private readonly handleChange = (event: Event): void => {
     /* Stopped, then re-announced under this element's own name. `Select`'s
-       `helix-change` bubbles and is composed, so left alone it would cross this
+       `helix-before-change` bubbles and is composed, so left alone it would cross this
        shadow boundary and be retargeted to look like this element's: a consumer
        would get two events per change, one of them carrying `Select`'s idea of
        what a name and a value are. */
@@ -151,7 +151,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         this.valueState = size
         this.requestUpdate('value', previous)
       },
-      event: (size) => new HelixChangeEvent({ property: 'value', value: String(size) }),
+      event: (size) => new HelixBeforeChangeEvent({ property: 'value', value: String(size) }),
       host: this,
       next,
     })

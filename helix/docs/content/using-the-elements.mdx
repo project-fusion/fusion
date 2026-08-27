@@ -27,7 +27,7 @@ advice.
 ## Bind Helix events with `onhelix-*`
 
 ```tsx
-<helix-tabs onhelix-change={(event) => setPane(event.detail.value)} />
+<helix-tabs onhelix-before-activate={(event) => setPane(event.detail.value)} />
 ```
 
 There is a real bug underneath this, and the elements work around it for you.

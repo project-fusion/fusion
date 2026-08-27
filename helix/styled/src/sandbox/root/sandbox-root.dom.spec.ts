@@ -388,7 +388,7 @@ describe('sandbox dividers', () => {
        every consumer of it then ignored in favor of reading the element. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const named: string[] = []
-    sandbox.addEventListener('helix-change', (event) => {
+    sandbox.addEventListener('helix-before-resize', (event) => {
       named.push((event as CustomEvent<{ property: string }>).detail.property)
     })
     await press(sandbox, panes(sandbox), 'ArrowRight')
@@ -454,10 +454,10 @@ describe('sandbox source editing', () => {
         value: string
       }
       jsx.dispatchEvent(
-        new CustomEvent('helix-change', {
+        new CustomEvent('helix-before-edit', {
           bubbles: true,
           composed: true,
-          detail: { name: 'tsx', value: 'export function Example() {}' },
+          detail: { property: 'value', value: 'export function Example() {}' },
         }),
       )
       await sandbox.updateComplete

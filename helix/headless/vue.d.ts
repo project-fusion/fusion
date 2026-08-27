@@ -126,7 +126,7 @@ import type {
   HelixDismissEvent,
   HelixSelectEvent,
   HelixSendEvent,
-  HelixChangeEvent,
+  HelixBeforePinEvent,
   HelixBeforeChangeEvent,
   HelixBeforeToggleEvent,
   HelixSampleEndEvent,
@@ -139,7 +139,10 @@ import type {
   HelixResizeEvent,
   HelixShortcutEvent,
   HelixReadEvent,
+  HelixBeforeActivateEvent,
   HelixCompleteEvent,
+  HelixBeforeResizeEvent,
+  HelixBeforeCollapseEvent,
   HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -873,9 +876,9 @@ export type HelixHeadlessChatElementEvent<E = Event> = TypedEvent<
   HelixHeadlessChat,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessChatHelixChangeElementEvent =
-  HelixHeadlessChatElementEvent<HelixChangeEvent>;
+/** `helix-before-pin` event type */
+export type HelixHeadlessChatHelixBeforePinElementEvent =
+  HelixHeadlessChatElementEvent<HelixBeforePinEvent>;
 
 export type HelixHeadlessChatVueProps = {
   /** Accessible name for the conversation. */
@@ -926,7 +929,7 @@ say that without the component knowing what a row looks like. */
 
 export type HelixHeadlessChatVueEvents = {
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
-  "helix-change": HelixHeadlessChatHelixChangeElementEvent;
+  "helix-before-pin": HelixHeadlessChatHelixBeforePinElementEvent;
 };
 
 /** `HelixHeadlessCheckboxGroup` component event */
@@ -4030,9 +4033,9 @@ export type HelixHeadlessOutlineElementEvent<E = Event> = TypedEvent<
   HelixHeadlessOutline,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessOutlineHelixChangeElementEvent =
-  HelixHeadlessOutlineElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessOutlineHelixBeforeActivateElementEvent =
+  HelixHeadlessOutlineElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixHeadlessOutlineVueProps = {
   /** Accessible name for the navigation. */
@@ -4067,7 +4070,7 @@ JavaScript rather than CSS decides. */
 
 export type HelixHeadlessOutlineVueEvents = {
   /** The section being read has changed, carrying its id as the value. */
-  "helix-change": HelixHeadlessOutlineHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessOutlineHelixBeforeActivateElementEvent;
 };
 
 /** `HelixHeadlessPagination` component event */
@@ -4226,9 +4229,9 @@ export type HelixHeadlessPaginationSizeElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPaginationSize,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessPaginationSizeHelixChangeElementEvent =
-  HelixHeadlessPaginationSizeElementEvent<HelixChangeEvent>;
+/** `helix-before-change` event type */
+export type HelixHeadlessPaginationSizeHelixBeforeChangeElementEvent =
+  HelixHeadlessPaginationSizeElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixHeadlessPaginationSizeVueProps = {
   /** The sizes offered, comma separated.
@@ -4255,7 +4258,7 @@ Reading gives the real one; writing declares it the consumer's, and
 
 export type HelixHeadlessPaginationSizeVueEvents = {
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
-  "helix-change": HelixHeadlessPaginationSizeHelixChangeElementEvent;
+  "helix-before-change": HelixHeadlessPaginationSizeHelixBeforeChangeElementEvent;
 };
 
 export type HelixHeadlessPaginationSummaryVueProps = {
@@ -5272,9 +5275,12 @@ export type HelixHeadlessSplitterElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSplitter,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessSplitterHelixChangeElementEvent =
-  HelixHeadlessSplitterElementEvent<HelixChangeEvent>;
+/** `helix-before-resize` event type */
+export type HelixHeadlessSplitterHelixBeforeResizeElementEvent =
+  HelixHeadlessSplitterElementEvent<HelixBeforeResizeEvent>;
+/** `helix-before-collapse` event type */
+export type HelixHeadlessSplitterHelixBeforeCollapseElementEvent =
+  HelixHeadlessSplitterElementEvent<HelixBeforeCollapseEvent>;
 
 export type HelixHeadlessSplitterVueProps = {
   /** Which way the panes are laid out.
@@ -5374,8 +5380,10 @@ passes through. */
 };
 
 export type HelixHeadlessSplitterVueEvents = {
-  /** Fired when the divider settles, named `position` or `collapsed`. */
-  "helix-change": HelixHeadlessSplitterHelixChangeElementEvent;
+  /** Fired before the divider settles, and cancelable. */
+  "helix-before-resize": HelixHeadlessSplitterHelixBeforeResizeElementEvent;
+  /** Fired before a pane shuts or reopens, and cancelable. */
+  "helix-before-collapse": HelixHeadlessSplitterHelixBeforeCollapseElementEvent;
 };
 
 export type HelixHeadlessStatGroupVueProps = {
@@ -5417,9 +5425,9 @@ export type HelixHeadlessStepsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSteps,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessStepsHelixChangeElementEvent =
-  HelixHeadlessStepsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessStepsHelixBeforeActivateElementEvent =
+  HelixHeadlessStepsElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixHeadlessStepsVueProps = {
   /** Accessible name for the sequence.
@@ -5472,7 +5480,7 @@ how markup says where to start. */
 
 export type HelixHeadlessStepsVueEvents = {
   /** Fired when the active step changes. */
-  "helix-change": HelixHeadlessStepsHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessStepsHelixBeforeActivateElementEvent;
 };
 
 /** `HelixHeadlessStep` component event */
@@ -5718,9 +5726,9 @@ export type HelixHeadlessTabsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTabs,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTabsHelixChangeElementEvent =
-  HelixHeadlessTabsElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessTabsHelixBeforeActivateElementEvent =
+  HelixHeadlessTabsElementEvent<HelixBeforeActivateEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessTabsHelixSelectElementEvent =
   HelixHeadlessTabsElementEvent<HelixSelectEvent>;
@@ -5780,7 +5788,7 @@ how markup says where to start. */
 
 export type HelixHeadlessTabsVueEvents = {
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixHeadlessTabsHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessTabsHelixBeforeActivateElementEvent;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
   "helix-select": HelixHeadlessTabsHelixSelectElementEvent;
 };
@@ -6681,9 +6689,9 @@ export type HelixHeadlessTourElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTour,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTourHelixChangeElementEvent =
-  HelixHeadlessTourElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessTourHelixBeforeActivateElementEvent =
+  HelixHeadlessTourElementEvent<HelixBeforeActivateEvent>;
 /** `helix-complete` event type */
 export type HelixHeadlessTourHelixCompleteElementEvent =
   HelixHeadlessTourElementEvent<HelixCompleteEvent>;
@@ -6737,7 +6745,7 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 
 export type HelixHeadlessTourVueEvents = {
   /** Fired when the current stop moves, carrying the new index. */
-  "helix-change": HelixHeadlessTourHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessTourHelixBeforeActivateElementEvent;
   /** Fired when the last stop is finished. */
   "helix-complete": HelixHeadlessTourHelixCompleteElementEvent;
   /** Fired when the reader leaves early. */
@@ -6896,9 +6904,9 @@ export type HelixHeadlessTreeElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTree,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessTreeHelixChangeElementEvent =
-  HelixHeadlessTreeElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessTreeHelixBeforeActivateElementEvent =
+  HelixHeadlessTreeElementEvent<HelixBeforeActivateEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessTreeHelixSelectElementEvent =
   HelixHeadlessTreeElementEvent<HelixSelectEvent>;
@@ -6942,7 +6950,7 @@ how markup says where to start. */
 
 export type HelixHeadlessTreeVueEvents = {
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
-  "helix-change": HelixHeadlessTreeHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessTreeHelixBeforeActivateElementEvent;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
   "helix-select": HelixHeadlessTreeHelixSelectElementEvent;
 };
@@ -7037,9 +7045,9 @@ export type HelixHeadlessVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixHeadlessVideoPlaylist,
   E
 >;
-/** `helix-change` event type */
-export type HelixHeadlessVideoPlaylistHelixChangeElementEvent =
-  HelixHeadlessVideoPlaylistElementEvent<HelixChangeEvent>;
+/** `helix-before-activate` event type */
+export type HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent =
+  HelixHeadlessVideoPlaylistElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixHeadlessVideoPlaylistVueProps = {
   /** Accessible name for the list, which usually has no visible heading. */
@@ -7066,7 +7074,7 @@ how markup says where to start. */
 
 export type HelixHeadlessVideoPlaylistVueEvents = {
   /** Fired before the current entry changes, and cancelable. */
-  "helix-change": HelixHeadlessVideoPlaylistHelixChangeElementEvent;
+  "helix-before-activate": HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent;
 };
 
 /** `HelixHeadlessVideo` component event */
@@ -7548,7 +7556,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessDateInputVueProps,
     HelixHeadlessDateInputVueEvents
   >;
-  /** A grid of days, per the APG date grid: the whole grid is one tab stop, arrows move by day and week, 'PageUp' and 'PageDown' move by month, and 'Home' and 'End' go to the ends of the week. Only the focused cell is in the tab sequence.  Roving 'tabindex' is written on the cells, which is free here because they are rendered into this shadow root rather than being markup a consumer wrote.  Dates are 'YYYY-MM-DD' strings and every calculation is in UTC. A local-time 'Date' shifts across a timezone or a daylight-saving boundary, so the string is what the component holds and the arithmetic never leaves UTC.  'month' is what the grid shows, separately from 'value', so paging through months does not select anything and a consumer can drive the view. Left unset, it follows the first selected date, and then the current month.  'mode' decides how many dates are held. Absent takes one. 'range' takes two and marks everything between them, starting over on the third click rather than replacing an end at random. 'multiple' toggles, so clicking a chosen date takes it out. All three read and write the same comma-separated 'value'.  'locale' is worth setting where the output is compared across environments. Left unset, month and day names come from the runtime's own locale, and a server and a browser need not agree on what that is.  'helix-change' was 'helix-select', and it moved when the calendar became a form control. A control whose value changes dispatches 'helix-change' here: 'Input', 'Select', 'Listbox', 'Radio.Group' and 'Toggle.Group' all do, and a calendar submitting a date is the same kind of thing. 'helix-select' stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as 'Menu' or 'Tree'.  Paging is 'helix-navigate' and not either of those, because it chooses nothing: the view moves and the answer does not.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** A grid of days, per the APG date grid: the whole grid is one tab stop, arrows move by day and week, 'PageUp' and 'PageDown' move by month, and 'Home' and 'End' go to the ends of the week. Only the focused cell is in the tab sequence.  Roving 'tabindex' is written on the cells, which is free here because they are rendered into this shadow root rather than being markup a consumer wrote.  Dates are 'YYYY-MM-DD' strings and every calculation is in UTC. A local-time 'Date' shifts across a timezone or a daylight-saving boundary, so the string is what the component holds and the arithmetic never leaves UTC.  'month' is what the grid shows, separately from 'value', so paging through months does not select anything and a consumer can drive the view. Left unset, it follows the first selected date, and then the current month.  'mode' decides how many dates are held. Absent takes one. 'range' takes two and marks everything between them, starting over on the third click rather than replacing an end at random. 'multiple' toggles, so clicking a chosen date takes it out. All three read and write the same comma-separated 'value'.  'locale' is worth setting where the output is compared across environments. Left unset, month and day names come from the runtime's own locale, and a server and a browser need not agree on what that is.  'helix-before-change' was 'helix-select', and it moved when the calendar became form control. A control whose value changes dispatches 'helix-before-change' here: 'Input', 'Select', 'Listbox', 'Radio.Group' and 'Toggle.Group' all do, and a calendar submitting a date is the same kind of thing. 'helix-select' stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as 'Menu' or 'Tree'.  Paging is 'helix-navigate' and not either of those, because it chooses nothing: the view moves and the answer does not.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-date-picker": DefineCustomElement<
     HelixHeadlessDatePicker,
     HelixHeadlessDatePickerVueProps,
@@ -7746,7 +7754,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessPaginationVueProps,
     HelixHeadlessPaginationVueEvents
   >;
-  /** Its own element beside 'Pagination' rather than a slot inside it, for the reason 'Pagination.Summary' is: a footer's direction and order are the consumer's, and a control that can only sit at one end of one row has taken that decision for them.  **'Select', not a native '<select>'.** It was native first, on the argument that the platform's own menu is a wheel on a phone and the widget a screen-reader user already knows. What that argument leaves out is that the library then has two dropdowns that are identical closed and different open, and a reader meets both in the same footer as a table's filters. Consistency is the whole product here, and it wins.  What it takes back with it: the caret is 'Select''s again rather than a color literal baked into a data URI, because a background image cannot read 'currentColor', and the label is a real '<label for>' against the trigger's own id, which 'Select' already renders and already tests.  **The label sits on the row, not above it.** Every other field in the library stacks its label because it stands in a column of fields; this one stands in a footer beside a run of page numbers, and a two-line control there makes the whole row two lines tall. 'Select''s host is a column, and an outer-tree rule beats a ':host' rule, so turning it into a row needs no property on 'Select' and nothing written into the consumer's markup.  **An empty 'sizes' renders nothing.** A chooser with nothing to choose from is a control a reader can operate and cannot use, which is worse than an absence. Falling back to the built-in list was the other answer and it is a component overruling a consumer who said "none". Same rule as 'Pagination' over a single page, and reported the same way, through 'ElementInternals.states' rather than an attribute the server never wrote.  'value' is the controlled property and 'default-value' seeds one this owns, the same contract every other stateful element here carries. Changing it announces 'helix-change'; what a consumer does with that is re-query and move back to page one, which is theirs to decide because only they know whether the reader's position should survive it. */
+  /** Its own element beside 'Pagination' rather than a slot inside it, for the reason 'Pagination.Summary' is: a footer's direction and order are the consumer's, and a control that can only sit at one end of one row has taken that decision for them.  **'Select', not a native '<select>'.** It was native first, on the argument that the platform's own menu is a wheel on a phone and the widget a screen-reader user already knows. What that argument leaves out is that the library then has two dropdowns that are identical closed and different open, and a reader meets both in the same footer as a table's filters. Consistency is the whole product here, and it wins.  What it takes back with it: the caret is 'Select''s again rather than a color literal baked into a data URI, because a background image cannot read 'currentColor', and the label is a real '<label for>' against the trigger's own id, which 'Select' already renders and already tests.  **The label sits on the row, not above it.** Every other field in the library stacks its label because it stands in a column of fields; this one stands in a footer beside a run of page numbers, and a two-line control there makes the whole row two lines tall. 'Select''s host is a column, and an outer-tree rule beats a ':host' rule, so turning it into a row needs no property on 'Select' and nothing written into the consumer's markup.  **An empty 'sizes' renders nothing.** A chooser with nothing to choose from is a control a reader can operate and cannot use, which is worse than an absence. Falling back to the built-in list was the other answer and it is a component overruling a consumer who said "none". Same rule as 'Pagination' over a single page, and reported the same way, through 'ElementInternals.states' rather than an attribute the server never wrote.  'value' is the controlled property and 'default-value' seeds one this owns, the same contract every other stateful element here carries. Changing it announces 'helix-before-change'; what a consumer does with that is re-query and move back to page one, which is theirs to decide because only they know whether the reader's position should survive it. */
   "helix-headless-pagination-size": DefineCustomElement<
     HelixHeadlessPaginationSize,
     HelixHeadlessPaginationSizeVueProps,
@@ -7848,7 +7856,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessSpeedDialVueProps,
     HelixHeadlessSpeedDialVueEvents
   >;
-  /** **One axis, and nesting is how you get two.** The sandbox this was taken from moves a cross: a divider down the middle, another across the bottom, and a corner that moves both. That is a layout rather than a component, and every part of it that is worth sharing is one divider between two panes. A splitter inside a splitter gives the cross back, and gives the three-pane and the four-pane arrangements it never had.  **Where two of them cross there is a corner, and it moves both.** A splitter slotted into a pane of another, at right angles to it, has one end of its divider sitting exactly on the other's. That end grows a handle: 'move' under the pointer, both arrow axes on the keyboard, and a drag that carries the two positions at once.  **The outer splitter draws it and the nested one announces itself upward.** Built the other way round first, because a splitter already knows where its own divider begins and needs no measurement of the other, and that version was clipped: the crossing lies on the boundary between a pane and the divider beside it, a handle centered there reaches back over the boundary, and a pane is 'overflow: auto'. Exactly half the corner was cut off. The outer separator is the one element that already straddles the seam, so the corner belongs in it.  That makes the channel between the two a single call in a single direction: 'cross(child, at)' says where the child crosses, 'moveTo' drives either one, and neither reads the other's state. The child is what calls it, because a parent cannot poll for a child that has not upgraded yet.  The one number it carries is a percentage rather than a measurement, which is what keeps either of them from measuring the other, and it assumes the nested splitter fills its pane. That is what slotting one into a pane does. Give the nested splitter its own inset, or wrap it in something smaller than the pane, and the corner is drawn where the crossing would be rather than where it is.  **It is a client-side enhancement and says so.** Finding the parent means inspecting the tree, which a server cannot do, so the corner appears at 'firstUpdated' and never in the served markup. That is allowed for exactly this: it is an affordance rather than content, and a splitter with no corner yet is a splitter with two working dividers.  Where two dividers are parallel there is no corner, because there is nothing to take hold of. Where they cross without a corner, the inner divider takes the pointer: every separator sits on the same layer, so a tie goes to document order and a deeper splitter is always later.  **A divider that is moving says so, whoever is moving it.** ':hover' cannot carry that: a drag holds the pointer through capture and a fast one leaves the target behind, and a corner moves the nested divider while the reader is on the crossing, nowhere near it. So a drag in progress is a state, and both dividers a corner moves are lit for as long as it moves them.  **The divider is a real 'role="separator"' with 'aria-valuenow', moved by the arrow keys as well as by pointer.** A divider only a mouse can move is unusable without one, which is the reason the sandbox's carries the same, and 'Home' and 'End' take it to its bounds.  **It goes where it is put, all the way to either end.** 'min' and 'max' are nothing and everything unless a consumer says otherwise, because a divider that stops dead short of the edge gives a reader no way to put a pane away. Where a pane should keep a sliver of itself, only whoever put the tabs on it knows how much, so they say so.  **A pane can be shut, and that is not the same as a divider at the edge.** The geometry is identical and the knowledge is not: only a shut pane knows where to open back to. So 'collapsed' is a second state rather than a reading of the position, and the position it opens to is simply the one collapsing never overwrote. 'collapsed-size' keeps a sliver showing where a pane has a tab strip worth leaving, and collapse overrides 'min' and 'max', which is what those are for: they keep a pane from vanishing by accident, and this is the deliberate version.  The two are kept in step in one direction only: a drag that settles on the collapsed size latches shut, and any move opens it again. Otherwise a reader could drag a pane closed and the consumer's own button would still be offering to close it.  A pane shut to nothing is told apart from one shut to a sliver, because the two want different dividers: a sliver still has a boundary worth drawing, and nothing leaves the divider sitting on the container's own edge.  **The box is measured once, when a drag starts.** Measuring per move is a forced layout on every pointer event, in the middle of a gesture whose whole job is to stay ahead of the pointer, and nothing about the box moves while the divider does.  **'helix-change' fires when it settles, not while it moves.** A drag is a stream of positions and only the one it ends at is a preference; announcing each would ask a consumer to write to storage a hundred times to record one decision. Nothing is stored here either: where a preference lives, and whether it should be kept at all, is the consumer's to decide, and a component writing to storage on its own would be deciding for all of them under a key it chose.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **One axis, and nesting is how you get two.** The sandbox this was taken from moves a cross: a divider down the middle, another across the bottom, and a corner that moves both. That is a layout rather than a component, and every part of it that is worth sharing is one divider between two panes. A splitter inside a splitter gives the cross back, and gives the three-pane and the four-pane arrangements it never had.  **Where two of them cross there is a corner, and it moves both.** A splitter slotted into a pane of another, at right angles to it, has one end of its divider sitting exactly on the other's. That end grows a handle: 'move' under the pointer, both arrow axes on the keyboard, and a drag that carries the two positions at once.  **The outer splitter draws it and the nested one announces itself upward.** Built the other way round first, because a splitter already knows where its own divider begins and needs no measurement of the other, and that version was clipped: the crossing lies on the boundary between a pane and the divider beside it, a handle centered there reaches back over the boundary, and a pane is 'overflow: auto'. Exactly half the corner was cut off. The outer separator is the one element that already straddles the seam, so the corner belongs in it.  That makes the channel between the two a single call in a single direction: 'cross(child, at)' says where the child crosses, 'moveTo' drives either one, and neither reads the other's state. The child is what calls it, because a parent cannot poll for a child that has not upgraded yet.  The one number it carries is a percentage rather than a measurement, which is what keeps either of them from measuring the other, and it assumes the nested splitter fills its pane. That is what slotting one into a pane does. Give the nested splitter its own inset, or wrap it in something smaller than the pane, and the corner is drawn where the crossing would be rather than where it is.  **It is a client-side enhancement and says so.** Finding the parent means inspecting the tree, which a server cannot do, so the corner appears at 'firstUpdated' and never in the served markup. That is allowed for exactly this: it is an affordance rather than content, and a splitter with no corner yet is a splitter with two working dividers.  Where two dividers are parallel there is no corner, because there is nothing to take hold of. Where they cross without a corner, the inner divider takes the pointer: every separator sits on the same layer, so a tie goes to document order and a deeper splitter is always later.  **A divider that is moving says so, whoever is moving it.** ':hover' cannot carry that: a drag holds the pointer through capture and a fast one leaves the target behind, and a corner moves the nested divider while the reader is on the crossing, nowhere near it. So a drag in progress is a state, and both dividers a corner moves are lit for as long as it moves them.  **The divider is a real 'role="separator"' with 'aria-valuenow', moved by the arrow keys as well as by pointer.** A divider only a mouse can move is unusable without one, which is the reason the sandbox's carries the same, and 'Home' and 'End' take it to its bounds.  **It goes where it is put, all the way to either end.** 'min' and 'max' are nothing and everything unless a consumer says otherwise, because a divider that stops dead short of the edge gives a reader no way to put a pane away. Where a pane should keep a sliver of itself, only whoever put the tabs on it knows how much, so they say so.  **A pane can be shut, and that is not the same as a divider at the edge.** The geometry is identical and the knowledge is not: only a shut pane knows where to open back to. So 'collapsed' is a second state rather than a reading of the position, and the position it opens to is simply the one collapsing never overwrote. 'collapsed-size' keeps a sliver showing where a pane has a tab strip worth leaving, and collapse overrides 'min' and 'max', which is what those are for: they keep a pane from vanishing by accident, and this is the deliberate version.  The two are kept in step in one direction only: a drag that settles on the collapsed size latches shut, and any move opens it again. Otherwise a reader could drag a pane closed and the consumer's own button would still be offering to close it.  A pane shut to nothing is told apart from one shut to a sliver, because the two want different dividers: a sliver still has a boundary worth drawing, and nothing leaves the divider sitting on the container's own edge.  **The box is measured once, when a drag starts.** Measuring per move is a forced layout on every pointer event, in the middle of a gesture whose whole job is to stay ahead of the pointer, and nothing about the box moves while the divider does.  **'helix-before-resize' fires when it settles, not while it moves.** A drag is a stream of positions and only the one it ends at is a preference; announcing each would ask a consumer to write to storage a hundred times to record one decision. Nothing is stored here either: where a preference lives, and whether it should be kept at all, is the consumer's to decide, and a component writing to storage on its own would be deciding for all of them under a key it chose.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-splitter": DefineCustomElement<
     HelixHeadlessSplitter,
     HelixHeadlessSplitterVueProps,

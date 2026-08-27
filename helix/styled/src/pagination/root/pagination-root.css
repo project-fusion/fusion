@@ -150,10 +150,20 @@
   pointer-events: none;
 }
 
+/* Eight selectors for four marks, and that is the shape rather than a
+   duplication. `::slotted()` never matches fallback content and a shadow-tree
+   rule never reaches an assigned node, so each control needs one selector for
+   the caret this component draws and one for the caret a consumer hands it.
+   Without the second, a slotted `<svg>` with a `viewBox` and no dimensions
+   arrives at its intrinsic 300x150 and takes the row with it. */
 [part="first"] svg,
 [part="last"] svg,
 [part="previous"] svg,
-[part="next"] svg {
+[part="next"] svg,
+::slotted([slot="first-icon"]),
+::slotted([slot="last-icon"]),
+::slotted([slot="previous-icon"]),
+::slotted([slot="next-icon"]) {
   block-size: var(--helix-size-icon-sm);
   inline-size: var(--helix-size-icon-sm);
 }
@@ -168,11 +178,19 @@
  *
  * Mirrored rather than swapped for the other icon, so the pair stays one
  * decision: `caret-double-left` reversed is exactly `caret-double-right`, and
- * two sets of icon imports that must agree is the kind of thing that drifts. */
+ * two sets of icon imports that must agree is the kind of thing that drifts.
+ *
+ * A slotted mark is mirrored on the same argument. The rule is about what the
+ * glyph means in the reading direction, not about which tree drew it, and a
+ * consumer's caret points the wrong way for exactly the reason ours did. */
 :host(:dir(rtl)) [part="first"] svg,
 :host(:dir(rtl)) [part="last"] svg,
 :host(:dir(rtl)) [part="previous"] svg,
-:host(:dir(rtl)) [part="next"] svg {
+:host(:dir(rtl)) [part="next"] svg,
+:host(:dir(rtl)) ::slotted([slot="first-icon"]),
+:host(:dir(rtl)) ::slotted([slot="last-icon"]),
+:host(:dir(rtl)) ::slotted([slot="previous-icon"]),
+:host(:dir(rtl)) ::slotted([slot="next-icon"]) {
   scale: -1 1;
 }
 

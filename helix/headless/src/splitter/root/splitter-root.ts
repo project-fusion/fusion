@@ -2,7 +2,8 @@ import {
   capturePointer,
   closestInstance,
   customElement,
-  HelixChangeEvent,
+  HelixBeforeCollapseEvent,
+  HelixBeforeResizeEvent,
   HelixElement,
   requestChange,
 } from '@helix-io/core'
@@ -111,7 +112,7 @@ const STACK_BELOW = 512
  * job is to stay ahead of the pointer, and nothing about the box moves while the
  * divider does.
  *
- * **`helix-change` fires when it settles, not while it moves.** A drag is a
+ * **`helix-before-resize` fires when it settles, not while it moves.** A drag is a
  * stream of positions and only the one it ends at is a preference; announcing
  * each would ask a consumer to write to storage a hundred times to record one
  * decision. Nothing is stored here either: where a preference lives, and whether
@@ -132,7 +133,8 @@ const STACK_BELOW = 512
  * @slot start - The pane before the divider.
  * @slot end - The pane after it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the divider settles, named `position` or `collapsed`.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and cancelable.
+ * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and cancelable.
  *
  * @csspart start - The box holding the first pane.
  * @csspart end - The box holding the second.
@@ -548,7 +550,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Asks to move, and applies it where the position is this element's to move.
    *
-   * Not announced per step: `helix-change` is the settling, below. A drag that
+   * Not announced per step: `helix-before-resize` is the settling, below. A drag that
    * announced every position would be asking a consumer to record a hundred
    * decisions to keep one.
    */
@@ -589,7 +591,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         this.positionState = value
         this.requestUpdate('position', previous)
       },
-      event: (value) => new HelixChangeEvent({ property: 'position', value: String(value) }),
+      event: (value) => new HelixBeforeResizeEvent({ property: 'position', value: String(value) }),
       host: this,
       next: wanted,
     })
@@ -608,7 +610,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
           this.requestUpdate('collapsed', previous)
         },
-        event: (value) => new HelixChangeEvent({ property: 'collapsed', value }),
+        event: (value) => new HelixBeforeCollapseEvent({ property: 'collapsed', value }),
         host: this,
         next: shut ?? '',
       })

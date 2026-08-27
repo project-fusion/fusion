@@ -521,7 +521,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * Takes what the list announced and stops it there.
    *
-   * The listbox says `helix-change` under its own name, and a consumer
+   * The listbox says `helix-before-change` under its own name, and a consumer
    * listening on this element would otherwise hear two changes for one choice,
    * one of them naming a control they did not put on the page.
    */

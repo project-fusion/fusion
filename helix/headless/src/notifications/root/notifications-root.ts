@@ -188,9 +188,19 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     /* Written after the render rather than reflected during it, so it follows
        every change rather than only the first, and so the server's output and a
        hydrating consumer's markup agree that neither has it yet. */
-    const unread = String(this.unread)
+    /* **Zero is the absence of the attribute, not `unread="0"`.** Writing it at
+       rest put an attribute on the host that a consumer's server never sent, and
+       the comment above claimed the opposite: writing in `updated` is not "after
+       hydration", it is the same microtask checkpoint `firstUpdated` runs in,
+       which is exactly how `data-settled` was a bug on three routes. Only a
+       departure from resting writes. */
+    const unread = this.unread > 0 ? String(this.unread) : null
     if (this.getAttribute('unread') !== unread) {
-      this.setAttribute('unread', unread)
+      if (unread === null) {
+        this.removeAttribute('unread')
+      } else {
+        this.setAttribute('unread', unread)
+      }
     }
   }
 

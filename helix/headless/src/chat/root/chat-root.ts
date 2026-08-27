@@ -1,6 +1,6 @@
 import {
   customElement,
-  HelixChangeEvent,
+  HelixBeforePinEvent,
   HelixElement,
   hostAria,
   MixinCollection,
@@ -65,7 +65,7 @@ import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
  * @csspart empty - Shown when the conversation has no turns.
  * @csspart loading - Shown while the history is still on its way.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+ * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
@@ -180,7 +180,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    *
    * Announced before it is applied, so a consumer owning the pin hears the
    * reader's scroll and decides. `property` names it, which is what
-   * `helix-change`'s detail is for: a listener switching on the name is
+   * `helix-before-pin`'s detail is for: a listener switching on the name is
    * switching on something with one meaning.
    */
   private requestPinned(next: boolean): boolean {
@@ -193,7 +193,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         this.pinnedState = value
         this.requestUpdate('pinned', previous)
       },
-      event: (value) => new HelixChangeEvent({ property: 'pinned', value: String(value) }),
+      event: (value) => new HelixBeforePinEvent({ property: 'pinned', value: String(value) }),
       host: this,
       next,
     })

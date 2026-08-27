@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@helix-io/testing/dom'
+import { formValue, mount, part, registerDom, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -448,5 +448,36 @@ describe('an invalid calendar says so where it can be heard', () => {
     expect(chosen.shadowRoot?.querySelector('[part="grid"]')?.hasAttribute('data-unset')).toBe(
       false,
     )
+  })
+
+  describe('the marks on the month controls', () => {
+    test('the caret is a fallback, so a page can hand over its own icon set', async () => {
+      const host = await mount(
+        '<helix-headless-date-picker default-month="2026-08"><span slot="previous-icon">back</span><span slot="next-icon">on</span></helix-headless-date-picker>',
+      )
+      await (host as unknown as { updateComplete: Promise<unknown> }).updateComplete
+      expect(slotted(host, 'previous-icon').length).toBe(1)
+      expect(slotted(host, 'next-icon').length).toBe(1)
+    })
+
+    test('and draws its own where nothing is handed over', async () => {
+      const host = await calendar('default-month="2026-08"')
+      await (host as unknown as { updateComplete: Promise<unknown> }).updateComplete
+      expect(slotted(host, 'previous-icon').length).toBe(0)
+      expect(part(host, 'previous-mark')).not.toBeNull()
+      expect(part(host, 'next-mark')).not.toBeNull()
+    })
+
+    test('a run of months carries one of each, not one per month', async () => {
+      /* A second `<slot name="previous-icon">` in the same root is assigned
+         nothing, so a duplicate would leave a calendar with an unreplaced mark
+         and no error. The controls are drawn on the first month and the last,
+         which is what keeps the names unique. */
+      const host = await calendar('default-month="2026-08" months="2"')
+      await (host as unknown as { updateComplete: Promise<unknown> }).updateComplete
+      for (const name of ['previous-icon', 'next-icon']) {
+        expect(host.shadowRoot?.querySelectorAll(`slot[name="${name}"]`).length).toBe(1)
+      }
+    })
   })
 })

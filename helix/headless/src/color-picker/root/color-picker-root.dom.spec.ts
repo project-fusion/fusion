@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { mount, part, registerDom, settle, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -24,7 +24,6 @@ const axis = async (host: Color, which: string, to: number): Promise<void> => {
   await host.updateComplete
 }
 
-/** Moves one of the ramps, which announce rather than being driven directly. */
 /**
  * Moves a channel the way its slider does: apply, then announce natively.
  *
@@ -341,5 +340,35 @@ describe('color picker', () => {
   test('and it can be withheld, for a picker whose value is stated elsewhere', async () => {
     const host = await picker('no-value')
     expect(host.shadowRoot?.querySelector('[part="value"]')).toBeNull()
+  })
+
+  describe('the mark on the eyedropper', () => {
+    /* The control is offered only where the platform has an `EyeDropper`, and
+       happy-dom has none, so the button never renders and neither does the
+       slot. Stubbed rather than skipped: what is under test is the swap, and
+       the gate is a different question that the specs above already ask. */
+    const withEyeDropper = async (children = ''): Promise<HTMLElement> => {
+      ;(globalThis as { EyeDropper?: unknown }).EyeDropper = class {}
+      const host = await mount(
+        `<helix-headless-color-picker>${children}</helix-headless-color-picker>`,
+      )
+      await settle(host as Parameters<typeof settle>[0])
+      return host
+    }
+
+    afterEach(() => {
+      ;(globalThis as { EyeDropper?: unknown }).EyeDropper = undefined
+    })
+
+    test('the dropper is a fallback, so a page can hand over its own icon set', async () => {
+      const host = await withEyeDropper('<span slot="eyedropper-icon">pick</span>')
+      expect(slotted(host, 'eyedropper-icon').length).toBe(1)
+    })
+
+    test('and draws its own where nothing is handed over', async () => {
+      const host = await withEyeDropper()
+      expect(slotted(host, 'eyedropper-icon').length).toBe(0)
+      expect(part(host, 'eyedropper')).not.toBeNull()
+    })
   })
 })

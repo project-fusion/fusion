@@ -1,7 +1,7 @@
 import {
   customElement,
+  HelixBeforeEditEvent,
   HelixCaretEvent,
-  HelixChangeEvent,
   HelixElement,
   onUnlessFalse,
 } from '@helix-io/core'
@@ -31,7 +31,7 @@ import { styles } from './sandbox-source.css.js'
  * @csspart source - The editable region.
  *
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
- * @event {HelixChangeEvent} helix-change - Fired when the source is edited.
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired when the source is edited.
  *
  * @cssproperty --sandbox-source-background - Fill behind the source.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
@@ -43,7 +43,7 @@ export class HelixSandboxSource extends HelixElement {
   value = ''
 
   /**
-   * Which source this pane holds, echoed in every `helix-change`.
+   * Which source this pane holds, echoed in every `helix-before-edit`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
@@ -99,7 +99,7 @@ export class HelixSandboxSource extends HelixElement {
 
   private readonly handleInput = (event: Event): void => {
     this.value = (event.target as HTMLTextAreaElement).value
-    this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
+    this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
     this.reportCaret(event)
   }
 
@@ -121,7 +121,7 @@ export class HelixSandboxSource extends HelixElement {
     field.selectionStart = selectionStart + 2
     field.selectionEnd = field.selectionStart
     this.value = field.value
-    this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
+    this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
   }
 
   protected override render(): TemplateResult {

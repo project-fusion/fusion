@@ -116,8 +116,8 @@ const addMonths = (date: Date, months: number): Date => {
  * Left unset, month and day names come from the runtime's own locale, and a
  * server and a browser need not agree on what that is.
  *
- * `helix-change` was `helix-select`, and it moved when the calendar became a
- * form control. A control whose value changes dispatches `helix-change` here:
+ * `helix-before-change` was `helix-select`, and it moved when the calendar became
+ * form control. A control whose value changes dispatches `helix-before-change` here:
  * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
  * calendar submitting a date is the same kind of thing. `helix-select` stays
  * what it is elsewhere, which is a row or an item being chosen in something
@@ -137,6 +137,9 @@ const addMonths = (date: Date, months: number): Date => {
  * @aliases Calendar, Date grid, Month view
  * @documentation https://helix.fusion.dev/components/date-picker
  *
+ * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.
+ * @slot next-icon - The glyph on the control that moves forward a month, usually a caret.
+ *
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
  * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
@@ -150,9 +153,9 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart month - One month, its header and its grid.
  * @csspart months - The run of months.
  * @csspart next - The control that moves to the next month.
- * @csspart next-mark - The glyph on the next month control.
+ * @csspart next-mark - The glyph on the next month control, where none is slotted.
  * @csspart previous - The control that moves to the previous month.
- * @csspart previous-mark - The glyph on the previous month control.
+ * @csspart previous-mark - The glyph on the previous month control, where none is slotted.
  * @csspart week - One row of days.
  * @csspart weekday - A column header naming a day of the week.
  *
@@ -584,6 +587,35 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     return built
   }
 
+  /**
+   * The caret saying which way the month moves, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people, which
+   * is the same pairing `Select` records on its indicator.
+   *
+   * **One of each is rendered at most**, whatever `months` is set to: the
+   * controls are drawn on the first month and the last rather than once per
+   * month, so a duplicate `<slot name="previous-icon">` cannot arise. A second
+   * slot of the same name is assigned nothing, which would have left one of two
+   * calendars with no mark and no error.
+   */
+  protected renderPreviousMark(): TemplateResult {
+    return html`<slot name="previous-icon">
+      <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretLeft.content)}
+      </svg>
+    </slot>`
+  }
+
+  protected renderNextMark(): TemplateResult {
+    return html`<slot name="next-icon">
+      <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretRight.content)}
+      </svg>
+    </slot>`
+  }
+
   private renderMonth(month: Date, index: number): TemplateResult {
     const { full, heading, weekday } = this.formats
     const weeks = this.weeksOf(month)
@@ -611,9 +643,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                 aria-label=${this.previousLabel}
                 @click=${() => this.show(addMonths(this.shown, -1))}
               >
-                <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-                  ${unsafeSVG(caretLeft.content)}
-                </svg>
+                ${this.renderPreviousMark()}
               </button>`
             : nothing
         }
@@ -626,9 +656,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                 aria-label=${this.nextLabel}
                 @click=${() => this.show(addMonths(this.shown, 1))}
               >
-                <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-                  ${unsafeSVG(caretRight.content)}
-                </svg>
+                ${this.renderNextMark()}
               </button>`
             : nothing
         }

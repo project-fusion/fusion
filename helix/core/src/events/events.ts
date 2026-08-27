@@ -31,8 +31,8 @@
  * 1. **Retargeting.** Stated above, and the reason it exists.
  * 2. **React's claimed verbs.** Its synthetic system owns `change`, `input`,
  *    `submit`, `copy`, `focus` and the rest, and a prop matching one of those
- *    is wired to the native event. Prefixed, `onhelix-change` matches none of
- *    them and reaches us.
+ *    is wired to the native event. Prefixed, `onhelix-before-change` matches none
+ *    of them and reaches us.
  * 3. **The type map below, which is global.** `HTMLElementEventMap` is shared
  *    with every element in a consumer's application, and our classes extend
  *    `Event`, so an entry named `select` does not fail to compile: it silently
@@ -45,7 +45,7 @@
  * - **Lifecycle** (`helix-before-open`, `helix-before-close`) does not bubble and is not
  *   composed. Overlays nest, and an inner one's lifecycle must never reach the
  *   outer one that contains it.
- * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-change`)
+ * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-before-change`)
  *   bubbles and is composed, so a parent or a router can intercept it across a
  *   shadow boundary.
  */
@@ -290,7 +290,7 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
 }
 
 /**
- * Detail carried by `helix-change`.
+ * Detail carried by every request that proposes a value.
  *
  * **`value` is a string, and the things that are not strings are the rule
  * rather than the exception to it.** Pagination's page, its page size, the
@@ -330,6 +330,90 @@ export interface ChangeDetail {
   property: string
   /** The value after the change. */
   value: string
+}
+
+/**
+ * A set is about to make a different child current, and can be refused.
+ *
+ * **The generic `helix-change` covered this and should not have.** Eleven
+ * families that are not form controls announced their state under the word the
+ * platform uses for a committed value, which is 294's whole complaint read from
+ * the other end: `Tabs` moving to another tab, `Tree` marking another row and
+ * `Steps` advancing are not a value changing, they are a set choosing. One word
+ * for four questions is what `appearance` was before `check:axes`.
+ *
+ * `active` names which child is current, so `activate` is the verb, and unlike
+ * `change` the platform has no claim on it. There is no notification half here:
+ * a native `change` would be a lie about what moved, and no other native event
+ * means this. The before event is the whole channel.
+ */
+export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-activate'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeActivateEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** A message is about to be pinned or unpinned, and can be refused. */
+export class HelixBeforePinEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-pin'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforePinEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** A divider is about to move, and can be refused. */
+export class HelixBeforeResizeEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-resize'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeResizeEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** A pane is about to collapse or reopen, and can be refused. */
+export class HelixBeforeCollapseEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-collapse'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeCollapseEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** Source is about to be edited, and can be refused. */
+export class HelixBeforeEditEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-before-edit'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixBeforeEditEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
 }
 
 /**
@@ -390,33 +474,6 @@ export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
 
   constructor(detail: ToggleDetail) {
     super(HelixBeforeToggleEvent.eventName, {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      detail,
-    })
-  }
-}
-
-/**
- * Fired when a value changes on something that is not a native input.
- *
- * `helix-change` rather than the `helix-value-change` this was called. The
- * rename was made on the belief that React binds no event whose name carries
- * two hyphens, which is false: it binds them fine, measured in Chrome against
- * 19.2.8. The shorter name stays for being shorter and for naming the thing
- * rather than the thing's field, and not for the reason it was chosen.
- *
- * The prefix is what keeps it clear of the native `change`. A consumer writes
- * `onhelix-change` for this and `onChange` for a real input's own, and the two
- * cannot be confused for each other. A control wrapping a native input relays
- * that input's `change` under its own name as well.
- */
-export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
-  static readonly eventName = 'helix-change'
-
-  constructor(detail: ChangeDetail) {
-    super(HelixChangeEvent.eventName, {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -914,12 +971,16 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
  * only step left that can be forgotten.
  */
 const registry = {
+  HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
+  HelixBeforeCollapseEvent,
+  HelixBeforeEditEvent,
   HelixBeforeOpenEvent,
+  HelixBeforePinEvent,
+  HelixBeforeResizeEvent,
   HelixBeforeToggleEvent,
   HelixCaretEvent,
-  HelixChangeEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
   HelixCopyEvent,

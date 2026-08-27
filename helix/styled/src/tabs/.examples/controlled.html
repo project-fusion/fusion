@@ -16,7 +16,7 @@
 <script>
   const strip = document.getElementById('strip')
 
-  strip.addEventListener('helix-change', (event) => {
+  strip.addEventListener('helix-before-activate', (event) => {
     strip.active = event.detail.value
   })
 </script>

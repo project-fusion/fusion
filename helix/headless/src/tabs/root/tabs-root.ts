@@ -37,7 +37,7 @@ import { HelixHeadlessTabsTab } from '../tab/tabs-tab.js'
  * @csspart tabs - The tab list.
  * @csspart panels - The panel container.
  *
- * @event {HelixChangeEvent} helix-change - Fired before the current tab moves, and cancelable. The only way to refuse one.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current tab moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
  */
 @customElement('helix-headless-tabs')
@@ -121,7 +121,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   }
 
   /* Through the mixin, so a consumer can refuse the change. It was written
-     straight from the event, which meant `helix-change` was an announcement
+     straight from the event, which meant `helix-before-activate` was an announcement
      nobody could answer, while `Radio.Group` two folders away could be. */
   private readonly handleSelection = (event: Event): void => {
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)

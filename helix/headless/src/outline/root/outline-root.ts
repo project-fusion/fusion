@@ -1,4 +1,9 @@
-import { customElement, HelixChangeEvent, HelixElement, IndicatorController } from '@helix-io/core'
+import {
+  customElement,
+  HelixBeforeActivateEvent,
+  HelixElement,
+  IndicatorController,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -45,7 +50,7 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/outline
  *
- * @event {HelixChangeEvent} helix-change - The section being read has changed, carrying its id as the value.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value.
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
@@ -221,7 +226,7 @@ export class HelixHeadlessOutline extends HelixElement {
     const next = active?.target.id ?? ''
     if (next !== this.reading) {
       this.reading = next
-      this.dispatchEvent(new HelixChangeEvent({ property: 'reading', value: next }))
+      this.dispatchEvent(new HelixBeforeActivateEvent({ property: 'reading', value: next }))
     }
   }
 

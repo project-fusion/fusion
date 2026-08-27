@@ -11,6 +11,14 @@
  * the mismatch `use-sandbox-editor.ts` describes and half of what it did not
  * fix: `/helix/sandbox` still reported one after the editor import moved.
  *
+ * **That cause is gone and this split is not.** The mark is an
+ * `ElementInternals.states` entry now rather than an attribute, so an element
+ * upgrading before hydration writes nothing React can see and the timing has
+ * stopped mattering. What the split is still for is the sentence above it: a
+ * barrel may hold helpers or elements, and a consumer taking `htmlToJsx` should
+ * not thereby define a custom element. The hydration diff was the symptom that
+ * found it, not the reason it is right.
+ *
  * A barrel may hold helpers or elements and this one held both, so a consumer
  * could not take the first without the second. The helpers stay in the barrel,
  * because a bundler can drop what it does not use from a module that only

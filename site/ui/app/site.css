@@ -770,3 +770,86 @@ helix-table[data-prose-table] {
   inline-size: var(--helix-size-icon-lg);
   vertical-align: middle;
 }
+
+/* ==========================================================================
+   Loading stand-ins, drawn without a component.
+
+   **A loading state may not depend on the JavaScript it is waiting for**, which
+   is the whole reason these are here rather than being `helix-skeleton` and
+   `helix-loader`. Those are the right elements and they cannot do this job:
+   `elements.css` hides every Helix tag with `visibility: hidden` until it
+   upgrades, so on a first load a `loading.tsx` built from them streams into the
+   HTML and stays invisible until the bundle registers the definitions, which is
+   about when the real page arrives. The stand-in was absent from exactly the
+   window it exists to fill, and present only on client navigations where the
+   elements were already defined.
+
+   So they are recipes, keyed on `data-`, the way `data-button` and `data-link`
+   already are. Plain elements, styled by the document, visible in the first
+   paint. The values match `helix-skeleton` and `helix-loader` so the two read as
+   the same thing when both are on screen.
+   ========================================================================== */
+
+[data-skeleton] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  /* The containing block for the sweep, and the clip that keeps it inside the
+     corner radius. */
+  overflow: hidden;
+  position: relative;
+}
+
+[data-skeleton]::after {
+  animation: siteSkeletonSweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent) 50%,
+    transparent 100%
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+@keyframes siteSkeletonSweep {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* The generic fallback's pulse, which is the loader's only variant and so the
+   only thing there is to copy. */
+[data-pulse] {
+  animation: sitePulse var(--helix-duration-slow) ease-in-out infinite alternate;
+  background-color: var(--helix-color-primary);
+  border-radius: var(--helix-radii-full);
+  block-size: var(--helix-size-icon-lg);
+  inline-size: var(--helix-size-icon-lg);
+}
+
+@keyframes sitePulse {
+  from {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* A reader who asked for less motion still needs to know it is working, so the
+   marks stay and only their movement stops. */
+@media (prefers-reduced-motion: reduce) {
+  [data-skeleton]::after,
+  [data-pulse] {
+    animation: none;
+  }
+}

@@ -111,8 +111,8 @@ const RESTING: Record<Knob, number> = {
  * element announces and applies nothing until answered, so at dispatch its own
  * property still holds the old value.
  *
- * Slider announces `helix-input` rather than `helix-change`, being one of the
- * five continuous controls, so the field moves under the thumb.
+ * Slider sends `input` alone rather than `input` and `change` together, being
+ * one of the five continuous controls, so the field moves under the thumb.
  */
 export function AuraLab(): React.ReactElement {
   const [shape, setShape] = useState(0)

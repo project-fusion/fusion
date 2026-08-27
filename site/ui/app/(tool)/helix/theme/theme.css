@@ -137,3 +137,102 @@ helix-sandbox-editor {
     animation: none;
   }
 }
+
+/* The audit counts, which are buttons wearing a tag.
+ *
+ * A bare reset rather than `all: unset`, which takes `box-sizing` with it and
+ * would need restoring in the same rule. Four properties is the whole of what a
+ * button brings that is unwanted here: the tag inside supplies every pixel a
+ * reader sees.
+ *
+ * The focus ring is the reason this is a button at all, so it is stated rather
+ * than left to the reset: `:focus-visible` only, because a pointer opening a
+ * panel does not need a ring left behind on the tag it came from. */
+.themeJump {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  padding: 0;
+}
+
+.themeJump:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}
+
+/* The two-letter sample beside a face's name.
+ *
+ * Subtle on purpose: the name is what a reader is scanning and the sample is
+ * what they check once they have found it, so it sits back a step in the ink
+ * ramp and does not compete for the row.
+ *
+ * A fixed inline size, because the whole column has to line up: `Ag` set in
+ * Playfair Display is wider than in Inter, and a ragged right edge down a
+ * thousand rows reads as a list that is broken rather than as type that varies.
+ * The sample is centered in that width so each face sits on one vertical.
+ *
+ * Not scaled to the option's text. A sample smaller than the name it describes
+ * cannot show a terminal or a bowl, which is the only thing it is here for, so
+ * it takes a step up rather than down. */
+.themeFaceSample {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-lg);
+  inline-size: 3ch;
+  line-height: var(--helix-leading-tight);
+  text-align: center;
+}
+
+/* The specimen column at the end of a face's row, holding either the sample or
+ * its stand-in.
+ *
+ * A fixed inline size, because the whole column has to line up: `Ag` in
+ * Playfair Display is wider than in Inter, and a ragged edge down a thousand
+ * rows reads as a list that is broken rather than as type that varies. Both
+ * children are laid on top of each other in the same box, so the swap when a
+ * face lands moves nothing beside it.
+ *
+ * Not scaled down to the option's text. A sample smaller than the name it
+ * describes cannot show a terminal or a bowl, which is the only thing it is
+ * here for, so it takes a step up rather than down. */
+.themeFace {
+  align-items: center;
+  block-size: var(--helix-text-xl);
+  display: grid;
+  flex: 0 0 auto;
+  inline-size: 3ch;
+  /* Ranged right, so the column's own edge is the one that lines up. At the end
+     of a row it is the right edge a reader reads down, not the left. */
+  justify-items: end;
+}
+
+.themeFace > * {
+  grid-area: 1 / 1;
+}
+
+.themeFaceSample {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-lg);
+  line-height: var(--helix-leading-tight);
+}
+
+/* **Which of the two is showing is decided by the face, not by a guess.**
+ * `useFacePreviews` writes `data-face-ready` when `document.fonts.load` has
+ * actually resolved, so until then the sample is hidden and its stand-in is
+ * not. `display=swap` would otherwise render `Ag` in the fallback under a row
+ * naming something else, which is worse than blank: blank is forgiven and wrong
+ * is believed. */
+.themeFaceSample:not([data-face-ready]) {
+  visibility: hidden;
+}
+
+.themeFaceSample[data-face-ready] + .themeFaceWaiting {
+  display: none;
+}
+
+.themeFaceWaiting {
+  --skeleton-size: var(--helix-text-md);
+
+  inline-size: 100%;
+}

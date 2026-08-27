@@ -219,6 +219,33 @@
               }
             },
             {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
@@ -277,11 +304,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixBeforeEditEvent"
               },
               "description": "Fired when the source is edited.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-before-edit",
+              "reactProp": "onhelix-before-edit"
             },
             {
               "type": {
@@ -874,6 +901,33 @@
               "privacy": "protected",
               "readonly": true,
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"

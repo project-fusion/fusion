@@ -57,13 +57,28 @@
     var(--helix-color-foreground-muted)
   );
   font-family: var(--helix-font-mono);
-  /* A hook defaulting to a semantic token, which `check:tokens` is right to
-     insist on. The first draft was `0.9em` so the fragment tracked whatever
-     text it sat in, and a ratio is genuinely the better default for something
-     that appears in headings, captions and body alike. It is not available:
-     a raw value is a raw value inside a fallback too. So the scale decides, and
-     `--code-size` is how a consumer puts the ratio back. */
-  font-size: var(--code-size, var(--helix-text-sm));
+  /* **A ratio of the text it sits in, not a rung of the scale.**
+   *
+   * This was `var(--helix-text-sm)`, a fixed 13px, on the reasoning that a ratio
+   * was the better default and was unavailable because `check:tokens` refuses a
+   * raw value inside a fallback too. The first half was right and the second was
+   * wrong, and the cost was paid in every heading: measured on the metrics page,
+   * `## What lands in node_modules` set the heading at 32px and the chip at 13,
+   * a ratio of 0.41, so a fragment of code in a heading rendered at body size
+   * and sat on the line like a footnote.
+   *
+   * `Stat` had already found the idiom and this did not look. Dividing one rung
+   * by another yields a number, and multiplying `1em` by it yields the inherited
+   * size scaled by that number. The value names two tokens, so the check is
+   * satisfied by the thing it was actually asking for, and the ratio still moves
+   * when a theme moves the scale.
+   *
+   * The rungs are the ones this already used: `sm` over `md` is 13 over 14, so
+   * body text is unchanged to the pixel and only the cases that were broken
+   * move. That step exists because a monospace face at the same nominal size
+   * reads larger than the prose around it, which is a fact about the face rather
+   * than about any one size, and is exactly why it belongs in a ratio. */
+  font-size: var(--code-size, calc(var(--helix-text-sm) / var(--helix-text-md) * 1em));
   padding-block: var(--helix-space-none);
   /* Half a step, and the punctuation is why.
    *

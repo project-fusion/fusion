@@ -1,5 +1,5 @@
 import { property } from 'lit/decorators.js'
-import { HelixChangeEvent } from '../../events/events.js'
+import { HelixBeforeActivateEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 import {
@@ -111,7 +111,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     /**
      * Requests a new current item, and reports whether the request stood.
      *
-     * Announces before it acts, so `preventDefault()` on the `helix-change` is
+     * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
      * a refusal and nothing moves. Unlike a native control, nothing has moved
      * by the time this runs, so refusing is simply not writing: there is
      * nothing to put back. Nobody refusing means the set updates itself,
@@ -128,7 +128,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
           this.activeState = value
           this.requestUpdate('active', previous)
         },
-        event: (value) => new HelixChangeEvent({ property: 'active', value }),
+        event: (value) => new HelixBeforeActivateEvent({ property: 'active', value }),
         host: this,
         next,
       })

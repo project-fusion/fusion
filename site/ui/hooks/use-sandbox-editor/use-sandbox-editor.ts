@@ -23,14 +23,25 @@ import { useEffect } from 'react'
  * Measured across three routes rather than argued: `/helix`, which registers
  * only through the deferred effect, produces no hydration diff, while
  * `/helix/theme` produces one and `/helix/sandbox` three, every one of them a
- * `data-settled=""` the server never sent. `data-settled` is written from a
- * `requestAnimationFrame` in `firstUpdated`, so a definition that lands during
- * module evaluation has a frame to spend before React arrives and a definition
- * that lands in an effect does not.
+ * `data-settled=""` the server never sent. It was written from a
+ * `requestAnimationFrame` in `firstUpdated`, so a definition that landed during
+ * module evaluation had a frame to spend before React arrived and one that
+ * landed in an effect did not.
  *
  * **It reports nothing on the surface that would send anyone looking**, which
  * is why it survived: the page renders, the editor works, and the only sign is
  * a console message naming an attribute no author wrote.
+ *
+ * **The attribute is gone and so is that failure.** `HelixElement` records the
+ * mark as an `ElementInternals.states` entry now, which is deliberately not in
+ * the DOM, so an element that upgrades before React arrives writes nothing
+ * React can find missing. The three routes measured above cannot diverge on it
+ * any more, whichever side of hydration a definition lands.
+ *
+ * The deferred import stays, for the reason it would have been worth writing
+ * without the bug: CodeMirror is about four megabytes and this keeps it out of
+ * the bundle a reader pays for before they have opened an editor. What changed
+ * is that it is a code-splitting decision rather than a hydration fix.
  *
  * The window where the tag is unknown is what `@helix-io/styled/elements.css`
  * already covers, hiding `:not(:defined)` by visibility so nothing reflows when

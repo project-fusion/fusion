@@ -2001,6 +2001,116 @@
         },
         {
           "kind": "class",
+          "description": "A set is about to make a different child current, and can be refused.\n\n**The generic `helix-change` covered this and should not have.** Eleven\nfamilies that are not form controls announced their state under the word the\nplatform uses for a committed value, which is 294's whole complaint read from\nthe other end: `Tabs` moving to another tab, `Tree` marking another row and\n`Steps` advancing are not a value changing, they are a set choosing. One word\nfor four questions is what `appearance` was before `check:axes`.\n\n`active` names which child is current, so `activate` is the verb, and unlike\n`change` the platform has no claim on it. There is no notification half here:\na native `change` would be a lie about what moved, and no other native event\nmeans this. The before event is the whole channel.",
+          "name": "HelixBeforeActivateEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-activate'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "A message is about to be pinned or unpinned, and can be refused.",
+          "name": "HelixBeforePinEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-pin'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "A divider is about to move, and can be refused.",
+          "name": "HelixBeforeResizeEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-resize'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "A pane is about to collapse or reopen, and can be refused.",
+          "name": "HelixBeforeCollapseEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-collapse'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Source is about to be edited, and can be refused.",
+          "name": "HelixBeforeEditEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-before-edit'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "A value is about to change, and the change can be refused.\n\n**The request half of every value control.** It announces the value being\n*proposed*, before anything moves, so a listener calling `preventDefault()`\nrefuses it and the control stays where it was. That is how a consumer takes\none decision without declaring a mode, which is what 294 settled: the element\nalways owns and applies its state, and refusing is the way to take it over.\n\n**The notification is native and separate.** Once this has gone out and the\nvalue has moved, the control announces it again under the platform's own\nname, `input` while a reader is editing and `change` when they are done, so\n`onChange` in React and `onchange=` in HTML both reach it and\n`currentTarget.value` is correct by the time a handler reads it. This event\ncarries the detail because at the moment it fires the value is not on the\nelement yet.\n\n**It replaced `helix-change` and `helix-input` on the value controls**, which\nwere one mechanism under two names chosen by `announcesInput`. The name said\n*phase* and the flag meant *granularity*, so a consumer reading \"change\" as\n\"the reader is done\" wired a request to `onhelix-change` and got one per\ncharacter. Granularity is now what the platform already says it is, `input`\nagainst `change`, and `announcesInput` picks which native one fires rather\nthan which name this carries. See 294.",
           "name": "HelixBeforeChangeEvent",
           "members": [
@@ -2035,28 +2145,6 @@
               "static": true,
               "readonly": true,
               "default": "'helix-before-toggle'"
-            }
-          ],
-          "superclass": {
-            "name": "CustomEvent",
-            "module": "src/events/events.ts"
-          },
-          "helix": {}
-        },
-        {
-          "kind": "class",
-          "description": "Fired when a value changes on something that is not a native input.\n\n`helix-change` rather than the `helix-value-change` this was called. The\nrename was made on the belief that React binds no event whose name carries\ntwo hyphens, which is false: it binds them fine, measured in Chrome against\n19.2.8. The shorter name stays for being shorter and for naming the thing\nrather than the thing's field, and not for the reason it was chosen.\n\nThe prefix is what keeps it clear of the native `change`. A consumer writes\n`onhelix-change` for this and `onChange` for a real input's own, and the two\ncannot be confused for each other. A control wrapping a native input relays\nthat input's `change` under its own name as well.",
-          "name": "HelixChangeEvent",
-          "members": [
-            {
-              "kind": "field",
-              "name": "eventName",
-              "type": {
-                "text": "string"
-              },
-              "static": true,
-              "readonly": true,
-              "default": "'helix-change'"
             }
           ],
           "superclass": {
@@ -2472,6 +2560,46 @@
         },
         {
           "kind": "js",
+          "name": "HelixBeforeActivateEvent",
+          "declaration": {
+            "name": "HelixBeforeActivateEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforePinEvent",
+          "declaration": {
+            "name": "HelixBeforePinEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeResizeEvent",
+          "declaration": {
+            "name": "HelixBeforeResizeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeCollapseEvent",
+          "declaration": {
+            "name": "HelixBeforeCollapseEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeEditEvent",
+          "declaration": {
+            "name": "HelixBeforeEditEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixBeforeChangeEvent",
           "declaration": {
             "name": "HelixBeforeChangeEvent",
@@ -2483,14 +2611,6 @@
           "name": "HelixBeforeToggleEvent",
           "declaration": {
             "name": "HelixBeforeToggleEvent",
-            "module": "src/events/events.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixChangeEvent",
-          "declaration": {
-            "name": "HelixChangeEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2671,6 +2791,25 @@
               "privacy": "protected",
               "readonly": true,
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard."
+            },
+            {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })"
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state."
             },
             {
               "kind": "method",
@@ -2896,6 +3035,33 @@
               "privacy": "protected",
               "readonly": true,
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "whenSettled",
+              "type": {
+                "text": "Promise<void>"
+              },
+              "readonly": true,
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "resolveSettled",
+              "type": {
+                "text": "() => void"
+              },
+              "privacy": "private",
+              "description": "Resolves `whenSettled`, once, from the frame that records the state.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
@@ -3361,6 +3527,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixBeforeActivateEvent",
+          "declaration": {
+            "name": "HelixBeforeActivateEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixBeforeChangeEvent",
           "declaration": {
             "name": "HelixBeforeChangeEvent",
@@ -3377,9 +3551,41 @@
         },
         {
           "kind": "js",
+          "name": "HelixBeforeCollapseEvent",
+          "declaration": {
+            "name": "HelixBeforeCollapseEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeEditEvent",
+          "declaration": {
+            "name": "HelixBeforeEditEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixBeforeOpenEvent",
           "declaration": {
             "name": "HelixBeforeOpenEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforePinEvent",
+          "declaration": {
+            "name": "HelixBeforePinEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeResizeEvent",
+          "declaration": {
+            "name": "HelixBeforeResizeEvent",
             "module": "./events/events.js"
           }
         },
@@ -3396,14 +3602,6 @@
           "name": "HelixCaretEvent",
           "declaration": {
             "name": "HelixCaretEvent",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixChangeEvent",
-          "declaration": {
-            "name": "HelixChangeEvent",
             "module": "./events/events.js"
           }
         },
@@ -4912,7 +5110,7 @@
                   }
                 }
               ],
-              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back. Nobody refusing means the set updates itself,\nwhether or not a consumer declared `active`, a declared property being a\nseed and a correction. See 294."
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-activate` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back. Nobody refusing means the set updates itself,\nwhether or not a consumer declared `active`, a declared property being a\nseed and a correction. See 294."
             },
             {
               "kind": "method",
@@ -5023,7 +5221,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-change` refuses the change, and nothing moves."
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-before-toggle` refuses the change, and nothing moves."
             },
             {
               "kind": "method",
@@ -5098,7 +5296,7 @@
                   }
                 }
               ],
-              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-change` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer\ndeclared the property: a declared property is a seed and a correction,\nthe way `<input value>` is, and a consumer who wants the change for\nthemselves refuses it and assigns their own. See 294."
+              "description": "Requests a checked change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the\n`helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer\ndeclared the property: a declared property is a seed and a correction,\nthe way `<input value>` is, and a consumer who wants the change for\nthemselves refuses it and assigns their own. See 294."
             },
             {
               "kind": "method",
@@ -5414,7 +5612,7 @@
               },
               "privacy": "protected",
               "readonly": true,
-              "description": "Whether every edit is announced, rather than every settled value.\n\nA control the reader types or drags in moves continuously, and the platform\ncalls that `input`: `<input type=\"text\">` fires one per keystroke and fires\n`change` once, on commit. Five controls here are that shape, and the rest\nchange in discrete steps where a step *is* the change.\n\nIt selects the event rather than the timing. `requestValue` is called\nwhenever the value moves either way; this decides whether that arrives as\n`helix-input` or `helix-change`, so a consumer can read the name and know\nhow often to expect it."
+              "description": "Whether every edit is announced, rather than every settled value.\n\nA control the reader types or drags in moves continuously, and the platform\ncalls that `input`: `<input type=\"text\">` fires one per keystroke and fires\n`change` once, on commit. Five controls here are that shape, and the rest\nchange in discrete steps where a step *is* the change.\n\nIt selects the event rather than the timing. `requestValue` is called\nwhenever the value moves either way; this decides whether the control sends\n`input` alone or `input` and `change` together, so a consumer can read the\nname and know how often to expect it."
             },
             {
               "kind": "method",
@@ -5537,7 +5735,7 @@
                   }
                 }
               ],
-              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Nobody refusing means the control updates\nitself, whether or not a consumer declared `value`: a declared property\nis a seed and a correction, the way `<input value>` is, and a consumer\nwho wants the change for themselves refuses it and assigns their own.\nSee 294."
+              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-change` is\na refusal and nothing moves. Nobody refusing means the control updates\nitself, whether or not a consumer declared `value`: a declared property\nis a seed and a correction, the way `<input value>` is, and a consumer\nwho wants the change for themselves refuses it and assigns their own.\nSee 294."
             },
             {
               "kind": "method",
