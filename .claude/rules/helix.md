@@ -1131,8 +1131,8 @@ The bug underneath is React's, [facebook/react#35446](https://github.com/faceboo
 open since January 2026 with a proposed fix unmerged. When it lands this becomes
 dead weight and should go.
 
-*Re-checked 21 Aug 2026: still open, and PR #35474 is still the proposed fix and
-still unmerged.* Which version this was measured against is not left to prose:
+*Re-checked 27 Aug 2026: the issue is still open, last touched 17 Aug, and PR
+#35474 is still the proposed fix, still unmerged and last touched 27 June.* Which version this was measured against is not left to prose:
 `check:react-bridge` reads the number out of this file and fails if the
 installed `react-dom` has moved past it, because a probe is a claim about one
 release's internals and nothing in `verify` reads a comment.
