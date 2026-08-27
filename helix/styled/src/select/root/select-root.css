@@ -47,9 +47,9 @@
   outline-offset: 0;
 }
 
-:host([data-invalid]) [part="trigger"],
-:host([data-invalid]) [part="trigger"]:hover,
-:host([data-invalid]) [part="trigger"]:focus-visible {
+:host(:state(invalid)) [part="trigger"],
+:host(:state(invalid)) [part="trigger"]:hover,
+:host(:state(invalid)) [part="trigger"]:focus-visible {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }
@@ -235,15 +235,15 @@
  * `scale` rather than `transform: scaleY`, so a consumer who wants to translate
  * or rotate the mark can do that without the two fighting over one property.
  *
- * `data-open` and not `[open]`: the resolved state, so a controlled select
+ * `:state(open)` and not `[open]`: the resolved state, so a controlled select
  * whose consumer has not applied the change yet does not turn early. */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
   transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([data-open]) [part="indicator"],
-:host([data-open]) ::slotted([slot="indicator"]) {
+:host(:state(open)) [part="indicator"],
+:host(:state(open)) ::slotted([slot="indicator"]) {
   scale: 1 -1;
 }
 

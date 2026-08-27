@@ -481,13 +481,12 @@ export class HelixHeadlessPagination extends HelixElement {
        beats internals, so naming it here costs them nothing. */
     hostAria(this.internals, { label: this.label, role: 'navigation' })
 
-    /* Feature-tested rather than assumed, the same way `hostAria` tests element
-       references: an engine without `CustomStateSet` gets a control that renders
-       its one page instead of disappearing, which is the behavior this had
-       before and is not broken. */
-    if ('states' in this.internals) {
-      this.internals.states[this.count <= 1 ? 'add' : 'delete']('empty')
-    }
+    /* Through `toggleState`, which carries the feature test this wrote out
+       itself until every state in the library came through one door. An engine
+       without `CustomStateSet` gets a control that renders its one page instead
+       of disappearing, which is the behavior this had before and is not
+       broken. */
+    this.toggleState('empty', this.count <= 1)
   }
 
   /**

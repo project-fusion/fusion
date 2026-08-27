@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -158,8 +158,6 @@ describe('pagination size with nothing to offer', () => {
       '<helix-headless-pagination-size sizes=""></helix-headless-pagination-size>',
     )
     expect(part(it, 'control')).toBeNull()
-    expect(
-      (it as unknown as { internals: { states: Set<string> } }).internals.states.has('empty'),
-    ).toBe(true)
+    expect(hasState(it, 'empty')).toBe(true)
   })
 })

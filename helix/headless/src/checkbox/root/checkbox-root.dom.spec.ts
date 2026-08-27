@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, settle } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, settle } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -176,7 +176,7 @@ describe('checkbox validation message', () => {
     const host = await required()
     expect(part(host, 'feedback')).toBeNull()
     expect((part(host, 'hint') as HTMLElement).textContent?.trim()).toBe('Hint')
-    expect(host.hasAttribute('data-invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
   })
 
   test("a failed submission puts the message in the hint's place", async () => {
@@ -194,7 +194,7 @@ describe('checkbox validation message', () => {
     expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe(
       'Tick this box to continue.',
     )
-    expect(host.hasAttribute('data-invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
   })
 
   test('answering it takes the message away again', async () => {
@@ -208,6 +208,6 @@ describe('checkbox validation message', () => {
 
     expect(part(host, 'feedback')).toBeNull()
     expect((part(host, 'hint') as HTMLElement).textContent?.trim()).toBe('Hint')
-    expect(host.hasAttribute('data-invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
   })
 })

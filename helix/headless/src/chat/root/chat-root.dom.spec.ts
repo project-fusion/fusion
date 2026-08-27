@@ -1,6 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, role } from '@helix-io/testing/dom'
 
+/** What a named slot was actually given, which is the only proof of assignment. */
+const assigned = (element: HTMLElement, name: string): Element[] =>
+  element.shadowRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)?.assignedElements() ??
+  []
+
 /* The transcript after hydration.
  *
  * Scroll ownership is most of what this component is, and happy-dom has no
@@ -140,6 +145,47 @@ describe('the pin', () => {
     element.pinned = false
     await element.updateComplete
     expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  /**
+   * The handler is on the transcript, and this is what says so.
+   *
+   * `scroll` is not composed, so an event dispatched inside the shadow root has
+   * a path that stops at the root and never includes the host: a capture
+   * listener on the host, which is where this lived, saw nothing ever. There is
+   * no layout here, so the transcript always reports itself at the bottom, which
+   * is enough: unpin by hand, send the platform's own event shape at the log, and
+   * a handler that runs pins again. A handler that does not run leaves it alone,
+   * which is what happened for as long as it was bound to the host.
+   */
+  test('a scroll on the transcript reaches the handler, unlike one on the host', async () => {
+    const element = await chat()
+    element.pinned = false
+    await element.updateComplete
+    part(element, 'log')?.dispatchEvent(new Event('scroll'))
+    await element.updateComplete
+    expect(element.pinned).toBe(true)
+  })
+
+  /**
+   * A conversation grows, and nothing else tells this element that it did.
+   *
+   * The slots are assigned by hand, so appending a child assigns it to nothing
+   * and fires no `slotchange`: the transcript kept rendering the turns it had at
+   * first paint and showed its empty state over children it already held.
+   */
+  test('a turn appended after the first render reaches the transcript', async () => {
+    const element = await chat()
+    const before = element.messages.length
+    const turn = document.createElement('helix-headless-chat-message')
+    turn.textContent = 'arrived later'
+    element.append(turn)
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    await element.updateComplete
+    expect(element.messages).toHaveLength(before + 1)
+    expect(assigned(element, 'messages')).toHaveLength(before + 1)
   })
 
   /**

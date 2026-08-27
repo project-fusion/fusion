@@ -250,12 +250,12 @@
  * and the ring are one edge, so when one turns they both do.
  *
  * This was missing on every field added after Input, which is what a sweep of
- * all sixteen form controls turned up: `data-invalid` reached the host and only
- * the message underneath answered it. */
-:host([data-invalid]) [part="field"],
-:host([data-invalid]) [part="field"]:hover,
-:host([data-invalid]:focus-within) [part="field"],
-:host([data-invalid]:focus-within) [part="field"]:hover {
+ * all sixteen form controls turned up: `:state(invalid)` reached the host and
+ * only the message underneath answered it. */
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }

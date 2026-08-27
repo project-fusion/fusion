@@ -146,10 +146,33 @@ export class HelixSandboxEditor extends HelixElement {
           this.language$.of(LANGUAGES[this.language]()),
           this.readOnly$.of(EditorState.readOnly.of(this.readOnly)),
           EditorView.lineWrapping,
+          /**
+           * The edit, announced before it lands, which is what `before` means.
+           *
+           * **A `transactionFilter` and not the update listener below**, and the
+           * difference is the whole of whether the event is refusable. An
+           * update listener runs after the transaction has been applied, so a
+           * `preventDefault()` there was accepted and ignored: the document
+           * already held the character and a consumer refusing an edit watched
+           * it stay. A filter runs before, and returning `[]` rejects the
+           * transaction outright, which is CodeMirror's own mechanism for this
+           * rather than an inverse transaction undoing what just happened.
+           *
+           * Only document changes are filtered. A selection move or a focus
+           * change is not an edit and passing them through the same gate would
+           * let a consumer refusing one keystroke also freeze the caret.
+           */
+          EditorState.transactionFilter.of((transaction) => {
+            if (!transaction.docChanged) {
+              return transaction
+            }
+            const next = transaction.newDoc.toString()
+            const request = new HelixBeforeEditEvent({ property: 'value', value: next })
+            return this.dispatchEvent(request) ? transaction : []
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               this.value = update.state.doc.toString()
-              this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
             }
             if (update.selectionSet || update.docChanged || update.focusChanged) {
               this.dispatchEvent(new HelixCaretEvent(this.caret))

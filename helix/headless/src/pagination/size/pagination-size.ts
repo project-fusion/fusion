@@ -174,12 +174,10 @@ export class HelixHeadlessPaginationSize extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* Feature-tested, like `Pagination`'s: an engine without `CustomStateSet`
-       gets an empty select rather than no element, which is the behavior this
-       had before. */
-    if ('states' in this.internals) {
-      this.internals.states[this.options.length === 0 ? 'add' : 'delete']('empty')
-    }
+    /* Through `toggleState`, like `Pagination`'s: an engine without
+       `CustomStateSet` gets an empty select rather than no element, which is the
+       behavior this had before. */
+    this.toggleState('empty', this.options.length === 0)
   }
 
   /**

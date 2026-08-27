@@ -1,15 +1,43 @@
-/* Avatar, body, actions. A grid rather than a flex row for `notifications`'
-   reason: the avatar column has to line up down the transcript whether or not
-   every turn has one. */
+/* Avatar, body, actions. A grid rather than a flex row, so each part can name
+   its own column and hiding one does not move the others.
+
+   **It does not reserve an avatar column across the transcript, and the note
+   here used to claim it did.** Each turn is its own grid, so no turn can know
+   what its neighbors slotted, and the column that was supposedly reserved was
+   only ever a `column-gap` every turn paid whether it had an avatar or not. A
+   transcript where every turn has one lines up, and so does a transcript where
+   none does, which is the ordinary case both ways: an assistant avatars every
+   one of its turns and a support thread avatars none. A transcript that avatars
+   only the first turn of each run staggers, and that is a grouping feature this
+   component does not have. */
 :host {
   display: block;
 }
 
 [part="message"] {
   align-items: start;
-  column-gap: var(--helix-space-sm);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+/* **The space beside an avatar belongs to the avatar, not to the column.** This
+   was `column-gap: var(--helix-space-sm)`, which a grid pays between two tracks
+   whether or not either has anything in it, and most turns in most transcripts
+   have neither an avatar nor an action row. Measured on a chat in a popover: the
+   header, the status line and the composer all align to the log's own padding at
+   x 36, and every turn sat at 48, indented past all three by two phantom tracks
+   nothing was in.
+
+   `::slotted()` is what makes the space conditional without anything having to
+   detect emptiness: a rule that matches an assigned node cannot apply when there
+   is no assigned node, so an absent avatar costs nothing and a present one is
+   spaced exactly as it was. */
+[part="avatar"] > slot::slotted(*) {
+  margin-inline-end: var(--helix-space-sm);
+}
+
+[part="actions"] > slot::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
 }
 
 /* **Each part names its own column**, so hiding one does not move the others.
@@ -36,9 +64,20 @@
   display: none;
 }
 
-[part="avatar"]:not(:has(*)) {
-  display: none;
-}
+/* **What was here was dead, and it is worth saying how rather than deleting it
+   quietly.** The rule read `[part="avatar"]:not(:has(*))`, meaning "hide the
+   avatar box when it holds nothing". It never fired: the box holds
+   `<slot name="avatar">`, which is an element child, so `:has(*)` is true
+   whether or not anybody slotted an avatar. The sibling idiom used elsewhere in
+   the library, `:not(:has(> slot:has(*)))`, is worse than wrong: `:has()` may
+   not be nested inside `:has()`, so the selector fails to parse and the whole
+   rule is dropped. Both were verified in a browser, the second through
+   `insertRule` throwing a `SyntaxError`.
+
+   Nothing replaces it, because nothing needs to. An empty box in an `auto` track
+   is zero wide, and the space beside it now belongs to the slotted content
+   above, so a turn with no avatar is laid out as though the column were not
+   there. Emptiness stopped being a thing this stylesheet has to detect. */
 
 [part="body"] {
   display: grid;
@@ -49,7 +88,17 @@
      says nothing: measured in the first baseline, four turns all against the
      leading edge with only their timestamps moving. */
   justify-items: start;
-  max-inline-size: var(--chat-message-measure, 42rem);
+  /* **The two ceilings answer different questions and a turn needs both.**
+     `--chat-message-measure` is a reading measure and caps prose on a wide chat.
+     It cannot keep the edge signal, because 42rem is 672 pixels and a chat is
+     usually narrower than that: measured in a 540 pixel popover, a fifteen word
+     turn was 512 wide, which is the entire column, so the reader's own turn
+     touched the leading edge as well as the trailing one and the one thing this
+     component uses to say whose turn it is said nothing again. The percentage is
+     what guarantees a gutter on the opposite side at any width, and `min()` lets
+     whichever is tighter win: the measure on a full-screen chat, the fraction in
+     a sidebar or a popover. */
+  max-inline-size: min(var(--chat-message-measure, 42rem), 80%);
 }
 
 :host([author="me"]) [part="body"] {
@@ -57,20 +106,37 @@
   justify-self: end;
 }
 
-/* **`surface-sunken`, and it was measured against `surface-raised` before it was
-   kept.** A turn reads as an object and the first instinct is to raise it, which
-   is right on the page and wrong everywhere this component is actually put. In
-   dark mode the page is L 0 and a raised surface is L 0.29, so a raised bubble
-   is a strong shape on a page and exactly invisible inside a popover, a dialog
-   or a drawer, whose panels are that same 0.29. Sunken is L 0.15 and is a tenth
-   and a half away from both: quiet on the page and clear in every container.
-   Measured in the launcher example, where a raised bubble left three turns as
-   floating text.
+/* **A wash of the foreground, not a rung on the surface ladder**, which is the
+   answer `Option` already wrote down for the same problem: a step on the ladder
+   is an absolute color, and a bubble has no idea what it is sitting on. This
+   component is put on the page, on a card, and inside a popover, a dialog and a
+   drawer, and those grounds are four different colors.
 
-   The reader's own turns carry chroma instead of lightness, which is why the
-   rule below can sit at the panel's own L and still be legible. */
+   Measured across all six of those, with `surface-sunken` and then with this:
+
+   | ground            | sunken | wash |
+   | ----------------- | ------ | ---- |
+   | light page        | 1.12   | 1.38 |
+   | light card        | 1.07   | 1.38 |
+   | light overlay     | 1.12   | 1.38 |
+   | dark page         | 1.07   | 1.35 |
+   | dark card         | 1.11   | 1.54 |
+   | dark overlay      | 1.39   | 1.57 |
+
+   A ladder rung was between 1.07 and 1.12 in five of the six, which is a bubble
+   nobody can see, and it moved with the ground. A wash cannot: it is a step
+   away from whatever is underneath it, everywhere, which is the whole property.
+
+   **One percentage rather than `light-dark()` of two**, which is where this
+   differs from `Option`'s hover: that mixes a fixed ink and needs 8 in light
+   against 12 in dark, and `--helix-color-foreground` already flips with the
+   mode, so the same 14% is the same step in both. Measured rather than assumed:
+   1.38 light against 1.35 dark on the page. */
 [part="content"] {
-  background-color: var(--chat-message-background, var(--helix-color-surface-sunken));
+  background-color: var(
+    --chat-message-background,
+    color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+  );
   border-radius: var(--helix-radii-md);
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
@@ -89,8 +155,22 @@
    nothing was asked why their chat was orange. `primary-subtle` is the same
    lightness and chroma at the brand's hue, so the tint is as quiet as it was
    and is now a color the page is already wearing. */
+/* The same wash at the brand's hue, and 28% because that is where it weighs the
+   same as the one above: 1.43 to 1.54 against every ground in both modes, where
+   the neutral wash is 1.35 to 1.57. The two turns are the same object with a
+   different tint, which is what keeps the transcript one rhythm rather than two.
+
+   **`primary-subtle` was the last thing here and it failed the way an absolute
+   color does.** It is L 0.28 and `surface-overlay` is L 0.29, so an own turn
+   inside a popover measured 1.04 against the panel behind it: legible by hue
+   alone, and gone entirely in grayscale or to a reader who cannot separate blue
+   from gray. That is the same collision `Option` records between `surface-raised`
+   and `surface-overlay`, one rung further down. */
 :host([author="me"]) [part="content"] {
-  background-color: var(--chat-message-background-me, var(--helix-color-primary-subtle));
+  background-color: var(
+    --chat-message-background-me,
+    color-mix(in oklab, var(--helix-color-primary) 28%, transparent)
+  );
 }
 
 [part="meta"] {

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@helix-io/testing/dom'
+import { hasState, mount, registerDom, role } from '@helix-io/testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason:
    `@customElement` runs on import, static imports are hoisted, and an element
@@ -214,14 +214,14 @@ describe('menu', () => {
     el.addEventListener('helix-before-open', (event) => event.preventDefault())
     el.toggleOpen()
     await el.updateComplete
-    expect(el.hasAttribute('data-open')).toBe(false)
+    expect(hasState(el, 'open')).toBe(false)
   })
 
   test('a consumer that states open is obeyed rather than asked', async () => {
     const el = await menu()
     el.open = true
     await el.updateComplete
-    expect(el.hasAttribute('data-open')).toBe(true)
+    expect(hasState(el, 'open')).toBe(true)
   })
 
   test('a row announces its choice rather than acting on it', async () => {

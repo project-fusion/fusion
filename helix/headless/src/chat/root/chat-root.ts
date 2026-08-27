@@ -145,6 +145,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   @state()
   private pinnedState: boolean | undefined = undefined
 
+  /** Watches for turns arriving, since a manual slot hears nothing about them. */
+  private watcher: MutationObserver | undefined = undefined
+
   /**
    * Which regions were given something, or undefined where nobody has counted.
    *
@@ -264,12 +267,25 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('scroll', this.handleScroll, { capture: true })
+    /* **A turn that arrives after first paint reaches nothing on its own.**
+       Slots are assigned by hand here, so appending a child assigns it to
+       nothing, fires no `slotchange`, and schedules no render: the transcript
+       went on showing "Nothing to show" over six children it already had, and
+       the one thing a conversation does is grow. Measured with `assignedElements()`
+       at zero against `children` at nine.
+
+       `childList` and not `subtree`, which is the difference between watching a
+       conversation and watching every token of it: a streaming turn rewrites its
+       own text on every frame, and a subtree observer would re-render the whole
+       transcript each time for a change inside a child that owns it. */
+    this.watcher = new MutationObserver(this.handleSlotChange)
+    this.watcher.observe(this, { childList: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('scroll', this.handleScroll, { capture: true })
+    this.watcher?.disconnect()
+    this.watcher = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -298,9 +314,20 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
    * The reader's own scrolling, which is the only thing that unpins.
    *
-   * Captured on the host rather than bound in the template, because the element
-   * that scrolls is in the shadow tree and `scroll` does not bubble: it reaches
-   * a listener in the capture phase and nowhere else.
+   * **Bound to the transcript in the template, and it has to be.** This was a
+   * capture listener on the host, on the reasoning that `scroll` does not bubble
+   * so the capture phase is the only phase that reaches it. Not bubbling is not
+   * the problem: `scroll` is not *composed*, and a non-composed event's
+   * propagation path stops at the shadow root and never includes the host, in
+   * any phase. So the listener never ran once, the pin never released, and a
+   * reader who scrolled up to re-read was pulled back to the bottom by the next
+   * turn to arrive, which this element's own description calls the most
+   * got-wrong thing in the category.
+   *
+   * Measured by dispatching both shapes at the transcript: with
+   * `composed: false`, which is what the platform sends, the host saw zero and
+   * `pinned` stayed true; with `composed: true` the host saw one and `pinned`
+   * went false. Bound here, the phase and the bubbling never come up.
    *
    * **The scroll this element does itself must not unpin it**, which is the
    * subtle half: `scrollTop = scrollHeight` fires the same event a reader's
@@ -326,6 +353,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         aria-live="polite"
         aria-label=${this.label || 'Conversation'}
         aria-busy=${this.loading ? 'true' : nothing}
+        @scroll=${this.handleScroll}
       >
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
         ${this.renderStatus(this.messages.length > 0)}

@@ -266,7 +266,7 @@
   transform: translateY(-100%);
 }
 
-:host([data-open]) [part="panel"] {
+:host(:state(open)) [part="panel"] {
   border: var(--drawer-border-width, var(--helix-border-floating)) solid
     var(--drawer-border-color, var(--helix-color-border));
   box-shadow: var(--drawer-shadow, var(--helix-shadow-floating));

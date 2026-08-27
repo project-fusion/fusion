@@ -14,5 +14,4 @@
  * runner imports and runs this repository's own spec files, so it is internal
  * by definition rather than by weight.
  */
-export * from './jsx/html-to-jsx.js'
 export * from './jsx/jsx-to-html.js'

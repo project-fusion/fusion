@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, slotted } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, role, slotted } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -441,9 +441,6 @@ describe('pagination out of range', () => {
 })
 
 describe('pagination with nowhere to go', () => {
-  const states = (host: HTMLElement): Set<string> =>
-    (host as unknown as { internals: { states: Set<string> } }).internals.states
-
   test('a single page reports itself empty, so the stylesheet can close over it', async () => {
     /* A control offering one page offers no navigation, and the row it sits in
        should close over it rather than hold a space for a thing that cannot be
@@ -452,21 +449,21 @@ describe('pagination with nowhere to go', () => {
        had. Whether the rule matched is a browser's question, and is measured
        there. */
     const nav = await mount('<helix-headless-pagination pages="1"></helix-headless-pagination>')
-    expect(states(nav).has('empty')).toBe(true)
+    expect(hasState(nav, 'empty')).toBe(true)
   })
 
   test('and stops reporting it the moment there is somewhere to go', async () => {
     const nav = await mount('<helix-headless-pagination pages="1"></helix-headless-pagination>')
     ;(nav as HTMLElement & { pages: number }).pages = 4
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
-    expect(states(nav).has('empty')).toBe(false)
+    expect(hasState(nav, 'empty')).toBe(false)
   })
 
   test('a total that has not loaded is one page, not none', async () => {
     // A result mid-flight renders a single page rather than an empty control
     // that appears later and pushes the layout down.
     const nav = await mount('<helix-headless-pagination></helix-headless-pagination>')
-    expect(states(nav).has('empty')).toBe(true)
+    expect(hasState(nav, 'empty')).toBe(true)
   })
 })
 

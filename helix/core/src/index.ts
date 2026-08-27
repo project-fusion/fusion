@@ -146,7 +146,11 @@ export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
-export { customElement, duplicateRegistrations } from './utils/custom-element/custom-element.js'
+export {
+  customElement,
+  definedTags,
+  duplicateRegistrations,
+} from './utils/custom-element/custom-element.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export { drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
 export {

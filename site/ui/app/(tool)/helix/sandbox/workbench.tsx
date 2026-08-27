@@ -1,7 +1,7 @@
 'use client'
 
 import { scrollItemIntoView } from '@helix-io/core'
-import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
+import { jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
   HelixBeforeEditEvent,
@@ -159,12 +159,16 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const [syntax, setSyntax] = useState<Syntax>('html')
   /* The text as it is on screen, in whichever syntax is showing, and not a
      canonical form the editor is a rendering of. It was HTML, and the JSX view
-     was `htmlToJsx` of it while every keystroke was `jsxToHtml` back: a round
+     was a conversion of it while every keystroke was converted back: a round
      trip through two converters on every character, which never reproduces
      half-typed markup, so the editor was handed a different document than the
      one being typed into and replaced it. Held as-is, what the editor emits is
-     exactly what comes back, and the conversion happens where it is actually
-     needed. */
+     exactly what comes back.
+
+     There is one converter now rather than two, and it runs in one place. Each
+     syntax is an authored file, so showing one is reading it; only a live edit
+     in the TSX pane has no HTML twin to preview, and that is the single call
+     left. */
   /* What is in the editor now, and in which language, so the effect below can
      tell "a new example arrived" from "the same one, asked for differently". */
   const seeded = useRef<{ example: string; syntax: Syntax } | null>(null)
@@ -594,7 +598,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             { css, markup },
             {
               css: example.css || CSS_START,
-              markup: syntax === 'html' ? example.html : htmlToJsx(example.html),
+              markup: syntax === 'html' ? example.html : example.tsx,
             },
           )
         : window.location.hash
@@ -695,7 +699,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       if (meant) {
         arrived.current = null
       }
-      const seed = carried?.markup ?? (syntax === 'html' ? example.html : htmlToJsx(example.html))
+      const seed = carried?.markup ?? (syntax === 'html' ? example.html : example.tsx)
       pristine.current = seed
       setMarkup(seed)
       /* The example's own stylesheet where it ships one, and the placeholder
@@ -720,15 +724,19 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
          `clear is not a function`, which took the whole page down. */
       terminal.current?.clear?.()
     } else if (last.syntax !== syntax) {
-      // The same text in the other language, so edits survive the switch.
-      setMarkup((current) => {
-        const converted = syntax === 'html' ? jsxToHtml(current) : htmlToJsx(current)
-        /* The baseline moves with it. What came out of the converter is the new
-           "untouched", or the next switch would compare this language's text
-           against the last one's and call every document edited. */
-        pristine.current = converted
-        return converted
-      })
+      /* **The other syntax is the other file, not a translation of this one.**
+         Both are authored, so switching shows what somebody wrote rather than
+         what a converter could recover, which is the whole reason `htmlToJsx`
+         is gone: it could not express a `<script>` at all, and an example whose
+         payload lives in one converted to something that is not React.
+
+         Reaching here at all means the reader either had no edits or agreed to
+         lose them: `setting === 'syntax'` above opens the confirm dialog when
+         `markup` has moved off `pristine`, and only answers it by calling
+         `applySyntax`. */
+      const authored = syntax === 'html' ? example.html : example.tsx
+      pristine.current = authored
+      setMarkup(authored)
     }
     seeded.current = { example: address, syntax }
   }, [example, family, syntax])
@@ -758,7 +766,14 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       (editor) => editor === document.activeElement,
     )
 
-    preview.current.source = syntax === 'html' ? markup : jsxToHtml(markup)
+    /* **The preview frame runs HTML, so a TSX pane has to be converted, and
+       this is the one conversion left.** It translates what the reader typed,
+       never an example: unedited, the authored HTML twin is shown as it was
+       written, and `jsxToHtml` is reached only once somebody has changed
+       something there is no authored twin for. */
+    const editedTsx = syntax === 'tsx' && markup !== pristine.current
+    preview.current.source =
+      syntax === 'html' ? markup : editedTsx ? jsxToHtml(markup) : (example?.html ?? '')
     preview.current.styles = css
 
     if (!typing) {
@@ -774,7 +789,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       }
     })
     return () => cancelAnimationFrame(restore)
-  }, [css, markup, syntax])
+    /* `example?.html` is in here because the unedited TSX pane previews it. The
+       effect already re-ran on every example change through `markup`, which is
+       reseeded by the effect above; naming it makes that a fact the dependency
+       list states rather than one it relies on. */
+  }, [css, example?.html, markup, syntax])
 
   // Switching files moves focus into the file switched to. It is what you were
   // going to do anyway, and it is also what corrects the status bar: the editor
@@ -1451,13 +1470,14 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             )}
           </helix-sandbox>
 
-          {/* Asked before the conversion, not after.
+          {/* Asked because the switch discards, which is a stronger reason than
+            the one this used to give.
  
-            Changing the environment does not throw the text away, it runs it
-            through `htmlToJsx` or `jsxToHtml`, and that is the problem: the
-            converters do not reproduce half-typed markup, so a document with
-            work in it can come back altered in ways nobody asked for. Untouched,
-            there is nothing to lose and the switch is silent.
+            It read that changing the environment runs the text through a
+            converter and that a document with work in it can come back altered.
+            Both syntaxes are authored files now, so the switch loads the other
+            one and whatever was typed here is simply gone. Untouched, there is
+            nothing to lose and the switch is silent.
  
             Rendered always rather than gated on `pendingSyntax`, because a
             dialog that unmounts cannot animate out, and `open` is what drives

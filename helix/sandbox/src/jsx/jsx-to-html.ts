@@ -1,8 +1,10 @@
 /**
  * Reads a JSX example back as the markup it stands for.
  *
- * The inverse of `htmlToJsx`, and it exists so the file on screen is the file
- * that runs. A preview renders markup into a document; it does not run React,
+ * It exists so the file on screen is the file that runs, and it is the only
+ * converter left: `htmlToJsx` is deleted, both syntaxes being authored files
+ * now rather than one derived from the other. What is converted here is a
+ * reader's live edit in the TSX pane, which has no authored twin. A preview renders markup into a document; it does not run React,
  * and putting a compiler in there to make it look as though it did would ship a
  * megabyte to answer a question nobody asked. Converting is honest and small:
  * the JSX in a sandbox is Helix elements with attributes, which is the same

@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'bun:test'
-import { htmlToJsx } from './html-to-jsx.js'
 import { jsxToHtml } from './jsx-to-html.js'
 
 describe('jsx to html', () => {
@@ -60,21 +59,9 @@ describe('jsx to html', () => {
   })
 })
 
-describe('the two directions agree', () => {
-  // The guarantee that matters: the file on screen is the file that runs, so
-  // markup turned into JSX and back has to be the markup it started as.
-  const examples = [
-    '<helix-button emphasis="solid" tone="primary">Go</helix-button>',
-    '<helix-badge label="Online" style="--badge-offset: 0.25rem">\n  <helix-avatar name="A B" size="lg"></helix-avatar>\n</helix-badge>',
-    '<helix-checkbox default-checked disabled name="a">Checked</helix-checkbox>',
-    '<helix-date-picker disable-days="0,6" first-day-of-week="1"></helix-date-picker>',
-    '<helix-flex direction="column" gap="sm">\n  <helix-text as="p">one</helix-text>\n  <helix-text as="p">two</helix-text>\n</helix-flex>',
-    '<img alt="" src="a.png" />',
-  ]
-
-  for (const [index, markup] of examples.entries()) {
-    test(`round trip ${index + 1} comes back unchanged`, () => {
-      expect(jsxToHtml(htmlToJsx(markup)).trim()).toBe(markup.trim())
-    })
-  }
-})
+/* **The round-trip suite is gone with the second converter, and so is the
+   property it asserted.** It ran `jsxToHtml(htmlToJsx(markup))` over six
+   examples and expected the markup back, which is a guarantee about a pair.
+   There is no pair now: each syntax is a file somebody wrote, `htmlToJsx` is
+   deleted, and what holds the two to each other is `check:examples-paired` for
+   their existence and `check:visual` for their pictures. */

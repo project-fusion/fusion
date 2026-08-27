@@ -229,7 +229,7 @@
    round it, the same way a field turns its own border, and `plain` gets an
    outline instead because it has no border to turn.
    The radius is the track's own, so the mark follows whatever shape it is in. */
-:host([data-invalid]) [part="track"] {
+:host(:state(invalid)) [part="track"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, role } from '@helix-io/testing/dom'
 
 /* One notification.
  *
@@ -36,11 +36,16 @@ describe('read state', () => {
     expect(element.read).toBe(false)
   })
 
-  test('the state is reflected, since unread is a visual state a stylesheet must see', async () => {
+  test('the state is recorded, since unread is a visual state a stylesheet must see', async () => {
+    /* And recorded rather than reflected. `read` was a reflected property until
+       27 Aug 2026, so an item served `default-read` grew the attribute on its
+       first update: a hydration mismatch, and an attribute a copy-paste then
+       re-reads as a declaration. */
     const element = await item()
     element.markRead(true)
     await element.updateComplete
-    expect(element.hasAttribute('read')).toBe(true)
+    expect(hasState(element, 'read')).toBe(true)
+    expect(element.hasAttribute('read')).toBe(false)
   })
 
   /**

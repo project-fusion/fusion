@@ -15,13 +15,18 @@ describe('checkbox server output', () => {
     ).toContain('Terms')
   })
 
-  test('a default-checked box is checked on the server', () => {
-    // Anything that waited for a lifecycle hook would render unchecked here and
-    // change at hydration.
+  test('a default-checked box is checked on the server, in the control', () => {
+    /* Anything that waited for a lifecycle hook would render unchecked here and
+       change at hydration.
+
+       The `<input>` is where this is now asked, `data-checked` having been the
+       answer until the state moved to `ElementInternals.states`, which no
+       server writes. The control is the half that has to be right anyway: it is
+       what carries the state into a form and what a reader is shown. */
     const markup = withoutStyles(
       ssr(html`<helix-headless-checkbox default-checked>x</helix-headless-checkbox>`),
     )
-    expect(markup).toContain('data-checked')
+    expect(partTag(markup, 'control')).toContain('checked')
   })
 
   test('the host carries only what the consumer wrote', () => {

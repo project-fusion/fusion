@@ -4,6 +4,7 @@ import {
   HelixCaretEvent,
   HelixElement,
   onUnlessFalse,
+  restoreValue,
 } from '@helix-io/core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
@@ -97,10 +98,38 @@ export class HelixSandboxSource extends HelixElement {
     )
   }
 
+  /**
+   * Announces the edit, then applies it if nobody refused.
+   *
+   * **This was the other way round, so `helix-before-edit` was a `before` event
+   * that had already happened.** The value was assigned and the request
+   * dispatched after it, which means `preventDefault()` was accepted and
+   * ignored: a consumer refusing an edit kept the old value in their handler and
+   * the pane held the new one. Every other `before` event in this library is
+   * announced first and applied only if the request stands, and this is that.
+   *
+   * `restoreValue` because the textarea has already taken the character
+   * whichever way it goes, so a refusal has to put the text back, and it does so
+   * without sending the caret to the end. Exactly what `Input` does with the
+   * same helper for the same reason. */
   private readonly handleInput = (event: Event): void => {
-    this.value = (event.target as HTMLTextAreaElement).value
-    this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
+    const field = event.target as HTMLTextAreaElement
+    this.edit(field, field.value)
     this.reportCaret(event)
+  }
+
+  /**
+   * The one place an edit is taken, so a refusal cannot be forgotten at one of them.
+   *
+   * Two paths reach it, a keystroke and the tab that indents, and the second had
+   * the same fault as the first with its own copy of the code.
+   */
+  private edit(field: HTMLTextAreaElement, next: string): void {
+    const request = new HelixBeforeEditEvent({ property: 'value', value: next })
+    if (this.dispatchEvent(request)) {
+      this.value = next
+    }
+    restoreValue(field, this.value)
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -120,8 +149,7 @@ export class HelixSandboxSource extends HelixElement {
     field.value = `${value.slice(0, selectionStart)}  ${value.slice(selectionEnd)}`
     field.selectionStart = selectionStart + 2
     field.selectionEnd = field.selectionStart
-    this.value = field.value
-    this.dispatchEvent(new HelixBeforeEditEvent({ property: 'value', value: this.value }))
+    this.edit(field, field.value)
   }
 
   protected override render(): TemplateResult {

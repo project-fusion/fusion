@@ -32,7 +32,7 @@ report we want, and it is not one we would have caught.
 | `oklch()` | Every color in the system |
 | `:has()` | 11 rules, mostly relational styling of slotted content |
 | `@starting-style` | Entry transitions on overlays |
-| `:state()` | Custom states a consumer's CSS can select |
+| `:state()` | Every boolean state the library publishes: `open`, `checked`, `invalid`, `read`, `has-label`, `settled`, `empty` |
 | `CSS.highlights` | Filter-match highlighting, in `Command` and `Combobox` |
 
 Positioning is `@floating-ui/dom` rather than CSS anchor positioning, which is a
@@ -48,6 +48,11 @@ the two to check, because they are the newest things the library assumes and
 they are load-bearing: the first is how every token expresses both color modes
 in one declaration, and the second is how every overlay is drawn in the top
 layer.
+
+`:state()` is the third and is deliberately not with them, because it does
+degrade: a component that cannot record a state keeps whatever its resting rule
+draws, so a checkbox is drawn unchecked rather than drawn wrong or not at all.
+It is feature-tested at the one place that records any of them.
 
 Neither degrades usefully. A browser without `light-dark()` gets no color at
 all rather than one mode; a browser without popover gets overlays that render in

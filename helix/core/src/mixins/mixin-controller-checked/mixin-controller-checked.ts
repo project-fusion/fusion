@@ -58,9 +58,9 @@ export declare class MixinControllerCheckedInterface {
  * happened yet. Set, and the consumer owns it and the element only announces.
  * Unset, and the element owns it and `defaultChecked` says where it starts.
  *
- * Sets `data-checked` on the host whenever the element is checked, in either
- * mode. Styled tiers select on that rather than `[checked]`, which is absent
- * for uncontrolled consumers.
+ * Records `:state(checked)` whenever the element is checked, in either mode.
+ * Styled tiers select on that rather than on `[checked]`, which is absent for
+ * uncontrolled consumers.
  */
 export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerCheckedInterface deliberately. The
@@ -77,7 +77,8 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * `MixinControllerOpen.open`.
      *
      * Not reflected: the attribute is the consumer's input and stays as they
-     * wrote it, and `data-checked` carries the resolved state for stylesheets.
+     * wrote it, and `:state(checked)` carries the resolved state for
+     * stylesheets.
      *
      *
      */
@@ -106,14 +107,25 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     private checkedState: boolean | undefined = undefined
 
     /**
-     * Mirrors the resolved state onto the host as `data-checked`.
+     * Records the resolved state as the custom state `checked`.
      *
-     * In `willUpdate` rather than `connectedCallback` because SSR calls the
-     * former and not the latter, so the attribute is present in server output.
+     * **A state and not `data-checked`, which is what this wrote until 27 Aug
+     * 2026.** The attribute went on in `willUpdate`, so `<helix-checkbox
+     * default-checked>` came back from a consumer's server without it and
+     * gained it the moment the definition landed, which React lists as a
+     * hydration mismatch and does not patch up. `HelixElement.toggleState` says
+     * why the host is the wrong place to keep a component's own bookkeeping.
+     *
+     * Still in `willUpdate`, which is where the resolved state is first known
+     * and is what a subclass rendering from it expects. The old note here said
+     * SSR calls `willUpdate` and not `connectedCallback`, so the attribute
+     * reached server output: true, and no longer a reason for anything, a
+     * custom state being a fact about a running element that a server has
+     * nothing to say about.
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.toggleAttribute('data-checked', this.checked)
+      this.toggleState('checked', this.checked)
     }
 
     /**

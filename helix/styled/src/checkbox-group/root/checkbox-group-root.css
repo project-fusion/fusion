@@ -32,17 +32,17 @@
  * other field in the library puts wrongness, and a reader scanning a form finds
  * it there.
  *
- * Through `--checkbox-border-color` rather than by writing `data-invalid` onto
- * the members, which was the objection to marking them and is a real one: these
- * are the consumer's elements and the group does not own their attributes. A
- * custom property set here inherits through the slot into each checkbox's own
- * shadow root, which is the same crossing `data-density` makes, and every rule
- * that paints that edge already reads the hook, so a pointer over one member
- * does not rub the mark off it.
+ * Through `--checkbox-border-color` rather than by writing `:state(invalid)`
+ * onto the members, which was the objection to marking them and is a real one:
+ * these are the consumer's elements and the group does not own what they say
+ * about themselves. A custom property set here inherits through the slot into
+ * each checkbox's own shadow root, which is the same crossing `data-density`
+ * makes, and every rule that paints that edge already reads the hook, so a
+ * pointer over one member does not rub the mark off it.
  *
  * Only the edge. The tick keeps its own ink: a box the reader ticked is not the
  * thing that is wrong, and a run of red ticks says the opposite. */
-:host([data-invalid]) [part="items"] {
+:host(:state(invalid)) [part="items"] {
   --checkbox-border-color: var(--helix-color-danger);
 }
 

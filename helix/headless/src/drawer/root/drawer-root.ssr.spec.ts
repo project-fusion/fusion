@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
+import { hostAttributes, hostTag, partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -14,16 +14,20 @@ describe('drawer server output', () => {
     )
     expect(partTag(markup, 'panel')).toMatch(/<dialog/)
     expect(partTag(markup, 'panel')).not.toContain('inert')
-    expect(hostTag(markup, 'helix-headless-drawer')).not.toContain('data-open')
+    expect(hostTag(markup, 'helix-headless-drawer')).not.toContain('open')
   })
 
-  test('renders its real state when opened by default', () => {
-    // Server-rendered open, so a drawer that starts open does not settle
-    // into place after hydration.
+  test('a drawer opened by default serves the same host as a shut one', () => {
+    /* Which is the point rather than a gap. `data-open` shipped here until 27
+       Aug 2026 and was the one thing in this file the server wrote and the
+       consumer had not: the open state is `ElementInternals.states` now, so the
+       host carries `default-open` and `label` because they were typed, and
+       nothing because the element ran. The dialog is shut either way, a server
+       having no `showModal()` to call. */
     const markup = ssr(
       html`<helix-headless-drawer default-open label="Examples">Content</helix-headless-drawer>`,
     )
-    expect(hostTag(markup, 'helix-headless-drawer')).toContain('data-open')
+    expect(hostAttributes(markup, 'helix-headless-drawer')).toEqual(['default-open', 'label'])
   })
 
   test('the name ships with it, and the role is the element', () => {

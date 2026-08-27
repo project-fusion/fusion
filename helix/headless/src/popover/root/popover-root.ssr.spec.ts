@@ -27,13 +27,14 @@ describe('popover server output', () => {
     ).toContain('popover="manual"')
   })
 
-  test('open reaches the served markup as the hook the styles select on', () => {
+  test('an open popover serves back what was typed and nothing else', () => {
+    // `data-open` was here until the open state moved to `ElementInternals`.
     expect(
       hostAttributes(
         ssr(html`<helix-headless-popover open>x</helix-headless-popover>`),
         'helix-headless-popover',
       ),
-    ).toEqual(['data-open', 'open'])
+    ).toEqual(['open'])
   })
 
   test('nothing is written onto the trigger, which is the consumer’s element', () => {

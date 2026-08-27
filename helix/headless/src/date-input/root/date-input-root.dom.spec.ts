@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -539,7 +539,7 @@ describe('an invalid date field marks the calendar too', () => {
       `<helix-headless-date-input feedback="Pick a weekday" label="When"></helix-headless-date-input>`,
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
-    expect(host.hasAttribute('data-invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(part(host, 'picker')?.hasAttribute('invalid')).toBe(true)
   })
 

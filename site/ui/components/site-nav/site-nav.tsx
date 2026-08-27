@@ -335,9 +335,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           <Wordmark />
         </a>
 
-        {!narrow && (
-          <helix-navigation label="Sections">
-            {/* `aria-current` on the host rather than on the trigger inside it.
+        <helix-navigation class={styles.wideOnly} label="Sections">
+          {/* `aria-current` on the host rather than on the trigger inside it.
                 `Navigation` measures its marker against the elements assigned
                 to its slot and reads `aria-current` off each, so the attribute
                 has to be on the element that is actually in the row. The
@@ -345,7 +344,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 marker cannot see it, and where we could not write an attribute
                 without slotting a replacement, which would cost the
                 `aria-expanded` the component manages on its own button. */}
-            {/* `suppressHydrationWarning`, for the same reason the gallery's
+          {/* `suppressHydrationWarning`, for the same reason the gallery's
                 options carry it: the element owns this node once it upgrades.
                 It watches the viewport and writes `data-narrow` onto its own
                 host to say the panel has become a band, which a custom element
@@ -353,18 +352,18 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 React finds an attribute on the server HTML that its own render
                 never produced. The server cannot know the width, so this is
                 expected rather than a symptom. */}
-            <helix-megamenu
-              label="Products"
-              onhelix-before-close={() => setPanelDown(false)}
-              /* Both fire before the panel moves and both are cancelable, so
+          <helix-megamenu
+            label="Products"
+            onhelix-before-close={() => setPanelDown(false)}
+            /* Both fire before the panel moves and both are cancelable, so
                  the bar starts changing on the same frame the reveal starts
                  rather than a frame behind it. */
-              onhelix-before-open={() => setPanelDown(true)}
-              ref={panelRef}
-              suppressHydrationWarning
-              variant="full"
-            >
-              {/* The trigger is slotted, and it has to be.
+            onhelix-before-open={() => setPanelDown(true)}
+            ref={panelRef}
+            suppressHydrationWarning
+            variant="full"
+          >
+            {/* The trigger is slotted, and it has to be.
                
                   `label` names the button the component renders in its own
                   shadow root, and this repo ships no declarative shadow DOM, so
@@ -395,51 +394,51 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                   produced. The disclosure state is the component's to own and
                   cannot be server-rendered, which is the case this flag is
                   for. */}
-              <button
-                aria-current={onProducts ? 'page' : undefined}
-                data-navigation-item
-                slot="trigger"
-                suppressHydrationWarning
-                type="button"
-              >
-                Products
-              </button>
-              {PRODUCTS.map((product) => (
-                <div data-megamenu-group key={product.name}>
-                  {/* The mark sits with the name and nowhere else in the
+            <button
+              aria-current={onProducts ? 'page' : undefined}
+              data-navigation-item
+              slot="trigger"
+              suppressHydrationWarning
+              type="button"
+            >
+              Products
+            </button>
+            {PRODUCTS.map((product) => (
+              <div data-megamenu-group key={product.name}>
+                {/* The mark sits with the name and nowhere else in the
                       column. `helix-icon` carries no label here: the words
                       beside it are the accessible reading, so the mark is
                       decoration rather than a second reading of the same
                       word. */}
-                  <h3 data-megamenu-heading>
-                    <helix-icon name={product.mark}></helix-icon>
-                    {product.name}. {product.role}
-                  </h3>
-                  {product.destinations.map((destination) =>
-                    /* A module that is named and not yet built is a `div`, not a
+                <h3 data-megamenu-heading>
+                  <helix-icon name={product.mark}></helix-icon>
+                  {product.name}. {product.role}
+                </h3>
+                {product.destinations.map((destination) =>
+                  /* A module that is named and not yet built is a `div`, not a
                        disabled link. There is nowhere for it to go, so an anchor
                        would be a promise the href cannot keep, and
                        `aria-disabled` on a real link leaves it in the tab order
                        announcing itself as somewhere you cannot follow. A row
                        that is not interactive simply is not one. */
-                    destination.stage ? (
-                      <div data-megamenu-item data-soon key={destination.title}>
-                        <strong>
-                          {destination.title}
-                          <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
-                            {destination.stage}
-                          </helix-tag>
-                        </strong>
-                        <span>{destination.summary}</span>
-                      </div>
-                    ) : (
-                      <Link
-                        aria-current={pathname === destination.href ? 'page' : undefined}
-                        data-megamenu-item
-                        href={destination.href}
-                        key={destination.href}
-                      >
-                        {/* Two rows, and the second is one line. The sentence
+                  destination.stage ? (
+                    <div data-megamenu-item data-soon key={destination.title}>
+                      <strong>
+                        {destination.title}
+                        <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                          {destination.stage}
+                        </helix-tag>
+                      </strong>
+                      <span>{destination.summary}</span>
+                    </div>
+                  ) : (
+                    <Link
+                      aria-current={pathname === destination.href ? 'page' : undefined}
+                      data-megamenu-item
+                      href={destination.href}
+                      key={destination.href}
+                    >
+                      {/* Two rows, and the second is one line. The sentence
                           earns its place, but a sentence that wraps turns a row
                           of names into a paragraph to read before choosing, and
                           the wrap is what made the panel long. Kept short
@@ -451,32 +450,33 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                           read as a set of icons rather than a set of places to
                           go. The row grid leaves that column at `auto`, so
                           these start where the heading does. */}
-                        <strong>{destination.title}</strong>
-                        <span>{destination.summary}</span>
-                      </Link>
-                    ),
-                  )}
-                </div>
-              ))}
-            </helix-megamenu>
-
-            {SECTIONS.map((section) => (
-              <Link
-                aria-current={within(section.href) ? 'page' : undefined}
-                href={section.href}
-                key={section.href}
-              >
-                {section.label}
-              </Link>
+                      <strong>{destination.title}</strong>
+                      <span>{destination.summary}</span>
+                    </Link>
+                  ),
+                )}
+              </div>
             ))}
-          </helix-navigation>
-        )}
+          </helix-megamenu>
+
+          {SECTIONS.map((section) => (
+            <Link
+              aria-current={within(section.href) ? 'page' : undefined}
+              href={section.href}
+              key={section.href}
+            >
+              {section.label}
+            </Link>
+          ))}
+        </helix-navigation>
 
         {/* The trigger and the palette both, from the one component the
             workbench renders too. Hidden on a narrow screen, where there is no
             keyboard to press the shortcut with and the drawer is the way
             through. */}
-        {!narrow && <SiteFind findable={findable} slot="end" />}
+        <div className={styles.wideOnly} slot="end">
+          <SiteFind findable={findable} />
+        </div>
 
         <helix-tooltip content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
@@ -484,11 +484,14 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           </helix-icon-button>
         </helix-tooltip>
 
-        {narrow && (
-          <helix-button emphasis="ghost" onClick={() => setOpen(true)} slot="end">
-            Menu
-          </helix-button>
-        )}
+        <helix-button
+          class={styles.narrowOnly}
+          emphasis="ghost"
+          onClick={() => setOpen(true)}
+          slot="end"
+        >
+          Menu
+        </helix-button>
       </helix-app-header>
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />

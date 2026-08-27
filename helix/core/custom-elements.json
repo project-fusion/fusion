@@ -2733,6 +2733,31 @@
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard."
             },
             {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it."
+            },
+            {
               "kind": "field",
               "name": "whenSettled",
               "type": {
@@ -2982,6 +3007,35 @@
               "privacy": "protected",
               "readonly": true,
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
@@ -3984,6 +4038,14 @@
           "name": "customElement",
           "declaration": {
             "name": "customElement",
+            "module": "./utils/custom-element/custom-element.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "definedTags",
+          "declaration": {
+            "name": "definedTags",
             "module": "./utils/custom-element/custom-element.js"
           }
         },
@@ -5238,7 +5300,7 @@
         },
         {
           "kind": "mixin",
-          "description": "Grafts controlled and uncontrolled checked state onto a base class.\n\nWhich mode it is in is read once, at the first update, from whether anything\nhad set `checked` by then: markup, a hydrating server's attributes and a\nframework's initial properties have all arrived, and nothing else has\nhappened yet. Set, and the consumer owns it and the element only announces.\nUnset, and the element owns it and `defaultChecked` says where it starts.\n\nSets `data-checked` on the host whenever the element is checked, in either\nmode. Styled tiers select on that rather than `[checked]`, which is absent\nfor uncontrolled consumers.",
+          "description": "Grafts controlled and uncontrolled checked state onto a base class.\n\nWhich mode it is in is read once, at the first update, from whether anything\nhad set `checked` by then: markup, a hydrating server's attributes and a\nframework's initial properties have all arrived, and nothing else has\nhappened yet. Set, and the consumer owns it and the element only announces.\nUnset, and the element owns it and `defaultChecked` says where it starts.\n\nRecords `:state(checked)` whenever the element is checked, in either mode.\nStyled tiers select on that rather than on `[checked]`, which is absent for\nuncontrolled consumers.",
           "name": "MixinControllerChecked",
           "members": [
             {
@@ -5247,7 +5309,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
+              "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `:state(checked)` carries the resolved state for\nstylesheets.",
               "attribute": "checked"
             },
             {
@@ -5341,7 +5403,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
+              "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `:state(checked)` carries the resolved state for\nstylesheets.",
               "fieldName": "checked"
             },
             {
@@ -5441,7 +5503,7 @@
         },
         {
           "kind": "mixin",
-          "description": "Grafts open state onto a base class, and says so twice.\n\n`helix-before-open` and `helix-before-close` announce the change while it is\nstill a request, so `preventDefault()` refuses it and nothing moves. Native\n`toggle` announces it afterwards, once the state has actually gone, carrying\n`newState` and `oldState` the way the platform does on `<details>` and on a\npopover. The first is how a consumer takes the decision; the second is what\nthey bind when they only want to know. See 294 and 296.\n\n`open` is a seed and a correction rather than a claim: the element applies\nits own changes from wherever markup started it, and `defaultOpen` is what a\nreset returns to.\n\nSets `data-open` on the host whenever the element is open. Styled tiers\nselect on that rather than `[open]`, which is absent until somebody writes\nit.",
+          "description": "Grafts open state onto a base class, and says so twice.\n\n`helix-before-open` and `helix-before-close` announce the change while it is\nstill a request, so `preventDefault()` refuses it and nothing moves. Native\n`toggle` announces it afterwards, once the state has actually gone, carrying\n`newState` and `oldState` the way the platform does on `<details>` and on a\npopover. The first is how a consumer takes the decision; the second is what\nthey bind when they only want to know. See 294 and 296.\n\n`open` is a seed and a correction rather than a claim: the element applies\nits own changes from wherever markup started it, and `defaultOpen` is what a\nreset returns to.\n\nRecords `:state(open)` whenever the element is open. Styled tiers select on\nthat rather than on `[open]`, which is absent until somebody writes it.",
           "name": "MixinControllerOpen",
           "members": [
             {
@@ -5450,7 +5512,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `:state(open)` carries the resolved state for stylesheets, which\nis what the mirror has always been for.",
               "attribute": "open"
             },
             {
@@ -5527,7 +5589,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `:state(open)` carries the resolved state for stylesheets, which\nis what the mirror has always been for.",
               "fieldName": "open"
             },
             {
@@ -6534,6 +6596,16 @@
         },
         {
           "kind": "function",
+          "name": "definedTags",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "description": "Every tag registered through `customElement`, whoever imported it first."
+        },
+        {
+          "kind": "function",
           "name": "customElement",
           "parameters": [
             {
@@ -6551,6 +6623,14 @@
           "name": "duplicateRegistrations",
           "declaration": {
             "name": "duplicateRegistrations",
+            "module": "src/utils/custom-element/custom-element.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "definedTags",
+          "declaration": {
+            "name": "definedTags",
             "module": "src/utils/custom-element/custom-element.ts"
           }
         },

@@ -219,6 +219,35 @@
               }
             },
             {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "whenSettled",
               "type": {
@@ -531,53 +560,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/jsx/html-to-jsx.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
             "module": "src/jsx/jsx-to-html.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/jsx/html-to-jsx.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "htmlToJsx",
-          "return": {
-            "type": {
-              "text": "string"
-            }
-          },
-          "parameters": [
-            {
-              "name": "html",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "name",
-              "default": "'Example'"
-            }
-          ],
-          "description": "The example's markup, as the body of a React component."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "htmlToJsx",
-          "declaration": {
-            "name": "htmlToJsx",
-            "module": "src/jsx/html-to-jsx.ts"
           }
         }
       ]
@@ -912,6 +895,35 @@
               "privacy": "protected",
               "readonly": true,
               "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleState",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "on",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Records a boolean fact about this element as a custom state.\n\n**The host belongs to whoever rendered it, and a component's own\nbookkeeping may not be kept there.** An attribute written on the first\nupdate is markup a consumer's server never sent, so a React consumer\nhydrates a DOM that has gained attributes since and reports a mismatch it\nwill not patch up. A custom state is not in the DOM at all: it carries the\nfact to a stylesheet through `:state()` and leaves the markup alone, so the\nserver's output and the client's agree by construction.\n\n`SETTLED` carries the long version of that argument and was the first to\nmove. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug\n2026, after the same fault was reported once more from the landing page's\nshowcase: a `default-checked` switch, a `default-checked` checkbox and a\n`default-open` accordion item, each writing its own resolved state onto\nitself before React reached the node.\n\n**The deferral that had been holding it is not a fix and could not be.**\nThe site imports the definitions from an effect so the upgrades fall the\nother side of hydration, which works only while hydration is one pass:\nanything that splits it, a streamed segment or a suspended boundary, puts\nan upgrade back inside the window. Timing cannot be the guarantee when the\nfact is kept somewhere React reconciles.\n\nFeature-tested rather than assumed, the way `hostAria` tests element\nreferences. An engine without `CustomStateSet` records nothing and keeps\nwhatever the resting rule draws, which is the safe direction to fail, and\nLit's server shim is one of them: a custom state is a fact about a running\nelement, and a server has nothing to say about it.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"

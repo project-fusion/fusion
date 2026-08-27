@@ -221,6 +221,25 @@ export const label = (host: HTMLElement): string | null =>
   (host as unknown as { internals?: ElementInternals }).internals?.ariaLabel ??
   null
 
+/**
+ * Whether a component has recorded a custom state on itself.
+ *
+ * The same shape as `role` and `label` above and for the same reason: a state
+ * a stylesheet selects on with `:state()` is kept in `ElementInternals` and
+ * writes no attribute, so `hasAttribute('data-open')` reports nothing on an
+ * element that is correctly open. It is the reading half of
+ * `HelixElement.toggleState`, and every spec that used to ask the host for a
+ * `data-` mirror asks this instead.
+ *
+ * A `Set` in happy-dom, per `registerDom`'s shim, and a real `CustomStateSet` in
+ * a browser. `has` is the whole of the interface either way; whether a rule
+ * matched is a browser's question and not one this environment can answer.
+ */
+export const hasState = (host: Element, name: string): boolean =>
+  (
+    host as unknown as { internals?: { states?: { has(value: string): boolean } } }
+  ).internals?.states?.has(name) ?? false
+
 /** Finds a shadow part by name. */
 export const part = (host: HTMLElement, name: string): Element | null =>
   host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null

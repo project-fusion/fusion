@@ -43,6 +43,26 @@ const duplicates = new Set<string>()
 export const duplicateRegistrations = (): string[] => [...duplicates]
 
 /**
+ * Every tag this decorator has defined, in definition order.
+ *
+ * **Recorded here because here is the only place that sees all of them once.** A
+ * spec wanting "every element this package defines" reached for patching
+ * `customElements.define` around an import of the barrel, and that answers
+ * correctly only for the first importer in the process: a second import is a
+ * module-cache hit and defines nothing, so any spec that touched a component
+ * first silently shrank the list. Measured when one did, and what it reported
+ * was a floor count, 164 against 250, which names nothing about the cause.
+ *
+ * Not `registerElementEvents`, which was tried and is a different set: the
+ * generated map holds the tags that *dispatch* something, so it came out 68
+ * against 90. Definition is the question, so the definition site is the answer.
+ */
+const defined: string[] = []
+
+/** Every tag registered through `customElement`, whoever imported it first. */
+export const definedTags = (): string[] => [...defined]
+
+/**
  * Says so when a second, different class asks for a tag that is already taken.
  *
  * **Returning quietly is right and saying nothing is not.** The registry keeps
@@ -101,4 +121,5 @@ export const customElement =
       return
     }
     customElements.define(tagName, target)
+    defined.push(tagName)
   }

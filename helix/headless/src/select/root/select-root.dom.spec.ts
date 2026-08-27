@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -225,7 +226,7 @@ if (hasLayout()) {
     test('and it closes, because the question has been answered', async () => {
       const host = await opened()
       await press(host as HTMLElement, 'pear')
-      expect((host as HTMLElement).hasAttribute('data-open')).toBe(false)
+      expect(hasState(host as HTMLElement, 'open')).toBe(false)
     })
 
     test('a multiple stays open, and the answers accumulate', async () => {
@@ -233,10 +234,10 @@ if (hasLayout()) {
          reopen to use again. */
       const host = await opened('multiple')
       await press(host as HTMLElement, 'pear')
-      expect((host as HTMLElement).hasAttribute('data-open')).toBe(true)
+      expect(hasState(host as HTMLElement, 'open')).toBe(true)
       await press(host as HTMLElement, 'apple')
       expect(host.value).toBe('pear,apple')
-      expect((host as HTMLElement).hasAttribute('data-open')).toBe(true)
+      expect(hasState(host as HTMLElement, 'open')).toBe(true)
     })
   })
 }

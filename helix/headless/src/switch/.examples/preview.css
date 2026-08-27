@@ -131,11 +131,11 @@ helix-headless-switch::part(thumb) {
   position: absolute;
 }
 
-helix-headless-switch[data-checked]::part(track) {
+helix-headless-switch:state(checked)::part(track) {
   background-color: var(--_gray-strong);
 }
 
-helix-headless-switch[data-checked]::part(thumb) {
+helix-headless-switch:state(checked)::part(thumb) {
   background-color: var(--_gray-surface);
   translate: 0.75rem 0;
 }

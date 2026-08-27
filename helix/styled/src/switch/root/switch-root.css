@@ -110,14 +110,14 @@
 /* No hairline once it is on: the thumb is white on the accent, which separates
    it further than a border would, and a border there reads as an outline drawn
    around something already distinct. */
-:host([data-checked]) [part="thumb"] {
+:host(:state(checked)) [part="thumb"] {
   border-color: transparent;
 }
 
 /* Color, and this is the one control that needs it. A checkbox says "on" with
    a tick, which is legible without color; a switch has no mark at all, so the
    fill is the whole difference between the two states. */
-:host([data-checked]) [part="track"] {
+:host(:state(checked)) [part="track"] {
   background-color: var(--switch-on-color, var(--helix-color-primary));
   border-color: var(--switch-on-color, var(--helix-color-primary));
 }
@@ -135,7 +135,7 @@
   opacity: 0;
 }
 
-:host([data-checked]) [part="thumb"] {
+:host(:state(checked)) [part="thumb"] {
   /* On the accent now rather than on the groove, so it takes the color meant
      to sit on it. `raised` against the brand is a dark thumb on a mid blue in
      dark mode, which is the same disappearing act the other way round. */
@@ -150,7 +150,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-:host([data-invalid]) [part="track"] {
+:host(:state(invalid)) [part="track"] {
   border-color: var(--helix-color-danger);
 }
 

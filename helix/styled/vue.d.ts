@@ -226,8 +226,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixAccordionItem["defaultOpen"];
@@ -1668,7 +1668,8 @@ same shape all four of these mixins have, for the reason given on
 `MixinControllerOpen.open`.
 
 Not reflected: the attribute is the consumer's input and stays as they
-wrote it, and `data-checked` carries the resolved state for stylesheets. */
+wrote it, and `:state(checked)` carries the resolved state for
+stylesheets. */
   checked?: HelixCheckbox["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   "default-checked"?: HelixCheckbox["defaultChecked"];
@@ -1794,8 +1795,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixColorInput["defaultOpen"];
@@ -2105,8 +2106,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixCombobox["defaultOpen"];
@@ -2310,8 +2311,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixCommand["defaultOpen"];
@@ -2698,8 +2699,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixDateInput["defaultOpen"];
@@ -3153,8 +3154,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixDialog["defaultOpen"];
@@ -3399,8 +3400,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixDrawer["defaultOpen"];
@@ -4700,8 +4701,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixMegamenu["defaultOpen"];
@@ -4901,8 +4902,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixMenu["defaultOpen"];
@@ -5063,10 +5064,20 @@ empty string would give. */
   at?: HelixNotificationsItem["at"];
   /** Whether the reader has seen it.
 
-Reflected, because unread is a visual state and a stylesheet has no other
-way to know. Set it and this element defers: a reader's click fires
-`helix-read` and changes nothing until a new value arrives. `default-read`
-seeds a state this element then owns. */
+Set it and this element defers: a reader's click fires `helix-read` and
+changes nothing until a new value arrives. `default-read` seeds a state
+this element then owns.
+
+**Not reflected, and it was until 27 Aug 2026.** The reason given was that
+unread is a visual state and a stylesheet has no other way to know, which
+is the same reason the four mixins mirror theirs, and the mirror may not be
+the property's own attribute: `<helix-notifications-item default-read>`
+came back from a server without `read` and gained it on the first update,
+which React reports as a hydration mismatch, and a copy of the serialized
+element re-parses that attribute as a declaration. `:state(read)` is what
+the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
+learned to mount an element a consumer had configured rather than a bare
+one. */
   read?: HelixNotificationsItem["read"];
   /** State to open with, where nothing declared one. */
   "default-read"?: HelixNotificationsItem["defaultRead"];
@@ -5796,8 +5807,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixPopover["defaultOpen"];
@@ -6537,8 +6548,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixSelect["defaultOpen"];
@@ -6969,8 +6980,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixSpeedDial["defaultOpen"];
@@ -7259,7 +7270,8 @@ same shape all four of these mixins have, for the reason given on
 `MixinControllerOpen.open`.
 
 Not reflected: the attribute is the consumer's input and stays as they
-wrote it, and `data-checked` carries the resolved state for stylesheets. */
+wrote it, and `:state(checked)` carries the resolved state for
+stylesheets. */
   checked?: HelixSwitch["checked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   "default-checked"?: HelixSwitch["defaultChecked"];
@@ -7814,8 +7826,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixTimeInput["defaultOpen"];
@@ -8526,8 +8538,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixTooltip["defaultOpen"];
@@ -8767,8 +8779,8 @@ opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
 back holding whatever the last reader did rather than what the author
-wrote. `data-open` carries the resolved state for stylesheets, which is
-what it has always been for. */
+wrote. `:state(open)` carries the resolved state for stylesheets, which
+is what the mirror has always been for. */
   open?: HelixTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixTreeItem["defaultOpen"];

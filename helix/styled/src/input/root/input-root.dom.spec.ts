@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -309,7 +310,7 @@ if (hasLayout()) {
       host.focus()
 
       const style = getComputedStyle(field)
-      expect(host.hasAttribute('data-invalid')).toBe(true)
+      expect(hasState(host, 'invalid')).toBe(true)
       expect(field.matches(':focus-within')).toBe(true)
       expect(style.outlineStyle).not.toBe('none')
       expect(style.outlineColor).toBe(style.borderTopColor)

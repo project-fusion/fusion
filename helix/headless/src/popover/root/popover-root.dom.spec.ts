@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -45,7 +45,7 @@ describe('popover', () => {
     host.addEventListener('helix-before-open', (event) => event.preventDefault())
     host.show()
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(false)
+    expect(hasState(host, 'open')).toBe(false)
   })
 
   test('closing is announced too, and refusing it leaves the panel open', async () => {
@@ -56,7 +56,7 @@ describe('popover', () => {
     host.addEventListener('helix-before-close', (event) => event.preventDefault())
     host.hide()
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(true)
+    expect(hasState(host, 'open')).toBe(true)
   })
 
   test('a command opens it from a button that is not its trigger', async () => {
@@ -76,7 +76,7 @@ describe('popover', () => {
     }
     inner.click()
     await target.updateComplete
-    expect(target.hasAttribute('data-open')).toBe(true)
+    expect(hasState(target, 'open')).toBe(true)
   })
 
   test('the panel is hidden while closed and shown while open', async () => {
@@ -88,7 +88,7 @@ describe('popover', () => {
   })
 
   test('open at mount serves open, without a click to get there', async () => {
-    expect((await popover('open')).hasAttribute('data-open')).toBe(true)
+    expect(hasState(await popover('open'), 'open')).toBe(true)
   })
 })
 
@@ -111,11 +111,11 @@ if (hasLayout()) {
 
       trigger.click()
       await host.updateComplete
-      expect(host.hasAttribute('data-open')).toBe(true)
+      expect(hasState(host, 'open')).toBe(true)
 
       trigger.click()
       await host.updateComplete
-      expect(host.hasAttribute('data-open')).toBe(false)
+      expect(hasState(host, 'open')).toBe(false)
     })
 
     test('the panel is in the top layer, which is the reason for all of this', async () => {

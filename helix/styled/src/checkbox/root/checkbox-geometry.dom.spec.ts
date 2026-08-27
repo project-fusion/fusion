@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, readyToMove, registerDom, settle } from '@helix-io/testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  readyToMove,
+  registerDom,
+  settle,
+} from '@helix-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -56,7 +64,7 @@ if (hasLayout()) {
       // The case gating on the property would have broken: a checkbox named by
       // its own content, which is how every checkbox was written before `label`.
       const host = await mount('<helix-checkbox>Accept</helix-checkbox>')
-      expect(host.hasAttribute('data-has-label')).toBe(true)
+      expect(hasState(host, 'has-label')).toBe(true)
       expect(getComputedStyle(part(host, 'label') as HTMLElement).display).not.toBe('none')
     })
 

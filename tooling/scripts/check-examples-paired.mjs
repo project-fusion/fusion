@@ -132,3 +132,83 @@ console.log(
   `paired examples: ${compared} families show the same copy on both tiers, ` +
     'each authored in its own package',
 )
+
+/**
+ * Every example is authored in both syntaxes, and neither is generated.
+ *
+ * **The same argument as the tiers above, one axis over.** `htmlToJsx` derived
+ * the React view of an example from its HTML at read time, which is the mistake
+ * `build-headless-examples.mjs` made and this file was written to replace. It
+ * failed harder: the styled-to-headless derivation was merely lossy, while this
+ * one emitted a `<script>` into a JSX fragment, so all 28 script-bearing
+ * examples produced a *syntax error* rather than a wrong picture. Measured with
+ * `bun build`: `{ name: 'archive.tar.gz' }` in JSX children is an expression
+ * container, not an object.
+ *
+ * It was wrong on script-free examples too, in three ways nobody had looked
+ * for: a leading comment was not counted as a root so no fragment was emitted
+ * (27 files), the stylesheet-to-import rule required `rel` before `href` and
+ * every example writes them alphabetically so it had never once fired (172
+ * files), and `for` was renamed to `htmlFor` on custom elements, where React
+ * writes the attribute verbatim and the browser lowercases it to something no
+ * component reads (41 files, and the corpus contains no actual `<label for=>`).
+ *
+ * **What is asserted here is that both exist, not that they read alike.** A
+ * React example legitimately moves copy out of the markup: a caption becomes a
+ * `const`, a row of months becomes an array a `map` walks. Comparing text would
+ * fail on exactly the examples worth authoring by hand. Equivalence is
+ * `check:visual`'s job, which renders both and diffs the pictures, and that is
+ * the assertion that catches a React example rendering something else.
+ */
+const SYNTAXES = [
+  { ext: '.html', name: 'HTML' },
+  { ext: '.tsx', name: 'TSX' },
+]
+
+const syntaxFindings = []
+let paired = 0
+
+for (const tier of [STYLED, HEADLESS]) {
+  for (const entry of readdirSync(tier, { withFileTypes: true })) {
+    const dir = join(tier, entry.name, '.examples')
+    if (!entry.isDirectory() || !existsSync(dir)) {
+      continue
+    }
+    const held = readdirSync(dir)
+    const slugs = new Set(
+      held
+        .filter((file) => file.endsWith('.html') || file.endsWith('.tsx'))
+        .map((file) => file.replace(/\.(html|tsx)$/, '')),
+    )
+    for (const slug of [...slugs].sort()) {
+      const missing = SYNTAXES.filter((one) => !held.includes(`${slug}${one.ext}`))
+      if (missing.length > 0) {
+        syntaxFindings.push(
+          `${entry.name}/${slug}: authored in ${SYNTAXES.length - missing.length} of ` +
+            `${SYNTAXES.length} syntaxes, missing ${missing.map((one) => one.name).join(' and ')}`,
+        )
+        continue
+      }
+      /* A `.tsx` that exports nothing is a file the sandbox cannot show and the
+         picture harness cannot render, which is the shape a half-finished
+         conversion leaves behind. */
+      if (!/export function Example\b/.test(readFileSync(join(dir, `${slug}.tsx`), 'utf8'))) {
+        syntaxFindings.push(`${entry.name}/${slug}.tsx: no \`export function Example\``)
+        continue
+      }
+      paired += 1
+    }
+  }
+}
+
+if (syntaxFindings.length > 0) {
+  console.error(
+    `paired examples: ${syntaxFindings.length} are not authored in both syntaxes.\n  ` +
+      `${syntaxFindings.join('\n  ')}\n\n` +
+      '  Both are authored, neither generated from the other. Write the missing\n' +
+      '  one by hand rather than converting its twin.',
+  )
+  process.exit(1)
+}
+
+console.log(`paired examples: ${paired} examples authored in HTML and TSX alike, neither derived`)

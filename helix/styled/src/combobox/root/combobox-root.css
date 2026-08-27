@@ -62,7 +62,7 @@
  * place for a symmetric caret and take different routes, and a rotation spends
  * the middle of the movement pointing at nothing.
  *
- * `data-open` and not `[open]`: the resolved state, so a controlled combobox
+ * `:state(open)` and not `[open]`: the resolved state, so a controlled combobox
  * whose consumer has not applied the change yet does not turn early. */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
@@ -163,10 +163,10 @@
 /* Wrong, and the field says so. The same four selectors Input carries: the
    focus rule owns the `outline`, so changing the border alone gives a focused
    field with an error a red border inside a blue ring. */
-:host([data-invalid]) [part="field"],
-:host([data-invalid]) [part="field"]:hover,
-:host([data-invalid]:focus-within) [part="field"],
-:host([data-invalid]:focus-within) [part="field"]:hover {
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }
@@ -184,8 +184,8 @@
   inline-size: var(--helix-size-icon);
 }
 
-:host([data-open]) [part="indicator"],
-:host([data-open]) ::slotted([slot="indicator"]) {
+:host(:state(open)) [part="indicator"],
+:host(:state(open)) ::slotted([slot="indicator"]) {
   scale: 1 -1;
 }
 

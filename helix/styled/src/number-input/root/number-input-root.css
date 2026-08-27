@@ -48,7 +48,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* `data-invalid` rather than `:user-invalid`, and rather than an `invalid`
+/* `:state(invalid)` rather than `:user-invalid`, and rather than an `invalid`
    property. `MixinField` mirrors "wrong, and the reader knows it" onto the host
    under that name, because `:user-invalid` tracks interaction with the element
    it is on and nobody interacts with this one: the reader types into an
@@ -59,14 +59,14 @@
    it: it works, which is the problem, because it would have been an API in a
    stylesheet and nowhere else. All four states, so the edge turns whichever
    route it arrives by. */
-:host([data-invalid]) [part="field"],
-:host([data-invalid]) [part="field"]:hover,
-:host([data-invalid]:focus-within) [part="field"],
-:host([data-invalid]:focus-within) [part="field"]:hover {
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
   border-color: var(--helix-color-danger);
 }
 
-:host([data-invalid]:focus-within) [part="field"] {
+:host(:state(invalid):focus-within) [part="field"] {
   outline-color: var(--helix-color-danger);
 }
 

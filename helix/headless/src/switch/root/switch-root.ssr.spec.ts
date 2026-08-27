@@ -18,13 +18,19 @@ describe('switch server output', () => {
     ).toContain('Dark mode')
   })
 
-  test('checked reaches the input and the host"s styling hook alike', () => {
-    // Both, and the second is the one that matters here. `data-checked` is what
-    // the fill and the thumb"s travel select on, so a checked switch that ships
-    // without it is drawn in the off position until hydration and then jumps.
+  test('checked reaches the input, and the host carries only what was typed', () => {
+    /* `data-checked` was served beside it until 27 Aug 2026, and this test said
+       the fill and the thumb"s travel select on it, so a switch shipped without
+       it is drawn off until hydration and then jumps. That was true of a
+       consumer serving declarative shadow DOM, where the styles are in the
+       markup. There is none here: shadow styles arrive with the definition, so
+       nothing is drawn in either position until the element upgrades, and
+       `elements.css` hides the tag by visibility until it does. What the
+       attribute cost in exchange was a hydration mismatch on every switch a
+       React consumer served checked. */
     const markup = ssr(html`<helix-headless-switch checked></helix-headless-switch>`)
     expect(partTag(markup, 'control')).toContain('checked')
-    expect(hostAttributes(markup, 'helix-headless-switch')).toEqual(['checked', 'data-checked'])
+    expect(hostAttributes(markup, 'helix-headless-switch')).toEqual(['checked'])
   })
 
   test('the role is not an attribute, because it goes through internals', () => {

@@ -53,9 +53,8 @@ export declare class MixinControllerOpenInterface {
  * its own changes from wherever markup started it, and `defaultOpen` is what a
  * reset returns to.
  *
- * Sets `data-open` on the host whenever the element is open. Styled tiers
- * select on that rather than `[open]`, which is absent until somebody writes
- * it.
+ * Records `:state(open)` whenever the element is open. Styled tiers select on
+ * that rather than on `[open]`, which is absent until somebody writes it.
  */
 export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerOpenInterface deliberately. The interface is
@@ -84,8 +83,8 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * that read it, be indistinguishable from one the consumer controls:
      * cloned, serialised for hydration, or diffed by a framework, it would come
      * back holding whatever the last reader did rather than what the author
-     * wrote. `data-open` carries the resolved state for stylesheets, which is
-     * what it has always been for.
+     * wrote. `:state(open)` carries the resolved state for stylesheets, which
+     * is what the mirror has always been for.
      */
     @property({ type: Boolean })
     get open(): boolean {
@@ -120,14 +119,20 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     private openState: boolean | undefined = undefined
 
     /**
-     * Mirrors the resolved state onto the host as `data-open`.
+     * Records the resolved state as the custom state `open`.
      *
-     * In `willUpdate` rather than `connectedCallback` because SSR calls the
-     * former and not the latter, so the attribute is present in server output.
+     * **A state and not `data-open`, which is what this wrote until 27 Aug
+     * 2026.** An `<helix-accordion-item default-open>` was served without the
+     * attribute and gained it on upgrade, which is a hydration mismatch a React
+     * consumer reports. See `HelixElement.toggleState`, and see `Toast.Item`
+     * for the other answer to the same fault: inverting the hook so the write
+     * falls on the side that only happens after somebody acts. Inversion works
+     * where the resting state is the loud one and cannot help here, `checked`
+     * and `open` being true only because a consumer asked for them.
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.toggleAttribute('data-open', this.open)
+      this.toggleState('open', this.open)
     }
 
     /**

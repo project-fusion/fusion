@@ -41,10 +41,10 @@
   outline-offset: 0;
 }
 
-:host([data-invalid]) [part="field"],
-:host([data-invalid]) [part="field"]:hover,
-:host([data-invalid]:focus-within) [part="field"],
-:host([data-invalid]:focus-within) [part="field"]:hover {
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }

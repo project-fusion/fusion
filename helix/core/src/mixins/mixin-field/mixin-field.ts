@@ -425,19 +425,24 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /**
-     * Mirrors "wrong, and the reader knows it" onto the host as `data-invalid`.
+     * Records "wrong, and the reader knows it" as the custom state `invalid`.
      *
      * The styled tier selects on this rather than on `:host(:user-invalid)`,
      * which cannot match for the reason above, so the invalid border never
      * arrived either. One state, and the message and the border agree by
      * construction.
      *
-     * In `willUpdate` rather than `connectedCallback`, which SSR never calls.
+     * **A state and not `data-invalid`, since 27 Aug 2026.** A field served
+     * with a `feedback` message already failing was written invalid on its
+     * first update, which is an attribute the consumer's server never sent.
+     * `HelixElement.toggleState` carries the argument.
+     *
+     * In `willUpdate`, which is where the resolved message is first known.
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
       this.shownFeedback = this.resolvedFeedback
-      this.toggleAttribute('data-invalid', this.shownFeedback !== '')
+      this.toggleState('invalid', this.shownFeedback !== '')
       /* And say it to the accessibility tree, which nothing did.
        *
        * A field carrying a `feedback` message painted red, and was described by

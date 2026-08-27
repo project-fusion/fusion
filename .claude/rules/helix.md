@@ -99,13 +99,18 @@ an `overflow` they had no way of knowing was missing.
   around it. Keep a wrapper only where it carries something real, as `<nav>`
   does in AppHeader, being a landmark whether or not it is filled.
 
-### State goes in markup, and `data-` is only a hook on top of it
+### State goes in markup, and the mirror is only a hook on top of it
 
 **A base component has no stylesheet, so any state a stylesheet has to
 interpret does not exist on that tier.** `hidden`, `inert`, `popover`, a real
 `<dialog>`, `open` on `<details>`: these are the state, because the platform
-already acts on them. `data-open` is a selector target the styled tier layers on
-top, and it can never be the mechanism.
+already acts on them. `:state(open)` is a selector target the styled tier layers
+on top, and it can never be the mechanism.
+
+*Amended 27 Aug 2026, when the hook stopped being an attribute.* This said
+`data-open` throughout, which was right about the layering and wrong about where
+the hook lives; see the rule on mirrors below. Nothing else in this section
+changes: a hook, wherever it is kept, is still not the mechanism.
 
 Twenty-four families already work this way and it was never written down, which
 is how the accordion became the outlier nobody noticed. Its content region
@@ -421,12 +426,43 @@ one of the two reasons it was wrong has gone.
 
 The line that is actually drawn, and it is not "value is special":
 
-- **Boolean states mirror to a `data-` name.** `data-open` and `data-checked`,
-  read by sixteen rules across six stylesheets. A different name, so a pasted
-  `data-open` is inert and can never be re-read as a declaration.
+- **Boolean states mirror to a custom state.** `:state(open)`,
+  `:state(checked)`, `:state(invalid)`, `:state(has-label)` and `:state(read)`,
+  set through `HelixElement.toggleState` and read by forty rules across
+  twenty-four stylesheets. Never the property's own attribute, so nothing a
+  component records can be re-read as a declaration.
 - **Payload states do not.** `value` is a string, and so is `active`, which
   names which child is active. Option's `data-active` is a boolean its listbox
   writes, so it is the first rule rather than an exception to the second.
+
+*Rewritten 27 Aug 2026, and the first bullet said `data-open` and `data-checked`
+until it was.* The mirror was an attribute, and an attribute is in the DOM: an
+element writes it on the first update, so `<helix-checkbox default-checked>`
+served by a consumer's server grew `data-checked` the moment the definition
+landed and React reported a hydration mismatch it will not patch up. Measured on
+the landing page's showcase, which listed a switch, a checkbox and an accordion
+item at once.
+
+**The reasoning that was there was sound and stopped one step short.** A
+different name so a paste cannot be re-read as a declaration is exactly right;
+it is just that the same argument goes on to the DOM itself. Nothing a component
+knows about itself belongs anywhere a framework reconciles, which is what
+`data-settled` was found for four times and `data-checked` a fifth.
+
+**Which side the write falls on is what decides between the two answers.** A
+fact that can be true on the first update mirrors to a custom state, because
+that is the window hydration is in. A fact that becomes true only after somebody
+acts may stay a `data-` attribute, the write being long past hydration:
+`data-closed` on `Toast.Item`, `data-playing` on `Video`, `data-scrolled` on
+`AppHeader`. Where the resting state is the loud one, inverting the name moves
+the write to the safe side and is the cheaper fix; where the state is true
+because a consumer asked for it, as `checked` and `open` are, inversion cannot
+help and the fact has to leave the DOM.
+
+`hydration.dom.spec.ts` is what holds it, and it mounts twice: bare, and again
+with the `default-*` and `label` attributes a consumer would have typed. The
+second mount is the one that catches this class, and adding it found a sixth
+instance nobody had reported, `Notifications.Item` reflecting `read`.
 
 If a payload ever needs a CSS hook, mirror the boolean fact (`data-filled`), not
 the payload: a floating label cares whether there is text, not what it says. And

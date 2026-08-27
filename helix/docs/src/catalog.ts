@@ -122,6 +122,22 @@ export interface Example {
   min?: number
   slug: string
   /**
+   * The same example authored in TSX, which is a file and never a conversion.
+   *
+   * **Both syntaxes are authored, neither derived.** The sandbox used to run
+   * the HTML through `htmlToJsx` when a reader asked for TSX, which is the
+   * mistake `build-headless-examples.mjs` made one axis over and this package
+   * already rejected once: a derived example is a function of its twin rather
+   * than a thing anybody wrote. It also did not work. Every example carrying a
+   * `<script>` converted to a JSX fragment with a `<script>` in it, which is a
+   * syntax error rather than a bad example, and three separate faults hit the
+   * script-free ones as well.
+   *
+   * `check:examples-paired` holds the two files to each other and
+   * `check:visual` holds the two pictures to each other.
+   */
+  tsx: string
+  /**
    * Which tier the example shows, read from what it renders.
    *
    * Off the markup rather than off the filename, the same test `check:tokens`
@@ -174,6 +190,8 @@ export interface ExampleSource {
   html: string
   /** File name without its extension: `default`, `base`, `cards.base`. */
   slug: string
+  /** The authored TSX beside the HTML, never a conversion of it. */
+  tsx: string
 }
 
 /**
@@ -404,6 +422,7 @@ const examplesOf = (
           tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
             | 'headless'
             | 'styled',
+          tsx: source.tsx,
         }
       })
   )

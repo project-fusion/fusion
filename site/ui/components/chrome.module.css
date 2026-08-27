@@ -64,23 +64,24 @@
  * that carries the brand without words, so it is the one thing that keeps the
  * brand's color. */
 /**
- * The mark takes `brand-mark`, not `primary`.
+ * **The stops are computed from `primary`, not borrowed from hover and active.**
  *
- * **They are different roles and the engine emits both for this reason.**
- * `primary` is solved against the ground it lands on, so a brand of `#3b82f6`
- * arrives as `#2067d9` on light and `#4c8fff` on dark: correct for a button,
- * wrong for a logo. `brand-mark` is the colour as chosen, moved only when the
- * raw value cannot be shown at all. A lockup painted in the contrast-solved
- * value is not the brand any more, and on a page that lets a reader set the
- * brand the difference is visible the moment they do.
+ * Those two are interaction states, and the palette is free to move them
+ * whichever way suits the scheme: the shipped stylesheet takes them *darker*
+ * than primary, and a derived palette takes them *lighter*. Either is right for
+ * a button. Neither is a gradient ramp, and a mark built from them inherits
+ * whichever direction the palette happened to choose. On the derived one that
+ * gave three increasingly pale blues with almost no range between them, so the
+ * lockup washed out.
  *
- * The other two stops are relative to it rather than borrowed from `primary`'s
- * hover and active, which were solved against a different constraint.
+ * Stating the offsets makes the ramp a property of the mark rather than a
+ * side effect of somebody else's hover state, and it keeps the same depth under
+ * any palette. `primary` stays the base, so the mark still follows the theme.
  */
 .fusionLogo {
-  --logo-color-from: var(--helix-color-brand-mark);
-  --logo-color-mid: oklch(from var(--helix-color-brand-mark) calc(l + 0.08) c h);
-  --logo-color-to: oklch(from var(--helix-color-brand-mark) calc(l - 0.09) c h);
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: oklch(from var(--helix-color-primary) calc(l - 0.09) c h);
+  --logo-color-to: oklch(from var(--helix-color-primary) calc(l - 0.17) c h);
 }
 
 /* ============================================================ footer ===== */
@@ -472,4 +473,35 @@
 .navAction {
   inline-size: 100%;
   margin-block-start: var(--helix-space-xs);
+}
+
+/* ============================================== responsive chrome ===== */
+
+/**
+ * The breakpoint is CSS, not React state.
+ *
+ * **`narrow` starts false, so the server always shipped the wide header.** It
+ * only became the narrow one after `matchMedia` ran in an effect, which means
+ * every phone got a first paint with four nav words and a search field laid over
+ * each other in a 375 pixel bar, and then a second layout once JavaScript
+ * arrived. On a fast connection that is a flicker; on a slow one it is the
+ * header for as long as the bundle takes; and where hydration fails for any
+ * reason it is the header permanently.
+ *
+ * A media query knows the width at first paint and needs nothing to have loaded.
+ * Both sets render and CSS picks, so there is no moment where the wrong one is
+ * showing and no state to get out of step with the viewport.
+ *
+ * 48rem, which is the breakpoint the rest of this file already turns at.
+ */
+@media (width < 48rem) {
+  .wideOnly {
+    display: none;
+  }
+}
+
+@media (width >= 48rem) {
+  .narrowOnly {
+    display: none;
+  }
 }

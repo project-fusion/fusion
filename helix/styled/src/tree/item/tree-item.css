@@ -224,7 +224,7 @@ a[part="row"] {
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([data-open]) [part="toggle"] {
+:host(:state(open)) [part="toggle"] {
   transform: rotate(0deg);
 }
 

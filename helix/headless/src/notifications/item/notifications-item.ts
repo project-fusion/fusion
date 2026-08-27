@@ -71,14 +71,24 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
   /**
    * Whether the reader has seen it.
    *
-   * Reflected, because unread is a visual state and a stylesheet has no other
-   * way to know. Set it and this element defers: a reader's click fires
-   * `helix-read` and changes nothing until a new value arrives. `default-read`
-   * seeds a state this element then owns.
+   * Set it and this element defers: a reader's click fires `helix-read` and
+   * changes nothing until a new value arrives. `default-read` seeds a state
+   * this element then owns.
+   *
+   * **Not reflected, and it was until 27 Aug 2026.** The reason given was that
+   * unread is a visual state and a stylesheet has no other way to know, which
+   * is the same reason the four mixins mirror theirs, and the mirror may not be
+   * the property's own attribute: `<helix-notifications-item default-read>`
+   * came back from a server without `read` and gained it on the first update,
+   * which React reports as a hydration mismatch, and a copy of the serialized
+   * element re-parses that attribute as a declaration. `:state(read)` is what
+   * the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
+   * learned to mount an element a consumer had configured rather than a bare
+   * one.
    *
    *
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   get read(): boolean {
     return this.readState ?? this.defaultRead
   }
@@ -203,6 +213,9 @@ export class HelixHeadlessNotificationsItem extends HelixElement {
       this.tick()
     }
     hostAria(this.internals, { role: 'listitem' })
+    /* The mirror the stylesheet selects on, kept off the host's attributes for
+       the reason on `read` itself. */
+    this.toggleState('read', this.read)
   }
 
   private renderTime(): TemplateResult | typeof nothing {

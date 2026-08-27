@@ -17,14 +17,17 @@ describe('menu server output', () => {
     expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
-  test('open reaches the served markup as the hook the styles select on', () => {
-    // Sorted by the helper, so this is a set rather than an order.
+  test('an open menu serves back what was typed and nothing else', () => {
+    /* Sorted by the helper, so this is a set rather than an order. `data-open`
+       was the third member until the open state moved to
+       `ElementInternals.states`, which no server writes and no hydration
+       reconciles. */
     expect(
       hostAttributes(
         ssr(html`<helix-headless-menu label="A" open></helix-headless-menu>`),
         'helix-headless-menu',
       ),
-    ).toEqual(['data-open', 'label', 'open'])
+    ).toEqual(['label', 'open'])
   })
 
   test('a row serves its words and its role', () => {

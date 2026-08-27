@@ -51,8 +51,8 @@
   outline-offset: 0;
 }
 
-:host([data-invalid]) [part="items"],
-:host([data-invalid]) [part="items"]:focus-visible {
+:host(:state(invalid)) [part="items"],
+:host(:state(invalid)) [part="items"]:focus-visible {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }

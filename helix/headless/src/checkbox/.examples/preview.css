@@ -64,11 +64,11 @@ helix-headless-checkbox::part(mark) {
 }
 
 /* State comes off the host, not off a class a consumer maintains. */
-helix-headless-checkbox[data-checked]::part(control) {
+helix-headless-checkbox:state(checked)::part(control) {
   background-color: currentColor;
 }
 
-helix-headless-checkbox[data-checked]::part(mark) {
+helix-headless-checkbox:state(checked)::part(mark) {
   background-color: canvas;
 }
 

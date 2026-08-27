@@ -67,7 +67,7 @@
   margin-inline-start: auto;
 }
 
-:host([data-open]) [part="chevron"] {
+:host(:state(open)) [part="chevron"] {
   transform: scaleY(-1);
 }
 
@@ -103,7 +103,7 @@
   transition: grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-:host([data-open]) [part="content"] {
+:host(:state(open)) [part="content"] {
   grid-template-rows: 1fr;
 }
 
@@ -117,7 +117,7 @@
 /* The padding is here and not on the box above, and it is not conditional.
  *
  * Both of those were wrong together. The spacing and the line height applied
- * only under `[data-open]`, so the moment a toggle began, the text lost its
+ * only under `:state(open)`, so the moment a toggle began, the text lost its
  * padding and changed leading in one frame and reflowed to a different shape
  * while the row was still traveling: the content squashed and sprang rather
  * than sliding. What is being animated is the row's height, so everything

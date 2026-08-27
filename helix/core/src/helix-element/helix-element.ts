@@ -532,6 +532,43 @@ export class HelixElement extends LitElement {
   protected readonly internals: ElementInternals
 
   /**
+   * Records a boolean fact about this element as a custom state.
+   *
+   * **The host belongs to whoever rendered it, and a component's own
+   * bookkeeping may not be kept there.** An attribute written on the first
+   * update is markup a consumer's server never sent, so a React consumer
+   * hydrates a DOM that has gained attributes since and reports a mismatch it
+   * will not patch up. A custom state is not in the DOM at all: it carries the
+   * fact to a stylesheet through `:state()` and leaves the markup alone, so the
+   * server's output and the client's agree by construction.
+   *
+   * `SETTLED` carries the long version of that argument and was the first to
+   * move. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug
+   * 2026, after the same fault was reported once more from the landing page's
+   * showcase: a `default-checked` switch, a `default-checked` checkbox and a
+   * `default-open` accordion item, each writing its own resolved state onto
+   * itself before React reached the node.
+   *
+   * **The deferral that had been holding it is not a fix and could not be.**
+   * The site imports the definitions from an effect so the upgrades fall the
+   * other side of hydration, which works only while hydration is one pass:
+   * anything that splits it, a streamed segment or a suspended boundary, puts
+   * an upgrade back inside the window. Timing cannot be the guarantee when the
+   * fact is kept somewhere React reconciles.
+   *
+   * Feature-tested rather than assumed, the way `hostAria` tests element
+   * references. An engine without `CustomStateSet` records nothing and keeps
+   * whatever the resting rule draws, which is the safe direction to fail, and
+   * Lit's server shim is one of them: a custom state is a fact about a running
+   * element, and a server has nothing to say about it.
+   */
+  protected toggleState(name: string, on: boolean): void {
+    if ('states' in this.internals) {
+      this.internals.states[on ? 'add' : 'delete'](name)
+    }
+  }
+
+  /**
    * Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -674,13 +711,10 @@ export class HelixElement extends LitElement {
        `applyReactProperties`. */
     const applied = applyReactProperties(this)
     requestAnimationFrame(() => {
-      /* Guarded the way `Pagination` guards its own state, because the shim in
-         `@helix-io/testing` supplies `states` and older engines do not. A
-         component that cannot record the state keeps its transitions suppressed,
-         which is the safe direction to fail: nothing animates that should not. */
-      if ('states' in this.internals) {
-        this.internals.states.add('settled')
-      }
+      /* Through `toggleState`, which carries the feature test. A component that
+         cannot record the state keeps its transitions suppressed, which is the
+         safe direction to fail: nothing animates that should not. */
+      this.toggleState('settled', true)
       this.resolveSettled()
       /* **Audited here as well as at dispatch, and this is the half that catches
          the real mistake.** The audit ran only from inside `dispatchEvent`, so an

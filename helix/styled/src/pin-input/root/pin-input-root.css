@@ -52,11 +52,11 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* `data-invalid` rather than `:user-invalid`, which cannot match: it tracks
+/* `:state(invalid)` rather than `:user-invalid`, which cannot match: it tracks
    interaction with the element it is on, and the reader interacts with an input
    in the shadow root. `MixinField` mirrors the flag onto the host. `Input`
    carries the measurement. */
-:host([data-invalid]) [part="cell"] {
+:host(:state(invalid)) [part="cell"] {
   border-color: var(--helix-color-danger);
 }
 

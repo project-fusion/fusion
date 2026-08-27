@@ -17,11 +17,15 @@ import '../index.js'
    as a declaration. `Tree.chevronPlacement`, `Toast.placement` and
    `Image.status` were each caught that way.
 
-   `data-` names are the exception and the library's own answer: a boolean state
-   mirrors to one deliberately, the server and the client agree on it, and a
-   pasted `data-open` is inert because nothing reads it as a declaration. A
-   first version of this asserted no attributes at all and reported
-   `Toast.Item`, which was doing exactly the sanctioned thing.
+   `data-` names were the exception and are nearly none of them now. A boolean
+   state that is true only because a reader acted still mirrors to one, since
+   the write falls long after hydration and a pasted `data-closed` is inert:
+   `Toast.Item` is the case, and a first version of this asserted no attributes
+   at all and reported it for doing exactly the sanctioned thing. A state that
+   can be true on the first update mirrors to nothing at all. `checked`, `open`,
+   `invalid` and `has-label` moved to `ElementInternals.states` on 27 Aug 2026,
+   which is not in the DOM, so the server's output and the client's cannot
+   disagree about them and there is nothing here to assert.
 
    What it deliberately does not assert is the part's own markup. That is the
    component's business and belongs in a spec written about it, not in one

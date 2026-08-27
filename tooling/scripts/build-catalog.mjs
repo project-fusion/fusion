@@ -94,11 +94,16 @@ for (const source of EXAMPLES) {
       }
       const slug = file.replace(/\.html$/, '')
       const stylesheet = join(dir, `${slug}.css`)
+      /* Read, never converted. `check:examples-paired` is what guarantees the
+         file is there, so an empty string here means that check is not running
+         rather than that the example has no React form. */
+      const authored = join(dir, `${slug}.tsx`)
       examples.push({
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         family: family.name,
         html: readFileSync(join(dir, file), 'utf8').trim(),
         slug,
+        tsx: existsSync(authored) ? readFileSync(authored, 'utf8').trim() : '',
       })
     }
   }

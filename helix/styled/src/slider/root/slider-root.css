@@ -448,11 +448,11 @@
  * A ring rather than a fill, so the thumb keeps the color that makes it legible
  * against the track, and on the same box the focus halo uses so a focused
  * invalid slider is one ring rather than two. */
-:host([data-invalid]) [part="control"]::-webkit-slider-thumb {
+:host(:state(invalid)) [part="control"]::-webkit-slider-thumb {
   box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
 }
 
-:host([data-invalid]) [part="control"]::-moz-range-thumb {
+:host(:state(invalid)) [part="control"]::-moz-range-thumb {
   box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
 }
 

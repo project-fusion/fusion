@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@helix-io/testing/dom'
 
 /* happy-dom before the element, and the import dynamic for it: an element
    registered against the `customElements` happy-dom replaces never upgrades. */
@@ -49,19 +49,19 @@ describe('dialog', () => {
     host.addEventListener('helix-before-open', (event) => event.preventDefault())
     host.show()
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(false)
+    expect(hasState(host, 'open')).toBe(false)
   })
 
   test('closing is announced too, and refusing it leaves the dialog open', async () => {
     const host = await dialog()
     host.show()
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(true)
+    expect(hasState(host, 'open')).toBe(true)
 
     host.addEventListener('helix-before-close', (event) => event.preventDefault())
     host.close()
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(true)
+    expect(hasState(host, 'open')).toBe(true)
   })
 
   test('a close that happened anyway is reflected back', async () => {
@@ -75,7 +75,7 @@ describe('dialog', () => {
     const native = part(host, 'dialog') as HTMLDialogElement
     native.dispatchEvent(new Event('close'))
     await host.updateComplete
-    expect(host.hasAttribute('data-open')).toBe(false)
+    expect(hasState(host, 'open')).toBe(false)
   })
 
   test('escape asks rather than acts, and persistent refuses it', async () => {
@@ -87,7 +87,7 @@ describe('dialog', () => {
     native.dispatchEvent(cancel)
     await host.updateComplete
     expect(cancel.defaultPrevented).toBe(true)
-    expect(host.hasAttribute('data-open')).toBe(true)
+    expect(hasState(host, 'open')).toBe(true)
   })
 })
 
@@ -126,7 +126,7 @@ describe('dialog invokers', () => {
     const { dialog, trigger } = await wired()
     press(trigger)
     await dialog.updateComplete
-    expect(dialog.hasAttribute('data-open')).toBe(true)
+    expect(hasState(dialog, 'open')).toBe(true)
   })
 
   test('exactly one command arrives, so the two paths never both fire', async () => {
@@ -155,7 +155,7 @@ describe('dialog invokers', () => {
     await (trigger as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
     expect(() => press(trigger)).not.toThrow()
     await dialog.updateComplete
-    expect(dialog.hasAttribute('data-open')).toBe(false)
+    expect(hasState(dialog, 'open')).toBe(false)
   })
 })
 

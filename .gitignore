@@ -69,6 +69,7 @@ site/ui/public/.probe/
 # that moved. What belongs in the history is the baseline a reviewer approved,
 # not the picture of a run that disagreed with it.
 *.diff.png
+*.parity.png
 
 # Derived from the manifests and the example files by `bun run catalog`.
 site/ui/content/catalog/catalog.generated.json

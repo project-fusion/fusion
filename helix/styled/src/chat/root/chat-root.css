@@ -45,8 +45,25 @@
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
   /* The transcript keeps its turns at the bottom when there are too few to fill
      it, which is what a conversation looks like: a new one starts at the bottom
-     of the box rather than at the top of an empty column. */
-  justify-content: flex-end;
+     of the box rather than at the top of an empty column.
+     
+     **`safe` is not a refinement here, it is the whole rule working at all.**
+     A scroll container that end-aligns its content pushes the overflow out of
+     the *start* edge, where there is no scroll position that reaches it: with a
+     plain `flex-end` a transcript taller than its box reported
+     `scrollHeight - clientHeight` of zero while its first turn sat 287 pixels
+     above the scrollport, so the reader could not scroll up and the history was
+     gone. Every part of this component's stated purpose went with it, since
+     `atBottom` is then permanently true, the pin never releases and the way back
+     is never offered. Measured in a 20rem box with six turns: 0 pixels of scroll
+     against 302 with `safe`.
+     
+     `safe` falls back to start alignment exactly when the content overflows,
+     which is the case where bottom alignment had nothing to do anyway. And where
+     `safe` is not understood the declaration is dropped and the transcript aligns
+     to the start, which is the same degradation: a short conversation sits at the
+     top of its box and a long one still scrolls. */
+  justify-content: safe flex-end;
 }
 
 /* **A region the consumer left empty is not laid out, and `hidden` is how it

@@ -112,12 +112,12 @@ helix-headless-tree-item::part(group) {
    unconditionally is what costs a component its hidden, and this is that
    mistake made in a stylesheet whose whole job is to demonstrate the tier.
    
-   Keyed off data-open rather than the hidden attribute, because ::part() takes
-   a pseudo-class after it and not a compound: ::part(group)[hidden] is not a
-   selector, so the first attempt at this matched nothing and the branch stayed
-   open while reporting itself shut. MixinControllerOpen mirrors the resolved
-   state onto the host for exactly this, open itself not reflecting. */
-helix-headless-tree-item:not([data-open])::part(group) {
+   Keyed off `:state(open)` rather than the hidden attribute, because ::part()
+   takes a pseudo-class after it and not a compound: ::part(group)[hidden] is
+   not a selector, so the first attempt at this matched nothing and the branch
+   stayed open while reporting itself shut. MixinControllerOpen records the
+   resolved state for exactly this, open itself not reflecting. */
+helix-headless-tree-item:not(:state(open))::part(group) {
   display: none;
 }
 

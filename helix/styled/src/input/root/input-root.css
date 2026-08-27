@@ -83,7 +83,7 @@
 /* The platform's verdict, which the host copies from the input, so this follows
    whatever the browser decided rather than a second opinion.
 
-   `data-invalid` rather than `:user-invalid`. The idea is the same, that a
+   `:state(invalid)` rather than `:user-invalid`. The idea is the same, that a
    field is not wrong before anyone has had a go at it, but the selector cannot
    match: `:user-invalid` tracks interaction with the element it is on, and
    nobody interacts with this one. The reader types into an `<input>` in the
@@ -104,10 +104,10 @@
    is the double-struck look the focus rule exists to prevent, arriving by a
    different route. The border and the ring are one edge, so when one of them
    turns they both do. */
-:host([data-invalid]) [part="field"],
-:host([data-invalid]) [part="field"]:hover,
-:host([data-invalid]:focus-within) [part="field"],
-:host([data-invalid]:focus-within) [part="field"]:hover {
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }

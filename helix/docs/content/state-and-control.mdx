@@ -100,10 +100,10 @@ The pair is the platform's, where a native input reflects its `value` *content
 attribute* to `defaultValue` and carries a dirty flag that stops the attribute
 affecting the value once a reader has typed.
 
-## State is on the host as `data-`
+## State is a custom state, not an attribute
 
 ```css
-helix-accordion-item[data-open] { … }
+helix-accordion-item:state(open) { … }
 ```
 
 `open` is not reflected, and neither is `value`. A payload written back as an
@@ -113,5 +113,20 @@ tell the two apart. `helix-input` takes `type="password"`, which a reflected
 `value` would carry straight past every session-replay masker that knows to mask
 `.value` and `input[value]`.
 
-So `data-open` and `data-checked` carry the resolved boolean for stylesheets,
-and the plain attribute stays what you wrote.
+So the resolved boolean is published as a custom state and the plain attribute
+stays what you wrote. `:state(open)`, `:state(checked)`, `:state(invalid)` and
+`:state(read)` are the four, and they work from your own stylesheet exactly as
+an attribute selector did:
+
+```css
+helix-checkbox:state(checked)::part(control) { … }
+helix-input:state(invalid)::part(field) { … }
+```
+
+**These were `data-open` and `data-checked` until 27 Aug 2026.** An attribute is
+in the DOM, and the element writes it on its first update, so a framework that
+server-renders your markup and then hydrates it finds attributes its own render
+never produced. React reports that as a hydration mismatch and does not patch it
+up. A custom state is not in the DOM: it reaches your stylesheet and leaves the
+markup alone, so the two renders agree by construction. If you were selecting on
+the old names, the change is mechanical.

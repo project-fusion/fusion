@@ -32,13 +32,13 @@
  * other field in the library puts wrongness, and a reader scanning a form finds
  * it there.
  *
- * Through `--radio-border-color` rather than by writing `data-invalid` onto the
- * members, which was the objection to marking them and is a real one: these are
- * the consumer's elements and the group does not own their attributes. A custom
- * property set here inherits through the slot into each radio's own shadow
- * root, which is the same crossing `data-density` makes, and every rule that
- * paints that circle already reads the hook, so neither a pointer over one nor
- * a selection rubs the mark off it. */
-:host([data-invalid]) [part="items"] {
+ * Through `--radio-border-color` rather than by writing `:state(invalid)` onto
+ * the members, which was the objection to marking them and is a real one: these
+ * are the consumer's elements and the group does not own what they say about
+ * themselves. A custom property set here inherits through the slot into each
+ * radio's own shadow root, which is the same crossing `data-density` makes, and
+ * every rule that paints that circle already reads the hook, so neither a
+ * pointer over one nor a selection rubs the mark off it. */
+:host(:state(invalid)) [part="items"] {
   --radio-border-color: var(--helix-color-danger);
 }

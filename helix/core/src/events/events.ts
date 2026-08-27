@@ -225,7 +225,25 @@ export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
   constructor(detail: TourAskDetail) {
     super(HelixTourAskEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      /* Not cancelable, and this is the one of the four where that was a real
+         promise rather than an idle flag. The name says *ask*, so a consumer had
+         every reason to think refusing it held the tour, and the root's
+         `handleAsk` never read `defaultPrevented`: the tour moved anyway.
+         Honoring it there would not have worked either, and the reason is
+         ordering. The root registers its listener in `connectedCallback` and a
+         consumer registers later, so on a bubbling event both are on the same
+         target and the root's runs first: it would read `defaultPrevented`
+         before the consumer had a chance to set it. `helix-shortcut` gets this
+         right by reading the flag on the element that dispatched, where every
+         listener has already run.
+
+         **The veto exists and is elsewhere**, which is why this is a
+         downgrade rather than a gap. Moving between stops goes through
+         `requestChange` and announces `helix-before-activate`; leaving early
+         dispatches `helix-before-close` and reads the flag before writing
+         `open`. Both are honored. This event is the stop telling the root a
+         button was pressed, and the decision is taken one step later. */
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -573,7 +591,11 @@ export class HelixConsoleEvent extends CustomEvent<ConsoleDetail> {
   constructor(detail: ConsoleDetail) {
     super(HelixConsoleEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      /* Not cancelable, for the reason `helix-resize` is not: a log line the
+         frame already wrote is a fact being relayed, and this element's own
+         comment at the dispatch says "relayed rather than acted on". Nothing
+         read the result. */
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -606,7 +628,13 @@ export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
   constructor(detail: ResizeDetail) {
     super(HelixResizeEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      /* Not cancelable, and it was until 27 Aug 2026. A measurement is not a
+         proposal: the content is that tall whether or not anybody wants it to
+         be, and neither dispatcher, `Heatmap` nor `Sandbox.Preview`, ever read
+         the result. So `preventDefault()` on it was accepted and ignored, which
+         is worse than refusing the call: a consumer had every reason to believe
+         they had stopped something. */
+      cancelable: false,
       composed: true,
       detail,
     })

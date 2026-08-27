@@ -116,7 +116,7 @@
 
    Indeterminate is not a third look: the same box with a different mark in it,
    because it means "some", not "neither". */
-:host([data-checked]) [part="control"],
+:host(:state(checked)) [part="control"],
 :host([indeterminate]) [part="control"] {
   border-color: var(
     --checkbox-border-color,
@@ -139,7 +139,7 @@
   /* The tick by default, and not only when the box is ticked, which is what
      stops the mark flashing on the way out.
  
-     `mask-image` does not animate, so it snapped the instant `data-checked`
+     `mask-image` does not animate, so it snapped the instant `:state(checked)`
      went, while `scale` still had a transition to run. Measured mid-uncheck:
      mask none, scale 1, background white. For the length of that transition the
      mark was an unmasked white square at full size, shrinking to nothing, which
@@ -164,7 +164,7 @@
   transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
-:host([data-checked]) [part="mark"],
+:host(:state(checked)) [part="mark"],
 :host([indeterminate]) [part="mark"] {
   scale: 1;
 }
@@ -191,20 +191,20 @@
  * The focus ring still outranks it, so a focused invalid box shows the red edge
  * with the accent ring around it. Those are two different facts, in two
  * different places, which is the arrangement the input has as well. */
-:host([data-invalid]) [part="control"],
-:host([data-invalid]) [part="field"]:hover [part="control"] {
+:host(:state(invalid)) [part="control"],
+:host(:state(invalid)) [part="field"]:hover [part="control"] {
   border-color: var(--helix-color-danger);
 }
 
 /* Color appears here and only here, because this is the one thing about a
    checkbox that is state. A ticked box that is still wrong takes it too, edge
    and mark together, rather than being half one thing and half the other. */
-:host([data-invalid][data-checked]) [part="control"],
-:host([data-invalid][indeterminate]) [part="control"] {
+:host(:state(invalid):state(checked)) [part="control"],
+:host(:state(invalid)[indeterminate]) [part="control"] {
   border-color: var(--helix-color-danger);
 }
 
-:host([data-invalid]) [part="mark"] {
+:host(:state(invalid)) [part="mark"] {
   background-color: var(--helix-color-danger);
 }
 
@@ -217,7 +217,7 @@
 
 /* Nothing to read, so nothing to space away from the box.
  *
- * `data-has-label` rather than a selector, because there is no selector for
+ * `:state(has-label)` rather than a selector, because there is no selector for
  * this. `[part="label"]:has(slot:empty)` looks like the answer and is not: a
  * slot's children are its fallback, and assigned nodes are not children, so
  * `slot:empty` is true whenever the property is empty whether or not the
@@ -226,7 +226,7 @@
  *
  * `display: none` rather than a zero width, because the gap is the cost here
  * and only a box that is not generated has no gap beside it. */
-:host(:not([data-has-label])) [part="label"] {
+:host(:not(:state(has-label))) [part="label"] {
   display: none;
 }
 
@@ -281,7 +281,7 @@
  * widened: three pixels is a 1px border with two more laid outside it by
  * `box-shadow`, so nothing about the card's box moves when it is chosen and a
  * column of them does not jump as the answer changes. */
-:host([variant="card"][data-checked]) [part="field"] {
+:host([variant="card"]:state(checked)) [part="field"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
