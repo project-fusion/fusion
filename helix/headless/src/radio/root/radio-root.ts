@@ -47,6 +47,32 @@ export class HelixHeadlessRadio extends HelixElement {
   @property({ reflect: true, type: Boolean })
   disabled = false
 
+  /**
+   * Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added.
+   */
+  get defaultSelected(): boolean {
+    return this.seeded
+  }
+
+  set defaultSelected(next: boolean) {
+    this.seeded = next
+  }
+
+  /** What the markup said, read once at construction for the reason above. */
+  private seeded = this.hasAttribute('selected')
+
   /** Whether this is the current choice. Written by the group. */
   @property({ reflect: true, type: Boolean })
   selected = false

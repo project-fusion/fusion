@@ -57,8 +57,15 @@
   justify-self: end;
 }
 
+/* **`surface-raised`, because a bubble is an object on the transcript rather
+   than a well cut into it.** It was `surface-sunken`, which on a dark page
+   measures L 0.15 against a ground of L 0, so the turn and the page it sat on
+   were fourteen hundredths of lightness apart and the bubble read as a slightly
+   uneven black. Raised is L 0.29 and is what every other card, panel and
+   overlay in the library sits at, which is the right company for a turn: the
+   thing that scrolls is the sunken one, and it paints no ground at all. */
 [part="content"] {
-  background-color: var(--chat-message-background, var(--helix-color-surface-sunken));
+  background-color: var(--chat-message-background, var(--helix-color-surface-raised));
   border-radius: var(--helix-radii-md);
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
@@ -68,8 +75,17 @@
   padding-inline: var(--helix-space-sm);
 }
 
+/* **The brand, not the accent.** This was `accent-subtle` and was the only rule
+   in the library that reached for an accent nobody asked for: `Button` and
+   `IconButton` are the other two elements that can paint one and both take it
+   from `tone="accent"`, which a consumer writes. The accent is derived as the
+   brand's complement, `--helix-seed-accent-hue: 180` off a blue seed, so the
+   default theme's own turns came out at hue 78 and a reader who had themed
+   nothing was asked why their chat was orange. `primary-subtle` is the same
+   lightness and chroma at the brand's hue, so the tint is as quiet as it was
+   and is now a color the page is already wearing. */
 :host([author="me"]) [part="content"] {
-  background-color: var(--chat-message-background-me, var(--helix-color-accent-subtle));
+  background-color: var(--chat-message-background-me, var(--helix-color-primary-subtle));
 }
 
 [part="meta"] {

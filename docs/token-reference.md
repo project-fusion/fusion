@@ -27,22 +27,22 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 87 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 35 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 36 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 19 |
-| `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 25 |
+| `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 26 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 52 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 180 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 113 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 184 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 117 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 85 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 26 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 27 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 13 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 9 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 4 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 151 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 87 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 154 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 96 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 5 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 4 |
@@ -91,7 +91,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-info` | `light-dark(var(--_helix-info-600), var(--_helix-info-400))` | 4 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-600), var(--_helix-success-400))` | 15 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-600), var(--_helix-warning-400))` | 12 |
-| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 67 |
+| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 68 |
 | `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 4 |
 | `--helix-color-danger-surface-hover` | `var(--_helix-danger-700)` | 3 |
 | `--helix-color-info-surface` | `var(--_helix-info-600)` | 0 |
@@ -108,12 +108,12 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 124 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 172 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 175 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 145 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 158 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 106 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 161 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 107 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 97 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 43 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 44 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 51 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 10 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
@@ -127,8 +127,8 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 126 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 17 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 10 |
-| `--helix-radii-full` | `9999px` | 43 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 11 |
+| `--helix-radii-full` | `9999px` | 46 |
 
 ## font
 
@@ -163,7 +163,7 @@ The three weights.
 |---|---|---|
 | `--helix-weight-regular` | `400` | 12 |
 | `--helix-weight-medium` | `500` | 72 |
-| `--helix-weight-semibold` | `600` | 36 |
+| `--helix-weight-semibold` | `600` | 37 |
 
 ## leading
 
@@ -233,7 +233,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 3 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 183 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 185 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 71 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 16 |
 
@@ -243,7 +243,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 162 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 164 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 33 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |

@@ -1101,14 +1101,38 @@ still unmerged.* Which version this was measured against is not left to prose:
 installed `react-dom` has moved past it, because a probe is a claim about one
 release's internals and nothing in `verify` reads a comment.
 
-**Object and function *properties* have the same bug and are not fixed.** React
+**Object and function *properties* had the same bug and are fixed now.**
+*Rewritten 26 Aug 2026, and this said the fix was deliberately unbuilt.* React
 skips everything it would have to apply imperatively while hydrating; strings,
-numbers and booleans survive only because the server wrote them as attributes.
-Binding at dispatch cannot be repeated for a property, which has to be right
-before the first paint rather than by the time somebody interacts. The design
-that would work, and why it is deliberately unbuilt, is written out beside
-`bindReactHandler`. It becomes real the first time a component declares an
-object property, and not before.
+numbers and booleans survive only because the server wrote them as attributes. An
+object or a function survives by no route at all, and both halves of React agree
+to drop it: the server renderer reaches `typeof value === 'object'` in its custom
+element branch and writes nothing into the HTML, and the client's hydrate path
+only diffs and warns. Two skips that match, so there is no mismatch to report and
+no warning anywhere, which is the worst shape a framework failure takes.
+
+`applyReactProperties` closes it, called from `firstUpdated` and again on the
+following frame if React had not committed by then. It assigns any *declared*
+reactive property whose value is an object or a function: only declared, or an
+arbitrary JSX prop lands on the element; only object or function, because a
+string already arrived as an attribute and re-applying it would reach into the
+one channel that is not broken. `null` is skipped and is the single divergence
+from a client mount, named at the call site. The server dropped it too, so the
+class default is standing, and assigning it would reproduce only a crash.
+
+**It was built when the first component needed one, which is exactly what the
+note it replaces asked for.** `helix-data-table` declares `rows` and
+`helix-table-column` declares `cell` and `compare`, so `rows={rows}` in JSX was a
+correctly labelled, permanently empty grid. The other ten `attribute: false`
+properties in the library are booleans and strings a parent writes at runtime,
+and this never touches them.
+
+**Binding at dispatch could not be repeated for a property**, which is why this
+is a second mechanism rather than the first one widened. A listener only has to
+exist by the time somebody interacts; a property has to be right before the first
+paint. `connectedCallback` is the obvious early moment and is the wrong one,
+measured: an element upgrades when its definition loads, which falls either side
+of hydration depending on how the consumer imported it.
 
 `useHelixEvent` is deleted. It existed to bind from an effect because the prop
 did not survive hydration, and all twenty-one of its call sites were binding to

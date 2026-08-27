@@ -355,8 +355,24 @@ const EXCUSED = {
     x: "Where the `<img>` sits relative to the root, which is the inner element's position inside this shadow root and answers a question nobody asked. A consumer measuring the picture on the page calls `getBoundingClientRect()` on the host, which is the box they wrote.",
     y: 'The other half of `x`, and the same answer.',
   },
+  'helix-list': {
+    reversed: 'The other half of `start`, and the same answer.',
+    start:
+      'This renders no `<ol>`: the rows are slotted and numbered by the CSS `list-item` counter, and that counter is not author-resettable. Measured in Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a `<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a named counter with explicit `::before` content does. Gaining a start means rebuilding the markers out of generated content, which is a different component. `type` is only `list-style-type` and is implemented.',
+  },
   'helix-option': {
     index: 'Derived from position among siblings, which the parent owns.',
+  },
+  'helix-pin-input': {
+    maxLength:
+      'A code is exactly `length` characters and the cells are what enforce it, so a maximum would be a second answer to a question `length` already settles, free to contradict it.',
+    minLength: 'The other half of `maxLength`, and the same answer.',
+    pattern:
+      'The filter is `type`, and it runs on arrival rather than on validation: a character the cells refuse never reaches the value, so there is nothing left for a pattern over the joined string to reject. One that disagreed with `type` would accept characters the boxes will not take.',
+    selectionDirection: 'The other two, and the same answer.',
+    selectionEnd: 'See `selectionStart`.',
+    selectionStart:
+      'The caret lives in one of `length` single-character boxes rather than in one text run, so there is no field for an offset to be an offset into. A consumer places the caret by focusing the component and the cells handle the rest, which is the whole reason this is not one `<input>`.',
   },
   'helix-progress': {
     position: 'Derived from `value` and `max`, and readonly on the native element.',

@@ -409,6 +409,24 @@ indicator is found once at the edge rather than shifting with the text.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
   chevronPlacement?: HelixAccordionItem["chevronPlacement"];
+  /** A group name, which is how `<details>` says a set is exclusive.
+
+**Two ways of saying the same thing, and the platform's one does not need a
+parent.** An accordion's `mode` makes its own children exclusive, which
+covers the ordinary case and cannot express a set spread across a page: a
+`<details name="faq">` anywhere in a document closes every other one that
+shares the name, and this does the same. Items in the same root with the
+same name are peers whether or not an accordion contains them.
+
+Where both are set the name wins, because it is the narrower statement: a
+consumer who named a group meant that group rather than whatever happens to
+be nested where.
+
+Optional rather than `''`, because a reflected string defaulting to the
+empty string writes `name=""` onto every item ever rendered: Lit reflects
+it, and the resting state of a reflected property is the attribute's
+absence. Caught by `hydration.dom.spec.ts`. */
+  name?: HelixAccordionItem["name"];
 
   /** Fired when the item opens or closes. */
   "onhelix-before-open"?: (
@@ -469,6 +487,24 @@ indicator is found once at the edge rather than shifting with the text.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
   "prop:chevronPlacement"?: HelixAccordionItem["chevronPlacement"];
+  /** A group name, which is how `<details>` says a set is exclusive.
+
+**Two ways of saying the same thing, and the platform's one does not need a
+parent.** An accordion's `mode` makes its own children exclusive, which
+covers the ordinary case and cannot express a set spread across a page: a
+`<details name="faq">` anywhere in a document closes every other one that
+shares the name, and this does the same. Items in the same root with the
+same name are peers whether or not an accordion contains them.
+
+Where both are set the name wins, because it is the narrower statement: a
+consumer who named a group meant that group rather than whatever happens to
+be nested where.
+
+Optional rather than `''`, because a reflected string defaulting to the
+empty string writes `name=""` onto every item ever rendered: Lit reflects
+it, and the resting state of a reflected property is the attribute's
+absence. Caught by `hydration.dom.spec.ts`. */
+  "prop:name"?: HelixAccordionItem["name"];
   /** Fired when the item opens or closes. */
   "on:helix-before-open"?: (
     e: HelixAccordionItemHelixBeforeOpenElementEvent,
@@ -4201,6 +4237,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixCombobox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  selectedIndex?: HelixCombobox["selectedIndex"];
 
   /** Announced once the value has moved. */
   oninput?: (e: HelixComboboxElementEvent) => void;
@@ -4389,6 +4432,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixCombobox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  "prop:selectedIndex"?: HelixCombobox["selectedIndex"];
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixComboboxElementEvent) => void;
   /** Announced once the value has moved. */
@@ -5269,6 +5319,13 @@ what was put in it, and the count is what tells them there is more to see. */
   maxTags?: HelixDateInput["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   min?: HelixDateInput["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, handed to the calendar this renders
+so the field and the grid agree about which dates exist. Counted from `min`
+where there is one and from 1 January 1970 where there is not, which is the
+platform's base. */
+  step?: HelixDateInput["step"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
   max?: HelixDateInput["max"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
@@ -5337,6 +5394,30 @@ submits and what `min` and `max` compare against. */
   "trigger-label"?: HelixDateInput["triggerLabel"];
   /** Accessible name for the control that opens the calendar. */
   triggerLabel?: HelixDateInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixDateInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixDateInput["readOnly"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5501,6 +5582,13 @@ what was put in it, and the count is what tells them there is more to see. */
   "prop:maxTags"?: HelixDateInput["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   "prop:min"?: HelixDateInput["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, handed to the calendar this renders
+so the field and the grid agree about which dates exist. Counted from `min`
+where there is one and from 1 January 1970 where there is not, which is the
+platform's base. */
+  "prop:step"?: HelixDateInput["step"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
   "prop:max"?: HelixDateInput["max"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
@@ -5569,6 +5657,30 @@ submits and what `min` and `max` compare against. */
   "attr:trigger-label"?: HelixDateInput["triggerLabel"];
   /** Accessible name for the control that opens the calendar. */
   "prop:triggerLabel"?: HelixDateInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "bool:read-only"?: HelixDateInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "prop:readOnly"?: HelixDateInput["readOnly"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5718,6 +5830,18 @@ camelCase name rather than dash-casing it. */
   defaultMonth?: HelixDatePicker["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   min?: HelixDatePicker["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, counted from `min` where there is
+one and from 1 January 1970 where there is not, which is the platform's own
+base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+on a Monday, and there was no way to say that: `disable-dates` takes a list
+and a year of Mondays is not a list anybody writes.
+
+One is every date and needs no rule, which is why anything below one is
+treated as one rather than as an error: a step of zero would block every
+date including the one already chosen. */
+  step?: HelixDatePicker["step"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
   max?: HelixDatePicker["max"];
   /** Accessible name for the grid. */
@@ -5726,6 +5850,32 @@ camelCase name rather than dash-casing it. */
   "first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   firstDayOfWeek?: HelixDatePicker["firstDayOfWeek"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixDatePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixDatePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  required?: HelixDatePicker["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5851,6 +6001,18 @@ camelCase name rather than dash-casing it. */
   "prop:defaultMonth"?: HelixDatePicker["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   "prop:min"?: HelixDatePicker["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, counted from `min` where there is
+one and from 1 January 1970 where there is not, which is the platform's own
+base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+on a Monday, and there was no way to say that: `disable-dates` takes a list
+and a year of Mondays is not a list anybody writes.
+
+One is every date and needs no rule, which is why anything below one is
+treated as one rather than as an error: a step of zero would block every
+date including the one already chosen. */
+  "prop:step"?: HelixDatePicker["step"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
   "prop:max"?: HelixDatePicker["max"];
   /** Accessible name for the grid. */
@@ -5859,6 +6021,32 @@ camelCase name rather than dash-casing it. */
   "attr:first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   "prop:firstDayOfWeek"?: HelixDatePicker["firstDayOfWeek"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "bool:read-only"?: HelixDatePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "prop:readOnly"?: HelixDatePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  "prop:required"?: HelixDatePicker["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5979,6 +6167,39 @@ A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
 so at the moment a reader asks. */
   persistent?: HelixDialog["persistent"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedby?: HelixDialog["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedBy?: HelixDialog["closedBy"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: the platform's contract is
+`close(value)` then read `returnValue`, and a consumer could do neither
+because `querySelector` does not reach the element. A confirmation asking
+which button was pressed is the ordinary case and had no answer.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  returnValue?: HelixDialog["returnValue"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-before-open"?: (e: HelixDialogHelixBeforeOpenElementEvent) => void;
@@ -6041,6 +6262,39 @@ A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
 so at the moment a reader asks. */
   "prop:persistent"?: HelixDialog["persistent"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  "attr:closedby"?: HelixDialog["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  "prop:closedBy"?: HelixDialog["closedBy"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: the platform's contract is
+`close(value)` then read `returnValue`, and a consumer could do neither
+because `querySelector` does not reach the element. A confirmation asking
+which button was pressed is the ordinary case and had no answer.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  "prop:returnValue"?: HelixDialog["returnValue"];
   /** Fired before it opens, and cancelable. */
   "on:helix-before-open"?: (e: HelixDialogHelixBeforeOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -6388,6 +6642,43 @@ lost its focus trap because a consumer forgot a word would be worse than an
 attribute on the host, and nothing selects on it: the scrim is rendered or
 not, rather than shown or hidden by CSS. */
   modal?: HelixDrawer["modal"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedby?: HelixDrawer["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedBy?: HelixDrawer["closedBy"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: `querySelector` does not reach the
+element, so a consumer could neither set the value nor read it back. A
+drawer asking which of its actions dismissed it is the ordinary case and had
+no answer.
+
+Written before `open` is set to false rather than passed to a `close(value)`
+call, because this component has no such method: it is driven by `open`
+alone, and `Dialog`'s `close()` is the one that takes the value directly.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  returnValue?: HelixDrawer["returnValue"];
 
   /** Fired when the drawer opens or closes. */
   "onhelix-before-open"?: (e: HelixDrawerHelixBeforeOpenElementEvent) => void;
@@ -6468,6 +6759,43 @@ lost its focus trap because a consumer forgot a word would be worse than an
 attribute on the host, and nothing selects on it: the scrim is rendered or
 not, rather than shown or hidden by CSS. */
   "prop:modal"?: HelixDrawer["modal"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  "attr:closedby"?: HelixDrawer["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  "prop:closedBy"?: HelixDrawer["closedBy"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: `querySelector` does not reach the
+element, so a consumer could neither set the value nor read it back. A
+drawer asking which of its actions dismissed it is the ordinary case and had
+no answer.
+
+Written before `open` is set to false rather than passed to a `close(value)`
+call, because this component has no such method: it is driven by `open`
+alone, and `Dialog`'s `close()` is the one that takes the value directly.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  "prop:returnValue"?: HelixDrawer["returnValue"];
   /** Fired when the drawer opens or closes. */
   "on:helix-before-open"?: (e: HelixDrawerHelixBeforeOpenElementEvent) => void;
   /** Fired before the panel closes, and cancelable. */
@@ -7673,6 +8001,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixInput["name"];
+  /** The caret and the selection, under the platform's own names.
+
+The `<input>` is inside this shadow root, so a consumer had no way to ask
+where the selection is, let alone move it: `querySelector` does not cross
+the boundary. An insert-at-cursor toolbar, a format button, a mask that
+repositions the caret after rewriting the value, all of them need this and
+none of them could be written. Textarea gained the same surface for the same
+reason. See 295.
+
+Zero before there is a control, which is where an empty field's caret would
+be anyway. */
+  selectionDirection?: HelixInput["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  selectionEnd?: HelixInput["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  selectionStart?: HelixInput["selectionStart"];
 
   /** Announced once the value has moved. */
   oninput?: (e: HelixInputElementEvent) => void;
@@ -7807,6 +8151,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixInput["name"];
+  /** The caret and the selection, under the platform's own names.
+
+The `<input>` is inside this shadow root, so a consumer had no way to ask
+where the selection is, let alone move it: `querySelector` does not cross
+the boundary. An insert-at-cursor toolbar, a format button, a mask that
+repositions the caret after rewriting the value, all of them need this and
+none of them could be written. Textarea gained the same surface for the same
+reason. See 295.
+
+Zero before there is a control, which is where an empty field's caret would
+be anyway. */
+  "prop:selectionDirection"?: HelixInput["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  "prop:selectionEnd"?: HelixInput["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  "prop:selectionStart"?: HelixInput["selectionStart"];
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
@@ -8403,6 +8763,22 @@ has to survive with the stylesheet turned off.
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
   kind?: HelixList["kind"];
+  /** Which markers an ordered list draws, in `<ol type>`'s own five values.
+
+Reflected, because this is one of the things a stylesheet selects on and
+the styled tier maps each to a `list-style-type`. The platform's spellings
+rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+a consumer would have written on an `<ol>`.
+
+**`start` and `reversed` are both absent and neither can be done here.**
+This renders no `<ol>`: the rows are slotted and numbered by the CSS
+`list-item` counter, and that counter is not author-resettable. Measured in
+Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+`<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+counter with explicit `::before` content does. So the markers would have to
+be rebuilt out of generated content to gain a start, which is a different
+component. `type` is only `list-style-type` and works. */
+  type?: HelixList["type"];
 };
 
 export type HelixListSolidJsProps = {
@@ -8449,6 +8825,22 @@ has to survive with the stylesheet turned off.
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
   "prop:kind"?: HelixList["kind"];
+  /** Which markers an ordered list draws, in `<ol type>`'s own five values.
+
+Reflected, because this is one of the things a stylesheet selects on and
+the styled tier maps each to a `list-style-type`. The platform's spellings
+rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+a consumer would have written on an `<ol>`.
+
+**`start` and `reversed` are both absent and neither can be done here.**
+This renders no `<ol>`: the rows are slotted and numbered by the CSS
+`list-item` counter, and that counter is not author-resettable. Measured in
+Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+`<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+counter with explicit `::before` content does. So the markers would have to
+be rebuilt out of generated content to gain a start, which is a different
+component. `type` is only `list-style-type` and works. */
+  "prop:type"?: HelixList["type"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8568,6 +8960,17 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixListbox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+`<select>`'s own pair, and this control is what stands in for one. The
+options are the consumer's own light-DOM children, so an index is a
+position among the elements they wrote rather than into anything this
+renders, which is what makes it the same number `<select>` would give.
+
+With `multiple` it is the first chosen one, which is also what the platform
+answers: a single index cannot describe a set, and `value` is the property
+that can. */
+  selectedIndex?: HelixListbox["selectedIndex"];
 
   /** Announced once the value has moved. */
   oninput?: (e: HelixListboxElementEvent) => void;
@@ -8684,6 +9087,17 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixListbox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+`<select>`'s own pair, and this control is what stands in for one. The
+options are the consumer's own light-DOM children, so an index is a
+position among the elements they wrote rather than into anything this
+renders, which is what makes it the same number `<select>` would give.
+
+With `multiple` it is the first chosen one, which is also what the platform
+answers: a single index cannot describe a set, and `value` is the property
+that can. */
+  "prop:selectedIndex"?: HelixListbox["selectedIndex"];
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixListboxElementEvent) => void;
   /** Announced once the value has moved. */
@@ -9939,6 +10353,13 @@ string is not a fact a selector needs. */
   active?: HelixOption["active"];
   /** Whether this choice is currently chosen. Written by the listbox. */
   selected?: HelixOption["selected"];
+  /** A shorter name for this choice, for where the row does not fit.
+
+`<option label>`'s own meaning: the text a chooser shows when it has less
+room than the row does, which is what a select's closed trigger has. Empty
+means the row's own content, which is the common case and is why this is not
+simply the accessible name. */
+  label?: HelixOption["label"];
   /** Identifies this choice, and is what a form submits. */
   value?: HelixOption["value"];
   /** A second destination for this row, taken with the modifier held.
@@ -9973,6 +10394,20 @@ about one of them and the other is a key nobody mentioned. It goes to
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
   alternateLabel?: HelixOption["alternateLabel"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixOption["defaultSelected"];
 
   /** Fired when this choice is made. */
   "onhelix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
@@ -10007,6 +10442,13 @@ string is not a fact a selector needs. */
   "prop:active"?: HelixOption["active"];
   /** Whether this choice is currently chosen. Written by the listbox. */
   "prop:selected"?: HelixOption["selected"];
+  /** A shorter name for this choice, for where the row does not fit.
+
+`<option label>`'s own meaning: the text a chooser shows when it has less
+room than the row does, which is what a select's closed trigger has. Empty
+means the row's own content, which is the common case and is why this is not
+simply the accessible name. */
+  "prop:label"?: HelixOption["label"];
   /** Identifies this choice, and is what a form submits. */
   "prop:value"?: HelixOption["value"];
   /** A second destination for this row, taken with the modifier held.
@@ -10041,6 +10483,20 @@ about one of them and the other is a key nobody mentioned. It goes to
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
   "prop:alternateLabel"?: HelixOption["alternateLabel"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  "prop:defaultSelected"?: HelixOption["defaultSelected"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixOptionHelixSelectElementEvent) => void;
 
@@ -11423,6 +11879,20 @@ card with no box loses the only thing that says you may pick several. */
   selected?: HelixRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   value?: HelixRadio["value"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixRadio["defaultSelected"];
 
   /** Fired when this choice is made. */
   "onhelix-select"?: (e: HelixRadioHelixSelectElementEvent) => void;
@@ -11484,6 +11954,20 @@ card with no box loses the only thing that says you may pick several. */
   "prop:selected"?: HelixRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   "prop:value"?: HelixRadio["value"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  "prop:defaultSelected"?: HelixRadio["defaultSelected"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixRadioHelixSelectElementEvent) => void;
 
@@ -11546,6 +12030,13 @@ helix-input */
   required?: HelixRating["required"];
   /** How many marks there are. */
   max?: HelixRating["max"];
+  /** The lowest score a reader can give, which is what clearing returns to.
+
+Zero rather than one, because "no rating" and "the worst rating" are
+different answers and a control that cannot express the first has to
+pretend the second. A survey that requires an answer says so with
+`required`, not by making one unreachable. */
+  min?: HelixRating["min"];
   /** The smallest part of a mark that can be chosen.
 
 `0.5` is the half star, and it is the reason the value is a number rather
@@ -11690,6 +12181,13 @@ helix-input */
   "prop:required"?: HelixRating["required"];
   /** How many marks there are. */
   "prop:max"?: HelixRating["max"];
+  /** The lowest score a reader can give, which is what clearing returns to.
+
+Zero rather than one, because "no rating" and "the worst rating" are
+different answers and a control that cannot express the first has to
+pretend the second. A survey that requires an answer says so with
+`required`, not by making one unreachable. */
+  "prop:min"?: HelixRating["min"];
   /** The smallest part of a mark that can be chosen.
 
 `0.5` is the half star, and it is the reason the value is a number rather
@@ -12355,6 +12853,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixSelect["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  selectedIndex?: HelixSelect["selectedIndex"];
 
   /** Announced once the value has moved. */
   oninput?: (e: HelixSelectElementEvent) => void;
@@ -12482,6 +12987,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixSelect["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  "prop:selectedIndex"?: HelixSelect["selectedIndex"];
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixSelectElementEvent) => void;
   /** Announced once the value has moved. */
@@ -14864,6 +15376,30 @@ never something this element would refuse to read back. */
   "trigger-label"?: HelixTimeInput["triggerLabel"];
   /** Accessible name for the control that opens the list. */
   triggerLabel?: HelixTimeInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixTimeInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixTimeInput["readOnly"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15047,6 +15583,30 @@ never something this element would refuse to read back. */
   "attr:trigger-label"?: HelixTimeInput["triggerLabel"];
   /** Accessible name for the control that opens the list. */
   "prop:triggerLabel"?: HelixTimeInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "bool:read-only"?: HelixTimeInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "prop:readOnly"?: HelixTimeInput["readOnly"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15227,6 +15787,32 @@ not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
   variant?: HelixTimePicker["variant"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixTimePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixTimePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  required?: HelixTimePicker["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15384,6 +15970,32 @@ not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
   "prop:variant"?: HelixTimePicker["variant"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "bool:read-only"?: HelixTimePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "prop:readOnly"?: HelixTimePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  "prop:required"?: HelixTimePicker["required"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15893,6 +16505,20 @@ export type HelixToggleProps = {
   selected?: HelixToggle["selected"];
   /** Whether the item can be chosen. */
   disabled?: HelixToggle["disabled"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixToggle["defaultSelected"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no
@@ -15913,6 +16539,20 @@ export type HelixToggleSolidJsProps = {
   "prop:selected"?: HelixToggle["selected"];
   /** Whether the item can be chosen. */
   "prop:disabled"?: HelixToggle["disabled"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  "prop:defaultSelected"?: HelixToggle["defaultSelected"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no
@@ -17638,6 +18278,23 @@ export type CustomElements = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
+   * - `name`: A group name, which is how `<details>` says a set is exclusive.
+   *
+   * **Two ways of saying the same thing, and the platform's one does not need a
+   * parent.** An accordion's `mode` makes its own children exclusive, which
+   * covers the ordinary case and cannot express a set spread across a page: a
+   * `<details name="faq">` anywhere in a document closes every other one that
+   * shares the name, and this does the same. Items in the same root with the
+   * same name are peers whether or not an accordion contains them.
+   *
+   * Where both are set the name wins, because it is the narrower statement: a
+   * consumer who named a group meant that group rather than whatever happens to
+   * be nested where.
+   *
+   * Optional rather than `''`, because a reflected string defaulting to the
+   * empty string writes `name=""` onto every item ever rendered: Lit reflects
+   * it, and the resting state of a reflected property is the attribute's
+   * absence. Caught by `hydration.dom.spec.ts`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -21145,6 +21802,13 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * Read off the listbox this renders, which owns the options and is where the
+   * same two properties are implemented. Delegating rather than recomputing is
+   * what keeps a composed control and the control inside it from answering
+   * differently: they are one chooser to a consumer. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -21914,6 +22578,12 @@ export type CustomElements = {
    * act on, where a row that silently stops is a field that appears to have lost
    * what was put in it, and the count is what tells them there is more to see.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
@@ -21943,6 +22613,17 @@ export type CustomElements = {
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -22192,9 +22873,32 @@ export type CustomElements = {
    * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, and there was no way to say that: `disable-dates` takes a list
+   * and a year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -22419,6 +23123,26 @@ export type CustomElements = {
    * A persistent dialog does not ignore that press. It answers it: see
    * `refuse`, which is the only way a dialog that will not be dismissed can say
    * so at the moment a reader asks.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: the platform's contract is
+   * `close(value)` then read `returnValue`, and a consumer could do neither
+   * because `querySelector` does not reach the element. A confirmation asking
+   * which button was pressed is the ordinary case and had no answer.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -22476,7 +23200,15 @@ export type CustomElements = {
    * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
-   * - `close() => void`: Asks to close, which a consumer may refuse.
+   * - `close(returnValue?: string) => void`: Asks to close, which a consumer may refuse.
+   *
+   * Takes what the dialog closed with, the way `<dialog>.close(value)` does, so
+   * the button that dismissed it can say which one it was. Set before the
+   * request rather than after, because a `close` listener reads `returnValue`
+   * and would otherwise read the previous one.
+   *
+   * Not set where the request is refused, since nothing closed and a value
+   * saying it did would outlive the refusal.
    *
    * ## CSS Custom Properties
    *
@@ -22853,6 +23585,30 @@ export type CustomElements = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: `querySelector` does not reach the
+   * element, so a consumer could neither set the value nor read it back. A
+   * drawer asking which of its actions dismissed it is the ordinary case and had
+   * no answer.
+   *
+   * Written before `open` is set to false rather than passed to a `close(value)`
+   * call, because this component has no such method: it is driven by `open`
+   * alone, and `Dialog`'s `close()` is the one that takes the value directly.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -24164,6 +24920,19 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectionDirection`: The caret and the selection, under the platform's own names.
+   *
+   * The `<input>` is inside this shadow root, so a consumer had no way to ask
+   * where the selection is, let alone move it: `querySelector` does not cross
+   * the boundary. An insert-at-cursor toolbar, a format button, a mask that
+   * repositions the caret after rewriting the value, all of them need this and
+   * none of them could be written. Textarea gained the same surface for the same
+   * reason. See 295.
+   *
+   * Zero before there is a control, which is where an empty field's caret would
+   * be anyway. (property only)
+   * - `selectionEnd`: Where the selection ends, as an offset into the value. (property only)
+   * - `selectionStart`: Where the selection starts, as an offset into the value. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -24228,6 +24997,13 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void`: Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects everything in the field.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
@@ -24851,6 +25627,21 @@ export type CustomElements = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `type`: Which markers an ordered list draws, in `<ol type>`'s own five values.
+   *
+   * Reflected, because this is one of the things a stylesheet selects on and
+   * the styled tier maps each to a `list-style-type`. The platform's spellings
+   * rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+   * a consumer would have written on an `<ol>`.
+   *
+   * **`start` and `reversed` are both absent and neither can be done here.**
+   * This renders no `<ol>`: the rows are slotted and numbered by the CSS
+   * `list-item` counter, and that counter is not author-resettable. Measured in
+   * Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+   * `<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+   * counter with explicit `::before` content does. So the markers would have to
+   * be rebuilt out of generated content to gain a start, which is a different
+   * component. `type` is only `list-style-type` and works.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -24981,6 +25772,20 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * `<select>`'s own pair, and this control is what stands in for one. The
+   * options are the consumer's own light-DOM children, so an index is a
+   * position among the elements they wrote rather than into anything this
+   * renders, which is what makes it the same number `<select>` would give.
+   *
+   * With `multiple` it is the first chosen one, which is also what the platform
+   * answers: a single index cannot describe a set, and `value` is the property
+   * that can. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words.
+   *
+   * Derived rather than declared, because `multiple` already decides it and a
+   * second property could disagree. (property only) (readonly)
    * - `options`: Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the
@@ -26390,6 +27195,12 @@ export type CustomElements = {
    * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `label`: A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
    * - `value`: Identifies this choice, and is what a form submits.
    * - `alternate`: A second destination for this row, taken with the modifier held.
    *
@@ -26413,6 +27224,19 @@ export type CustomElements = {
    * `aria-description` rather than into the name: the name is the row's own
    * words and stays what a reader searched for, and the second destination is a
    * fact about what pressing a key would do, which is what a description is.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `text`: The words, for a listbox that has to match text against them.
    *
    * Read from the rendered content rather than required as a property, because
@@ -27761,6 +28585,19 @@ export type CustomElements = {
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27874,6 +28711,12 @@ export type CustomElements = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: How many marks there are.
+   * - `min`: The lowest score a reader can give, which is what clearing returns to.
+   *
+   * Zero rather than one, because "no rating" and "the worst rating" are
+   * different answers and a control that cannot express the first has to
+   * pretend the second. A survey that requires an answer says so with
+   * `required`, not by making one unreachable.
    * - `step`: The smallest part of a mark that can be chosen.
    *
    * `0.5` is the half star, and it is the reason the value is a number rather
@@ -28791,6 +29634,13 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * Read off the listbox this renders, which owns the options and is where the
+   * same two properties are implemented. Delegating rather than recomputing is
+   * what keeps a composed control and the control inside it from answering
+   * differently: they are one chooser to a consumer. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -31376,6 +32226,17 @@ export type CustomElements = {
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -31679,6 +32540,18 @@ export type CustomElements = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -32406,6 +33279,19 @@ export type CustomElements = {
    * - `value`: Identifies the item to the group.
    * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `focusable`: Whether this item holds the group's tab stop while nothing is chosen.
    *
    * The stop normally rides on the selection, and an unanswered group has no
@@ -33985,6 +34871,23 @@ export type CustomElementsSolidJs = {
    * `start` is for a tree-like reading, where the indicator leads the label.
    * `none` is for a row that carries its own affordance and would otherwise
    * have two.
+   * - `name`: A group name, which is how `<details>` says a set is exclusive.
+   *
+   * **Two ways of saying the same thing, and the platform's one does not need a
+   * parent.** An accordion's `mode` makes its own children exclusive, which
+   * covers the ordinary case and cannot express a set spread across a page: a
+   * `<details name="faq">` anywhere in a document closes every other one that
+   * shares the name, and this does the same. Items in the same root with the
+   * same name are peers whether or not an accordion contains them.
+   *
+   * Where both are set the name wins, because it is the narrower statement: a
+   * consumer who named a group meant that group rather than whatever happens to
+   * be nested where.
+   *
+   * Optional rather than `''`, because a reflected string defaulting to the
+   * empty string writes `name=""` onto every item ever rendered: Lit reflects
+   * it, and the resting state of a reflected property is the attribute's
+   * absence. Caught by `hydration.dom.spec.ts`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -37568,6 +38471,13 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * Read off the listbox this renders, which owns the options and is where the
+   * same two properties are implemented. Delegating rather than recomputing is
+   * what keeps a composed control and the control inside it from answering
+   * differently: they are one chooser to a consumer. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -38349,6 +39259,12 @@ export type CustomElementsSolidJs = {
    * act on, where a row that silently stops is a field that appears to have lost
    * what was put in it, and the count is what tells them there is more to see.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
@@ -38378,6 +39294,17 @@ export type CustomElementsSolidJs = {
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -38630,9 +39557,32 @@ export type CustomElementsSolidJs = {
    * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, and there was no way to say that: `disable-dates` takes a list
+   * and a year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -38860,6 +39810,26 @@ export type CustomElementsSolidJs = {
    * A persistent dialog does not ignore that press. It answers it: see
    * `refuse`, which is the only way a dialog that will not be dismissed can say
    * so at the moment a reader asks.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: the platform's contract is
+   * `close(value)` then read `returnValue`, and a consumer could do neither
+   * because `querySelector` does not reach the element. A confirmation asking
+   * which button was pressed is the ordinary case and had no answer.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -38917,7 +39887,15 @@ export type CustomElementsSolidJs = {
    * See 294.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `show() => void`: Moves focus into the dialog and makes the rest of the page inert.
-   * - `close() => void`: Asks to close, which a consumer may refuse.
+   * - `close(returnValue?: string) => void`: Asks to close, which a consumer may refuse.
+   *
+   * Takes what the dialog closed with, the way `<dialog>.close(value)` does, so
+   * the button that dismissed it can say which one it was. Set before the
+   * request rather than after, because a `close` listener reads `returnValue`
+   * and would otherwise read the previous one.
+   *
+   * Not set where the request is refused, since nothing closed and a value
+   * saying it did would outlive the refusal.
    *
    * ## CSS Custom Properties
    *
@@ -39303,6 +40281,30 @@ export type CustomElementsSolidJs = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: `querySelector` does not reach the
+   * element, so a consumer could neither set the value nor read it back. A
+   * drawer asking which of its actions dismissed it is the ordinary case and had
+   * no answer.
+   *
+   * Written before `open` is set to false rather than passed to a `close(value)`
+   * call, because this component has no such method: it is driven by `open`
+   * alone, and `Dialog`'s `close()` is the one that takes the value directly.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -40648,6 +41650,19 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectionDirection`: The caret and the selection, under the platform's own names.
+   *
+   * The `<input>` is inside this shadow root, so a consumer had no way to ask
+   * where the selection is, let alone move it: `querySelector` does not cross
+   * the boundary. An insert-at-cursor toolbar, a format button, a mask that
+   * repositions the caret after rewriting the value, all of them need this and
+   * none of them could be written. Textarea gained the same surface for the same
+   * reason. See 295.
+   *
+   * Zero before there is a control, which is where an empty field's caret would
+   * be anyway. (property only)
+   * - `selectionEnd`: Where the selection ends, as an offset into the value. (property only)
+   * - `selectionStart`: Where the selection starts, as an offset into the value. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -40712,6 +41727,13 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void`: Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `select() => void`: Selects everything in the field.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
@@ -41351,6 +42373,21 @@ export type CustomElementsSolidJs = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `type`: Which markers an ordered list draws, in `<ol type>`'s own five values.
+   *
+   * Reflected, because this is one of the things a stylesheet selects on and
+   * the styled tier maps each to a `list-style-type`. The platform's spellings
+   * rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+   * a consumer would have written on an `<ol>`.
+   *
+   * **`start` and `reversed` are both absent and neither can be done here.**
+   * This renders no `<ol>`: the rows are slotted and numbered by the CSS
+   * `list-item` counter, and that counter is not author-resettable. Measured in
+   * Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+   * `<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+   * counter with explicit `::before` content does. So the markers would have to
+   * be rebuilt out of generated content to gain a start, which is a different
+   * component. `type` is only `list-style-type` and works.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -41483,6 +42520,20 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * `<select>`'s own pair, and this control is what stands in for one. The
+   * options are the consumer's own light-DOM children, so an index is a
+   * position among the elements they wrote rather than into anything this
+   * renders, which is what makes it the same number `<select>` would give.
+   *
+   * With `multiple` it is the first chosen one, which is also what the platform
+   * answers: a single index cannot describe a set, and `value` is the property
+   * that can. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words.
+   *
+   * Derived rather than declared, because `multiple` already decides it and a
+   * second property could disagree. (property only) (readonly)
    * - `options`: Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the
@@ -42926,6 +43977,12 @@ export type CustomElementsSolidJs = {
    * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `label`: A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
    * - `value`: Identifies this choice, and is what a form submits.
    * - `alternate`: A second destination for this row, taken with the modifier held.
    *
@@ -42949,6 +44006,19 @@ export type CustomElementsSolidJs = {
    * `aria-description` rather than into the name: the name is the row's own
    * words and stays what a reader searched for, and the second destination is a
    * fact about what pressing a key would do, which is what a description is.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `text`: The words, for a listbox that has to match text against them.
    *
    * Read from the rendered content rather than required as a property, because
@@ -44332,6 +45402,19 @@ export type CustomElementsSolidJs = {
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice. Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -44450,6 +45533,12 @@ export type CustomElementsSolidJs = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: How many marks there are.
+   * - `min`: The lowest score a reader can give, which is what clearing returns to.
+   *
+   * Zero rather than one, because "no rating" and "the worst rating" are
+   * different answers and a control that cannot express the first has to
+   * pretend the second. A survey that requires an answer says so with
+   * `required`, not by making one unreachable.
    * - `step`: The smallest part of a mark that can be chosen.
    *
    * `0.5` is the half star, and it is the reason the value is a number rather
@@ -45391,6 +46480,13 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectedIndex`: Which option is chosen, as an index, or `-1` where none is.
+   *
+   * Read off the listbox this renders, which owns the options and is where the
+   * same two properties are implemented. Delegating rather than recomputing is
+   * what keeps a composed control and the control inside it from answering
+   * differently: they are one chooser to a consumer. (property only)
+   * - `type`: Which kind of chooser this is, in the platform's two words. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -48041,6 +49137,17 @@ export type CustomElementsSolidJs = {
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -48347,6 +49454,18 @@ export type CustomElementsSolidJs = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
+   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -49094,6 +50213,19 @@ export type CustomElementsSolidJs = {
    * - `value`: Identifies the item to the group.
    * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added. (property only)
    * - `focusable`: Whether this item holds the group's tab stop while nothing is chosen.
    *
    * The stop normally rides on the selection, and an unanswered group has no

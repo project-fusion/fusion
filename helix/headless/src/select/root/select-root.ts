@@ -115,6 +115,30 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   placeholder = 'Choose'
 
   /**
+   * Which option is chosen, as an index, or `-1` where none is.
+   *
+   * Read off the listbox this renders, which owns the options and is where the
+   * same two properties are implemented. Delegating rather than recomputing is
+   * what keeps a composed control and the control inside it from answering
+   * differently: they are one chooser to a consumer.
+   */
+  get selectedIndex(): number {
+    return this.listbox?.selectedIndex ?? -1
+  }
+
+  set selectedIndex(at: number) {
+    const listbox = this.listbox
+    if (listbox) {
+      listbox.selectedIndex = at
+    }
+  }
+
+  /** Which kind of chooser this is, in the platform's two words. */
+  get type(): string {
+    return this.multiple ? 'select-multiple' : 'select-one'
+  }
+
+  /**
    * The list inside the surface, or nothing where there is no DOM to hold one.
    *
    * The optional chain is the server. `renderRoot` is a property Lit's element

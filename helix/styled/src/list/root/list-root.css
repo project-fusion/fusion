@@ -54,6 +54,36 @@
   list-style-type: decimal;
 }
 
+/* Which glyphs an ordered list uses.
+ *
+ * The five `type` values are the platform's own spellings mapped to CSS ones,
+ * so `<helix-list type="i">` is what a consumer would have written on an `<ol>`.
+ * `1` needs no rule, being what the base rule above already says.
+ *
+ * There is no `start` and no `reversed`, and that is measured rather than
+ * assumed. This renders no `<ol>`, so the numbering is the CSS `list-item`
+ * counter, and Chrome 148 does not let an author reset it: `counter-reset:
+ * list-item 4` moves nothing on a `<div>`, a `<ul>`, or a real `<ol>`, while
+ * `<ol start="5">` moves it and a named counter with explicit `::before`
+ * content does too. Gaining a start would mean rebuilding the markers out of
+ * generated content, which is a different component. */
+
+:host([kind="ordered"][type="a"]) ::slotted(*) {
+  list-style-type: lower-alpha;
+}
+
+:host([kind="ordered"][type="A"]) ::slotted(*) {
+  list-style-type: upper-alpha;
+}
+
+:host([kind="ordered"][type="i"]) ::slotted(*) {
+  list-style-type: lower-roman;
+}
+
+:host([kind="ordered"][type="I"]) ::slotted(*) {
+  list-style-type: upper-roman;
+}
+
 :host([kind="unordered"]) ::slotted(*) {
   list-style-type: disc;
 }

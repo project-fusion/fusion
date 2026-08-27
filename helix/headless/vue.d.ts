@@ -217,6 +217,24 @@ indicator is found once at the edge rather than shifting with the text.
 `none` is for a row that carries its own affordance and would otherwise
 have two. */
   chevronPlacement?: HelixHeadlessAccordionItem["chevronPlacement"];
+  /** A group name, which is how `<details>` says a set is exclusive.
+
+**Two ways of saying the same thing, and the platform's one does not need a
+parent.** An accordion's `mode` makes its own children exclusive, which
+covers the ordinary case and cannot express a set spread across a page: a
+`<details name="faq">` anywhere in a document closes every other one that
+shares the name, and this does the same. Items in the same root with the
+same name are peers whether or not an accordion contains them.
+
+Where both are set the name wins, because it is the narrower statement: a
+consumer who named a group meant that group rather than whatever happens to
+be nested where.
+
+Optional rather than `''`, because a reflected string defaulting to the
+empty string writes `name=""` onto every item ever rendered: Lit reflects
+it, and the resting state of a reflected property is the attribute's
+absence. Caught by `hydration.dom.spec.ts`. */
+  name?: HelixHeadlessAccordionItem["name"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -1664,6 +1682,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessCombobox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  selectedIndex?: HelixHeadlessCombobox["selectedIndex"];
 };
 
 export type HelixHeadlessComboboxVueEvents = {
@@ -2108,6 +2133,13 @@ what was put in it, and the count is what tells them there is more to see. */
   maxTags?: HelixHeadlessDateInput["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   min?: HelixHeadlessDateInput["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, handed to the calendar this renders
+so the field and the grid agree about which dates exist. Counted from `min`
+where there is one and from 1 January 1970 where there is not, which is the
+platform's base. */
+  step?: HelixHeadlessDateInput["step"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
   max?: HelixHeadlessDateInput["max"];
   /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
@@ -2176,6 +2208,30 @@ submits and what `min` and `max` compare against. */
   "trigger-label"?: HelixHeadlessDateInput["triggerLabel"];
   /** Accessible name for the control that opens the calendar. */
   triggerLabel?: HelixHeadlessDateInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixHeadlessDateInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixHeadlessDateInput["readOnly"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2353,6 +2409,18 @@ camelCase name rather than dash-casing it. */
   defaultMonth?: HelixHeadlessDatePicker["defaultMonth"];
   /** Earliest selectable date, as `YYYY-MM-DD`. */
   min?: HelixHeadlessDatePicker["min"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, counted from `min` where there is
+one and from 1 January 1970 where there is not, which is the platform's own
+base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+on a Monday, and there was no way to say that: `disable-dates` takes a list
+and a year of Mondays is not a list anybody writes.
+
+One is every date and needs no rule, which is why anything below one is
+treated as one rather than as an error: a step of zero would block every
+date including the one already chosen. */
+  step?: HelixHeadlessDatePicker["step"];
   /** Latest selectable date, as `YYYY-MM-DD`. */
   max?: HelixHeadlessDatePicker["max"];
   /** Accessible name for the grid. */
@@ -2361,6 +2429,32 @@ camelCase name rather than dash-casing it. */
   "first-day-of-week"?: HelixHeadlessDatePicker["firstDayOfWeek"];
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   firstDayOfWeek?: HelixHeadlessDatePicker["firstDayOfWeek"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixHeadlessDatePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixHeadlessDatePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  required?: HelixHeadlessDatePicker["required"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixHeadlessDatePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -2466,6 +2560,28 @@ A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
 so at the moment a reader asks. */
   persistent?: HelixHeadlessDialog["persistent"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedby?: HelixHeadlessDialog["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedBy?: HelixHeadlessDialog["closedBy"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2494,6 +2610,17 @@ what it has always been for. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessDialog["defaultOpen"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: the platform's contract is
+`close(value)` then read `returnValue`, and a consumer could do neither
+because `querySelector` does not reach the element. A confirmation asking
+which button was pressed is the ordinary case and had no answer.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  returnValue?: HelixHeadlessDialog["returnValue"];
 };
 
 export type HelixHeadlessDialogVueEvents = {
@@ -2621,6 +2748,28 @@ lost its focus trap because a consumer forgot a word would be worse than an
 attribute on the host, and nothing selects on it: the scrim is rendered or
 not, rather than shown or hidden by CSS. */
   modal?: HelixHeadlessDrawer["modal"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedby?: HelixHeadlessDrawer["closedBy"];
+  /** Which close requests the browser answers on its own.
+
+`<dialog closedby>`, forwarded, and safe to forward because every path it
+opens still comes back through this element: a close request fires `cancel`
+first, `handleCancel` prevents it, and `requestOpen` decides. So
+`closedby="any"` gains light dismiss without giving up the refusal, which is
+the property this component exists to keep.
+
+Absent by default, which is the platform's `auto` and this library's rule
+that a resting value is an attribute's absence. */
+  closedBy?: HelixHeadlessDrawer["closedBy"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2649,6 +2798,21 @@ what it has always been for. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessDrawer["defaultOpen"];
+  /** What the dialog closed with, the way `<dialog>` reports it.
+
+**The whole point of a `<dialog>` returning a value is lost behind a shadow
+boundary**, which is where this one is: `querySelector` does not reach the
+element, so a consumer could neither set the value nor read it back. A
+drawer asking which of its actions dismissed it is the ordinary case and had
+no answer.
+
+Written before `open` is set to false rather than passed to a `close(value)`
+call, because this component has no such method: it is driven by `open`
+alone, and `Dialog`'s `close()` is the one that takes the value directly.
+
+Held here as well as on the element, so a value set before the first render
+survives to it and a consumer reading one back gets what they wrote. */
+  returnValue?: HelixHeadlessDrawer["returnValue"];
 };
 
 export type HelixHeadlessDrawerVueEvents = {
@@ -3257,6 +3421,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessInput["name"];
+  /** The caret and the selection, under the platform's own names.
+
+The `<input>` is inside this shadow root, so a consumer had no way to ask
+where the selection is, let alone move it: `querySelector` does not cross
+the boundary. An insert-at-cursor toolbar, a format button, a mask that
+repositions the caret after rewriting the value, all of them need this and
+none of them could be written. Textarea gained the same surface for the same
+reason. See 295.
+
+Zero before there is a control, which is where an empty field's caret would
+be anyway. */
+  selectionDirection?: HelixHeadlessInput["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  selectionEnd?: HelixHeadlessInput["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  selectionStart?: HelixHeadlessInput["selectionStart"];
 };
 
 export type HelixHeadlessInputVueEvents = {
@@ -3456,6 +3636,22 @@ has to survive with the stylesheet turned off.
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
   kind?: HelixHeadlessList["kind"];
+  /** Which markers an ordered list draws, in `<ol type>`'s own five values.
+
+Reflected, because this is one of the things a stylesheet selects on and
+the styled tier maps each to a `list-style-type`. The platform's spellings
+rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+a consumer would have written on an `<ol>`.
+
+**`start` and `reversed` are both absent and neither can be done here.**
+This renders no `<ol>`: the rows are slotted and numbered by the CSS
+`list-item` counter, and that counter is not author-resettable. Measured in
+Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+`<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+counter with explicit `::before` content does. So the markers would have to
+be rebuilt out of generated content to gain a start, which is a different
+component. `type` is only `list-style-type` and works. */
+  type?: HelixHeadlessList["type"];
 };
 
 export type HelixHeadlessListVueEvents = {};
@@ -3585,6 +3781,17 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessListbox["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+`<select>`'s own pair, and this control is what stands in for one. The
+options are the consumer's own light-DOM children, so an index is a
+position among the elements they wrote rather than into anything this
+renders, which is what makes it the same number `<select>` would give.
+
+With `multiple` it is the first chosen one, which is also what the platform
+answers: a single index cannot describe a set, and `value` is the property
+that can. */
+  selectedIndex?: HelixHeadlessListbox["selectedIndex"];
 };
 
 export type HelixHeadlessListboxVueEvents = {
@@ -4235,6 +4442,13 @@ string is not a fact a selector needs. */
   active?: HelixHeadlessOption["active"];
   /** Whether this choice is currently chosen. Written by the listbox. */
   selected?: HelixHeadlessOption["selected"];
+  /** A shorter name for this choice, for where the row does not fit.
+
+`<option label>`'s own meaning: the text a chooser shows when it has less
+room than the row does, which is what a select's closed trigger has. Empty
+means the row's own content, which is the common case and is why this is not
+simply the accessible name. */
+  label?: HelixHeadlessOption["label"];
   /** Identifies this choice, and is what a form submits. */
   value?: HelixHeadlessOption["value"];
   /** A second destination for this row, taken with the modifier held.
@@ -4269,6 +4483,20 @@ about one of them and the other is a key nobody mentioned. It goes to
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
   alternateLabel?: HelixHeadlessOption["alternateLabel"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixHeadlessOption["defaultSelected"];
 };
 
 export type HelixHeadlessOptionVueEvents = {
@@ -4944,6 +5172,20 @@ export type HelixHeadlessRadioVueProps = {
   selected?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   value?: HelixHeadlessRadio["value"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixHeadlessRadio["defaultSelected"];
 };
 
 export type HelixHeadlessRadioVueEvents = {
@@ -4963,6 +5205,13 @@ export type HelixHeadlessRatingHelixBeforeChangeElementEvent =
 export type HelixHeadlessRatingVueProps = {
   /** How many marks there are. */
   max?: HelixHeadlessRating["max"];
+  /** The lowest score a reader can give, which is what clearing returns to.
+
+Zero rather than one, because "no rating" and "the worst rating" are
+different answers and a control that cannot express the first has to
+pretend the second. A survey that requires an answer says so with
+`required`, not by making one unreachable. */
+  min?: HelixHeadlessRating["min"];
   /** The smallest part of a mark that can be chosen.
 
 `0.5` is the half star, and it is the reason the value is a number rather
@@ -5220,6 +5469,13 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessSelect["name"];
+  /** Which option is chosen, as an index, or `-1` where none is.
+
+Read off the listbox this renders, which owns the options and is where the
+same two properties are implemented. Delegating rather than recomputing is
+what keeps a composed control and the control inside it from answering
+differently: they are one chooser to a consumer. */
+  selectedIndex?: HelixHeadlessSelect["selectedIndex"];
 };
 
 export type HelixHeadlessSelectVueEvents = {
@@ -6342,6 +6598,30 @@ never something this element would refuse to read back. */
   "trigger-label"?: HelixHeadlessTimeInput["triggerLabel"];
   /** Accessible name for the control that opens the list. */
   triggerLabel?: HelixHeadlessTimeInput["triggerLabel"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixHeadlessTimeInput["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixHeadlessTimeInput["readOnly"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -6550,6 +6830,32 @@ not touch, and React reads that as a hydration mismatch. The absent
 attribute *is* the list, which the stylesheet reads as the base rule, so
 only the departure has to be named. */
   variant?: HelixHeadlessTimePicker["variant"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  "read-only"?: HelixHeadlessTimePicker["readOnly"];
+  /** Whether the control refuses changes while still submitting its value.
+
+**Enforced by refusing every request in one place**, which is the seam this
+component already has: `requestValue` is what every path here comes through,
+and gating it once is what stops the next call site from being written
+without the check.
+
+Not `disabled`, which is the confusion worth naming: a disabled control
+submits nothing and leaves the tab order, and a read-only one submits its
+value and stays reachable, which is what a form showing a value somebody
+else set needs. */
+  readOnly?: HelixHeadlessTimePicker["readOnly"];
+  /** Whether the form refuses to submit while nothing is chosen. */
+  required?: HelixHeadlessTimePicker["required"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixHeadlessTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -6850,6 +7156,20 @@ export type HelixHeadlessToggleVueProps = {
   selected?: HelixHeadlessToggle["selected"];
   /** Whether the item can be chosen. */
   disabled?: HelixHeadlessToggle["disabled"];
+  /** Whether the markup declared this one chosen, which is what a reset returns to.
+
+`<option selected>` reflects to `defaultSelected` and `option.selected` is
+live state that does not reflect, and those are two different facts. This
+element has one `selected` doing both jobs, so what is captured here is what
+the markup said at upgrade, before anything could overwrite it: read the
+attribute later and the listbox's own writes answer instead.
+
+**The deeper half is 302 and is not this.** State reflecting under the
+declaration's name is the fault `TreeItem` already avoids by mirroring to
+`data-selected`, and four families here still write `selected` back into a
+consumer's markup. Splitting them means moving what every stylesheet selects
+on, which is a change of its own rather than a property being added. */
+  defaultSelected?: HelixHeadlessToggle["defaultSelected"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no

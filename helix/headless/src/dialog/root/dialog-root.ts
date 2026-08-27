@@ -5,7 +5,7 @@ import {
   hostAria,
   MixinControllerOpen,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -101,6 +101,48 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     },
   })
 
+  /**
+   * Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   */
+  @property({ attribute: 'closedby', reflect: true })
+  closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
+   * What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: the platform's contract is
+   * `close(value)` then read `returnValue`, and a consumer could do neither
+   * because `querySelector` does not reach the element. A confirmation asking
+   * which button was pressed is the ordinary case and had no answer.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote.
+   */
+  get returnValue(): string {
+    return this.dialog?.returnValue ?? this.returned
+  }
+
+  set returnValue(value: string) {
+    this.returned = value
+    const dialog = this.dialog
+    if (dialog) {
+      dialog.returnValue = value
+    }
+  }
+
+  /** What a value set before the element existed is kept in. */
+  private returned = ''
+
   /** The native dialog, or nothing where there is no DOM to hold one. */
   private get dialog(): HTMLDialogElement | null {
     return this.renderRoot?.querySelector('dialog') ?? null
@@ -111,9 +153,25 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     this.requestOpen(true)
   }
 
-  /** Asks to close, which a consumer may refuse. */
-  close(): void {
-    this.requestOpen(false)
+  /**
+   * Asks to close, which a consumer may refuse.
+   *
+   * Takes what the dialog closed with, the way `<dialog>.close(value)` does, so
+   * the button that dismissed it can say which one it was. Set before the
+   * request rather than after, because a `close` listener reads `returnValue`
+   * and would otherwise read the previous one.
+   *
+   * Not set where the request is refused, since nothing closed and a value
+   * saying it did would outlive the refusal.
+   */
+  close(returnValue?: string): void {
+    const previous = this.returnValue
+    if (returnValue !== undefined) {
+      this.returnValue = returnValue
+    }
+    if (!this.requestOpen(false) && returnValue !== undefined) {
+      this.returnValue = previous
+    }
   }
 
   /**
@@ -241,6 +299,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   protected override render(): TemplateResult {
     return html`<dialog
       part="dialog"
+      closedby=${this.closedBy ?? nothing}
       aria-label=${this.label || 'Dialog'}
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}

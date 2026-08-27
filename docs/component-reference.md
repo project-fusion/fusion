@@ -63,6 +63,7 @@ Usable on its own as a disclosure, with no accordion around it.
 | --- | --- | --- | --- | --- | --- |
 | `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixHeadlessAccordionItem` | Where the open indicator sits, or whether there is one. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `name` | `name` | `string \| undefined` | - | `HelixHeadlessAccordionItem` | A group name, which is how `<details>` says a set is exclusive. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 
 #### Methods
@@ -1643,7 +1644,9 @@ Input, Color Input and Date Input all take.
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessCombobox` | Text shown while nothing has been chosen. |
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixHeadlessCombobox` | What a tag's remove control is called, since the mark has no name. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `selectedIndex` | - | `number` | - | `HelixHeadlessCombobox` | Which option is chosen, as an index, or `-1` where none is. |
 | `suggest` | `suggest` | `boolean` | `false` | `HelixHeadlessCombobox` | Whether the field finishes the word as it is typed. |
+| `type` | - | `string` | - | `HelixHeadlessCombobox` | Which kind of chooser this is, in the platform's two words. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -2003,7 +2006,9 @@ whatever holds it.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixHeadlessDateInput` | What the field says before a date is in it. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessDateInput` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `step` | `step` | `number` | `1` | `HelixHeadlessDateInput` | How far apart the selectable dates are, in days. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixHeadlessDateInput` | Accessible name for the control that opens the calendar. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessDateInput` | The value as a `Date`, at midnight UTC, or `null` while there is no date. |
@@ -2124,6 +2129,9 @@ grid reads as a continuous run of dates.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages forward. |
 | `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages back. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the control refuses changes while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the form refuses to submit while nothing is chosen. |
+| `step` | `step` | `number` | `1` | `HelixHeadlessDatePicker` | How far apart the selectable dates are, in days. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessDatePicker` | The value as a `Date`, at midnight UTC, or `null` while there is no date. |
 | `valueAsNumber` | - | `number` | - | `HelixHeadlessDatePicker` | The value as milliseconds since the epoch, or `NaN` while there is no date. |
@@ -2201,10 +2209,12 @@ dialog rather than being a div somebody positioned.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `align` | `align` | `'center' \| 'start' \| undefined` | - | - | Whether the panel's contents run from the start or center on it. |
+| `closedBy` | `closedby` | `'any' \| 'closerequest' \| 'none' \| undefined` | - | `HelixHeadlessDialog` | Which close requests the browser answers on its own. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessDialog` | Accessible name for the dialog. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `persistent` | `persistent` | `boolean` | `false` | `HelixHeadlessDialog` | Whether Escape can close it. |
+| `returnValue` | - | `string` | - | `HelixHeadlessDialog` | What the dialog closed with, the way `<dialog>` reports it. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| 'full' \| undefined` | - | - | How wide the panel is allowed to be. |
 
 #### Methods
@@ -2387,12 +2397,14 @@ rest is flat and the movement is what says something happened.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `closedBy` | `closedby` | `'any' \| 'closerequest' \| 'none' \| undefined` | - | `HelixHeadlessDrawer` | Which close requests the browser answers on its own. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessDrawer` | Accessible name for the panel. |
 | `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | Whether the panel is glass rather than opaque. |
 | `modal` | `modal` | `boolean` | `true` | `HelixHeadlessDrawer` | Whether the drawer blocks the page behind it. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixHeadlessDrawer` | Which edge the drawer comes from. |
+| `returnValue` | - | `string` | - | `HelixHeadlessDrawer` | What the dialog closed with, the way `<dialog>` reports it. |
 
 #### Methods
 
@@ -3053,6 +3065,9 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `reveal` | `reveal` | `boolean` | `false` | `HelixHeadlessInput` | Whether a password field offers a toggle that shows what was typed. |
 | `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixHeadlessInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
+| `selectionDirection` | - | `SelectionDirection` | - | `HelixHeadlessInput` | The caret and the selection, under the platform's own names. |
+| `selectionEnd` | - | `number` | - | `HelixHeadlessInput` | Where the selection ends, as an offset into the value. |
+| `selectionStart` | - | `number` | - | `HelixHeadlessInput` | Where the selection starts, as an offset into the value. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessInput` | Focus is delegated to the input, so the host is never the focus target. |
 | `type` | `type` | `InputType` | `'text'` | `HelixHeadlessInput` | What the field accepts, which decides the keyboard and the validation. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -3067,6 +3082,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 | `select()` | `HelixHeadlessInput` | Selects everything in the field. |
+| `setSelectionRange()` | `HelixHeadlessInput` | Selects a range, which is the one operation the three accessors above cannot express between them. |
 
 #### Events
 
@@ -3292,6 +3308,7 @@ decoration doing what emptiness already does.
 | `kind` | `kind` | `'default' \| 'description' \| 'ordered' \| 'unordered' \| undefined` | - | `HelixHeadlessList` | What kind of list this is, which is a fact about the content. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessList` | Accessible name for the set. |
 | `marker` | `marker` | `'rail' \| undefined` | - | - | Where the marker sits. |
+| `type` | `type` | `'1' \| 'a' \| 'A' \| 'i' \| 'I' \| undefined` | - | `HelixHeadlessList` | Which markers an ordered list draws, in `<ol type>`'s own five values. |
 
 #### Slots
 
@@ -3391,7 +3408,9 @@ list moves under the reader rather than the reader moving to find it.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `options` | - | `HelixHeadlessOption[]` | - | `HelixHeadlessListbox` | Every option, in the order a reader meets them. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `selectedIndex` | - | `number` | - | `HelixHeadlessListbox` | Which option is chosen, as an index, or `-1` where none is. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessListbox` | Focusing the host focuses the list inside it. |
+| `type` | - | `string` | - | `HelixHeadlessListbox` | Which kind of chooser this is, in the platform's two words. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `values` | - | `string[]` | - | `HelixHeadlessListbox` | The chosen values, which is a list whether or not `multiple` is set. |
 
@@ -4062,8 +4081,10 @@ picked from what they are looking at.
 | `active` | `data-active` | `boolean` | `false` | `HelixHeadlessOption` | Whether this is the option the keyboard is on. Written by the listbox. |
 | `alternate` | `alternate` | `string` | `''` | `HelixHeadlessOption` | A second destination for this row, taken with the modifier held. |
 | `alternateLabel` | `alternate-label` | `string` | `''` | `HelixHeadlessOption` | What the second destination is, for a reader who cannot see the footer. |
+| `defaultSelected` | - | `boolean` | - | `HelixHeadlessOption` | Whether the markup declared this one chosen, which is what a reset returns to. |
 | `description` | `description` | `string \| undefined` | - | `HelixHeadlessOption` | A second line under the words, for what the choice actually is. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice can be made. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessOption` | A shorter name for this choice, for where the row does not fit. |
 | `selected` | `selected` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice is currently chosen. Written by the listbox. |
 | `text` | - | `string` | - | `HelixHeadlessOption` | The words, for a listbox that has to match text against them. |
 | `value` | `value` | `string` | `''` | `HelixHeadlessOption` | Identifies this choice, and is what a form submits. |
@@ -4652,6 +4673,7 @@ and being chosen is an answer rather than a state.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `defaultSelected` | - | `boolean` | - | `HelixHeadlessRadio` | Whether the markup declared this one chosen, which is what a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this choice can be made. |
 | `hideControl` | `hide-control` | `boolean` | `false` | - | Takes the circle away, leaving the card as the whole control. |
 | `selected` | `selected` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this is the current choice. Written by the group. |
@@ -4793,6 +4815,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `max` | `max` | `number` | `5` | `HelixHeadlessRating` | How many marks there are. |
+| `min` | `min` | `number` | `0` | `HelixHeadlessRating` | The lowest score a reader can give, which is what clearing returns to. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessRating` | Whether this shows a score rather than asks for one. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
@@ -5287,6 +5310,8 @@ from the field it came out of.
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'Choose'` | `HelixHeadlessSelect` | Shown on the trigger while nothing is chosen. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `selectedIndex` | - | `number` | - | `HelixHeadlessSelect` | Which option is chosen, as an index, or `-1` where none is. |
+| `type` | - | `string` | - | `HelixHeadlessSelect` | Which kind of chooser this is, in the platform's two words. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -6502,6 +6527,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixHeadlessTimeInput` | What the field says before a time is in it. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTimeInput` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `step` | `step` | `number` | `15` | `HelixHeadlessTimeInput` | How far apart the offered times are, in minutes. |
 | `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixHeadlessTimeInput` | Whether the field writes the time out, or holds the value as it is. |
@@ -6632,6 +6658,8 @@ card would be a card inside a card there.
 | `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimePicker` | Earliest time offered, as `HH:mm`. |
 | `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixHeadlessTimePicker` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the control refuses changes while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the form refuses to submit while nothing is chosen. |
 | `step` | `step` | `number` | `15` | `HelixHeadlessTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessTimePicker` | The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time. |
@@ -6908,6 +6936,7 @@ one fill appearing as another disappears.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `defaultSelected` | - | `boolean` | - | `HelixHeadlessToggle` | Whether the markup declared this one chosen, which is what a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessToggle` | Whether the item can be chosen. |
 | `focusable` | - | `boolean` | `false` | `HelixHeadlessToggle` | Whether this item holds the group's tab stop while nothing is chosen. |
 | `selected` | `selected` | `boolean` | `false` | `HelixHeadlessToggle` | Whether this item is the current one. |

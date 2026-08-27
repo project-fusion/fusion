@@ -79,9 +79,46 @@ export class HelixHeadlessOption extends HelixElement {
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
   active = false
 
+  /**
+   * Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added.
+   */
+  get defaultSelected(): boolean {
+    return this.seeded
+  }
+
+  set defaultSelected(next: boolean) {
+    this.seeded = next
+  }
+
+  /** What the markup said, read once at construction for the reason above. */
+  private seeded = this.hasAttribute('selected')
+
   /** Whether this choice is currently chosen. Written by the listbox. */
   @property({ reflect: true, type: Boolean })
   selected = false
+
+  /**
+   * A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
+   */
+  @property()
+  label = ''
 
   /** Identifies this choice, and is what a form submits. */
   @property()

@@ -169,6 +169,17 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   @property()
   min = ''
 
+  /**
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
+   */
+  @property({ type: Number })
+  step = 1
+
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
   @property()
   max = ''
@@ -482,6 +493,30 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     }
   }
 
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     // Whatever the markup arrived with, so a form knows before anything is typed.
@@ -618,6 +653,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
       locale=${this.locale || nothing}
       max=${this.max || nothing}
       min=${this.min || nothing}
+      step=${this.step}
       @helix-before-change=${this.handleCalendarChange}
     ></${this.tag('date-picker')}>`
   }
@@ -689,6 +725,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
           inputmode="numeric"
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
+          ?readonly=${this.readOnly}
           ?required=${this.required}
           @blur=${this.handleBlur}
           @focus=${this.handleFocus}

@@ -312,6 +312,37 @@ export class HelixHeadlessListbox extends MixinCollection(
   })
 
   /**
+   * Which option is chosen, as an index, or `-1` where none is.
+   *
+   * `<select>`'s own pair, and this control is what stands in for one. The
+   * options are the consumer's own light-DOM children, so an index is a
+   * position among the elements they wrote rather than into anything this
+   * renders, which is what makes it the same number `<select>` would give.
+   *
+   * With `multiple` it is the first chosen one, which is also what the platform
+   * answers: a single index cannot describe a set, and `value` is the property
+   * that can.
+   */
+  get selectedIndex(): number {
+    return this.options.findIndex((option) => option.selected)
+  }
+
+  set selectedIndex(at: number) {
+    const option = this.options[at]
+    this.value = option?.value ?? ''
+  }
+
+  /**
+   * Which kind of chooser this is, in the platform's two words.
+   *
+   * Derived rather than declared, because `multiple` already decides it and a
+   * second property could disagree.
+   */
+  get type(): string {
+    return this.multiple ? 'select-multiple' : 'select-one'
+  }
+
+  /**
    * Every option, in the order a reader meets them.
    *
    * Descendants rather than children, because a group puts a level between the

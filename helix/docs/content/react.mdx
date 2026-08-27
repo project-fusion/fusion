@@ -9,7 +9,7 @@ title: React
 
 There is no React package. The elements are custom elements and React renders
 them directly. What ships for React is a `jsx.d.ts` that types every tag and a
-runtime bridge in `@helix-io/core` that repairs one React behavior.
+runtime bridge in `@helix-io/core` that repairs two React behaviors.
 
 ```ts
 import '@helix-io/styled/jsx'
@@ -31,11 +31,41 @@ written, so the casing is the event's own.
 
 ## The bridge
 
-React has a hydration bug with custom events: handlers attached during hydration
-are stashed on the DOM node but never bound, so an event fired before the next
-render finds nothing listening. `HelixElement` repairs it by reading React's own
-stash off the node and calling what it finds, so a handler works from the first
-paint rather than from the first re-render.
+React skips everything it would have to apply imperatively while hydrating. That
+is two things, and `HelixElement` repairs both.
+
+**Event handlers** attached during hydration are stashed on the DOM node but
+never bound, so an event fired before the next render finds nothing listening.
+The element reads React's own stash off the node and binds what it finds, so a
+handler works from the first paint rather than from the first re-render.
+
+**Object and function properties** are dropped on both sides: React's server
+renderer writes nothing for a prop whose value is an object, and the hydrate path
+never applies one. An array prop therefore arrives by no route at all, and
+because both halves agree, nothing warns. The element assigns them itself once it
+upgrades, which is what lets a data table take its rows as a plain prop:
+
+```tsx
+<helix-data-table label="People" rows={rows}>
+  <helix-table-column field="name" sortable>Name</helix-table-column>
+  <helix-table-column field="team" sortable>Team</helix-table-column>
+  <helix-table-column field="location">Location</helix-table-column>
+</helix-data-table>
+```
+
+Only properties the component declares, and only values an attribute could not
+have carried, so a string is left to the channel that already works. A `null` is
+left alone too, and the component's own default stands.
+
+The columns are elements rather than a config array for the same reason: `field`,
+`sortable` and `width` are strings and booleans, so they cross to the server
+intact, and `cell` and `compare` are functions on an element that can repair its
+own props. Nested inside a `columns` array they would be unreachable.
+
+**The cell values still do not server-render**, which is a separate limit and not
+this one. Reading a cell needs the columns, and the columns are markup children
+the server render does not hand the table, so the first paint is a labeled shell
+either way. Use `helix-table` where the content has to be in the served HTML.
 
 That is runtime code you already have, in `@helix-io/core`, and nothing to
 configure. One thing to know about it: it reads a React

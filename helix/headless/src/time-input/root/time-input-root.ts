@@ -455,6 +455,30 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
     }
   }
 
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     // Whatever the markup arrived with, so a form knows before anything is typed.
@@ -595,6 +619,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
           autocomplete=${this.autocomplete || nothing}
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
+          ?readonly=${this.readOnly}
           ?required=${this.required}
           @blur=${this.handleBlur}
           @focus=${this.handleFocus}

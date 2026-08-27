@@ -188,6 +188,67 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
     delegatesFocus: true,
   }
 
+  /**
+   * The caret and the selection, under the platform's own names.
+   *
+   * The `<input>` is inside this shadow root, so a consumer had no way to ask
+   * where the selection is, let alone move it: `querySelector` does not cross
+   * the boundary. An insert-at-cursor toolbar, a format button, a mask that
+   * repositions the caret after rewriting the value, all of them need this and
+   * none of them could be written. Textarea gained the same surface for the same
+   * reason. See 295.
+   *
+   * Zero before there is a control, which is where an empty field's caret would
+   * be anyway.
+   */
+  get selectionDirection(): SelectionDirection {
+    return this.control?.selectionDirection ?? 'none'
+  }
+
+  set selectionDirection(direction: SelectionDirection) {
+    const control = this.control
+    if (control) {
+      control.selectionDirection = direction
+    }
+  }
+
+  /** Where the selection ends, as an offset into the value. */
+  get selectionEnd(): number {
+    return this.control?.selectionEnd ?? 0
+  }
+
+  set selectionEnd(at: number) {
+    const control = this.control
+    if (control) {
+      control.selectionEnd = at
+    }
+  }
+
+  /** Where the selection starts, as an offset into the value. */
+  get selectionStart(): number {
+    return this.control?.selectionStart ?? 0
+  }
+
+  set selectionStart(at: number) {
+    const control = this.control
+    if (control) {
+      control.selectionStart = at
+    }
+  }
+
+  /**
+   * Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
+   */
+  setSelectionRange(start: number, end: number, direction?: SelectionDirection): void {
+    this.control?.setSelectionRange(start, end, direction)
+  }
+
   private get control(): HTMLInputElement | null {
     return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
   }

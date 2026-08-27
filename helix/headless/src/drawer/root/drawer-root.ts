@@ -5,7 +5,7 @@ import {
   MixinControllerOpen,
   onUnlessFalse,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -103,6 +103,52 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   @property({ converter: onUnlessFalse })
   modal = true
 
+  /**
+   * Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   */
+  @property({ attribute: 'closedby', reflect: true })
+  closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
+   * What the dialog closed with, the way `<dialog>` reports it.
+   *
+   * **The whole point of a `<dialog>` returning a value is lost behind a shadow
+   * boundary**, which is where this one is: `querySelector` does not reach the
+   * element, so a consumer could neither set the value nor read it back. A
+   * drawer asking which of its actions dismissed it is the ordinary case and had
+   * no answer.
+   *
+   * Written before `open` is set to false rather than passed to a `close(value)`
+   * call, because this component has no such method: it is driven by `open`
+   * alone, and `Dialog`'s `close()` is the one that takes the value directly.
+   *
+   * Held here as well as on the element, so a value set before the first render
+   * survives to it and a consumer reading one back gets what they wrote.
+   */
+  get returnValue(): string {
+    return this.panel?.returnValue ?? this.returned
+  }
+
+  set returnValue(value: string) {
+    this.returned = value
+    const panel = this.panel
+    if (panel) {
+      panel.returnValue = value
+    }
+  }
+
+  /** What a value set before the element existed is kept in. */
+  private returned = ''
+
   /** The panel, which is a real `<dialog>`. */
   private get panel(): HTMLDialogElement | null {
     return this.renderRoot?.querySelector<HTMLDialogElement>('[part="panel"]') ?? null
@@ -181,6 +227,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
        thing that could drift from what the element actually did. */
     return html`<dialog
       part="panel"
+      closedby=${this.closedBy ?? nothing}
       aria-label=${this.label || 'Drawer'}
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}

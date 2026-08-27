@@ -74,6 +74,28 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   }
 
   /**
+   * A group name, which is how `<details>` says a set is exclusive.
+   *
+   * **Two ways of saying the same thing, and the platform's one does not need a
+   * parent.** An accordion's `mode` makes its own children exclusive, which
+   * covers the ordinary case and cannot express a set spread across a page: a
+   * `<details name="faq">` anywhere in a document closes every other one that
+   * shares the name, and this does the same. Items in the same root with the
+   * same name are peers whether or not an accordion contains them.
+   *
+   * Where both are set the name wins, because it is the narrower statement: a
+   * consumer who named a group meant that group rather than whatever happens to
+   * be nested where.
+   *
+   * Optional rather than `''`, because a reflected string defaulting to the
+   * empty string writes `name=""` onto every item ever rendered: Lit reflects
+   * it, and the resting state of a reflected property is the attribute's
+   * absence. Caught by `hydration.dom.spec.ts`.
+   */
+  @property({ reflect: true })
+  name?: string
+
+  /**
    * The nearest accordion above this item, if there is one.
    *
    * Resolved on demand rather than held, so an item moved between accordions
@@ -93,6 +115,18 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * separate set, and opening a section in it must not close anything outside.
    */
   private get peers(): HelixHeadlessAccordionItem[] {
+    if (this.name !== undefined && this.name !== '') {
+      /* By name, across the whole root rather than one accordion, which is what
+         `<details name>` means. `getRootNode()` so an item inside a shadow tree
+         finds its group there rather than reaching into the document, which is
+         the same boundary every IDREF in this library respects. */
+      const root = this.getRootNode() as Document | ShadowRoot
+      return [
+        ...root.querySelectorAll<HelixHeadlessAccordionItem>(
+          `${this.localName}[name="${CSS.escape(this.name)}"]`,
+        ),
+      ]
+    }
     const accordion = this.accordion
     if (!accordion || accordion.items.indexOf(this) === -1) {
       return []
@@ -122,7 +156,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       return
     }
 
-    if (next && mode !== undefined) {
+    if (next && (mode !== undefined || (this.name !== undefined && this.name !== ''))) {
       for (const peer of this.peers) {
         if (peer !== this && peer.open) {
           // A peer in controlled mode will only notify: its consumer owns the

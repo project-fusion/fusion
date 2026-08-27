@@ -41,8 +41,12 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* Primary, for the reason the own-turn tint is: send is the ordinary affirmative
+   control and every other one in the library is `tone="primary"` by default.
+   Painting it `accent-surface` made the accent the color of an action nobody
+   opted into, and put an orange button under a chat on an otherwise blue page. */
 [part="send"] {
-  background-color: var(--helix-color-accent-surface);
+  background-color: var(--helix-color-primary-surface);
   border: 0;
   border-radius: var(--helix-radii-md);
   color: var(--helix-color-foreground-on-accent);
@@ -54,7 +58,7 @@
 }
 
 [part="send"]:hover:not(:disabled) {
-  background-color: var(--helix-color-accent-surface-hover);
+  background-color: var(--helix-color-primary-surface-hover);
 }
 
 [part="send"]:disabled {

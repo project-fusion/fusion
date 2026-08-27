@@ -257,6 +257,20 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A group name, which is how `<details>` says a set is exclusive.\n\n**Two ways of saying the same thing, and the platform's one does not need a\nparent.** An accordion's `mode` makes its own children exclusive, which\ncovers the ordinary case and cannot express a set spread across a page: a\n`<details name=\"faq\">` anywhere in a document closes every other one that\nshares the name, and this does the same. Items in the same root with the\nsame name are peers whether or not an accordion contains them.\n\nWhere both are set the name wins, because it is the narrower statement: a\nconsumer who named a group meant that group rather than whatever happens to\nbe nested where.\n\nOptional rather than `''`, because a reflected string defaulting to the\nempty string writes `name=\"\"` onto every item ever rendered: Lit reflects\nit, and the resting state of a reflected property is the attribute's\nabsence. Caught by `hydration.dom.spec.ts`.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessAccordionItem",
+                "module": "src/accordion/item/accordion-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "accordion",
               "type": {
                 "text": "HelixHeadlessAccordion | null"
@@ -535,6 +549,18 @@
               },
               "description": "Where the open indicator sits, or whether there is one.\n\n`auto` resolves to `end`, which is where a reader scanning a list of\nsummaries expects it: the label starts at the same x on every row, and the\nindicator is found once at the edge rather than shifting with the text.\n`start` is for a tree-like reading, where the indicator leads the label.\n`none` is for a row that carries its own affordance and would otherwise\nhave two.",
               "fieldName": "chevronPlacement",
+              "inheritedFrom": {
+                "name": "HelixHeadlessAccordionItem",
+                "module": "src/accordion/item/accordion-item.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A group name, which is how `<details>` says a set is exclusive.\n\n**Two ways of saying the same thing, and the platform's one does not need a\nparent.** An accordion's `mode` makes its own children exclusive, which\ncovers the ordinary case and cannot express a set spread across a page: a\n`<details name=\"faq\">` anywhere in a document closes every other one that\nshares the name, and this does the same. Items in the same root with the\nsame name are peers whether or not an accordion contains them.\n\nWhere both are set the name wins, because it is the narrower statement: a\nconsumer who named a group meant that group rather than whatever happens to\nbe nested where.\n\nOptional rather than `''`, because a reflected string defaulting to the\nempty string writes `name=\"\"` onto every item ever rendered: Lit reflects\nit, and the resting state of a reflected property is the attribute's\nabsence. Caught by `hydration.dom.spec.ts`.",
+              "fieldName": "name",
               "inheritedFrom": {
                 "name": "HelixHeadlessAccordionItem",
                 "module": "src/accordion/item/accordion-item.ts"
@@ -17903,6 +17929,31 @@
             },
             {
               "kind": "field",
+              "name": "selectedIndex",
+              "type": {
+                "text": "number"
+              },
+              "description": "Which option is chosen, as an index, or `-1` where none is.\n\nRead off the listbox this renders, which owns the options and is where the\nsame two properties are implemented. Delegating rather than recomputing is\nwhat keeps a composed control and the control inside it from answering\ndifferently: they are one chooser to a consumer.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which kind of chooser this is, in the platform's two words.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "listbox",
               "type": {
                 "text": "HelixHeadlessListbox | null"
@@ -22988,6 +23039,20 @@
             },
             {
               "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far apart the selectable dates are, in days.\n\n`<input type=\"date\" step>`'s own unit, handed to the calendar this renders\nso the field and the grid agree about which dates exist. Counted from `min`\nwhere there is one and from 1 January 1970 where there is not, which is the\nplatform's base.",
+              "attribute": "step",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "max",
               "type": {
                 "text": "string"
@@ -23308,6 +23373,21 @@
               "privacy": "private",
               "readonly": true,
               "description": "Escape shuts the calendar without moving the date.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "attribute": "read-only",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -23938,6 +24018,19 @@
               }
             },
             {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far apart the selectable dates are, in days.\n\n`<input type=\"date\" step>`'s own unit, handed to the calendar this renders\nso the field and the grid agree about which dates exist. Counted from `min`\nwhere there is one and from 1 January 1970 where there is not, which is the\nplatform's base.",
+              "fieldName": "step",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
               "name": "max",
               "type": {
                 "text": "string"
@@ -24036,6 +24129,19 @@
               "default": "'Choose a date'",
               "description": "Accessible name for the control that opens the calendar.",
               "fieldName": "triggerLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "fieldName": "readOnly",
               "inheritedFrom": {
                 "name": "HelixHeadlessDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -24795,6 +24901,20 @@
             },
             {
               "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far apart the selectable dates are, in days.\n\n`<input type=\"date\" step>`'s own unit, counted from `min` where there is\none and from 1 January 1970 where there is not, which is the platform's own\nbase. A booking calendar that only takes Mondays is `step=\"7\"` with a `min`\non a Monday, and there was no way to say that: `disable-dates` takes a list\nand a year of Mondays is not a list anybody writes.\n\nOne is every date and needs no rule, which is why anything below one is\ntreated as one rather than as an error: a step of zero would block every\ndate including the one already chosen.",
+              "attribute": "step",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "max",
               "type": {
                 "text": "string"
@@ -25060,6 +25180,51 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "attribute": "read-only",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while nothing is chosen.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports \"required and empty\", or clears it.\n\nWritten out rather than taken from `MixinField`, which is where the seven\nform controls get this. That mixin brings a label, a hint and a feedback\nregion with it, and this is a grid rather than a field: it is composed\n*into* the field that has those, so taking the mixin would give one control\ntwo of each. What is shared is five lines, and the anchor is what the\nbrowser points its bubble at.",
               "inheritedFrom": {
                 "name": "HelixHeadlessDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
@@ -25685,6 +25850,19 @@
               }
             },
             {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How far apart the selectable dates are, in days.\n\n`<input type=\"date\" step>`'s own unit, counted from `min` where there is\none and from 1 January 1970 where there is not, which is the platform's own\nbase. A booking calendar that only takes Mondays is `step=\"7\"` with a `min`\non a Monday, and there was no way to say that: `disable-dates` takes a list\nand a year of Mondays is not a list anybody writes.\n\nOne is every date and needs no rule, which is why anything below one is\ntreated as one rather than as an error: a step of zero would block every\ndate including the one already chosen.",
+              "fieldName": "step",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
               "name": "max",
               "type": {
                 "text": "string"
@@ -25718,6 +25896,32 @@
               "default": "0",
               "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
               "fieldName": "firstDayOfWeek",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "fieldName": "readOnly",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while nothing is chosen.",
+              "fieldName": "required",
               "inheritedFrom": {
                 "name": "HelixHeadlessDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
@@ -26193,6 +26397,46 @@
             },
             {
               "kind": "field",
+              "name": "closedBy",
+              "type": {
+                "text": "'any' | 'closerequest' | 'none' | undefined"
+              },
+              "description": "Which close requests the browser answers on its own.\n\n`<dialog closedby>`, forwarded, and safe to forward because every path it\nopens still comes back through this element: a close request fires `cancel`\nfirst, `handleCancel` prevents it, and `requestOpen` decides. So\n`closedby=\"any\"` gains light dismiss without giving up the refusal, which is\nthe property this component exists to keep.\n\nAbsent by default, which is the platform's `auto` and this library's rule\nthat a resting value is an attribute's absence.",
+              "attribute": "closedby",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "returnValue",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the dialog closed with, the way `<dialog>` reports it.\n\n**The whole point of a `<dialog>` returning a value is lost behind a shadow\nboundary**, which is where this one is: the platform's contract is\n`close(value)` then read `returnValue`, and a consumer could do neither\nbecause `querySelector` does not reach the element. A confirmation asking\nwhich button was pressed is the ordinary case and had no answer.\n\nHeld here as well as on the element, so a value set before the first render\nsurvives to it and a consumer reading one back gets what they wrote.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "returned",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What a value set before the element existed is kept in.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "dialog",
               "type": {
                 "text": "HTMLDialogElement | null"
@@ -26230,9 +26474,18 @@
                   "text": "void"
                 }
               },
-              "description": "Asks to close, which a consumer may refuse.",
+              "parameters": [
+                {
+                  "name": "returnValue",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Asks to close, which a consumer may refuse.\n\nTakes what the dialog closed with, the way `<dialog>.close(value)` does, so\nthe button that dismissed it can say which one it was. Set before the\nrequest rather than after, because a `close` listener reads `returnValue`\nand would otherwise read the previous one.\n\nNot set where the request is refused, since nothing closed and a value\nsaying it did would outlive the refusal.",
               "type": {
-                "text": "close() => void"
+                "text": "close(returnValue?: string) => void"
               },
               "inheritedFrom": {
                 "name": "HelixHeadlessDialog",
@@ -26484,6 +26737,18 @@
               "default": "false",
               "description": "Whether Escape can close it.\n\nOff for a dialog that must be answered. It does not disable the close\ncontrol a consumer slots in: refusing to be dismissed is not the same as\nrefusing to be closed, and a dialog with no way out at all is a trap.\n\nEscape *and* a press on the backdrop, which it now genuinely means. The\nsentence said both for a long time while nothing listened for a backdrop\npress, so it promised a behavior a consumer would have written their\nmarkup around; the fix then was to narrow the sentence, and the fix now is\nto build the half that was missing.\n\nA persistent dialog does not ignore that press. It answers it: see\n`refuse`, which is the only way a dialog that will not be dismissed can say\nso at the moment a reader asks.",
               "fieldName": "persistent",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
+            },
+            {
+              "name": "closedby",
+              "type": {
+                "text": "'any' | 'closerequest' | 'none' | undefined"
+              },
+              "description": "Which close requests the browser answers on its own.\n\n`<dialog closedby>`, forwarded, and safe to forward because every path it\nopens still comes back through this element: a close request fires `cancel`\nfirst, `handleCancel` prevents it, and `requestOpen` decides. So\n`closedby=\"any\"` gains light dismiss without giving up the refusal, which is\nthe property this component exists to keep.\n\nAbsent by default, which is the platform's `auto` and this library's rule\nthat a resting value is an attribute's absence.",
+              "fieldName": "closedBy",
               "inheritedFrom": {
                 "name": "HelixHeadlessDialog",
                 "module": "src/dialog/root/dialog-root.ts"
@@ -28107,6 +28372,46 @@
             },
             {
               "kind": "field",
+              "name": "closedBy",
+              "type": {
+                "text": "'any' | 'closerequest' | 'none' | undefined"
+              },
+              "description": "Which close requests the browser answers on its own.\n\n`<dialog closedby>`, forwarded, and safe to forward because every path it\nopens still comes back through this element: a close request fires `cancel`\nfirst, `handleCancel` prevents it, and `requestOpen` decides. So\n`closedby=\"any\"` gains light dismiss without giving up the refusal, which is\nthe property this component exists to keep.\n\nAbsent by default, which is the platform's `auto` and this library's rule\nthat a resting value is an attribute's absence.",
+              "attribute": "closedby",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "returnValue",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the dialog closed with, the way `<dialog>` reports it.\n\n**The whole point of a `<dialog>` returning a value is lost behind a shadow\nboundary**, which is where this one is: `querySelector` does not reach the\nelement, so a consumer could neither set the value nor read it back. A\ndrawer asking which of its actions dismissed it is the ordinary case and had\nno answer.\n\nWritten before `open` is set to false rather than passed to a `close(value)`\ncall, because this component has no such method: it is driven by `open`\nalone, and `Dialog`'s `close()` is the one that takes the value directly.\n\nHeld here as well as on the element, so a value set before the first render\nsurvives to it and a consumer reading one back gets what they wrote.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "returned",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What a value set before the element existed is kept in.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "panel",
               "type": {
                 "text": "HTMLDialogElement | null"
@@ -28403,6 +28708,18 @@
               "default": "true",
               "description": "Whether the drawer blocks the page behind it.\n\nTurning this off removes the focus trap and the scrim together, because\nthey are one decision: a panel that traps focus without covering the page\nstrands the reader, and one that covers without trapping lets them tab\nbehind the cover.\n\nNot reflected. It stays `true` by default, since a drawer that silently\nlost its focus trap because a consumer forgot a word would be worse than an\nattribute on the host, and nothing selects on it: the scrim is rendered or\nnot, rather than shown or hidden by CSS.",
               "fieldName": "modal",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDrawer",
+                "module": "src/drawer/root/drawer-root.ts"
+              }
+            },
+            {
+              "name": "closedby",
+              "type": {
+                "text": "'any' | 'closerequest' | 'none' | undefined"
+              },
+              "description": "Which close requests the browser answers on its own.\n\n`<dialog closedby>`, forwarded, and safe to forward because every path it\nopens still comes back through this element: a close request fires `cancel`\nfirst, `handleCancel` prevents it, and `requestOpen` decides. So\n`closedby=\"any\"` gains light dismiss without giving up the refusal, which is\nthe property this component exists to keep.\n\nAbsent by default, which is the platform's `auto` and this library's rule\nthat a resting value is an attribute's absence.",
+              "fieldName": "closedBy",
               "inheritedFrom": {
                 "name": "HelixHeadlessDrawer",
                 "module": "src/drawer/root/drawer-root.ts"
@@ -36025,6 +36342,80 @@
             },
             {
               "kind": "field",
+              "name": "selectionDirection",
+              "type": {
+                "text": "SelectionDirection"
+              },
+              "description": "The caret and the selection, under the platform's own names.\n\nThe `<input>` is inside this shadow root, so a consumer had no way to ask\nwhere the selection is, let alone move it: `querySelector` does not cross\nthe boundary. An insert-at-cursor toolbar, a format button, a mask that\nrepositions the caret after rewriting the value, all of them need this and\nnone of them could be written. Textarea gained the same surface for the same\nreason. See 295.\n\nZero before there is a control, which is where an empty field's caret would\nbe anyway.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectionEnd",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the selection ends, as an offset into the value.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectionStart",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the selection starts, as an offset into the value.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setSelectionRange",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "start",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "end",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "direction",
+                  "optional": true,
+                  "type": {
+                    "text": "SelectionDirection"
+                  }
+                }
+              ],
+              "description": "Selects a range, which is the one operation the three accessors above\ncannot express between them.\n\nSetting `selectionStart` past the current `selectionEnd` drags the end\nalong, so the two writes a consumer would make in sequence do not compose\ninto the range they asked for. The platform has this method for that reason\nand so does this.",
+              "type": {
+                "text": "setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "control",
               "type": {
                 "text": "HTMLInputElement | null"
@@ -39346,6 +39737,20 @@
             },
             {
               "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'1' | 'a' | 'A' | 'i' | 'I' | undefined"
+              },
+              "description": "Which markers an ordered list draws, in `<ol type>`'s own five values.\n\nReflected, because this is one of the things a stylesheet selects on and\nthe styled tier maps each to a `list-style-type`. The platform's spellings\nrather than the CSS ones, so `<helix-list kind=\"ordered\" type=\"i\">` is what\na consumer would have written on an `<ol>`.\n\n**`start` and `reversed` are both absent and neither can be done here.**\nThis renders no `<ol>`: the rows are slotted and numbered by the CSS\n`list-item` counter, and that counter is not author-resettable. Measured in\nChrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a\n`<ul>`, or even on a real `<ol>`, while `<ol start=\"5\">` does and a *named*\ncounter with explicit `::before` content does. So the markers would have to\nbe rebuilt out of generated content to gain a start, which is a different\ncomponent. `type` is only `list-style-type` and works.",
+              "attribute": "type",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessList",
+                "module": "src/list/root/list-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "tier",
               "type": {
                 "text": "string"
@@ -39516,6 +39921,18 @@
               },
               "description": "What kind of list this is, which is a fact about the content.\n\nOn the headless tier because it is meaning rather than decoration, the same\nargument `severity` makes on `Callout`. A numbered list is numbered because\nthe order carries information; a bulleted one is bulleted because the items\nare a set and the order does not. That distinction is the reader's, and it\nhas to survive with the stylesheet turned off.\n\n- `default` is a run of rows and takes no marker. It is what a list of\n  settings or files is: neither ordered nor a set to be counted.\n- `ordered` numbers them, for steps.\n- `unordered` bullets them, for a set.\n- `description` pairs each row's label with its supporting text as a term\n  and what the term means.\n\n**`description` reuses the row's existing slots rather than inventing a\n  second kind of row.** A term and its description is exactly the label and\n  the supporting text `List.Item` already has, so the kind changes how the\n  pair is drawn and nothing about what a consumer writes. A separate\n  `List.Term` element would be a second row shape for one attribute's sake.",
               "fieldName": "kind",
+              "inheritedFrom": {
+                "name": "HelixHeadlessList",
+                "module": "src/list/root/list-root.ts"
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'1' | 'a' | 'A' | 'i' | 'I' | undefined"
+              },
+              "description": "Which markers an ordered list draws, in `<ol type>`'s own five values.\n\nReflected, because this is one of the things a stylesheet selects on and\nthe styled tier maps each to a `list-style-type`. The platform's spellings\nrather than the CSS ones, so `<helix-list kind=\"ordered\" type=\"i\">` is what\na consumer would have written on an `<ol>`.\n\n**`start` and `reversed` are both absent and neither can be done here.**\nThis renders no `<ol>`: the rows are slotted and numbered by the CSS\n`list-item` counter, and that counter is not author-resettable. Measured in\nChrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a\n`<ul>`, or even on a real `<ol>`, while `<ol start=\"5\">` does and a *named*\ncounter with explicit `::before` content does. So the markers would have to\nbe rebuilt out of generated content to gain a start, which is a different\ncomponent. `type` is only `list-style-type` and works.",
+              "fieldName": "type",
               "inheritedFrom": {
                 "name": "HelixHeadlessList",
                 "module": "src/list/root/list-root.ts"
@@ -40298,6 +40715,31 @@
               "privacy": "protected",
               "readonly": true,
               "default": "new DisabledCascadeController(this, { items: () => this.options, })",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectedIndex",
+              "type": {
+                "text": "number"
+              },
+              "description": "Which option is chosen, as an index, or `-1` where none is.\n\n`<select>`'s own pair, and this control is what stands in for one. The\noptions are the consumer's own light-DOM children, so an index is a\nposition among the elements they wrote rather than into anything this\nrenders, which is what makes it the same number `<select>` would give.\n\nWith `multiple` it is the first chosen one, which is also what the platform\nanswers: a single index cannot describe a set, and `value` is the property\nthat can.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which kind of chooser this is, in the platform's two words.\n\nDerived rather than declared, because `multiple` already decides it and a\nsecond property could disagree.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -48794,6 +49236,28 @@
             },
             {
               "kind": "field",
+              "name": "defaultSelected",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the markup declared this one chosen, which is what a reset returns to.\n\n`<option selected>` reflects to `defaultSelected` and `option.selected` is\nlive state that does not reflect, and those are two different facts. This\nelement has one `selected` doing both jobs, so what is captured here is what\nthe markup said at upgrade, before anything could overwrite it: read the\nattribute later and the listbox's own writes answer instead.\n\n**The deeper half is 302 and is not this.** State reflecting under the\ndeclaration's name is the fault `TreeItem` already avoids by mirroring to\n`data-selected`, and four families here still write `selected` back into a\nconsumer's markup. Splitting them means moving what every stylesheet selects\non, which is a change of its own rather than a property being added.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "seeded",
+              "privacy": "private",
+              "description": "What the markup said, read once at construction for the reason above.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "selected",
               "type": {
                 "text": "boolean"
@@ -48802,6 +49266,20 @@
               "description": "Whether this choice is currently chosen. Written by the listbox.",
               "attribute": "selected",
               "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A shorter name for this choice, for where the row does not fit.\n\n`<option label>`'s own meaning: the text a chooser shows when it has less\nroom than the row does, which is what a select's closed trigger has. Empty\nmeans the row's own content, which is the common case and is why this is not\nsimply the accessible name.",
+              "attribute": "label",
               "inheritedFrom": {
                 "name": "HelixHeadlessOption",
                 "module": "src/option/root/option-root.ts"
@@ -49151,6 +49629,19 @@
               "default": "false",
               "description": "Whether this choice is currently chosen. Written by the listbox.",
               "fieldName": "selected",
+              "inheritedFrom": {
+                "name": "HelixHeadlessOption",
+                "module": "src/option/root/option-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A shorter name for this choice, for where the row does not fit.\n\n`<option label>`'s own meaning: the text a chooser shows when it has less\nroom than the row does, which is what a select's closed trigger has. Empty\nmeans the row's own content, which is the common case and is why this is not\nsimply the accessible name.",
+              "fieldName": "label",
               "inheritedFrom": {
                 "name": "HelixHeadlessOption",
                 "module": "src/option/root/option-root.ts"
@@ -56336,6 +56827,28 @@
             },
             {
               "kind": "field",
+              "name": "defaultSelected",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the markup declared this one chosen, which is what a reset returns to.\n\n`<option selected>` reflects to `defaultSelected` and `option.selected` is\nlive state that does not reflect, and those are two different facts. This\nelement has one `selected` doing both jobs, so what is captured here is what\nthe markup said at upgrade, before anything could overwrite it: read the\nattribute later and the listbox's own writes answer instead.\n\n**The deeper half is 302 and is not this.** State reflecting under the\ndeclaration's name is the fault `TreeItem` already avoids by mirroring to\n`data-selected`, and four families here still write `selected` back into a\nconsumer's markup. Splitting them means moving what every stylesheet selects\non, which is a change of its own rather than a property being added.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "seeded",
+              "privacy": "private",
+              "description": "What the markup said, read once at construction for the reason above.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "selected",
               "type": {
                 "text": "boolean"
@@ -57226,6 +57739,20 @@
             },
             {
               "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The lowest score a reader can give, which is what clearing returns to.\n\nZero rather than one, because \"no rating\" and \"the worst rating\" are\ndifferent answers and a control that cannot express the first has to\npretend the second. A survey that requires an answer says so with\n`required`, not by making one unreachable.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "step",
               "type": {
                 "text": "number"
@@ -57902,6 +58429,19 @@
               "default": "5",
               "description": "How many marks there are.",
               "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixHeadlessRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The lowest score a reader can give, which is what clearing returns to.\n\nZero rather than one, because \"no rating\" and \"the worst rating\" are\ndifferent answers and a control that cannot express the first has to\npretend the second. A survey that requires an answer says so with\n`required`, not by making one unreachable.",
+              "fieldName": "min",
               "inheritedFrom": {
                 "name": "HelixHeadlessRating",
                 "module": "src/rating/root/rating-root.ts"
@@ -61613,6 +62153,31 @@
               "default": "'Choose'",
               "description": "Shown on the trigger while nothing is chosen.",
               "attribute": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectedIndex",
+              "type": {
+                "text": "number"
+              },
+              "description": "Which option is chosen, as an index, or `-1` where none is.\n\nRead off the listbox this renders, which owns the options and is where the\nsame two properties are implemented. Delegating rather than recomputing is\nwhat keeps a composed control and the control inside it from answering\ndifferently: they are one chooser to a consumer.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which kind of chooser this is, in the platform's two words.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessSelect",
                 "module": "src/select/root/select-root.ts"
@@ -75929,6 +76494,21 @@
               }
             },
             {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "attribute": "read-only",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "focus",
               "return": {
@@ -76571,6 +77151,19 @@
               "default": "'Choose a time'",
               "description": "Accessible name for the control that opens the list.",
               "fieldName": "triggerLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "fieldName": "readOnly",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
@@ -77618,6 +78211,51 @@
               }
             },
             {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "attribute": "read-only",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while nothing is chosen.",
+              "attribute": "required",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reportRequired",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports \"required and empty\", or clears it.\n\nWritten out rather than taken from `MixinField`, which is where the seven\nform controls get this. That mixin brings a label, a hint and a feedback\nregion with it, and this is a grid rather than a field: it is composed\n*into* the field that has those, so taking the mixin would give one control\ntwo of each. What is shared is five lines, and the anchor is what the\nbrowser points its bubble at.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "revealWhenSettled",
               "privacy": "private",
@@ -78199,6 +78837,32 @@
               },
               "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
               "fieldName": "variant",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "name": "read-only",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control refuses changes while still submitting its value.\n\n**Enforced by refusing every request in one place**, which is the seam this\ncomponent already has: `requestValue` is what every path here comes through,\nand gating it once is what stops the next call site from being written\nwithout the check.\n\nNot `disabled`, which is the confusion worth naming: a disabled control\nsubmits nothing and leaves the tab order, and a read-only one submits its\nvalue and stays reachable, which is what a form showing a value somebody\nelse set needs.",
+              "fieldName": "readOnly",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the form refuses to submit while nothing is chosen.",
+              "fieldName": "required",
               "inheritedFrom": {
                 "name": "HelixHeadlessTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"
@@ -81352,6 +82016,28 @@
               "default": "''",
               "description": "Identifies the item to the group.",
               "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixHeadlessToggle",
+                "module": "src/toggle/root/toggle-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultSelected",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the markup declared this one chosen, which is what a reset returns to.\n\n`<option selected>` reflects to `defaultSelected` and `option.selected` is\nlive state that does not reflect, and those are two different facts. This\nelement has one `selected` doing both jobs, so what is captured here is what\nthe markup said at upgrade, before anything could overwrite it: read the\nattribute later and the listbox's own writes answer instead.\n\n**The deeper half is 302 and is not this.** State reflecting under the\ndeclaration's name is the fault `TreeItem` already avoids by mirroring to\n`data-selected`, and four families here still write `selected` back into a\nconsumer's markup. Splitting them means moving what every stylesheet selects\non, which is a change of its own rather than a property being added.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessToggle",
+                "module": "src/toggle/root/toggle-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "seeded",
+              "privacy": "private",
+              "description": "What the markup said, read once at construction for the reason above.",
               "inheritedFrom": {
                 "name": "HelixHeadlessToggle",
                 "module": "src/toggle/root/toggle-root.ts"

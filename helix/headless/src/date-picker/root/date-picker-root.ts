@@ -245,6 +245,22 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   @property()
   min = ''
 
+  /**
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, and there was no way to say that: `disable-dates` takes a list
+   * and a year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
+   */
+  @property({ type: Number })
+  step = 1
+
   /** Latest selectable date, as `YYYY-MM-DD`. */
   @property()
   max = ''
@@ -356,6 +372,17 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     }
     if (list(this.disableDays).includes(String(date.getUTCDay()))) {
       return true
+    }
+    /* Counted from `min` where there is one and from the epoch where there is
+       not, which is what the platform does with a `step` and no `min`. Whole
+       days, because both ends are midnight UTC and neither carries a time. */
+    const step = Math.max(1, Math.floor(this.step) || 1)
+    if (step > 1) {
+      const base = this.min === '' ? 0 : (asDate(this.min)?.getTime() ?? 0)
+      const days = Math.round((date.getTime() - base) / 86_400_000)
+      if (days % step !== 0) {
+        return true
+      }
     }
     return list(this.disableDates).includes(iso)
   }
@@ -490,6 +517,56 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     this.removeEventListener('keydown', this.handleKeydown)
   }
 
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /** Whether the form refuses to submit while nothing is chosen. */
+  @property({ reflect: true, type: Boolean })
+  required = false
+
+  /**
+   * Reports "required and empty", or clears it.
+   *
+   * Written out rather than taken from `MixinField`, which is where the seven
+   * form controls get this. That mixin brings a label, a hint and a feedback
+   * region with it, and this is a grid rather than a field: it is composed
+   * *into* the field that has those, so taking the mixin would give one control
+   * two of each. What is shared is five lines, and the anchor is what the
+   * browser points its bubble at.
+   */
+  private reportRequired(): void {
+    if (this.required && this.value === '') {
+      this.internals.setValidity(
+        { valueMissing: true },
+        'Choose a date.',
+        this.renderRoot?.querySelector<HTMLElement>('[part="grid"]') ?? undefined,
+      )
+    } else {
+      this.internals.setValidity({})
+    }
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
@@ -503,6 +580,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     this.internals.ariaDisabled = this.isDisabled ? 'true' : null
     this.internals.ariaInvalid = this.invalid ? 'true' : null
     this.report()
+  }
+
+  /**
+   * Reports validity after render, because the bubble needs somewhere to point.
+   *
+   * `updated` and not `willUpdate`: the anchor is a rendered part, and on the
+   * first pass through `willUpdate` there is no grid yet, so the browser would
+   * put the message in the corner of the viewport rather than on the calendar.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.reportRequired()
   }
 
   /**

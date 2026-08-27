@@ -446,6 +446,56 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /** Whether the form refuses to submit while nothing is chosen. */
+  @property({ reflect: true, type: Boolean })
+  required = false
+
+  /**
+   * Reports "required and empty", or clears it.
+   *
+   * Written out rather than taken from `MixinField`, which is where the seven
+   * form controls get this. That mixin brings a label, a hint and a feedback
+   * region with it, and this is a grid rather than a field: it is composed
+   * *into* the field that has those, so taking the mixin would give one control
+   * two of each. What is shared is five lines, and the anchor is what the
+   * browser points its bubble at.
+   */
+  private reportRequired(): void {
+    if (this.required && this.value === '') {
+      this.internals.setValidity(
+        { valueMissing: true },
+        'Choose a time.',
+        this.renderRoot?.querySelector<HTMLElement>('[part="list"]') ?? undefined,
+      )
+    } else {
+      this.internals.setValidity({})
+    }
+  }
+
+  /**
    * Reveals once the wheels have rendered themselves.
    *
    * `updated` is this element's own moment, and each wheel is a `helix-listbox`
@@ -485,6 +535,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.reportRequired()
     this.reveal()
     void this.revealWhenSettled()
   }

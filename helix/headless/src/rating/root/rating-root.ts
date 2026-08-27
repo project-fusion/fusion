@@ -98,6 +98,17 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   max = 5
 
   /**
+   * The lowest score a reader can give, which is what clearing returns to.
+   *
+   * Zero rather than one, because "no rating" and "the worst rating" are
+   * different answers and a control that cannot express the first has to
+   * pretend the second. A survey that requires an answer says so with
+   * `required`, not by making one unreachable.
+   */
+  @property({ type: Number })
+  min = 0
+
+  /**
    * The smallest part of a mark that can be chosen.
    *
    * `0.5` is the half star, and it is the reason the value is a number rather

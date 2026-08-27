@@ -49,6 +49,26 @@ export class HelixHeadlessList extends HelixElement {
   @property({ reflect: true })
   kind?: 'default' | 'description' | 'ordered' | 'unordered'
 
+  /**
+   * Which markers an ordered list draws, in `<ol type>`'s own five values.
+   *
+   * Reflected, because this is one of the things a stylesheet selects on and
+   * the styled tier maps each to a `list-style-type`. The platform's spellings
+   * rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
+   * a consumer would have written on an `<ol>`.
+   *
+   * **`start` and `reversed` are both absent and neither can be done here.**
+   * This renders no `<ol>`: the rows are slotted and numbered by the CSS
+   * `list-item` counter, and that counter is not author-resettable. Measured in
+   * Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a
+   * `<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a *named*
+   * counter with explicit `::before` content does. So the markers would have to
+   * be rebuilt out of generated content to gain a start, which is a different
+   * component. `type` is only `list-style-type` and works.
+   */
+  @property({ reflect: true })
+  type?: '1' | 'a' | 'A' | 'i' | 'I'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'list' })

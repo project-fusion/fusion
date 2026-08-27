@@ -450,7 +450,7 @@ describe('the data property', () => {
    * assigns no property to a custom element while hydrating: the server renderer
    * reaches `typeof value === 'object'` and drops the prop, and the client's
    * hydrate path only diffs. Both halves skip it and agree, so a React consumer
-   * writing `rows={rows}` got a correctly labelled, permanently empty grid with
+   * writing `rows={rows}` got a correctly labeled, permanently empty grid with
    * no warning from anybody.
    *
    * Asserted here as well as in `helix/core`, because the core spec proves the
