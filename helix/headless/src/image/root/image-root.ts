@@ -95,6 +95,27 @@ export class HelixHeadlessImage extends HelixElement {
   fetchPriority: 'auto' | 'high' | 'low' = 'auto'
 
   /**
+   * Whether the browser may decode off the main thread.
+   *
+   * **The template hardcoded `async` and a consumer could not reach it**, which
+   * is worse than the property being absent: the decision was taken on their
+   * behalf and nothing said so. `async` is still the resting value and still
+   * right for a picture in a page, and `sync` is what a consumer reaches for
+   * when the picture is about to be composited with something else and a tear
+   * would show.
+   */
+  @property()
+  decoding: 'async' | 'auto' | 'sync' = 'async'
+
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  @property({ attribute: 'crossorigin' })
+  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+
+  /** How much of the referring URL to send with the request. */
+  @property({ attribute: 'referrerpolicy' })
+  referrerPolicy = ''
+
+  /**
    * Whether the picture is on its way, here, or never coming.
    *
    * Read-only to a consumer: it is a report rather than a setting.
@@ -224,12 +245,52 @@ export class HelixHeadlessImage extends HelixElement {
     this.settle()
   }
 
+  /**
+   * The picture's own state, under the platform's own names.
+   *
+   * The `<img>` is inside this shadow root, so a consumer asking how big the
+   * picture turned out to be, or whether it is already there, had nowhere to
+   * ask: `querySelector` does not cross a shadow boundary. `status` answers a
+   * narrower question and answers it in this library's words, which is the
+   * right report for the three states this element draws and is not a
+   * substitute for the numbers.
+   *
+   * `naturalWidth` and `naturalHeight` are the case worth having: they are how
+   * a consumer sizes a lightbox or works out an aspect ratio, and they exist
+   * nowhere else on the page.
+   */
+  private get image(): HTMLImageElement | null {
+    return this.renderRoot?.querySelector('img') ?? null
+  }
+
+  /** Whether the picture has finished arriving, however it went. */
+  get complete(): boolean {
+    return this.image?.complete ?? false
+  }
+
+  /** Which candidate the browser actually chose out of `srcset`. */
+  get currentSrc(): string {
+    return this.image?.currentSrc ?? ''
+  }
+
+  /** The picture's own height in pixels, and zero until it has arrived. */
+  get naturalHeight(): number {
+    return this.image?.naturalHeight ?? 0
+  }
+
+  /** The picture's own width in pixels, and zero until it has arrived. */
+  get naturalWidth(): number {
+    return this.image?.naturalWidth ?? 0
+  }
+
   protected override render(): TemplateResult {
     return html`<img
         part="image"
         alt=${this.alt}
         loading=${this.loading ?? 'lazy'}
-        decoding="async"
+        decoding=${this.decoding}
+        crossorigin=${this.crossOrigin ?? nothing}
+        referrerpolicy=${this.referrerPolicy || nothing}
         fetchpriority=${this.fetchPriority}
         src=${this.src || nothing}
         srcset=${this.srcset || nothing}

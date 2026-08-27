@@ -107,15 +107,32 @@ const ownMembers = (source, name) => {
     at += 1
   }
   const members = new Set()
+  /* Carried from the doc comment onto the member it documents, because the
+     answer is already in the file being read. `DEPRECATED` below is a hand list
+     of the same fact, and a hand copy of something the source states drifts: it
+     was missing `HTMLImageElement.name`, which lib.dom marks and which the
+     parser could not see because it skips comment lines. Reading the marker
+     leaves the list holding only what is not marked, which is the half that
+     needs a person. */
+  let deprecated = false
   for (const line of source.slice(start, at - 1).split('\n')) {
     const text = line.trim()
-    if (text === '' || text.startsWith('/') || text.startsWith('*')) {
+    if (text.startsWith('/') || text.startsWith('*')) {
+      if (text.includes('@deprecated')) {
+        deprecated = true
+      }
+      continue
+    }
+    if (text === '') {
       continue
     }
     const property = /^(?:readonly\s+)?([a-zA-Z][a-zA-Z0-9]*)\s*:\s/.exec(text)
     if (property && !text.slice(0, text.indexOf(':')).includes('(')) {
-      members.add(property[1])
+      if (!deprecated) {
+        members.add(property[1])
+      }
     }
+    deprecated = false
   }
   return members
 }
@@ -323,6 +340,10 @@ const EXCUSED = {
     value:
       'The native `value` is `C:\\fakepath\\name`, a lie the platform tells for privacy. `files` is the real surface.',
   },
+  'helix-image': {
+    x: "Where the `<img>` sits relative to the root, which is the inner element's position inside this shadow root and answers a question nobody asked. A consumer measuring the picture on the page calls `getBoundingClientRect()` on the host, which is the box they wrote.",
+    y: 'The other half of `x`, and the same answer.',
+  },
   'helix-option': {
     index: 'Derived from position among siblings, which the parent owns.',
   },
@@ -496,7 +517,11 @@ for (const module of manifest.modules ?? []) {
          for `currentTime` only because its own mirror happens to be spelled
          `position`. Getting the name wrong was the whole of what the check
          could see. Thirty-nine of Video's fifty-nine fields are private. */
-      if (member.kind === 'field' && member.privacy !== 'private' && member.privacy !== 'protected') {
+      if (
+        member.kind === 'field' &&
+        member.privacy !== 'private' &&
+        member.privacy !== 'protected'
+      ) {
         names.add(member.name)
       }
     }

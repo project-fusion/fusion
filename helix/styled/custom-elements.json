@@ -9830,9 +9830,8 @@
               "kind": "field",
               "name": "author",
               "type": {
-                "text": "string"
+                "text": "string | undefined"
               },
-              "default": "''",
               "description": "Who said it.\n\nFree text rather than a two-value union, because a conversation is not\nalways two-sided: a transcript with a system turn, a tool call and three\nparticipants is the ordinary case for anything worth building this for.\n`me` and `them` are the conventional values and the stylesheet knows them;\nanything else is a name the consumer styles.",
               "attribute": "author",
               "reflects": true,
@@ -9845,9 +9844,8 @@
               "kind": "field",
               "name": "state",
               "type": {
-                "text": "'' | 'failed' | 'sending' | 'sent' | 'streaming'"
+                "text": "'failed' | 'sending' | 'sent' | 'streaming' | undefined"
               },
-              "default": "''",
               "description": "What has happened to it.\n\nReflected, because every one of the four is a visual state and a stylesheet\nhas no other way to know. Empty is a settled message with nothing to report,\nwhich is what most of a transcript is.",
               "attribute": "state",
               "reflects": true,
@@ -10119,9 +10117,8 @@
             {
               "name": "author",
               "type": {
-                "text": "string"
+                "text": "string | undefined"
               },
-              "default": "''",
               "description": "Who said it.\n\nFree text rather than a two-value union, because a conversation is not\nalways two-sided: a transcript with a system turn, a tool call and three\nparticipants is the ordinary case for anything worth building this for.\n`me` and `them` are the conventional values and the stylesheet knows them;\nanything else is a name the consumer styles.",
               "fieldName": "author",
               "inheritedFrom": {
@@ -10132,9 +10129,8 @@
             {
               "name": "state",
               "type": {
-                "text": "'' | 'failed' | 'sending' | 'sent' | 'streaming'"
+                "text": "'failed' | 'sending' | 'sent' | 'streaming' | undefined"
               },
-              "default": "''",
               "description": "What has happened to it.\n\nReflected, because every one of the four is a visual state and a stylesheet\nhas no other way to know. Empty is a settled message with nothing to report,\nwhich is what most of a transcript is.",
               "fieldName": "state",
               "inheritedFrom": {
@@ -28694,11 +28690,10 @@
               "kind": "field",
               "name": "direction",
               "type": {
-                "text": "'back' | 'forward'"
+                "text": "'back' | 'forward' | undefined"
               },
               "privacy": "private",
-              "default": "'forward'",
-              "description": "Which way the last move went, for whatever animates the change.\n\nReflected as `data-direction`, because the styled tier cannot know it: both\nmoves replace one page with another, and only the stack knows whether the\nreader went deeper or came back. Without it a slide has to pick one\ndirection and be wrong half the time.",
+              "description": "Which way the last move went, for whatever animates the change.\n\nReflected as `data-direction`, because the styled tier cannot know it: both\nmoves replace one page with another, and only the stack knows whether the\nreader went deeper or came back. Without it a slide has to pick one\ndirection and be wrong half the time.\n\n**Undefined until a move has happened**, which is what \"the last move\" means\nbefore there has been one. It defaulted to `forward` and was written on the\nfirst update, which cost two things: an attribute on the host that a\nconsumer's server never sent, reported as a hydration mismatch, and a first\npage that animated itself in on load, since an animation is not a transition\nand the settle guard does not suppress it.",
               "inheritedFrom": {
                 "name": "HelixHeadlessDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
@@ -33488,6 +33483,48 @@
             },
             {
               "kind": "field",
+              "name": "decoding",
+              "type": {
+                "text": "'async' | 'auto' | 'sync'"
+              },
+              "default": "'async'",
+              "description": "Whether the browser may decode off the main thread.\n\n**The template hardcoded `async` and a consumer could not reach it**, which\nis worse than the property being absent: the decision was taken on their\nbehalf and nothing said so. `async` is still the resting value and still\nright for a picture in a page, and `sync` is what a consumer reaches for\nwhen the picture is about to be composited with something else and a tear\nwould show.",
+              "attribute": "decoding",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "crossOrigin",
+              "type": {
+                "text": "'anonymous' | 'use-credentials' | null"
+              },
+              "default": "null",
+              "description": "How the picture is fetched across origins, which decides whether a canvas can read it.",
+              "attribute": "crossorigin",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "referrerPolicy",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How much of the referring URL to send with the request.",
+              "attribute": "referrerpolicy",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "status",
               "type": {
                 "text": "'error' | 'loaded' | 'loading'"
@@ -33573,6 +33610,72 @@
                 }
               },
               "description": "Catches the picture that was already there.\n\nA cached image can finish loading before this element has a listener on it,\nand then `load` never fires and the placeholder stays up over a picture that\nis sitting right behind it. `complete` is the platform's own answer to that\nquestion, and `naturalWidth` separates a decoded picture from one that\ncarries no pixels, which `complete` reports as finished either way.\n\n**It can only ever conclude success.** A picture that has not been attempted\nlooks exactly like one that failed: `complete` is true and `naturalWidth` is\nzero for both, and a DOM that never fetches anything reports that for every\nimage it has. Deciding `error` here called every picture broken the moment\nit rendered. Failure has an event of its own and that event is reliable, so\nthis is only here to catch the success that happened too early to hear.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "image",
+              "type": {
+                "text": "HTMLImageElement | null"
+              },
+              "privacy": "private",
+              "description": "The picture's own state, under the platform's own names.\n\nThe `<img>` is inside this shadow root, so a consumer asking how big the\npicture turned out to be, or whether it is already there, had nowhere to\nask: `querySelector` does not cross a shadow boundary. `status` answers a\nnarrower question and answers it in this library's words, which is the\nright report for the three states this element draws and is not a\nsubstitute for the numbers.\n\n`naturalWidth` and `naturalHeight` are the case worth having: they are how\na consumer sizes a lightbox or works out an aspect ratio, and they exist\nnowhere else on the page.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "complete",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the picture has finished arriving, however it went.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "currentSrc",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which candidate the browser actually chose out of `srcset`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "naturalHeight",
+              "type": {
+                "text": "number"
+              },
+              "description": "The picture's own height in pixels, and zero until it has arrived.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "naturalWidth",
+              "type": {
+                "text": "number"
+              },
+              "description": "The picture's own width in pixels, and zero until it has arrived.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessImage",
                 "module": "src/image/root/image-root.ts"
@@ -33794,6 +33897,45 @@
               "default": "'auto'",
               "description": "How urgently to fetch it, for the one picture that is the page.\n\nThe hero of a page is usually its largest contentful paint, and the fix is\ntwo attributes rather than one: `loading=\"eager\"` stops it waiting for the\nviewport, and this stops it queueing behind everything else the parser\nfound first. Left alone the browser decides, which is right for the other\nninety-nine pictures.",
               "fieldName": "fetchPriority",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "name": "decoding",
+              "type": {
+                "text": "'async' | 'auto' | 'sync'"
+              },
+              "default": "'async'",
+              "description": "Whether the browser may decode off the main thread.\n\n**The template hardcoded `async` and a consumer could not reach it**, which\nis worse than the property being absent: the decision was taken on their\nbehalf and nothing said so. `async` is still the resting value and still\nright for a picture in a page, and `sync` is what a consumer reaches for\nwhen the picture is about to be composited with something else and a tear\nwould show.",
+              "fieldName": "decoding",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "name": "crossorigin",
+              "type": {
+                "text": "'anonymous' | 'use-credentials' | null"
+              },
+              "default": "null",
+              "description": "How the picture is fetched across origins, which decides whether a canvas can read it.",
+              "fieldName": "crossOrigin",
+              "inheritedFrom": {
+                "name": "HelixHeadlessImage",
+                "module": "src/image/root/image-root.ts"
+              }
+            },
+            {
+              "name": "referrerpolicy",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How much of the referring URL to send with the request.",
+              "fieldName": "referrerPolicy",
               "inheritedFrom": {
                 "name": "HelixHeadlessImage",
                 "module": "src/image/root/image-root.ts"
@@ -73202,6 +73344,47 @@
             },
             {
               "kind": "field",
+              "name": "cols",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How many characters wide the box is, where the layout is not deciding.\n\nOptional and absent by default, which is the reflected-property rule: a\n`<textarea>` left alone is 20 columns wide and a styled one is whatever its\nbox says, so writing a number here is a departure rather than the resting\nstate. `wrap=\"hard\"` needs it, the two being the pair that decides where\nthe browser inserts the line breaks it submits.",
+              "attribute": "cols",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dirName",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name a second entry carries, holding which way the text runs.\n\n**Submitted through `setFormValue`, because the inner control's own\n`dirname` cannot reach the form.** This host is form-associated and reports\nits value itself, so the `<textarea>` inside the shadow root participates in\nno form at all and forwarding the attribute would have looked right and\nsubmitted nothing. `ElementInternals` takes a `FormData`, which is how one\nelement sends two entries, and that is what this does.",
+              "attribute": "dirname",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "wrap",
+              "type": {
+                "text": "'hard' | 'off' | 'soft'"
+              },
+              "default": "'soft'",
+              "description": "How the browser wraps the text, and whether the breaks are submitted with it.",
+              "attribute": "wrap",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "shadowRootOptions",
               "type": {
                 "text": "ShadowRootInit"
@@ -73272,6 +73455,121 @@
               },
               "privacy": "private",
               "description": "Re-measures when the box changes rather than only when a property does.\n\nThe height was computed on Lit updates alone, and nothing about a container\nnarrowing, a font swapping, or the field finally gaining a layout box is a\nproperty change here. A field that wrapped to three lines at one width kept\na three-line height at half the width and clipped the rest behind\n`overflow: hidden`, with no way for a reader to reach it.\n\nObserving the control also covers the zero case above from the other side:\na `ResizeObserver` fires when an element gains a box, so a field that was\nhidden when it first tried to grow measures itself the moment it is shown.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "FormData | string"
+                }
+              },
+              "description": "What the form receives, which is two entries where `dirName` asks for it.\n\nA plain string otherwise, because that is the common case and a `FormData`\nof one entry says the same thing at more cost. The direction is read off\nthe control rather than assumed, so a field a consumer set `dir=\"rtl\"` on,\nor one inside an RTL document, submits what the reader actually saw.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectionDirection",
+              "type": {
+                "text": "SelectionDirection"
+              },
+              "description": "The caret and the selection, under the platform's own names.\n\n**The whole reason this renders a real `<textarea>` is the caret**, and the\ncaret was the one thing a consumer could not reach: the control is inside\nthis shadow root, so `querySelector` does not find it and there was no way\nto ask where the selection is, let alone move it. A field that cannot be\nscripted at the caret cannot do an insert-at-cursor toolbar, which is the\nfirst thing anybody builds on a textarea.\n\nWritten through to the control, and answering zero before there is one,\nwhich is where an empty field's caret would be anyway.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectionEnd",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the selection ends, as an offset into the value.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selectionStart",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where the selection starts, as an offset into the value.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setSelectionRange",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "start",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "end",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "direction",
+                  "optional": true,
+                  "type": {
+                    "text": "SelectionDirection"
+                  }
+                }
+              ],
+              "description": "Selects a range, which is the one operation the three accessors above\ncannot express between them.\n\nSetting `selectionStart` past the current `selectionEnd` drags the end\nalong, so the two writes a consumer would make in sequence do not compose\ninto the range they asked for. The platform has this method for that reason\nand so does this.",
+              "type": {
+                "text": "setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "textLength",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many characters the value holds.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "string"
+              },
+              "description": "What kind of control this is, which for a textarea is always the one word.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
@@ -73821,6 +74119,44 @@
               "default": "3",
               "description": "How many lines the box is before anything is typed.",
               "fieldName": "rows",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "name": "cols",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How many characters wide the box is, where the layout is not deciding.\n\nOptional and absent by default, which is the reflected-property rule: a\n`<textarea>` left alone is 20 columns wide and a styled one is whatever its\nbox says, so writing a number here is a departure rather than the resting\nstate. `wrap=\"hard\"` needs it, the two being the pair that decides where\nthe browser inserts the line breaks it submits.",
+              "fieldName": "cols",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "name": "dirname",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name a second entry carries, holding which way the text runs.\n\n**Submitted through `setFormValue`, because the inner control's own\n`dirname` cannot reach the form.** This host is form-associated and reports\nits value itself, so the `<textarea>` inside the shadow root participates in\nno form at all and forwarding the attribute would have looked right and\nsubmitted nothing. `ElementInternals` takes a `FormData`, which is how one\nelement sends two entries, and that is what this does.",
+              "fieldName": "dirName",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "name": "wrap",
+              "type": {
+                "text": "'hard' | 'off' | 'soft'"
+              },
+              "default": "'soft'",
+              "description": "How the browser wraps the text, and whether the breaks are submitted with it.",
+              "fieldName": "wrap",
               "inheritedFrom": {
                 "name": "HelixHeadlessTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
@@ -87262,12 +87598,12 @@
             },
             {
               "kind": "field",
-              "name": "muted",
+              "name": "defaultMuted",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether it starts silent, which is what an autoplaying video must do.",
+              "description": "Whether it *starts* silent, which is what an autoplaying video must do.\n\n**Renamed from `muted`, because that is what it always was.** The platform\nsplits these two: the `muted` content attribute reflects to `defaultMuted`,\nand the `muted` property is live state a reader's click moves without\ntouching the attribute. This element declared one property called `muted`,\nbound it to the attribute, and tracked the live state privately as\n`silent`, so `<helix-video>.muted` answered what the author wrote rather\nthan whether there was sound. A name matching the platform's while meaning\nsomething else is worse than a name the platform does not have, and\n`check:platform-fidelity` could not see it: it compares names.",
               "attribute": "muted",
               "reflects": true,
               "inheritedFrom": {
@@ -87313,6 +87649,65 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "attribute": "preload",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "autoplay",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts on its own, which a browser only allows while silent.\n\nForwarded rather than acted on. Whether an unprompted play is permitted is\nthe browser's policy and not this element's, and `play()` already swallows\nthe refusal: what follows a refused autoplay is a paused player showing its\nstart control, which is the correct thing to be looking at.",
+              "attribute": "autoplay",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "crossOrigin",
+              "type": {
+                "text": "'anonymous' | 'use-credentials' | null"
+              },
+              "default": "null",
+              "description": "How the media is fetched across origins, which decides whether a track can be read.",
+              "attribute": "crossorigin",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disablePictureInPicture",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser may offer picture in picture.",
+              "attribute": "disable-picture-in-picture",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableRemotePlayback",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser may offer playback on a remote device.",
+              "attribute": "disable-remote-playback",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"
@@ -87513,7 +87908,7 @@
             },
             {
               "kind": "field",
-              "name": "duration",
+              "name": "knownDuration",
               "type": {
                 "text": "number"
               },
@@ -87757,6 +88152,169 @@
               "privacy": "private",
               "default": "[]",
               "description": "The sources and caption tracks to copy into the video, as the consumer wrote them.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "currentSrc",
+              "type": {
+                "text": "string"
+              },
+              "description": "The media's own state, under the platform's own names.\n\n**This element already knew every one of these and kept them private.** It\ntracks `currentTime` as `position`, `duration` as `knownDuration`, `volume`\nas `loudness`, `paused` as `playing` and `playbackRate` as `rate`, paints\nthem, and published none of them, so a consumer asking where the video had\nreached had nowhere to ask: the `<video>` is inside this shadow root and\n`querySelector` does not cross it. 295 is that finding across the library\nand this is its clearest case.\n\n**Read from the element, with the mirror as the fallback.** The element is\nthe truth and the mirror is a render cache that a media event refreshes, so\nreading the mirror alone would answer with whatever the last `timeupdate`\nsaid rather than with where the video is now. The fallback is what answers\non the server and before the first render, where there is no element and\nthe mirror holds what markup asked for.\n\n**Accessors rather than reactive properties**, because none of these is a\nsetting: they are the media's state, and a `@property` would give each one\nan attribute that a consumer could write and the element would then have to\ndisagree with. Where the platform makes one writable this writes it\nthrough, and where the platform does not neither does this.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "currentTime",
+              "type": {
+                "text": "number"
+              },
+              "description": "Where playback has reached, in seconds.\n\nWriting seeks, through the same clamp `seek` uses, because a `currentTime`\npast the end is the one write the platform answers with an exception.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultPlaybackRate",
+              "type": {
+                "text": "number"
+              },
+              "description": "The rate playback returns to, which `defaultPlaybackRate` names natively.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number"
+              },
+              "description": "How long the media runs, in seconds, and `NaN` until that is known.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ended",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether playback has run off the end.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "paused",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether playback is stopped, which is the resting state and not an error.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "playbackRate",
+              "type": {
+                "text": "number"
+              },
+              "description": "How fast it plays, where 1 is the recorded speed.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "preservesPitch",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether pitch is held steady when the rate changes.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "seeking",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether it is currently moving to a new position.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "videoHeight",
+              "type": {
+                "text": "number"
+              },
+              "description": "The media's own height in pixels, and zero until the metadata has loaded.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "videoWidth",
+              "type": {
+                "text": "number"
+              },
+              "description": "The media's own width in pixels, and zero until the metadata has loaded.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether there is sound, now, which a reader's click moves.\n\nThe live half of the pair above. Writing mutes or unmutes the media itself\nrather than the attribute, which is what the platform does and what the\nmute control here has always done directly.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "volume",
+              "type": {
+                "text": "number"
+              },
+              "description": "How loud it plays, 0 to 1.",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"
@@ -88447,8 +89005,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether it starts silent, which is what an autoplaying video must do.",
-              "fieldName": "muted",
+              "description": "Whether it *starts* silent, which is what an autoplaying video must do.\n\n**Renamed from `muted`, because that is what it always was.** The platform\nsplits these two: the `muted` content attribute reflects to `defaultMuted`,\nand the `muted` property is live state a reader's click moves without\ntouching the attribute. This element declared one property called `muted`,\nbound it to the attribute, and tracked the live state privately as\n`silent`, so `<helix-video>.muted` answered what the author wrote rather\nthan whether there was sound. A name matching the platform's while meaning\nsomething else is worse than a name the platform does not have, and\n`check:platform-fidelity` could not see it: it compares names.",
+              "fieldName": "defaultMuted",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"
@@ -88488,6 +89046,58 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "fieldName": "preload",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "autoplay",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts on its own, which a browser only allows while silent.\n\nForwarded rather than acted on. Whether an unprompted play is permitted is\nthe browser's policy and not this element's, and `play()` already swallows\nthe refusal: what follows a refused autoplay is a paused player showing its\nstart control, which is the correct thing to be looking at.",
+              "fieldName": "autoplay",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "crossorigin",
+              "type": {
+                "text": "'anonymous' | 'use-credentials' | null"
+              },
+              "default": "null",
+              "description": "How the media is fetched across origins, which decides whether a track can be read.",
+              "fieldName": "crossOrigin",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "disable-picture-in-picture",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser may offer picture in picture.",
+              "fieldName": "disablePictureInPicture",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "disable-remote-playback",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser may offer playback on a remote device.",
+              "fieldName": "disableRemotePlayback",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideo",
                 "module": "src/video/root/video-root.ts"

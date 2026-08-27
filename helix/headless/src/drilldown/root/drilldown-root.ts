@@ -74,9 +74,16 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * moves replace one page with another, and only the stack knows whether the
    * reader went deeper or came back. Without it a slide has to pick one
    * direction and be wrong half the time.
+   *
+   * **Undefined until a move has happened**, which is what "the last move" means
+   * before there has been one. It defaulted to `forward` and was written on the
+   * first update, which cost two things: an attribute on the host that a
+   * consumer's server never sent, reported as a hydration mismatch, and a first
+   * page that animated itself in on load, since an animation is not a transition
+   * and the settle guard does not suppress it.
    */
   @state()
-  private direction: 'back' | 'forward' = 'forward'
+  private direction?: 'back' | 'forward'
 
   private readonly drilldown = new DrilldownController<HelixHeadlessDrilldownItem>(this, {
     isRow: (element: Element): boolean =>
@@ -237,7 +244,11 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
     this.placeTabStop()
     this.toggleAttribute('data-drilled', !this.drilldown.atRoot)
-    this.setAttribute('data-direction', this.direction)
+    if (this.direction === undefined) {
+      this.removeAttribute('data-direction')
+    } else {
+      this.setAttribute('data-direction', this.direction)
+    }
   }
 
   /** Walks the tree marking which rows are on the page showing. */

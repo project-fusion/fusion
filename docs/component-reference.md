@@ -1067,11 +1067,11 @@ is the signal, and decorating it competes with the thing it is decorating.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `at` | `at` | `string` | `''` | `HelixHeadlessChatMessage` | When it was said, as anything `Date` parses. |
-| `author` | `author` | `string` | `''` | `HelixHeadlessChatMessage` | Who said it. |
+| `author` | `author` | `string \| undefined` | - | `HelixHeadlessChatMessage` | Who said it. |
 | `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. Empty is the runtime's own. |
 | `retryLabel` | `retry-label` | `string` | `'Try again'` | `HelixHeadlessChatMessage` | Label for the control offered on a failed message. |
 | `sendingLabel` | `sending-label` | `string` | `'Sending'` | `HelixHeadlessChatMessage` | What to call each state, for a reader who cannot see it. |
-| `state` | `state` | `'' \| 'failed' \| 'sending' \| 'sent' \| 'streaming'` | `''` | `HelixHeadlessChatMessage` | What has happened to it. |
+| `state` | `state` | `'failed' \| 'sending' \| 'sent' \| 'streaming' \| undefined` | - | `HelixHeadlessChatMessage` | What has happened to it. |
 
 #### Events
 
@@ -2938,8 +2938,15 @@ base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alt` | `alt` | `string` | `''` | `HelixHeadlessImage` | What it shows, for a reader who cannot see it. |
+| `complete` | - | `boolean` | - | `HelixHeadlessImage` | Whether the picture has finished arriving, however it went. |
+| `crossOrigin` | `crossorigin` | `'anonymous' \| 'use-credentials' \| null` | `null` | `HelixHeadlessImage` | How the picture is fetched across origins, which decides whether a canvas can read it. |
+| `currentSrc` | - | `string` | - | `HelixHeadlessImage` | Which candidate the browser actually chose out of `srcset`. |
+| `decoding` | `decoding` | `'async' \| 'auto' \| 'sync'` | `'async'` | `HelixHeadlessImage` | Whether the browser may decode off the main thread. |
 | `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixHeadlessImage` | How urgently to fetch it, for the one picture that is the page. |
 | `loading` | `loading` | `'eager' \| 'lazy' \| undefined` | - | `HelixHeadlessImage` | Whether to wait until it is nearly on screen. |
+| `naturalHeight` | - | `number` | - | `HelixHeadlessImage` | The picture's own height in pixels, and zero until it has arrived. |
+| `naturalWidth` | - | `number` | - | `HelixHeadlessImage` | The picture's own width in pixels, and zero until it has arrived. |
+| `referrerPolicy` | `referrerpolicy` | `string` | `''` | `HelixHeadlessImage` | How much of the referring URL to send with the request. |
 | `rounded` | `rounded` | `boolean` | `false` | - | Whether the corners are cut. |
 | `sizes` | `sizes` | `string` | `''` | `HelixHeadlessImage` | How much of the line it will take, passed through to the picture. |
 | `src` | `src` | `string` | `''` | `HelixHeadlessImage` | Where the picture is. |
@@ -6368,7 +6375,9 @@ dragged wider than the form holding it is a field that breaks the layout.
 | --- | --- | --- | --- | --- | --- |
 | `autocomplete` | `autocomplete` | `string` | `''` | `HelixHeadlessTextarea` | What the browser may autofill here, as one of the platform's own tokens. |
 | `autoGrow` | `auto-grow` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the box follows its own content rather than scrolling. |
+| `cols` | `cols` | `number \| undefined` | - | `HelixHeadlessTextarea` | How many characters wide the box is, where the layout is not deciding. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `dirName` | `dirname` | `string` | `''` | `HelixHeadlessTextarea` | The name a second entry carries, holding which way the text runs. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -6383,8 +6392,14 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `rows` | `rows` | `number` | `3` | `HelixHeadlessTextarea` | How many lines the box is before anything is typed. |
+| `selectionDirection` | - | `SelectionDirection` | - | `HelixHeadlessTextarea` | The caret and the selection, under the platform's own names. |
+| `selectionEnd` | - | `number` | - | `HelixHeadlessTextarea` | Where the selection ends, as an offset into the value. |
+| `selectionStart` | - | `number` | - | `HelixHeadlessTextarea` | Where the selection starts, as an offset into the value. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessTextarea` | Focus is delegated to the control, so the host is never the target. |
+| `textLength` | - | `number` | - | `HelixHeadlessTextarea` | How many characters the value holds. |
+| `type` | - | `string` | - | `HelixHeadlessTextarea` | What kind of control this is, which for a textarea is always the one word. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `wrap` | `wrap` | `'hard' \| 'off' \| 'soft'` | `'soft'` | `HelixHeadlessTextarea` | How the browser wraps the text, and whether the breaks are submitted with it. |
 
 #### Methods
 
@@ -6395,6 +6410,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `setSelectionRange()` | `HelixHeadlessTextarea` | Selects a range, which is the one operation the three accessors above cannot express between them. |
 
 #### Events
 
@@ -7427,24 +7443,41 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `autoplay` | `autoplay` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it starts on its own, which a browser only allows while silent. |
 | `controls` | `controls` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser draws the controls instead of this element. |
+| `crossOrigin` | `crossorigin` | `'anonymous' \| 'use-credentials' \| null` | `null` | `HelixHeadlessVideo` | How the media is fetched across origins, which decides whether a track can be read. |
+| `currentSrc` | - | `string` | - | `HelixHeadlessVideo` | The media's own state, under the platform's own names. |
+| `currentTime` | - | `number` | - | `HelixHeadlessVideo` | Where playback has reached, in seconds. |
+| `defaultMuted` | `muted` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it *starts* silent, which is what an autoplaying video must do. |
+| `defaultPlaybackRate` | - | `number` | - | `HelixHeadlessVideo` | The rate playback returns to, which `defaultPlaybackRate` names natively. |
+| `disablePictureInPicture` | `disable-picture-in-picture` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer picture in picture. |
+| `disableRemotePlayback` | `disable-remote-playback` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer playback on a remote device. |
+| `duration` | - | `number` | - | `HelixHeadlessVideo` | How long the media runs, in seconds, and `NaN` until that is known. |
+| `ended` | - | `boolean` | - | `HelixHeadlessVideo` | Whether playback has run off the end. |
 | `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixHeadlessVideo` | And what they are told when it will not play at all. |
 | `extraControls` | `extra-controls` | `string` | `''` | `HelixHeadlessVideo` | Controls beyond the ones every player has, named in the order they appear. |
 | `idleDelay` | `idle-delay` | `number` | `2500` | `HelixHeadlessVideo` | How long the bar waits after the pointer stops before it goes, in ms. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessVideo` | Accessible name, since a video is not described by its filename. |
 | `loadingLabel` | `loading-label` | `string` | `'Loading'` | `HelixHeadlessVideo` | What a reader is told while the picture is waiting for more of itself. |
 | `loop` | `loop` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it starts again at the end. |
-| `muted` | `muted` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it starts silent, which is what an autoplaying video must do. |
+| `muted` | - | `boolean` | - | `HelixHeadlessVideo` | Whether there is sound, now, which a reader's click moves. |
 | `overflowControls` | `overflow-controls` | `string` | `''` | `HelixHeadlessVideo` | Controls that go behind one button instead of onto the bar, named the same way. |
+| `paused` | - | `boolean` | - | `HelixHeadlessVideo` | Whether playback is stopped, which is the resting state and not an error. |
 | `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixHeadlessVideo` | And while it would stop it. |
+| `playbackRate` | - | `number` | - | `HelixHeadlessVideo` | How fast it plays, where 1 is the recorded speed. |
 | `playLabel` | `play-label` | `string` | `'Play'` | `HelixHeadlessVideo` | What the play control is called while it would start the video. |
 | `playsInline` | `plays-inline` | `boolean` | `true` | `HelixHeadlessVideo` | Whether it plays where it sits rather than taking over the screen. |
 | `poster` | `poster` | `string` | `''` | `HelixHeadlessVideo` | A still shown before it plays, which the platform draws itself. |
 | `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixHeadlessVideo` | How much to fetch before anything is asked for. |
+| `preservesPitch` | - | `boolean` | - | `HelixHeadlessVideo` | Whether pitch is held steady when the rate changes. |
+| `seeking` | - | `boolean` | - | `HelixHeadlessVideo` | Whether it is currently moving to a new position. |
 | `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
 | `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixHeadlessVideo` | The speeds offered, slowest first, as multipliers of normal. |
 | `src` | `src` | `string` | `''` | `HelixHeadlessVideo` | Where the video is, for the common case of one file. |
 | `startControl` | `start-control` | `'none' \| undefined` | - | `HelixHeadlessVideo` | The big mark over the picture before anything has played, or `none`. |
+| `videoHeight` | - | `number` | - | `HelixHeadlessVideo` | The media's own height in pixels, and zero until the metadata has loaded. |
+| `videoWidth` | - | `number` | - | `HelixHeadlessVideo` | The media's own width in pixels, and zero until the metadata has loaded. |
+| `volume` | - | `number` | - | `HelixHeadlessVideo` | How loud it plays, 0 to 1. |
 
 #### Methods
 

@@ -19,10 +19,37 @@
  * at a time, which is a check that only runs where somebody thought to write it.
  *
  * **What is allowed.** A reflected boolean defaulting to `false` writes nothing,
- * which is the ordinary case and most of the library. A reflected string
- * defaulting to `''` writes nothing. Anything else is either a mismatch or a
- * property that wants to be written in `updated` after the first render, which
- * is what `helix-heatmap` does with `visible` and says why.
+ * which is the ordinary case and most of the library.
+ *
+ * **This said a reflected string defaulting to `''` writes nothing, and that was
+ * false.** Lit reflects the empty string as `author=""`. Measured by mounting
+ * the element: a consumer writing `<helix-chat-message>` got back
+ * `author="" state=""`, so the one component relying on the exemption was the
+ * one shipping the mismatch this file exists to prevent. The exemption is gone
+ * and both properties are undefined at rest.
+ *
+ * **And it offered `updated` as the remedy, which is the same bug.** "Written
+ * after the first render" is not written after hydration: `updated` runs in the
+ * microtask checkpoint `firstUpdated` runs in, before React need have reached
+ * the node. `helix-heatmap` was moved there to satisfy this check and went on
+ * writing `visible="0"` onto every server-rendered instance;
+ * `helix-notifications` did the same with `unread="0"`. That is the fault
+ * `data-settled` was found for four separate times, patched three of them as
+ * route-specific bugs before anyone looked at the cause.
+ *
+ * **The rule is the resting state, not the timing.** A property writes nothing
+ * until it departs from what a consumer's server would have sent, whichever
+ * mechanism writes it. Where the resting state is the one that needs saying, the
+ * hook inverts: `helix-toast-item` publishes `data-closed` rather than
+ * `data-open`, a toast being open at rest.
+ *
+ * **A static pass cannot see most of this**, which is why it is no longer the
+ * only guard. Reflection is one route; `setAttribute`, `toggleAttribute` and a
+ * `dataset` write are three more, and they produce the identical symptom from
+ * somewhere this file has no reason to look.
+ * `helix/headless/src/hydration.dom.spec.ts` mounts every registered element and
+ * fails if it adds anything at all to its own host, which asks the outcome
+ * rather than enumerating the causes.
  *
  * **A getter with no setter is refused outright**, for a different reason worth
  * keeping in the same place: Lit reflects what is in `changedProperties`, and
@@ -58,13 +85,17 @@ const sources = (from, found = []) => {
   return found
 }
 
-/** A default that writes no attribute when reflected. */
+/**
+ * A default that writes no attribute when reflected.
+ *
+ * `''` was on this list and does not belong: Lit reflects the empty string as
+ * `author=""`, measured on `helix-chat-message`, which is the attribute a
+ * consumer's server never sent. An absent initialiser and an explicit
+ * `undefined` are the two that genuinely write nothing, and `false` is the third
+ * because a reflected boolean removes the attribute rather than writing it.
+ */
 const silent = (initializer) =>
-  initializer === undefined ||
-  initializer === 'false' ||
-  initializer === "''" ||
-  initializer === '""' ||
-  initializer === 'undefined'
+  initializer === undefined || initializer === 'false' || initializer === 'undefined'
 
 const problems = []
 let checked = 0

@@ -19,7 +19,7 @@ import '../index.js'
 
    `data-` names are the exception and the library's own answer: a boolean state
    mirrors to one deliberately, the server and the client agree on it, and a
-   pasted `data-open` is inert because nothing reads it as a declaration. A
+   pasted `data-closed` is inert because nothing reads it as a declaration. A
    first version of this asserted no attributes at all and reported
    `Toast.Item`, which was doing exactly the sanctioned thing.
 

@@ -341,7 +341,7 @@ slot[name="icon"]::slotted(*) {
  *
  * Here rather than in the headless tier, which has no CSS: what the state means
  * is the component's, how it is drawn is this tier's. A headless consumer reads
- * `data-open` and decides for themselves. */
+ * `data-closed` and decides for themselves. */
 /* Gone, and it takes its own space with it.
  *
  * `display: none` was instant, so the messages under it jumped up. Collapsing
@@ -353,7 +353,7 @@ slot[name="icon"]::slotted(*) {
  * `visibility: hidden` is what takes it out of the accessibility tree once the
  * height is gone, where `display: none` would have ended the transition before
  * it started. */
-:host(:not([data-open])) [part="item"] {
+:host([data-closed]) [part="item"] {
   /* The last thing holding the box open. Padding is inside the border box and
      survives a zero height, so it has to collapse with the row. */
   padding-block: 0;
@@ -378,7 +378,7 @@ slot[name="icon"]::slotted(*) {
   display: grid;
 }
 
-:host(:not([data-open])) {
+:host([data-closed]) {
   grid-template-rows: minmax(0, 0fr);
   margin-block-start: 0;
   opacity: 0;
@@ -425,8 +425,8 @@ slot[name="icon"]::slotted(*) {
  * indistinguishable from forgotten. */
 @media (prefers-reduced-motion: reduce) {
   :host,
-  :host(:not([data-open])),
-  :host(:not([data-open])) [part="item"] {
+  :host([data-closed]),
+  :host([data-closed]) [part="item"] {
     transition: none;
   }
 

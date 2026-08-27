@@ -257,9 +257,15 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     /* Mirrored for CSS rather than reflected onto `open` itself, which is the
        library's rule about state: a reflected `open` is indistinguishable from
        one the consumer declared, and that attribute is what ownership is read
-       from. `data-open` can never be mistaken for a declaration. */
-    this.toggleAttribute('data-open', this.open)
-    /* And `hidden` beside it, because `data-open` is a hook and not a
+       from. `data-closed` can never be mistaken for a declaration. */
+    /* **`data-closed`, because open is the resting state.** It was `data-open`,
+       written whenever the toast was open, and a toast opens by default: a
+       consumer server-rendering `<helix-toast-item>` got a `data-open` back that
+       React never sent. Inverting keeps a `data-` hook for the headless consumer
+       this publishes it for, and moves the write to the side that only happens
+       after somebody dismisses the message, which is long past hydration. */
+    this.toggleAttribute('data-closed', !this.open)
+    /* And `hidden` beside it, because `data-closed` is a hook and not a
        mechanism. A dismissed toast was hidden by `opacity: 0` and
        `visibility: hidden` in the styled sheet and by nothing at all here, so a
        consumer on this tier had a message that never went away: measured, a

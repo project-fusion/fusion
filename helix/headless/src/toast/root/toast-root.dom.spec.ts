@@ -112,7 +112,7 @@ describe('toast item', () => {
     // which is what `data-` attributes are and why they are not the state.
     expect(found.open).toBe(false)
     await found.updateComplete
-    expect(found.hasAttribute('data-open')).toBe(false)
+    expect(found.hasAttribute('data-closed')).toBe(true)
     expect(found.isConnected).toBe(true)
   })
 

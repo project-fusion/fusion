@@ -1782,10 +1782,10 @@ repository does that. The per-component tables are what a page pays.
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | \`@helix-io/core\` | 126,898 | 41,892 | 36,088 | Element base class, mixins, decorators, floating positioning. |
-| \`@helix-io/headless\` | 488,119 | 124,134 | 97,852 | Every headless family, which is what the barrel means. |
+| \`@helix-io/headless\` | 491,714 | 124,971 | 98,539 | Every headless family, which is what the barrel means. |
 | \`@helix-io/icons\` | 45,238 | 14,531 | 12,270 | The whole glyph set. |
 | \`@helix-io/theme\` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@helix-io/styled\` | 1,606,740 | 459,202 | 321,931 | Every styled family. |
+| \`@helix-io/styled\` | 1,610,321 | 460,125 | 322,641 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1808,9 +1808,9 @@ is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 18,495 bytes gzipped alone and adds 6,175 to a page that already has Helix on it, so 67 percent of the first one is shared and 33 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`quote\` at 9,370 gzipped alone, the dearest \`color-input\` at 65,195, over 92 components. Every family at once is 459,202.
+Across the tier: the cheapest is \`quote\` at 9,370 gzipped alone, the dearest \`color-input\` at 65,195, over 92 components. Every family at once is 460,125.
 
-**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs 124,134 bytes gzipped whatever else the page does, which is 7 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
+**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs 124,971 bytes gzipped whatever else the page does, which is 7 times the median family measured above. The styled tier imports the family it extends instead, all 92 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
 The headless tier never had the problem, and it is the control: \`@helix-io/core\` is \`sideEffects: false\`, and a headless family is a median of 11,852 bytes gzipped alone.
 
@@ -1918,7 +1918,7 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | \`callout\` | 71,177 | 24,119 | 20,088 | 912 | 548 | 207 |
 | \`card\` | 26,039 | 8,971 | 7,918 | 694 | 423 | 116 |
 | \`carousel\` | 77,422 | 26,047 | 21,729 | 7,184 | 2,524 | 1,582 |
-| \`chat\` | 34,804 | 11,359 | 10,036 | 7,402 | 2,454 | 1,612 |
+| \`chat\` | 34,775 | 11,352 | 10,032 | 7,373 | 2,447 | 1,482 |
 | \`checkbox\` | 32,608 | 10,533 | 9,299 | 2,133 | 1,066 | 385 |
 | \`checkbox-group\` | 35,152 | 11,139 | 9,826 | 4,182 | 1,682 | 958 |
 | \`code\` | 24,624 | 8,545 | 7,549 | 451 | 314 | -14 |
@@ -1935,13 +1935,13 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | \`divider\` | 26,209 | 9,097 | 7,997 | 1,115 | 639 | 239 |
 | \`donut-chart\` | 65,764 | 22,600 | 19,959 | 9,435 | 3,453 | 2,376 |
 | \`drawer\` | 28,189 | 9,611 | 8,453 | 1,529 | 770 | 313 |
-| \`drilldown\` | 77,631 | 26,243 | 21,686 | 5,013 | 1,897 | 1,174 |
+| \`drilldown\` | 77,677 | 26,257 | 21,702 | 5,059 | 1,909 | 1,211 |
 | \`empty\` | 26,161 | 9,011 | 7,958 | 816 | 486 | 135 |
 | \`file-input\` | 81,134 | 27,228 | 22,468 | 6,044 | 2,367 | 1,524 |
-| \`heatmap\` | 33,591 | 11,262 | 9,964 | 2,980 | 1,354 | 702 |
+| \`heatmap\` | 33,645 | 11,287 | 9,964 | 3,034 | 1,380 | 761 |
 | \`icon\` | 70,583 | 23,870 | 19,921 | 850 | 507 | 173 |
 | \`icon-button\` | 29,127 | 9,805 | 8,630 | 2,234 | 912 | 512 |
-| \`image\` | 27,372 | 9,338 | 8,218 | 2,352 | 1,014 | 449 |
+| \`image\` | 27,990 | 9,484 | 8,350 | 2,970 | 1,170 | 673 |
 | \`input\` | 80,277 | 26,861 | 22,097 | 4,380 | 1,784 | 1,097 |
 | \`kbd\` | 27,407 | 9,540 | 8,419 | 2,427 | 1,264 | 608 |
 | \`legend\` | 28,360 | 9,858 | 8,716 | 1,097 | 640 | 231 |
@@ -1953,7 +1953,7 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | \`menu\` | 105,846 | 35,962 | 30,509 | 7,960 | 2,517 | 1,620 |
 | \`meter\` | 29,137 | 9,863 | 8,687 | 3,800 | 1,409 | 933 |
 | \`navigation\` | 27,994 | 9,603 | 8,461 | 1,582 | 769 | 352 |
-| \`notifications\` | 33,361 | 11,106 | 9,779 | 5,938 | 2,214 | 1,337 |
+| \`notifications\` | 33,428 | 11,122 | 9,800 | 6,005 | 2,230 | 1,383 |
 | \`number-input\` | 82,635 | 27,413 | 22,561 | 6,908 | 2,443 | 1,512 |
 | \`option\` | 27,784 | 9,362 | 8,274 | 2,448 | 899 | 412 |
 | \`outline\` | 31,017 | 10,611 | 9,352 | 4,558 | 1,927 | 1,062 |
@@ -1978,18 +1978,18 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | \`table\` | 30,782 | 9,997 | 8,843 | 4,118 | 1,354 | 725 |
 | \`tabs\` | 32,891 | 10,786 | 9,482 | 4,343 | 1,401 | 759 |
 | \`tag\` | 71,461 | 24,200 | 20,048 | 897 | 518 | 225 |
-| \`textarea\` | 34,006 | 10,896 | 9,614 | 3,033 | 1,290 | 599 |
+| \`textarea\` | 34,978 | 11,134 | 9,827 | 4,003 | 1,546 | 846 |
 | \`time-input\` | 128,599 | 41,722 | 35,200 | 26,429 | 7,425 | 5,822 |
 | \`time-picker\` | 94,286 | 30,946 | 25,622 | 16,495 | 5,261 | 3,847 |
 | \`timeline\` | 71,993 | 24,213 | 20,235 | 1,896 | 724 | 322 |
-| \`toast\` | 75,188 | 25,315 | 20,948 | 4,004 | 1,397 | 869 |
+| \`toast\` | 75,191 | 25,317 | 20,982 | 4,007 | 1,399 | 818 |
 | \`toggle\` | 37,210 | 11,852 | 10,471 | 3,742 | 1,403 | 793 |
 | \`toolbar\` | 27,907 | 9,622 | 8,489 | 2,932 | 1,384 | 676 |
 | \`tooltip\` | 54,988 | 19,212 | 17,017 | 5,867 | 2,229 | 1,318 |
 | \`tour\` | 58,612 | 19,960 | 17,644 | 8,960 | 2,795 | 1,834 |
 | \`tree\` | 81,415 | 27,280 | 22,457 | 7,096 | 2,517 | 1,538 |
 | \`trend\` | 70,786 | 23,973 | 20,039 | 1,056 | 580 | 276 |
-| \`video\` | 127,356 | 41,286 | 35,162 | 29,219 | 7,537 | 6,098 |
+| \`video\` | 129,208 | 41,686 | 35,450 | 31,071 | 7,929 | 6,420 |
 | \`video-playlist\` | 113,223 | 37,650 | 31,955 | 14,014 | 3,824 | 2,700 |
 | \`virtual-list\` | 28,887 | 10,040 | 8,804 | 2,089 | 1,078 | 544 |
 
@@ -2013,7 +2013,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 | \`callout\` | 76,007 | 25,948 | 21,678 | 5,726 | 2,452 | 1,746 |
 | \`card\` | 37,602 | 13,262 | 11,584 | 12,245 | 4,848 | 3,867 |
 | \`carousel\` | 103,661 | 34,440 | 28,832 | 33,412 | 10,773 | 8,750 |
-| \`chat\` | 44,508 | 13,796 | 12,104 | 17,096 | 4,909 | 3,717 |
+| \`chat\` | 44,479 | 13,792 | 12,110 | 17,067 | 4,907 | 3,671 |
 | \`checkbox\` | 55,308 | 18,042 | 15,753 | 24,817 | 8,616 | 6,945 |
 | \`checkbox-group\` | 44,945 | 14,761 | 12,919 | 13,961 | 5,346 | 3,970 |
 | \`code\` | 31,259 | 11,203 | 9,789 | 7,069 | 3,117 | 2,423 |
@@ -2030,15 +2030,15 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 | \`divider\` | 31,546 | 11,049 | 9,612 | 6,435 | 2,740 | 1,869 |
 | \`donut-chart\` | 106,791 | 35,357 | 30,998 | 50,445 | 16,370 | 13,368 |
 | \`drawer\` | 45,442 | 15,767 | 13,732 | 18,765 | 7,033 | 5,679 |
-| \`drilldown\` | 86,641 | 29,289 | 24,097 | 14,010 | 4,889 | 3,617 |
+| \`drilldown\` | 86,687 | 29,302 | 24,130 | 14,056 | 4,899 | 3,644 |
 | \`empty\` | 28,553 | 9,910 | 8,699 | 3,192 | 1,499 | 900 |
 | \`file-input\` | 118,089 | 39,252 | 32,825 | 42,992 | 14,185 | 11,825 |
 | \`flex\` | 28,867 | 10,086 | 8,808 | 3,881 | 1,767 | 1,137 |
 | \`grid\` | 32,658 | 11,533 | 10,042 | 7,670 | 3,269 | 2,397 |
-| \`heatmap\` | 36,436 | 12,305 | 10,805 | 5,807 | 2,480 | 1,577 |
+| \`heatmap\` | 36,490 | 12,328 | 10,826 | 5,861 | 2,503 | 1,690 |
 | \`icon\` | 71,658 | 24,290 | 20,169 | 1,908 | 933 | 498 |
 | \`icon-button\` | 42,768 | 13,935 | 12,142 | 15,861 | 5,162 | 4,043 |
-| \`image\` | 32,437 | 11,208 | 9,786 | 7,399 | 2,994 | 2,025 |
+| \`image\` | 33,055 | 11,353 | 9,935 | 8,017 | 3,134 | 2,238 |
 | \`input\` | 100,170 | 33,371 | 27,720 | 24,264 | 8,213 | 6,697 |
 | \`kbd\` | 32,087 | 11,420 | 10,006 | 7,092 | 3,174 | 2,278 |
 | \`legend\` | 39,288 | 13,389 | 11,624 | 12,017 | 4,360 | 3,259 |
@@ -2050,7 +2050,7 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 | \`menu\` | 125,687 | 42,672 | 36,069 | 27,783 | 8,923 | 7,130 |
 | \`meter\` | 43,938 | 14,771 | 12,879 | 18,583 | 6,353 | 5,188 |
 | \`navigation\` | 30,237 | 10,384 | 9,099 | 3,809 | 1,636 | 937 |
-| \`notifications\` | 40,323 | 12,998 | 11,426 | 12,887 | 4,153 | 2,981 |
+| \`notifications\` | 40,390 | 13,014 | 11,441 | 12,954 | 4,170 | 3,095 |
 | \`number-input\` | 99,181 | 33,177 | 27,540 | 23,439 | 8,065 | 6,399 |
 | \`option\` | 38,158 | 13,201 | 11,524 | 12,807 | 4,841 | 3,758 |
 | \`outline\` | 42,473 | 14,409 | 12,577 | 15,997 | 5,729 | 4,457 |
@@ -2077,18 +2077,18 @@ The headless tier plus presentation. This is what \`bun add @helix-io/styled\` g
 | \`tabs\` | 50,970 | 16,534 | 14,455 | 22,411 | 7,203 | 5,776 |
 | \`tag\` | 84,093 | 29,151 | 24,298 | 13,514 | 5,460 | 4,379 |
 | \`text\` | 31,489 | 10,610 | 9,271 | 6,504 | 2,381 | 1,660 |
-| \`textarea\` | 45,879 | 14,956 | 13,028 | 14,889 | 5,438 | 4,226 |
+| \`textarea\` | 46,851 | 15,199 | 13,268 | 15,859 | 5,680 | 4,363 |
 | \`time-input\` | 194,994 | 61,193 | 52,366 | 92,804 | 26,942 | 22,843 |
 | \`time-picker\` | 135,059 | 43,490 | 36,473 | 57,260 | 17,642 | 14,665 |
 | \`timeline\` | 80,873 | 27,362 | 22,881 | 10,765 | 3,929 | 3,118 |
-| \`toast\` | 100,584 | 33,767 | 28,286 | 29,387 | 9,761 | 8,104 |
+| \`toast\` | 100,573 | 33,765 | 28,260 | 29,376 | 9,760 | 8,101 |
 | \`toggle\` | 58,976 | 19,455 | 16,994 | 25,500 | 9,006 | 7,366 |
 | \`toolbar\` | 29,864 | 10,383 | 9,088 | 4,872 | 2,273 | 1,374 |
 | \`tooltip\` | 66,718 | 23,328 | 20,518 | 17,579 | 6,308 | 4,883 |
 | \`tour\` | 82,825 | 27,031 | 23,832 | 33,160 | 9,856 | 8,057 |
 | \`tree\` | 103,084 | 34,865 | 29,108 | 28,753 | 9,953 | 8,228 |
 | \`trend\` | 77,447 | 26,289 | 21,963 | 7,710 | 2,930 | 2,133 |
-| \`video\` | 180,040 | 56,972 | 48,846 | 81,882 | 23,195 | 19,897 |
+| \`video\` | 181,892 | 57,365 | 49,219 | 83,734 | 23,594 | 20,162 |
 | \`video-playlist\` | 147,222 | 47,963 | 40,822 | 47,994 | 13,852 | 11,502 |
 | \`virtual-list\` | 31,592 | 11,148 | 9,739 | 4,777 | 2,323 | 1,484 |
 
@@ -2103,11 +2103,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | \`@helix-io/core\` | 825,359 | 105 | 145,414 | \`@floating-ui/dom\`, \`@helix-io/icons\` |
-| \`@helix-io/headless\` | 8,794,068 | 420 | 689,355 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
+| \`@helix-io/headless\` | 8,879,775 | 420 | 697,248 | \`@helix-io/core\`, \`@helix-io/icons\`, \`uqr\` |
 | \`@helix-io/icons\` | 63,768 | 11 | 19,847 | none |
 | \`@helix-io/styles\` | 79,995 | 5 | 0 | none |
 | \`@helix-io/theme\` | 465,772 | 8 | 4,793 | none |
-| \`@helix-io/styled\` | 9,479,095 | 711 | 291,003 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
+| \`@helix-io/styled\` | 9,545,918 | 711 | 291,003 | \`@helix-io/core\`, \`@helix-io/headless\`, \`@helix-io/styles\` |
 
 ## Not measured yet
 

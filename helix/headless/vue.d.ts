@@ -2858,6 +2858,23 @@ viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
   fetchPriority?: HelixHeadlessImage["fetchPriority"];
+  /** Whether the browser may decode off the main thread.
+
+**The template hardcoded `async` and a consumer could not reach it**, which
+is worse than the property being absent: the decision was taken on their
+behalf and nothing said so. `async` is still the resting value and still
+right for a picture in a page, and `sync` is what a consumer reaches for
+when the picture is about to be composited with something else and a tear
+would show. */
+  decoding?: HelixHeadlessImage["decoding"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  crossorigin?: HelixHeadlessImage["crossOrigin"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  crossOrigin?: HelixHeadlessImage["crossOrigin"];
+  /** How much of the referring URL to send with the request. */
+  referrerpolicy?: HelixHeadlessImage["referrerPolicy"];
+  /** How much of the referring URL to send with the request. */
+  referrerPolicy?: HelixHeadlessImage["referrerPolicy"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -5876,6 +5893,34 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   readOnly?: HelixHeadlessTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   rows?: HelixHeadlessTextarea["rows"];
+  /** How many characters wide the box is, where the layout is not deciding.
+
+Optional and absent by default, which is the reflected-property rule: a
+`<textarea>` left alone is 20 columns wide and a styled one is whatever its
+box says, so writing a number here is a departure rather than the resting
+state. `wrap="hard"` needs it, the two being the pair that decides where
+the browser inserts the line breaks it submits. */
+  cols?: HelixHeadlessTextarea["cols"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  dirname?: HelixHeadlessTextarea["dirName"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  dirName?: HelixHeadlessTextarea["dirName"];
+  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  wrap?: HelixHeadlessTextarea["wrap"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -5949,6 +5994,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessTextarea["name"];
+  /** The caret and the selection, under the platform's own names.
+
+**The whole reason this renders a real `<textarea>` is the caret**, and the
+caret was the one thing a consumer could not reach: the control is inside
+this shadow root, so `querySelector` does not find it and there was no way
+to ask where the selection is, let alone move it. A field that cannot be
+scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+first thing anybody builds on a textarea.
+
+Written through to the control, and answering zero before there is one,
+which is where an empty field's caret would be anyway. */
+  selectionDirection?: HelixHeadlessTextarea["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  selectionEnd?: HelixHeadlessTextarea["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  selectionStart?: HelixHeadlessTextarea["selectionStart"];
 };
 
 export type HelixHeadlessTextareaVueEvents = {
@@ -7098,8 +7159,30 @@ export type HelixHeadlessVideoVueProps = {
   label?: HelixHeadlessVideo["label"];
   /** Whether it starts again at the end. */
   loop?: HelixHeadlessVideo["loop"];
-  /** Whether it starts silent, which is what an autoplaying video must do. */
-  muted?: HelixHeadlessVideo["muted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  muted?: HelixHeadlessVideo["defaultMuted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  defaultMuted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   "plays-inline"?: HelixHeadlessVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
@@ -7111,6 +7194,25 @@ either alone, so this one is not drawn at all when it is set. */
   controls?: HelixHeadlessVideo["controls"];
   /** How much to fetch before anything is asked for. */
   preload?: HelixHeadlessVideo["preload"];
+  /** Whether it starts on its own, which a browser only allows while silent.
+
+Forwarded rather than acted on. Whether an unprompted play is permitted is
+the browser's policy and not this element's, and `play()` already swallows
+the refusal: what follows a refused autoplay is a paused player showing its
+start control, which is the correct thing to be looking at. */
+  autoplay?: HelixHeadlessVideo["autoplay"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  crossorigin?: HelixHeadlessVideo["crossOrigin"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  crossOrigin?: HelixHeadlessVideo["crossOrigin"];
+  /** Whether the browser may offer picture in picture. */
+  "disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
+  /** Whether the browser may offer picture in picture. */
+  disablePictureInPicture?: HelixHeadlessVideo["disablePictureInPicture"];
+  /** Whether the browser may offer playback on a remote device. */
+  "disable-remote-playback"?: HelixHeadlessVideo["disableRemotePlayback"];
+  /** Whether the browser may offer playback on a remote device. */
+  disableRemotePlayback?: HelixHeadlessVideo["disableRemotePlayback"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -7265,6 +7367,19 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "error-label"?: HelixHeadlessVideo["errorLabel"];
   /** And what they are told when it will not play at all. */
   errorLabel?: HelixHeadlessVideo["errorLabel"];
+  /** Where playback has reached, in seconds.
+
+Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+past the end is the one write the platform answers with an exception. */
+  currentTime?: HelixHeadlessVideo["currentTime"];
+  /** The rate playback returns to, which `defaultPlaybackRate` names natively. */
+  defaultPlaybackRate?: HelixHeadlessVideo["defaultPlaybackRate"];
+  /** How fast it plays, where 1 is the recorded speed. */
+  playbackRate?: HelixHeadlessVideo["playbackRate"];
+  /** Whether pitch is held steady when the rate changes. */
+  preservesPitch?: HelixHeadlessVideo["preservesPitch"];
+  /** How loud it plays, 0 to 1. */
+  volume?: HelixHeadlessVideo["volume"];
 };
 
 export type HelixHeadlessVideoVueEvents = {

@@ -6969,6 +6969,23 @@ viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
   fetchPriority?: HelixImage["fetchPriority"];
+  /** Whether the browser may decode off the main thread.
+
+**The template hardcoded `async` and a consumer could not reach it**, which
+is worse than the property being absent: the decision was taken on their
+behalf and nothing said so. `async` is still the resting value and still
+right for a picture in a page, and `sync` is what a consumer reaches for
+when the picture is about to be composited with something else and a tear
+would show. */
+  decoding?: HelixImage["decoding"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  crossorigin?: HelixImage["crossOrigin"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  crossOrigin?: HelixImage["crossOrigin"];
+  /** How much of the referring URL to send with the request. */
+  referrerpolicy?: HelixImage["referrerPolicy"];
+  /** How much of the referring URL to send with the request. */
+  referrerPolicy?: HelixImage["referrerPolicy"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -7033,6 +7050,23 @@ viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
   "prop:fetchPriority"?: HelixImage["fetchPriority"];
+  /** Whether the browser may decode off the main thread.
+
+**The template hardcoded `async` and a consumer could not reach it**, which
+is worse than the property being absent: the decision was taken on their
+behalf and nothing said so. `async` is still the resting value and still
+right for a picture in a page, and `sync` is what a consumer reaches for
+when the picture is about to be composited with something else and a tear
+would show. */
+  "prop:decoding"?: HelixImage["decoding"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  "attr:crossorigin"?: HelixImage["crossOrigin"];
+  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  "prop:crossOrigin"?: HelixImage["crossOrigin"];
+  /** How much of the referring URL to send with the request. */
+  "attr:referrerpolicy"?: HelixImage["referrerPolicy"];
+  /** How much of the referring URL to send with the request. */
+  "prop:referrerPolicy"?: HelixImage["referrerPolicy"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -13966,6 +14000,34 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   readOnly?: HelixTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   rows?: HelixTextarea["rows"];
+  /** How many characters wide the box is, where the layout is not deciding.
+
+Optional and absent by default, which is the reflected-property rule: a
+`<textarea>` left alone is 20 columns wide and a styled one is whatever its
+box says, so writing a number here is a departure rather than the resting
+state. `wrap="hard"` needs it, the two being the pair that decides where
+the browser inserts the line breaks it submits. */
+  cols?: HelixTextarea["cols"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  dirname?: HelixTextarea["dirName"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  dirName?: HelixTextarea["dirName"];
+  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  wrap?: HelixTextarea["wrap"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -14013,6 +14075,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixTextarea["name"];
+  /** The caret and the selection, under the platform's own names.
+
+**The whole reason this renders a real `<textarea>` is the caret**, and the
+caret was the one thing a consumer could not reach: the control is inside
+this shadow root, so `querySelector` does not find it and there was no way
+to ask where the selection is, let alone move it. A field that cannot be
+scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+first thing anybody builds on a textarea.
+
+Written through to the control, and answering zero before there is one,
+which is where an empty field's caret would be anyway. */
+  selectionDirection?: HelixTextarea["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  selectionEnd?: HelixTextarea["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  selectionStart?: HelixTextarea["selectionStart"];
 
   /** Announced once the value has moved. */
   oninput?: (e: HelixTextareaElementEvent) => void;
@@ -14068,6 +14146,34 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "prop:readOnly"?: HelixTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
   "prop:rows"?: HelixTextarea["rows"];
+  /** How many characters wide the box is, where the layout is not deciding.
+
+Optional and absent by default, which is the reflected-property rule: a
+`<textarea>` left alone is 20 columns wide and a styled one is whatever its
+box says, so writing a number here is a departure rather than the resting
+state. `wrap="hard"` needs it, the two being the pair that decides where
+the browser inserts the line breaks it submits. */
+  "prop:cols"?: HelixTextarea["cols"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  "attr:dirname"?: HelixTextarea["dirName"];
+  /** The name a second entry carries, holding which way the text runs.
+
+**Submitted through `setFormValue`, because the inner control's own
+`dirname` cannot reach the form.** This host is form-associated and reports
+its value itself, so the `<textarea>` inside the shadow root participates in
+no form at all and forwarding the attribute would have looked right and
+submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+element sends two entries, and that is what this does. */
+  "prop:dirName"?: HelixTextarea["dirName"];
+  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  "prop:wrap"?: HelixTextarea["wrap"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -14115,6 +14221,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixTextarea["name"];
+  /** The caret and the selection, under the platform's own names.
+
+**The whole reason this renders a real `<textarea>` is the caret**, and the
+caret was the one thing a consumer could not reach: the control is inside
+this shadow root, so `querySelector` does not find it and there was no way
+to ask where the selection is, let alone move it. A field that cannot be
+scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+first thing anybody builds on a textarea.
+
+Written through to the control, and answering zero before there is one,
+which is where an empty field's caret would be anyway. */
+  "prop:selectionDirection"?: HelixTextarea["selectionDirection"];
+  /** Where the selection ends, as an offset into the value. */
+  "prop:selectionEnd"?: HelixTextarea["selectionEnd"];
+  /** Where the selection starts, as an offset into the value. */
+  "prop:selectionStart"?: HelixTextarea["selectionStart"];
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixTextareaElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
@@ -16451,8 +16573,30 @@ export type HelixVideoProps = {
   label?: HelixVideo["label"];
   /** Whether it starts again at the end. */
   loop?: HelixVideo["loop"];
-  /** Whether it starts silent, which is what an autoplaying video must do. */
-  muted?: HelixVideo["muted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  muted?: HelixVideo["defaultMuted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  defaultMuted?: HelixVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   "plays-inline"?: HelixVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
@@ -16464,6 +16608,25 @@ either alone, so this one is not drawn at all when it is set. */
   controls?: HelixVideo["controls"];
   /** How much to fetch before anything is asked for. */
   preload?: HelixVideo["preload"];
+  /** Whether it starts on its own, which a browser only allows while silent.
+
+Forwarded rather than acted on. Whether an unprompted play is permitted is
+the browser's policy and not this element's, and `play()` already swallows
+the refusal: what follows a refused autoplay is a paused player showing its
+start control, which is the correct thing to be looking at. */
+  autoplay?: HelixVideo["autoplay"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  crossorigin?: HelixVideo["crossOrigin"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  crossOrigin?: HelixVideo["crossOrigin"];
+  /** Whether the browser may offer picture in picture. */
+  "disable-picture-in-picture"?: HelixVideo["disablePictureInPicture"];
+  /** Whether the browser may offer picture in picture. */
+  disablePictureInPicture?: HelixVideo["disablePictureInPicture"];
+  /** Whether the browser may offer playback on a remote device. */
+  "disable-remote-playback"?: HelixVideo["disableRemotePlayback"];
+  /** Whether the browser may offer playback on a remote device. */
+  disableRemotePlayback?: HelixVideo["disableRemotePlayback"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -16618,6 +16781,19 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "error-label"?: HelixVideo["errorLabel"];
   /** And what they are told when it will not play at all. */
   errorLabel?: HelixVideo["errorLabel"];
+  /** Where playback has reached, in seconds.
+
+Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+past the end is the one write the platform answers with an exception. */
+  currentTime?: HelixVideo["currentTime"];
+  /** The rate playback returns to, which `defaultPlaybackRate` names natively. */
+  defaultPlaybackRate?: HelixVideo["defaultPlaybackRate"];
+  /** How fast it plays, where 1 is the recorded speed. */
+  playbackRate?: HelixVideo["playbackRate"];
+  /** Whether pitch is held steady when the rate changes. */
+  preservesPitch?: HelixVideo["preservesPitch"];
+  /** How loud it plays, 0 to 1. */
+  volume?: HelixVideo["volume"];
 
   /** Fired when the reader asks for the next item. */
   "onhelix-next"?: (e: HelixVideoHelixNextElementEvent) => void;
@@ -16642,8 +16818,30 @@ export type HelixVideoSolidJsProps = {
   "prop:label"?: HelixVideo["label"];
   /** Whether it starts again at the end. */
   "prop:loop"?: HelixVideo["loop"];
-  /** Whether it starts silent, which is what an autoplaying video must do. */
-  "prop:muted"?: HelixVideo["muted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  "bool:muted"?: HelixVideo["defaultMuted"];
+  /** Whether it *starts* silent, which is what an autoplaying video must do.
+
+**Renamed from `muted`, because that is what it always was.** The platform
+splits these two: the `muted` content attribute reflects to `defaultMuted`,
+and the `muted` property is live state a reader's click moves without
+touching the attribute. This element declared one property called `muted`,
+bound it to the attribute, and tracked the live state privately as
+`silent`, so `<helix-video>.muted` answered what the author wrote rather
+than whether there was sound. A name matching the platform's while meaning
+something else is worse than a name the platform does not have, and
+`check:platform-fidelity` could not see it: it compares names. */
+  "prop:defaultMuted"?: HelixVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   "bool:plays-inline"?: HelixVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
@@ -16655,6 +16853,25 @@ either alone, so this one is not drawn at all when it is set. */
   "prop:controls"?: HelixVideo["controls"];
   /** How much to fetch before anything is asked for. */
   "prop:preload"?: HelixVideo["preload"];
+  /** Whether it starts on its own, which a browser only allows while silent.
+
+Forwarded rather than acted on. Whether an unprompted play is permitted is
+the browser's policy and not this element's, and `play()` already swallows
+the refusal: what follows a refused autoplay is a paused player showing its
+start control, which is the correct thing to be looking at. */
+  "prop:autoplay"?: HelixVideo["autoplay"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  "attr:crossorigin"?: HelixVideo["crossOrigin"];
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  "prop:crossOrigin"?: HelixVideo["crossOrigin"];
+  /** Whether the browser may offer picture in picture. */
+  "bool:disable-picture-in-picture"?: HelixVideo["disablePictureInPicture"];
+  /** Whether the browser may offer picture in picture. */
+  "prop:disablePictureInPicture"?: HelixVideo["disablePictureInPicture"];
+  /** Whether the browser may offer playback on a remote device. */
+  "bool:disable-remote-playback"?: HelixVideo["disableRemotePlayback"];
+  /** Whether the browser may offer playback on a remote device. */
+  "prop:disableRemotePlayback"?: HelixVideo["disableRemotePlayback"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -16809,6 +17026,19 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "attr:error-label"?: HelixVideo["errorLabel"];
   /** And what they are told when it will not play at all. */
   "prop:errorLabel"?: HelixVideo["errorLabel"];
+  /** Where playback has reached, in seconds.
+
+Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+past the end is the one write the platform answers with an exception. */
+  "prop:currentTime"?: HelixVideo["currentTime"];
+  /** The rate playback returns to, which `defaultPlaybackRate` names natively. */
+  "prop:defaultPlaybackRate"?: HelixVideo["defaultPlaybackRate"];
+  /** How fast it plays, where 1 is the recorded speed. */
+  "prop:playbackRate"?: HelixVideo["playbackRate"];
+  /** Whether pitch is held steady when the rate changes. */
+  "prop:preservesPitch"?: HelixVideo["preservesPitch"];
+  /** How loud it plays, 0 to 1. */
+  "prop:volume"?: HelixVideo["volume"];
   /** Fired when the reader asks for the next item. */
   "on:helix-next"?: (e: HelixVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
@@ -23092,6 +23322,16 @@ export type CustomElements = {
    * viewport, and this stops it queueing behind everything else the parser
    * found first. Left alone the browser decides, which is right for the other
    * ninety-nine pictures.
+   * - `decoding`: Whether the browser may decode off the main thread.
+   *
+   * **The template hardcoded `async` and a consumer could not reach it**, which
+   * is worse than the property being absent: the decision was taken on their
+   * behalf and nothing said so. `async` is still the resting value and still
+   * right for a picture in a page, and `sync` is what a consumer reaches for
+   * when the picture is about to be composited with something else and a tear
+   * would show.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas can read it.
+   * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Read-only to a consumer: it is a report rather than a setting.
@@ -23107,6 +23347,10 @@ export type CustomElements = {
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
+   * - `complete`: Whether the picture has finished arriving, however it went. (property only) (readonly)
+   * - `currentSrc`: Which candidate the browser actually chose out of `srcset`. (property only) (readonly)
+   * - `naturalHeight`: The picture's own height in pixels, and zero until it has arrived. (property only) (readonly)
+   * - `naturalWidth`: The picture's own width in pixels, and zero until it has arrived. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -30193,6 +30437,22 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `cols`: How many characters wide the box is, where the layout is not deciding.
+   *
+   * Optional and absent by default, which is the reflected-property rule: a
+   * `<textarea>` left alone is 20 columns wide and a styled one is whatever its
+   * box says, so writing a number here is a departure rather than the resting
+   * state. `wrap="hard"` needs it, the two being the pair that decides where
+   * the browser inserts the line breaks it submits.
+   * - `dirname`/`dirName`: The name a second entry carries, holding which way the text runs.
+   *
+   * **Submitted through `setFormValue`, because the inner control's own
+   * `dirname` cannot reach the form.** This host is form-associated and reports
+   * its value itself, so the `<textarea>` inside the shadow root participates in
+   * no form at all and forwarding the attribute would have looked right and
+   * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+   * element sends two entries, and that is what this does.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with it.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -30227,6 +30487,21 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectionDirection`: The caret and the selection, under the platform's own names.
+   *
+   * **The whole reason this renders a real `<textarea>` is the caret**, and the
+   * caret was the one thing a consumer could not reach: the control is inside
+   * this shadow root, so `querySelector` does not find it and there was no way
+   * to ask where the selection is, let alone move it. A field that cannot be
+   * scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+   * first thing anybody builds on a textarea.
+   *
+   * Written through to the control, and answering zero before there is one,
+   * which is where an empty field's caret would be anyway. (property only)
+   * - `selectionEnd`: Where the selection ends, as an offset into the value. (property only)
+   * - `selectionStart`: Where the selection starts, as an offset into the value. (property only)
+   * - `textLength`: How many characters the value holds. (property only) (readonly)
+   * - `type`: What kind of control this is, which for a textarea is always the one word. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -30284,6 +30559,13 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void`: Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
@@ -32664,13 +32946,32 @@ export type CustomElements = {
    * - `poster`: A still shown before it plays, which the platform draws itself.
    * - `label`: Accessible name, since a video is not described by its filename.
    * - `loop`: Whether it starts again at the end.
-   * - `muted`: Whether it starts silent, which is what an autoplaying video must do.
+   * - `muted`/`defaultMuted`: Whether it *starts* silent, which is what an autoplaying video must do.
+   *
+   * **Renamed from `muted`, because that is what it always was.** The platform
+   * splits these two: the `muted` content attribute reflects to `defaultMuted`,
+   * and the `muted` property is live state a reader's click moves without
+   * touching the attribute. This element declared one property called `muted`,
+   * bound it to the attribute, and tracked the live state privately as
+   * `silent`, so `<helix-video>.muted` answered what the author wrote rather
+   * than whether there was sound. A name matching the platform's while meaning
+   * something else is worse than a name the platform does not have, and
+   * `check:platform-fidelity` could not see it: it compares names.
    * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *
    * A fallback rather than a default. Two bars over one video is worse than
    * either alone, so this one is not drawn at all when it is set.
    * - `preload`: How much to fetch before anything is asked for.
+   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can be read.
+   * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
+   * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -32740,6 +33041,47 @@ export type CustomElements = {
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
    * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
+   * - `currentSrc`: The media's own state, under the platform's own names.
+   *
+   * **This element already knew every one of these and kept them private.** It
+   * tracks `currentTime` as `position`, `duration` as `knownDuration`, `volume`
+   * as `loudness`, `paused` as `playing` and `playbackRate` as `rate`, paints
+   * them, and published none of them, so a consumer asking where the video had
+   * reached had nowhere to ask: the `<video>` is inside this shadow root and
+   * `querySelector` does not cross it. 295 is that finding across the library
+   * and this is its clearest case.
+   *
+   * **Read from the element, with the mirror as the fallback.** The element is
+   * the truth and the mirror is a render cache that a media event refreshes, so
+   * reading the mirror alone would answer with whatever the last `timeupdate`
+   * said rather than with where the video is now. The fallback is what answers
+   * on the server and before the first render, where there is no element and
+   * the mirror holds what markup asked for.
+   *
+   * **Accessors rather than reactive properties**, because none of these is a
+   * setting: they are the media's state, and a `@property` would give each one
+   * an attribute that a consumer could write and the element would then have to
+   * disagree with. Where the platform makes one writable this writes it
+   * through, and where the platform does not neither does this. (property only) (readonly)
+   * - `currentTime`: Where playback has reached, in seconds.
+   *
+   * Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+   * past the end is the one write the platform answers with an exception. (property only)
+   * - `defaultPlaybackRate`: The rate playback returns to, which `defaultPlaybackRate` names natively. (property only)
+   * - `duration`: How long the media runs, in seconds, and `NaN` until that is known. (property only) (readonly)
+   * - `ended`: Whether playback has run off the end. (property only) (readonly)
+   * - `paused`: Whether playback is stopped, which is the resting state and not an error. (property only) (readonly)
+   * - `playbackRate`: How fast it plays, where 1 is the recorded speed. (property only)
+   * - `preservesPitch`: Whether pitch is held steady when the rate changes. (property only)
+   * - `seeking`: Whether it is currently moving to a new position. (property only) (readonly)
+   * - `videoHeight`: The media's own height in pixels, and zero until the metadata has loaded. (property only) (readonly)
+   * - `videoWidth`: The media's own width in pixels, and zero until the metadata has loaded. (property only) (readonly)
+   * - `muted`: Whether there is sound, now, which a reader's click moves.
+   *
+   * The live half of the pair above. Writing mutes or unmutes the media itself
+   * rather than the attribute, which is what the platform does and what the
+   * mute control here has always done directly. (property only)
+   * - `volume`: How loud it plays, 0 to 1. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -39301,6 +39643,16 @@ export type CustomElementsSolidJs = {
    * viewport, and this stops it queueing behind everything else the parser
    * found first. Left alone the browser decides, which is right for the other
    * ninety-nine pictures.
+   * - `decoding`: Whether the browser may decode off the main thread.
+   *
+   * **The template hardcoded `async` and a consumer could not reach it**, which
+   * is worse than the property being absent: the decision was taken on their
+   * behalf and nothing said so. `async` is still the resting value and still
+   * right for a picture in a page, and `sync` is what a consumer reaches for
+   * when the picture is about to be composited with something else and a tear
+   * would show.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas can read it.
+   * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Read-only to a consumer: it is a report rather than a setting.
@@ -39316,6 +39668,10 @@ export type CustomElementsSolidJs = {
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
+   * - `complete`: Whether the picture has finished arriving, however it went. (property only) (readonly)
+   * - `currentSrc`: Which candidate the browser actually chose out of `srcset`. (property only) (readonly)
+   * - `naturalHeight`: The picture's own height in pixels, and zero until it has arrived. (property only) (readonly)
+   * - `naturalWidth`: The picture's own width in pixels, and zero until it has arrived. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -46585,6 +46941,22 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
+   * - `cols`: How many characters wide the box is, where the layout is not deciding.
+   *
+   * Optional and absent by default, which is the reflected-property rule: a
+   * `<textarea>` left alone is 20 columns wide and a styled one is whatever its
+   * box says, so writing a number here is a departure rather than the resting
+   * state. `wrap="hard"` needs it, the two being the pair that decides where
+   * the browser inserts the line breaks it submits.
+   * - `dirname`/`dirName`: The name a second entry carries, holding which way the text runs.
+   *
+   * **Submitted through `setFormValue`, because the inner control's own
+   * `dirname` cannot reach the form.** This host is form-associated and reports
+   * its value itself, so the `<textarea>` inside the shadow root participates in
+   * no form at all and forwarding the attribute would have looked right and
+   * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+   * element sends two entries, and that is what this does.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with it.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -46619,6 +46991,21 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `selectionDirection`: The caret and the selection, under the platform's own names.
+   *
+   * **The whole reason this renders a real `<textarea>` is the caret**, and the
+   * caret was the one thing a consumer could not reach: the control is inside
+   * this shadow root, so `querySelector` does not find it and there was no way
+   * to ask where the selection is, let alone move it. A field that cannot be
+   * scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+   * first thing anybody builds on a textarea.
+   *
+   * Written through to the control, and answering zero before there is one,
+   * which is where an empty field's caret would be anyway. (property only)
+   * - `selectionEnd`: Where the selection ends, as an offset into the value. (property only)
+   * - `selectionStart`: Where the selection starts, as an offset into the value. (property only)
+   * - `textLength`: How many characters the value holds. (property only) (readonly)
+   * - `type`: What kind of control this is, which for a textarea is always the one word. (property only) (readonly)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -46676,6 +47063,13 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `setSelectionRange(start: number, end: number, direction?: SelectionDirection) => void`: Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
@@ -49115,13 +49509,32 @@ export type CustomElementsSolidJs = {
    * - `poster`: A still shown before it plays, which the platform draws itself.
    * - `label`: Accessible name, since a video is not described by its filename.
    * - `loop`: Whether it starts again at the end.
-   * - `muted`: Whether it starts silent, which is what an autoplaying video must do.
+   * - `muted`/`defaultMuted`: Whether it *starts* silent, which is what an autoplaying video must do.
+   *
+   * **Renamed from `muted`, because that is what it always was.** The platform
+   * splits these two: the `muted` content attribute reflects to `defaultMuted`,
+   * and the `muted` property is live state a reader's click moves without
+   * touching the attribute. This element declared one property called `muted`,
+   * bound it to the attribute, and tracked the live state privately as
+   * `silent`, so `<helix-video>.muted` answered what the author wrote rather
+   * than whether there was sound. A name matching the platform's while meaning
+   * something else is worse than a name the platform does not have, and
+   * `check:platform-fidelity` could not see it: it compares names.
    * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *
    * A fallback rather than a default. Two bars over one video is worse than
    * either alone, so this one is not drawn at all when it is set.
    * - `preload`: How much to fetch before anything is asked for.
+   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can be read.
+   * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
+   * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -49191,6 +49604,47 @@ export type CustomElementsSolidJs = {
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
    * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
+   * - `currentSrc`: The media's own state, under the platform's own names.
+   *
+   * **This element already knew every one of these and kept them private.** It
+   * tracks `currentTime` as `position`, `duration` as `knownDuration`, `volume`
+   * as `loudness`, `paused` as `playing` and `playbackRate` as `rate`, paints
+   * them, and published none of them, so a consumer asking where the video had
+   * reached had nowhere to ask: the `<video>` is inside this shadow root and
+   * `querySelector` does not cross it. 295 is that finding across the library
+   * and this is its clearest case.
+   *
+   * **Read from the element, with the mirror as the fallback.** The element is
+   * the truth and the mirror is a render cache that a media event refreshes, so
+   * reading the mirror alone would answer with whatever the last `timeupdate`
+   * said rather than with where the video is now. The fallback is what answers
+   * on the server and before the first render, where there is no element and
+   * the mirror holds what markup asked for.
+   *
+   * **Accessors rather than reactive properties**, because none of these is a
+   * setting: they are the media's state, and a `@property` would give each one
+   * an attribute that a consumer could write and the element would then have to
+   * disagree with. Where the platform makes one writable this writes it
+   * through, and where the platform does not neither does this. (property only) (readonly)
+   * - `currentTime`: Where playback has reached, in seconds.
+   *
+   * Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+   * past the end is the one write the platform answers with an exception. (property only)
+   * - `defaultPlaybackRate`: The rate playback returns to, which `defaultPlaybackRate` names natively. (property only)
+   * - `duration`: How long the media runs, in seconds, and `NaN` until that is known. (property only) (readonly)
+   * - `ended`: Whether playback has run off the end. (property only) (readonly)
+   * - `paused`: Whether playback is stopped, which is the resting state and not an error. (property only) (readonly)
+   * - `playbackRate`: How fast it plays, where 1 is the recorded speed. (property only)
+   * - `preservesPitch`: Whether pitch is held steady when the rate changes. (property only)
+   * - `seeking`: Whether it is currently moving to a new position. (property only) (readonly)
+   * - `videoHeight`: The media's own height in pixels, and zero until the metadata has loaded. (property only) (readonly)
+   * - `videoWidth`: The media's own width in pixels, and zero until the metadata has loaded. (property only) (readonly)
+   * - `muted`: Whether there is sound, now, which a reader's click moves.
+   *
+   * The live half of the pair above. Writing mutes or unmutes the media itself
+   * rather than the attribute, which is what the platform does and what the
+   * mute control here has always done directly. (property only)
+   * - `volume`: How loud it plays, 0 to 1. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image

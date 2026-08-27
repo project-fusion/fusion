@@ -229,9 +229,21 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ reflect: true, type: Boolean })
   loop = false
 
-  /** Whether it starts silent, which is what an autoplaying video must do. */
-  @property({ reflect: true, type: Boolean })
-  muted = false
+  /**
+   * Whether it *starts* silent, which is what an autoplaying video must do.
+   *
+   * **Renamed from `muted`, because that is what it always was.** The platform
+   * splits these two: the `muted` content attribute reflects to `defaultMuted`,
+   * and the `muted` property is live state a reader's click moves without
+   * touching the attribute. This element declared one property called `muted`,
+   * bound it to the attribute, and tracked the live state privately as
+   * `silent`, so `<helix-video>.muted` answered what the author wrote rather
+   * than whether there was sound. A name matching the platform's while meaning
+   * something else is worse than a name the platform does not have, and
+   * `check:platform-fidelity` could not see it: it compares names.
+   */
+  @property({ attribute: 'muted', reflect: true, type: Boolean })
+  defaultMuted = false
 
   /** Whether it plays where it sits rather than taking over the screen. */
   @property({ attribute: 'plays-inline', converter: onUnlessFalse })
@@ -249,6 +261,29 @@ export class HelixHeadlessVideo extends HelixElement {
   /** How much to fetch before anything is asked for. */
   @property()
   preload: 'auto' | 'metadata' | 'none' = 'metadata'
+
+  /**
+   * Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
+   */
+  @property({ reflect: true, type: Boolean })
+  autoplay = false
+
+  /** How the media is fetched across origins, which decides whether a track can be read. */
+  @property({ attribute: 'crossorigin' })
+  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+
+  /** Whether the browser may offer picture in picture. */
+  @property({ attribute: 'disable-picture-in-picture', reflect: true, type: Boolean })
+  disablePictureInPicture = false
+
+  /** Whether the browser may offer playback on a remote device. */
+  @property({ attribute: 'disable-remote-playback', reflect: true, type: Boolean })
+  disableRemotePlayback = false
 
   /**
    * Controls beyond the ones every player has, named in the order they appear.
@@ -406,7 +441,7 @@ export class HelixHeadlessVideo extends HelixElement {
   private position = 0
 
   @state()
-  private duration = 0
+  private knownDuration = 0
 
   @state()
   private loudness = 1
@@ -540,6 +575,148 @@ export class HelixHeadlessVideo extends HelixElement {
   @state()
   private media: { attrs: Record<string, string>; tag: 'source' | 'track' }[] = []
 
+  /**
+   * The media's own state, under the platform's own names.
+   *
+   * **This element already knew every one of these and kept them private.** It
+   * tracks `currentTime` as `position`, `duration` as `knownDuration`, `volume`
+   * as `loudness`, `paused` as `playing` and `playbackRate` as `rate`, paints
+   * them, and published none of them, so a consumer asking where the video had
+   * reached had nowhere to ask: the `<video>` is inside this shadow root and
+   * `querySelector` does not cross it. 295 is that finding across the library
+   * and this is its clearest case.
+   *
+   * **Read from the element, with the mirror as the fallback.** The element is
+   * the truth and the mirror is a render cache that a media event refreshes, so
+   * reading the mirror alone would answer with whatever the last `timeupdate`
+   * said rather than with where the video is now. The fallback is what answers
+   * on the server and before the first render, where there is no element and
+   * the mirror holds what markup asked for.
+   *
+   * **Accessors rather than reactive properties**, because none of these is a
+   * setting: they are the media's state, and a `@property` would give each one
+   * an attribute that a consumer could write and the element would then have to
+   * disagree with. Where the platform makes one writable this writes it
+   * through, and where the platform does not neither does this.
+   */
+  get currentSrc(): string {
+    return this.video?.currentSrc ?? ''
+  }
+
+  /**
+   * Where playback has reached, in seconds.
+   *
+   * Writing seeks, through the same clamp `seek` uses, because a `currentTime`
+   * past the end is the one write the platform answers with an exception.
+   */
+  get currentTime(): number {
+    return this.video?.currentTime ?? this.position
+  }
+
+  set currentTime(seconds: number) {
+    this.position = seconds
+    this.seek(seconds)
+  }
+
+  /** The rate playback returns to, which `defaultPlaybackRate` names natively. */
+  get defaultPlaybackRate(): number {
+    return this.video?.defaultPlaybackRate ?? 1
+  }
+
+  set defaultPlaybackRate(rate: number) {
+    const video = this.video
+    if (video) {
+      video.defaultPlaybackRate = rate
+    }
+  }
+
+  /** How long the media runs, in seconds, and `NaN` until that is known. */
+  get duration(): number {
+    return this.video?.duration ?? this.knownDuration
+  }
+
+  /** Whether playback has run off the end. */
+  get ended(): boolean {
+    return this.video?.ended ?? false
+  }
+
+  /** Whether playback is stopped, which is the resting state and not an error. */
+  get paused(): boolean {
+    return this.video?.paused ?? !this.playing
+  }
+
+  /** How fast it plays, where 1 is the recorded speed. */
+  get playbackRate(): number {
+    return this.video?.playbackRate ?? this.rate
+  }
+
+  set playbackRate(rate: number) {
+    this.rate = rate
+    const video = this.video
+    if (video) {
+      video.playbackRate = rate
+    }
+  }
+
+  /** Whether pitch is held steady when the rate changes. */
+  get preservesPitch(): boolean {
+    return this.video?.preservesPitch ?? true
+  }
+
+  set preservesPitch(preserve: boolean) {
+    const video = this.video
+    if (video) {
+      video.preservesPitch = preserve
+    }
+  }
+
+  /** Whether it is currently moving to a new position. */
+  get seeking(): boolean {
+    return this.video?.seeking ?? false
+  }
+
+  /** The media's own height in pixels, and zero until the metadata has loaded. */
+  get videoHeight(): number {
+    return this.video?.videoHeight ?? 0
+  }
+
+  /** The media's own width in pixels, and zero until the metadata has loaded. */
+  get videoWidth(): number {
+    return this.video?.videoWidth ?? 0
+  }
+
+  /**
+   * Whether there is sound, now, which a reader's click moves.
+   *
+   * The live half of the pair above. Writing mutes or unmutes the media itself
+   * rather than the attribute, which is what the platform does and what the
+   * mute control here has always done directly.
+   */
+  get muted(): boolean {
+    return this.video?.muted ?? this.defaultMuted
+  }
+
+  set muted(quiet: boolean) {
+    this.silent = quiet
+    const video = this.video
+    if (video) {
+      video.muted = quiet
+    }
+  }
+
+  /** How loud it plays, 0 to 1. */
+  get volume(): number {
+    return this.video?.volume ?? this.loudness
+  }
+
+  set volume(level: number) {
+    this.loudness = level
+    const video = this.video
+    if (video) {
+      video.volume = level
+    }
+  }
+
   private get video(): HTMLVideoElement | null {
     return this.renderRoot?.querySelector<HTMLVideoElement>('[part="video"]') ?? null
   }
@@ -620,7 +797,7 @@ export class HelixHeadlessVideo extends HelixElement {
     if (!video) {
       return
     }
-    this.duration = video.duration
+    this.knownDuration = video.duration
     /* The video's own shape, handed to CSS as a number.
      *
      * `aspect-ratio: auto` cannot be used for this, and that is the whole
@@ -1417,7 +1594,7 @@ export class HelixHeadlessVideo extends HelixElement {
   /* `protected` rather than `private`: the method was already the seam and a
      tier above simply could not reach it. */
   protected renderBar(): TemplateResult {
-    const done = this.duration > 0 ? this.position / this.duration : 0
+    const done = this.knownDuration > 0 ? this.position / this.knownDuration : 0
     return html`<div part="controls">
       <button
         part="play"
@@ -1427,16 +1604,16 @@ export class HelixHeadlessVideo extends HelixElement {
       >
         ${drawIcon(this.playing ? pause : play)}
       </button>
-      <span part="time">${clock(this.position)} / ${clock(this.duration)}</span>
+      <span part="time">${clock(this.position)} / ${clock(this.knownDuration)}</span>
       <input
         part="scrubber"
         type="range"
         min="0"
-        max=${Number.isFinite(this.duration) && this.duration > 0 ? this.duration : 0}
+        max=${Number.isFinite(this.knownDuration) && this.knownDuration > 0 ? this.knownDuration : 0}
         step="0.01"
         .value=${String(this.position)}
         aria-label="Seek"
-        aria-valuetext=${`${clock(this.position)} of ${clock(this.duration)}`}
+        aria-valuetext=${`${clock(this.position)} of ${clock(this.knownDuration)}`}
         style=${`--video-progress: ${done}`}
         @input=${(event: Event) => this.seek(Number((event.target as HTMLInputElement).value))}
       />
@@ -1540,9 +1717,13 @@ export class HelixHeadlessVideo extends HelixElement {
         src=${this.src || nothing}
         poster=${this.poster || nothing}
         preload=${this.preload}
+        crossorigin=${this.crossOrigin ?? nothing}
+        ?autoplay=${this.autoplay}
         ?controls=${this.controls}
+        ?disablepictureinpicture=${this.disablePictureInPicture}
+        ?disableremoteplayback=${this.disableRemotePlayback}
         ?loop=${this.loop}
-        ?muted=${this.muted}
+        ?muted=${this.defaultMuted}
         ?playsinline=${this.playsInline}
         @loadedmetadata=${this.handleLoaded}
         @timeupdate=${this.handleTime}

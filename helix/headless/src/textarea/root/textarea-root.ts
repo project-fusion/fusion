@@ -74,6 +74,35 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   @property({ type: Number })
   rows = 3
 
+  /**
+   * How many characters wide the box is, where the layout is not deciding.
+   *
+   * Optional and absent by default, which is the reflected-property rule: a
+   * `<textarea>` left alone is 20 columns wide and a styled one is whatever its
+   * box says, so writing a number here is a departure rather than the resting
+   * state. `wrap="hard"` needs it, the two being the pair that decides where
+   * the browser inserts the line breaks it submits.
+   */
+  @property({ type: Number })
+  cols?: number
+
+  /**
+   * The name a second entry carries, holding which way the text runs.
+   *
+   * **Submitted through `setFormValue`, because the inner control's own
+   * `dirname` cannot reach the form.** This host is form-associated and reports
+   * its value itself, so the `<textarea>` inside the shadow root participates in
+   * no form at all and forwarding the attribute would have looked right and
+   * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
+   * element sends two entries, and that is what this does.
+   */
+  @property({ attribute: 'dirname' })
+  dirName = ''
+
+  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  @property()
+  wrap: 'hard' | 'off' | 'soft' = 'soft'
+
   /** Focus is delegated to the control, so the host is never the target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -162,6 +191,96 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    */
   private resize: ResizeObserver | undefined
 
+  /**
+   * What the form receives, which is two entries where `dirName` asks for it.
+   *
+   * A plain string otherwise, because that is the common case and a `FormData`
+   * of one entry says the same thing at more cost. The direction is read off
+   * the control rather than assumed, so a field a consumer set `dir="rtl"` on,
+   * or one inside an RTL document, submits what the reader actually saw.
+   */
+  private formValue(): FormData | string {
+    const control = this.control
+    if (!this.dirName || !this.name || !control) {
+      return this.value
+    }
+    const data = new FormData()
+    data.append(this.name, this.value)
+    data.append(this.dirName, getComputedStyle(control).direction === 'rtl' ? 'rtl' : 'ltr')
+    return data
+  }
+
+  /**
+   * The caret and the selection, under the platform's own names.
+   *
+   * **The whole reason this renders a real `<textarea>` is the caret**, and the
+   * caret was the one thing a consumer could not reach: the control is inside
+   * this shadow root, so `querySelector` does not find it and there was no way
+   * to ask where the selection is, let alone move it. A field that cannot be
+   * scripted at the caret cannot do an insert-at-cursor toolbar, which is the
+   * first thing anybody builds on a textarea.
+   *
+   * Written through to the control, and answering zero before there is one,
+   * which is where an empty field's caret would be anyway.
+   */
+  get selectionDirection(): SelectionDirection {
+    return this.control?.selectionDirection ?? 'none'
+  }
+
+  set selectionDirection(direction: SelectionDirection) {
+    const control = this.control
+    if (control) {
+      control.selectionDirection = direction
+    }
+  }
+
+  /** Where the selection ends, as an offset into the value. */
+  get selectionEnd(): number {
+    return this.control?.selectionEnd ?? 0
+  }
+
+  set selectionEnd(at: number) {
+    const control = this.control
+    if (control) {
+      control.selectionEnd = at
+    }
+  }
+
+  /** Where the selection starts, as an offset into the value. */
+  get selectionStart(): number {
+    return this.control?.selectionStart ?? 0
+  }
+
+  set selectionStart(at: number) {
+    const control = this.control
+    if (control) {
+      control.selectionStart = at
+    }
+  }
+
+  /**
+   * Selects a range, which is the one operation the three accessors above
+   * cannot express between them.
+   *
+   * Setting `selectionStart` past the current `selectionEnd` drags the end
+   * along, so the two writes a consumer would make in sequence do not compose
+   * into the range they asked for. The platform has this method for that reason
+   * and so does this.
+   */
+  setSelectionRange(start: number, end: number, direction?: SelectionDirection): void {
+    this.control?.setSelectionRange(start, end, direction)
+  }
+
+  /** How many characters the value holds. */
+  get textLength(): number {
+    return this.value.length
+  }
+
+  /** What kind of control this is, which for a textarea is always the one word. */
+  get type(): string {
+    return 'textarea'
+  }
+
   /** Puts the caret in the field, the way a label pointing at one would. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
@@ -169,7 +288,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
 
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
-    this.internals.setFormValue(this.value)
+    this.internals.setFormValue(this.formValue())
     const control = this.control
     if (!control) {
       return
@@ -271,6 +390,8 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
         id="control"
         .value=${this.value}
         rows=${this.rows}
+        cols=${this.cols ?? nothing}
+        wrap=${this.wrap}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
         autocomplete=${this.autocomplete || nothing}
