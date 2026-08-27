@@ -3,10 +3,27 @@ import { registerDom } from '@helix-io/testing/dom'
 
 const tag = 'probe-element'
 
+/** A probe declaring the shapes React cannot hand over. See `carried`. */
+const carrier = 'carrier-element'
+
 beforeAll(async () => {
   registerDom()
   const { HelixElement } = await import('./helix-element.js')
   customElements.define(tag, class extends HelixElement {})
+  customElements.define(
+    carrier,
+    class extends HelixElement {
+      static override properties = {
+        cell: { attribute: false },
+        label: {},
+        rows: { attribute: false },
+      }
+
+      cell: unknown = undefined
+      label = ''
+      rows: unknown = []
+    },
+  )
 })
 
 /**
@@ -289,5 +306,107 @@ describe('the settled mark', () => {
     await frame()
     await Promise.resolve()
     expect(resolved).toBe(true)
+  })
+})
+
+/**
+ * The properties React holds and never applies, which is the same hydration bug
+ * as the handlers above with none of the same escape.
+ *
+ * A handler only has to exist by the time somebody interacts, so the element
+ * binds it at dispatch. A property has to be right before the first paint, so
+ * these assert *when* as much as *whether*, and the first test is the one that
+ * fails if the assignment is ever moved later than `firstUpdated`.
+ */
+describe('the object property React is holding', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  type Carrier = HTMLElement & {
+    cell: unknown
+    label: string
+    rows: unknown
+    updateComplete: Promise<unknown>
+  }
+
+  /** Upgraded with the bag already on it: a definition that landed after React. */
+  const late = (props: Record<string, unknown>): Carrier => {
+    const element = document.createElement(carrier) as Carrier
+    Object.assign(element, { __reactProps$k9x2: props })
+    document.body.append(element)
+    return element
+  }
+
+  /** Upgraded before the bag arrives: a definition evaluated with the bundle. */
+  const early = (element: Carrier, props: Record<string, unknown>): void => {
+    Object.assign(element, { __reactProps$k9x2: props })
+  }
+
+  test('is assigned by the first update, because a property has to be right before the paint', async () => {
+    const rows = [{ name: 'Ada Okonjo' }]
+    const element = late({ rows })
+    await element.updateComplete
+    expect(element.rows).toBe(rows)
+  })
+
+  test('is assigned when it is a function, which is what a formatted cell passes', async () => {
+    const cell = (row: Record<string, unknown>): unknown => row.name
+    const element = late({ cell })
+    await element.updateComplete
+    expect(element.cell).toBe(cell)
+  })
+
+  /* The other upgrade ordering, and the reason there is a second look at all.
+     A definition evaluated with the client bundle is running before React
+     hydrates, so the first update finds no bag and the frame is what catches
+     it. */
+  test('is assigned a frame later when React had not committed by the first update', async () => {
+    const rows = [{ name: 'Bo Lindqvist' }]
+    const element = document.createElement(carrier) as Carrier
+    document.body.append(element)
+    await element.updateComplete
+    expect(element.rows).toEqual([])
+
+    early(element, { rows })
+    await frame()
+    await element.updateComplete
+
+    expect(element.rows).toBe(rows)
+  })
+
+  /* **The narrowing, and why it is not "apply every prop React is holding".** A
+     string reached the element as an attribute the server wrote, so it is
+     already correct and re-applying it would be this reaching into a channel
+     that is not broken. */
+  test('leaves a string alone, that having arrived as an attribute', async () => {
+    const element = late({ label: 'People' })
+    element.setAttribute('label', 'Objects')
+    await element.updateComplete
+    expect(element.label).toBe('Objects')
+  })
+
+  /* The other half of the narrowing. Without it any JSX prop at all would be
+     written onto the element, which is a different component's API surface
+     arriving by accident. */
+  test('never writes a prop the class did not declare', async () => {
+    const element = late({ unknownThing: { deep: true } })
+    await element.updateComplete
+    expect('unknownThing' in element).toBe(false)
+  })
+
+  /* Named in `applyReactProperties` as the one divergence from a client mount.
+     React would assign the null; the server dropped it and left the class
+     default standing, and reproducing the assignment reproduces only a crash. */
+  test('leaves a null alone, so the class default stands rather than the crash', async () => {
+    const element = late({ rows: null })
+    await element.updateComplete
+    expect(element.rows).toEqual([])
+  })
+
+  test('is not looked for when React is not on the page', async () => {
+    const element = document.createElement(carrier) as Carrier
+    document.body.append(element)
+    await element.updateComplete
+    await frame()
+    expect(element.rows).toEqual([])
   })
 })

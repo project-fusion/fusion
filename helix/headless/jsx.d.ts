@@ -4195,6 +4195,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessDateInput["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  valueAsDate?: HelixHeadlessDateInput["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  valueAsNumber?: HelixHeadlessDateInput["valueAsNumber"];
 
   /** Fired when the date changes. */
   "onhelix-before-change"?: (
@@ -4413,6 +4427,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessDateInput["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  "prop:valueAsDate"?: HelixHeadlessDateInput["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  "prop:valueAsNumber"?: HelixHeadlessDateInput["valueAsNumber"];
   /** Fired when the date changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
@@ -4556,6 +4584,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessDatePicker["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  valueAsDate?: HelixHeadlessDatePicker["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  valueAsNumber?: HelixHeadlessDatePicker["valueAsNumber"];
 
   /** Fired before the dates change, and cancelable. */
   "onhelix-before-change"?: (
@@ -4677,6 +4719,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessDatePicker["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  "prop:valueAsDate"?: HelixHeadlessDatePicker["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  "prop:valueAsNumber"?: HelixHeadlessDatePicker["valueAsNumber"];
   /** Fired before the dates change, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessDatePickerHelixBeforeChangeElementEvent,
@@ -7978,6 +8034,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessNumberInput["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  valueAsNumber?: HelixHeadlessNumberInput["valueAsNumber"];
 
   /** Fired as the value changes, and cancelable. */
   "onhelix-before-change"?: (
@@ -8093,6 +8155,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessNumberInput["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  "prop:valueAsNumber"?: HelixHeadlessNumberInput["valueAsNumber"];
   /** Fired as the value changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessNumberInputHelixBeforeChangeElementEvent,
@@ -9707,6 +9775,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessRating["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  valueAsNumber?: HelixHeadlessRating["valueAsNumber"];
 
   /** Fired before the score changes, and cancelable. */
   "onhelix-before-change"?: (
@@ -9827,6 +9901,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessRating["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  "prop:valueAsNumber"?: HelixHeadlessRating["valueAsNumber"];
   /** Fired before the score changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessRatingHelixBeforeChangeElementEvent,
@@ -12292,6 +12372,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessTimeInput["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  valueAsDate?: HelixHeadlessTimeInput["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  valueAsNumber?: HelixHeadlessTimeInput["valueAsNumber"];
 
   /** Fired when the time changes. */
   "onhelix-before-change"?: (
@@ -12465,6 +12555,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessTimeInput["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  "prop:valueAsDate"?: HelixHeadlessTimeInput["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  "prop:valueAsNumber"?: HelixHeadlessTimeInput["valueAsNumber"];
   /** Fired when the time changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
@@ -12635,6 +12735,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessTimePicker["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  valueAsDate?: HelixHeadlessTimePicker["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  valueAsNumber?: HelixHeadlessTimePicker["valueAsNumber"];
 
   /** Fired when the time changes. */
   "onhelix-before-change"?: (
@@ -12782,6 +12892,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessTimePicker["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  "prop:valueAsDate"?: HelixHeadlessTimePicker["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  "prop:valueAsNumber"?: HelixHeadlessTimePicker["valueAsNumber"];
   /** Fired when the time changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
@@ -18896,6 +19016,18 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date`, at midnight UTC, or `null` while there is no date.
+   *
+   * The platform's own pair on `<input type="date">`, and this control holds the
+   * same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+   * the same two properties. UTC because the platform chose UTC: a date that is
+   * the same date everywhere must not become a different one by crossing a
+   * timezone, and midnight local would do exactly that for anybody west of
+   * Greenwich.
+   *
+   * `null` while the value is half typed, which is most of the keystrokes a
+   * reader makes in one of these. (property only)
+   * - `valueAsNumber`: The value as milliseconds since the epoch, or `NaN` while there is no date. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -19157,6 +19289,18 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date`, at midnight UTC, or `null` while there is no date.
+   *
+   * The platform's own pair on `<input type="date">`, and this control holds the
+   * same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+   * the same two properties. UTC because the platform chose UTC: a date that is
+   * the same date everywhere must not become a different one by crossing a
+   * timezone, and midnight local would do exactly that for anybody west of
+   * Greenwich.
+   *
+   * `null` while the value is half typed, which is most of the keystrokes a
+   * reader makes in one of these. (property only)
+   * - `valueAsNumber`: The value as milliseconds since the epoch, or `NaN` while there is no date. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -23014,6 +23158,11 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsNumber`: The value as a number, or `NaN` while the control is empty.
+   *
+   * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+   * is zero, so an empty control would report a number it does not hold and a
+   * form would submit it. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -24878,6 +25027,11 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
+   * - `valueAsNumber`: The value as a number, or `NaN` while the control is empty.
+   *
+   * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+   * is zero, so an empty control would report a number it does not hold and a
+   * form would submit it. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -27811,6 +27965,14 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   *
+   * The platform's own pair on `<input type="time">`, epoch day included: a time
+   * is an offset into a day rather than an instant, and putting it on the epoch
+   * is what makes `valueAsNumber` come out as milliseconds since midnight rather
+   * than as a moment nobody meant. Assigning any date reads the clock off it, so
+   * a consumer handing over `new Date()` gets the time of day they expected. (property only)
+   * - `valueAsNumber`: The value as milliseconds since midnight, or `NaN` while there is no time. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -28107,6 +28269,14 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   *
+   * The platform's own pair on `<input type="time">`, epoch day included: a time
+   * is an offset into a day rather than an instant, and putting it on the epoch
+   * is what makes `valueAsNumber` come out as milliseconds since midnight rather
+   * than as a moment nobody meant. Assigning any date reads the clock off it, so
+   * a consumer handing over `new Date()` gets the time of day they expected. (property only)
+   * - `valueAsNumber`: The value as milliseconds since midnight, or `NaN` while there is no time. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -34703,6 +34873,18 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date`, at midnight UTC, or `null` while there is no date.
+   *
+   * The platform's own pair on `<input type="date">`, and this control holds the
+   * same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+   * the same two properties. UTC because the platform chose UTC: a date that is
+   * the same date everywhere must not become a different one by crossing a
+   * timezone, and midnight local would do exactly that for anybody west of
+   * Greenwich.
+   *
+   * `null` while the value is half typed, which is most of the keystrokes a
+   * reader makes in one of these. (property only)
+   * - `valueAsNumber`: The value as milliseconds since the epoch, or `NaN` while there is no date. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -34967,6 +35149,18 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date`, at midnight UTC, or `null` while there is no date.
+   *
+   * The platform's own pair on `<input type="date">`, and this control holds the
+   * same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+   * the same two properties. UTC because the platform chose UTC: a date that is
+   * the same date everywhere must not become a different one by crossing a
+   * timezone, and midnight local would do exactly that for anybody west of
+   * Greenwich.
+   *
+   * `null` while the value is half typed, which is most of the keystrokes a
+   * reader makes in one of these. (property only)
+   * - `valueAsNumber`: The value as milliseconds since the epoch, or `NaN` while there is no date. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -38894,6 +39088,11 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsNumber`: The value as a number, or `NaN` while the control is empty.
+   *
+   * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+   * is zero, so an empty control would report a number it does not hold and a
+   * form would submit it. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -40788,6 +40987,11 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `score`: The score, as a number, clamped to what the marks can show. (property only) (readonly)
+   * - `valueAsNumber`: The value as a number, or `NaN` while the control is empty.
+   *
+   * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+   * is zero, so an empty control would report a number it does not hold and a
+   * form would submit it. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -43784,6 +43988,14 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   *
+   * The platform's own pair on `<input type="time">`, epoch day included: a time
+   * is an offset into a day rather than an instant, and putting it on the epoch
+   * is what makes `valueAsNumber` come out as milliseconds since midnight rather
+   * than as a moment nobody meant. Assigning any date reads the clock off it, so
+   * a consumer handing over `new Date()` gets the time of day they expected. (property only)
+   * - `valueAsNumber`: The value as milliseconds since midnight, or `NaN` while there is no time. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -44083,6 +44295,14 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
+   * - `valueAsDate`: The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   *
+   * The platform's own pair on `<input type="time">`, epoch day included: a time
+   * is an offset into a day rather than an instant, and putting it on the epoch
+   * is what makes `valueAsNumber` come out as milliseconds since midnight rather
+   * than as a moment nobody meant. Assigning any date reads the clock off it, so
+   * a consumer handing over `new Date()` gets the time of day they expected. (property only)
+   * - `valueAsNumber`: The value as milliseconds since midnight, or `NaN` while there is no time. (property only)
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.

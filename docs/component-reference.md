@@ -2006,6 +2006,8 @@ whatever holds it.
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixHeadlessDateInput` | Accessible name for the control that opens the calendar. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessDateInput` | The value as a `Date`, at midnight UTC, or `null` while there is no date. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessDateInput` | The value as milliseconds since the epoch, or `NaN` while there is no date. |
 
 #### Methods
 
@@ -2123,6 +2125,8 @@ grid reads as a continuous run of dates.
 | `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages forward. |
 | `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages back. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessDatePicker` | The value as a `Date`, at midnight UTC, or `null` while there is no date. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessDatePicker` | The value as milliseconds since the epoch, or `NaN` while there is no date. |
 
 #### Methods
 
@@ -3994,6 +3998,7 @@ three times as long to cross.
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
 | `step` | `step` | `number` | `1` | `HelixHeadlessNumberInput` | How far one step moves. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessNumberInput` | The value as a number, or `NaN` while the control is empty. |
 
 #### Methods
 
@@ -4795,6 +4800,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessRating` | Whether the score is written out beside the marks. |
 | `step` | `step` | `number` | `1` | `HelixHeadlessRating` | The smallest part of a mark that can be chosen. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessRating` | The value as a number, or `NaN` while the control is empty. |
 | `valueText` | `value-text` | `string` | `''` | `HelixHeadlessRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
 | `variant` | `variant` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 
@@ -6501,6 +6507,8 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixHeadlessTimeInput` | Whether the field writes the time out, or holds the value as it is. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixHeadlessTimeInput` | Accessible name for the control that opens the list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessTimeInput` | The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessTimeInput` | The value as milliseconds since midnight, or `NaN` while there is no time. |
 | `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixHeadlessTimeInput` | Whether the panel is one list of times or a column each. |
 
 #### Methods
@@ -6626,6 +6634,8 @@ card would be a card inside a card there.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `step` | `step` | `number` | `15` | `HelixHeadlessTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueAsDate` | - | `Date \| null` | - | `HelixHeadlessTimePicker` | The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time. |
+| `valueAsNumber` | - | `number` | - | `HelixHeadlessTimePicker` | The value as milliseconds since midnight, or `NaN` while there is no time. |
 | `variant` | `variant` | `'list' \| 'wheels' \| undefined` | - | `HelixHeadlessTimePicker` | Whether the times are one list or a column each. |
 
 #### Methods

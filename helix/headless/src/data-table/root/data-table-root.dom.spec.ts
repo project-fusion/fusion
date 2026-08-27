@@ -441,4 +441,34 @@ describe('the data property', () => {
     expect(given.map((row) => row.name)).toEqual(['delta', 'alpha', 'charlie', 'bravo'])
     remove()
   })
+
+  /**
+   * **The component `applyReactProperties` was built against, and the reason it
+   * stopped being a design sketch in a comment.**
+   *
+   * `rows` is an array, so it can only be assigned as a property, and React
+   * assigns no property to a custom element while hydrating: the server renderer
+   * reaches `typeof value === 'object'` and drops the prop, and the client's
+   * hydrate path only diffs. Both halves skip it and agree, so a React consumer
+   * writing `rows={rows}` got a correctly labelled, permanently empty grid with
+   * no warning from anybody.
+   *
+   * Asserted here as well as in `helix/core`, because the core spec proves the
+   * mechanism against a probe and this proves it reaches the property a consumer
+   * actually writes. The bag is attached before the element is appended, which is
+   * the ordering of a definition that landed after hydration.
+   */
+  test('rows arrives from the props bag React never applied', async () => {
+    const element = document.createElement('helix-headless-data-table') as Table
+    element.innerHTML = `
+      <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      <helix-headless-table-column field="size">Size</helix-headless-table-column>`
+    Object.assign(element, { __reactProps$k9x2: { rows } })
+    document.body.append(element)
+    await settled(element)
+
+    expect(element.rows).toBe(rows)
+    expect(bodyRows(element)).toHaveLength(4)
+    element.remove()
+  })
 })

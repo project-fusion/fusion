@@ -1,5 +1,7 @@
 import {
+  valueAsTime as asTime,
   customElement,
+  timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerOpen,
@@ -617,6 +619,32 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
         ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
+  }
+
+  /**
+   * The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   *
+   * The platform's own pair on `<input type="time">`, epoch day included: a time
+   * is an offset into a day rather than an instant, and putting it on the epoch
+   * is what makes `valueAsNumber` come out as milliseconds since midnight rather
+   * than as a moment nobody meant. Assigning any date reads the clock off it, so
+   * a consumer handing over `new Date()` gets the time of day they expected.
+   */
+  get valueAsDate(): Date | null {
+    return asTime(this.value)
+  }
+
+  set valueAsDate(date: Date | null) {
+    this.value = fromTime(date)
+  }
+
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  get valueAsNumber(): number {
+    return asTime(this.value)?.getTime() ?? Number.NaN
+  }
+
+  set valueAsNumber(ms: number) {
+    this.value = Number.isNaN(ms) ? '' : fromTime(new Date(ms))
   }
 }
 

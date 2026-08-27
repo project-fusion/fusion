@@ -1,5 +1,7 @@
 import {
+  valueAsDate as asDate,
   customElement,
+  dateAsValue as fromDate,
   HelixFormElement,
   HelixNavigateEvent,
   hostAria,
@@ -731,6 +733,36 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         this.renderMonth(addMonths(shown, index), index),
       )}
     </div>`
+  }
+
+  /**
+   * The value as a `Date`, at midnight UTC, or `null` while there is no date.
+   *
+   * The platform's own pair on `<input type="date">`, and this control holds the
+   * same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+   * the same two properties. UTC because the platform chose UTC: a date that is
+   * the same date everywhere must not become a different one by crossing a
+   * timezone, and midnight local would do exactly that for anybody west of
+   * Greenwich.
+   *
+   * `null` while the value is half typed, which is most of the keystrokes a
+   * reader makes in one of these.
+   */
+  get valueAsDate(): Date | null {
+    return asDate(this.value)
+  }
+
+  set valueAsDate(date: Date | null) {
+    this.value = fromDate(date)
+  }
+
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  get valueAsNumber(): number {
+    return asDate(this.value)?.getTime() ?? Number.NaN
+  }
+
+  set valueAsNumber(ms: number) {
+    this.value = Number.isNaN(ms) ? '' : fromDate(new Date(ms))
   }
 }
 

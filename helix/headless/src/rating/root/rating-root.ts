@@ -1,5 +1,7 @@
 import {
+  valueAsNumber as asNumber,
   customElement,
+  numberAsValue as fromNumber,
   HelixFormElement,
   KeyboardNavigationController,
   MixinControllerValue,
@@ -454,6 +456,21 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
         >`
         : nothing
     }`
+  }
+
+  /**
+   * The value as a number, or `NaN` while the control is empty.
+   *
+   * `NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+   * is zero, so an empty control would report a number it does not hold and a
+   * form would submit it.
+   */
+  get valueAsNumber(): number {
+    return asNumber(this.value)
+  }
+
+  set valueAsNumber(count: number) {
+    this.value = fromNumber(count)
   }
 }
 

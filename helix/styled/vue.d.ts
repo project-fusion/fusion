@@ -2848,6 +2848,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixDateInput["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  valueAsDate?: HelixDateInput["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  valueAsNumber?: HelixDateInput["valueAsNumber"];
 };
 
 export type HelixDateInputVueEvents = {
@@ -2983,6 +2997,20 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixDatePicker["name"];
+  /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
+
+The platform's own pair on `<input type="date">`, and this control holds the
+same `YYYY-MM-DD` string, so a consumer moving from one to the other reads
+the same two properties. UTC because the platform chose UTC: a date that is
+the same date everywhere must not become a different one by crossing a
+timezone, and midnight local would do exactly that for anybody west of
+Greenwich.
+
+`null` while the value is half typed, which is most of the keystrokes a
+reader makes in one of these. */
+  valueAsDate?: HelixDatePicker["valueAsDate"];
+  /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
+  valueAsNumber?: HelixDatePicker["valueAsNumber"];
 };
 
 export type HelixDatePickerVueEvents = {
@@ -5008,6 +5036,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixNumberInput["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  valueAsNumber?: HelixNumberInput["valueAsNumber"];
 };
 
 export type HelixNumberInputVueEvents = {
@@ -5973,6 +6007,12 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixRating["name"];
+  /** The value as a number, or `NaN` while the control is empty.
+
+`NaN` and not zero, which is the trap the platform already avoids: `Number('')`
+is zero, so an empty control would report a number it does not hold and a
+form would submit it. */
+  valueAsNumber?: HelixRating["valueAsNumber"];
 };
 
 export type HelixRatingVueEvents = {
@@ -7648,6 +7688,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixTimeInput["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  valueAsDate?: HelixTimeInput["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  valueAsNumber?: HelixTimeInput["valueAsNumber"];
 };
 
 export type HelixTimeInputVueEvents = {
@@ -7810,6 +7860,16 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixTimePicker["name"];
+  /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+
+The platform's own pair on `<input type="time">`, epoch day included: a time
+is an offset into a day rather than an instant, and putting it on the epoch
+is what makes `valueAsNumber` come out as milliseconds since midnight rather
+than as a moment nobody meant. Assigning any date reads the clock off it, so
+a consumer handing over `new Date()` gets the time of day they expected. */
+  valueAsDate?: HelixTimePicker["valueAsDate"];
+  /** The value as milliseconds since midnight, or `NaN` while there is no time. */
+  valueAsNumber?: HelixTimePicker["valueAsNumber"];
 };
 
 export type HelixTimePickerVueEvents = {

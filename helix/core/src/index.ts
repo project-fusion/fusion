@@ -199,3 +199,11 @@ export {
   type ToneMark,
   toneMark,
 } from './utils/tone-marks/tone-marks.js'
+export {
+  dateAsValue,
+  numberAsValue,
+  timeAsValue,
+  valueAsDate,
+  valueAsNumber,
+  valueAsTime,
+} from './utils/value-as/value-as.js'

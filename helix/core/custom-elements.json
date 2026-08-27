@@ -4380,6 +4380,54 @@
             "name": "toneMark",
             "module": "./utils/tone-marks/tone-marks.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "dateAsValue",
+          "declaration": {
+            "name": "dateAsValue",
+            "module": "./utils/value-as/value-as.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "numberAsValue",
+          "declaration": {
+            "name": "numberAsValue",
+            "module": "./utils/value-as/value-as.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "timeAsValue",
+          "declaration": {
+            "name": "timeAsValue",
+            "module": "./utils/value-as/value-as.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "valueAsDate",
+          "declaration": {
+            "name": "valueAsDate",
+            "module": "./utils/value-as/value-as.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "valueAsNumber",
+          "declaration": {
+            "name": "valueAsNumber",
+            "module": "./utils/value-as/value-as.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "valueAsTime",
+          "declaration": {
+            "name": "valueAsTime",
+            "module": "./utils/value-as/value-as.js"
+          }
         }
       ]
     },
@@ -7421,6 +7469,170 @@
           "declaration": {
             "name": "toneMark",
             "module": "src/utils/tone-marks/tone-marks.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/value-as/value-as.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "valueAsDate",
+          "return": {
+            "type": {
+              "text": "Date | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "The date a `YYYY-MM-DD` value names, at midnight UTC, or `null`.\n\nThe range check is not decoration. `2026-02-31` matches the pattern and\n`Date.UTC` rolls it forward to 3 March, so without reading the parts back a\ncontrol would report a date the reader never typed and never saw."
+        },
+        {
+          "kind": "function",
+          "name": "dateAsValue",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "date",
+              "type": {
+                "text": "Date | null"
+              }
+            }
+          ],
+          "description": "The `YYYY-MM-DD` value for a date, or the empty string, which is how a control says nothing."
+        },
+        {
+          "kind": "function",
+          "name": "valueAsTime",
+          "return": {
+            "type": {
+              "text": "Date | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "The time an `HH:mm` value names, on 1 January 1970 UTC, or `null`.\n\nThe platform's own answer for `<input type=\"time\">`, and the epoch day is\nwhat makes `valueAsNumber` come out as milliseconds since midnight rather\nthan as an instant nobody meant."
+        },
+        {
+          "kind": "function",
+          "name": "timeAsValue",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "date",
+              "type": {
+                "text": "Date | null"
+              }
+            }
+          ],
+          "description": "The `HH:mm` value for a time, or the empty string.\n\nSeconds are written only where there are any, because `HH:mm` is what this\nlibrary's time controls hold and a trailing `:00` on every value would be a\nformat change dressed as a conversion."
+        },
+        {
+          "kind": "function",
+          "name": "valueAsNumber",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "The number a value holds, or `NaN`.\n\n`Number('')` is zero, which is the trap: an empty control would report a\nnumber it does not hold and a form would submit it. The platform answers\n`NaN` for an empty `<input type=\"number\">` and so does this."
+        },
+        {
+          "kind": "function",
+          "name": "numberAsValue",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "count",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "The value for a number, or the empty string, which is how a control says nothing."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "valueAsDate",
+          "declaration": {
+            "name": "valueAsDate",
+            "module": "src/utils/value-as/value-as.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "dateAsValue",
+          "declaration": {
+            "name": "dateAsValue",
+            "module": "src/utils/value-as/value-as.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "valueAsTime",
+          "declaration": {
+            "name": "valueAsTime",
+            "module": "src/utils/value-as/value-as.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "timeAsValue",
+          "declaration": {
+            "name": "timeAsValue",
+            "module": "src/utils/value-as/value-as.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "valueAsNumber",
+          "declaration": {
+            "name": "valueAsNumber",
+            "module": "src/utils/value-as/value-as.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "numberAsValue",
+          "declaration": {
+            "name": "numberAsValue",
+            "module": "src/utils/value-as/value-as.ts"
           }
         }
       ]

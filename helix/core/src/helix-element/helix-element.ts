@@ -392,34 +392,74 @@ const bindReactHandler = (host: EventTarget, event: Event): void => {
   }
 }
 
-/* **The same bug applies to object and function properties, and this does not
-   fix those.** React skips every prop it would have to apply imperatively while
-   hydrating, not only listeners. Strings, numbers and booleans arrive anyway,
-   because the server wrote them as attributes and Lit converts them back; an
-   object or a function is simply absent until React commits.
-
-   The trick above does not transfer, and the reason is worth stating because it
-   looks like it should. A listener only has to exist by the time somebody
-   interacts, so binding it at dispatch is late enough that hydration has
-   certainly finished and early enough to catch the event being sent. A property
-   has to be right before the first paint, and there is no equally safe late
-   moment. An earlier version of this bound at `connectedCallback` and caught
-   nothing at all, measured: an element upgrades when its definition loads, which
-   can fall either side of React's hydration.
-
-   What would work, when something needs it: in `firstUpdated`, read the props
-   bag and assign any declared reactive property (Lit hands them over as
-   `elementProperties`) whose value is an object or a function, re-checking once
-   on the next frame if React has not stashed anything yet. Assigning what React
-   will assign on its own next commit is idempotent, so the handover costs
-   nothing and needs no bookkeeping.
-
-   It is deliberately not built. No component here declares an object or array
-   property: the eight `attribute: false` properties are parent-to-child
-   coordination written at runtime, not consumer API. A fix carrying a timing
-   race, with no failing case to hold it honest, is a fix that rots. Build it
-   with the first component that needs one, and measure the race against that
-   component rather than against a guess. */
+/**
+ * Assigns the object and function properties React is holding and never applied.
+ *
+ * **The same hydration bug as the handlers above, and it needed its own fix.**
+ * React skips every prop it would have to apply imperatively while hydrating,
+ * not only listeners. Strings, numbers and booleans arrive anyway, because the
+ * server wrote them as attributes and Lit converts them back. An object or a
+ * function arrives by no route at all, and both halves of React agree to drop
+ * it: the server renderer reaches its custom element branch, finds
+ * `typeof value === 'object'` and `continue`s, so nothing is written into the
+ * HTML; and the client's hydrate path only diffs and warns for a custom element,
+ * never reaching `setPropOnCustomElement`. Two skips that match, so there is no
+ * mismatch to report and no warning anywhere.
+ *
+ * **The binding trick above does not transfer, which is why this is separate.**
+ * A listener only has to exist by the time somebody interacts, so binding it at
+ * dispatch is late enough that hydration has certainly finished and early enough
+ * to catch the event being sent. A property has to be right before the first
+ * paint. `connectedCallback` is the obvious early moment and is the wrong one,
+ * measured: an element upgrades when its definition loads, which falls either
+ * side of hydration depending on how the consumer imported it, and on the side
+ * this is for it is too early to see anything.
+ *
+ * **Only what the class declared, and only what could not have arrived as an
+ * attribute.** The first is what stops an arbitrary JSX prop being written onto
+ * the element; the second is what keeps this to the properties that are actually
+ * broken, rather than re-applying a string that is already correct. Three
+ * qualify today, `rows` on the data table and `cell` and `compare` on a table
+ * column, and the other ten `attribute: false` properties in the library are
+ * booleans and strings a parent writes at runtime, which no consumer passes and
+ * this never touches.
+ *
+ * **`null` is the one place this does not reproduce a client mount, and it is
+ * deliberate.** `typeof null` is `'object'`, and React assigns a null prop on a
+ * client mount while dropping it on the server, so it is genuinely inside the
+ * gap this closes. Assigning it would faithfully reproduce a crash: the server
+ * left the class default standing, and replacing that default with `null` is the
+ * one case where closing the gap makes the page worse than leaving it open.
+ *
+ * Idempotent, so the handover needs no bookkeeping. Lit compares by identity, so
+ * React's next commit assigning the same value schedules no update, and one
+ * assigning a different value is a change whoever writes it.
+ */
+const applyReactProperties = (host: HelixElement): boolean => {
+  const props = reactPropsOf(host)
+  if (props === undefined) {
+    return false
+  }
+  const target = host as unknown as Record<string, unknown>
+  for (const name of (host.constructor as typeof HelixElement).elementProperties.keys()) {
+    /* `hasOwn` rather than `in`, because the bag is a plain object and a
+       component is free to declare a property called `constructor` or
+       `toString`. A symbol can be a declared property name and can never be a
+       JSX prop, so it is skipped before the lookup rather than stringified into
+       one that cannot match. */
+    if (typeof name !== 'string' || !Object.hasOwn(props, name)) {
+      continue
+    }
+    const value = props[name]
+    if (value === null || (typeof value !== 'object' && typeof value !== 'function')) {
+      continue
+    }
+    if (target[name] !== value) {
+      target[name] = value
+    }
+  }
+  return true
+}
 
 /**
  * @summary Base class every Helix element extends.
@@ -596,6 +636,13 @@ export class HelixElement extends LitElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* **The first of two looks, and the one that costs nothing.** It succeeds
+       whenever the definition landed after React hydrated, which is the ordering
+       a deferred or lazily imported element has: the bag is already on the node,
+       and the update this assignment schedules is a microtask, so the value is
+       rendered in the same task the upgrade happened in. See
+       `applyReactProperties`. */
+    const applied = applyReactProperties(this)
     requestAnimationFrame(() => {
       /* Guarded the way `Pagination` guards its own state, because the shim in
          `@helix-io/testing` supplies `states` and older engines do not. A
@@ -616,6 +663,21 @@ export class HelixElement extends LitElement {
          either way: the audit holds its own set. */
       const props = reactPropsOf(this)
       if (props !== undefined) {
+        /* **The other ordering, and the second and last look.** A definition
+           evaluated with the client bundle upgrades before React hydrates, so
+           there was no bag to read above. A frame callback runs in the rendering
+           step *before* paint and the Lit update it schedules is a microtask, so
+           the value still reaches the screen in this frame rather than after an
+           empty one.
+
+           Two looks and no loop, because the only ordering neither covers is
+           React splitting hydration across frames, which nothing here has
+           produced. If a component ever shows up empty on a page large enough to
+           do that, this is the line to raise, and the measurement is what should
+           decide by how much rather than a number chosen now. */
+        if (!applied) {
+          applyReactProperties(this)
+        }
         auditReactProps(this, props)
       }
     })
