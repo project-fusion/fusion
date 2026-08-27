@@ -246,6 +246,17 @@
               }
             },
             {
+              "kind": "field",
+              "name": "stopInner",
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Stops an inner control's own announcement at this element's boundary.\n\n**A composed control is one control to a consumer, and the natives had no\nequivalent of the stop the prefixed events already get.** `<helix-select>`\nrenders a `<helix-listbox>`, and both announce: the listbox dispatches\n`input` and `change` from its own host, `input` is composed by\nspecification, and a consumer listening on the select therefore heard one\nchoice twice. Measured before this existed, on the styled tier, one choice\non the inner listbox: select `input` twice and `change` three times,\ncombobox, date input, time input and color input twice each. `Command` was\nthe only one that was right, because it happened to reach for\n`stopImmediatePropagation` for a different reason.\n\nBound on the child in the parent's template, so it runs while the event is\nstill at the child and before it can cross. The guard is for the case where\na component binds this on itself: an element must never stop its own\nannouncement, which is the one it exists to make.\n\nThis is the same job the `helix-before-*` handlers do with their own\n`stopPropagation`, and it is separate rather than folded into them because\na consumer may legitimately refuse a request without the notification ever\nhappening: the two travel at different times and one can be absent.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
@@ -928,6 +939,17 @@
               },
               "privacy": "private",
               "description": "Resolves `whenSettled`, once, from the frame that records the state.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stopInner",
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Stops an inner control's own announcement at this element's boundary.\n\n**A composed control is one control to a consumer, and the natives had no\nequivalent of the stop the prefixed events already get.** `<helix-select>`\nrenders a `<helix-listbox>`, and both announce: the listbox dispatches\n`input` and `change` from its own host, `input` is composed by\nspecification, and a consumer listening on the select therefore heard one\nchoice twice. Measured before this existed, on the styled tier, one choice\non the inner listbox: select `input` twice and `change` three times,\ncombobox, date input, time input and color input twice each. `Command` was\nthe only one that was right, because it happened to reach for\n`stopImmediatePropagation` for a different reason.\n\nBound on the child in the parent's template, so it runs while the event is\nstill at the child and before it can cross. The guard is for the case where\na component binds this on itself: an element must never stop its own\nannouncement, which is the one it exists to make.\n\nThis is the same job the `helix-before-*` handlers do with their own\n`stopPropagation`, and it is separate rather than folded into them because\na consumer may legitimately refuse a request without the notification ever\nhappening: the two travel at different times and one can be absent.",
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"

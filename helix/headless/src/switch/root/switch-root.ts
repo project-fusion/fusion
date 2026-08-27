@@ -71,7 +71,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     if (!taken) {
       return
     }
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
   /** Reports what the form would submit, and the verdict on it. */

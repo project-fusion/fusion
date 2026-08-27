@@ -180,18 +180,55 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     }
     this.value = next
     /* Under the platform's own name, after the value has moved, so a consumer
-       binding `onChange` reads the group's new value off the target. */
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+       binding `onChange` reads the group's new value off the target.
+
+       `input` beside it, because this is a discrete control and that is the
+       pair a native `<select>` sends and the pair every other discrete control
+       here sends through `MixinControllerValue`. The group had only `change`,
+       so a consumer binding `onInput` on the set heard the boxes and never the
+       group. */
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+  }
+
+  /**
+   * Stops a box's own announcement, for the reason the request above is stopped.
+   *
+   * **The split gave the requests two names and left the notifications sharing
+   * one.** A box announces `input` and `change` from its own host now, which is
+   * what makes `onChange` work on a checkbox, and both bubble up through this
+   * group: measured, one click produced `change` from the group and `input` and
+   * `change` from the box, all three at a consumer listening here, two of them
+   * describing one box rather than the set. That is exactly the collision the
+   * comment on `handleToggle` describes, arriving by the other route.
+   *
+   * `stopImmediatePropagation` and not `stopPropagation`, and for the same
+   * reason it gives: the box's event and this group's own carry one name from
+   * what a consumer sees as one element, so stopping propagation alone still
+   * leaves every other listener on this host receiving both.
+   *
+   * A listener on the box itself is unaffected, which is where per-box handling
+   * belongs. Each box is form-associated and submits itself; what this stops is
+   * one box answering a question asked of the set.
+   */
+  private readonly handleMemberNative = (event: Event): void => {
+    if (event.target !== this) {
+      event.stopImmediatePropagation()
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-before-toggle', this.handleToggle)
+    this.addEventListener('change', this.handleMemberNative)
+    this.addEventListener('input', this.handleMemberNative)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-before-toggle', this.handleToggle)
+    this.removeEventListener('change', this.handleMemberNative)
+    this.removeEventListener('input', this.handleMemberNative)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

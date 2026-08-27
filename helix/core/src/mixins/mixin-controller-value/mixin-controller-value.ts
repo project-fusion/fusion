@@ -157,7 +157,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     private announceNatively(): void {
       this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
       if (!this.announcesInput) {
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
       }
     }
 

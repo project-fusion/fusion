@@ -215,6 +215,45 @@ describe('a relayed native event', () => {
     expect(calls).toBe(0)
   })
 
+  /* The trio the comment beside `reactPropFor` named as fixed while `Video` kept
+     them broken: it relayed `play`, `pause` and `ended` with `bubbles: true`,
+     which is the one branch that refuses to bind, so all three were silent in
+     React. Both directions are asserted, because the fix is a propagation flag
+     and a test of only the working half would pass against the bug. */
+  test.each([
+    ['play', 'onPlay'],
+    ['pause', 'onPause'],
+    ['ended', 'onEnded'],
+  ])('%s reaches %s when it does not bubble, as the platform sends it', (type, prop) => {
+    let calls = 0
+    const element = hydrated({
+      [prop]: () => {
+        calls += 1
+      },
+    })
+
+    element.dispatchEvent(new Event(type, { bubbles: false, composed: false }))
+
+    expect(calls).toBe(1)
+  })
+
+  test.each([
+    ['play', 'onPlay'],
+    ['pause', 'onPause'],
+    ['ended', 'onEnded'],
+  ])('%s reaches nothing when it bubbles, which is what %s was doing', (type, prop) => {
+    let calls = 0
+    const element = hydrated({
+      [prop]: () => {
+        calls += 1
+      },
+    })
+
+    element.dispatchEvent(new Event(type, { bubbles: true, composed: true }))
+
+    expect(calls).toBe(0)
+  })
+
   test('is left alone where React wires the element itself', () => {
     let calls = 0
     const element = hydrated({

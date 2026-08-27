@@ -327,6 +327,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         filter-label=${this.placeholder}
         filterable
         @helix-before-change=${this.handleChange}
+        @change=${this.stopInner}
+        @input=${this.stopInner}
       >
         <slot></slot>
       </${this.tag('listbox')}>

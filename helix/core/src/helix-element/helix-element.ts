@@ -587,6 +587,36 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * Stops an inner control's own announcement at this element's boundary.
+   *
+   * **A composed control is one control to a consumer, and the natives had no
+   * equivalent of the stop the prefixed events already get.** `<helix-select>`
+   * renders a `<helix-listbox>`, and both announce: the listbox dispatches
+   * `input` and `change` from its own host, `input` is composed by
+   * specification, and a consumer listening on the select therefore heard one
+   * choice twice. Measured before this existed, on the styled tier, one choice
+   * on the inner listbox: select `input` twice and `change` three times,
+   * combobox, date input, time input and color input twice each. `Command` was
+   * the only one that was right, because it happened to reach for
+   * `stopImmediatePropagation` for a different reason.
+   *
+   * Bound on the child in the parent's template, so it runs while the event is
+   * still at the child and before it can cross. The guard is for the case where
+   * a component binds this on itself: an element must never stop its own
+   * announcement, which is the one it exists to make.
+   *
+   * This is the same job the `helix-before-*` handlers do with their own
+   * `stopPropagation`, and it is separate rather than folded into them because
+   * a consumer may legitimately refuse a request without the notification ever
+   * happening: the two travel at different times and one can be absent.
+   */
+  protected readonly stopInner = (event: Event): void => {
+    if (event.target !== this) {
+      event.stopPropagation()
+    }
+  }
+
+  /**
    * Re-emits a native event from the host, under its own name.
    *
    * A native event fired by an inner `<input>` or `<textarea>` is not composed,

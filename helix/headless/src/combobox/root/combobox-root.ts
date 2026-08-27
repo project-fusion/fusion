@@ -710,6 +710,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       ?multiple=${this.multiple}
       .value=${this.value}
       @helix-before-change=${this.handleChange}
+      @change=${this.stopInner}
+      @input=${this.stopInner}
     >
       <!-- The field's words are read off the options, and on the first
            render there are none: the slot has not been assigned yet, so a

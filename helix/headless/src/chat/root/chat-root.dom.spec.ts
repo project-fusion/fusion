@@ -27,7 +27,14 @@ const markup = (attributes = '') => `
   <helix-headless-chat label="Support" ${attributes}>
     <helix-headless-chat-message author="them" state="sent">Hello</helix-headless-chat-message>
     <helix-headless-chat-message author="me" state="sent">Hi</helix-headless-chat-message>
+    <button slot="resume">Jump to latest</button>
     <helix-headless-chat-composer slot="composer"></helix-headless-chat-composer>
+  </helix-headless-chat>`
+
+/** The same conversation with nothing but its turns, which is the bare case. */
+const bare = `
+  <helix-headless-chat label="Support">
+    <helix-headless-chat-message author="them" state="sent">Hello</helix-headless-chat-message>
   </helix-headless-chat>`
 
 const chat = async (attributes = '') => {
@@ -47,6 +54,24 @@ describe('the transcript', () => {
 
   test('the turns declared as children are the transcript', async () => {
     expect((await chat()).messages).toHaveLength(2)
+  })
+
+  /**
+   * A region nobody filled is not laid out, and this element is the only party
+   * that can say so.
+   *
+   * The slots are assigned by hand, so a filled slot has no more children than
+   * an empty one and no stylesheet can tell them apart with `:has()`. Left to
+   * CSS, a chat with no header drew a hairline under nothing and a chat with no
+   * composer drew one over nothing, 25 pixels of chrome each.
+   */
+  test('a region nobody filled is hidden, and a filled one is not', async () => {
+    const empty = (await mount(bare)) as Chat
+    await empty.updateComplete
+    expect(part(empty, 'header')?.hasAttribute('hidden')).toBe(true)
+    expect(part(empty, 'composer')?.hasAttribute('hidden')).toBe(true)
+    const filled = await chat()
+    expect(part(filled, 'composer')?.hasAttribute('hidden')).toBe(false)
   })
 
   /**
@@ -99,6 +124,22 @@ describe('the pin', () => {
     element.pinned = false
     await element.updateComplete
     expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(false)
+  })
+
+  /**
+   * And only while there is one to offer.
+   *
+   * The way back is a slot, so a consumer who never filled it has no control to
+   * show and the region is a box with a negative top margin over the transcript:
+   * revealing it on every unpin moved the composer without putting anything on
+   * screen.
+   */
+  test('a way back nobody slotted is never offered', async () => {
+    const element = (await mount(bare)) as Chat
+    await element.updateComplete
+    element.pinned = false
+    await element.updateComplete
+    expect(part(element, 'resume')?.hasAttribute('hidden')).toBe(true)
   })
 
   /**

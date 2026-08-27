@@ -11,6 +11,15 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
 
 /**
+ * The regions a consumer fills, in the order they are rendered.
+ *
+ * Named once because two things read the list: the manual assignment that puts
+ * a child in the region its `slot` names, and the emptiness each region is
+ * hidden on. They went out of step the first time they were written twice.
+ */
+const REGIONS = ['header', 'resume', 'status', 'composer'] as const
+
+/**
  * @summary A conversation: the turns, and where the reader is in them.
  *
  * @description
@@ -136,6 +145,32 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   @state()
   private pinnedState: boolean | undefined = undefined
 
+  /**
+   * Which regions were given something, or undefined where nobody has counted.
+   *
+   * **A slot that is assigned by hand has no children, so no stylesheet can ask
+   * whether it was filled.** `[part="header"]:not(:has(> slot:has(*)))` is the
+   * rule every other collection here hides an empty region with, and `:has()`
+   * walks the DOM tree: with `slotAssignment: 'manual'` the assigned elements
+   * are children of this host and never of the slot, so the test was false for
+   * a filled header exactly as often as for an empty one and the rule never
+   * matched. Measured on a chat with nothing slotted at all: the header was 25
+   * pixels tall and drew its hairline under nothing, and so did the composer.
+   *
+   * Undefined rather than empty on the way in, for `MixinCollection`'s reason:
+   * the server has no children to count, and an unknown answer is not "empty".
+   * It serves every region and the first assignment on the client settles them,
+   * which is a shadow-root attribute rather than a host one and so is nothing a
+   * consumer's hydration compares.
+   */
+  @state()
+  private filled: ReadonlySet<string> | undefined = undefined
+
+  /** Whether a region has something in it, taking unknown for yes. */
+  private has(name: string): boolean {
+    return this.filled?.has(name) ?? true
+  }
+
   /** The turns declared as children, in the order they are written. */
   get messages(): HelixHeadlessChatMessage[] {
     /* `?? []` is the server: Lit's element shim carries attributes and not a
@@ -207,10 +242,23 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     }
     const messages = this.messages
     log.assign(...messages)
-    for (const name of ['header', 'composer', 'status', 'resume']) {
-      root
-        ?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
-        ?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === name))
+    const filled = new Set<string>()
+    for (const name of REGIONS) {
+      const given = [...this.children].filter((child) => child.getAttribute('slot') === name)
+      root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)?.assign?.(...given)
+      if (given.length > 0) {
+        filled.add(name)
+      }
+    }
+    /* Compared before it is set, because this runs from `updated` and a new Set
+       every render is a new value every render, which is a render loop. */
+    const previous = this.filled
+    if (
+      !previous ||
+      previous.size !== filled.size ||
+      [...filled].some((name) => !previous.has(name))
+    ) {
+      this.filled = filled
     }
   }
 
@@ -269,7 +317,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const away = !this.pinned
-    return html`<div part="header"><slot name="header"></slot></div>
+    return html`<div part="header" ?hidden=${!this.has('header')}>
+        <slot name="header"></slot>
+      </div>
       <div
         part="log"
         role="log"
@@ -280,9 +330,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
         ${this.renderStatus(this.messages.length > 0)}
       </div>
-      <div part="resume" ?hidden=${!away}><slot name="resume"></slot></div>
-      <div part="status" role="status"><slot name="status"></slot></div>
-      <div part="composer"><slot name="composer"></slot></div>`
+      <div part="resume" ?hidden=${!away || !this.has('resume')}>
+        <slot name="resume"></slot>
+      </div>
+      <div part="status" role="status" ?hidden=${!this.has('status')}>
+        <slot name="status"></slot>
+      </div>
+      <div part="composer" ?hidden=${!this.has('composer')}>
+        <slot name="composer"></slot>
+      </div>`
   }
 }
 

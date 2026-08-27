@@ -414,6 +414,8 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
       swatches=${this.swatches || nothing}
       ?disabled=${this.isDisabled}
       @helix-before-change=${this.handlePickerChange}
+      @change=${this.stopInner}
+      @input=${this.stopInner}
       @helix-sample-start=${this.handleSampleStart}
       @helix-sample-end=${this.handleSampleEnd}
     ></${this.tag('color-picker')}>`

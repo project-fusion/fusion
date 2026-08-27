@@ -63,10 +63,24 @@
  * to change color, the wordmark beside it was. The mark is the one thing here
  * that carries the brand without words, so it is the one thing that keeps the
  * brand's color. */
+/**
+ * The mark takes `brand-mark`, not `primary`.
+ *
+ * **They are different roles and the engine emits both for this reason.**
+ * `primary` is solved against the ground it lands on, so a brand of `#3b82f6`
+ * arrives as `#2067d9` on light and `#4c8fff` on dark: correct for a button,
+ * wrong for a logo. `brand-mark` is the colour as chosen, moved only when the
+ * raw value cannot be shown at all. A lockup painted in the contrast-solved
+ * value is not the brand any more, and on a page that lets a reader set the
+ * brand the difference is visible the moment they do.
+ *
+ * The other two stops are relative to it rather than borrowed from `primary`'s
+ * hover and active, which were solved against a different constraint.
+ */
 .fusionLogo {
-  --logo-color-from: var(--helix-color-primary);
-  --logo-color-mid: var(--helix-color-primary-hover);
-  --logo-color-to: var(--helix-color-primary-active);
+  --logo-color-from: var(--helix-color-brand-mark);
+  --logo-color-mid: oklch(from var(--helix-color-brand-mark) calc(l + 0.08) c h);
+  --logo-color-to: oklch(from var(--helix-color-brand-mark) calc(l - 0.09) c h);
 }
 
 /* ============================================================ footer ===== */

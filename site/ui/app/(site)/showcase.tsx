@@ -64,6 +64,22 @@ const DWELL = 7000
 const BRAND = '#3b82f6'
 
 /**
+ * True when something above this panel has already themed the document.
+ *
+ * **The panel derives into itself, which is right until the page does too.**
+ * `ThemeScope` paints a derived palette onto `document.documentElement`, and
+ * this panel's own tokens land on a node inside it, so they win locally: a
+ * reader drags the page's brand control and every band moves except the one
+ * band that is explicitly about the palette. That is the worst possible band to
+ * leave behind.
+ *
+ * Read from the root rather than passed in as a prop, because the page that sets
+ * it is a layout two levels up and threading a flag through would put knowledge
+ * of the drafts into a component the live landing page shares.
+ */
+const pageIsThemed = (): boolean => document.documentElement.hasAttribute('data-helix-theme')
+
+/**
  * Re-derives from one color and puts the result on the panel.
  *
  * **All of it comes from the engine, including the seed.** This file used to
@@ -84,8 +100,9 @@ const BRAND = '#3b82f6'
  * and a seed written on a plain element is read by nothing. The attribute is
  * what re-runs those declarations here.
  *
- * Scoped to the panel rather than the document, because the rest of the page is
- * not the demonstration.
+ * Scoped to the panel rather than the document, because on the live page the
+ * rest of the page is not the demonstration. Where a page has themed itself,
+ * this stands down: see `pageIsThemed`.
  */
 const restyle = (
   engine: ThemeEngine,
@@ -93,6 +110,18 @@ const restyle = (
   hex: string,
   scheme: ThemeIntent['scheme'],
 ): void => {
+  /* Stand down and inherit. Anything written here on a previous pass has to come
+     off too, or the panel keeps the last palette it derived for itself. */
+  if (pageIsThemed()) {
+    for (const name of [...node.style]) {
+      if (name.startsWith('--helix-')) {
+        node.style.removeProperty(name)
+      }
+    }
+    delete node.dataset.helixTheme
+    return
+  }
+
   const theme = engine.derive({ brand: engine.hexToOklch(hex), scheme })
 
   node.dataset.helixTheme = ''

@@ -246,7 +246,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     )
     /* And under the platform's own name, which is what `onChange` binds and
        what a native file input sends when the chosen files move. */
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
   /**

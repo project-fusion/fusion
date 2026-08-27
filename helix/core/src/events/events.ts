@@ -468,6 +468,11 @@ export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
  * The notification is native, as it is for a value: the control relays `change`
  * from the inner input and announces `input` beside it, so `onChange` reads
  * `currentTarget.checked` and gets a boolean from the platform.
+ *
+ * It also ends a collision. Checkbox Group listened for its boxes' change and
+ * dispatched its own under the same name from the same host, so it had to call
+ * `stopImmediatePropagation` to keep a consumer from receiving one box's
+ * boolean alongside the whole set. Two names, two facts.
  */
 export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
   static readonly eventName = 'helix-before-toggle'
@@ -486,92 +491,6 @@ export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
 export interface ToggleDetail {
   /** The state being asked for, as a boolean and not a word that reads like one. */
   checked: boolean
-}
-
-/**
- * Fired when something that is checked or unchecked is about to change.
- *
- * **Separate from `helix-change` because the payload is a boolean and that one
- * carries a string.** It was not separate, and the cost was exact: the checked
- * mixin dispatched `value: String(checked)`, so a consumer received `"false"`,
- * which is truthy. Our own checkbox group decoded it with
- * `detail.value === 'true'`, which is what a workaround looks like when it has
- * been in the codebase long enough to read as a convention.
- *
- * A generic `HelixChangeEvent<T>` was measured first and reached `jsx.d.ts`
- * intact, so the manifest and the generator both carry one. It fails one step
- * later: the map below derives from the registry through
- * `InstanceType<Registry[K]>`, which resolves an unspecified parameter to
- * `unknown` rather than to its default, so every `addEventListener` consumer
- * traded a wrong type for no type. Restoring the entry means an override list
- * beside the registry, which is the second list the registry exists to abolish.
- * A union (`string | boolean`) fails differently and worse: every consumer of
- * every text field narrows for a case that cannot happen to them, and the next
- * numeric control widens it again.
- *
- * So the split follows the shape already in this file. `helix-before-open` carries
- * `{ open: boolean }` rather than stringifying into a change, and this is the
- * same decision for the same reason.
- *
- * It also ends a collision. Checkbox Group listened for its boxes' change and
- * dispatched its own under the same name from the same host, so it had to call
- * `stopImmediatePropagation` to keep a consumer from receiving one box's
- * boolean alongside the whole set. Two names, two facts.
- *
- * The detail carries no `name`. Which control changed is `composedPath()[0]`,
- * which is right across a shadow boundary where `event.target` is retargeted,
- * and the group already identifies its boxes that way.
- */
-export class HelixToggleEvent extends CustomEvent<ToggleDetail> {
-  static readonly eventName = 'helix-toggle'
-
-  constructor(detail: ToggleDetail) {
-    super(HelixToggleEvent.eventName, {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      detail,
-    })
-  }
-}
-
-/**
- * Fired as a value changes, on a control the reader edits continuously.
- *
- * **The platform's pair, and we had only half of it.** `<input type="text">`
- * fires `input` on every keystroke and `change` once the edit is committed.
- * Helix fired `helix-change` on every keystroke and relayed the native `change`
- * on commit, so an element carried two events whose names said the opposite of
- * their timings: a consumer reading "change" as "the reader is done" wired a
- * search request to `onhelix-change` and sent one per character. Web Awesome and
- * Spectrum both use the native pair, and anyone arriving from either, or from
- * HTML, reads ours backwards.
- *
- * So a control the reader types or drags in announces `helix-input`, and
- * `change` stays what it is: the native one, relayed, on commit. Five carry it:
- * Input, Textarea, Number Input, Pin Input and Slider. Everything else changes
- * in discrete steps, where one announcement per step is a change and is named
- * one: choosing an option, moving a tab, settling a divider.
- *
- * Same detail as `helix-change`, because it is the same fact at a different
- * moment, and same shape: cancelable, announced before the value moves, so
- * `preventDefault()` refuses the keystroke and the control is put back.
- *
- * It shares a name with the `<helix-input>` element, which is a collision only
- * to read: an event name and a tag name occupy different namespaces, and the
- * alternative was a name that no longer matches the platform's.
- */
-export class HelixInputEvent extends CustomEvent<ChangeDetail> {
-  static readonly eventName = 'helix-input'
-
-  constructor(detail: ChangeDetail) {
-    super(HelixInputEvent.eventName, {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      detail,
-    })
-  }
 }
 
 /** Detail carried by `helix-create`. */
@@ -987,7 +906,6 @@ const registry = {
   HelixCreateEvent,
   HelixDismissEvent,
   HelixFilterEvent,
-  HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -999,7 +917,6 @@ const registry = {
   HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
-  HelixToggleEvent,
   HelixTourAskEvent,
 } as const
 

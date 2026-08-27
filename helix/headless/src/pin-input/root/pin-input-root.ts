@@ -201,7 +201,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         /* And a native `change`, because a filled code is this control's
            commit. There is no inner control to relay one from: six boxes each
            fire their own, and none of them means the code is entered. */
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
       }
     })
   }

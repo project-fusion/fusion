@@ -216,6 +216,51 @@ for (const [name, entry] of components) {
    * does not declare is a channel a consumer cannot find. */
 }
 
+/**
+ * A class nobody dispatches, which neither half above can see.
+ *
+ * **The two checks are per component and this one is per class**, so an event
+ * class that no component declares and no component constructs satisfies both by
+ * being absent from both. Three reached that state through 294 and 296:
+ * `HelixChangeEvent` when the eleven generic families took verbs of their own,
+ * and `HelixInputEvent` and `HelixToggleEvent` when the value and checked
+ * controls moved to the platform's `input`, `change` and `toggle`. All three
+ * were still exported and still in `HTMLElementEventMap`, which is the part that
+ * costs a consumer something: the name types clean against `addEventListener`,
+ * the handler is never called, and nothing anywhere says why.
+ *
+ * Found by grep during an audit rather than by this file, twice, which is the
+ * argument for it being here.
+ */
+const everyDispatch = new Set()
+for (const tier of TIERS) {
+  for (const path of walk(tier).filter(isSource)) {
+    for (const [, cls] of readFileSync(path, 'utf8').matchAll(/new (Helix\w*Event)\s*\(/g)) {
+      const event = names.get(cls)
+      if (event !== undefined) {
+        everyDispatch.add(event)
+      }
+    }
+  }
+}
+/* Every source file rather than the component classes above, which is a
+   correction this check needed on its first run: it reported `HelixCopyEvent`
+   as orphaned, and `CopyController` dispatches it on behalf of whatever host
+   applies it. A controller is not a component and dispatches all the same, and
+   `MixinChartSource` and the other mixins are the same shape. */
+const orphaned = [...names.entries()].filter(([, event]) => !everyDispatch.has(event))
+if (orphaned.length > 0) {
+  console.error(`Event classes nothing dispatches (${orphaned.length}):\n`)
+  for (const [cls, event] of orphaned) {
+    console.error(
+      `  ${cls} declares \`${event}\` and no component constructs it. It is exported and in ` +
+        '`HTMLElementEventMap`, so the name type-checks against `addEventListener` and the ' +
+        'handler is never called. Delete it, or dispatch it.\n',
+    )
+  }
+  process.exit(1)
+}
+
 if (problems.length > 0) {
   console.error(`Events that are declared or dispatched but not both (${problems.length}):\n`)
   for (const problem of problems) {

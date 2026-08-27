@@ -252,7 +252,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
   /** Reports the value. */

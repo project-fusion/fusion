@@ -8,6 +8,34 @@
   min-block-size: 0;
 }
 
+/* **Each region names its own row**, which is the same rule `chat-message` keeps
+   about its columns and for the same reason: a `display: none` grid item leaves
+   the grid entirely, so with implicit placement every region below a hidden one
+   moves up a track and takes that track's sizing with it. Measured in the
+   sidebar example the moment empty regions started hiding for real: with no
+   header, the log landed on the `auto` track at 166 pixels and the composer
+   landed on the `1fr` one at 741, which is a text field seven hundred pixels
+   tall under a transcript that had stopped scrolling. */
+[part="header"] {
+  grid-row: 1;
+}
+
+[part="log"] {
+  grid-row: 2;
+}
+
+[part="resume"] {
+  grid-row: 3;
+}
+
+[part="status"] {
+  grid-row: 4;
+}
+
+[part="composer"] {
+  grid-row: 5;
+}
+
 [part="log"] {
   display: flex;
   flex-direction: column;
@@ -21,9 +49,22 @@
   justify-content: flex-end;
 }
 
-[part="header"]:not(:has(> slot:has(*))),
-[part="status"]:not(:has(> slot:has(*))),
-[part="composer"]:not(:has(> slot:has(*))) {
+/* **A region the consumer left empty is not laid out, and `hidden` is how it
+   says so.** This tested `:not(:has(> slot:has(*)))`, which is the rule the
+   rest of the library hides an empty region with and is inert here: the slots
+   are assigned by hand, so a filled region's slot has no more children than an
+   empty one's and the test never matched. A chat with nothing slotted drew a
+   hairline under an empty header and another over an empty composer, 25 pixels
+   of chrome each, measured.
+
+   `display: none` has to be said rather than left to the platform. A `[hidden]`
+   rule in the UA stylesheet loses to any author rule that sets `display`, and
+   two of these set one: the way back is a grid and it stayed on screen through
+   every pin, which is the one control whose whole job is to appear and go. */
+[part="header"][hidden],
+[part="resume"][hidden],
+[part="status"][hidden],
+[part="composer"][hidden] {
   display: none;
 }
 

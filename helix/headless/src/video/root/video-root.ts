@@ -893,7 +893,26 @@ export class HelixHeadlessVideo extends HelixElement {
     if (owner === this && typeof navigator !== 'undefined' && navigator.mediaSession) {
       navigator.mediaSession.playbackState = this.playing ? 'playing' : 'paused'
     }
-    this.dispatchEvent(new Event(event.type, { bubbles: true, composed: true }))
+    /* Non-bubbling, which is what the platform sends and what makes these reach
+       a React consumer at all.
+     *
+     * `play`, `pause` and `ended` are in react-dom's `nonDelegatedEvents`, read
+     * out of the installed 19.2.8 rather than remembered: it concatenates the
+     * whole media list onto `beforetoggle cancel close invalid load scroll
+     * scrollend toggle`. React attaches those directly to `<video>`, `<audio>`
+     * and `<img>` and never to a custom element, so nothing at the root hears
+     * them. `bindReactHandler` is what closes that, and `reactPropFor` skips
+     * anything that bubbles, on the grounds that a bubbling relay is already
+     * reaching React's delegated listener and a second binding would double
+     * every call.
+     *
+     * So these three were sending `bubbles: true` into the one branch that
+     * refuses to bind, and `onPlay`, `onPause` and `onEnded` on `<helix-video>`
+     * were silent in React. The comment beside `reactPropFor` named this exact
+     * trio as fixed while this line kept it broken. Matching the platform's own
+     * propagation fixes it and is what `Image` already does with `load` and
+     * `error`. */
+    this.dispatchEvent(new Event(event.type, { bubbles: false, composed: false }))
   }
 
   /**

@@ -655,6 +655,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
       min=${this.min || nothing}
       step=${this.step}
       @helix-before-change=${this.handleCalendarChange}
+      @change=${this.stopInner}
+      @input=${this.stopInner}
     ></${this.tag('date-picker')}>`
   }
 

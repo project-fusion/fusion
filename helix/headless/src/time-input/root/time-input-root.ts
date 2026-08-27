@@ -552,6 +552,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
       step=${this.step}
       .value=${this.picked}
       @helix-before-change=${this.handlePicked}
+      @change=${this.stopInner}
+      @input=${this.stopInner}
     ></${this.tag('time-picker')}>`
   }
 

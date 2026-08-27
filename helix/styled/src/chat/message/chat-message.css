@@ -57,15 +57,20 @@
   justify-self: end;
 }
 
-/* **`surface-raised`, because a bubble is an object on the transcript rather
-   than a well cut into it.** It was `surface-sunken`, which on a dark page
-   measures L 0.15 against a ground of L 0, so the turn and the page it sat on
-   were fourteen hundredths of lightness apart and the bubble read as a slightly
-   uneven black. Raised is L 0.29 and is what every other card, panel and
-   overlay in the library sits at, which is the right company for a turn: the
-   thing that scrolls is the sunken one, and it paints no ground at all. */
+/* **`surface-sunken`, and it was measured against `surface-raised` before it was
+   kept.** A turn reads as an object and the first instinct is to raise it, which
+   is right on the page and wrong everywhere this component is actually put. In
+   dark mode the page is L 0 and a raised surface is L 0.29, so a raised bubble
+   is a strong shape on a page and exactly invisible inside a popover, a dialog
+   or a drawer, whose panels are that same 0.29. Sunken is L 0.15 and is a tenth
+   and a half away from both: quiet on the page and clear in every container.
+   Measured in the launcher example, where a raised bubble left three turns as
+   floating text.
+
+   The reader's own turns carry chroma instead of lightness, which is why the
+   rule below can sit at the panel's own L and still be legible. */
 [part="content"] {
-  background-color: var(--chat-message-background, var(--helix-color-surface-raised));
+  background-color: var(--chat-message-background, var(--helix-color-surface-sunken));
   border-radius: var(--helix-radii-md);
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);

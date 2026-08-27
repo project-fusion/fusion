@@ -248,13 +248,22 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     }
     /* Closed on a choice, unless more than one can be made: a multi-select that
        shut after each pick would be a control the reader has to reopen to use
-       again. `helix-before-change` is left to travel, since it came from the listbox
-       and says the same thing this would. */
+       again. */
     if (!this.multiple) {
       this.close()
     }
+    /* The listbox's request is stopped and this element's own has already gone
+       out, from `requestValue` above: two elements announcing one choice is
+       what a consumer would have to deduplicate. The comment here used to say
+       the listbox's was "left to travel", which the line below it has always
+       contradicted.
+
+       And no `change` is dispatched here. `requestValue` announces `input` and
+       `change` through the mixin, the way every other discrete control does, so
+       a second one from this line was a second `change` per choice: measured on
+       the styled tier at three, one from the mixin, one from here, and one from
+       the listbox before it was stopped. */
     event.stopPropagation()
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
   }
 
   private readonly handleTriggerKeydown = (event: KeyboardEvent): void => {
@@ -333,6 +342,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ?filterable=${this.filterable}
       aria-label=${this.label || nothing}
       @helix-before-change=${this.handleChange}
+      @change=${this.stopInner}
+      @input=${this.stopInner}
     >
       <!-- The trigger's words are read off the options, and on the first
            render there are none: the slot has not been assigned yet, so a
