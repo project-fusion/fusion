@@ -3,9 +3,10 @@ import type {
   FOLDS_UP_TO,
   Helix,
   HelixBeforeChangeEvent,
+  HelixBeforeCloseEvent,
+  HelixBeforeOpenEvent,
   HelixBeforeToggleEvent,
   HelixChangeEvent,
-  HelixCloseEvent,
   HelixCompleteEvent,
   HelixCopyEvent,
   HelixCreateEvent,
@@ -129,7 +130,6 @@ import type {
   HelixHeadlessVirtualList,
   HelixNavigateEvent,
   HelixNextEvent,
-  HelixOpenEvent,
   HelixPreviousEvent,
   HelixReadEvent,
   HelixResizeEvent,
@@ -346,12 +346,12 @@ export type HelixHeadlessAccordionItemElementEvent<E = Event> = TypedEvent<
   HelixHeadlessAccordionItem,
   E
 >;
-/** `helix-close` event type */
-export type HelixHeadlessAccordionItemHelixCloseElementEvent =
-  HelixHeadlessAccordionItemElementEvent<HelixCloseEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessAccordionItemHelixOpenElementEvent =
-  HelixHeadlessAccordionItemElementEvent<HelixOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessAccordionItemHelixBeforeCloseElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessAccordionItemHelixBeforeOpenElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessAccordionItemProps = {
   /** Where the open indicator sits, or whether there is one.
@@ -392,10 +392,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -403,11 +402,15 @@ helix-close */
   defaultOpen?: HelixHeadlessAccordionItem["defaultOpen"];
 
   /** Fired before the section closes, and cancelable. */
-  "onhelix-close"?: (
-    e: HelixHeadlessAccordionItemHelixCloseElementEvent,
+  "onhelix-before-close"?: (
+    e: HelixHeadlessAccordionItemHelixBeforeCloseElementEvent,
   ) => void;
   /** Fired when the item opens or closes. */
-  "onhelix-open"?: (e: HelixHeadlessAccordionItemHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessAccordionItemHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessAccordionItemElementEvent) => void;
 };
 
 export type HelixHeadlessAccordionItemSolidJsProps = {
@@ -449,23 +452,24 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessAccordionItem["defaultOpen"];
   /** Fired before the section closes, and cancelable. */
-  "on:helix-close"?: (
-    e: HelixHeadlessAccordionItemHelixCloseElementEvent,
+  "on:helix-before-close"?: (
+    e: HelixHeadlessAccordionItemHelixBeforeCloseElementEvent,
   ) => void;
   /** Fired when the item opens or closes. */
-  "on:helix-open"?: (
-    e: HelixHeadlessAccordionItemHelixOpenElementEvent,
+  "on:helix-before-open"?: (
+    e: HelixHeadlessAccordionItemHelixBeforeOpenElementEvent,
   ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessAccordionItemElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2126,12 +2130,12 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessColorInputHelixOpenElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessColorInputHelixCloseElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessColorInputHelixBeforeCloseElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessColorInputProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -2202,10 +2206,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -2276,10 +2279,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the panel opens. */
-  "onhelix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessColorInputElementEvent) => void;
 };
 
@@ -2352,10 +2359,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -2425,10 +2431,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the panel opens. */
-  "on:helix-open"?: (e: HelixHeadlessColorInputHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessColorInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessColorInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -2736,12 +2746,12 @@ export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
 /** `helix-create` event type */
 export type HelixHeadlessComboboxHelixCreateElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessComboboxHelixOpenElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessComboboxHelixCloseElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessComboboxHelixBeforeCloseElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessComboboxProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -2847,10 +2857,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -2923,10 +2932,14 @@ reflected none of them. */
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "onhelix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
-  "onhelix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessComboboxElementEvent) => void;
 };
 
@@ -3034,10 +3047,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -3109,10 +3121,14 @@ reflected none of them. */
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "on:helix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
-  "on:helix-open"?: (e: HelixHeadlessComboboxHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessComboboxHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessComboboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -3129,12 +3145,12 @@ export type HelixHeadlessCommandElementEvent<E = Event> = TypedEvent<
 /** `helix-select` event type */
 export type HelixHeadlessCommandHelixSelectElementEvent =
   HelixHeadlessCommandElementEvent<HelixSelectEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessCommandHelixOpenElementEvent =
-  HelixHeadlessCommandElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessCommandHelixCloseElementEvent =
-  HelixHeadlessCommandElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessCommandHelixBeforeCloseElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessCommandProps = {
   /** Accessible name for the overlay, which has no visible heading. */
@@ -3171,10 +3187,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -3184,9 +3199,15 @@ helix-close */
   /** Fired when a command is chosen. */
   "onhelix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Fired when the palette opens. */
-  "onhelix-open"?: (e: HelixHeadlessCommandHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessCommandHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessCommandElementEvent) => void;
 };
 
 export type HelixHeadlessCommandSolidJsProps = {
@@ -3224,10 +3245,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -3236,9 +3256,15 @@ helix-close */
   /** Fired when a command is chosen. */
   "on:helix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Fired when the palette opens. */
-  "on:helix-open"?: (e: HelixHeadlessCommandHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessCommandHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessCommandElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3700,12 +3726,12 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessDateInputHelixOpenElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessDateInputHelixCloseElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDateInputHelixBeforeCloseElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessDateInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -3841,10 +3867,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -3915,10 +3940,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the calendar opens. */
-  "onhelix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessDateInputElementEvent) => void;
 };
 
@@ -4056,10 +4085,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -4129,10 +4157,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the calendar opens. */
-  "on:helix-open"?: (e: HelixHeadlessDateInputHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessDateInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessDateInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -4404,12 +4436,12 @@ export type HelixHeadlessDialogElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDialog,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessDialogHelixOpenElementEvent =
-  HelixHeadlessDialogElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessDialogHelixCloseElementEvent =
-  HelixHeadlessDialogElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDialogHelixBeforeCloseElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessDialogProps = {
   /** Accessible name for the dialog. */
@@ -4450,10 +4482,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -4461,11 +4492,17 @@ helix-close */
   defaultOpen?: HelixHeadlessDialog["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessDialogHelixBeforeCloseElementEvent,
+  ) => void;
   /** Relayed, because the platform's own does not escape. */
   onclose?: (e: HelixHeadlessDialogElementEvent) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessDialogElementEvent) => void;
 };
 
 export type HelixHeadlessDialogSolidJsProps = {
@@ -4507,21 +4544,26 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessDialog["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessDialogHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessDialogHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessDialogHelixBeforeCloseElementEvent,
+  ) => void;
   /** Relayed, because the platform's own does not escape. */
   "on:close"?: (e: HelixHeadlessDialogElementEvent) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessDialogElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4696,12 +4738,12 @@ export type HelixHeadlessDrawerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDrawer,
   E
 >;
-/** `helix-close` event type */
-export type HelixHeadlessDrawerHelixCloseElementEvent =
-  HelixHeadlessDrawerElementEvent<HelixCloseEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessDrawerHelixOpenElementEvent =
-  HelixHeadlessDrawerElementEvent<HelixOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDrawerHelixBeforeCloseElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDrawerHelixBeforeOpenElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDrawerProps = {
   /** Which edge the drawer comes from.
@@ -4745,10 +4787,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -4756,11 +4797,17 @@ helix-close */
   defaultOpen?: HelixHeadlessDrawer["defaultOpen"];
 
   /** Fired before the panel closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
+  ) => void;
   /** Relayed, because the platform's own does not escape. */
   onclose?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
-  "onhelix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessDrawerElementEvent) => void;
 };
 
 export type HelixHeadlessDrawerSolidJsProps = {
@@ -4805,21 +4852,26 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessDrawer["defaultOpen"];
   /** Fired before the panel closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessDrawerHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
+  ) => void;
   /** Relayed, because the platform's own does not escape. */
   "on:close"?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
-  "on:helix-open"?: (e: HelixHeadlessDrawerHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessDrawerElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6502,12 +6554,12 @@ export type HelixHeadlessMegamenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMegamenu,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessMegamenuHelixOpenElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessMegamenuHelixCloseElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessMegamenuHelixBeforeCloseElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessMegamenuProps = {
   /** The section's name, which names the default trigger and the panel. */
@@ -6592,10 +6644,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -6603,10 +6654,14 @@ helix-close */
   defaultOpen?: HelixHeadlessMegamenu["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessMegamenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessMegamenuElementEvent) => void;
 };
 
@@ -6693,20 +6748,23 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessMegamenuHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessMegamenuHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessMegamenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessMegamenuElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -6863,12 +6921,12 @@ export type HelixHeadlessMenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMenu,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessMenuHelixOpenElementEvent =
-  HelixHeadlessMenuElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessMenuHelixCloseElementEvent =
-  HelixHeadlessMenuElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessMenuHelixBeforeCloseElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeCloseEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessMenuHelixSelectElementEvent =
   HelixHeadlessMenuElementEvent<HelixSelectEvent>;
@@ -6918,10 +6976,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -6929,12 +6986,16 @@ helix-close */
   defaultOpen?: HelixHeadlessMenu["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessMenuHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessMenuHelixBeforeCloseElementEvent,
+  ) => void;
   /** Fired when an item is chosen. */
   "onhelix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessMenuElementEvent) => void;
 };
 
@@ -6983,22 +7044,25 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessMenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessMenuHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessMenuHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessMenuHelixBeforeCloseElementEvent,
+  ) => void;
   /** Fired when an item is chosen. */
   "on:helix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessMenuElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -8548,12 +8612,12 @@ export type HelixHeadlessPopoverElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPopover,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessPopoverHelixOpenElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessPopoverHelixCloseElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessPopoverHelixBeforeCloseElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessPopoverProps = {
   /** Accessible name for the panel. */
@@ -8582,10 +8646,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -8593,10 +8656,14 @@ helix-close */
   defaultOpen?: HelixHeadlessPopover["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessPopoverHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessPopoverElementEvent) => void;
 };
 
@@ -8627,20 +8694,23 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessPopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessPopover["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessPopoverHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessPopoverHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessPopoverHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessPopoverElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -9360,12 +9430,12 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessSelectHelixOpenElementEvent =
-  HelixHeadlessSelectElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessSelectHelixCloseElementEvent =
-  HelixHeadlessSelectElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessSelectHelixBeforeCloseElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessSelectProps = {
   /** Whether the list can be narrowed by typing.
@@ -9414,10 +9484,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -9488,10 +9557,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Fired when the list opens. */
-  "onhelix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessSelectElementEvent) => void;
 };
 
@@ -9542,10 +9615,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -9615,10 +9687,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Fired when the list opens. */
-  "on:helix-open"?: (e: HelixHeadlessSelectHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessSelectHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -10076,12 +10152,12 @@ export type HelixHeadlessSpeedDialElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSpeedDial,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessSpeedDialHelixOpenElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessSpeedDialHelixCloseElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessSpeedDialHelixBeforeCloseElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessSpeedDialProps = {
   /** Names the trigger and the set of actions it opens. */
@@ -10113,10 +10189,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -10124,10 +10199,14 @@ helix-close */
   defaultOpen?: HelixHeadlessSpeedDial["defaultOpen"];
 
   /** Fired before it opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessSpeedDialElementEvent) => void;
 };
 
@@ -10161,20 +10240,23 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Fired before it opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessSpeedDialHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessSpeedDialHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessSpeedDialElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11501,12 +11583,12 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessTimeInputHelixOpenElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTimeInputHelixCloseElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTimeInputHelixBeforeCloseElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTimeInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -11597,10 +11679,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -11671,10 +11752,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the list opens. */
-  "onhelix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "onhelix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTimeInputElementEvent) => void;
 };
 
@@ -11767,10 +11852,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -11840,10 +11924,14 @@ reflected none of them. */
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the list opens. */
-  "on:helix-open"?: (e: HelixHeadlessTimeInputHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired when it closes. */
-  "on:helix-close"?: (e: HelixHeadlessTimeInputHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTimeInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12662,12 +12750,12 @@ export type HelixHeadlessTooltipElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTooltip,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessTooltipHelixOpenElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTooltipHelixCloseElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTooltipHelixBeforeCloseElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTooltipProps = {
   /** The text shown in the bubble.
@@ -12766,10 +12854,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -12777,10 +12864,14 @@ helix-close */
   defaultOpen?: HelixHeadlessTooltip["defaultOpen"];
 
   /** Fired before the bubble shows, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it hides, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "onhelix-before-close"?: (
+    e: HelixHeadlessTooltipHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTooltipElementEvent) => void;
 };
 
@@ -12881,20 +12972,23 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessTooltip["defaultOpen"];
   /** Fired before the bubble shows, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessTooltipHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before it hides, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessTooltipHelixCloseElementEvent) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "on:helix-before-close"?: (
+    e: HelixHeadlessTooltipHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTooltipElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12914,9 +13008,9 @@ export type HelixHeadlessTourHelixChangeElementEvent =
 /** `helix-complete` event type */
 export type HelixHeadlessTourHelixCompleteElementEvent =
   HelixHeadlessTourElementEvent<HelixCompleteEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTourHelixCloseElementEvent =
-  HelixHeadlessTourElementEvent<HelixCloseEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTourHelixBeforeCloseElementEvent =
+  HelixHeadlessTourElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTourProps = {
   /** Whether the tour is running. */
@@ -12966,7 +13060,11 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   /** Fired when the last stop is finished. */
   "onhelix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
-  "onhelix-close"?: (e: HelixHeadlessTourHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessTourHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessTourElementEvent) => void;
 };
 
 export type HelixHeadlessTourSolidJsProps = {
@@ -13016,7 +13114,11 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   /** Fired when the last stop is finished. */
   "on:helix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
-  "on:helix-close"?: (e: HelixHeadlessTourHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessTourHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessTourElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13071,8 +13173,6 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "onhelix-tour-ask"?: (
     e: HelixHeadlessTourStopHelixTourAskElementEvent,
   ) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
-  ontoggle?: (e: HelixHeadlessTourStopElementEvent) => void;
 };
 
 export type HelixHeadlessTourStopSolidJsProps = {
@@ -13112,8 +13212,6 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "on:helix-tour-ask"?: (
     e: HelixHeadlessTourStopHelixTourAskElementEvent,
   ) => void;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
-  "on:toggle"?: (e: HelixHeadlessTourStopElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13129,12 +13227,12 @@ export type HelixHeadlessTreeItemElementEvent<E = Event> = TypedEvent<
 /** `helix-select` event type */
 export type HelixHeadlessTreeItemHelixSelectElementEvent =
   HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessTreeItemHelixOpenElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTreeItemHelixCloseElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTreeItemHelixBeforeCloseElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTreeItemProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
@@ -13194,10 +13292,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -13209,9 +13306,15 @@ helix-close */
   /** Fired when the item is chosen. */
   "onhelix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
-  "onhelix-open"?: (e: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before a branch closes, and cancelable. */
-  "onhelix-close"?: (e: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
+  "onhelix-before-close"?: (
+    e: HelixHeadlessTreeItemHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  ontoggle?: (e: HelixHeadlessTreeItemElementEvent) => void;
 };
 
 export type HelixHeadlessTreeItemSolidJsProps = {
@@ -13272,10 +13375,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   "prop:open"?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "bool:default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -13286,9 +13388,15 @@ helix-close */
   /** Fired when the item is chosen. */
   "on:helix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
-  "on:helix-open"?: (e: HelixHeadlessTreeItemHelixOpenElementEvent) => void;
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
+  ) => void;
   /** Fired before a branch closes, and cancelable. */
-  "on:helix-close"?: (e: HelixHeadlessTreeItemHelixCloseElementEvent) => void;
+  "on:helix-before-close"?: (
+    e: HelixHeadlessTreeItemHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  "on:toggle"?: (e: HelixHeadlessTreeItemElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14087,18 +14195,18 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-close`: Fired before the section closes, and cancelable.
-   * - `helix-open`: Fired when the item opens or closes.
+   * - `helix-before-close`: Fired before the section closes, and cancelable.
+   * - `helix-before-open`: Fired when the item opens or closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -14118,8 +14226,8 @@ export type CustomElements = {
    * intent as a method keeps the parent out of the child's internals.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -14147,7 +14255,7 @@ export type CustomElements = {
    * coordinates: it walks up to the nearest accordion, reads the mode off it, and
    * closes its peers itself.
    *
-   * Coordination is structural, not a subscription. `helix-open` does not bubble
+   * Coordination is structural, not a subscription. `helix-before-open` does not bubble
    * and is not composed, because overlays nest and an inner one's lifecycle must
    * never read as the outer one's, so an accordion cannot learn that a child
    * opened by listening for it.
@@ -15979,10 +16087,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -16039,9 +16146,9 @@ export type CustomElements = {
    * - `helix-before-change`: Fired when the color changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the panel opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -16060,8 +16167,8 @@ export type CustomElements = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -16550,10 +16657,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -16611,9 +16717,9 @@ export type CustomElements = {
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
-   * - `helix-open`: Fired when the panel opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -16630,8 +16736,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -16779,10 +16885,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -16790,8 +16895,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when a command is chosen.
-   * - `helix-open`: Fired when the palette opens.
-   * - `helix-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the palette opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -16806,8 +16912,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -17293,10 +17399,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -17353,9 +17458,9 @@ export type CustomElements = {
    * - `helix-before-change`: Fired when the date changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the calendar opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -17372,8 +17477,8 @@ export type CustomElements = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -17692,7 +17797,7 @@ export type CustomElements = {
    * alone, two of those would shut the dialog while the consumer's state still
    * said open, which is the bug that makes a modal impossible to reopen. Escape
    * is intercepted and routed through the request, so `preventDefault()` on the
-   * `helix-close` refuses it; a close that happens anyway is reflected back.
+   * `helix-before-close` refuses it; a close that happens anyway is reflected back.
    *
    * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
    * the rest of the document is something no JavaScript trap can achieve.
@@ -17753,19 +17858,19 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -17784,8 +17889,8 @@ export type CustomElements = {
    * - `close() => void`: Asks to close, which a consumer may refuse.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -18070,19 +18175,19 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-close`: Fired before the panel closes, and cancelable.
+   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
-   * - `helix-open`: Fired when the drawer opens or closes.
+   * - `helix-before-open`: Fired when the drawer opens or closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -18097,8 +18202,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -19966,19 +20071,18 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -19993,8 +20097,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -20202,20 +20306,19 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -20232,8 +20335,8 @@ export type CustomElements = {
    * - `hide() => void`: Closes the menu, and forgets which page was showing.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -20918,7 +21021,27 @@ export type CustomElements = {
    *
    * Read from the rendered content rather than required as a property, because
    * the content is where a consumer naturally puts it and asking for both is
-   * asking for two things to disagree. (property only) (readonly)
+   * asking for two things to disagree.
+   *
+   * **The default slot's content, not the element's.** This was
+   * `this.textContent`, which is every descendant text node an option holds,
+   * and an option holds three slots: the words, plus `start` for an icon and
+   * `end` for a shortcut or a count. Neither of those is what a reader
+   * searched for, and both were being run onto the end of it.
+   *
+   * **Six things read this and all six were wrong.** The collapsed field of
+   * Select and of Combobox show it, the listbox filters on it, Combobox
+   * matches typed text against it, completes inline from it, and labels a
+   * chosen tag with it. Measured on a font picker whose options carry a
+   * two-letter specimen in `end`: the field read `Noto Sans Linear BAg`, and
+   * typing `ag` matched 1,892 of 1,893 options, every row containing the
+   * sample. An option with a keyboard shortcut in its end slot has the same
+   * fault and a worse one, every row carrying one matching every letter of it.
+   *
+   * A node goes to the default slot when it names no other, which is the rule
+   * the platform applies at assignment. Asking the same question here rather
+   * than a second one is what stops the two disagreeing. Text nodes are
+   * always the default slot's and cannot say otherwise. (property only) (readonly)
    *
    * ## Events
    *
@@ -21620,19 +21743,18 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -21649,8 +21771,8 @@ export type CustomElements = {
    * - `hide() => void`: Closes the panel and puts focus back on the trigger.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -22418,10 +22540,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -22478,9 +22599,9 @@ export type CustomElements = {
    * - `helix-before-change`: Relayed from the listbox when the answer changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the list opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -22499,8 +22620,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -23065,19 +23186,18 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -23092,8 +23212,8 @@ export type CustomElements = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -24493,10 +24613,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -24553,9 +24672,9 @@ export type CustomElements = {
    * - `helix-before-change`: Fired when the time changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the list opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -24572,8 +24691,8 @@ export type CustomElements = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -25551,8 +25670,8 @@ export type CustomElements = {
    * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
    * control has already committed to it.
    *
-   * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
-   * `helix-close` like every other overlay here, and a consumer can drive it with
+   * Open state comes from `MixinControllerOpen`, so it announces `helix-before-open` and
+   * `helix-before-close` like every other overlay here, and a consumer can drive it with
    * `open` where they need to.
    *
    * ## Attributes & Properties
@@ -25644,19 +25763,18 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before the bubble shows, and cancelable.
-   * - `helix-close`: Fired before it hides, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
+   * - `helix-before-close`: Fired before it hides, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -25684,8 +25802,8 @@ export type CustomElements = {
    * the reader had moved on to.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -25774,7 +25892,8 @@ export type CustomElements = {
    *
    * - `helix-change`: Fired when the current stop moves, carrying the new index.
    * - `helix-complete`: Fired when the last stop is finished.
-   * - `helix-close`: Fired when the reader leaves early.
+   * - `helix-before-close`: Fired when the reader leaves early.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -25861,7 +25980,6 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -25987,10 +26105,9 @@ export type CustomElements = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    *
@@ -25999,8 +26116,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when the item is chosen.
-   * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-before-open`: Fired before a branch opens, and cancelable.
+   * - `helix-before-close`: Fired before a branch closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -26030,8 +26148,8 @@ export type CustomElements = {
    * because choosing announced a value and nothing listened for it.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -26800,18 +26918,18 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-close`: Fired before the section closes, and cancelable.
-   * - `helix-open`: Fired when the item opens or closes.
+   * - `helix-before-close`: Fired before the section closes, and cancelable.
+   * - `helix-before-open`: Fired when the item opens or closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -26831,8 +26949,8 @@ export type CustomElementsSolidJs = {
    * intent as a method keeps the parent out of the child's internals.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -26861,7 +26979,7 @@ export type CustomElementsSolidJs = {
    * coordinates: it walks up to the nearest accordion, reads the mode off it, and
    * closes its peers itself.
    *
-   * Coordination is structural, not a subscription. `helix-open` does not bubble
+   * Coordination is structural, not a subscription. `helix-before-open` does not bubble
    * and is not composed, because overlays nest and an inner one's lifecycle must
    * never read as the outer one's, so an accordion cannot learn that a child
    * opened by listening for it.
@@ -28741,10 +28859,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -28801,9 +28918,9 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Fired when the color changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the panel opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -28822,8 +28939,8 @@ export type CustomElementsSolidJs = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -29314,10 +29431,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -29375,9 +29491,9 @@ export type CustomElementsSolidJs = {
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
-   * - `helix-open`: Fired when the panel opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -29394,8 +29510,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -29546,10 +29662,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
@@ -29557,8 +29672,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when a command is chosen.
-   * - `helix-open`: Fired when the palette opens.
-   * - `helix-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the palette opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -29573,8 +29689,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -30067,10 +30183,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -30127,9 +30242,9 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Fired when the date changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the calendar opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -30146,8 +30261,8 @@ export type CustomElementsSolidJs = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -30470,7 +30585,7 @@ export type CustomElementsSolidJs = {
    * alone, two of those would shut the dialog while the consumer's state still
    * said open, which is the bug that makes a modal impossible to reopen. Escape
    * is intercepted and routed through the request, so `preventDefault()` on the
-   * `helix-close` refuses it; a close that happens anyway is reflected back.
+   * `helix-before-close` refuses it; a close that happens anyway is reflected back.
    *
    * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
    * the rest of the document is something no JavaScript trap can achieve.
@@ -30531,19 +30646,19 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -30562,8 +30677,8 @@ export type CustomElementsSolidJs = {
    * - `close() => void`: Asks to close, which a consumer may refuse.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -30855,19 +30970,19 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-close`: Fired before the panel closes, and cancelable.
+   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
-   * - `helix-open`: Fired when the drawer opens or closes.
+   * - `helix-before-open`: Fired when the drawer opens or closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -30882,8 +30997,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -32798,19 +32913,18 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -32825,8 +32939,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -33040,20 +33154,19 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -33070,8 +33183,8 @@ export type CustomElementsSolidJs = {
    * - `hide() => void`: Closes the menu, and forgets which page was showing.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -33767,7 +33880,27 @@ export type CustomElementsSolidJs = {
    *
    * Read from the rendered content rather than required as a property, because
    * the content is where a consumer naturally puts it and asking for both is
-   * asking for two things to disagree. (property only) (readonly)
+   * asking for two things to disagree.
+   *
+   * **The default slot's content, not the element's.** This was
+   * `this.textContent`, which is every descendant text node an option holds,
+   * and an option holds three slots: the words, plus `start` for an icon and
+   * `end` for a shortcut or a count. Neither of those is what a reader
+   * searched for, and both were being run onto the end of it.
+   *
+   * **Six things read this and all six were wrong.** The collapsed field of
+   * Select and of Combobox show it, the listbox filters on it, Combobox
+   * matches typed text against it, completes inline from it, and labels a
+   * chosen tag with it. Measured on a font picker whose options carry a
+   * two-letter specimen in `end`: the field read `Noto Sans Linear BAg`, and
+   * typing `ag` matched 1,892 of 1,893 options, every row containing the
+   * sample. An option with a keyboard shortcut in its end slot has the same
+   * fault and a worse one, every row carrying one matching every letter of it.
+   *
+   * A node goes to the default slot when it names no other, which is the rule
+   * the platform applies at assignment. Asking the same question here rather
+   * than a second one is what stops the two disagreeing. Text nodes are
+   * always the default slot's and cannot say otherwise. (property only) (readonly)
    *
    * ## Events
    *
@@ -34481,19 +34614,18 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -34510,8 +34642,8 @@ export type CustomElementsSolidJs = {
    * - `hide() => void`: Closes the panel and puts focus back on the trigger.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -35299,10 +35431,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -35359,9 +35490,9 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Relayed from the listbox when the answer changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the list opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -35380,8 +35511,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -35959,19 +36090,18 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -35986,8 +36116,8 @@ export type CustomElementsSolidJs = {
    *
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -37433,10 +37563,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -37493,9 +37622,9 @@ export type CustomElementsSolidJs = {
    * - `helix-before-change`: Fired when the time changes.
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-open`: Fired when the list opens.
-   * - `helix-close`: Fired when it closes.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-close`: Fired when it closes.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -37512,8 +37641,8 @@ export type CustomElementsSolidJs = {
    * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -38512,8 +38641,8 @@ export type CustomElementsSolidJs = {
    * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
    * control has already committed to it.
    *
-   * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
-   * `helix-close` like every other overlay here, and a consumer can drive it with
+   * Open state comes from `MixinControllerOpen`, so it announces `helix-before-open` and
+   * `helix-before-close` like every other overlay here, and a consumer can drive it with
    * `open` where they need to.
    *
    * ## Attributes & Properties
@@ -38605,19 +38734,18 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    *
    * ## Events
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-open`: Fired before the bubble shows, and cancelable.
-   * - `helix-close`: Fired before it hides, and cancelable.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
+   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
+   * - `helix-before-close`: Fired before it hides, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -38645,8 +38773,8 @@ export type CustomElementsSolidJs = {
    * the reader had moved on to.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
@@ -38738,7 +38866,8 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-change`: Fired when the current stop moves, carrying the new index.
    * - `helix-complete`: Fired when the last stop is finished.
-   * - `helix-close`: Fired when the reader leaves early.
+   * - `helix-before-close`: Fired when the reader leaves early.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -38828,7 +38957,6 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
-   * - `toggle`: Says the panel moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -38957,10 +39085,9 @@ export type CustomElementsSolidJs = {
    * opened itself would put `open` on its own host and, from the next thing
    * that read it, be indistinguishable from one the consumer controls:
    * cloned, serialised for hydration, or diffed by a framework, it would come
-   * back controlled and stop responding. `data-open` carries the resolved
-   * state for stylesheets, which is what it has always been for.
-   *
-   * helix-close
+   * back holding whatever the last reader did rather than what the author
+   * wrote. `data-open` carries the resolved state for stylesheets, which is
+   * what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    *
@@ -38969,8 +39096,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-select`: Fired when the item is chosen.
-   * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable.
+   * - `helix-before-open`: Fired before a branch opens, and cancelable.
+   * - `helix-before-close`: Fired before a branch closes, and cancelable.
+   * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
@@ -39000,8 +39128,8 @@ export type CustomElementsSolidJs = {
    * because choosing announced a value and nothing listened for it.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
-   * Announces before it acts, so `preventDefault()` on the `helix-open` or
-   * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+   * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+   * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.

@@ -209,7 +209,7 @@ export function InsightBrowser({
             className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
             label="Search insights"
-            onhelix-before-change={(event) => {
+            onInput={(event) => {
               setQuery(event.detail.value)
               mirror('q', event.detail.value)
             }}
@@ -246,7 +246,7 @@ export function InsightBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={topic}
               label="Topic"
-              onhelix-before-change={(event) => {
+              onChange={(event) => {
                 setTopic(event.detail.value)
                 mirror('topic', event.detail.value)
               }}
@@ -270,7 +270,7 @@ export function InsightBrowser({
                 className={`${browser.chromeControl} ${browser.filterControl}`}
                 default-value={kind}
                 label="Kind"
-                onhelix-before-change={(event) => {
+                onChange={(event) => {
                   setKind(event.detail.value)
                   mirror('kind', event.detail.value)
                 }}
@@ -299,7 +299,7 @@ export function InsightBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onhelix-before-change={(event) => sortBy(event.detail.value)}
+              onChange={(event) => sortBy(event.currentTarget.value)}
             >
               {/* A different mark from the filters', because it does a different
                   thing: a funnel takes rows away, and this only changes the

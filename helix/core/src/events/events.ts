@@ -4,7 +4,7 @@
  * A named class rather than `dispatchEvent(new CustomEvent(name, …))` for three
  * reasons, all of them about the type reaching a consumer:
  *
- * 1. `@event {HelixOpenEvent} helix-open` puts the class name in the manifest,
+ * 1. `@event {HelixBeforeOpenEvent} helix-before-open` puts the class name in the manifest,
  *    which is what lets the React generator emit a typed callback instead of
  *    `(detail: unknown)`.
  * 2. The augmentation of `HTMLElementEventMap` below types `addEventListener`
@@ -22,8 +22,8 @@
  * control's own. Prefixed, it cannot be mistaken for either.
  *
  * The name also decides the framework prop, and decides it verbatim: React
- * slices `on` off the prop and listens for exactly what is left, so `helix-open`
- * is `onhelix-open`. Nothing strips the prefix and nothing camel-cases it, which
+ * slices `on` off the prop and listens for exactly what is left, so `helix-before-open`
+ * is `onhelix-before-open`. Nothing strips the prefix and nothing camel-cases it, which
  * is what leaves the prefix free to do the third job below.
  *
  * The prefix earns its place three times over:
@@ -42,7 +42,7 @@
  *
  * Propagation follows the event's role rather than a single house rule:
  *
- * - **Lifecycle** (`helix-open`, `helix-close`) does not bubble and is not
+ * - **Lifecycle** (`helix-before-open`, `helix-before-close`) does not bubble and is not
  *   composed. Overlays nest, and an inner one's lifecycle must never reach the
  *   outer one that contains it.
  * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-change`)
@@ -50,7 +50,7 @@
  *   shadow boundary.
  */
 
-/** Detail carried by `helix-open` and `helix-close`. */
+/** Detail carried by `helix-before-open` and `helix-before-close`. */
 export interface OpenDetail {
   /** The state the element is moving to. */
   open: boolean
@@ -60,7 +60,7 @@ export interface OpenDetail {
  * Fired when an element is about to open.
  *
  * Cancelable: `preventDefault()` refuses the change, and the element stays
- * closed. Paired with `helix-close` rather than being one event carrying a
+ * closed. Paired with `helix-before-close` rather than being one event carrying a
  * boolean, so a listener that only cares about one direction says so by which
  * event it listens for.
  *
@@ -68,11 +68,11 @@ export interface OpenDetail {
  * three overlays, and an inner one opening must not read as the outer one
  * opening.
  */
-export class HelixOpenEvent extends CustomEvent<OpenDetail> {
-  static readonly eventName = 'helix-open'
+export class HelixBeforeOpenEvent extends CustomEvent<OpenDetail> {
+  static readonly eventName = 'helix-before-open'
 
   constructor() {
-    super(HelixOpenEvent.eventName, {
+    super(HelixBeforeOpenEvent.eventName, {
       bubbles: false,
       cancelable: true,
       composed: false,
@@ -81,12 +81,12 @@ export class HelixOpenEvent extends CustomEvent<OpenDetail> {
   }
 }
 
-/** Fired when an element is about to close. See `HelixOpenEvent`. */
-export class HelixCloseEvent extends CustomEvent<OpenDetail> {
-  static readonly eventName = 'helix-close'
+/** Fired when an element is about to close. See `HelixBeforeOpenEvent`. */
+export class HelixBeforeCloseEvent extends CustomEvent<OpenDetail> {
+  static readonly eventName = 'helix-before-close'
 
   constructor() {
-    super(HelixCloseEvent.eventName, {
+    super(HelixBeforeCloseEvent.eventName, {
       bubbles: false,
       cancelable: true,
       composed: false,
@@ -99,7 +99,7 @@ export class HelixCloseEvent extends CustomEvent<OpenDetail> {
  * Fired when the reader asks for the next thing in a set.
  *
  * Paired with `helix-previous` rather than being one event carrying a
- * direction, which is the reason `helix-open` gives for its own pair: a
+ * direction, which is the reason `helix-before-open` gives for its own pair: a
  * listener that only cares about one direction says so by which event it
  * listens for. The detail carries the direction anyway, so a consumer who does
  * want one handler can have one.
@@ -452,7 +452,7 @@ export interface ToggleDetail {
  * every text field narrows for a case that cannot happen to them, and the next
  * numeric control widens it again.
  *
- * So the split follows the shape already in this file. `helix-open` carries
+ * So the split follows the shape already in this file. `helix-before-open` carries
  * `{ open: boolean }` rather than stringifying into a change, and this is the
  * same decision for the same reason.
  *
@@ -915,10 +915,11 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
  */
 const registry = {
   HelixBeforeChangeEvent,
+  HelixBeforeCloseEvent,
+  HelixBeforeOpenEvent,
   HelixBeforeToggleEvent,
   HelixCaretEvent,
   HelixChangeEvent,
-  HelixCloseEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
   HelixCopyEvent,
@@ -928,7 +929,6 @@ const registry = {
   HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
-  HelixOpenEvent,
   HelixPreviousEvent,
   HelixReadEvent,
   HelixResizeEvent,

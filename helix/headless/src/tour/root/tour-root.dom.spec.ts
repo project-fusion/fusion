@@ -114,7 +114,7 @@ describe('moving through it', () => {
     tour.addEventListener('helix-complete', () => {
       done += 1
     })
-    tour.addEventListener('helix-close', () => {
+    tour.addEventListener('helix-before-close', () => {
       closed += 1
     })
     tour.skip()
@@ -246,14 +246,14 @@ describe('a tour whose stop the consumer owns', () => {
 })
 
 describe('leaving the run', () => {
-  /* Only one of the two ways out is a request. `HelixCloseEvent` is
+  /* Only one of the two ways out is a request. `HelixBeforeCloseEvent` is
      `cancelable: true` and `HelixCompleteEvent` is not, deliberately: leaving
      early is something a consumer may refuse, and having finished is something
      that has already happened. The audit read both as closes and said neither
      was cancelable; only the first of them ever could be. */
   test('is cancelable when the reader is leaving early', async () => {
     const tour = await run()
-    tour.addEventListener('helix-close', (event) => {
+    tour.addEventListener('helix-before-close', (event) => {
       event.preventDefault()
     })
     tour.skip()

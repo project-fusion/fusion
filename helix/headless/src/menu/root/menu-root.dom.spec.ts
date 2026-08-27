@@ -211,7 +211,7 @@ describe('menu', () => {
     // controlled path and is the consumer stating the answer rather than asking
     // for it, so there is nothing there to refuse.
     const el = await menu()
-    el.addEventListener('helix-open', (event) => event.preventDefault())
+    el.addEventListener('helix-before-open', (event) => event.preventDefault())
     el.toggleOpen()
     await el.updateComplete
     expect(el.hasAttribute('data-open')).toBe(false)

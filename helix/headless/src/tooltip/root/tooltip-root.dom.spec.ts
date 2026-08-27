@@ -106,7 +106,7 @@ describe('tooltip', () => {
 
   test('it announces before it opens, and a refusal holds it shut', async () => {
     const tip = await tooltip()
-    tip.addEventListener('helix-open', (event) => {
+    tip.addEventListener('helix-before-open', (event) => {
       event.preventDefault()
     })
     tip.show()
@@ -119,7 +119,7 @@ describe('tooltip', () => {
     tip.show()
     await tip.updateComplete
     let closed = false
-    tip.addEventListener('helix-close', () => {
+    tip.addEventListener('helix-before-close', () => {
       closed = true
     })
     tip.hide()

@@ -14,7 +14,7 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * coordinates: it walks up to the nearest accordion, reads the mode off it, and
  * closes its peers itself.
  *
- * Coordination is structural, not a subscription. `helix-open` does not bubble
+ * Coordination is structural, not a subscription. `helix-before-open` does not bubble
  * and is not composed, because overlays nest and an inner one's lifecycle must
  * never read as the outer one's, so an accordion cannot learn that a child
  * opened by listening for it.

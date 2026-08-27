@@ -67,8 +67,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
  * control has already committed to it.
  *
- * Open state comes from `MixinControllerOpen`, so it announces `helix-open` and
- * `helix-close` like every other overlay here, and a consumer can drive it with
+ * Open state comes from `MixinControllerOpen`, so it announces `helix-before-open` and
+ * `helix-before-close` like every other overlay here, and a consumer can drive it with
  * `open` where they need to.
  *
  * @since 0.1.0
@@ -81,9 +81,9 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @slot content - The bubble's content, when `content` is not enough. Anything
  * slotted here replaces the property, which is this slot's fallback.
  *
- * @event {HelixOpenEvent} helix-open - Fired before the bubble shows, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the bubble shows, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it hides, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart arrow - The point, resting against the trigger.
  * @csspart tooltip - The bubble.

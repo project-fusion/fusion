@@ -279,7 +279,7 @@ export function Showcase(): React.ReactElement {
         class={styles.showcaseSwitch}
         label="Showing"
         label-placement="start"
-        onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
+        onChange={(event: CustomEvent<{ value: string }>) => {
           setView(event.detail.value as View)
         }}
         separation="outlined"
@@ -307,7 +307,7 @@ export function Showcase(): React.ReactElement {
         class={styles.showcaseBrand}
         default-value={BRAND}
         name="brand"
-        onhelix-before-change={(event: CustomEvent<{ value: string }>) => {
+        onChange={(event: CustomEvent<{ value: string }>) => {
           setBrand(event.detail.value)
         }}
         value={brand}

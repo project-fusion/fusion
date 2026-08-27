@@ -105,8 +105,8 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     <helix-drawer
       label="Preferences"
       material="glass"
-      onhelix-close={() => onOpenChange(false)}
-      onhelix-open={() => onOpenChange(true)}
+      onhelix-before-close={() => onOpenChange(false)}
+      onhelix-before-open={() => onOpenChange(true)}
       open={open}
       placement="end"
     >
@@ -128,7 +128,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             `aria-label`. */}
         <helix-toggle-group
           label="Color mode"
-          onhelix-before-change={(event) => choose(event.detail.value as ColorMode)}
+          onChange={(event) => choose(event.currentTarget.value as ColorMode)}
           value={mode}
         >
           <helix-toggle value="system">System</helix-toggle>
@@ -144,7 +144,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         <helix-toggle-group
           hint="Styled extends headless, so it shows more."
           label="API reference"
-          onhelix-before-change={(event) => chooseTier(event.detail.value as ApiTier)}
+          onChange={(event) => chooseTier(event.currentTarget.value as ApiTier)}
           value={tier}
         >
           <helix-toggle value="headless">Headless</helix-toggle>

@@ -48,9 +48,9 @@ import { property } from 'lit/decorators.js'
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
  *
- * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {

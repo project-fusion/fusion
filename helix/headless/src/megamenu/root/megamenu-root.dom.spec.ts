@@ -309,7 +309,7 @@ describe('a megamenu', () => {
     const second = bar.querySelector('#b') as Section
     await first.updateComplete
     await second.updateComplete
-    first.addEventListener('helix-close', (event) => event.preventDefault())
+    first.addEventListener('helix-before-close', (event) => event.preventDefault())
 
     ;(part(first, 'trigger') as HTMLElement).click()
     await first.updateComplete

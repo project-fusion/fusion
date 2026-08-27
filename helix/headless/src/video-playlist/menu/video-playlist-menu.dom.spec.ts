@@ -176,7 +176,7 @@ describe('video playlist menu', () => {
     const { menu, playlist } = await mountMenu()
     playlist.active = 'two'
     await playlist.updateComplete
-    menu.dispatchEvent(new CustomEvent('helix-open', { bubbles: true, composed: true }))
+    menu.dispatchEvent(new CustomEvent('helix-before-open', { bubbles: true, composed: true }))
     await menu.updateComplete
     expect(entries(menu).map((one) => one.getAttribute('aria-checked'))).toEqual([
       'false',

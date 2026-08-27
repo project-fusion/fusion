@@ -87,8 +87,8 @@ export function SiteMenu({
     <helix-drawer
       label="Site navigation"
       material="glass"
-      onhelix-close={() => onOpenChange(false)}
-      onhelix-open={() => onOpenChange(true)}
+      onhelix-before-close={() => onOpenChange(false)}
+      onhelix-before-open={() => onOpenChange(true)}
       open={open}
       placement={placement}
     >
@@ -253,7 +253,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      panel's bottom edge while one is down, which is the only number here the
      app has to go and measure.
    *
-   * **An effect and an observer, not a frame callback.** `helix-open` fires
+   * **An effect and an observer, not a frame callback.** `helix-before-open` fires
    * before the panel has moved, so the measurement cannot happen there, and the
    * obvious repair is to defer it a frame. A `requestAnimationFrame` never runs
    * in a background tab, so the sheet would open at the bar's own height and
@@ -355,11 +355,11 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 expected rather than a symptom. */}
             <helix-megamenu
               label="Products"
-              onhelix-close={() => setPanelDown(false)}
+              onhelix-before-close={() => setPanelDown(false)}
               /* Both fire before the panel moves and both are cancelable, so
                  the bar starts changing on the same frame the reveal starts
                  rather than a frame behind it. */
-              onhelix-open={() => setPanelDown(true)}
+              onhelix-before-open={() => setPanelDown(true)}
               ref={panelRef}
               suppressHydrationWarning
               variant="full"

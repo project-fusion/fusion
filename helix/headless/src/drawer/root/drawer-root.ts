@@ -53,9 +53,10 @@ import { property } from 'lit/decorators.js'
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
  *
- * @event {HelixCloseEvent} helix-close - Fired before the panel closes, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
  * @event {Event} close - Relayed, because the platform's own does not escape.
- * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the drawer opens or closes.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {

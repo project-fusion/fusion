@@ -236,11 +236,11 @@ export function SiteFind({
         class={styles.siteCommand}
         hotkey="mod+k"
         label="Search"
-        onhelix-close={() => {
+        onhelix-before-close={() => {
           setOpen(false)
           setNeedle('')
         }}
-        onhelix-open={() => setOpen(true)}
+        onhelix-before-open={() => setOpen(true)}
         onhelix-select={(event: { detail: { alternate?: boolean; value: string } }) => {
           setOpen(false)
           router.push(event.detail.value)

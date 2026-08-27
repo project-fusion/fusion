@@ -108,7 +108,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-open', this.reread)
+    this.removeEventListener('helix-before-open', this.reread)
     this.#observer?.disconnect()
     this.#observer = undefined
   }
@@ -156,7 +156,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    * host, which `tree-root.ssr.spec.ts` caught, and the rule it broke was the
    * one that stops a copied host coming back frozen.
    *
-   * So it is re-read at the moment it is looked at. `helix-open` comes from the
+   * So it is re-read at the moment it is looked at. `helix-before-open` comes from the
    * menu in this element's own shadow root, which is the one direction events
    * do arrive from, and a closed menu showing a stale mark is a thing nobody
    * can see.
@@ -167,7 +167,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
     if (!playlist || this.#observer) {
       return
     }
-    this.addEventListener('helix-open', this.reread)
+    this.addEventListener('helix-before-open', this.reread)
     this.#observer = new MutationObserver(this.reread)
     this.#observer.observe(playlist, { childList: true, subtree: true })
     this.reread()

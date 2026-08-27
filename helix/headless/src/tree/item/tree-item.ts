@@ -67,8 +67,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart group - The container for nested items.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
- * @event {HelixOpenEvent} helix-open - Fired before a branch opens, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before a branch closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
  */

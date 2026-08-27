@@ -1277,16 +1277,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "host",
-              "type": {
-                "text": "ReactiveControllerHost & HTMLElement"
-              },
-              "privacy": "private",
-              "readonly": true,
-              "default": "host"
-            },
-            {
-              "kind": "field",
               "name": "options",
               "type": {
                 "text": "PopoverOptions"
@@ -1363,25 +1353,6 @@
                 }
               },
               "description": "Hides the surface and stops everything watching it."
-            },
-            {
-              "kind": "method",
-              "name": "announce",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "newState",
-                  "type": {
-                    "text": "'closed' | 'open'"
-                  }
-                }
-              ],
-              "description": "Says the panel moved, under the platform's own name and in its shape.\n\n**The browser fires this already and nobody can hear it.** A surface shown\nwith `showPopover()` gets a `toggle` from the platform, on the surface, and\n`toggle` on a popover neither bubbles nor is composed: it stops at the\nshadow root the panel is rendered in. So every one of the ten families that\nopens this way had a native event a consumer could not reach. See 296.\n\n**Dispatched here rather than relayed from the surface**, which is the one\nplace the choice is not obvious. Relaying would be the platform doing the\nwork, and it is what `Avatar` does for `load`. It is wrong here because\n`show()` feature-detects: a browser without the popover API still gets a\npositioned panel, deliberately, and would then get no event either. The\ncontroller knows the panel moved whichever branch it took.\n\n**`newState` and `oldState`, because that is the shape the platform uses**,\nand a consumer arriving from `<details>` or from a popover of their own\nreads the same two words. Not cancelable, and this is the half worth\nstating: `helix-open` and `helix-close` are the cancelable request and\nrefusing is how a consumer takes the decision. A second cancelable event\nfor one transition is two answers to one question, which 296 refuses."
             },
             {
               "kind": "method",
@@ -1854,8 +1825,8 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Fired when an element is about to open.\n\nCancelable: `preventDefault()` refuses the change, and the element stays\nclosed. Paired with `helix-close` rather than being one event carrying a\nboolean, so a listener that only cares about one direction says so by which\nevent it listens for.\n\nNeither bubbles nor composed. A dialog inside a drawer inside a popover is\nthree overlays, and an inner one opening must not read as the outer one\nopening.",
-          "name": "HelixOpenEvent",
+          "description": "Fired when an element is about to open.\n\nCancelable: `preventDefault()` refuses the change, and the element stays\nclosed. Paired with `helix-before-close` rather than being one event carrying a\nboolean, so a listener that only cares about one direction says so by which\nevent it listens for.\n\nNeither bubbles nor composed. A dialog inside a drawer inside a popover is\nthree overlays, and an inner one opening must not read as the outer one\nopening.",
+          "name": "HelixBeforeOpenEvent",
           "members": [
             {
               "kind": "field",
@@ -1865,7 +1836,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'helix-open'"
+              "default": "'helix-before-open'"
             }
           ],
           "superclass": {
@@ -1876,8 +1847,8 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element is about to close. See `HelixOpenEvent`.",
-          "name": "HelixCloseEvent",
+          "description": "Fired when an element is about to close. See `HelixBeforeOpenEvent`.",
+          "name": "HelixBeforeCloseEvent",
           "members": [
             {
               "kind": "field",
@@ -1887,7 +1858,7 @@
               },
               "static": true,
               "readonly": true,
-              "default": "'helix-close'"
+              "default": "'helix-before-close'"
             }
           ],
           "superclass": {
@@ -1898,7 +1869,7 @@
         },
         {
           "kind": "class",
-          "description": "Fired when the reader asks for the next thing in a set.\n\nPaired with `helix-previous` rather than being one event carrying a\ndirection, which is the reason `helix-open` gives for its own pair: a\nlistener that only cares about one direction says so by which event it\nlistens for. The detail carries the direction anyway, so a consumer who does\nwant one handler can have one.\n\nBubbles and is composed, because the thing that answers this is usually not\nthe thing that asked. A video has no notion of a set: it plays one resource,\nand what comes next is a playlist's business or the consumer's, so the event\nhas to reach a wrapper.\n\nNot cancelable. There is no default action to refuse: the component that\nfires this does nothing on its own, and an event whose `preventDefault` means\nnothing is an event that lies about what it offers.",
+          "description": "Fired when the reader asks for the next thing in a set.\n\nPaired with `helix-previous` rather than being one event carrying a\ndirection, which is the reason `helix-before-open` gives for its own pair: a\nlistener that only cares about one direction says so by which event it\nlistens for. The detail carries the direction anyway, so a consumer who does\nwant one handler can have one.\n\nBubbles and is composed, because the thing that answers this is usually not\nthe thing that asked. A video has no notion of a set: it plays one resource,\nand what comes next is a playlist's business or the consumer's, so the event\nhas to reach a wrapper.\n\nNot cancelable. There is no default action to refuse: the component that\nfires this does nothing on its own, and an event whose `preventDefault` means\nnothing is an event that lies about what it offers.",
           "name": "HelixNextEvent",
           "members": [
             {
@@ -2096,7 +2067,7 @@
         },
         {
           "kind": "class",
-          "description": "Fired when something that is checked or unchecked is about to change.\n\n**Separate from `helix-change` because the payload is a boolean and that one\ncarries a string.** It was not separate, and the cost was exact: the checked\nmixin dispatched `value: String(checked)`, so a consumer received `\"false\"`,\nwhich is truthy. Our own checkbox group decoded it with\n`detail.value === 'true'`, which is what a workaround looks like when it has\nbeen in the codebase long enough to read as a convention.\n\nA generic `HelixChangeEvent<T>` was measured first and reached `jsx.d.ts`\nintact, so the manifest and the generator both carry one. It fails one step\nlater: the map below derives from the registry through\n`InstanceType<Registry[K]>`, which resolves an unspecified parameter to\n`unknown` rather than to its default, so every `addEventListener` consumer\ntraded a wrong type for no type. Restoring the entry means an override list\nbeside the registry, which is the second list the registry exists to abolish.\nA union (`string | boolean`) fails differently and worse: every consumer of\nevery text field narrows for a case that cannot happen to them, and the next\nnumeric control widens it again.\n\nSo the split follows the shape already in this file. `helix-open` carries\n`{ open: boolean }` rather than stringifying into a change, and this is the\nsame decision for the same reason.\n\nIt also ends a collision. Checkbox Group listened for its boxes' change and\ndispatched its own under the same name from the same host, so it had to call\n`stopImmediatePropagation` to keep a consumer from receiving one box's\nboolean alongside the whole set. Two names, two facts.\n\nThe detail carries no `name`. Which control changed is `composedPath()[0]`,\nwhich is right across a shadow boundary where `event.target` is retargeted,\nand the group already identifies its boxes that way.",
+          "description": "Fired when something that is checked or unchecked is about to change.\n\n**Separate from `helix-change` because the payload is a boolean and that one\ncarries a string.** It was not separate, and the cost was exact: the checked\nmixin dispatched `value: String(checked)`, so a consumer received `\"false\"`,\nwhich is truthy. Our own checkbox group decoded it with\n`detail.value === 'true'`, which is what a workaround looks like when it has\nbeen in the codebase long enough to read as a convention.\n\nA generic `HelixChangeEvent<T>` was measured first and reached `jsx.d.ts`\nintact, so the manifest and the generator both carry one. It fails one step\nlater: the map below derives from the registry through\n`InstanceType<Registry[K]>`, which resolves an unspecified parameter to\n`unknown` rather than to its default, so every `addEventListener` consumer\ntraded a wrong type for no type. Restoring the entry means an override list\nbeside the registry, which is the second list the registry exists to abolish.\nA union (`string | boolean`) fails differently and worse: every consumer of\nevery text field narrows for a case that cannot happen to them, and the next\nnumeric control widens it again.\n\nSo the split follows the shape already in this file. `helix-before-open` carries\n`{ open: boolean }` rather than stringifying into a change, and this is the\nsame decision for the same reason.\n\nIt also ends a collision. Checkbox Group listened for its boxes' change and\ndispatched its own under the same name from the same host, so it had to call\n`stopImmediatePropagation` to keep a consumer from receiving one box's\nboolean alongside the whole set. Two names, two facts.\n\nThe detail carries no `name`. Which control changed is `composedPath()[0]`,\nwhich is right across a shadow boundary where `event.target` is retargeted,\nand the group already identifies its boxes that way.",
           "name": "HelixToggleEvent",
           "members": [
             {
@@ -2437,17 +2408,17 @@
       "exports": [
         {
           "kind": "js",
-          "name": "HelixOpenEvent",
+          "name": "HelixBeforeOpenEvent",
           "declaration": {
-            "name": "HelixOpenEvent",
+            "name": "HelixBeforeOpenEvent",
             "module": "src/events/events.ts"
           }
         },
         {
           "kind": "js",
-          "name": "HelixCloseEvent",
+          "name": "HelixBeforeCloseEvent",
           "declaration": {
-            "name": "HelixCloseEvent",
+            "name": "HelixBeforeCloseEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3398,6 +3369,22 @@
         },
         {
           "kind": "js",
+          "name": "HelixBeforeCloseEvent",
+          "declaration": {
+            "name": "HelixBeforeCloseEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixBeforeOpenEvent",
+          "declaration": {
+            "name": "HelixBeforeOpenEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixBeforeToggleEvent",
           "declaration": {
             "name": "HelixBeforeToggleEvent",
@@ -3417,14 +3404,6 @@
           "name": "HelixChangeEvent",
           "declaration": {
             "name": "HelixChangeEvent",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixCloseEvent",
-          "declaration": {
-            "name": "HelixCloseEvent",
             "module": "./events/events.js"
           }
         },
@@ -3497,14 +3476,6 @@
           "name": "HelixNextEvent",
           "declaration": {
             "name": "HelixNextEvent",
-            "module": "./events/events.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HelixOpenEvent",
-          "declaration": {
-            "name": "HelixOpenEvent",
             "module": "./events/events.js"
           }
         },
@@ -5265,7 +5236,7 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-open` or `helix-close` refuses the change, and nothing moves."
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts: a listener calling `preventDefault()` on the\n`helix-before-open` or `helix-before-close` refuses the change, and nothing moves."
             },
             {
               "kind": "method",
@@ -5282,7 +5253,7 @@
         },
         {
           "kind": "mixin",
-          "description": "Grafts controlled and uncontrolled open state onto a base class.\n\nWhich mode it is in is read once, at the first update, from whether anything\nhad set `open` by then: markup, a hydrating server's attributes and a\nframework's initial properties have all arrived, and nothing else has\nhappened yet. Set, and the consumer owns it and the element only announces.\nUnset, and the element owns it and `defaultOpen` says where it starts.\n\nSets `data-open` on the host whenever the element is open, in either mode.\nStyled tiers select on that rather than `[open]`, which is absent for\nuncontrolled consumers.",
+          "description": "Grafts open state onto a base class, and says so twice.\n\n`helix-before-open` and `helix-before-close` announce the change while it is\nstill a request, so `preventDefault()` refuses it and nothing moves. Native\n`toggle` announces it afterwards, once the state has actually gone, carrying\n`newState` and `oldState` the way the platform does on `<details>` and on a\npopover. The first is how a consumer takes the decision; the second is what\nthey bind when they only want to know. See 294 and 296.\n\n`open` is a seed and a correction rather than a claim: the element applies\nits own changes from wherever markup started it, and `defaultOpen` is what a\nreset returns to.\n\nSets `data-open` on the host whenever the element is open. Styled tiers\nselect on that rather than `[open]`, which is absent until somebody writes\nit.",
           "name": "MixinControllerOpen",
           "members": [
             {
@@ -5291,7 +5262,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open"
             },
             {
@@ -5330,7 +5301,26 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294."
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294."
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question."
             },
             {
               "kind": "method",
@@ -5349,7 +5339,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open"
             },
             {

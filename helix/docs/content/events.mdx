@@ -43,8 +43,8 @@ notice, it is one you would.
 
 ## Propagation follows the event's role
 
-**Lifecycle does not bubble and is not composed.** `helix-open` and
-`helix-close`. Overlays nest, and an inner one's lifecycle must never reach the
+**Lifecycle does not bubble and is not composed.** `helix-before-open` and
+`helix-before-close`. Overlays nest, and an inner one's lifecycle must never reach the
 outer one that contains it: a menu closing inside a dialog is not the dialog
 closing.
 
@@ -61,7 +61,7 @@ The events that precede a state change are cancelable, and that is the only way
 to refuse one:
 
 ```ts
-dialog.addEventListener('helix-close', (event) => {
+dialog.addEventListener('helix-before-close', (event) => {
   if (unsaved) {
     event.preventDefault()
   }
@@ -75,7 +75,7 @@ dispatch, so an event you can listen for is an event that is documented.
 
 | Event | Roughly |
 |---|---|
-| `helix-open`, `helix-close` | An element's open state, before it moves |
+| `helix-before-open`, `helix-before-close` | An element's open state, before it moves |
 | `helix-change` | A committed value |
 | `helix-input` | An edit in progress |
 | `helix-select` | An item chosen from a set |

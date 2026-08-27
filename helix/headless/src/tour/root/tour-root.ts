@@ -1,7 +1,7 @@
 import {
   customElement,
+  HelixBeforeCloseEvent,
   HelixChangeEvent,
-  HelixCloseEvent,
   HelixCompleteEvent,
   HelixElement,
   hostAria,
@@ -66,7 +66,8 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * carrying the new index.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
- * @event {HelixCloseEvent} helix-close - Fired when the reader leaves early.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when the reader leaves early.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends HelixElement {
@@ -176,7 +177,7 @@ export class HelixHeadlessTour extends HelixElement {
    * `preventDefault` was refusing something that had already happened.
    */
   skip(): void {
-    const event = new HelixCloseEvent()
+    const event = new HelixBeforeCloseEvent()
     this.dispatchEvent(event)
     if (event.defaultPrevented) {
       return

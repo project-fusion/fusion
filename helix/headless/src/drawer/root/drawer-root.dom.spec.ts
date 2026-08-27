@@ -77,7 +77,7 @@ describe('drawer', () => {
   test('announces its own open changes, like every other open component', async () => {
     const drawer = (await mount(markup)) as Updatable
     let seen: boolean | null = null
-    drawer.addEventListener('helix-open', (event) => {
+    drawer.addEventListener('helix-before-open', (event) => {
       seen = (event as CustomEvent<{ open: boolean }>).detail.open
     })
     drawer.requestOpen(true)
@@ -123,7 +123,7 @@ describe('drawer', () => {
     drawer.requestOpen(true)
     await drawer.updateComplete
 
-    drawer.addEventListener('helix-close', (event) => event.preventDefault())
+    drawer.addEventListener('helix-before-close', (event) => event.preventDefault())
     ;(part(drawer, 'panel') as HTMLDialogElement).dispatchEvent(
       new Event('cancel', { cancelable: true }),
     )

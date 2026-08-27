@@ -7,7 +7,6 @@ import type {
   HelixChangeEvent,
   HelixDialog,
   HelixInput,
-  HelixInputEvent,
   HelixMenu,
   HelixSandbox,
   HelixSandboxPreview,
@@ -445,20 +444,21 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setRailOpen(false)
   }, [])
 
-  /* The proposed value, off the event, not `event.target.value` off the host.
+  /* The applied value, off the target, because this binds the native `input`.
    *
-   * The before event announces the value being *proposed*, so the element has
-   * not applied it yet and `event.target.value` is still the previous one.
-   * Reading the host set the filter to what it already was, the element put the
-   * text back, and the field could not be typed into at all: the sandbox's own
-   * examples were unfilterable in the sandbox. The detail is the channel.
-   */
-  const filterChanged = (event: HelixInputEvent) => {
-    setFilter(event.detail.value)
+   * The pair matters and the wrong half of it is a field that cannot be typed
+   * into. `helix-before-change` announces what is being *proposed*, before the
+   * element has moved, so reading the host there sets the filter to what it
+   * already was and the text goes back: the sandbox's own examples were
+   * unfilterable that way. The native `input` fires after the element applied,
+   * so the target is the answer, which is what every handler ever written
+   * expects. See 294. */
+  const filterChanged = (event: { currentTarget: { value: string } }) => {
+    setFilter(event.currentTarget.value)
   }
 
-  const paneChosen = (event: HelixChangeEvent) => {
-    setPane(event.detail.value as Pane)
+  const paneChosen = (event: { currentTarget: { value: string } }) => {
+    setPane(event.currentTarget.value as Pane)
   }
   // Verbatim. What is typed is what is held and what is handed back.
   const paneEdited = (event: HelixChangeEvent) => {
@@ -989,7 +989,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         <helix-input
           aria-label="Filter examples"
           class={styles.examplesFilter}
-          onhelix-before-change={filterChanged}
+          onInput={filterChanged}
           placeholder="Filter"
           ref={filterRef}
           type="search"
@@ -1220,7 +1220,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 not pointing. This is a choice among files, and it says so. */}
               <helix-toggle-group
                 aria-label="Files"
-                onhelix-before-change={paneChosen}
+                onChange={paneChosen}
                 separation="plain"
                 value={pane}
               >
@@ -1466,7 +1466,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           <helix-dialog
             align="center"
             label="Change environment"
-            onhelix-close={confirmClosed}
+            onhelix-before-close={confirmClosed}
             open={pendingSyntax !== null}
             ref={confirmSyntax}
             size="sm"
@@ -1521,8 +1521,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           class={styles.examplesDrawerHost}
           label="Examples"
           material="glass"
-          onhelix-close={() => setRailOpen(false)}
-          onhelix-open={() => setRailOpen(true)}
+          onhelix-before-close={() => setRailOpen(false)}
+          onhelix-before-open={() => setRailOpen(true)}
           open={railOpen}
           placement="end"
         >

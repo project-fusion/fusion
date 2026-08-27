@@ -114,7 +114,7 @@
 /* The panel is a window onto the sheet, never a surface of its own.
  *
  * Unconditional. Keyed to the open state it came off on the frame the collapse
- * started, since `helix-close` fires before the panel moves, and the panel
+ * started, since `helix-before-close` fires before the panel moves, and the panel
  * finished collapsing as an opaque rectangle of the page's color. It is only
  * ever on screen while open or collapsing, and the sheet covers both, so it
  * never needs a ground here.

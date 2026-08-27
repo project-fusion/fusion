@@ -400,7 +400,7 @@ describe('a branch opening is announced, and can be owned', () => {
   test('closing a branch is announced before it happens', async () => {
     const item = await branch()
     let told = true
-    item.addEventListener('helix-close', () => {
+    item.addEventListener('helix-before-close', () => {
       told = true
     })
     item.toggleOpen()
@@ -411,7 +411,7 @@ describe('a branch opening is announced, and can be owned', () => {
 
   test('a refusal leaves the branch as it was', async () => {
     const item = await branch()
-    item.addEventListener('helix-close', (event) => event.preventDefault())
+    item.addEventListener('helix-before-close', (event) => event.preventDefault())
     item.toggleOpen()
     await item.updateComplete
     expect(item.open).toBe(true)
@@ -430,7 +430,7 @@ describe('a branch opening is announced, and can be owned', () => {
 
   test('and refusing the close is what holds it open', async () => {
     const item = await branch('open')
-    item.addEventListener('helix-close', (event: Event) => {
+    item.addEventListener('helix-before-close', (event: Event) => {
       event.preventDefault()
     })
     item.toggleOpen()

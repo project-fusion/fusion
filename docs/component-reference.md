@@ -77,8 +77,9 @@ Usable on its own as a disclosure, with no accordion around it.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired when the item opens or closes. |
-| `helix-close` | `HelixCloseEvent` | Fired before the section closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the item opens or closes. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the section closes, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -1404,9 +1405,9 @@ pads its own lower rows.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -1651,9 +1652,9 @@ Input, Color Input and Date Input all take.
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the chosen option changes. |
 | `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
-| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -1742,8 +1743,9 @@ otherwise walk up and down the screen under the words being typed.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. |
-| `helix-open` | `HelixOpenEvent` | Fired when the palette opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the palette opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -2005,9 +2007,9 @@ whatever holds it.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the date changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the calendar opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the calendar opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -2188,9 +2190,10 @@ dialog rather than being a div somebody positioned.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
 | `close` | `Event` | Relayed, because the platform's own does not escape. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -2372,9 +2375,10 @@ rest is flat and the movement is what says something happened.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired when the drawer opens or closes. |
-| `helix-close` | `HelixCloseEvent` | Fired before the panel closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the drawer opens or closes. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the panel closes, and cancelable. |
 | `close` | `Event` | Relayed, because the platform's own does not escape. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -3474,9 +3478,9 @@ Everything about what opens it and what closes it is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -3546,10 +3550,10 @@ one panel and reads the same on a phone as on a desk.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -4405,9 +4409,9 @@ time.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -5248,9 +5252,9 @@ from the field it came out of.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Relayed from the listbox when the answer changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -5521,9 +5525,9 @@ moves through it is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -6459,9 +6463,9 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the time changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7022,9 +7026,9 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-open` | `HelixOpenEvent` | Fired before the bubble shows, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it hides, and cancelable. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the bubble shows, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it hides, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7089,7 +7093,8 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 | --- | --- | --- |
 | `helix-change` | `HelixChangeEvent` | Fired when the current stop moves, carrying the new index. |
 | `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
-| `helix-close` | `HelixCloseEvent` | Fired when the reader leaves early. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when the reader leaves early. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7139,7 +7144,6 @@ name, on purpose.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-tour-ask` | `HelixTourAskEvent` | A stop asking the tour to move, from its own controls. |
-| `toggle` | `Event` | Says the panel moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
@@ -7280,8 +7284,9 @@ the row itself stays flat.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
-| `helix-open` | `HelixOpenEvent` | Fired before a branch opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before a branch opens, and cancelable. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before a branch closes, and cancelable. |
+| `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 

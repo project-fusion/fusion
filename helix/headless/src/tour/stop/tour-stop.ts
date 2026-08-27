@@ -51,7 +51,6 @@ import '../../button/index.js'
  * @documentation https://helix.fusion.dev/components/tour
  *
  * @event {HelixTourAskEvent} helix-tour-ask - A stop asking the tour to move, from its own controls.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *
  * @slot - What this stop says. A card, a heading and a line, anything.
  * @slot actions - Replaces the controls, which are Back, Next and Skip.

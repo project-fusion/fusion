@@ -61,4 +61,28 @@ describe('option', () => {
     const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
     expect(slot.assignedNodes()[0]?.textContent?.trim()).toBe('Alpha')
   })
+
+  test('takes the default slot and leaves the other two alone', async () => {
+    /* **The regression this exists for was silent and wide.** `text` read
+       `this.textContent`, so an icon in `start` or a shortcut in `end` was run
+       onto the end of the words. Six things read it: the collapsed field of
+       Select and of Combobox, the listbox filter, Combobox's exact match, its
+       inline completion, and the tag it labels a chosen value with.
+
+       Measured on a font picker whose options carried a two-letter specimen in
+       `end`, the field read `Noto Sans Linear BAg` and typing `ag` matched
+       1,892 of 1,893 rows. Nothing threw, and the filter looked like it worked
+       for every needle that happened not to occur in the slotted content. */
+    const host = (await mount(
+      `<helix-headless-option value="save">
+         <span slot="start">icon</span>
+         Save
+         <span slot="end">Cmd S</span>
+       </helix-headless-option>`,
+    )) as HTMLElement & { text: string }
+
+    expect(host.text).toBe('Save')
+    expect(host.text).not.toContain('icon')
+    expect(host.text).not.toContain('Cmd')
+  })
 })

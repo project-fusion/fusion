@@ -82,12 +82,12 @@ element warns on its second unanswered request.
 
 ### 2. The event name is the event's own
 
-`onhelix-open`, not `onHelixOpen` and not `onOpen`. React slices `on` off the
+`onhelix-before-open`, not `onHelixOpen` and not `onOpen`. React slices `on` off the
 prop and listens for exactly what is left, so the casing is not negotiable. From
-anything that is not React, `addEventListener('helix-open', …)`.
+anything that is not React, `addEventListener('helix-before-open', …)`.
 
-**Lifecycle does not bubble and coordination does.** `helix-open` and
-`helix-close` reach the element and stop, so a menu closing inside a dialog is
+**Lifecycle does not bubble and coordination does.** `helix-before-open` and
+`helix-before-close` reach the element and stop, so a menu closing inside a dialog is
 not the dialog closing; `helix-select`, `helix-change` and `helix-dismiss` cross
 shadow boundaries and can be caught on a container. If a listener on a wrapper
 hears nothing, it is a lifecycle event and belongs on the element.

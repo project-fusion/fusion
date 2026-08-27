@@ -84,8 +84,9 @@ const parse = (hotkey: string) => {
  * @csspart listbox-loading - Shown while the options are still on their way.
  *
  * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
- * @event {HelixOpenEvent} helix-open - Fired when the palette opens.
- * @event {HelixCloseEvent} helix-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the palette opens.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
@@ -309,7 +310,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     exportparts="dialog"
       label=${this.label}
       .open=${this.open}
-      @helix-close=${() => {
+      @helix-before-close=${() => {
         if (this.open) {
           this.requestOpen(false)
         }

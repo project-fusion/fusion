@@ -22,7 +22,7 @@ component does not accept is a compile error rather than a runtime shrug.
 ## Bind events with `onhelix-*`
 
 ```tsx
-<helix-accordion-item onhelix-open={(event) => track(event.detail.open)} />
+<helix-accordion-item onhelix-before-open={(event) => track(event.detail.open)} />
 ```
 
 The prop is `on` and the event name, verbatim. Not `onHelixOpen`, not `onOpen`.

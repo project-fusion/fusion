@@ -26,12 +26,12 @@ describe('the handler React is holding', () => {
   test('is bound before the event goes out, because hydration never bound it', () => {
     let calls = 0
     const element = hydrated({
-      'onhelix-open': () => {
+      'onhelix-before-open': () => {
         calls += 1
       },
     })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(calls).toBe(1)
   })
@@ -46,11 +46,11 @@ describe('the handler React is holding', () => {
     const handler = (): void => {
       calls += 1
     }
-    const element = hydrated({ 'onhelix-open': handler })
+    const element = hydrated({ 'onhelix-before-open': handler })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
-    element.addEventListener('helix-open', handler)
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
+    element.addEventListener('helix-before-open', handler)
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(calls).toBe(2)
   })
@@ -63,13 +63,13 @@ describe('the handler React is holding', () => {
     const seen: string[] = []
     const first = (): number => seen.push('first')
     const second = (): number => seen.push('second')
-    const element = hydrated({ 'onhelix-open': first })
+    const element = hydrated({ 'onhelix-before-open': first })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
-    element.removeEventListener('helix-open', first)
-    element.addEventListener('helix-open', second)
-    Object.assign(element, { __reactProps$k9x2: { 'onhelix-open': second } })
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
+    element.removeEventListener('helix-before-open', first)
+    element.addEventListener('helix-before-open', second)
+    Object.assign(element, { __reactProps$k9x2: { 'onhelix-before-open': second } })
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(seen).toEqual(['first', 'second'])
   })
@@ -91,7 +91,7 @@ describe('the handler React is holding', () => {
     const element = document.createElement(tag)
     document.body.append(element)
 
-    expect(() => element.dispatchEvent(new CustomEvent('helix-open'))).not.toThrow()
+    expect(() => element.dispatchEvent(new CustomEvent('helix-before-open'))).not.toThrow()
   })
 })
 
@@ -114,7 +114,7 @@ describe('a handler prop attached to nothing', () => {
   test('a misspelled event name is named, along with what nothing dispatches', () => {
     const element = hydrated({ 'onhelix-opne': () => {} })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(warnings[0]).toContain('onhelix-opne')
     expect(warnings[0]).toContain('nothing dispatches')
@@ -123,8 +123,12 @@ describe('a handler prop attached to nothing', () => {
   test("Solid's `on:` form is called what it is, rather than reported as a typo", () => {
     const element = hydrated({ 'on:helix-open': () => {} })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
+    /* `onhelix-open`, not `onhelix-before-open`: the warning echoes the prop it
+       was given, and `on:helix-open` is a stand-in for any Solid-shaped name
+       rather than this library's event. A rename swept the expectation and not
+       the input, which is the one shape a global rename gets wrong. */
     expect(warnings[0]).toContain("Solid's syntax")
     expect(warnings[0]).toContain('onhelix-open')
   })
@@ -139,9 +143,9 @@ describe('a handler prop attached to nothing', () => {
   })
 
   test('a correct prop says nothing at all', () => {
-    const element = hydrated({ 'onhelix-open': () => {} })
+    const element = hydrated({ 'onhelix-before-open': () => {} })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(warnings).toEqual([])
   })
@@ -149,9 +153,9 @@ describe('a handler prop attached to nothing', () => {
   test('says it once, not on every keystroke', () => {
     const element = hydrated({ 'onhelix-opne': () => {} })
 
-    element.dispatchEvent(new CustomEvent('helix-open'))
-    element.dispatchEvent(new CustomEvent('helix-open'))
-    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
+    element.dispatchEvent(new CustomEvent('helix-before-open'))
 
     expect(warnings).toHaveLength(1)
   })

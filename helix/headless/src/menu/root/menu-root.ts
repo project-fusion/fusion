@@ -46,10 +46,10 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @slot - The items.
  * @slot trigger - What opens it.
  *
- * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart back - The control that returns from a submenu.
  * @csspart back-mark - The glyph on the back control of a submenu.

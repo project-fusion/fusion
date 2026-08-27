@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * alone, two of those would shut the dialog while the consumer's state still
  * said open, which is the bug that makes a modal impossible to reopen. Escape
  * is intercepted and routed through the request, so `preventDefault()` on the
- * `helix-close` refuses it; a close that happens anyway is reflected back.
+ * `helix-before-close` refuses it; a close that happens anyway is reflected back.
  *
  * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
  * the rest of the document is something no JavaScript trap can achieve.
@@ -57,9 +57,10 @@ import { property } from 'lit/decorators.js'
  * @slot header - The title, and anything beside it.
  * @slot footer - The actions.
  *
- * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {Event} close - Relayed, because the platform's own does not escape.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
  */

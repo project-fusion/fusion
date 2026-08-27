@@ -121,8 +121,8 @@ import type {
   HelixHeadlessVideoPlaylist,
   HelixHeadlessVideo,
   HelixHeadlessVirtualList,
-  HelixCloseEvent,
-  HelixOpenEvent,
+  HelixBeforeCloseEvent,
+  HelixBeforeOpenEvent,
   HelixDismissEvent,
   HelixSelectEvent,
   HelixSendEvent,
@@ -188,12 +188,12 @@ export type HelixHeadlessAccordionItemElementEvent<E = Event> = TypedEvent<
   HelixHeadlessAccordionItem,
   E
 >;
-/** `helix-close` event type */
-export type HelixHeadlessAccordionItemHelixCloseElementEvent =
-  HelixHeadlessAccordionItemElementEvent<HelixCloseEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessAccordionItemHelixOpenElementEvent =
-  HelixHeadlessAccordionItemElementEvent<HelixOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessAccordionItemHelixBeforeCloseElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessAccordionItemHelixBeforeOpenElementEvent =
+  HelixHeadlessAccordionItemElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessAccordionItemVueProps = {
   /** Where the open indicator sits, or whether there is one.
@@ -234,10 +234,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -247,9 +246,11 @@ helix-close */
 
 export type HelixHeadlessAccordionItemVueEvents = {
   /** Fired before the section closes, and cancelable. */
-  "helix-close": HelixHeadlessAccordionItemHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessAccordionItemHelixBeforeCloseElementEvent;
   /** Fired when the item opens or closes. */
-  "helix-open": HelixHeadlessAccordionItemHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessAccordionItemHelixBeforeOpenElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessAccordionItemElementEvent;
 };
 
 export type HelixHeadlessAccordionVueProps = {
@@ -1104,12 +1105,12 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessColorInputHelixOpenElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessColorInputHelixCloseElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessColorInputHelixBeforeCloseElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessColorInputVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -1180,10 +1181,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -1254,10 +1254,10 @@ export type HelixHeadlessColorInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessColorInputElementEvent;
   /** Fired when the panel opens. */
-  "helix-open": HelixHeadlessColorInputHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessColorInputHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessColorInputHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessColorInputHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessColorInputElementEvent;
 };
 
@@ -1419,12 +1419,12 @@ export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
 /** `helix-create` event type */
 export type HelixHeadlessComboboxHelixCreateElementEvent =
   HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessComboboxHelixOpenElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessComboboxHelixCloseElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessComboboxHelixBeforeCloseElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessComboboxVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -1530,10 +1530,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -1606,10 +1605,10 @@ export type HelixHeadlessComboboxVueEvents = {
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "helix-create": HelixHeadlessComboboxHelixCreateElementEvent;
   /** Fired when the panel opens. */
-  "helix-open": HelixHeadlessComboboxHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessComboboxHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessComboboxHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessComboboxHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessComboboxElementEvent;
 };
 
@@ -1621,12 +1620,12 @@ export type HelixHeadlessCommandElementEvent<E = Event> = TypedEvent<
 /** `helix-select` event type */
 export type HelixHeadlessCommandHelixSelectElementEvent =
   HelixHeadlessCommandElementEvent<HelixSelectEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessCommandHelixOpenElementEvent =
-  HelixHeadlessCommandElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessCommandHelixCloseElementEvent =
-  HelixHeadlessCommandElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessCommandHelixBeforeCloseElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessCommandVueProps = {
   /** Accessible name for the overlay, which has no visible heading. */
@@ -1663,10 +1662,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -1678,9 +1676,11 @@ export type HelixHeadlessCommandVueEvents = {
   /** Fired when a command is chosen. */
   "helix-select": HelixHeadlessCommandHelixSelectElementEvent;
   /** Fired when the palette opens. */
-  "helix-open": HelixHeadlessCommandHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessCommandHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessCommandHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessCommandHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessCommandElementEvent;
 };
 
 /** `HelixHeadlessCopyButton` component event */
@@ -1923,12 +1923,12 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessDateInputHelixOpenElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessDateInputHelixCloseElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDateInputHelixBeforeCloseElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessDateInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -2064,10 +2064,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -2138,10 +2137,10 @@ export type HelixHeadlessDateInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessDateInputElementEvent;
   /** Fired when the calendar opens. */
-  "helix-open": HelixHeadlessDateInputHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessDateInputHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessDateInputHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessDateInputHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessDateInputElementEvent;
 };
 
@@ -2281,12 +2280,12 @@ export type HelixHeadlessDialogElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDialog,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessDialogHelixOpenElementEvent =
-  HelixHeadlessDialogElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessDialogHelixCloseElementEvent =
-  HelixHeadlessDialogElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDialogHelixBeforeCloseElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessDialogVueProps = {
   /** Accessible name for the dialog. */
@@ -2327,10 +2326,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -2340,11 +2338,13 @@ helix-close */
 
 export type HelixHeadlessDialogVueEvents = {
   /** Fired before it opens, and cancelable. */
-  "helix-open": HelixHeadlessDialogHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessDialogHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
-  "helix-close": HelixHeadlessDialogHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessDialogHelixBeforeCloseElementEvent;
   /** Relayed, because the platform's own does not escape. */
   close: HelixHeadlessDialogElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessDialogElementEvent;
 };
 
 export type HelixHeadlessDividerVueProps = {
@@ -2432,12 +2432,12 @@ export type HelixHeadlessDrawerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDrawer,
   E
 >;
-/** `helix-close` event type */
-export type HelixHeadlessDrawerHelixCloseElementEvent =
-  HelixHeadlessDrawerElementEvent<HelixCloseEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessDrawerHelixOpenElementEvent =
-  HelixHeadlessDrawerElementEvent<HelixOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessDrawerHelixBeforeCloseElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDrawerHelixBeforeOpenElementEvent =
+  HelixHeadlessDrawerElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDrawerVueProps = {
   /** Which edge the drawer comes from.
@@ -2481,10 +2481,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -2494,11 +2493,13 @@ helix-close */
 
 export type HelixHeadlessDrawerVueEvents = {
   /** Fired before the panel closes, and cancelable. */
-  "helix-close": HelixHeadlessDrawerHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessDrawerHelixBeforeCloseElementEvent;
   /** Relayed, because the platform's own does not escape. */
   close: HelixHeadlessDrawerElementEvent;
   /** Fired when the drawer opens or closes. */
-  "helix-open": HelixHeadlessDrawerHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessDrawerHelixBeforeOpenElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessDrawerElementEvent;
 };
 
 /** `HelixHeadlessDrilldownItem` component event */
@@ -3364,12 +3365,12 @@ export type HelixHeadlessMegamenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMegamenu,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessMegamenuHelixOpenElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessMegamenuHelixCloseElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessMegamenuHelixBeforeCloseElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessMegamenuVueProps = {
   /** The section's name, which names the default trigger and the panel. */
@@ -3454,10 +3455,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -3467,10 +3467,10 @@ helix-close */
 
 export type HelixHeadlessMegamenuVueEvents = {
   /** Fired before it opens, and cancelable. */
-  "helix-open": HelixHeadlessMegamenuHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessMegamenuHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
-  "helix-close": HelixHeadlessMegamenuHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessMegamenuHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessMegamenuElementEvent;
 };
 
@@ -3555,12 +3555,12 @@ export type HelixHeadlessMenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMenu,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessMenuHelixOpenElementEvent =
-  HelixHeadlessMenuElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessMenuHelixCloseElementEvent =
-  HelixHeadlessMenuElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessMenuHelixBeforeCloseElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeCloseEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessMenuHelixSelectElementEvent =
   HelixHeadlessMenuElementEvent<HelixSelectEvent>;
@@ -3610,10 +3610,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -3623,12 +3622,12 @@ helix-close */
 
 export type HelixHeadlessMenuVueEvents = {
   /** Fired before it opens, and cancelable. */
-  "helix-open": HelixHeadlessMenuHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessMenuHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
-  "helix-close": HelixHeadlessMenuHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessMenuHelixBeforeCloseElementEvent;
   /** Fired when an item is chosen. */
   "helix-select": HelixHeadlessMenuHelixSelectElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessMenuElementEvent;
 };
 
@@ -4427,12 +4426,12 @@ export type HelixHeadlessPopoverElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPopover,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessPopoverHelixOpenElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessPopoverHelixCloseElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessPopoverHelixBeforeCloseElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessPopoverVueProps = {
   /** Accessible name for the panel. */
@@ -4461,10 +4460,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -4474,10 +4472,10 @@ helix-close */
 
 export type HelixHeadlessPopoverVueEvents = {
   /** Fired before it opens, and cancelable. */
-  "helix-open": HelixHeadlessPopoverHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessPopoverHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
-  "helix-close": HelixHeadlessPopoverHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessPopoverHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessPopoverElementEvent;
 };
 
@@ -4848,12 +4846,12 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessSelectHelixOpenElementEvent =
-  HelixHeadlessSelectElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessSelectHelixCloseElementEvent =
-  HelixHeadlessSelectElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessSelectHelixBeforeCloseElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessSelectVueProps = {
   /** Whether the list can be narrowed by typing.
@@ -4902,10 +4900,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -4976,10 +4973,10 @@ export type HelixHeadlessSelectVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessSelectElementEvent;
   /** Fired when the list opens. */
-  "helix-open": HelixHeadlessSelectHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessSelectHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessSelectHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessSelectHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessSelectElementEvent;
 };
 
@@ -5214,12 +5211,12 @@ export type HelixHeadlessSpeedDialElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSpeedDial,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessSpeedDialHelixOpenElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessSpeedDialHelixCloseElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessSpeedDialHelixBeforeCloseElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessSpeedDialVueProps = {
   /** Names the trigger and the set of actions it opens. */
@@ -5251,10 +5248,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -5264,10 +5260,10 @@ helix-close */
 
 export type HelixHeadlessSpeedDialVueEvents = {
   /** Fired before it opens, and cancelable. */
-  "helix-open": HelixHeadlessSpeedDialHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessSpeedDialHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
-  "helix-close": HelixHeadlessSpeedDialHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessSpeedDialHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessSpeedDialElementEvent;
 };
 
@@ -5964,12 +5960,12 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessTimeInputHelixOpenElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTimeInputHelixCloseElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTimeInputHelixBeforeCloseElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTimeInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -6060,10 +6056,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -6134,10 +6129,10 @@ export type HelixHeadlessTimeInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessTimeInputElementEvent;
   /** Fired when the list opens. */
-  "helix-open": HelixHeadlessTimeInputHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessTimeInputHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
-  "helix-close": HelixHeadlessTimeInputHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessTimeInputHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTimeInputElementEvent;
 };
 
@@ -6558,12 +6553,12 @@ export type HelixHeadlessTooltipElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTooltip,
   E
 >;
-/** `helix-open` event type */
-export type HelixHeadlessTooltipHelixOpenElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTooltipHelixCloseElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTooltipHelixBeforeCloseElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTooltipVueProps = {
   /** The text shown in the bubble.
@@ -6662,10 +6657,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -6675,10 +6669,10 @@ helix-close */
 
 export type HelixHeadlessTooltipVueEvents = {
   /** Fired before the bubble shows, and cancelable. */
-  "helix-open": HelixHeadlessTooltipHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessTooltipHelixBeforeOpenElementEvent;
   /** Fired before it hides, and cancelable. */
-  "helix-close": HelixHeadlessTooltipHelixCloseElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
+  "helix-before-close": HelixHeadlessTooltipHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTooltipElementEvent;
 };
 
@@ -6693,9 +6687,9 @@ export type HelixHeadlessTourHelixChangeElementEvent =
 /** `helix-complete` event type */
 export type HelixHeadlessTourHelixCompleteElementEvent =
   HelixHeadlessTourElementEvent<HelixCompleteEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTourHelixCloseElementEvent =
-  HelixHeadlessTourElementEvent<HelixCloseEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTourHelixBeforeCloseElementEvent =
+  HelixHeadlessTourElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTourVueProps = {
   /** Whether the tour is running. */
@@ -6747,7 +6741,9 @@ export type HelixHeadlessTourVueEvents = {
   /** Fired when the last stop is finished. */
   "helix-complete": HelixHeadlessTourHelixCompleteElementEvent;
   /** Fired when the reader leaves early. */
-  "helix-close": HelixHeadlessTourHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessTourHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessTourElementEvent;
 };
 
 /** `HelixHeadlessTourStop` component event */
@@ -6797,8 +6793,6 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
 export type HelixHeadlessTourStopVueEvents = {
   /** A stop asking the tour to move, from its own controls. */
   "helix-tour-ask": HelixHeadlessTourStopHelixTourAskElementEvent;
-  /** Says the panel moved, carrying `newState` and `oldState`. */
-  toggle: HelixHeadlessTourStopElementEvent;
 };
 
 /** `HelixHeadlessTreeItem` component event */
@@ -6809,12 +6803,12 @@ export type HelixHeadlessTreeItemElementEvent<E = Event> = TypedEvent<
 /** `helix-select` event type */
 export type HelixHeadlessTreeItemHelixSelectElementEvent =
   HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
-/** `helix-open` event type */
-export type HelixHeadlessTreeItemHelixOpenElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixOpenEvent>;
-/** `helix-close` event type */
-export type HelixHeadlessTreeItemHelixCloseElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
+/** `helix-before-close` event type */
+export type HelixHeadlessTreeItemHelixBeforeCloseElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeCloseEvent>;
 
 export type HelixHeadlessTreeItemVueProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
@@ -6874,10 +6868,9 @@ is how a consumer says they own it. So an uncontrolled element that
 opened itself would put `open` on its own host and, from the next thing
 that read it, be indistinguishable from one the consumer controls:
 cloned, serialised for hydration, or diffed by a framework, it would come
-back controlled and stop responding. `data-open` carries the resolved
-state for stylesheets, which is what it has always been for.
-
-helix-close */
+back holding whatever the last reader did rather than what the author
+wrote. `data-open` carries the resolved state for stylesheets, which is
+what it has always been for. */
   open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -6891,9 +6884,11 @@ export type HelixHeadlessTreeItemVueEvents = {
   /** Fired when the item is chosen. */
   "helix-select": HelixHeadlessTreeItemHelixSelectElementEvent;
   /** Fired before a branch opens, and cancelable. */
-  "helix-open": HelixHeadlessTreeItemHelixOpenElementEvent;
+  "helix-before-open": HelixHeadlessTreeItemHelixBeforeOpenElementEvent;
   /** Fired before a branch closes, and cancelable. */
-  "helix-close": HelixHeadlessTreeItemHelixCloseElementEvent;
+  "helix-before-close": HelixHeadlessTreeItemHelixBeforeCloseElementEvent;
+  /** Says the state moved, carrying `newState` and `oldState`. */
+  toggle: HelixHeadlessTreeItemElementEvent;
 };
 
 /** `HelixHeadlessTree` component event */
@@ -7379,7 +7374,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessAccordionItemVueProps,
     HelixHeadlessAccordionItemVueEvents
   >;
-  /** Holds the mode and nothing else. The item that was clicked is what coordinates: it walks up to the nearest accordion, reads the mode off it, and closes its peers itself.  Coordination is structural, not a subscription. 'helix-open' does not bubble and is not composed, because overlays nest and an inner one's lifecycle must never read as the outer one's, so an accordion cannot learn that a child opened by listening for it.  Membership resolves on demand, so there is no registry to keep in step: an item added a second after render coordinates on its first click.  Items are matched with 'instanceof HelixHeadlessAccordionItem', never by tag name. Matching 'helix-accordion-item' would tie this tier to the styled one.  Every listener is attached on connect, so none of it runs on the server, where there is no tree to walk and no events to hear. */
+  /** Holds the mode and nothing else. The item that was clicked is what coordinates: it walks up to the nearest accordion, reads the mode off it, and closes its peers itself.  Coordination is structural, not a subscription. 'helix-before-open' does not bubble and is not composed, because overlays nest and an inner one's lifecycle must never read as the outer one's, so an accordion cannot learn that a child opened by listening for it.  Membership resolves on demand, so there is no registry to keep in step: an item added a second after render coordinates on its first click.  Items are matched with 'instanceof HelixHeadlessAccordionItem', never by tag name. Matching 'helix-accordion-item' would tie this tier to the styled one.  Every listener is attached on connect, so none of it runs on the server, where there is no tree to walk and no events to hear. */
   "helix-headless-accordion": DefineCustomElement<
     HelixHeadlessAccordion,
     HelixHeadlessAccordionVueProps,
@@ -7559,7 +7554,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessDatePickerVueProps,
     HelixHeadlessDatePickerVueEvents
   >;
-  /** A real '<dialog>' opened with 'showModal()', not a div with a role and a hand-built trap. The platform gives four things that are each a day's work to reimplement and easy to get subtly wrong: the top layer, so the dialog is above everything regardless of what 'z-index' anyone else wrote; a real backdrop; Escape; and inert-behind, so the page underneath is not reachable by pointer, keyboard, or a screen reader's virtual cursor.  **'open' drives 'showModal()', and every way it can close comes back through 'requestOpen'.** A native dialog can close from three directions: the property, Escape, and a '<form method="dialog">' submit inside it. Left alone, two of those would shut the dialog while the consumer's state still said open, which is the bug that makes a modal impossible to reopen. Escape is intercepted and routed through the request, so 'preventDefault()' on the 'helix-close' refuses it; a close that happens anyway is reflected back.  **Nothing here traps focus.** 'showModal()' does it, and better: 'inert' on the rest of the document is something no JavaScript trap can achieve. 'FocusTrapController' stays for the surfaces that are not modal.  The regions are bare slots rather than wrappers, for the reason the card's are: an unassigned '<slot>' is 'display: contents' and generates no box, so a dialog with no footer has no empty band where one would be.  Opened declaratively with the platform's invoker attributes:  '''html <helix-button commandfor="confirm" command="--show">Delete…</helix-button> <helix-dialog id="confirm">…</helix-dialog> '''  '--show', '--close' and '--toggle'. Custom commands rather than the built-in 'show-modal', because those are defined against native elements and do nothing when pointed at a custom one. */
+  /** A real '<dialog>' opened with 'showModal()', not a div with a role and a hand-built trap. The platform gives four things that are each a day's work to reimplement and easy to get subtly wrong: the top layer, so the dialog is above everything regardless of what 'z-index' anyone else wrote; a real backdrop; Escape; and inert-behind, so the page underneath is not reachable by pointer, keyboard, or a screen reader's virtual cursor.  **'open' drives 'showModal()', and every way it can close comes back through 'requestOpen'.** A native dialog can close from three directions: the property, Escape, and a '<form method="dialog">' submit inside it. Left alone, two of those would shut the dialog while the consumer's state still said open, which is the bug that makes a modal impossible to reopen. Escape is intercepted and routed through the request, so 'preventDefault()' on the 'helix-before-close' refuses it; a close that happens anyway is reflected back.  **Nothing here traps focus.** 'showModal()' does it, and better: 'inert' on the rest of the document is something no JavaScript trap can achieve. 'FocusTrapController' stays for the surfaces that are not modal.  The regions are bare slots rather than wrappers, for the reason the card's are: an unassigned '<slot>' is 'display: contents' and generates no box, so a dialog with no footer has no empty band where one would be.  Opened declaratively with the platform's invoker attributes:  '''html <helix-button commandfor="confirm" command="--show">Delete…</helix-button> <helix-dialog id="confirm">…</helix-dialog> '''  '--show', '--close' and '--toggle'. Custom commands rather than the built-in 'show-modal', because those are defined against native elements and do nothing when pointed at a custom one. */
   "helix-headless-dialog": DefineCustomElement<
     HelixHeadlessDialog,
     HelixHeadlessDialogVueProps,
@@ -7997,7 +7992,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessToolbarVueProps,
     HelixHeadlessToolbarVueEvents
   >;
-  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once, rather than on every open, since a warning that repeats is one people learn to filter out.  It shows on hover and on focus, and hides on leave, on blur, on Escape, and once the trigger has been activated: the hint is spent when the control has been used. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-open' and 'helix-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
+  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once, rather than on every open, since a warning that repeats is one people learn to filter out.  It shows on hover and on focus, and hides on leave, on blur, on Escape, and once the trigger has been activated: the hint is spent when the control has been used. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-before-open' and 'helix-before-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
   "helix-headless-tooltip": DefineCustomElement<
     HelixHeadlessTooltip,
     HelixHeadlessTooltipVueProps,

@@ -46,7 +46,7 @@ describe('dialog', () => {
 
   test('opening is announced before it happens, so it can be refused', async () => {
     const host = await dialog()
-    host.addEventListener('helix-open', (event) => event.preventDefault())
+    host.addEventListener('helix-before-open', (event) => event.preventDefault())
     host.show()
     await host.updateComplete
     expect(host.hasAttribute('data-open')).toBe(false)
@@ -58,7 +58,7 @@ describe('dialog', () => {
     await host.updateComplete
     expect(host.hasAttribute('data-open')).toBe(true)
 
-    host.addEventListener('helix-close', (event) => event.preventDefault())
+    host.addEventListener('helix-before-close', (event) => event.preventDefault())
     host.close()
     await host.updateComplete
     expect(host.hasAttribute('data-open')).toBe(true)

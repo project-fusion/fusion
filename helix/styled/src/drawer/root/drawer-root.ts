@@ -25,7 +25,7 @@ import { styles } from './drawer-root.css.js'
  * @csspart header - The header region.
  * @csspart content - The scrolling content region.
  *
- * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the drawer opens or closes.
  *
  * @cssproperty --drawer-backdrop - Filter applied behind a `material="glass"` drawer.
  *   Follows the theme's material policy; set it to override the strength on one drawer.

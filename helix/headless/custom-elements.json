@@ -132,7 +132,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -183,13 +183,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -319,19 +342,27 @@
           "events": [
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before the section closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the item opens or closes.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -348,7 +379,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -424,7 +455,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Holds the mode and nothing else. The item that was clicked is what\ncoordinates: it walks up to the nearest accordion, reads the mode off it, and\ncloses its peers itself.\n\nCoordination is structural, not a subscription. `helix-open` does not bubble\nand is not composed, because overlays nest and an inner one's lifecycle must\nnever read as the outer one's, so an accordion cannot learn that a child\nopened by listening for it.\n\nMembership resolves on demand, so there is no registry to keep in step: an\nitem added a second after render coordinates on its first click.\n\nItems are matched with `instanceof HelixHeadlessAccordionItem`, never by tag\nname. Matching `helix-accordion-item` would tie this tier to the styled one.\n\nEvery listener is attached on connect, so none of it runs on the server,\nwhere there is no tree to walk and no events to hear.",
+          "description": "Holds the mode and nothing else. The item that was clicked is what\ncoordinates: it walks up to the nearest accordion, reads the mode off it, and\ncloses its peers itself.\n\nCoordination is structural, not a subscription. `helix-before-open` does not bubble\nand is not composed, because overlays nest and an inner one's lifecycle must\nnever read as the outer one's, so an accordion cannot learn that a child\nopened by listening for it.\n\nMembership resolves on demand, so there is no registry to keep in step: an\nitem added a second after render coordinates on its first click.\n\nItems are matched with `instanceof HelixHeadlessAccordionItem`, never by tag\nname. Matching `helix-accordion-item` would tie this tier to the styled one.\n\nEvery listener is attached on connect, so none of it runs on the server,\nwhere there is no tree to walk and no events to hear.",
           "name": "HelixHeadlessAccordion",
           "slots": [
             {
@@ -9418,7 +9449,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -9469,13 +9500,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -10125,25 +10179,25 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the panel opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -10224,7 +10278,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -12151,7 +12205,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -12202,13 +12256,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -12866,25 +12943,25 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the panel opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -13003,7 +13080,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -13393,7 +13470,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -13444,13 +13521,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -13588,19 +13688,27 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the palette opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -13645,7 +13753,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -16346,7 +16454,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -16397,13 +16505,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -17053,25 +17184,25 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the calendar opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -17198,7 +17329,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -18530,7 +18661,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A real `<dialog>` opened with `showModal()`, not a div with a role and a\nhand-built trap. The platform gives four things that are each a day's work to\nreimplement and easy to get subtly wrong: the top layer, so the dialog is\nabove everything regardless of what `z-index` anyone else wrote; a real\nbackdrop; Escape; and inert-behind, so the page underneath is not reachable\nby pointer, keyboard, or a screen reader's virtual cursor.\n\n**`open` drives `showModal()`, and every way it can close comes back through\n`requestOpen`.** A native dialog can close from three directions: the\nproperty, Escape, and a `<form method=\"dialog\">` submit inside it. Left\nalone, two of those would shut the dialog while the consumer's state still\nsaid open, which is the bug that makes a modal impossible to reopen. Escape\nis intercepted and routed through the request, so `preventDefault()` on the\n`helix-close` refuses it; a close that happens anyway is reflected back.\n\n**Nothing here traps focus.** `showModal()` does it, and better: `inert` on\nthe rest of the document is something no JavaScript trap can achieve.\n`FocusTrapController` stays for the surfaces that are not modal.\n\nThe regions are bare slots rather than wrappers, for the reason the card's\nare: an unassigned `<slot>` is `display: contents` and generates no box, so a\ndialog with no footer has no empty band where one would be.\n\nOpened declaratively with the platform's invoker attributes:\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n<helix-dialog id=\"confirm\">…</helix-dialog>\n```\n\n`--show`, `--close` and `--toggle`. Custom commands rather than the built-in\n`show-modal`, because those are defined against native elements and do\nnothing when pointed at a custom one.",
+          "description": "A real `<dialog>` opened with `showModal()`, not a div with a role and a\nhand-built trap. The platform gives four things that are each a day's work to\nreimplement and easy to get subtly wrong: the top layer, so the dialog is\nabove everything regardless of what `z-index` anyone else wrote; a real\nbackdrop; Escape; and inert-behind, so the page underneath is not reachable\nby pointer, keyboard, or a screen reader's virtual cursor.\n\n**`open` drives `showModal()`, and every way it can close comes back through\n`requestOpen`.** A native dialog can close from three directions: the\nproperty, Escape, and a `<form method=\"dialog\">` submit inside it. Left\nalone, two of those would shut the dialog while the consumer's state still\nsaid open, which is the bug that makes a modal impossible to reopen. Escape\nis intercepted and routed through the request, so `preventDefault()` on the\n`helix-before-close` refuses it; a close that happens anyway is reflected back.\n\n**Nothing here traps focus.** `showModal()` does it, and better: `inert` on\nthe rest of the document is something no JavaScript trap can achieve.\n`FocusTrapController` stays for the surfaces that are not modal.\n\nThe regions are bare slots rather than wrappers, for the reason the card's\nare: an unassigned `<slot>` is `display: contents` and generates no box, so a\ndialog with no footer has no empty band where one would be.\n\nOpened declaratively with the platform's invoker attributes:\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n<helix-dialog id=\"confirm\">…</helix-dialog>\n```\n\n`--show`, `--close` and `--toggle`. Custom commands rather than the built-in\n`show-modal`, because those are defined against native elements and do\nnothing when pointed at a custom one.",
           "name": "HelixHeadlessDialog",
           "cssParts": [
             {
@@ -18659,7 +18790,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -18710,13 +18841,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -18846,19 +19000,19 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before it opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
@@ -18867,6 +19021,14 @@
               "description": "Relayed, because the platform's own does not escape.",
               "name": "close",
               "reactProp": "onclose"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -18893,7 +19055,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -19895,7 +20057,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -19946,13 +20108,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -20082,11 +20267,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before the panel closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
@@ -20098,11 +20283,19 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the drawer opens or closes.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -20137,7 +20330,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -30024,7 +30217,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -30075,13 +30268,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -30211,25 +30427,25 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before it opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -30275,7 +30491,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -31220,7 +31436,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -31271,13 +31487,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -31407,19 +31646,19 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before it opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
@@ -31433,7 +31672,7 @@
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -31519,7 +31758,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -35019,7 +35258,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "The words, for a listbox that has to match text against them.\n\nRead from the rendered content rather than required as a property, because\nthe content is where a consumer naturally puts it and asking for both is\nasking for two things to disagree.",
+              "description": "The words, for a listbox that has to match text against them.\n\nRead from the rendered content rather than required as a property, because\nthe content is where a consumer naturally puts it and asking for both is\nasking for two things to disagree.\n\n**The default slot's content, not the element's.** This was\n`this.textContent`, which is every descendant text node an option holds,\nand an option holds three slots: the words, plus `start` for an icon and\n`end` for a shortcut or a count. Neither of those is what a reader\nsearched for, and both were being run onto the end of it.\n\n**Six things read this and all six were wrong.** The collapsed field of\nSelect and of Combobox show it, the listbox filters on it, Combobox\nmatches typed text against it, completes inline from it, and labels a\nchosen tag with it. Measured on a font picker whose options carry a\ntwo-letter specimen in `end`: the field read `Noto Sans Linear BAg`, and\ntyping `ag` matched 1,892 of 1,893 options, every row containing the\nsample. An option with a keyboard shortcut in its end slot has the same\nfault and a worse one, every row carrying one matching every letter of it.\n\nA node goes to the default slot when it names no other, which is the rule\nthe platform applies at assignment. Asking the same question here rather\nthan a second one is what stops the two disagreeing. Text nodes are\nalways the default slot's and cannot say otherwise.",
               "readonly": true
             },
             {
@@ -38445,7 +38684,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -38496,13 +38735,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -38632,25 +38894,25 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before it opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -38688,7 +38950,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -42585,7 +42847,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -42636,13 +42898,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -43292,25 +43577,25 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the list opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -43375,7 +43660,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -45719,7 +46004,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -45770,13 +46055,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -45906,25 +46214,25 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before it opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -45962,7 +46270,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -53139,7 +53447,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -53190,13 +53498,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -53846,25 +54177,25 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired when the list opens.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when it closes.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -53972,7 +54303,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -58140,7 +58471,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**Two forms, and they are not equivalent for a screen reader.**\n\nWrapping is the convenience form and is right where the bubble decorates a\ncontrol that already says what it is. The trigger stays the consumer's own\nelement, slotted, and nothing here can describe it: an IDREF cannot cross a\nshadow boundary, an element reference is valid only into the same tree or a\nshadow-including *ancestor* (the bubble's tree is neither, it is inward), and\na string on the trigger means writing to markup the consumer server-rendered.\nAll three measured.\n\n`for` is the form that works. The tooltip sits *beside* the trigger in the\nconsumer's own tree and names it by id, so both are in one tree and an IDREF\nbetween them is legal in the ordinary way:\n\n```html\n<helix-button id=\"save\" aria-describedby=\"save-tip\">Save</helix-button>\n<helix-tooltip id=\"save-tip\" for=\"save\" content=\"Save your work\"></helix-tooltip>\n```\n\nNote that the reference points at *this host*, not at the bubble inside its\nshadow root: the description is computed from the flat tree, which descends\ninto shadow content on its own.\n\n**The consumer writes that `aria-describedby`, and nothing here writes it for\nthem.** WebAwesome and Spectrum Web Components both do write it, with\n`setAttribute` on the trigger at runtime, which is the one thing this library\ndeclines everywhere: React rendered that element on the server without the\nattribute and reports a mismatch it will not patch up. Two ids in the markup\nis the whole cost of the version that is correct before any JavaScript runs.\n\nBecause it is the consumer's line to write, it is also theirs to forget, so\n`for` audits itself on first open and says so once, rather than on every\nopen, since a warning that repeats is one people learn to filter out.\n\nIt shows on hover and on focus, and hides on leave, on blur, on Escape, and\nonce the trigger has been activated: the hint is spent when the control has\nbeen used.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-open` and\n`helix-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
+          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**Two forms, and they are not equivalent for a screen reader.**\n\nWrapping is the convenience form and is right where the bubble decorates a\ncontrol that already says what it is. The trigger stays the consumer's own\nelement, slotted, and nothing here can describe it: an IDREF cannot cross a\nshadow boundary, an element reference is valid only into the same tree or a\nshadow-including *ancestor* (the bubble's tree is neither, it is inward), and\na string on the trigger means writing to markup the consumer server-rendered.\nAll three measured.\n\n`for` is the form that works. The tooltip sits *beside* the trigger in the\nconsumer's own tree and names it by id, so both are in one tree and an IDREF\nbetween them is legal in the ordinary way:\n\n```html\n<helix-button id=\"save\" aria-describedby=\"save-tip\">Save</helix-button>\n<helix-tooltip id=\"save-tip\" for=\"save\" content=\"Save your work\"></helix-tooltip>\n```\n\nNote that the reference points at *this host*, not at the bubble inside its\nshadow root: the description is computed from the flat tree, which descends\ninto shadow content on its own.\n\n**The consumer writes that `aria-describedby`, and nothing here writes it for\nthem.** WebAwesome and Spectrum Web Components both do write it, with\n`setAttribute` on the trigger at runtime, which is the one thing this library\ndeclines everywhere: React rendered that element on the server without the\nattribute and reports a mismatch it will not patch up. Two ids in the markup\nis the whole cost of the version that is correct before any JavaScript runs.\n\nBecause it is the consumer's line to write, it is also theirs to forget, so\n`for` audits itself on first open and says so once, rather than on every\nopen, since a warning that repeats is one people learn to filter out.\n\nIt shows on hover and on focus, and hides on leave, on blur, on Escape, and\nonce the trigger has been activated: the hint is spent when the control has\nbeen used.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-before-open` and\n`helix-before-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
           "name": "HelixHeadlessTooltip",
           "cssParts": [
             {
@@ -58492,7 +58823,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -58543,13 +58874,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -58679,25 +59033,25 @@
           "events": [
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before the bubble shows, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before it hides, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
             },
             {
               "type": {
                 "text": "Event"
               },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
               "name": "toggle",
               "reactProp": "ontoggle"
             }
@@ -58789,7 +59143,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -59278,11 +59632,19 @@
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired when the reader leaves early.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -59735,14 +60097,6 @@
               "description": "A stop asking the tour to move, from its own controls.",
               "name": "helix-tour-ask",
               "reactProp": "onhelix-tour-ask"
-            },
-            {
-              "type": {
-                "text": "Event"
-              },
-              "description": "Says the panel moved, carrying `newState` and `oldState`.",
-              "name": "toggle",
-              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -60102,7 +60456,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "attribute": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -60153,13 +60507,36 @@
                   }
                 }
               ],
-              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-before-open` or\n`helix-before-close` is a refusal and nothing moves. Nobody refusing means the\nelement opens or closes itself, whether or not a consumer declared\n`open`: a declared property is a seed and a correction, and a consumer\nwho wants the decision for themselves refuses it and assigns their own.\nSee 294.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               },
               "type": {
                 "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceToggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the state moved, under the platform's own name and in its shape.\n\n**`<details>` fires `toggle` and a popover fires `toggle`, and sixteen\nfamilies here fired neither.** Two of them render a real `<dialog>` and\nten show a `popover=\"manual\"` panel, so the browser was already firing\nsomething on an element inside a shadow root, where `toggle` neither\nbubbles nor composes and so reaches nobody. The rest, the disclosures,\nhave no native element to fire anything at all: `AccordionItem` and\n`TreeItem` are `aria-expanded` and `hidden` written by hand, which is\n`<details>`'s job done manually.\n\n**From here rather than from `PopoverController`, which had it first.**\nThe controller covers eleven families and the mixin covers sixteen, and\nthe overlap is ten that would have announced twice. What `toggle` reports\nis the *state*, and the state is this mixin's; the controller is a way of\nputting a panel on the screen.\n\n**`newState` and `oldState`, because that is the platform's shape**, so a\nconsumer arriving from `<details>` reads the same two words. Not\ncancelable: the before events are the request, and a second cancelable\nevent for one transition is two answers to one question.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
             },
             {
@@ -60297,19 +60674,27 @@
             },
             {
               "type": {
-                "text": "HelixOpenEvent"
+                "text": "HelixBeforeOpenEvent"
               },
               "description": "Fired before a branch opens, and cancelable.",
-              "name": "helix-open",
-              "reactProp": "onhelix-open"
+              "name": "helix-before-open",
+              "reactProp": "onhelix-before-open"
             },
             {
               "type": {
-                "text": "HelixCloseEvent"
+                "text": "HelixBeforeCloseEvent"
               },
               "description": "Fired before a branch closes, and cancelable.",
-              "name": "helix-close",
-              "reactProp": "onhelix-close"
+              "name": "helix-before-close",
+              "reactProp": "onhelix-before-close"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Says the state moved, carrying `newState` and `oldState`.",
+              "name": "toggle",
+              "reactProp": "ontoggle"
             }
           ],
           "attributes": [
@@ -60371,7 +60756,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.\n\nhelix-close",
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback holding whatever the last reader did rather than what the author\nwrote. `data-open` carries the resolved state for stylesheets, which is\nwhat it has always been for.",
               "fieldName": "open",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
@@ -61787,7 +62172,7 @@
                   "text": "void"
                 }
               },
-              "description": "Watches the playlist for entries arriving, and re-reads it on every open.\n\nTwo signals rather than one, because the two facts change on different\nclocks and only one of them is observable.\n\n**Which entries exist** is the playlist's light DOM, and a `MutationObserver`\nsees it directly.\n\n**Which entry is current** is `active`, a property with no attribute, so\nthere is nothing to observe: events travel up from the playlist and this\nelement is below it, and mirroring `active` to a `data-` name is ruled out\non its own merits, `active` being a payload rather than a boolean fact.\nMirroring it was written and reverted here: it put `data-active` onto every\nhost, which `tree-root.ssr.spec.ts` caught, and the rule it broke was the\none that stops a copied host coming back frozen.\n\nSo it is re-read at the moment it is looked at. `helix-open` comes from the\nmenu in this element's own shadow root, which is the one direction events\ndo arrive from, and a closed menu showing a stale mark is a thing nobody\ncan see."
+              "description": "Watches the playlist for entries arriving, and re-reads it on every open.\n\nTwo signals rather than one, because the two facts change on different\nclocks and only one of them is observable.\n\n**Which entries exist** is the playlist's light DOM, and a `MutationObserver`\nsees it directly.\n\n**Which entry is current** is `active`, a property with no attribute, so\nthere is nothing to observe: events travel up from the playlist and this\nelement is below it, and mirroring `active` to a `data-` name is ruled out\non its own merits, `active` being a payload rather than a boolean fact.\nMirroring it was written and reverted here: it put `data-active` onto every\nhost, which `tree-root.ssr.spec.ts` caught, and the rule it broke was the\none that stops a copied host coming back frozen.\n\nSo it is re-read at the moment it is looked at. `helix-before-open` comes from the\nmenu in this element's own shadow root, which is the one direction events\ndo arrive from, and a closed menu showing a stale mark is a thing nobody\ncan see."
             },
             {
               "kind": "field",

@@ -83,9 +83,9 @@ let showing: HelixHeadlessMegamenu | undefined
  * @csspart trigger - The default trigger, where none was slotted.
  * @csspart surface - The floating panel, which is what opens.
  *
- * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
- * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  */

@@ -49,9 +49,9 @@ import '../../listbox/index.js'
  * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the answer changes.
  * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixOpenEvent} helix-open - Fired when the list opens.
- * @event {HelixCloseEvent} helix-close - Fired when it closes.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart label - The question, over the trigger.
  * @csspart value - The chosen option's text inside the trigger.

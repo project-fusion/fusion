@@ -44,8 +44,9 @@ const TRIGGER_ID = 'trigger'
  * @csspart content - The revealed region.
  * @csspart content-inner - The clipping box inside the animated region.
  *
- * @event {HelixCloseEvent} helix-close - Fired before the section closes, and cancelable.
- * @event {HelixOpenEvent} helix-open - Fired when the item opens or closes.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the section closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the item opens or closes.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-accordion-item')
 export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {

@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixCloseEvent, HelixOpenEvent } from '../../events/events.js'
+import { HelixBeforeCloseEvent, HelixBeforeOpenEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 
@@ -31,7 +31,7 @@ export declare class MixinControllerOpenInterface {
    * Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
-   * `helix-open` or `helix-close` refuses the change, and nothing moves.
+   * `helix-before-open` or `helix-before-close` refuses the change, and nothing moves.
    */
   requestOpen(next: boolean): boolean
 
@@ -40,17 +40,22 @@ export declare class MixinControllerOpenInterface {
 }
 
 /**
- * Grafts controlled and uncontrolled open state onto a base class.
+ * Grafts open state onto a base class, and says so twice.
  *
- * Which mode it is in is read once, at the first update, from whether anything
- * had set `open` by then: markup, a hydrating server's attributes and a
- * framework's initial properties have all arrived, and nothing else has
- * happened yet. Set, and the consumer owns it and the element only announces.
- * Unset, and the element owns it and `defaultOpen` says where it starts.
+ * `helix-before-open` and `helix-before-close` announce the change while it is
+ * still a request, so `preventDefault()` refuses it and nothing moves. Native
+ * `toggle` announces it afterwards, once the state has actually gone, carrying
+ * `newState` and `oldState` the way the platform does on `<details>` and on a
+ * popover. The first is how a consumer takes the decision; the second is what
+ * they bind when they only want to know. See 294 and 296.
  *
- * Sets `data-open` on the host whenever the element is open, in either mode.
- * Styled tiers select on that rather than `[open]`, which is absent for
- * uncontrolled consumers.
+ * `open` is a seed and a correction rather than a claim: the element applies
+ * its own changes from wherever markup started it, and `defaultOpen` is what a
+ * reset returns to.
+ *
+ * Sets `data-open` on the host whenever the element is open. Styled tiers
+ * select on that rather than `[open]`, which is absent until somebody writes
+ * it.
  */
 export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerOpenInterface deliberately. The interface is
@@ -78,10 +83,9 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * opened itself would put `open` on its own host and, from the next thing
      * that read it, be indistinguishable from one the consumer controls:
      * cloned, serialised for hydration, or diffed by a framework, it would come
-     * back controlled and stop responding. `data-open` carries the resolved
-     * state for stylesheets, which is what it has always been for.
-     *
-     * helix-close
+     * back holding whatever the last reader did rather than what the author
+     * wrote. `data-open` carries the resolved state for stylesheets, which is
+     * what it has always been for.
      */
     @property({ type: Boolean })
     get open(): boolean {
@@ -129,8 +133,8 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     /**
      * Requests an open-state change, and reports whether it was applied.
      *
-     * Announces before it acts, so `preventDefault()` on the `helix-open` or
-     * `helix-close` is a refusal and nothing moves. Nobody refusing means the
+     * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
+     * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the
      * element opens or closes itself, whether or not a consumer declared
      * `open`: a declared property is a seed and a correction, and a consumer
      * who wants the decision for themselves refuses it and assigns their own.
@@ -140,16 +144,52 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
       if (this.open === next) {
         return true
       }
-      return requestChange({
+      const applied = requestChange({
         apply: (open) => {
           const previous = this.open
           this.openState = open
           this.requestUpdate('open', previous)
         },
-        event: (open) => (open ? new HelixOpenEvent() : new HelixCloseEvent()),
+        event: (open) => (open ? new HelixBeforeOpenEvent() : new HelixBeforeCloseEvent()),
         host: this,
         next,
       })
+      if (applied) {
+        this.announceToggle(next)
+      }
+      return applied
+    }
+
+    /**
+     * Says the state moved, under the platform's own name and in its shape.
+     *
+     * **`<details>` fires `toggle` and a popover fires `toggle`, and sixteen
+     * families here fired neither.** Two of them render a real `<dialog>` and
+     * ten show a `popover="manual"` panel, so the browser was already firing
+     * something on an element inside a shadow root, where `toggle` neither
+     * bubbles nor composes and so reaches nobody. The rest, the disclosures,
+     * have no native element to fire anything at all: `AccordionItem` and
+     * `TreeItem` are `aria-expanded` and `hidden` written by hand, which is
+     * `<details>`'s job done manually.
+     *
+     * **From here rather than from `PopoverController`, which had it first.**
+     * The controller covers eleven families and the mixin covers sixteen, and
+     * the overlap is ten that would have announced twice. What `toggle` reports
+     * is the *state*, and the state is this mixin's; the controller is a way of
+     * putting a panel on the screen.
+     *
+     * **`newState` and `oldState`, because that is the platform's shape**, so a
+     * consumer arriving from `<details>` reads the same two words. Not
+     * cancelable: the before events are the request, and a second cancelable
+     * event for one transition is two answers to one question.
+     */
+    private announceToggle(open: boolean): void {
+      const event = new Event('toggle', { bubbles: false, cancelable: false, composed: false })
+      Object.assign(event, {
+        newState: open ? 'open' : 'closed',
+        oldState: open ? 'closed' : 'open',
+      })
+      this.dispatchEvent(event)
     }
 
     /** Requests the opposite of the current state. */

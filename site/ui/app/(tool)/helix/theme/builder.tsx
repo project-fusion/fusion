@@ -7,18 +7,21 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
-import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces'
+import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces.generated'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import {
+  BOUNDS,
   type Character,
   INITIAL,
   intentFrom,
   type Mechanism,
+  queryFrom,
   SCOPE,
   type Settings,
 } from './defaults'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
+import { useFacePreviews } from './use-face-previews'
 import './theme.css'
 import styles from '../workbench.module.css'
 
@@ -54,12 +57,29 @@ const PREVIEW_SHARE = 68
  * token layer actually uses. The empty value is the stylesheet's own stack.
  */
 interface Face {
+  /** Google's own category, which is what the dropdowns are grouped by. */
+  category: number
   family: string
   google?: string
   label: string
+  /** The one-weight request behind the sample, absent on the resting option. */
+  preview?: string
 }
 
-const SYSTEM: Face = { family: '', label: 'System default' }
+/**
+ * A named run of faces, which is what a dropdown shows instead of a wall.
+ *
+ * **Because two thousand alphabetical families is a wall**, and a combobox that filters
+ * as it is typed into answers "I know what I want" rather than "show me
+ * something reasonable". Six of them led the list already, which helped the
+ * second reader and left the other 1,933 in one undifferentiated run.
+ */
+interface FaceGroup {
+  faces: Face[]
+  label: string
+}
+
+const SYSTEM: Face = { category: 0, family: '', label: 'System default' }
 
 /**
  * Every Google family, rather than the six somebody happened to like.
@@ -67,7 +87,7 @@ const SYSTEM: Face = { family: '', label: 'System default' }
  * The nine hardcoded here were a list, not a judgment: they carried the exact
  * weights the token layer uses because each was written out by hand, which is
  * precisely what does not scale and precisely what `bun run faces` now does for
- * 1,939 of them. A family is offered when it can serve at least one of 400, 500
+ * two thousand of them. A family is offered when it can serve at least one of 400, 500
  * and 600, and asked for the ones it has: the same request against a family
  * shipping only 400 and 700 returns a stylesheet missing two weights and a page
  * that synthesizes the difference.
@@ -77,69 +97,213 @@ const SYSTEM: Face = { family: '', label: 'System default' }
  * and already argued why. A longer list is a longer list.
  */
 const fromCatalog = (row: FaceRow): Face => ({
+  category: row[2],
   family: row[0],
   google: `${row[0].replace(/ /g, '+')}:wght@${row[1]}`,
   label: row[0],
+  /* The first weight the family has, for the two-letter sample beside its name.
+     `google` above asks for all three because the token layer sets all three;
+     a preview needs one, and asking for the others triples a request whose
+     whole point is to be cheap. */
+  preview: `${row[0].replace(/ /g, '+')}:wght@${row[1].split(';')[0]}`,
 })
 
-const CATALOG: Face[] = GOOGLE_FACES.filter((row) => row[2] === 0).map(fromCatalog)
+/* **`!== 1` rather than `=== 0`.** The third field is a category now and
+   monospace kept the 1 it had, so the mono half is unchanged and the
+   proportional half is every other category rather than the one value that used
+   to mean "not mono". Read the old way, this list would have held sans-serif
+   alone and lost 1,172 serif, display and handwriting families in silence. */
+const CATALOG: Face[] = GOOGLE_FACES.filter((row) => row[2] !== 1).map(fromCatalog)
 const CATALOG_MONO: Face[] = GOOGLE_FACES.filter((row) => row[2] === 1).map(fromCatalog)
 
 /**
- * The six that lead the list, because 1,939 alphabetical families is a wall.
+ * The six that lead every dropdown, under a heading of their own.
  *
- * A combobox filters as it is typed into, which answers "I know what I want"
- * and not "show me something reasonable". These are the ones the builder used
- * to offer, so the reader who opened it before sees what they saw, and the
- * reader who has no opinion gets a short list of faces that read well at the
- * sizes the token layer sets rather than the first six words in the alphabet.
+ * These are the ones the builder used to offer, so a reader who opened it before
+ * sees what they saw, and a reader with no opinion gets a short list of faces
+ * that read well at the sizes the token layer sets rather than the first six
+ * words in the alphabet.
+ *
+ * **"Recommended" is the honest word for them**, and it was worth checking
+ * rather than assuming: they are not the most downloaded, not the newest and not
+ * a partnership. They are the ones somebody tried at these sizes and kept, which
+ * is what a reader hears when a font picker says recommended.
  */
 const LEADING = ['Inter', 'DM Sans', 'Work Sans', 'Fraunces', 'Playfair Display', 'Source Serif 4']
 
-const lead = (faces: Face[]): Face[] => [
-  ...LEADING.map((name) => faces.find((face) => face.family === name)).filter(
-    (face): face is Face => face !== undefined,
-  ),
-  ...faces.filter((face) => !LEADING.includes(face.family)),
-]
+/** Google's five, in the order a reader is most likely to want them. */
+const CATEGORY_ORDER = [0, 2, 3, 4, 1] as const
 
-const FACES: Face[] = [SYSTEM, ...lead(CATALOG)]
+const CATEGORY_LABEL: Record<number, string> = {
+  0: 'Sans serif',
+  1: 'Monospace',
+  2: 'Serif',
+  3: 'Display',
+  4: 'Handwriting',
+}
 
 /**
- * The same faces, with a different word for choosing none.
+ * The catalog as named runs: the picked few, then Google's own categories.
+ *
+ * **A face appears once.** The recommended group is drawn from the categories
+ * below it, so those exclude it: two options carrying one value is a select that
+ * shows the wrong word for the right choice, and a reader scrolling past Inter
+ * twice has no way to know the two are the same.
+ *
+ * **Empty groups are dropped rather than rendered empty**, which matters for the
+ * monospace field, where three of the five categories cannot occur at all.
+ * Filtering is the listbox's own and it already hides a group whose options a
+ * filter has all hidden, so this only has to answer for the ones that were never
+ * going to have members.
+ */
+const grouped = (faces: Face[], leading: readonly string[]): FaceGroup[] => {
+  const picked = leading
+    .map((name) => faces.find((face) => face.family === name))
+    .filter((face): face is Face => face !== undefined)
+
+  const rest = faces.filter((face) => !leading.includes(face.family))
+
+  return [
+    { faces: picked, label: 'Recommended' },
+    ...CATEGORY_ORDER.map((category) => ({
+      faces: rest.filter((face) => face.category === category),
+      label: CATEGORY_LABEL[category] ?? '',
+    })),
+  ].filter((group) => group.faces.length > 0)
+}
+
+/**
+ * The resting option, which sits above every group and belongs to none.
+ *
+ * It is not a face and grouping it with faces would say it is one. Rendered
+ * loose before the first group, the way a select's own empty option is.
+ */
+const FACE_GROUPS: FaceGroup[] = grouped(CATALOG, LEADING)
+
+/**
+ * The same groups, with a different word for choosing none.
  *
  * `--helix-font-display` is emitted as `display ?? body`, so leaving this alone
  * does not fall back to the system, it follows whatever the body face is: pick
- * Fraunces for the body and the headings are Fraunces too. Sharing `FACES` here
- * meant the resting option read `System default`, which is true only while the
- * body face is also unset and wrong the moment it is not. `Same as body` is
+ * Fraunces for the body and the headings are Fraunces too. `Same as body` is
  * true in both cases, the body face being the system default when nobody has
- * chosen one.
+ * chosen one, where `System default` is true only while it is unset.
  */
-const DISPLAY_FACES: Face[] = [
-  { family: '', label: 'Same as body' },
-  ...FACES.filter((face) => face.family !== ''),
-]
+const DISPLAY_REST: Face = { category: 0, family: '', label: 'Same as body' }
 
-/* Monospace is a category in the catalog rather than a list here, so a face
-   that calls itself mono is offered where mono is asked for and nowhere else.
-   The three that used to be hardcoded lead it for the same reason as above. */
+/* Monospace is a category in the catalog rather than a list here, so a face that
+   calls itself mono is offered where mono is asked for and nowhere else. The
+   three that used to be hardcoded lead it for the same reason as above. */
 const MONO_LEADING = ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono']
 
-const MONO_FACES: Face[] = [
-  { family: '', label: 'System mono' },
-  ...MONO_LEADING.map((name) => CATALOG_MONO.find((face) => face.family === name)).filter(
-    (face): face is Face => face !== undefined,
-  ),
-  ...CATALOG_MONO.filter((face) => !MONO_LEADING.includes(face.family)),
-]
+const MONO_GROUPS: FaceGroup[] = grouped(CATALOG_MONO, MONO_LEADING)
+
+const MONO_REST: Face = { category: 1, family: '', label: 'System mono' }
+
+/** Every face carrying a Google request, for the fonts URL to look one up in. */
+const ALL_FACES: Face[] = [...CATALOG, ...CATALOG_MONO]
+
+/**
+ * The options inside a face dropdown: the resting one loose, then the groups.
+ *
+ * Written once because three fields render it and the only things that differ
+ * are which catalog and which word for choosing none. Three copies would be
+ * three chances for one of them to lose its grouping in a later edit.
+ *
+ * The resting option is not in a group because it is not a face, and putting it
+ * under `Recommended` would recommend the absence of one.
+ */
+const faceOptions = (groups: FaceGroup[], rest: Face) => (
+  <>
+    <helix-option value={rest.family}>{rest.label}</helix-option>
+    {groups.map((group) => (
+      <helix-option-group key={group.label} label={group.label}>
+        {group.faces.map((face) => (
+          <helix-option key={face.family} value={face.family}>
+            {face.label}
+            {/* **The specimen, after the name.**
+
+                `Ag` because two letters carry the most: an ascender, a bowl, a
+                descender, and the terminal on the g, which is where a grotesque
+                and a humanist part company. Longer samples say no more and take
+                the width the name needs.
+
+                The `end` slot rather than the start, so the names stay flush
+                against the left edge a reader is scanning down. The column is a
+                fixed width so its own right edge does not go ragged: `Ag` set in
+                Playfair Display is wider than in Inter, and a thousand rows of
+                that reads as a broken list rather than as type that varies.
+
+                **The skeleton is not decoration.** `display=swap` means an
+                unloaded sample renders in the fallback face, so without it a row
+                saying `Playfair Display` would show `Ag` set in Inter: not
+                blank, which a reader forgives, but wrong, which a reader
+                believes. A stand-in says the face has not arrived, which is the
+                one thing the fallback cannot say about itself.
+
+                `aria-hidden` on the wrapper rather than on both children, which
+                hides the subtree in one place and keeps the option's accessible
+                name the family name it already was.
+
+                `data-face-request` is what `useFacePreviews` observes, and it
+                writes `data-face-ready` back when the face has actually loaded.
+                The two swap on that, so neither is guessing. */}
+            <span aria-hidden="true" className="themeFace" slot="end">
+              {/* **The face is named here or the sample is a lie.** It is the
+                  one thing in this markup that cannot be moved to a stylesheet,
+                  a rule per family being a rule per family. Dropped once during
+                  an edit and not noticed by eye: every sample rendered in the
+                  page's own face, so a thousand rows showed one typeface wearing
+                  a thousand names, which is the exact failure the skeleton beside
+                  it exists to prevent. Caught by measuring the rendered glyphs
+                  rather than by looking at them. */}
+              <span
+                className="themeFaceSample"
+                data-face-request={face.preview}
+                style={{ fontFamily: `"${face.family}", var(--helix-font-sans)` }}
+              >
+                Ag
+              </span>
+              <helix-skeleton className="themeFaceWaiting" shape="text" />
+            </span>
+          </helix-option>
+        ))}
+      </helix-option-group>
+    ))}
+  </>
+)
 
 export function ThemeBuilder({
+  contexts,
   findable,
+  initialContext,
+  initialLayout,
+  initialSettings,
   initialTheme,
-  pageMarkup,
+  layouts,
+  markup,
 }: {
+  /** Whose page the preview is, and what a reader picks one by. */
+  contexts: readonly { label: string; value: string }[]
   findable: Findable[]
+  /**
+   * Which context and layout the link asked for, if it asked for either.
+   *
+   * Validated against the offered lists by the server component, so an unknown
+   * one arrives here as `undefined` rather than as an axis value nothing can
+   * render.
+   */
+  initialContext?: string
+  initialLayout?: string
+  /**
+   * What the reader's link described, already validated.
+   *
+   * **Seeded from the URL on the server**, so a shared theme is in the HTML
+   * rather than applied a frame after hydration. Every value has been checked
+   * and clamped by `settingsFrom`: what arrives here is a `Settings` that the
+   * controls below can all display.
+   */
+  initialSettings: Settings
   /**
    * The default theme, derived on the server.
    *
@@ -152,15 +316,22 @@ export function ThemeBuilder({
    * the module transfer and the rest was hydration.
    */
   initialTheme: DerivedTheme
+  /** How much page there is, which is the axis the context is not. */
+  layouts: readonly { label: string; value: string }[]
   /**
-   * The preview's page, already a string.
+   * The preview's page, already a string, once per layout and context.
    *
    * Rendered by the server component above, for the reason written out there:
    * taking it back out of the DOM with `innerHTML` loses every value React set
    * as a property rather than as an attribute, which on a client navigation is
    * all of them.
+   *
+   * **Keyed by the pair**, and the labels arrive separately, so this component
+   * never imports `themed-page.tsx`. It is a client component and that module
+   * is three page skeletons nothing renders in a browser: importing it to read
+   * six labels would ship all of them.
    */
-  pageMarkup: string
+  markup: Readonly<Record<string, string>>
 }) {
   useSandboxEditor()
 
@@ -214,28 +385,64 @@ export function ThemeBuilder({
       setControlsShown(Number(event.detail.value) > 2)
     }
   }
-  const [brand, setBrand] = useState(INITIAL.brand)
-  const [scheme, setScheme] = useState(INITIAL.scheme)
-  const [contrastTarget, setContrastTarget] = useState(INITIAL.contrastTarget)
-  const [chromaScale, setChromaScale] = useState(INITIAL.chromaScale)
-  const [accentHue, setAccentHue] = useState(INITIAL.accentHue)
-  const [density, setDensity] = useState(INITIAL.density)
-  const [radius, setRadius] = useState(INITIAL.radius)
-  const [allowance, setAllowance] = useState(INITIAL.allowance)
-  const [harmony, setHarmony] = useState(INITIAL.harmony)
+  const [brand, setBrand] = useState(initialSettings.brand)
+  const [scheme, setScheme] = useState(initialSettings.scheme)
+  const [contrastTarget, setContrastTarget] = useState(initialSettings.contrastTarget)
+  const [chromaScale, setChromaScale] = useState(initialSettings.chromaScale)
+  const [accentHue, setAccentHue] = useState(initialSettings.accentHue)
+  const [density, setDensity] = useState(initialSettings.density)
+  const [radius, setRadius] = useState(initialSettings.radius)
+  const [allowance, setAllowance] = useState(initialSettings.allowance)
+  const [harmony, setHarmony] = useState(initialSettings.harmony)
   const [split, setSplit] = useState(PREVIEW_SHARE)
-  const [bodyFace, setBodyFace] = useState(INITIAL.bodyFace)
-  const [displayFace, setDisplayFace] = useState(INITIAL.displayFace)
-  const [monoFace, setMonoFace] = useState(INITIAL.monoFace)
-  const [motion, setMotion] = useState(INITIAL.motion)
-  const [textBase, setTextBase] = useState(INITIAL.textBase)
-  const [textScale, setTextScale] = useState(INITIAL.textScale)
-  const [surface, setSurface] = useState(INITIAL.surface)
-  const [floating, setFloating] = useState(INITIAL.floating)
+  const [bodyFace, setBodyFace] = useState(initialSettings.bodyFace)
+  const [displayFace, setDisplayFace] = useState(initialSettings.displayFace)
+  const [monoFace, setMonoFace] = useState(initialSettings.monoFace)
+  const [motion, setMotion] = useState(initialSettings.motion)
+  const [textBase, setTextBase] = useState(initialSettings.textBase)
+  const [textScale, setTextScale] = useState(initialSettings.textScale)
+  const [surface, setSurface] = useState(initialSettings.surface)
+  const [floating, setFloating] = useState(initialSettings.floating)
   /* The shipped policy, so the sliders start where the stylesheet already is and
      moving one is a departure a reader can see rather than a jump. */
-  const [blur, setBlur] = useState(INITIAL.blur)
-  const [translucency, setTranslucency] = useState(INITIAL.translucency)
+  const [blur, setBlur] = useState(initialSettings.blur)
+  const [translucency, setTranslucency] = useState(initialSettings.translucency)
+
+  /* **What the preview pretends to be, and neither is part of the theme.**
+     They change no token, appear in no artifact and are measured by nothing:
+     the palette a reader leaves with is identical whichever pair is chosen. So
+     they live here rather than in `Settings`, they are absent from
+     `intentFrom`, and `reset` leaves them alone, `reset` being about the
+     shipped values rather than about what a reader is looking at while they
+     depart from them.
+
+     **Two pieces of state because they are two questions.** A minimal
+     storefront and a dense storefront are both real, so a single list of every
+     combination would be nine rows a reader has to read to find the two facts
+     they are choosing between.
+
+     The first entry of each list is its resting one, which is the convention
+     the generated lists are ordered by. */
+  /**
+   * Which of the audit's three panels is open.
+   *
+   * **Held here because the toolbar has to be able to move it.** The tags above
+   * the preview count what the panel lists, and a reader with "2 fail" had no
+   * way to get from the count to the list: the tag says fail and the tab says
+   * Contrast, so the one mapping nobody could guess was the one that mattered.
+   * Clicking a tag opens its panel now, which answers it by doing rather than by
+   * renaming.
+   *
+   * `active` on Tabs is a seed and a correction rather than a strict controlled
+   * property, so the set still moves itself on a click and this only has to
+   * agree with it. Answering `helix-change` is what keeps them agreeing.
+   */
+  const [audit, setAudit] = useState('contrast')
+
+  const [context, setContext] = useState(initialContext ?? contexts[0]?.value ?? '')
+  const [layout, setLayout] = useState(initialLayout ?? layouts[0]?.value ?? '')
+
+  const source = markup[`${layout}:${context}`] ?? ''
 
   /* **Every reader-movable value in one object**, which is what the three uses
      below share. It was stated three times, as state initialisers, as the
@@ -285,6 +492,44 @@ export function ThemeBuilder({
       translucency,
     ],
   )
+
+  /**
+   * The link, kept current, so a reader can bookmark a theme or send one.
+   *
+   * **`replaceState` rather than the router.** `router.replace` re-runs the
+   * server component, which would re-derive the theme on a server once per
+   * frame of a slider drag to produce a palette this browser has already
+   * derived. Nothing about the page needs to change: the URL is a record of
+   * what is on screen, not a request for it.
+   *
+   * **Debounced, because `replaceState` is rate limited.** A slider announces
+   * on every pointer move, and Safari has throttled history writes at around a
+   * hundred per thirty seconds for years. A quarter second after the reader
+   * stops is indistinguishable from live for something nobody reads until they
+   * copy it, and it costs one write per gesture instead of forty.
+   *
+   * **Not on the first pass**, or a reader arriving at the bare `/helix/theme`
+   * would have its query rewritten before they touched anything. There is
+   * nothing to record until something moves.
+   */
+  const written = useRef(false)
+
+  useEffect(() => {
+    if (!written.current) {
+      written.current = true
+      return
+    }
+
+    const timer = setTimeout(() => {
+      const query = queryFrom(settings, {
+        context: context === contexts[0]?.value ? undefined : context,
+        layout: layout === layouts[0]?.value ? undefined : layout,
+      })
+      window.history.replaceState(null, '', query ? `?${query}` : window.location.pathname)
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [context, contexts, layout, layouts, settings])
 
   /* Compared against the values the engine and the stylesheet ship with, so
      "pristine" means the reader has changed nothing rather than that they have
@@ -399,6 +644,14 @@ export function ThemeBuilder({
   }, [theme])
   const preview = useRef<HelixSandboxPreview>(null)
 
+  /* The pane holding the three face dropdowns, so the samples inside them can be
+     watched. Every option is in the light DOM here whether the list is open or
+     shut, and an option in a shut list has no box, so the observer reports the
+     ones a reader can see and nothing else. */
+  const controls = useRef<HTMLElement>(null)
+
+  useFacePreviews(controls)
+
   const css = theme.css[SCOPE] ?? ''
 
   /* **The artifact keeps its scope and the frame gets `:root`.** What the editor
@@ -420,7 +673,7 @@ export function ThemeBuilder({
      the head of its stylesheet. */
   const fontsHref = useMemo(() => {
     const wanted = [bodyFace, displayFace, monoFace]
-      .map((family) => [...FACES, ...MONO_FACES].find((face) => face.family === family)?.google)
+      .map((family) => ALL_FACES.find((face) => face.family === family)?.google)
       .filter((request): request is string => Boolean(request))
 
     if (wanted.length === 0) {
@@ -436,7 +689,7 @@ export function ThemeBuilder({
     if (!preview.current) {
       return
     }
-    preview.current.source = pageMarkup
+    preview.current.source = source
     /* **The palette, the layout and the faces, because the frame has none of
        them.** A sandboxed document cannot fetch the site's stylesheet, so the
        page's own rules travel with its markup the way the theme does. The theme
@@ -461,7 +714,7 @@ export function ThemeBuilder({
       THEMED_PAGE_STYLES,
       framed,
     ].join('\n')
-  }, [fontsHref, framed, pageMarkup])
+  }, [fontsHref, framed, source])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
@@ -557,7 +810,7 @@ export function ThemeBuilder({
         onhelix-change={controlsMoved}
         position={controlsPosition}
       >
-        <section className="themeControls" slot="start">
+        <section className="themeControls" ref={controls} slot="start">
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
               <helix-flex align="center" gap="sm" justify="between">
@@ -576,10 +829,63 @@ export function ThemeBuilder({
               </helix-text>
             </helix-flex>
 
+            {/* **A preview control, in the form, because every input is.** The
+                toolbar above is status and the form is settings, which the
+                toolbar's own comment argues; a control up there would be a
+                second place to look for the same kind of thing.
+
+                First, because it is the frame rather than a setting: a reader
+                picks it once and then judges everything else against it. What
+                keeps it from reading as the most important *theme* decision is
+                the hint, which says out loud that it changes no token. It is
+                absent from `Settings` and from `reset` for the same reason. */}
+            <helix-select
+              hint="Only the words change. The palette is the same whichever you pick."
+              label="Preview"
+              name="context"
+              onChange={(event) => setContext(event.currentTarget.value)}
+              value={context}
+            >
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              {contexts.map((entry) => (
+                <helix-option key={entry.value} value={entry.value}>
+                  {entry.label}
+                </helix-option>
+              ))}
+            </helix-select>
+
+            {/* **The second axis, and it is a second control because two of the
+                answers can be true at once.** A minimal storefront and a dense
+                storefront are both real arrangements, so who is speaking and how
+                much page they speak on are independent questions. Nine rows in
+                one list would make a reader read every combination to find the
+                two facts they are choosing.
+
+                The hint says what it costs, because it does cost something: a
+                sparse layout has no chart and nothing that floats, so two of
+                the controls further down stop having anything on screen to act
+                on. The audit is unaffected, measuring the palette rather than
+                what is displayed. */}
+            <helix-select
+              hint="How much page there is. Minimal has no chart and nothing that floats."
+              label="Layout"
+              name="layout"
+              onChange={(event) => setLayout(event.currentTarget.value)}
+              value={layout}
+            >
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              {layouts.map((entry) => (
+                <helix-option key={entry.value} value={entry.value}>
+                  {entry.label}
+                </helix-option>
+              ))}
+            </helix-select>
+
             <helix-color-input
+              hint="The one color you own. Everything else is derived from it."
               label="Brand"
               name="brand"
-              onhelix-change={(event) => setBrand(event.detail.value)}
+              onChange={(event) => setBrand(event.currentTarget.value)}
               value={brand}
             ></helix-color-input>
 
@@ -616,9 +922,10 @@ export function ThemeBuilder({
             ) : null}
 
             <helix-select
+              hint="Which half of the palette is derived. Both are emitted; this picks the one you see."
               label="Color scheme"
               name="scheme"
-              onhelix-change={(event) => setScheme(event.detail.value as 'dark' | 'light')}
+              onChange={(event) => setScheme(event.currentTarget.value as 'dark' | 'light')}
               value={scheme}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -627,9 +934,10 @@ export function ThemeBuilder({
             </helix-select>
 
             <helix-select
+              hint="The ratio every foreground has to clear against the ground it lands on."
               label="Contrast target"
               name="contrast"
-              onhelix-change={(event) => setContrastTarget(Number(event.detail.value))}
+              onChange={(event) => setContrastTarget(Number(event.currentTarget.value))}
               value={String(contrastTarget)}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -655,14 +963,13 @@ export function ThemeBuilder({
                 the brand at full chroma, both ends at the brand's own lightness
                 and hue, so the track shows what the slider will produce. */}
             <helix-slider
+              {...BOUNDS.chromaScale}
               className="themeChannel"
+              hint="How much of the brand’s chroma the palette keeps. Zero is gray."
               label="Saturation"
-              max={100}
-              min={0}
               name="chroma"
-              onhelix-input={(event) => setChromaScale(Number(event.detail.value))}
+              onInput={(event) => setChromaScale(Number(event.currentTarget.value))}
               show-value
-              step={5}
               style={{ '--slider-track-image': ramps.saturation ?? '' }}
               value={String(chromaScale)}
             ></helix-slider>
@@ -670,37 +977,34 @@ export function ThemeBuilder({
             {/* The whole wheel, starting at the brand, so a reader is choosing
                 a direction off their own color and not an abstract number. */}
             <helix-slider
+              {...BOUNDS.accentHue}
               className="themeChannel"
+              hint="How far around the wheel the accent sits from the brand, in degrees."
               label="Accent angle"
-              max={360}
-              min={0}
               name="accent"
-              onhelix-input={(event) => setAccentHue(Number(event.detail.value))}
+              onInput={(event) => setAccentHue(Number(event.currentTarget.value))}
               show-value
-              step={15}
               style={{ '--slider-track-image': ramps.accent ?? '' }}
               value={String(accentHue)}
             ></helix-slider>
 
             <helix-slider
+              {...BOUNDS.density}
+              hint="Control heights and the spacing scale, as a percentage of the shipped one."
               label="Density"
-              max={120}
-              min={80}
               name="density"
-              onhelix-input={(event) => setDensity(Number(event.detail.value))}
+              onInput={(event) => setDensity(Number(event.currentTarget.value))}
               show-value
-              step={5}
               value={String(density)}
             ></helix-slider>
 
             <helix-slider
+              {...BOUNDS.radius}
+              hint="As a percentage of the shipped radii. Zero is square."
               label="Corner radius"
-              max={150}
-              min={0}
               name="radius"
-              onhelix-input={(event) => setRadius(Number(event.detail.value))}
+              onInput={(event) => setRadius(Number(event.currentTarget.value))}
               show-value
-              step={10}
               value={String(radius)}
             ></helix-slider>
 
@@ -717,47 +1021,35 @@ export function ThemeBuilder({
             <helix-combobox
               label="Body face"
               name="body-face"
-              onhelix-change={(event) => setBodyFace(event.detail.value)}
+              onChange={(event) => setBodyFace(event.currentTarget.value)}
               placeholder="System default"
               value={bodyFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {FACES.map((face) => (
-                <helix-option key={face.label} value={face.family}>
-                  {face.label}
-                </helix-option>
-              ))}
+              {faceOptions(FACE_GROUPS, SYSTEM)}
             </helix-combobox>
 
             <helix-combobox
               hint="Headings. Follows the body face where it is left alone."
               label="Display face"
               name="display-face"
-              onhelix-change={(event) => setDisplayFace(event.detail.value)}
+              onChange={(event) => setDisplayFace(event.currentTarget.value)}
               placeholder="Same as body"
               value={displayFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {DISPLAY_FACES.map((face) => (
-                <helix-option key={face.label} value={face.family}>
-                  {face.label}
-                </helix-option>
-              ))}
+              {faceOptions(FACE_GROUPS, DISPLAY_REST)}
             </helix-combobox>
 
             <helix-combobox
               label="Mono face"
               name="mono-face"
-              onhelix-change={(event) => setMonoFace(event.detail.value)}
+              onChange={(event) => setMonoFace(event.currentTarget.value)}
               placeholder="System mono"
               value={monoFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {MONO_FACES.map((face) => (
-                <helix-option key={face.label} value={face.family}>
-                  {face.label}
-                </helix-option>
-              ))}
+              {faceOptions(MONO_GROUPS, MONO_REST)}
             </helix-combobox>
 
             {/* **Hue is meaning and loudness is not**, which is the line this
@@ -766,14 +1058,12 @@ export function ThemeBuilder({
               loud the palette around it is measured six times primary's chroma
               against a muted brand, which is a red that shouts. */}
             <helix-slider
+              {...BOUNDS.harmony}
               hint="How far the statuses follow the palette's loudness."
               label="Status harmony"
-              max={100}
-              min={0}
               name="harmony"
-              onhelix-input={(event) => setHarmony(Number(event.detail.value))}
+              onInput={(event) => setHarmony(Number(event.currentTarget.value))}
               show-value
-              step={10}
               value={String(harmony)}
             ></helix-slider>
 
@@ -783,13 +1073,12 @@ export function ThemeBuilder({
               warning that has stopped looking like a warning and still collides
               is worse than one that only collides. */}
             <helix-slider
+              {...BOUNDS.allowance}
+              hint="How far a status may rotate, in degrees, to clear a role it collides with."
               label="Status hue allowance"
-              max={60}
-              min={0}
               name="allowance"
-              onhelix-input={(event) => setAllowance(Number(event.detail.value))}
+              onInput={(event) => setAllowance(Number(event.currentTarget.value))}
               show-value
-              step={10}
               value={String(allowance)}
             ></helix-slider>
 
@@ -799,25 +1088,22 @@ export function ThemeBuilder({
               pixel; the steps above are a display ramp where each has to be
               obviously not the last, so they compound. One control for each. */}
             <helix-slider
+              {...BOUNDS.textBase}
+              hint="The base size in pixels. Every UI step is measured off it."
               label="Body size"
-              max={18}
-              min={12}
               name="text-base"
-              onhelix-input={(event) => setTextBase(Number(event.detail.value))}
+              onInput={(event) => setTextBase(Number(event.currentTarget.value))}
               show-value
-              step={1}
               value={String(textBase)}
             ></helix-slider>
 
             <helix-slider
+              {...BOUNDS.textScale}
               hint="The ratio between the display steps."
               label="Type scale"
-              max={160}
-              min={110}
               name="text-scale"
-              onhelix-input={(event) => setTextScale(Number(event.detail.value))}
+              onInput={(event) => setTextScale(Number(event.currentTarget.value))}
               show-value
-              step={2}
               value={String(textScale)}
             ></helix-slider>
 
@@ -854,9 +1140,10 @@ export function ThemeBuilder({
               stylesheet's own. The option stays in the list so there is a way
               back to it, and both states now read `Default`. */}
             <helix-select
+              hint="The pace and the curve together. Default keeps the stylesheet’s own."
               label="Motion"
               name="motion"
-              onhelix-change={(event) => setMotion(event.detail.value as Character)}
+              onChange={(event) => setMotion(event.currentTarget.value as Character)}
               placeholder="Default"
               value={motion}
             >
@@ -875,7 +1162,7 @@ export function ThemeBuilder({
               offered here and refused there for that reason. */}
             <helix-toggle-group
               label="Separation, in flow"
-              onhelix-change={(event) => setSurface(event.detail.value as Mechanism)}
+              onChange={(event) => setSurface(event.currentTarget.value as Mechanism)}
               value={surface}
             >
               <helix-toggle value="border">Border</helix-toggle>
@@ -886,7 +1173,7 @@ export function ThemeBuilder({
 
             <helix-toggle-group
               label="Separation, floating"
-              onhelix-change={(event) => setFloating(event.detail.value as Mechanism)}
+              onChange={(event) => setFloating(event.currentTarget.value as Mechanism)}
               value={floating}
             >
               <helix-toggle value="shadow">Shadow</helix-toggle>
@@ -909,26 +1196,22 @@ export function ThemeBuilder({
               comes back `unverifiable` rather than measured, which the pairings
               panel says out loud when it happens. */}
             <helix-slider
+              {...BOUNDS.blur}
               hint="Pixels behind a translucent surface. Zero is flat."
               label="Material blur"
-              max={40}
-              min={0}
               name="material-blur"
-              onhelix-input={(event) => setBlur(Number(event.detail.value))}
+              onInput={(event) => setBlur(Number(event.currentTarget.value))}
               show-value
-              step={2}
               value={String(blur)}
             ></helix-slider>
 
             <helix-slider
+              {...BOUNDS.translucency}
               hint="How opaque those surfaces are. Below 100 they stop being a known ground."
               label="Material opacity"
-              max={100}
-              min={40}
               name="material-opacity"
-              onhelix-input={(event) => setTranslucency(Number(event.detail.value))}
+              onInput={(event) => setTranslucency(Number(event.currentTarget.value))}
               show-value
-              step={4}
               value={String(translucency)}
             ></helix-slider>
           </helix-flex>
@@ -990,24 +1273,65 @@ export function ThemeBuilder({
               </helix-tooltip>
 
               <helix-flex align="center" gap="xs">
-                <helix-tag emphasis="subtle" tone={failures.length > 0 ? 'danger' : 'success'}>
-                  {counts.pass ?? 0} pass
-                </helix-tag>
-                {failures.length > 0 ? (
-                  <helix-tag emphasis="subtle" tone="danger">
-                    {failures.length} fail
+                {/* **The tone belongs to what the tag counts, not to the run.**
+                    This was `danger` whenever anything failed, so a palette with
+                    two bad pairs painted "65 pass" the same red as "2 fail":
+                    two identical tags side by side, one of them good news, and
+                    the count a reader most wants to see going up was the one
+                    that looked like an alarm. The failures have their own tag
+                    and it is already red. */}
+                {/* **Each count opens the panel that lists it.**
+
+                    The tags say pass, fail, unverifiable and collisions; the
+                    panel's tabs say Contrast, Collisions and Unverifiable. Three
+                    map by their own word and the fourth cannot: "2 fail" and
+                    "65 pass" are both the Contrast tab, and nothing on screen
+                    said so. Renaming one to match the other was the candidate
+                    against this and is worse, "2 contrast" not being English and
+                    "Contrast failures" not being a tab label that fits.
+
+                    **Still status rather than settings**, which is the rule the
+                    toolbar's own comment sets and this does not break: none of
+                    them changes the theme. A count that opens its own detail is
+                    a shortcut to reading, not a control over the palette.
+
+                    A real `button` around the tag rather than a handler on it. A
+                    tag is not an affordance, and the keyboard, the focus ring and
+                    the announcement all come free from the element that is. */}
+                <button className="themeJump" onClick={() => setAudit('contrast')} type="button">
+                  <helix-tag emphasis="subtle" tone="success">
+                    {counts.pass ?? 0} pass
                   </helix-tag>
+                </button>
+                {failures.length > 0 ? (
+                  <button className="themeJump" onClick={() => setAudit('contrast')} type="button">
+                    <helix-tag emphasis="subtle" tone="danger">
+                      {failures.length} fail
+                    </helix-tag>
+                  </button>
                 ) : null}
                 {unmeasured.length > 0 ? (
-                  <helix-tag emphasis="subtle" tone="neutral">
-                    {unmeasured.length} unverifiable
-                  </helix-tag>
+                  <button
+                    className="themeJump"
+                    onClick={() => setAudit('unmeasured')}
+                    type="button"
+                  >
+                    <helix-tag emphasis="subtle" tone="neutral">
+                      {unmeasured.length} unverifiable
+                    </helix-tag>
+                  </button>
                 ) : null}
                 {theme.collisions.length > 0 ? (
-                  <helix-tag emphasis="subtle" tone="warning">
-                    {theme.collisions.length} collision
-                    {theme.collisions.length === 1 ? '' : 's'}
-                  </helix-tag>
+                  <button
+                    className="themeJump"
+                    onClick={() => setAudit('collisions')}
+                    type="button"
+                  >
+                    <helix-tag emphasis="subtle" tone="warning">
+                      {theme.collisions.length} collision
+                      {theme.collisions.length === 1 ? '' : 's'}
+                    </helix-tag>
+                  </button>
                 ) : null}
               </helix-flex>
             </helix-sandbox-toolbar>
@@ -1071,7 +1395,13 @@ export function ThemeBuilder({
                 is a ground nobody can know. Stacked in one column they read as
                 one list of complaints, and a reader looking for the second kind
                 has to know it exists. */}
-            <helix-tabs data-density="sm" defaultActive="contrast" label="The audit" slot="panel">
+            <helix-tabs
+              active={audit}
+              data-density="sm"
+              label="The audit"
+              onhelix-change={(event) => setAudit(event.detail.value)}
+              slot="panel"
+            >
               <helix-tabs-tab value="contrast">
                 Contrast
                 {failures.length > 0 ? ` (${failures.length})` : ''}

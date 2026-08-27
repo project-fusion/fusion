@@ -271,7 +271,7 @@ export function ComponentBrowser({
             className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
             label="Search components"
-            onhelix-before-change={(event) => {
+            onInput={(event) => {
               setQuery(event.detail.value)
               mirror('q', event.detail.value)
             }}
@@ -339,7 +339,7 @@ export function ComponentBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={category}
               label="Category"
-              onhelix-before-change={(event) => {
+              onChange={(event) => {
                 setCategory(event.detail.value)
                 mirror('category', event.detail.value)
               }}
@@ -368,7 +368,7 @@ export function ComponentBrowser({
                 className={`${browser.chromeControl} ${browser.filterControl}`}
                 default-value={status}
                 label="Status"
-                onhelix-before-change={(event) => {
+                onChange={(event) => {
                   setStatus(event.detail.value)
                   mirror('status', event.detail.value)
                 }}
@@ -399,7 +399,7 @@ export function ComponentBrowser({
               className={`${browser.chromeControl} ${browser.filterControl}`}
               default-value={order}
               label="Sort"
-              onhelix-before-change={(event) => sortBy(event.detail.value)}
+              onChange={(event) => sortBy(event.currentTarget.value)}
             >
               {/* A different mark from the filters', because it does a
                   different thing: a funnel takes rows away, and this only

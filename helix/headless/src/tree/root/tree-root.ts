@@ -238,8 +238,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    this.addEventListener('helix-open', this.handleBranch)
-    this.addEventListener('helix-close', this.handleBranch)
+    this.addEventListener('helix-before-open', this.handleBranch)
+    this.addEventListener('helix-before-close', this.handleBranch)
     this.addEventListener('keydown', this.handleKeydown)
     /* Nested items arrive on a *branch's* slot, not on this element's, so the
        root's `slotchange` never fires for them: a subtree rendered after first
@@ -253,8 +253,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.removeEventListener('helix-open', this.handleBranch)
-    this.removeEventListener('helix-close', this.handleBranch)
+    this.removeEventListener('helix-before-open', this.handleBranch)
+    this.removeEventListener('helix-before-close', this.handleBranch)
     this.removeEventListener('keydown', this.handleKeydown)
     this.watcher?.disconnect()
     this.watcher = undefined

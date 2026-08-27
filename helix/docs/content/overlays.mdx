@@ -47,8 +47,8 @@ tree is reported as the element containing that tree, so a naive "is focus still
 inside me" check never matches and closes the overlay the moment anything inside
 it is focused. Every dismissal path here walks through the roots instead.
 
-**Nesting works because lifecycle events do not bubble.** `helix-open` and
-`helix-close` are neither bubbling nor composed, so a menu closing inside a
+**Nesting works because lifecycle events do not bubble.** `helix-before-open` and
+`helix-before-close` are neither bubbling nor composed, so a menu closing inside a
 dialog is not the dialog closing. `Escape` closes the innermost overlay and
 leaves the rest.
 
@@ -67,7 +67,7 @@ something with a button in it, that is a `Popover`.
 The close is announced before it happens:
 
 ```ts
-dialog.addEventListener('helix-close', (event) => {
+dialog.addEventListener('helix-before-close', (event) => {
   if (unsaved) {
     event.preventDefault()
   }

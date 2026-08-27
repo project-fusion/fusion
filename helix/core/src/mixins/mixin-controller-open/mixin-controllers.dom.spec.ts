@@ -53,10 +53,10 @@ interface Kind {
    would each have hardcoded their own and nothing would have said they differ. */
 const KINDS: Kind[] = [
   {
-    closing: 'helix-close',
+    closing: 'helix-before-close',
     fallback: 'default-open',
     moved: true,
-    opening: 'helix-open',
+    opening: 'helix-before-open',
     request: 'requestOpen',
     resting: false,
     state: 'open',
@@ -212,3 +212,42 @@ for (const kind of KINDS) {
     })
   })
 }
+
+describe('saying the state moved', () => {
+  /* `<details>` fires `toggle` and a popover fires `toggle`, and sixteen
+     families here fired neither: two render a real `<dialog>`, ten show a
+     `popover="manual"` panel, and the browser was firing something on an
+     element inside a shadow root where `toggle` neither bubbles nor composes.
+     The disclosures have no native element to fire anything at all. See 296. */
+  const heard = (host: HTMLElement, act: () => void): string[] => {
+    const said: string[] = []
+    const listen = (event: Event): void => {
+      said.push((event as Event & { newState: string }).newState)
+    }
+    host.addEventListener('toggle', listen)
+    act()
+    host.removeEventListener('toggle', listen)
+    return said
+  }
+
+  for (const kind of KINDS.filter((one) => one.state === 'open')) {
+    test('announces `toggle` from the host once the state has gone', async () => {
+      const host = await mount(`<${kind.tag}></${kind.tag}>`)
+      expect(heard(host, () => ask(host, kind, kind.moved))).toEqual(['open'])
+      expect(heard(host, () => ask(host, kind, kind.resting))).toEqual(['closed'])
+    })
+
+    test('and says nothing where the change was refused', async () => {
+      const host = await mount(`<${kind.tag}></${kind.tag}>`)
+      host.addEventListener(kind.opening, (event: Event) => {
+        event.preventDefault()
+      })
+      expect(heard(host, () => ask(host, kind, kind.moved))).toEqual([])
+    })
+
+    test('and says nothing where it was already in that state', async () => {
+      const host = await mount(`<${kind.tag}></${kind.tag}>`)
+      expect(heard(host, () => ask(host, kind, kind.resting))).toEqual([])
+    })
+  }
+})

@@ -125,9 +125,33 @@ export class HelixHeadlessOption extends HelixElement {
    * Read from the rendered content rather than required as a property, because
    * the content is where a consumer naturally puts it and asking for both is
    * asking for two things to disagree.
+   *
+   * **The default slot's content, not the element's.** This was
+   * `this.textContent`, which is every descendant text node an option holds,
+   * and an option holds three slots: the words, plus `start` for an icon and
+   * `end` for a shortcut or a count. Neither of those is what a reader
+   * searched for, and both were being run onto the end of it.
+   *
+   * **Six things read this and all six were wrong.** The collapsed field of
+   * Select and of Combobox show it, the listbox filters on it, Combobox
+   * matches typed text against it, completes inline from it, and labels a
+   * chosen tag with it. Measured on a font picker whose options carry a
+   * two-letter specimen in `end`: the field read `Noto Sans Linear BAg`, and
+   * typing `ag` matched 1,892 of 1,893 options, every row containing the
+   * sample. An option with a keyboard shortcut in its end slot has the same
+   * fault and a worse one, every row carrying one matching every letter of it.
+   *
+   * A node goes to the default slot when it names no other, which is the rule
+   * the platform applies at assignment. Asking the same question here rather
+   * than a second one is what stops the two disagreeing. Text nodes are
+   * always the default slot's and cannot say otherwise.
    */
   get text(): string {
-    return this.textContent?.trim() ?? ''
+    return [...this.childNodes]
+      .filter((node) => !(node instanceof Element) || node.slot === '')
+      .map((node) => node.textContent ?? '')
+      .join('')
+      .trim()
   }
 
   /** Makes this choice and announces it. */
