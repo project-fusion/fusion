@@ -20,9 +20,22 @@ const cells = (host: HTMLElement): HTMLInputElement[] => [
   ...(host.shadowRoot?.querySelectorAll<HTMLInputElement>('[part="cell"]') ?? []),
 ]
 
-/** What arrives in a box, whether typed, pasted, or filled by the browser. */
+/**
+ * A reader entering the row and typing into a box, which is what arrives in one
+ * whether it was typed, pasted, or filled by the browser.
+ *
+ * **The `focusin` is not decoration.** The component takes its commit baseline
+ * when focus arrives from outside the row, so a helper that types without
+ * arriving leaves the component's own focus move (it advances a box per
+ * character) as the first `focusin` it ever sees, and the baseline lands on the
+ * text that was just typed. That is not what a browser does, where the reader's
+ * click or tab is the first one, and it silently turned three commit specs
+ * green-to-red when the baseline moved. Modeling the arrival is what makes
+ * this helper mean its own name.
+ */
 const arrive = async (host: Pin, at: number, text: string): Promise<void> => {
   const cell = cells(host)[at] as HTMLInputElement
+  cell.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: null }))
   cell.value = text
   cell.dispatchEvent(new Event('input', { bubbles: true }))
   await host.updateComplete
@@ -264,6 +277,39 @@ describe('input pin commit', () => {
     })
     return seen
   }
+
+  /** Focus arriving from outside, which is what takes the baseline. */
+  const enter = (host: Pin, at = 0): void => {
+    cells(host)[at]?.dispatchEvent(
+      new FocusEvent('focusin', { bubbles: true, relatedTarget: null }),
+    )
+  }
+
+  test('a value the consumer assigned is not announced as one the reader entered', async () => {
+    /* The one row where the platform and the old "value at the last commit"
+       baseline disagreed, measured in Chromium against a native input: a script
+       assigns while the field is unfocused, the reader visits and edits
+       nothing, and native stays silent. `change` on a field is read by
+       `MixinField` as "the reader has had a go at this", so announcing here
+       told a consumer their own assignment was the reader's answer. */
+    const host = await pin('length="4"')
+    const seen = commits(host)
+    host.value = '1234'
+    await host.updateComplete
+    enter(host)
+    leave(host, 0)
+    expect(seen).toEqual([])
+  })
+
+  test('and editing after that assignment does commit, carrying the whole code', async () => {
+    const host = await pin('length="4"')
+    const seen = commits(host)
+    host.value = '12'
+    await host.updateComplete
+    await arrive(host, 2, '3')
+    leave(host, 2)
+    expect(seen).toEqual(['123'])
+  })
 
   test('an edited code commits when focus leaves the row', async () => {
     const host = await pin('length="4"')
