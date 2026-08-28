@@ -127,8 +127,24 @@ export class AriaForwardController implements ReactiveController {
       const elements = ids
         .map((id) => root.getElementById?.(id) ?? null)
         .filter((element): element is HTMLElement => element !== null)
-      ;(target as unknown as Record<string, Element[] | null>)[property] =
-        elements.length > 0 ? elements : null
+      const reflect = target as unknown as Record<string, Element[] | null>
+      if (elements.length > 0) {
+        reflect[property] = elements
+        this.forwarded.add(attribute)
+        continue
+      }
+      /* Only if this controller is what put it there, which is the same rule
+         the states below keep and for a worse reason. `MixinField` writes
+         `aria-describedby` on the control for its own hint, and assigning null
+         here removes the content attribute, so forwarding nothing wiped the
+         component's own description on all eighteen form controls. Invisible to
+         every DOM spec: happy-dom implements no ARIA element reflection, so the
+         `property in target` guard above skips this whole branch and the suite
+         is green against code that clears a description in every browser. */
+      if (this.forwarded.has(attribute)) {
+        reflect[property] = null
+        this.forwarded.delete(attribute)
+      }
     }
     for (const attribute of STATES) {
       const value = this.host.getAttribute(attribute)
