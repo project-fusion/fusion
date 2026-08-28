@@ -30,9 +30,15 @@ describe('app header', () => {
     expect(header.shadowRoot?.querySelector('nav')).toBeNull()
   })
 
+  /* **Asserted through the event and the attribute list, never `:state()`.**
+     happy-dom implements neither `ElementInternals.states` nor the selector, so
+     `matches(':state(scrolled)')` is false in every case: the `toBe(false)`
+     assertions this replaces passed on a component that had stopped working, and
+     the `toBe(true)` ones could not pass at all. The event is the observable
+     half by design, and it is the half a consumer uses. */
   test('starts un-scrolled, matching what the server rendered', async () => {
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
-    expect(header.matches(':state(scrolled)')).toBe(false)
+    expect(header.getAttributeNames()).not.toContain('data-scrolled')
   })
 
   // The whole reason this is a state and not `data-scrolled`: an attribute the
@@ -40,9 +46,13 @@ describe('app header', () => {
   // hydrating the page reports the tree as mismatched.
   test('writes no attribute a hydrating framework could disagree with', async () => {
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    const seen: boolean[] = []
+    header.addEventListener('helix-scrolled', (event) => {
+      seen.push((event as CustomEvent<{ scrolled: boolean }>).detail.scrolled)
+    })
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.matches(':state(scrolled)')).toBe(true)
+    expect(seen).toEqual([true])
     expect(header.getAttributeNames()).not.toContain('data-scrolled')
   })
 
@@ -83,21 +93,29 @@ describe('app header', () => {
   })
 
   test('reflects scroll position so styling needs no handler of its own', async () => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    const seen: boolean[] = []
+    header.addEventListener('helix-scrolled', (event) => {
+      seen.push((event as CustomEvent<{ scrolled: boolean }>).detail.scrolled)
+    })
+
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.matches(':state(scrolled)')).toBe(true)
-
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.matches(':state(scrolled)')).toBe(false)
+
+    expect(seen).toEqual([true, false])
   })
 
   test('stops listening once removed', async () => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    const seen: boolean[] = []
+    header.addEventListener('helix-scrolled', () => seen.push(true))
     header.remove()
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.matches(':state(scrolled)')).toBe(false)
+    expect(seen).toEqual([])
   })
 })
