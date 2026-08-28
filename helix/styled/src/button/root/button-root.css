@@ -142,7 +142,7 @@
    * at the default and still 32 under `data-density="sm"`, against links of 28.
    *
    * `IconButton` had the hook and this did not, so the shipped fold worked with
-   * a `dots-three` trigger and a labelled one did not, which is the difference
+   * a `dots-three` trigger and a labeled one did not, which is the difference
    * between the overflow example and a repository switcher. One hook rather
    * than a second control size: the container knows the number and no scale
    * contains it. */

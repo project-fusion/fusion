@@ -25,7 +25,7 @@
     calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
   );
 
-  /* And the same for a labelled one, which the rule above cannot reach.
+  /* And the same for a labeled one, which the rule above cannot reach.
    *
    * `--icon-button-size` is `IconButton`'s alone, so a trail whose control says
    * a word rather than showing a glyph (a repository switcher, a branch picker)
