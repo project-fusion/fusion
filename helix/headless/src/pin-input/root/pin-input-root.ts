@@ -219,8 +219,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         /* And a native `change`, because a filled code is this control's
            commit. There is no inner control to relay one from: six boxes each
            fire their own, and none of them means the code is entered. */
-        this.committed = next
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+        this.commit()
       }
     })
   }
@@ -329,32 +328,79 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * The code as it stood at the last commit, so a blur that changed nothing
+   * The code as it stood when focus arrived, so a visit that changed nothing
    * says nothing.
    *
-   * **The last commit, and not the value the reader arrived on**, which is what
-   * the platform compares against. Taking that reading means recognizing the
-   * arrival, and this component moves focus itself on every character, so the
-   * `focus` it would be reading is mostly one it caused: telling those apart
-   * rests entirely on `relatedTarget`, on an event the element dispatched to
-   * itself. The last commit rests on nothing, and it is the value the event
-   * would carry anyway.
+   * **This is the platform's reading, and it was the other one until it was
+   * measured.** It held the value at the last *commit*, on the argument that
+   * recognizing an arrival is hard here: this component moves focus itself on
+   * every character, so most `focus` events are ones it caused, and telling
+   * those apart rests entirely on `relatedTarget`. That is true and it is not
+   * an obstacle, because `handleFocusOut` was already doing exactly that guard
+   * one method away. The reasoning had talked itself out of a check it had
+   * already written.
    *
-   * They agree everywhere a reader is involved, including the case the platform
-   * is careful about: typing a character and deleting it again leaves the code
-   * where it was, so neither reading commits. They part only when a script
-   * assigns while the field is unfocused, where this commits on the way out and
-   * the platform does not, having taken its baseline after the assignment.
-   * Announcing a value a consumer set themselves is the safe half of that trade.
+   * **What the two readings do to a real browser**, measured in Chromium
+   * against a native `<input>` with real keystrokes:
+   *
+   * | | native | last commit | on arrival |
+   * |---|---|---|---|
+   * | types, leaves | `change` | `change` | `change` |
+   * | script assigns unfocused, visit with no edit | silent | **`change`** | silent |
+   * | script assigns unfocused, then edits | `change` | `change` | `change` |
+   * | types a character and deletes it | silent | silent | silent |
+   *
+   * One row differed and it is the one that matters: a consumer who assigns
+   * `value` and then has a reader tab through the row was told the reader had
+   * entered a code. `change` on a field means "the reader had a go at this",
+   * `MixinField` treats it as exactly that, and announcing a value the consumer
+   * set themselves is a false positive rather than the safe half of a trade.
+   *
+   * **The narrower divergence that is left** is a script assigning while the row
+   * is focused, where the platform stays silent because no user edit happened
+   * and this commits on the way out. Closing it needs a dirty flag set from real
+   * cell input rather than a baseline, which is more machinery than the case has
+   * earned: a consumer writing to a field the reader is inside is already in a
+   * fight with them.
    *
    * Seeded in `firstUpdated`, a code in the markup being committed by whoever
-   * wrote it.
+   * wrote it, and re-taken on every arrival from outside the row.
    */
   private committed = ''
 
   /** Selecting on focus, so typing replaces rather than appending. */
   private readonly handleFocus = (event: FocusEvent): void => {
     ;(event.target as HTMLInputElement).select()
+  }
+
+  /**
+   * Whether focus is currently somewhere inside the row.
+   *
+   * **The arrival is a transition, not a `relatedTarget` reading**, which is
+   * what the first version of this did and is what the exit still does. It does
+   * not work on the way in for two separate reasons and the second is the one
+   * that decides it. Every character moves focus to the next box, so an
+   * unguarded `focusin` re-baselines on each keystroke and the row can never
+   * report anything: measured, the three commit specs went silent at once. And
+   * `focusin` carries `relatedTarget` in a browser and not in happy-dom, so a
+   * guard written on it is a guard that holds in production and not in the
+   * specs, which is the worse half. This flag needs neither: entering is
+   * `focusin` while it is `false`, and nothing else is.
+   */
+  private within = false
+
+  /**
+   * Takes the baseline when focus arrives from outside the row.
+   *
+   * The value at arrival is what the platform compares against, and the table
+   * on `committed` is why.
+   */
+  private readonly handleFocusIn = (): void => {
+    if (this.within) {
+      return
+    }
+    this.within = true
+    this.committed = this.value
   }
 
   /**
@@ -372,14 +418,33 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * **Focus leaving the row, and not a cell.** Every character moves focus to
    * the next box, so a per-cell blur would commit on every keystroke, which is
    * the fault this exists to fix pointed the other way.
-   *
-   * `composed: false`, like the completion above and like the native event this
-   * stands in for. It is dispatched on the host, so a consumer hears it.
    */
   private readonly handleFocusOut = (event: FocusEvent): void => {
     if (this.cells.includes(event.relatedTarget as HTMLInputElement)) {
       return
     }
+    this.within = false
+    this.commit()
+  }
+
+  /**
+   * Announces the code as entered, from whichever moment reached it first.
+   *
+   * **One writer, because the fact has two moments and only one meaning.** A
+   * filled code and a row being left are both "the reader is done with this",
+   * and they were two dispatch sites kept from disagreeing by both remembering
+   * to update `committed`. They are one call now, so a third moment cannot be
+   * added that fires without baselining, which is the way the pair would have
+   * drifted.
+   *
+   * Silent when nothing moved since the baseline, which is what makes it safe
+   * to call from both: completing a code that is already the committed one, or
+   * leaving a row nobody edited, says nothing.
+   *
+   * `composed: false`, like the native event this stands in for. It is
+   * dispatched on the host, so a consumer hears it.
+   */
+  private commit(): void {
     if (this.value === this.committed) {
       return
     }
@@ -387,7 +452,33 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
-  /** Reports the code and a verdict on it. */
+  /**
+   * Reports the code and a verdict on it.
+   *
+   * **A half-entered code is invalid whether or not it is required, and that is
+   * the platform's answer rather than ours.** It looked like an oversight worth
+   * a question: `required` guards `valueMissing` and nothing guards `tooShort`,
+   * so an optional code is refused for being half filled. Measured in Chromium
+   * against a native `<input minlength="4">` with real keystrokes, which is the
+   * feature this is the same shape as:
+   *
+   * | | optional | required |
+   * |---|---|---|
+   * | typed `12` | `tooShort`, invalid | `tooShort`, invalid |
+   * | left empty | valid | `valueMissing` |
+   * | typed `1234` | valid | valid |
+   *
+   * So `required` decides whether *nothing* is acceptable, and the length rule
+   * applies to anything that is not nothing. That is the right split for a code
+   * as well: two of four characters is not an optional code omitted, it is a
+   * code got wrong, and submitting it would send a fragment. The gate on the
+   * message is `touched` rather than `required`, which is what stops a reader
+   * being told off before they have had a go.
+   *
+   * `execCommand('insertText')` is not enough to measure this: `tooShort`
+   * applies only to a value the user edited, and the first run of the probe
+   * reported every case valid because nothing had set that flag.
+   */
   private sync(): void {
     this.internals.setFormValue(this.value)
     const first = this.cells[0]
@@ -449,6 +540,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         part="field"
         role="group"
         aria-describedby=${this.describedBy ?? nothing}
+        @focusin=${this.handleFocusIn}
         @focusout=${this.handleFocusOut}
       >
         ${characters.map(
