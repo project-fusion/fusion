@@ -210,6 +210,31 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * failing, and `change` when the reader has edited and committed. Focus
      * alone is deliberately not one of them. Tabbing past an empty required
      * field should not be answered with an error.
+     *
+     * **A composite control has to construct its own `change`, and this mixin
+     * deliberately does not do it for them.** A native `change` is
+     * `composed: false`, so a control built from several inner inputs never
+     * relays one to its host: `Input` gets this free from its one control, and
+     * `PinInput` had four boxes, none of whose `change` means the code is
+     * entered, so a half-entered code was never `touched` and could never say
+     * what was wrong with it. See 311.
+     *
+     * **The obvious shared fix is for `touched` to take a `focusout`, and it is
+     * the wrong one**, because it is the paragraph above undone: a `focusout`
+     * fires on the reader who tabbed past and typed nothing, which is exactly
+     * the case this refuses to call an error. What a composite needs is not a
+     * focus moment, it is the native meaning of `change`, "edited, then left",
+     * and the editing half is the part a mixin up here cannot see.
+     *
+     * **Nor is there one shape to extract yet.** The two composites in the
+     * library solve it differently and both are right: `PinInput` is
+     * focus-driven, taking a baseline when focus arrives from outside the row
+     * and announcing on the way out if it moved, and `DateInput` is
+     * value-driven, stopping its inner `change` and announcing once the date
+     * itself moves. Generalizing from those two would be generalizing from one,
+     * since only one of them has a leaving moment at all. The trigger for
+     * lifting it is a third control that needs the focus-driven shape, at which
+     * point what moves up is the baseline-and-commit pair rather than `touched`.
      */
     @state()
     private touched = false
