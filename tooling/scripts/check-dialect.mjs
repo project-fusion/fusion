@@ -7,7 +7,7 @@
  * the count from 658 occurrences to 239. Four days later it was 1,685 across
  * 386 files. Nothing checked it and `CLAUDE.md` stated the em dash rule and
  * said nothing about spelling, so there was no line for a contributor to have
- * read and no script to fail. This file is the remedy `check:queue` already
+ * read and no script to fail. This file is the remedy `check:prose:queue` already
  * demonstrates: the rule nobody re-reads survives exactly as long as nobody
  * re-reads it.
  *
@@ -30,7 +30,7 @@
  *
  * **And this file skips its own list, which it did not until 25 Aug 2026.** The
  * denylist is British by construction and lives inside a tree the writer walks,
- * so `bun run dialect` rewrote it: measured on the commit that introduced the
+ * so `bun run fix:dialect` rewrote it: measured on the commit that introduced the
  * check, every pair in it is already `['color', 'color']`, meaning the list has
  * never held a British form and the check has never been able to fail. It
  * reports 1,974 files all in American spelling and it is reading nothing. Only
@@ -47,7 +47,8 @@
  * file's own prose needed, and they are proof the mechanism works rather than
  * the whole list.
  *
- * Run `bun run dialect` to rewrite, and `bun run check:dialect` to fail when a
+ * Run `bun run fix:dialect` to rewrite, and `bun run check:prose:dialect` to
+ * fail when a
  * British form is left. `verify` runs the check, for the reason it runs
  * `biome ci`.
  */
@@ -150,8 +151,19 @@ const PAIRS = [
   ['whilst', 'while'],
 ]
 
-const ROOTS = ['cortex', 'docs', 'helix', 'site', 'tooling', '.github']
-const FILES = ['CLAUDE.md', 'README.md']
+/* **`.claude` is in here for the reason the docblock gives, not as an
+   afterthought.** The argument above is that an unwritten convention is learned
+   from the corpus, so prose in the wrong dialect teaches the next contributor
+   to write it. `.claude/rules` is the corpus an agent reads first and most
+   literally, and it sat outside this list while holding nine British spellings,
+   which is the failure this check exists to prevent, in the one directory
+   written to be copied from. */
+const ROOTS = ['cortex', 'docs', 'helix', 'site', 'tooling', '.claude', '.github']
+
+/* Root files are named rather than globbed, so one that is not named is not
+   swept: `Cargo.toml` carried a British spelling in a comment for as long as it
+   has existed, and nothing here looked at it. */
+const FILES = ['CLAUDE.md', 'CONTRIBUTING.md', 'Cargo.toml', 'README.md']
 
 const IGNORED = new Set([
   '.next',
@@ -256,10 +268,41 @@ const problems = []
 let checked = 0
 let rewritten = 0
 
+/**
+ * Every pair, plus the regular inflections of each.
+ *
+ * **`\b` at both ends is what made the list a list of exact words**, so a stem
+ * never matched inside its own plural and the pair for the commonest word in
+ * the repository caught one occurrence of eighty-six. That is why two families
+ * are enumerated by hand below, six entries and three: they are the two
+ * somebody hit, and every other pair was left as a stem that only ever matched
+ * its own bare form. Measured 28 Aug 2026, after the pairs were made live: 255
+ * occurrences past the check, four stems accounting for 194 of them.
+ *
+ * A closed suffix set rather than `[a-z]*`, because the open form matches a
+ * compound as readily as an inflection: `aria-labelledby` is the platform's
+ * own attribute and `ColourInput` is an alias that exists so a British speaker
+ * finds the family, and both would be rewritten into something that does not
+ * work. A compound that does need catching is cheaper as its own pair than as
+ * a rule with exceptions.
+ *
+ * `analyses` is the one collision the suffixes create, being the American
+ * plural of `analysis` as well as the British verb, so it is named here rather
+ * than guessed at.
+ */
+const SUFFIXES = ['', 'd', 'ed', 'es', 'ing', 'r', 'rs', 's']
+const COLLISIONS = new Set(['analyses'])
+
+const INFLECTED = PAIRS.flatMap(([british, american]) =>
+  SUFFIXES.map((suffix) => [british + suffix, american + suffix]).filter(
+    ([form]) => !COLLISIONS.has(form),
+  ),
+)
+
 /** One line, every pair applied. No pattern spans a newline, so this is whole. */
 const swept = (line) => {
   let after = line
-  for (const [british, american] of PAIRS) {
+  for (const [british, american] of INFLECTED) {
     after = after.replace(new RegExp(`\\b${british}\\b`, 'gi'), (match) => like(match, american))
   }
   return after
@@ -286,7 +329,7 @@ for (const path of [...ROOTS.flatMap((root) => files(root)), ...FILES]) {
     if (skip(index)) {
       continue
     }
-    for (const [british, american] of PAIRS) {
+    for (const [british, american] of INFLECTED) {
       const found = new RegExp(`\\b${british}\\b`, 'i').exec(line)
       /* A match that the rewrite would not change is not a finding, and the
          reporter said otherwise until 25 Aug 2026. It named every pair whose
@@ -314,7 +357,7 @@ if (problems.length > 0) {
     console.error(`  ${problem}`)
   }
   if (problems.length > 40) {
-    console.error(`\n  ...and ${problems.length - 40} more. Run \`bun run dialect\`.`)
+    console.error(`\n  ...and ${problems.length - 40} more. Run \`bun run fix:dialect\`.`)
   }
   process.exit(1)
 }

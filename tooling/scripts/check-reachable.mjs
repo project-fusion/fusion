@@ -3,8 +3,8 @@
  * Every attribute a stylesheet selects on the host can be reached from a property.
  *
  * **The third check on one rule, and the direction the other two do not ask
- * about.** `check:reflected` bans a default on a reflecting property and
- * `check:reflected-defaults` bans a default that writes an attribute; both look
+ * about.** `check:api:reflected` bans a default on a reflecting property and
+ * `check:api:reflected-defaults` bans a default that writes an attribute; both look
  * at properties that already reflect. Neither notices a property that *should*
  * reflect and does not, which is the half the rule states first: reflection
  * exists so a selector can reach a value.
@@ -40,7 +40,7 @@
  * version of the problem: React assigns the property verbatim, so the converter
  * never runs and `split="35"` arrives as a string, `modal="false"` as a truthy
  * one. That is a fault in the example rather than the component, and
- * `check:visual-parity` holds it by rendering both syntaxes and comparing.
+ * `check:spec:visual-parity` holds it by rendering both syntaxes and comparing.
  */
 import { readFileSync } from 'node:fs'
 
@@ -124,7 +124,7 @@ if (findings.length > 0) {
     `reachable: ${findings.length} of ${checked} host-attribute rules cannot be reached from a ` +
       `property.\n\n  ${findings.join('\n  ')}\n\n` +
       '  Add `reflect: true`. If the property carries a default, make it optional first, or\n' +
-      '  `check:reflected` will refuse it: a reflected property takes no default.\n',
+      '  `check:api:reflected` will refuse it: a reflected property takes no default.\n',
   )
   process.exit(1)
 }

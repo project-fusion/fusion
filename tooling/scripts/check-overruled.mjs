@@ -43,7 +43,7 @@
  * is one decision written for two surfaces, which is the pattern the base layer
  * exists for. What is not exempt is the component half sitting alone.
  *
- * Run with `bun run check:overruled` (also part of `bun run verify`).
+ * Run with `bun run check:css:overruled` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

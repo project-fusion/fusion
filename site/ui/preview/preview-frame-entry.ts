@@ -74,7 +74,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
      the platform paints form controls and scrollbars against; `data-color-mode`
      is what `light-dark()` resolves through once Lightning CSS has compiled it
      into a shim. Setting only the first leaves 37 of the 56 two-armed tokens on
-     their light arm, the 24 series colours among them.
+     their light arm, the 24 series colors among them.
 
      Absent leaves both alone, so a frame nobody has told follows the reader's
      own `prefers-color-scheme`, which is what a preview of a component should

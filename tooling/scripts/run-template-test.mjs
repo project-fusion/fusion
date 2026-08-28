@@ -26,7 +26,7 @@
  *   TypeScript falls back to a declaration file sitting beside the JavaScript
  *   it resolved, and `tsc` emits `index.d.ts` next to `index.js` for every
  *   package in this repo. The ordering rule is still right and is still
- *   enforced by `check:publishable`, but it is fatal only where declarations do
+ *   enforced by `check:pkg:publishable`, but it is fatal only where declarations do
  *   not sit beside their runtime files, which is a build layout we do not have.
  *   What this catches is a subpath that resolves to nothing at all.
  * - **Did anything unpublished come along?** A published package depending on an

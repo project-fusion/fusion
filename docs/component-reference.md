@@ -1,7 +1,7 @@
 # Component reference
 
-*Generated from `helix/styled/custom-elements.json` by `bun run reference`. Do
-not edit: `bun run check:reference` fails when this file and the manifest
+*Generated from `helix/styled/custom-elements.json` by `bun run gen:reference`. Do
+not edit: `bun run check:gen:reference` fails when this file and the manifest
 disagree, and the manifest is regenerated from the source on every build.*
 
 The styled tier, which is what an application writes. Every styled component
@@ -18,7 +18,7 @@ Groups collapsible sections, one open at a time by default.
 
 Extends `HelixHeadlessAccordion`.
 
-Items share one rule between neighbours rather than each drawing its own, so
+Items share one rule between neighbors rather than each drawing its own, so
 the seam between two items is one pixel and not two. Those seams are what
 carry the grouping, which is why the surrounding frame is opt-in rather than
 the default: an accordion is a list, where a card is a surface.
@@ -2139,7 +2139,7 @@ The column track is wider than the day, and the day is centered in it. The
 difference is the space between days, which belongs to the track rather than
 to a `gap`, so a range can paint across the whole track and stay continuous.
 
-Days from the neighbouring months stay in place and stay selectable, marked
+Days from the neighboring months stay in place and stay selectable, marked
 quieter rather than hidden, so the first and last weeks are whole and the
 grid reads as a continuous run of dates.
 
@@ -2863,7 +2863,7 @@ Presentation only, so there is no headless tier.
 
 ### Root (`helix-heatmap`)
 
-A strip of cells coloured by how each one went: uptime, contributions, activity.
+A strip of cells colored by how each one went: uptime, contributions, activity.
 
 Extends `HelixHeadlessHeatmap`.
 
@@ -3283,7 +3283,7 @@ A row that wraps, because a legend sits under a chart as wide as the chart
 and there is no arrangement of eight names that fits every width. Set
 `--legend-direction` to `column` where it sits beside one instead.
 
-The eight series colours are mapped here rather than in the tier below, which
+The eight series colors are mapped here rather than in the tier below, which
 carries the index and holds no tokens. Written as eight rules for the reason
 `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
 custom property set inline would be the headless tier naming a color.
@@ -4700,7 +4700,7 @@ Encodes a short piece of text as a scannable square.
 Extends `HelixHeadlessQrCode`.
 
 The picture is the headless tier's. What this adds is a size that can be set
-once, the colours a scanner needs, and the box that holds a center mark.
+once, the colors a scanner needs, and the box that holds a center mark.
 
 **The ink is `currentColor` and the ground is a real fill.** A code has to be
 dark on light to read, and the pair that guarantees it is not the page's
@@ -7563,8 +7563,8 @@ legible thing here, which is right anyway, since the number is what a reader
 reads and the judgment is a gloss on it.
 
 **No visual axis applies here, and that is the answer rather than a gap.**
-This family carries `@groups charts`, so `check:axes` reports it beside eight
-that do declare one. Each of the three was asked and each refuses for a reason
+This family carries `@groups charts`, so it sits beside eight that do
+declare one. Each of the three was asked and each refuses for a reason
 about what this is rather than about the axis. `emphasis` is how much ink a
 mark claims, and there is no mark: an arrow glyph and two runs of text, whose
 weight is `Text`'s business and whose size is the region's. `material` is what

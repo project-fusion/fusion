@@ -19,7 +19,7 @@
  * one.** `TypeError: B(...).toBeCloseTo is not a function` is reported as a
  * failed test, so the suite is red and the count is right and the reason is
  * wrong: the arc length was never compared to anything. Nine facts about arcs
- * and slot centres were unchecked in the only engine that computes them, and
+ * and slot centers were unchecked in the only engine that computes them, and
  * the report said they had been checked and failed.
  *
  * **And the pressure is to write the spec around it, which is the real cost.**
@@ -39,7 +39,7 @@
  * this repository does that, and if something starts, this check goes quiet
  * rather than wrong, which is the failure direction to prefer.
  *
- * Run with `bun run check:matchers` (also part of `bun run verify`).
+ * Run with `bun run check:spec:matchers` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

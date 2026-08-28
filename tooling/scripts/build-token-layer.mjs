@@ -24,7 +24,7 @@
  * That is not decoration: most of the reasoning in this design system's color
  * work is in those paragraphs.
  *
- * `bun run tokens:build` writes, `bun run check:tokens-layer` fails when the
+ * `bun run gen:tokens-layer` writes, `bun run check:gen:tokens-layer` fails when the
  * outputs and the source disagree.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -38,7 +38,7 @@ const JSON_OUT = join(ROOT, 'helix/styles/tokens.json')
 
 /* The generated region, named in the file so a reader editing the stylesheet
    can see where their edit will be overwritten. */
-const OPEN = '/* GENERATED from src/tokens.ts by `bun run tokens:build`. Do not edit below. */'
+const OPEN = '/* GENERATED from src/tokens.ts by `bun run gen:tokens-layer`. Do not edit below. */'
 const CLOSE = '/* GENERATED end. */'
 
 const { TOKENS, TOKEN_GROUPS } = await import('../../helix/styles/src/tokens.ts')
@@ -136,7 +136,7 @@ if (process.argv.includes('--check')) {
     readFileSync(JSON_OUT, 'utf8') !== json ? 'tokens.json' : undefined,
   ].filter(Boolean)
   if (stale.length > 0) {
-    console.error(`token layer: ${stale.join(' and ')} stale. Run \`bun run tokens:build\``)
+    console.error(`token layer: ${stale.join(' and ')} stale. Run \`bun run gen:tokens-layer\``)
     process.exit(1)
   }
   console.log(`token layer: ${TOKENS.length} tokens in ${categories.length} categories, current`)

@@ -20,7 +20,7 @@
  * - **Read and never declared** is a working feature nobody is told about, and
  *   one nothing stops a later edit from removing, since no document names it.
  *
- * Design tokens (`--helix-name`) are excluded, because `check:tokens` already
+ * Design tokens (`--helix-name`) are excluded, because `check:css:tokens` already
  * owns them and a component reading one is not publishing a hook.
  *
  * **Private properties (`--_name`) used to be excluded outright, and that was
@@ -40,7 +40,7 @@
  * tab's own shadow root to read, one file over.
  *
  * Two things are deliberately outside it. `helix/styles` is excluded because
- * its primitives are a scale, and `check:tokens` says in as many words that a
+ * its primitives are a scale, and `check:css:tokens` says in as many words that a
  * rung with no reader is fine: `--_helix-neutral-500` is not dead, it is a step
  * nothing has needed yet. And `.examples/` is excluded because a headless
  * example's gray palette is written whole in every family's `preview.css`, so a
@@ -74,7 +74,7 @@
  * declaration on a container holding both set two different things and neither
  * component could be blamed.
  *
- * Run with `bun run check:hooks` (also part of `bun run verify`).
+ * Run with `bun run check:css:hooks` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'

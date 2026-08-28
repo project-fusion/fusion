@@ -50,7 +50,7 @@
  *   `*EventMap` in the DOM library, so it needs no list to keep current and
  *   catches the next one on the day it is written. See 294.
  *
- * Run with `bun run check:platform-fidelity`.
+ * Run with `bun run check:api:platform-fidelity`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'

@@ -20,7 +20,7 @@
  * failure and not a green tick.
  *
  * The count that used to be here said five and the list had grown to fifteen,
- * which is the shape of thing `check:matchers` exists to notice: it reads the
+ * which is the shape of thing `check:spec:matchers` exists to notice: it reads the
  * specs and this file against each other, so the list moves whenever a spec
  * reaches for something new, and a number written beside it is stale by the
  * next one.
@@ -131,7 +131,7 @@ export const beforeAll = (body: () => unknown): void => {
  * Runs after every test in the block it was declared in, passed or failed.
  *
  * **The rules require one and this harness did not have it**, which is a gap of
- * exactly the shape `check:matchers` exists to police from the other side: a
+ * exactly the shape `check:spec:matchers` exists to police from the other side: a
  * spec importing `afterEach` compiled under happy-dom, where it comes from
  * `bun:test`, and failed to bundle for the browser, where `build-specs.mjs`
  * points `bun:test` at this file. The error names the missing export rather than
@@ -616,7 +616,7 @@ export const part = (host: HTMLElement, name: string): Element | null =>
  * `await host.updateComplete` reads the state from before the last update
  * landed, and an unbounded loop hangs the whole run when a component never
  * settles. Written twice because the two harnesses share no code, which is the
- * arrangement `check:matchers` already exists to police from the other side.
+ * arrangement `check:spec:matchers` already exists to police from the other side.
  * See 299.
  */
 export const settle = async (host: Updatable, turns = 40): Promise<void> => {

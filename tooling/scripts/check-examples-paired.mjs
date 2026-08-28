@@ -56,7 +56,7 @@ const CANONICAL = 'preview.html'
  * missed: it stripped tags and compared what was between them, so `virtual-list`
  * failed on `var(--helix-space-sm)` against `0.5rem`. A headless stylesheet
  * writing raw values is not a difference in copy, it is the tier working as
- * documented, and `check:tokens` permits it by name.
+ * documented, and `check:css:tokens` permits it by name.
  */
 const copy = (markup) =>
   markup
@@ -157,7 +157,7 @@ console.log(
  * React example legitimately moves copy out of the markup: a caption becomes a
  * `const`, a row of months becomes an array a `map` walks. Comparing text would
  * fail on exactly the examples worth authoring by hand. Equivalence is
- * `check:visual`'s job, which renders both and diffs the pictures, and that is
+ * `check:spec:visual`'s job, which renders both and diffs the pictures, and that is
  * the assertion that catches a React example rendering something else.
  */
 const SYNTAXES = [

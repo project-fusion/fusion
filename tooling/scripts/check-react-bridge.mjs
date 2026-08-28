@@ -33,7 +33,7 @@
  * makes the note worth trusting. This is the general fault #126 was filed about,
  * fixed for the one measurement in the repository that names a version.
  *
- * Run with `bun run check:react-bridge` (also part of `bun run verify`).
+ * Run with `bun run check:pkg:react-bridge` (also part of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
 

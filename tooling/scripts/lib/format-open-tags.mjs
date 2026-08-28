@@ -4,7 +4,7 @@
  *
  * Extracted when a generator for the headless examples arrived, because two
  * writers of the same files have to agree: it wrote its markup one way, the
- * formatter rewrote it the other, and `bun run check` cleaned nine files that
+ * formatter rewrote it the other, and `bun run fix` cleaned nine files that
  * the very next `--check` then reported as drifted. That generator is gone,
  * both tiers being authored now, and this stays because the formatter still
  * has other writers to agree with. That is the same rule the

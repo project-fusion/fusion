@@ -2,7 +2,7 @@
 /**
  * Where two spellings exist for one idea, the hooks settle on one.
  *
- * **`check:hooks` holds two real rules and has no opinion about the noun.** It
+ * **`check:css:hooks` holds two real rules and has no opinion about the noun.** It
  * requires a hook to be named for its family and to have a reader, and neither
  * of those stops one component calling a corner `--card-radii` while another
  * calls it `--video-radius`. Measured 28 Aug 2026 over the 490 published hooks,
@@ -22,14 +22,14 @@
  * `translate`, `--chat-message-measure` feeds `max-inline-size`, and in every
  * one of those the name is *better* than the property. A hook may name the idea
  * it controls; what it may not do is name the same idea a second way. So this
- * checks synonyms rather than derivation, which is `check:axes`' shape: a closed
+ * checks synonyms rather than derivation, which is `check:css:axes`' shape: a closed
  * vocabulary, one spelling each, and silence about everything outside it.
  *
  * The exception list is the interesting part rather than an escape hatch. A hook
  * really feeding `inset-*` keeps `-inset`, because there the word is the
  * property.
  *
- * Run with `bun run check:hook-names` (also part of `bun run verify`).
+ * Run with `bun run check:css:hook-names` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

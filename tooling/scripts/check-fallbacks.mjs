@@ -35,10 +35,10 @@
  *   findings of which 27 were the regexp misreading an attribute.
  * - **Comments hold `<slot>` too.** `Card` and `Dialog` both explain the
  *   bare-slot rule in prose, so a scan that does not blank comments reports the
- *   documentation as a component. The same trap `check:composed`,
- *   `check:seams` and `check:grounds` each record hitting.
+ *   documentation as a component. The same trap `check:api:composed`,
+ *   `check:api:seams` and `check:css:grounds` each record hitting.
  *
- * Run with `bun run check:fallbacks` (also part of `bun run verify`).
+ * Run with `bun run check:css:fallbacks` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

@@ -21,14 +21,28 @@
  * move is an event, so recording the name it moved from is the honest way to
  * catch what the move missed, and the check says so when it fires.
  *
- * Run with `bun run check:repository` (also part of `bun run verify`).
+ * Run with `bun run check:prose:repository` (also part of `bun run verify`).
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const ROOT = join(import.meta.dirname, '../..')
-const SKIP = new Set(['node_modules', '.git', '.next-dev', '.next', 'dist', '.local', '.turbo'])
+/* `worktrees` for the reason `check-dialect.mjs` skips it: `.claude/worktrees`
+   is gitignored scratch holding whole checkouts of this repository, so walking
+   into one finds an older copy of every file here, including this check, whose
+   own `FORMER` list names the paths it exists to refuse. Reported as two
+   findings in a tree with nothing wrong with it. */
+const SKIP = new Set([
+  '.git',
+  '.local',
+  '.next',
+  '.next-dev',
+  '.turbo',
+  'dist',
+  'node_modules',
+  'worktrees',
+])
 
 /** Paths this repository has lived at before. Add one when it moves again. */
 const FORMER = ['former-org/former-repo', 'former-org/fusion']

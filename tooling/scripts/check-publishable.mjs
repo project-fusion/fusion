@@ -52,10 +52,10 @@
  *
  * **One version per domain.** Lockstep is the versioning policy, and the
  * property it exists to hold is that `@fusion.dev/helix-headless@x` works with
- * `@fusion.dev/helix@x`. A manifest carrying a different string from its neighbours
+ * `@fusion.dev/helix@x`. A manifest carrying a different string from its neighbors
  * is that promise already broken, and the release stamps whatever it finds.
  *
- * Run with `bun run check:publishable` (also part of `bun run verify`).
+ * Run with `bun run check:pkg:publishable` (also part of `bun run verify`).
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'

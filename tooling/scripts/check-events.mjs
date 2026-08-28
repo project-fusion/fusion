@@ -9,7 +9,7 @@
  * `helix-change` that is the *only* way to refuse a change, and neither
  * declared it, so the refusal path was undiscoverable from the docs.
  *
- * Third of its shape after `check:hooks` and `check:parts`, and the same
+ * Third of its shape after `check:css:hooks` and `check:api:parts`, and the same
  * argument: nothing about a missing `@event` fails, warns, or looks wrong.
  *
  * **Declared on the class that dispatches, or on one it extends.** A styled
@@ -17,7 +17,7 @@
  * by a mixin belongs to every component that applies it, so both the `extends`
  * chain and applied mixins are followed.
  *
- * Run with `bun run check:events` (also part of `bun run verify`).
+ * Run with `bun run check:api:events` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'

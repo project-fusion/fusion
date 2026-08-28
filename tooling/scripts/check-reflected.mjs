@@ -38,7 +38,7 @@
  * properties were breaking it when this was written, which is the argument for
  * a check rather than a rule.
  *
- * Run with `bun run check:reflected` (also part of `bun run verify`).
+ * Run with `bun run check:api:reflected` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

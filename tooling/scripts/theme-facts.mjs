@@ -8,7 +8,7 @@
  *
  * `oracle.json` is the emitted answer for seventeen intents, and `cargo test`
  * asserts the engine against it, so it cannot go stale without the Rust suite
- * failing. That makes it a better source than the source was: `check:seeds` used
+ * failing. That makes it a better source than the source was: `check:css:seeds` used
  * to match `` `--${namespace}-${family}-${` `` and could see a family but never a
  * leaf, and here the leaves are literally present.
  *
@@ -49,7 +49,7 @@ if (!base) {
  * The `pinned` intent adds `color-house-teal`, which is the whole point of that
  * feature: a caller may name a token of their own and have it verified beside
  * the rest. Left in the emitted set it reads as a name the engine invented, and
- * `check:seeds` would go looking for it in `tokens.css` and ask for a
+ * `check:css:seeds` would go looking for it in `tokens.css` and ask for a
  * declaration nobody should write.
  */
 const pinned = new Set(INTENTS.flatMap(({ intent }) => Object.keys(intent.tokens ?? {})))

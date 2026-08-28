@@ -85,13 +85,13 @@ const pageIsThemed = (): boolean => document.documentElement.hasAttribute('data-
  * **All of it comes from the engine, including the seed.** This file used to
  * carry a hand-written bridge and a comment explaining that the two derivations
  * "do not talk to each other": `deriveTheme` computed tokens in JavaScript
- * while the twenty-four series colours a chart reads computed themselves in CSS
+ * while the twenty-four series colors a chart reads computed themselves in CSS
  * off `--_helix-seed-brand`, so setting the tokens moved the buttons and the
  * tags and left every chart on the page the original blue. This wrote the
  * private primitive itself to close the gap.
  *
  * The engine emits `seeds` now, so the bridge is gone and nothing here reaches
- * past `helix/styles`'s public surface. `check:seeds` holds the two name sets
+ * past `helix/styles`'s public surface. `check:css:seeds` holds the two name sets
  * to each other in both directions.
  *
  * **`data-helix-theme` is still set before the values, and that is not

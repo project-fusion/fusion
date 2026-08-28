@@ -105,8 +105,8 @@ its arrow is `tooltip-arrow`.
 `Command` forwarded the listbox's `search-field` under a name it also rendered
 itself, so `::part(search-field)` matched two elements at once.
 
-This is checked in both directions. `check:parts` holds a published part and a
-rendered one to each other, and `check:exportparts` holds a composition to
+This is checked in both directions. `check:api:parts` holds a published part and a
+rendered one to each other, and `check:api:exportparts` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
 nothing. Before it existed, 148 published child parts were unreachable: all
 sixteen of the color picker's from inside a color input, all thirteen of the

@@ -33,7 +33,7 @@
  * that changes its `cancelable` moves every component that dispatches it in one
  * edit and this check follows.
  *
- * Run with `bun run check:cancelable` (also part of `bun run verify`).
+ * Run with `bun run check:api:cancelable` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

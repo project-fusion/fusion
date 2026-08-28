@@ -228,7 +228,7 @@
  *
  * These are user units inside a viewBox that scales with its container, so a
  * `--helix-text-*` token would be the wrong quantity entirely: it would set a
- * page size on something measured in the drawing's own coordinates. `check:tokens`
+ * page size on something measured in the drawing's own coordinates. `check:css:tokens`
  * is right that a raw number in page CSS is a smell, and right that this is not
  * page CSS, so the numbers moved to where SVG has always put them.
  */
@@ -302,7 +302,7 @@
 .diagramPulse path {
   stroke: var(--helix-color-primary);
   /* Lifted above the brand so the traveling head reads against a field that is
-     itself brand-coloured. At the token value it disappeared into the aura. */
+     itself brand-colored. At the token value it disappeared into the aura. */
   stroke-opacity: 0.92;
   /* Wider and weaker than the old 3px at 45 percent: a tight bright halo on a
      short fast dash reads as a hard object with an outline, and what a light
@@ -844,7 +844,7 @@
 .tDisplay {
   font-family: var(--helix-font-display);
   /* Fluid between two rungs of the ramp rather than between two numbers
-     nobody chose. `check:tokens` was right to flag the originals: a page that
+     nobody chose. `check:css:tokens` was right to flag the originals: a page that
      invents its own sizes is how a scale stops being one. */
   font-size: clamp(var(--helix-text-3xl), 5.6vw, calc(var(--helix-text-3xl) * 1.6));
   font-weight: var(--helix-weight-semibold);
@@ -1006,7 +1006,7 @@
  *
  * **`helix-card` was in this rule and did not need to be.** The note that put it
  * here said the component ships `sm` and the draft wants `lg`; the component
- * resolves `var(--card-radii, var(--helix-radii-lg))` and always has, so the
+ * resolves `var(--card-radius, var(--helix-radii-lg))` and always has, so the
  * line restated the default and the premise was simply wrong. What was actually
  * on the wrong corner was `helix-code-block`, which is not reached by this
  * selector and is now fixed where it lives.
@@ -1622,7 +1622,7 @@
  * was the one object still on its own surface: an opaque `surface-raised` bar
  * over a block of flat page background, which beside a row of translucent cards
  * reads as a screenshot of a different site. `CodeBlock` published only
- * `--code-block-background` until now, so there was no way to say this without
+ * `--code-block-background-color` until now, so there was no way to say this without
  * reaching past it; it publishes the backdrop, the border and the header ground
  * as well, and this is written entirely in those.
  *
@@ -1632,9 +1632,13 @@
  * what makes the bar a bar rather than the block growing a title. */
 .noRules :global(helix-code-block) {
   --code-block-backdrop: blur(40px) saturate(1.5);
-  --code-block-background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  --code-block-background-color: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
   --code-block-border-color: transparent;
-  --code-block-header-background: color-mix(in oklab, var(--helix-color-surface) 46%, transparent);
+  --code-block-header-background-color: color-mix(
+    in oklab,
+    var(--helix-color-surface) 46%,
+    transparent
+  );
 }
 
 /**

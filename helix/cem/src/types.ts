@@ -193,7 +193,7 @@ export type Category = (typeof CATEGORIES)[number]
  * **What it is for** is the visual axes: a legend whose swatches are solid while
  * the bars it keys are outlined is a legend that does not match its own chart,
  * and that is a fault no check could see while the only grouping was purpose.
- * `check:axes` reads it. See 176.
+ * `check:css:axes` reads it. See 176.
  *
  * Closed, the way `CATEGORIES` and the statuses are, so a typo lands a family
  * in a group of one rather than being trusted.

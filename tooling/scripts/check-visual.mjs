@@ -84,12 +84,12 @@
  * Baselines live beside the example they picture, `.examples/preview.png` and
  * `.examples/preview.narrow.png`, in the package that authors it. The tiers
  * keep separate `src` trees, so the two sets share names and never a path.
- * `check:examples` ignores them because it reads only `.html` and `.css`, which
+ * `check:prose:examples` ignores them because it reads only `.html` and `.css`, which
  * is true of every other reader of an `.examples` directory as well.
  *
  * ```
- * bun run check:visual              compare both tiers, and fail on a difference
- * bun run check:visual accordion    just that family, in whichever tiers have one
+ * bun run check:spec:visual              compare both tiers, and fail on a difference
+ * bun run check:spec:visual accordion    just that family, in whichever tiers have one
  * bun run visual:update             rewrite the baselines
  * ```
  *
@@ -144,7 +144,7 @@ const WIDTHS = [
   { suffix: '.narrow', width: 390 },
 ]
 
-/* Both halves of what `bun run frame` writes, and both are required.
+/* Both halves of what `bun run gen:frame` writes, and both are required.
    `build-frame.mjs` empties the directory and writes the bundle, the stylesheet
    and the document together, so one of them missing means none of them is
    trustworthy. The bundle alone was checked until the styled tier was added,
@@ -174,7 +174,7 @@ if (process.platform !== 'linux') {
 const absent = [FRAME, SHEET].filter((one) => !existsSync(one))
 if (absent.length > 0) {
   console.error(
-    `visual: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run \`bun run frame\`` +
+    `visual: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run \`bun run gen:frame\`` +
       ' first: the bundle is what defines the tags, and the stylesheet is what defines every token ' +
       'the styled tier draws with.',
   )
@@ -203,7 +203,7 @@ if (total === 0) {
 
 /* A named family present in one tier and not the other is reported and not
    refused. Layout and effect families ship styled-only, having no structure or
-   a11y to separate, so `bun run check:visual flex` legitimately pictures one
+   a11y to separate, so `bun run check:spec:visual flex` legitimately pictures one
    tier; failing on it would make the filter unusable for exactly the families
    whose appearance is all they are. */
 for (const tier of tiers) {

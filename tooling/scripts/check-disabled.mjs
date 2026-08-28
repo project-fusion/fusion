@@ -23,9 +23,9 @@
  * it never inherits a fieldset's state and the `disabled` its group writes onto
  * it really is a plain attribute. Keyed on the family, this check called that a
  * bug twice. A component qualifies if the headless file at the same path reaches
- * `HelixFormElement`, matched the way `check:composed` matches its tiers.
+ * `HelixFormElement`, matched the way `check:api:composed` matches its tiers.
  *
- * Run with `bun run check:disabled` (also part of `bun run verify`).
+ * Run with `bun run check:api:disabled` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

@@ -114,7 +114,7 @@ describe('registry matches content on disk', () => {
   })
 
   // The generated module is only worth having if it says what the frontmatter
-  // says. `bun run check:docs` is what enforces that in CI; this is what
+  // says. `bun run check:gen:docs` is what enforces that in CI; this is what
   // catches it in the two seconds after somebody edits a title by hand.
   test('title and description come from the frontmatter', () => {
     for (const page of pages) {

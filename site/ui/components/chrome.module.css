@@ -206,7 +206,7 @@
  *
  * No fallback on `--icon-size`. The footer sets it on the element, and a length
  * written here to cover the case where it does not would be a raw space value
- * that `check:tokens` is right to refuse. Without one an unset size makes the
+ * that `check:css:tokens` is right to refuse. Without one an unset size makes the
  * `calc` invalid and the margin drops, which is the correct failure: the mark
  * sits where an unadjusted mark sits.
  *
@@ -540,7 +540,7 @@
    the only thing on screen that says where the reader is. */
 .siteCommand {
   --option-active-color: var(--helix-color-primary-subtle);
-  --option-radii: var(--helix-radii-sm);
+  --option-radius: var(--helix-radii-sm);
 }
 
 /* The navigation drawer, which was reading as prose and is a menu.

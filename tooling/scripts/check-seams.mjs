@@ -30,7 +30,7 @@
  * how it stopped working. A template names no tag now: `tier` resolves
  * `<${this.tag('listbox')}>` to the headless element here and the styled one in the
  * tier above. The scan for `<helix-…` then matched nothing at all and this
- * reported "0 families compose another" as a pass, which is what `check:floors`
+ * reported "0 families compose another" as a pass, which is what `check:spec:floors`
  * exists to catch and did.
  *
  * `icon` is exempt too, and that is a judgment rather than an oversight. It is
@@ -40,11 +40,11 @@
  * them. Wrapping every one of them in a method would be
  * fourteen seams nobody opens.
  *
- * Comments and JSDoc are stripped first, for the reason `check:composed` gives:
+ * Comments and JSDoc are stripped first, for the reason `check:api:composed` gives:
  * class docs are full of usage examples naming tags the file has no business
  * rendering, and those are prose.
  *
- * Run with `bun run check:seams` (also part of `bun run verify`).
+ * Run with `bun run check:api:seams` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -75,7 +75,7 @@ const withoutComments = (text) =>
     .replaceAll(/\/\/[^\n]*/g, (match) => ' '.repeat(match.length))
 
 /* Where each tag is declared, so a part's family is its folder and not its
-   name. Same rule `check:composed` settled on, and for the same reason. */
+   name. Same rule `check:api:composed` settled on, and for the same reason. */
 const families = new Map()
 for (const file of sources(TIER)) {
   const declared = /@customElement\(['"]helix-headless-([a-z0-9-]+)['"]\)/.exec(

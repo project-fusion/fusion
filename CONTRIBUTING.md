@@ -13,12 +13,13 @@ package manager will write a second one.
 
 | Command | Does |
 |---|---|
-| `bun run check` | Fixes what it can: ordering, formatting, tokens, dialect |
+| `bun run fix` | Fixes what it can: ordering, formatting, tokens, dialect |
 | `bun run verify` | Judges. Must pass before anything is called done |
 
 **`verify` never writes.** It runs `biome ci`, not `biome check --write`, because
 a step that edits your files cannot tell you whether they were correct. Run
-`check` while you work and `verify` before you open a pull request.
+`fix` while you work, `check` for the guards alone, and `verify` before you open
+a pull request.
 
 Rust is `cargo test --workspace`, and `cargo fmt` and `clippy` rather than
 Biome. Workspace lints are `clippy::pedantic` with `unsafe_code` forbidden: fix
@@ -29,7 +30,7 @@ a finding rather than allowing it, and comment any allow at its site.
 [`docs/19-queue.md`](docs/19-queue.md) is the issue tracker, in the repository,
 under review, and versioned with the code it describes. Numbers are stable: a
 finished item keeps its number, so a commit naming #49 still means something a
-year from now. `bun run check:queue` prints the next free number and holds the
+year from now. `bun run check:prose:queue` prints the next free number and holds the
 ordering.
 
 If you are proposing work rather than doing it, a queue row is often the better
@@ -37,13 +38,13 @@ artifact than an issue, because the reasoning survives next to the code.
 
 ## House style
 
-Most of this is enforced, so `bun run check` will tell you. The parts worth
+Most of this is enforced, so `bun run fix` will tell you. The parts worth
 knowing before you write:
 
 - **No em dashes**, in code, docs, comments or copy. Periods, colons, commas or
   parentheses.
-- **American spelling** everywhere, comments and prose alike. `bun run dialect`
-  rewrites and `check:dialect` judges. Comments are in scope because an
+- **American spelling** everywhere, comments and prose alike. `bun run fix:dialect`
+  rewrites and `check:prose:dialect` judges. Comments are in scope because an
   unwritten convention is learned from the corpus.
 - **Alphabetize** object keys, interface members and exported types, skipping
   where order is semantic: positional arguments, middleware chains, CSS
@@ -66,7 +67,7 @@ the cause is deeper, the fix still goes deeper.
 
 There is a skill for it: `.claude/skills/adding-helix-components`. A component
 is not one file. It is both tiers, tokens, specs on every part, manifest
-metadata and an example, and `bun run check:stable` knows the difference.
+metadata and an example, and `bun run check:api:stable` knows the difference.
 
 ## Commits
 

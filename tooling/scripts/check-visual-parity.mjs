@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process'
  * arrangement could not drift because the React view was a function of the HTML
  * one; it also could not be correct, emitting a `<script>` into a JSX fragment
  * for all 28 script-bearing examples and three separate faults on the rest.
- * `check:examples-paired` holds the two files to each other. This holds the two
+ * `check:prose:examples-paired` holds the two files to each other. This holds the two
  * pictures to each other, which is the only comparison that can see a React
  * example rendering something else.
  *
@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process'
  * asserts a fact somebody thought to assert. Two pictures of the same example
  * assert the part nobody thinks to.
  *
- * **No baseline, and that is the interesting difference from `check:visual`.**
+ * **No baseline, and that is the interesting difference from `check:spec:visual`.**
  * That check compares today's render to a committed PNG, so it is Linux-only:
  * text rasterization differs by platform and a cross-platform comparison would
  * differ on nearly every glyph. This compares two renders taken seconds apart
@@ -28,7 +28,7 @@ import { execFileSync } from 'node:child_process'
  * anywhere. Nothing is committed, so nothing can be committed wrong.
  *
  * **What a difference means is usually the React side.** The HTML example is
- * the one the sandbox has always run and the one `check:visual` already guards
+ * the one the sandbox has always run and the one `check:spec:visual` already guards
  * against a reviewed baseline, so when these two disagree the picture to
  * distrust is the new one. The diff is written beside the example as
  * `<slug>.parity.png` and left there to be looked at.
@@ -50,7 +50,7 @@ import { PNG } from 'pngjs'
 
 const root = resolve(import.meta.dirname, '../..')
 
-/* The same two tiers `check:visual` pictures, read the same way and for the
+/* The same two tiers `check:spec:visual` pictures, read the same way and for the
    same reason: a headless example is deliberately token-free and wants only its
    own `preview.css`, and a styled example is nothing but tokens and wants
    `frame.css`. */
@@ -64,7 +64,7 @@ const SHEET = join(root, 'site/ui/public/sandbox/frame.css')
 const FONTS = join(root, 'site/ui/public/fonts')
 const BUILT = join(root, '.local/parity')
 
-/* One width, not the two `check:visual` takes. That check is asking whether the
+/* One width, not the two `check:spec:visual` takes. That check is asking whether the
    library still looks like itself, which is a question about layout and wants
    a narrow picture; this one is asking whether two spellings of one example
    agree, and a disagreement large enough to matter is visible at any width. The
@@ -119,13 +119,13 @@ const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
  *
  * **Reverse composition, because the arrow points the wrong way for us.**
  * Fifteen families render another inside their own shadow root, named through
- * `this.tag()`, which `check:seams` already reads. If `listbox` changes, the
+ * `this.tag()`, which `check:api:seams` already reads. If `listbox` changes, the
  * picture that moves is `select`'s, so the set has to grow from the changed
  * family outward to everything that composes it, and keep growing: a family
  * composing a family that composes the change is just as affected.
  *
  * **Over-inclusion is the safe direction and is chosen on purpose.** The scan
- * does not strip comments the way `check:seams` does, so a `this.tag()` inside
+ * does not strip comments the way `check:api:seams` does, so a `this.tag()` inside
  * a comment pulls a family in that did not need to be there. That costs seconds
  * of comparison. The opposite mistake costs a picture nobody looked at, which is
  * the whole failure this check exists to prevent.
@@ -221,7 +221,7 @@ const absent = dryRun ? [] : [FRAME, SHEET].filter((one) => !existsSync(one))
 if (absent.length > 0) {
   console.error(
     `parity: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run ` +
-      '`bun run frame` first: the bundle is what defines the tags on both sides.',
+      '`bun run gen:frame` first: the bundle is what defines the tags on both sides.',
   )
   process.exit(1)
 }
@@ -230,7 +230,7 @@ if (absent.length > 0) {
  * The bundle has to be newer than the components, or a fix looks like a failure.
  *
  * **Both sides render from `frame.js`**, so a change to a component reaches
- * neither of them until `bun run frame` has rebuilt it. That is not a stale
+ * neither of them until `bun run gen:frame` has rebuilt it. That is not a stale
  * picture, it is a stale *library*, and it reads as the fix not having worked:
  * `breadcrumbs/links` was repaired, re-run, and still reported 1,236 pixels,
  * because the bundle predated the repair. Checked rather than remembered.
@@ -255,7 +255,7 @@ const sources = dryRun ? 0 : Math.max(...TIERS.map((tier) => newest(tier.source)
 if (sources > bundled) {
   console.error(
     'parity: `frame.js` is older than the components it bundles, so both sides would render the\n' +
-      '  library as it was before your change. Run `bun run frame` and try again.',
+      '  library as it was before your change. Run `bun run gen:frame` and try again.',
   )
   process.exit(1)
 }
@@ -476,7 +476,7 @@ const shell = (tier, body, script) =>
   `<script defer src="/frame.js"></script>${script}${body}`
 
 /* **Held in memory rather than read per request, because the file moves.**
-   `bun run frame` empties the directory and rewrites the bundle, so a rebuild
+   `bun run gen:frame` empties the directory and rewrites the bundle, so a rebuild
    running alongside this serves a truncated `frame.js` or none at all. Every
    element then fails to define, every React page renders an empty root, and the
    run reports all 568 examples differing, which reads as a catastrophe in the
@@ -596,7 +596,7 @@ await tab.route('**/*', (route) =>
    made the numbers move and neither was right, because the premise is: this
    compares what the two examples *ship as*, and the HTML one ships with those
    spaces. Rewriting it to render like the TSX asks the comparison whether the
-   two say the same thing, which is a question `check:examples-paired` already
+   two say the same thing, which is a question `check:prose:examples-paired` already
    covers and not the one worth a browser.
 
    So the difference is real and it belongs to the TSX. Prose wrapping an inline
@@ -638,7 +638,7 @@ const picture = async (url) => {
     return [...new Set(pending)].filter((tag) => customElements.get(tag) === undefined)
   })
   await tab.evaluate(async () => {
-    /* Three frames rather than the two `check:visual` waits. React mounts in a
+    /* Three frames rather than the two `check:spec:visual` waits. React mounts in a
        task of its own and an example that sets state in an effect, which the
        timestamped ones do, needs the render that follows it. */
     await new Promise((done) =>
@@ -740,7 +740,7 @@ for (const entry of entries) {
     findings.push(
       `${where}: ${missing.map((tag) => `\`<${tag}>\``).join(', ')} never upgraded, so nothing ` +
         'registers them. The example names an element the bundle does not define: check the tag ' +
-        'against the component, and that `bun run frame` has run since it was renamed.',
+        'against the component, and that `bun run gen:frame` has run since it was renamed.',
     )
     continue
   }
@@ -816,7 +816,7 @@ for (const entry of entries) {
     findings.push(
       `${where}: ${moved} pixels differ between the two syntaxes. The marked difference is at ` +
         `${relative(root, file)}, and the side to distrust is usually the TSX: the HTML one is ` +
-        'what `check:visual` already holds to a reviewed baseline.',
+        'what `check:spec:visual` already holds to a reviewed baseline.',
     )
   }
 }
@@ -846,7 +846,7 @@ console.log(
   `parity: ${compared} examples render identically from their HTML and their TSX` +
     /* **A scoped run says so in the same line as its verdict.** A number on its
        own reads as the whole corpus, which is how a check that stopped covering
-       things goes on looking like one that passes. See `check:floors`. */
+       things goes on looking like one that passes. See `check:spec:floors`. */
     (skipped.size > 0 ? `, with ${skipped.size} families not compared this run` : '') +
     /* Named every run, because an exception nobody is reminded of is an
        exception that becomes permanent. */

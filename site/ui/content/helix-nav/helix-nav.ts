@@ -27,7 +27,7 @@ import { getFamilies } from '../catalog/catalog'
  *
  * What that costs is the insertion point, which is a fact about the navigation
  * living outside the file called `sections.ts`. It is stated once, below, and
- * `check:docs` still owns everything about the sections it does declare.
+ * `check:gen:docs` still owns everything about the sections it does declare.
  */
 
 /** A row in the sidebar: where it goes, what it is called, what sits under it. */

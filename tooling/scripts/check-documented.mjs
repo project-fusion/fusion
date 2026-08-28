@@ -11,7 +11,7 @@
  * swept the code had nothing to make it sweep the pages.
  *
  * It was written after an end-to-end read found four of exactly that, all from
- * one rename. `appearance` is refused outright by `check:axes`, and `tiers.mdx`
+ * one rename. `appearance` is refused outright by `check:css:axes`, and `tiers.mdx`
  * taught it three times over: in the package table, in the prose about what the
  * styled tier owns, and in the code sample a reader would copy. The same page
  * named a `WithOpen` mixin that does not exist, a `disclosure` family that does
@@ -28,7 +28,7 @@
  *   check missed, and it is the form an override example takes.
  * - **A token, and a per-component hook.** `--helix-color-border-subtle`
  *   resolves to nothing and the property silently falls back, which is the same
- *   failure `check:tokens` already catches in CSS and could not see in prose. A
+ *   failure `check:css:tokens` already catches in CSS and could not see in prose. A
  *   hook is held only where its prefix is a real family, because a page
  *   legitimately shows a consumer's own properties: `--site-cta-inline-size` and
  *   `--brand-blue-500` are the reader's to name and not ours to verify.
@@ -71,7 +71,7 @@
  * narrower than exempting the page: the page can still be wrong about anything
  * else.
  *
- * Run with `bun run check:documented` (also part of `bun run verify`), after
+ * Run with `bun run check:prose:documented` (also part of `bun run verify`), after
  * `bun run analyze`.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'

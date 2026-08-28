@@ -23,7 +23,7 @@
  * guarded, or observes the same targets. It asks whether the teardown has a
  * counterpart at all, which is the failure that actually shipped four times.
  *
- * Run with `bun run check:observers` (also part of `bun run verify`).
+ * Run with `bun run check:api:observers` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

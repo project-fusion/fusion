@@ -16,7 +16,7 @@
  * gone from the manifest, so the rule would have read an empty set, passed
  * everything, and gone on looking thorough. See 294.
  *
- * Run with `bun run check:examples` (also part of `bun run verify`).
+ * Run with `bun run check:prose:examples` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

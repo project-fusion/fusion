@@ -57,7 +57,7 @@
  * is right on load and wrong from the first change. Reflection on a computed
  * value is a promise the mechanism cannot keep.
  *
- * Run with `bun run check:reflected-defaults`.
+ * Run with `bun run check:api:reflected-defaults`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

@@ -2,7 +2,7 @@
 /**
  * Every spec file is reached by the script that claims to run the specs.
  *
- * **A spec nobody runs is the `check:dialect` fault in a different costume.** It
+ * **A spec nobody runs is the `check:prose:dialect` fault in a different costume.** It
  * is written, it is reviewed, it is committed, it goes green because it is never
  * executed, and it protects nothing. `helix/headless` runs `bun test dom.spec`
  * and `bun test ssr.spec`, so a pure spec named `order.spec.ts` sat between the
@@ -22,7 +22,7 @@
  * by construction, which is the arrangement `helix/core` uses and the reason it
  * has never had this problem.
  *
- * Run with `bun run check:spec-runners`.
+ * Run with `bun run check:spec:spec-runners`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

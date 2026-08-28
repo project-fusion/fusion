@@ -46,7 +46,7 @@
  * already pins bun. Before that it set up bun and Rust and never Node at all,
  * so the floor was met by whatever the runner image happened to ship.
  *
- * Run with `bun run check:node` (also the first step of `bun run verify`).
+ * Run with `bun run check:pkg:node` (also the first step of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

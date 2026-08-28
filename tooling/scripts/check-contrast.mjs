@@ -2,7 +2,7 @@
 /**
  * Measures every ink against the ground it is really painted on.
  *
- * **This is the two thirds `check:pairings` cannot see.** That one reads the
+ * **This is the two thirds `check:css:pairings` cannot see.** That one reads the
  * stylesheets and can only recognize a rule that sets an ink *and* a ground
  * together: eleven do, where 165 set only an ink and 112 only a ground, and the
  * rest inherit their ground from a host, a part above them or the page. No scan
@@ -43,7 +43,7 @@
  * **Only elements that paint text are read.** An empty box has no ink to judge,
  * and every wrapper in the tree would otherwise arrive as a pair.
  *
- * Run with `bun run check:contrast`, after `bun run frame`.
+ * Run with `bun run check:css:contrast`, after `bun run gen:frame`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
@@ -90,7 +90,7 @@ const origin = `http://127.0.0.1:${server.address().port}`
    `surface-raised` in dark until the engine was asked instead. Naming the
    unpainted pairs turns the hole into a list.
 
-   **Read from what the engine emitted, not from its source.** `check:pairings`
+   **Read from what the engine emitted, not from its source.** `check:css:pairings`
    carries the argument: the model is Rust now, and the regular expression that
    used to stand in for it missed every status ink's grounds. */
 
@@ -393,7 +393,7 @@ for (const mode of ['light', 'dark']) {
 
         /* **An icon is ink too, and nothing was reading it.** A trigger whose only
        content is a glyph has no text node, so a walk looking for text steps
-       over it: the Speed Dial pair `check:pairings` caught at 2.96:1 was
+       over it: the Speed Dial pair `check:css:pairings` caught at 2.96:1 was
        reintroduced here deliberately and this check passed it.
 
        A glyph is a graphic, so the bar is 1.4.11's 3:1 rather than 1.4.3's 4.5.

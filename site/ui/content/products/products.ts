@@ -98,7 +98,7 @@ export interface Product {
    * **A tile, and the letter is painted rather than cut out.** A mask would
    * make it a real hole, which is the same thing only while the mark sits on
    * white: anywhere else the hole takes the ground behind it, and a letter on a
-   * coloured field has to stay light on every ground it lands on.
+   * colored field has to stay light on every ground it lands on.
    *
    * **The drawing carries no color decision.** The tile is a gradient between
    * `--logo-color-from` and `--logo-color-to` and the letter is

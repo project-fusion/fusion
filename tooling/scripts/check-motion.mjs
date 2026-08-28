@@ -36,7 +36,7 @@
  *
  * Naming the rule is the point; choosing the answer is the component's.
  *
- * Run with `bun run check:motion` (also part of `bun run verify`).
+ * Run with `bun run check:css:motion` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'

@@ -49,7 +49,7 @@ const PUBLIC = join(ROOT, 'site/ui/public')
  * do ship.
  *
  * A reference documents what a reader can take. The line to draw is whether a
- * package publishes, and `check:publishable` already holds that flag, so this
+ * package publishes, and `check:pkg:publishable` already holds that flag, so this
  * reads a list of publishing packages rather than filtering tag names
  * downstream: a name filter would have to be updated every time the private
  * package grew an element, and would be silent when it was not.
@@ -94,7 +94,7 @@ for (const source of EXAMPLES) {
       }
       const slug = file.replace(/\.html$/, '')
       const stylesheet = join(dir, `${slug}.css`)
-      /* Read, never converted. `check:examples-paired` is what guarantees the
+      /* Read, never converted. `check:prose:examples-paired` is what guarantees the
          file is there, so an empty string here means that check is not running
          rather than that the example has no React form. */
       const authored = join(dir, `${slug}.tsx`)
@@ -147,7 +147,7 @@ mkdirSync(DOCS, { recursive: true })
  * take real files with it.
  *
  * Clearing at all is not tidiness. Without it a deleted page leaves its `.md`
- * behind, still served, still linked from nothing, and `check:routes` reports
+ * behind, still served, still linked from nothing, and `check:gen:routes` reports
  * it as a document no route points at. Found exactly that way. */
 for (const dir of [PUBLIC, join(PUBLIC, 'insights')]) {
   if (!existsSync(dir)) {

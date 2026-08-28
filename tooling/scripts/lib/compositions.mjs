@@ -1,7 +1,7 @@
 /**
  * Where a component renders another component, and what that costs a consumer.
  *
- * Read by `check:exportparts`, which holds a composition to publishing what it
+ * Read by `check:api:exportparts`, which holds a composition to publishing what it
  * renders.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -222,7 +222,7 @@ export const exposedAs = (role, part) => (part === role ? role : `${role}-${part
  * Every site where a component renders another, with what it forwards.
  *
  * A site is `<${this.tag('child')} …>`, which is the only way a component may
- * name another (see `check:composed`). The `part` on that element is the role
+ * name another (see `check:api:composed`). The `part` on that element is the role
  * the child plays here, and is what a forwarded name is prefixed with.
  */
 export const compositions = () => {

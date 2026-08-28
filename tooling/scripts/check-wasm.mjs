@@ -41,7 +41,7 @@ const TOLERANCE = 1e-12
 
 if (!existsSync(join(WASM, 'fusion_helix_theme.js'))) {
   /* **Refused rather than built here, and rather than skipped.** This no longer
-     runs `bun run wasm` first, which is the point of it: the artifact is tracked
+     runs `bun run gen:wasm` first, which is the point of it: the artifact is tracked
      now, so what gets measured against the oracle is the file that ships rather
      than a fresh one built beside it. Reaching this line means the tracked file
      is gone, which is a deleted artifact rather than a missing toolchain.
@@ -50,7 +50,7 @@ if (!existsSync(join(WASM, 'fusion_helix_theme.js'))) {
      red one. */
   console.error(
     'wasm: helix/theme/wasm is tracked and is not here, so this check has\n' +
-      'nothing to measure. Restore it, or rebuild it with `bun run wasm`, which\n' +
+      'nothing to measure. Restore it, or rebuild it with `bun run gen:wasm`, which\n' +
       'needs the `wasm32-unknown-unknown` target and the `wasm-bindgen` CLI:\n' +
       '  rustup target add wasm32-unknown-unknown\n' +
       '  cargo install wasm-bindgen-cli --version 0.2.126 --locked',

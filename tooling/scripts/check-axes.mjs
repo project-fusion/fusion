@@ -42,7 +42,7 @@
  *   held 21 declarations across four axes, and `UNSWEPT` is empty now, so a
  *   component reintroducing it fails rather than being asked to explain itself.
  *
- * Run with `bun run check:axes`, after `bun run analyze`.
+ * Run with `bun run check:css:axes`, after `bun run analyze`.
  */
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -162,7 +162,7 @@ const PENDING = {}
  * `width` asks how much room a thing takes, and most answer with a policy:
  * `auto`, `standard`, `full`. A table column answers with a CSS grid track,
  * `16rem` or `minmax(0, 2fr)`, because the question there is not which of three
- * behaviours but exactly how wide. Same axis, and the value space a continuum,
+ * behaviors but exactly how wide. Same axis, and the value space a continuum,
  * so the registry cannot hold it and this says which components are on that
  * side of it. They are exempt from the value list and from the styled-tier rule,
  * a track being what the headless tier feeds `grid-template-columns`.
@@ -311,7 +311,7 @@ for (const family of Object.keys(UNSWEPT)) {
  * a key whose swatches are solid while the bars they key are outlined is a
  * legend that does not match its own chart. Nothing else here could see that.
  *
- * Reported rather than failed on, for the reason `check:routes` counts its
+ * Reported rather than failed on, for the reason `check:gen:routes` counts its
  * stubs: the answer to a disagreement is sometimes that the axis genuinely does
  * not apply, and failing would pressure someone into declaring an axis to
  * silence a script. A count that does not fall is visible work.

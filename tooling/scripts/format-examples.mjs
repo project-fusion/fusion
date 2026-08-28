@@ -18,7 +18,7 @@
  *
  * **Biome sorts attributes too, now that `useSortedAttributes` is on**, and this
  * has to agree with it or the two take turns undoing each other inside a single
- * `bun run check`. They did disagree, and Biome was right: see `name` below.
+ * `bun run fix`. They did disagree, and Biome was right: see `name` below.
  *
  * The closing `>` goes on its own line at the tag's indentation, so the
  * attribute block reads as a list and the tag's own name and its end line up.
@@ -39,7 +39,7 @@
  * **It rewrites open tags and nothing else.** Text, comments and closing tags
  * are copied through untouched, and an attribute value is never re-quoted.
  *
- * `bun run check` writes; `bun run check:examples` judges. Same split as
+ * `bun run fix` writes; `bun run check:prose:examples` judges. Same split as
  * `biome check --write` against `biome ci`, for the same reason: a step that
  * edits your files cannot tell you whether they were right.
  */
@@ -49,7 +49,7 @@ import { join } from 'node:path'
 const ROOTS = ['helix/styled/src', 'helix/sandbox/src']
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
-   is. `check:examples` already holds these fences to the rules about inline
+   is. `check:prose:examples` already holds these fences to the rules about inline
    styles and declared state, and left the shape of the markup alone, so the one
    place a six-attribute one-liner could survive the sweep was a code fence. One
    had. */
@@ -112,7 +112,7 @@ if (problems.length > 0) {
   console.error(
     `Examples with more than one attribute on a line (${problems.length}):\n\n  ${problems.join(
       '\n  ',
-    )}\n\nRun \`bun run check\` and commit the result.`,
+    )}\n\nRun \`bun run fix\` and commit the result.`,
   )
   process.exit(1)
 }

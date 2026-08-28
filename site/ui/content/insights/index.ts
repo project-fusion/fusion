@@ -34,7 +34,7 @@ export type Kind = 'Decision' | 'Essay' | 'Note'
  *
  * Self-hosted under `public/`, never a vendor URL. Hotlinking a stock library's
  * CDN makes it a runtime dependency of the site, which is the Sovereignty
- * Constraint applied to our own pages, and the permissive licences are the ones
+ * Constraint applied to our own pages, and the permissive licenses are the ones
  * that let you take the file rather than the link. It is also the difference
  * between two sets of terms: the Unsplash *license* asks for no attribution,
  * while their *API* requires it.
@@ -128,7 +128,7 @@ export interface Insight {
  * naming a file, two posts cannot silently take the same URL because two files
  * cannot take the same name, and retitling is editing frontmatter rather than
  * moving an address. A deliberate rename is a `git mv`, which is visible in
- * review and is where `check:routes` asks for a redirect.
+ * review and is where `check:gen:routes` asks for a redirect.
  *
  * The copy is drawn from `docs/`, which is the same rule the landing page
  * follows: the argument on the site and the argument in the plan are the same

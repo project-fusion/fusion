@@ -35,13 +35,13 @@
  *   which is the usual sign of the right one, and the collision rule below is
  *   what keeps the collapse safe.
  *
- * **A forwarded part still needs its `@csspart`,** and `check:parts` is what
+ * **A forwarded part still needs its `@csspart`,** and `check:api:parts` is what
  * asks for it: it counts an `exportparts` name as rendered, so a forward
  * without a declaration fails there rather than here. The two checks are one
  * contract read from two ends.
  *
  * **And the door has to be checked from outside, which nothing did.**
- * `check:selectors` reads `[part="x"]` inside a component's own sheet and stops
+ * `check:css:selectors` reads `[part="x"]` inside a component's own sheet and stops
  * there, so `helix-thing::part(nothing)` written from outside was unchecked in
  * every sheet, doc and page in the repository. It is the same silence as every
  * other part failure, in the one place nobody looks, and it had eight:
@@ -58,7 +58,7 @@
  * - `overriding-a-component.mdx`, the page that teaches parts, styled
  *   `helix-dialog::part(panel)`. Dialog publishes `dialog`.
  *
- * Run with `bun run check:exportparts` (also part of `bun run verify`).
+ * Run with `bun run check:api:exportparts` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

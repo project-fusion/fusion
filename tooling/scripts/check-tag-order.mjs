@@ -25,7 +25,7 @@
  * already knew the answer.
  *
  * **A docs page is generated from this order.** The manifest carries the tags
- * in source order and `bun run reference` writes them out that way, so an
+ * in source order and `bun run gen:reference` writes them out that way, so an
  * unsorted block is not untidy source, it is a published API table a reader
  * scans and does not find a part in. That is the whole argument for judging it
  * here rather than leaving it to review.
@@ -35,9 +35,9 @@
  * `@param` and `@reference`, whose order is the order of the thing they
  * describe and not alphabetical, and none of them appears beside a `@summary`.
  *
- * Run `bun run tag-order` to rewrite, and `bun run check:tag-order` to fail
+ * Run `bun run fix:tag-order` to rewrite, and `bun run check:prose:tag-order` to fail
  * when a block is left out of order. `verify` runs the check, beside
- * `check:dialect`, for the same reason and not in the pre-push hook: nothing
+ * `check:prose:dialect`, for the same reason and not in the pre-push hook: nothing
  * here is a generated file, so a stale one cannot turn a push red.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -272,7 +272,7 @@ if (problems.length > 0) {
     console.error(`  ${problem}`)
   }
   if (problems.length > 40) {
-    console.error(`\n  ...and ${problems.length - 40} more. Run \`bun run tag-order\`.`)
+    console.error(`\n  ...and ${problems.length - 40} more. Run \`bun run fix:tag-order\`.`)
   }
   process.exit(1)
 }

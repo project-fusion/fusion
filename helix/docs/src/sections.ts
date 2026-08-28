@@ -11,7 +11,7 @@
  * **A section with no pages is not declared.** A navigation entry is the
  * strongest existence claim a site can make, and the sections this library
  * intends to grow (Foundations, Components, Tooling) have nothing in them yet.
- * `bun run check:docs` fails on an empty section rather than rendering a
+ * `bun run check:gen:docs` fails on an empty section rather than rendering a
  * heading with nothing under it.
  *
  * See [`plan/23-helix-docs.md`](plan/23-helix-docs.md) for the

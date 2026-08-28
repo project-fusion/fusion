@@ -21,7 +21,7 @@
  */
 
 /**
- * Identity tag, for the editor and for `check:tokens`.
+ * Identity tag, for the editor and for `check:css:tokens`.
  *
  * The check reads `` css` ` `` templates out of `.ts` files exactly as it reads
  * whole `.css` files, so the tokens named here are held to the same rule as the
@@ -203,7 +203,7 @@ export const THEMED_PAGE_STYLES = css`
 
   /* **The call to action inverts on the band.** A solid neutral button on a
      brand fill comes out near-black, which has contrast and reads as
-     unconsidered: on a coloured band the emphatic thing is the pale one. Through
+     unconsidered: on a colored band the emphatic thing is the pale one. Through
      the two hooks Button publishes for it rather than a rule of ours reaching
      into the component, and it borrows the same pair the band already uses, so
      the button cannot disagree with the text beside it about what is legible
@@ -230,7 +230,7 @@ export const THEMED_PAGE_STYLES = css`
      before this: the header's brand sat at 76, the footer's at 100 and every
      paragraph at 272, so a page with four things on it had three left edges.
      The header and the footer paint full-bleed grounds and their *contents* do
-     not, which is the distinction the hooks exist for: \`--app-header-inset\` and
+     not, which is the distinction the hooks exist for: \`--app-header-padding\` and
      \`--app-header-max-inline-size\` are published for precisely this, so nothing
      here reaches inside a shadow root to say it. */
   .themedMinimal {
@@ -242,7 +242,7 @@ export const THEMED_PAGE_STYLES = css`
   }
 
   .themedMinimal .themedHeader {
-    --app-header-inset: var(--helix-space-2xl);
+    --app-header-padding: var(--helix-space-2xl);
     --app-header-max-inline-size: var(--themed-measure);
   }
 

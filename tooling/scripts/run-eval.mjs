@@ -13,9 +13,9 @@
  * reference cannot answer is a badly formed question, not a hard one, and it
  * would otherwise sit in the corpus penalising every real agent that met it.
  *
- * So `check:eval` runs the reference and demands 100%. That is not circular and
+ * So `check:gen:eval` runs the reference and demands 100%. That is not circular and
  * it is not a claim about any agent: it is the corpus checking itself, the same
- * way `check:reference` holds a generated file to its generator. **What it
+ * way `check:gen:reference` holds a generated file to its generator. **What it
  * catches is staleness.** A family rename invalidates forty questions at once,
  * silently, and the reference is what notices.
  *
@@ -25,7 +25,7 @@
  * pass or a fail. The responder interface below is the seam for it: one function
  * from a question to a string.
  *
- * Run with `bun run eval`, or `bun run check:eval` for the CI half.
+ * Run with `bun run eval`, or `bun run check:gen:eval` for the CI half.
  */
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -167,7 +167,7 @@ if (process.argv.includes('--check')) {
     if (wrong.length > 10) {
       console.error(`  ...and ${wrong.length - 10} more.`)
     }
-    console.error('\nRun `bun run eval:build` if an artifact moved under it.')
+    console.error('\nRun `bun run gen:eval` if an artifact moved under it.')
     process.exit(1)
   }
   console.log(

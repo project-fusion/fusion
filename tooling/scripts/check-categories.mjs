@@ -26,7 +26,7 @@
  * the headless manifest unable to say what its own components are for. Two
  * declarations that are checked against each other is the honest shape.
  *
- * Run with `bun run check:categories` (also part of `bun run verify`).
+ * Run with `bun run check:api:categories` (also part of `bun run verify`).
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -67,7 +67,7 @@ for (const family of families) {
   const headless = rootCategory(TIERS.headless, family)
   const styled = rootCategory(TIERS.styled, family)
   /* A family present on one tier only is not this check's business: the tiers
-     are deliberately not a mirror, and `check:pairings` and `check:seams` are
+     are deliberately not a mirror, and `check:css:pairings` and `check:api:seams` are
      where that question already lives. */
   if (headless === null || styled === null) {
     continue

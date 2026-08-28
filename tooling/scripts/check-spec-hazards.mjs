@@ -34,7 +34,7 @@
  * nothing, and never returns. `settle` in `@fusion.dev/helix-testing/dom` is the same
  * loop with a bound, and it names the element when it gives up.
  *
- * Run with `bun run check:spec-hazards` (also part of `bun run verify`).
+ * Run with `bun run check:spec:spec-hazards` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

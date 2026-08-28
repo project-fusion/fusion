@@ -12,7 +12,7 @@
  * into a grouping rule and into an open shadow root.
  *
  * That assumption is the whole product. A collector that silently reads nothing
- * is `check:dialect` again, green and structurally incapable of failing, which
+ * is `check:prose:dialect` again, green and structurally incapable of failing, which
  * is the failure `24-diagnostics.md` was written around. So it is asserted
  * here, in Chromium, on a page holding real Helix elements with real adopted
  * stylesheets, with deliberate faults planted and an exact expected set.
@@ -22,7 +22,7 @@
  * libraries in one step, and a module graph on `file://` is blocked by the
  * same-origin rules the bundles' own imports rely on.
  *
- * Run with `bun run check:diagnostics`, after `bun run specs`.
+ * Run with `bun run check:spec:diagnostics`, after `bun run gen:specs`.
  */
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'

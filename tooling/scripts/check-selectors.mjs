@@ -68,7 +68,7 @@
  * detection does not exist: a region that cannot know whether it was filled
  * must not draw anything that depends on it being filled.
  *
- * Run with `bun run check:selectors` (also part of `bun run verify`).
+ * Run with `bun run check:css:selectors` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, join } from 'node:path'
@@ -181,7 +181,7 @@ for (const tier of TIERS) {
       }
       /* And the parts a shared `draw…` helper writes on the component's behalf.
        *
-       * The same blind spot `check:parts` had, and it fails the opposite way,
+       * The same blind spot `check:api:parts` had, and it fails the opposite way,
        * which is why both were needed: there, five real parts read as
        * documented-and-never-rendered; here, five live stylesheet rules read as
        * matching nothing. Two checks disagreeing with the code in opposite
@@ -463,11 +463,11 @@ for (const tier of TIERS) {
  * hole this rule fell into first. Harvesting `part="x"` without excluding the
  * bracket let a lookup satisfy itself: the very selector being checked was
  * counted as evidence that the part exists, so this rule passed on a name
- * nothing rendered. It is the same shape as `check:parts` counting a JSDoc that
+ * nothing rendered. It is the same shape as `check:api:parts` counting a JSDoc that
  * quotes markup, and it was live across 53 files. Once fixed it found one:
  * `command` documented `search-field` after that name stopped being forwarded,
  * and the `querySelector('[part="search-field"]')` three hundred lines away had
- * been holding `check:parts` green over it.
+ * been holding `check:api:parts` green over it.
  */
 const OWNS_PARTS = (tier) => tier !== 'helix/core/src'
 

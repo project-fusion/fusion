@@ -26,7 +26,7 @@
  * An `expect(markup).toBe` comparison of the whole string is left alone: it is
  * not a substring search and would fail loudly rather than quietly.
  *
- * Run with `bun run check:specs` (also part of `bun run verify`).
+ * Run with `bun run check:spec:specs` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

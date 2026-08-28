@@ -25,14 +25,14 @@
  * **The relative `@import`s in `all.css` survive because the whole set lands
  * side by side.** `dist/all.css` importing `./tokens.css` finds `dist/tokens.css`.
  *
- * Run with `bun run styles:dist`, which `@fusion.dev/helix-styles`' `build` calls.
+ * Run with `bun run gen:styles-dist`, which `@fusion.dev/helix-styles`' `build` calls.
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /* Resolved from this file rather than from the working directory, because
    turbo runs a package's `build` with the package as its cwd and a contributor
-   runs `bun run styles:dist` from the root. */
+   runs `bun run gen:styles-dist` from the root. */
 const ROOT = join(import.meta.dirname, '../..')
 const SOURCE = join(ROOT, 'helix/styles/src')
 const OUT = join(ROOT, 'helix/styles/dist')

@@ -68,7 +68,7 @@
  * unstyled, silent, and passing every other check. One line, `static override
  * tier = 'helix-'`, and it is held to it here.
  *
- * Run with `bun run check:composed` (also part of `bun run verify`).
+ * Run with `bun run check:api:composed` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -247,7 +247,7 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-/* **The number is why `check:floors` can see this check at all.** It read
+/* **The number is why `check:spec:floors` can see this check at all.** It read
    integers out of a success line and skipped a line that has none, so this one
    was silently exempt from the thing floors exists to catch: a check that has
    quietly stopped checking. `checked` is a tally of *assertions*, one per tag

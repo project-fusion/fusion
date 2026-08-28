@@ -38,7 +38,7 @@
  * how a reader follows it, and only for targets that look like a repository
  * file: anything with a scheme, an anchor alone, or a bare word is left alone.
  *
- * Run with `bun run check:references` (also part of `bun run verify`).
+ * Run with `bun run check:prose:references` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'

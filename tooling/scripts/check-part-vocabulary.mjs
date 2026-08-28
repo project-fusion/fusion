@@ -2,7 +2,7 @@
 /**
  * Holds the words that name a *role* to one spelling each.
  *
- * **This is `check:axes` one stage later and on a bigger surface.** That check
+ * **This is `check:css:axes` one stage later and on a bigger surface.** That check
  * was written because `appearance` had become one word for four questions; this
  * one is written because the reverse happened to parts. Counted across both
  * tiers, 204 part names serve 92 families, and nine of those words meant "the
@@ -24,11 +24,11 @@
  * are here; everything else is the escape hatch, the way `variant` is on the
  * axes.
  *
- * **The sandbox is out of scope**, on the same grounds `check:parts` gives for
+ * **The sandbox is out of scope**, on the same grounds `check:api:parts` gives for
  * not requiring it to document parts at all: its internals are not API and
  * nobody reskins a dev tool.
  *
- * Run with `bun run check:vocabulary` (also part of `bun run verify`).
+ * Run with `bun run check:api:vocabulary` (also part of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
 import { TIERS, walk, withoutComments } from './lib/compositions.mjs'
@@ -79,7 +79,7 @@ const REFUSED = {
 /**
  * Words doing something the registry has no word for, each with what it is.
  *
- * Same contract as `check:axes`'s `UNSWEPT`: this names the work rather than
+ * Same contract as `check:css:axes`'s `UNSWEPT`: this names the work rather than
  * blocking on it, and an entry nothing renders is deleted rather than kept.
  *
  * `body` looks like a synonym of `content` and is not, which is why it is here

@@ -29,7 +29,7 @@
      site one navigation away. */
   --site-inset: var(--helix-space-2xl);
 
-  /* Both rails the same width, which is what centres the column between them.
+  /* Both rails the same width, which is what centers the column between them.
      They were 15 and 13, so the middle track was two rem off center and the
      prose inside it inherited the error. Equal is not a coincidence to be
      maintained by hand: it is one number used twice. */
@@ -304,7 +304,7 @@
 /* Through the component's own hook, not a rule of ours. `.apiReference
    helix-icon { block-size }` is a document rule, which beats a shadow one
    whatever the specificity and whatever the layer, so it would have killed
-   `icon-root.css` rather than adjusted it. `check:overruled` said so. */
+   `icon-root.css` rather than adjusted it. `check:css:overruled` said so. */
 .apiReference {
   --icon-size: 1em;
 }
@@ -349,7 +349,7 @@
   overflow-wrap: normal;
 }
 
-/* And the type beside it, coloured by what each part of it is. The tokens are
+/* And the type beside it, colored by what each part of it is. The tokens are
    the library's own, so a type on this page is the color the same word takes
    in the sandbox's editor. */
 /* A type wraps rather than scrolls.
@@ -364,7 +364,7 @@
  * while there was still room to put them on the next line whole. */
 /* A default value, which is code and is not a union.
  *
- * It shares the type column's colours and none of its wrapping rules: a literal
+ * It shares the type column's colors and none of its wrapping rules: a literal
  * has no members to hold together, and holding it together anyway is what made
  * `"Show password"` overflow an 83px cell and print itself over the description.
  * `anywhere` rather than `break-word`, because only `anywhere` lowers the
@@ -417,7 +417,7 @@
      also what keeps a bar with its member, since a margin is not a break
      opportunity and a space would be.
      `2xs` on both sides. It was `0.35em`, which scales with the code type and
-     which `check:tokens` refused, correctly: the type column is one size, so
+     which `check:css:tokens` refused, correctly: the type column is one size, so
      there is nothing for an em to track that a token does not. */
   margin-inline: var(--helix-space-2xs);
   opacity: 0.6;

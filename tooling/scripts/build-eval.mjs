@@ -15,14 +15,14 @@
  * stale the first time a family is renamed and nothing says so, which is the
  * exact failure the documentation read of 24 Aug 2026 found nine of. Every
  * question here is derived from the manifest, the token set or the example
- * index, so a rename either updates a question or fails `check:eval`.
+ * index, so a rename either updates a question or fails `check:gen:eval`.
  *
  * **What it deliberately does not contain is a question about prose.** "Explain
  * why raised goes down the ramp" has no machine-comparable answer, and a corpus
  * that mixed those in would have a score nobody could act on. The four kinds
  * below all have exactly one right answer that a current artifact states.
  *
- * Run with `bun run eval:build`; `check:eval` holds the result.
+ * Run with `bun run gen:eval`; `check:gen:eval` holds the result.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -43,7 +43,7 @@ const OUT = join(ROOT, 'tooling', 'eval', 'questions.json')
  * That is the one failure a self-checking corpus cannot see, so it is guarded
  * from outside rather than by agreement: every family named in the corpus has to
  * be a directory under `helix/styled/src` with an `index.ts`, which is the same test
- * `check:examples` uses to decide what a family is.
+ * `check:prose:examples` uses to decide what a family is.
  */
 const familyOf = (declaration) => declaration.modulePath?.split('/').at(-3) ?? declaration.tagName
 
@@ -86,7 +86,7 @@ const tokens = () =>
  * question worth asking is not "is `--nonsense` a token" but "is
  * `--helix-color-border-subtle` a token", which is the shape an agent produces
  * when it is pattern-matching instead of reading. That exact name was written
- * into a stylesheet during this session and `check:tokens` caught it, which is
+ * into a stylesheet during this session and `check:css:tokens` caught it, which is
  * where the mutation list comes from.
  */
 const plausible = (name, real) => {
@@ -204,7 +204,7 @@ const sources = ['helix/styled/custom-elements.json', 'helix/styles/tokens.json'
    from a path, and a wrong derivation shared by the generator and the reference
    scores a perfect hundred while every answer is wrong: that happened, and
    `item` was the answer to twelve questions. So the names are held against the
-   directories, which is the same test `check:examples` uses. */
+   directories, which is the same test `check:prose:examples` uses. */
 const directories = new Set(
   readdirSync(join(ROOT, 'helix', 'styled', 'src'), { withFileTypes: true })
     .filter(
@@ -230,7 +230,7 @@ if (invented.length > 0) {
 }
 
 const corpus = {
-  /* Counted here rather than derived by a reader, and asserted by `check:eval`:
+  /* Counted here rather than derived by a reader, and asserted by `check:gen:eval`:
      a corpus that shrinks because a generator stopped finding something is the
      failure this number catches. */
   counts: Object.fromEntries(
@@ -249,7 +249,7 @@ if (process.argv.includes('--check')) {
   const found = existsSync(OUT) ? readFileSync(OUT, 'utf8') : ''
   if (found !== wanted) {
     console.error(
-      'tooling/eval/questions.json is behind the artifacts it is generated from. Run `bun run eval:build` and commit the result.',
+      'tooling/eval/questions.json is behind the artifacts it is generated from. Run `bun run gen:eval` and commit the result.',
     )
     process.exit(1)
   }

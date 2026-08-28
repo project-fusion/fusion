@@ -27,7 +27,7 @@
  * end with the muted gray and puts the on-accent ink on it, deliberately and
  * with the measurement in its comment, and the model had no idea.
  *
- * Run with `bun run check:pairings` (also part of `bun run verify`).
+ * Run with `bun run check:css:pairings` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

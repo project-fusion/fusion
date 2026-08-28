@@ -41,6 +41,10 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  */
 const DEDICATED = new Set([
   'biome ci .',
+  /* Runs every other check itself, so a shard drawing it runs the whole suite
+     serially and becomes the critical path for a workflow that split six ways
+     to avoid exactly that. */
+  'bun run check:spec:floors',
   'bun run rs:check',
   'bun run rs:test',
   'bun run test',
@@ -53,7 +57,7 @@ const DEDICATED = new Set([
  * **`build` is here because `catalog` does not reach everything.** `catalog` is
  * a `site/ui` task and turbo builds what that package depends on, which is not
  * the whole workspace: `@fusion.dev/helix-headless` is not one of its dependencies, and
- * `check:metrics` measures `helix/headless/dist`. Shards without a full build
+ * `check:gen:metrics` measures `helix/headless/dist`. Shards without a full build
  * measured a dist nobody had produced, which passed on a machine where an
  * earlier build had left one and failed on a runner. That is the same fault
  * 273 fixed in three package scripts, arriving once more through turbo's graph
@@ -63,7 +67,7 @@ const DEDICATED = new Set([
  * Without one every shard pays the build, which is why the remote cache is a
  * precondition for this split rather than a refinement of it.
  */
-const PREREQUISITES = ['bun run build', 'bun run analyze', 'bun run catalog']
+const PREREQUISITES = ['bun run build', 'bun run analyze', 'bun run gen:catalog']
 
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
@@ -102,9 +106,9 @@ if (!Number.isInteger(shard) || !Number.isInteger(of) || of < 1) {
   process.exit(1)
 }
 
-/* Striped rather than blocked, so a run of expensive neighbours cannot land in
-   one shard. `check:contrast` renders every example in a browser and
-   `check:node` reads one file, and nothing here knows which is which. */
+/* Striped rather than blocked, so a run of expensive neighbors cannot land in
+   one shard. `check:css:contrast` renders every example in a browser and
+   `check:pkg:node` reads one file, and nothing here knows which is which. */
 const mine = checks.filter((_, index) => index % of === shard)
 
 const run = (step) => {

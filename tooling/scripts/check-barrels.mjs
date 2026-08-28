@@ -10,7 +10,7 @@
  * '@fusion.dev/helix-headless'` retains all 83 families whether or not one of them is
  * reachable.
  *
- * Measured before this check existed, by `bun run metrics`: 82 of the 88 styled
+ * Measured before this check existed, by `bun run gen:metrics`: 82 of the 88 styled
  * families imported the headless barrel, and `@fusion.dev/helix/button` came to
  * 449,026 raw bytes, 115,590 gzipped, against 41,587 and 14,149 after the same
  * import went deep. The whole styled tier is 1.4MB, so one button was 29
@@ -26,7 +26,7 @@
  * bundle, so they cost a consumer nothing, but a spec is where the next person
  * copies an import from.
  *
- * Run with `bun run check:barrels`.
+ * Run with `bun run check:api:barrels`.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

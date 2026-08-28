@@ -38,7 +38,7 @@
  * wearing a theme. The classification is a judgment, so it lives in the audit
  * and in `plan/22-theming.md` rather than in a regexp here.
  *
- * Run with `bun run check:separation` (also part of `bun run verify`).
+ * Run with `bun run check:css:separation` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -67,8 +67,8 @@ walk(SOURCE)
 
 /* Comments carry these names too: every converted stylesheet explains the
    policy above the rule, and a scan that does not blank them reports the
-   documentation as a half-converted surface. The same trap `check:composed`,
-   `check:seams` and `check:grounds` each record hitting. */
+   documentation as a half-converted surface. The same trap `check:api:composed`,
+   `check:api:seams` and `check:css:grounds` each record hitting. */
 const uncommented = (source) => source.replace(/\/\*[\s\S]*?\*\//g, ' ')
 
 const problems = []

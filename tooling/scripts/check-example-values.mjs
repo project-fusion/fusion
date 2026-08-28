@@ -15,7 +15,7 @@
  * component offers and count the differences. That is a reference site teaching
  * an API that does not exist.
  *
- * `check:attributes` is a different question, whether a *document rule* selects
+ * `check:api:attributes` is a different question, whether a *document rule* selects
  * on something a component reflects. This one is about the markup in the
  * examples, and it reads the manifest rather than a list kept here: the union in
  * `custom-elements.json` is what the component's own type says, so this cannot

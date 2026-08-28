@@ -49,7 +49,7 @@
  * the slider's own `mask-image` already did. A hook makes the guess correctable;
  * geometry makes it unnecessary. No script can tell which a given mark wants.
  *
- * Run with `bun run check:grounds` (also part of `bun run verify`).
+ * Run with `bun run check:css:grounds` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

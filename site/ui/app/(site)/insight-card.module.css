@@ -19,7 +19,7 @@
  * `align-content` on the host directly, and that is a document rule overruling a
  * shadow one: it worked only because the card set nothing there, and the day the
  * card packed its own regions at the start the two collided and the component's
- * value was the dead one. `check:overruled` reported it the same hour. The note
+ * value was the dead one. `check:css:overruled` reported it the same hour. The note
  * this replaces said there was no custom property for it and that inventing one
  * here would name something the component never reads, which was true and is the
  * argument for the component publishing one rather than for reaching past it. */
@@ -61,7 +61,7 @@
   /* **Through the component's hook, not past it.** `backdrop-filter` written
      here is a document rule on a shadow host, which wins whatever the
      specificity and whatever the layer, so the card's own `material` handling
-     stops meaning anything and `check:overruled` says so. `--card-backdrop` is
+     stops meaning anything and `check:css:overruled` says so. `--card-backdrop` is
      the hook `Card` publishes for this, and setting it leaves the component in
      charge of when the blur applies. */
   --card-backdrop: blur(40px) saturate(1.5);

@@ -7,7 +7,7 @@
  * tidily and buries `name` under `devDependencies`, which is the one field
  * anyone opening the file is looking for.
  *
- * Run with `bun run order` (also part of `bun run check`).
+ * Run with `bun run fix:order` (also part of `bun run fix`).
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -83,10 +83,40 @@ const orderExports = (node) => {
   return ordered
 }
 
+/**
+ * Script names, alphabetized case-insensitively.
+ *
+ * **`scripts` was pinned in `PRIORITY` and never sorted inside**, so its keys
+ * were alphabetical only because they had been typed that way, and any edit
+ * that added or renamed one left the order to insertion. Renaming the 77
+ * checks to `check:<group>:<name>` on 28 Aug 2026 put every one of them back
+ * in the order of the name it used to have, which reads as alphabetical right
+ * up to the point where it is not.
+ *
+ * Case-insensitive because that is what the rule in `CLAUDE.md` says and what
+ * `localeCompare` does not do on its own: `Z` sorts before `a` by code point,
+ * and a manifest is read by people.
+ *
+ * Keys only. A script's *value* is a pipeline whose order is the whole meaning
+ * of it, and nothing here touches one.
+ */
+const orderScripts = (scripts) => {
+  const ordered = {}
+  for (const key of Object.keys(scripts).sort((a, b) =>
+    a.toLowerCase().localeCompare(b.toLowerCase()),
+  )) {
+    ordered[key] = scripts[key]
+  }
+  return ordered
+}
+
 const order = (pkg) => {
   const ordered = sortByList(pkg, PRIORITY)
   if (ordered.exports) {
     ordered.exports = orderExports(ordered.exports)
+  }
+  if (ordered.scripts) {
+    ordered.scripts = orderScripts(ordered.scripts)
   }
   return ordered
 }

@@ -24,7 +24,7 @@
  * section: all of them fail the build, so the committed file is only ever a
  * valid one.
  *
- * Run with `bun run docs`, or `bun run check:docs` for the check.
+ * Run with `bun run gen:docs`, or `bun run check:gen:docs` for the check.
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -63,7 +63,7 @@ const OPEN = /^\[\/\/\]: # \(tokens:([a-z-]+)\)$/
  * A Foundations page showing `var(--_helix-scale-2)` is showing a reader the one
  * layer they are told never to touch, and telling them nothing: the point of the
  * table is what the token is worth. Resolved, `--helix-space-xs` reads as a
- * length and `--helix-color-background` as the two colours it actually is.
+ * length and `--helix-color-background` as the two colors it actually is.
  */
 const resolve = (value, primitives, depth = 0) => {
   if (depth > 6) {
@@ -297,7 +297,7 @@ for (const slug of slugs) {
    * something that does not exist.
    *
    * `--helix-seed-*` is exempt because `derive()` emits it at runtime and it
-   * appears in no stylesheet, which is the same split `check:seeds` exists for.
+   * appears in no stylesheet, which is the same split `check:css:seeds` exists for.
    * A trailing hyphen is a wildcard a sentence wrote, as in
    * `--helix-color-series-*`. */
   for (const [, named] of source.matchAll(/(--helix-[a-z0-9-]+)/g)) {
@@ -444,7 +444,7 @@ const literal = (page) =>
 
 const generated = `/**
  * Every page this package documents, derived from the frontmatter of each MDX
- * file by \`bun run docs\`. Do not edit: \`bun run check:docs\` fails when this
+ * file by \`bun run gen:docs\`. Do not edit: \`bun run check:gen:docs\` fails when this
  * file and the content disagree, and the content is the source.
  */
 import type { DocPage } from './registry.js'
@@ -472,8 +472,8 @@ if (!check && refilled.length > 0) {
 }
 
 const sources = `/**
- * Every page's MDX, inlined by \`bun run docs\`. Do not edit: the files in
- * \`content/\` are the source, and \`bun run check:docs\` fails when this module
+ * Every page's MDX, inlined by \`bun run gen:docs\`. Do not edit: the files in
+ * \`content/\` are the source, and \`bun run check:gen:docs\` fails when this module
  * and they disagree.
  */
 export const docSources: Record<string, string> = {
@@ -493,14 +493,16 @@ ${slugs
 if (check) {
   const existing = readFileSync(OUT, 'utf8')
   if (refilled.length > 0) {
-    console.error(`docs: a token table is stale in ${refilled.join(', ')}. Run \`bun run docs\``)
+    console.error(
+      `docs: a token table is stale in ${refilled.join(', ')}. Run \`bun run gen:docs\``,
+    )
     process.exit(1)
   }
   if (
     existing !== formatted(generated, 'pages.generated.ts') ||
     readFileSync(SOURCES, 'utf8') !== formatted(sources, 'sources.generated.ts')
   ) {
-    console.error('docs: pages.generated.ts is stale. Run `bun run docs`')
+    console.error('docs: pages.generated.ts is stale. Run `bun run gen:docs`')
     process.exit(1)
   }
   console.log(

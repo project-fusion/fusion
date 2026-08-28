@@ -64,7 +64,7 @@ undefined there.
 - Class `Helix<Family><Part>` extending the base, tag `helix-<family>-<part>`.
 - Presentation only, and the properties are the visual axes: `emphasis`,
   `material`, `separation`, `tone`. **`appearance` is refused outright** by
-  `check:axes` and is not a word this library uses; `dense` is not one either,
+  `check:css:axes` and is not a word this library uses; `dense` is not one either,
   since size comes from `data-density` on the region.
 - Styles in the `.css` file, imported as `./​<family>-<part>.css.js`:
 
@@ -102,7 +102,7 @@ expect(scope.getElementById(element.getAttribute('aria-labelledby'))).toBe(title
 ## 6. Verify
 
 ```bash
-bun run check && bun run verify
+bun run fix && bun run verify
 ```
 
 `build` runs `styles` and `analyze`, and `analyze` is what regenerates the

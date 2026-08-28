@@ -75,7 +75,7 @@
   color: var(--helix-color-foreground);
 }
 
-/* Named one selector at a time, for the reason `check:motion` exists: a reduce
+/* Named one selector at a time, for the reason `check:css:motion` exists: a reduce
    rule written looser than the rule it answers loses on specificity. */
 @media (prefers-reduced-motion: reduce) {
   .docsJump {
@@ -96,7 +96,7 @@
 }
 
 .workbenchHeader {
-  --app-header-inset: var(--helix-space-md);
+  --app-header-padding: var(--helix-space-md);
   --app-header-max-inline-size: none;
 
   border-block-end-color: var(--helix-color-border);
@@ -201,10 +201,10 @@
 /* **The drawer's top padding is `2xl` by default where its sides are `lg`**, which
    is the room a title needs and this one has none: the label is the accessible
    name and nothing draws it, so the gap sat above the filter as empty chrome.
-   `--drawer-inset-block-start` is the hook the component documents for exactly
+   `--drawer-padding-block-start` is the hook the component documents for exactly
    this, its own comment saying the site is what sets it. */
 .examplesDrawerHost {
-  --drawer-inset-block-start: var(--helix-space-lg);
+  --drawer-padding-block-start: var(--helix-space-lg);
 }
 
 .examplesDrawer {
@@ -290,7 +290,7 @@
 
 /* The row reveals it, and only `opacity` is keyed there.
  *
- * **A document rule reaching in from `helix-tree-item` is one `check:overruled`
+ * **A document rule reaching in from `helix-tree-item` is one `check:css:overruled`
  * fails on, and it is right to**: it wins whatever the specificity and whatever
  * the layer, so a property the component sets there is dead. `color` was, which
  * is why an earlier version of this rule had to go. `opacity` is not set

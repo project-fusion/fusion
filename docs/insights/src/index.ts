@@ -16,7 +16,7 @@
  * what lets `/thesis.md` be the source served verbatim rather than a
  * serialization of something else. A component with children could be added and
  * would still degrade; a childless one would leave a hole, which is what
- * `check:docs` refuses in the two documentation packages and what this package
+ * `check:gen:docs` refuses in the two documentation packages and what this package
  * should inherit when it grows one.
  *
  * Shaped like `@fusion.dev/helix-docs` and `@fusion.dev/cortex-docs` deliberately, so a third

@@ -99,7 +99,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           and the insights and nothing else, so all 43 documentation pages were
           unreachable from the palette: a reader who typed "installation" got
           nothing, on a site whose largest section is documentation. The
-          registry already knew about them, `check:routes` counting 89
+          registry already knew about them, `check:gen:routes` counting 89
           component, 43 doc, 6 insight and 15 page, and it is the same list the
           sitemap and `llms.txt` are built from. A fourth copy of it here would
           have drifted the same way the third one did.

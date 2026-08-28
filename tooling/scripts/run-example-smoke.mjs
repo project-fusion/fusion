@@ -2,7 +2,7 @@
 /**
  * Renders every example in a real browser and reports anything that broke.
  *
- * `check:examples` reads them: it knows an attribute a component does not
+ * `check:prose:examples` reads them: it knows an attribute a component does not
  * declare, a slot nothing offers, an inline style. What it cannot know is
  * whether the example *works*, because the only way to find that out is to run
  * it. Nothing did. An example could throw on upgrade, name an element that is
@@ -24,7 +24,7 @@
  * second harness that rendered examples its own way would be checking a
  * relationship nobody has.
  *
- * Run with `bun run smoke`, after `bun run frame`.
+ * Run with `bun run smoke`, after `bun run gen:frame`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
@@ -112,7 +112,7 @@ const NETWORK = /Failed to load resource/
  * milliseconds. It is here so that the day something does interact, or an
  * example self-drives, the trap is already covered rather than needing to be
  * remembered. Do not read a green smoke run as saying the examples are all
- * correctly wired: that is what `check:examples` and a reader's console say. */
+ * correctly wired: that is what `check:prose:examples` and a reader's console say. */
 const AUDIT = /is controlled: `/
 
 page.on('console', (message) => {

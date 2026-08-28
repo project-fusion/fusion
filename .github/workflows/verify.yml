@@ -115,6 +115,35 @@ jobs:
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
+  # **Its own job because it runs every other check.** In the shard pool it made
+  # whichever shard drew it run the whole suite serially, so a six-way split had
+  # a single shard doing all of it and finished no sooner than that shard did.
+  #
+  # Same prerequisites as a shard, for the same reason: the checks it runs read
+  # what `build` and `analyze` write.
+  floors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.20.0'
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+
+      - run: bun run check:spec:floors
+
+      - name: The tree is unchanged by verifying it
+        run: git diff --exit-code
+
   # Its own job because it reads every file regardless of who owns it, so
   # sharding it would mean six passes over the same tree.
   lint:
@@ -214,7 +243,7 @@ jobs:
     # `playwright install`. It never once finished: three runs, three
     # `cancelled` conclusions, which report as neither pass nor fail and read  # dialect:quoted, GitHub spells this conclusion value so
     # in the summary as a job that simply did not object. That is the fault
-    # `check:floors` exists to catch, one level up, in the workflow rather than
+    # `check:spec:floors` exists to catch, one level up, in the workflow rather than
     # in the script.
     timeout-minutes: 45
     strategy:
@@ -227,11 +256,11 @@ jobs:
           # above them or the page, and only a laid-out document knows. Both
           # color modes, because the half not on screen is the half that fails.
           - task: contrast
-            run: bun run check:contrast
+            run: bun run check:css:contrast
           # The specs themselves.
           - task: specs
             run: bun run specs:browser
-          # Every example, rendered. `check:examples` reads them and can tell
+          # Every example, rendered. `check:prose:examples` reads them and can tell
           # you an attribute no component declares; only running one can tell
           # you it throws on upgrade, names an element registered nowhere, or
           # lays out to nothing.
@@ -246,11 +275,11 @@ jobs:
           # crosses platforms, so on a contributor's Mac it says so and exits
           # clean. See 148.
           - task: visual
-            run: bun run check:visual
+            run: bun run check:spec:visual
           # Every example rendered twice, from its HTML and from its TSX, and
           # the two compared. Both are authored now, neither derived from the
           # other, which is the right arrangement and costs exactly one thing:
-          # nothing else notices them drifting. `check:examples-paired` holds
+          # nothing else notices them drifting. `check:prose:examples-paired` holds
           # the two files to each other; only a picture can hold the two
           # renders.
           #
@@ -269,7 +298,7 @@ jobs:
             # verdict: a subset that reports like a full pass is the failure
             # this whole check exists to prevent.
             run: >-
-              bun run check:visual-parity --changed
+              bun run check:spec:visual-parity --changed
               "${{ github.event_name == 'pull_request'
               && github.event.pull_request.base.sha
               || github.event.before }}"
@@ -281,7 +310,7 @@ jobs:
           # assumption, that CSSOM hands back what it reads, is asserted nowhere
           # else.
           - task: diagnostics
-            run: bun run check:diagnostics
+            run: bun run check:spec:diagnostics
     steps:
       # **Full history, because `parity` scopes itself by diffing against the
       # base and a depth-1 checkout has nothing to diff against.** The script
@@ -323,7 +352,7 @@ jobs:
         run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
-      # `check:visual` marks the changed pixels into `preview.diff.png` beside
+      # `check:spec:visual` marks the changed pixels into `preview.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
@@ -368,7 +397,7 @@ jobs:
   # what fails it.
   verify:
     if: always()
-    needs: [plan, checks, lint, types, tests, browser]
+    needs: [plan, checks, floors, lint, types, tests, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

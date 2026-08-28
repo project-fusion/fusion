@@ -4,7 +4,7 @@ import { ENGAGEMENT, ENGAGEMENT_COPY } from '@/content/landing/helix-landing'
 /**
  * Everything the landing page says, as data.
  *
- * The page renders it as bands of Helix markup; `bun run catalog` renders the
+ * The page renders it as bands of Helix markup; `bun run gen:catalog` renders the
  * same object as `/index.md`. Neither is the source: this is, and that is the
  * whole point. The `.md` used to be a stub saying "this page renders from a
  * typed module", which was honest and useless.

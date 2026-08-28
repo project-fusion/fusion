@@ -36,25 +36,53 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 | Command | Does |
 |---|---|
 | `bun run verify` | Everything. Must pass before anything is called done |
-| `bun run check` | Fixes what it can: ordering, formatting, tokens |
+| `bun run check` | Every guard, and nothing else. `check:<group>` for one group |
+| `bun run fix` | Fixes what it can: ordering, formatting, tokens |
 | `bun run regen` | Every generated file, in the one order that works |
 | `bun run build` | Compiles TS. Runs `styles` and `analyze` first |
 | `bun run analyze` | Regenerates custom-elements manifests |
 | `cargo test --workspace` | Rust |
 
 **`verify` never writes.** It runs `biome ci`, not `biome check --write`. A step
-that edits your files cannot tell you whether they were correct. `check` fixes;
-`verify` judges.
+that edits your files cannot tell you whether they were correct. `fix` writes;
+`check` and `verify` judge.
+
+**A name runs a leaf or everything under it, and never both.** `check:css:tokens`
+is one guard, `check:css` is the twenty in that group, `check` is all 77. The
+groups are `api`, `css`, `gen`, `pkg`, `prose` and `spec`, and they sort by what
+a guard reads rather than by what kind of fault it catches, because the useful
+question after an edit is "what covers the thing I just touched" and never "run
+me every consistency check".
+
+**`check` used to be the fixer**, which is why `fix` exists and why this table
+has an extra row. A flat `check:*` namespace of 77 entries had no way to run a
+subset and no way to run the whole set short of `verify`, which also compiles,
+tests and runs two cargo passes.
 
 **`regen` exists because the order is not obvious and getting it wrong is a red
-build.** Twelve generators have a `check:` that judges them, and several read
-what an earlier one wrote: `reference` and `element-events` read the manifests
-`analyze` produces, `tokens` reads what `tokens:build` emits, `metrics` measures
-the built packages, and `content` and `catalog` read the pages `docs` filled.
-Run out of order they each succeed and disagree with each other, and the failure
-surfaces in CI as *"the tree is unchanged by verifying it"*, which names none of
-them. The order was carried in a conversation until it was got wrong twice in one
-night; it is a script now.
+build.** Eleven generators have a `check:gen:` that judges them, and several read
+what an earlier one wrote: `gen:reference` and `gen:element-events` read the
+manifests `analyze` produces, `gen:tokens-reference` reads what
+`gen:tokens-layer` emits, `gen:metrics` measures the built packages, and
+`gen:content` and `gen:catalog` read the pages `gen:docs` filled. Run out of
+order they each succeed and disagree with each other, and the failure surfaces in
+CI as *"the tree is unchanged by verifying it"*, which names none of them. The
+order was carried in a conversation until it was got wrong twice in one night; it
+is a script now.
+
+**So `gen` is the one family with no runner, and that is deliberate.** Everywhere
+else a bare name runs everything beneath it, which is safe because the members
+are independent. These are not: a `gen` assembled from its own members would run
+them in whatever order they sorted in, and the failure it produced would be the
+exact one the paragraph above is about, under a name promising the opposite.
+`regen` is the hand-written order and `gen:*` are its members.
+
+**A writer and its judge share a name.** `gen:reference` writes what
+`check:gen:reference` reads. That pairing was kept by hand and lost twice,
+`element-events` and `themed-page` each landing in one list and not the other,
+and a third time in `catalog`, which is regenerated and has no judge at all.
+Three of them did not even share a word before this: `check:gen:eval` judged
+`eval:build`, and `eval` was a different command that ran the corpus.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
 push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`
@@ -64,11 +92,17 @@ exists.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `docs/token-reference.md is behind helix/styles/tokens.json` is a red
-build that stays red until somebody runs `bun run tokens` and pushes again, so
-`.githooks/pre-push` runs `biome ci` and the seven staleness checks and nothing
-else: 8 seconds against ten minutes. It judges and never writes, because a hook
-that edits the tree during `git push` produces a push that does not contain the
-edits. `git push --no-verify` skips it.
+build that stays red until somebody runs `bun run gen:tokens-reference` and
+pushes again, so `.githooks/pre-push` runs `biome ci`, `check:css:reachable` and
+the twelve
+generated-file checks and nothing else: 9 seconds against ten minutes. It judges
+and never writes, because a hook that edits the tree during `git push` produces
+a push that does not contain the edits. `git push --no-verify` skips it.
+
+**The count is load-bearing and this sentence has been wrong before.** It said
+seven while the loop held eleven, because the loop grows whenever a generator
+does and the prose does not. The loop is the authority; if they disagree again,
+the loop is right.
 
 Installed by `git config core.hooksPath .githooks`, which the `prepare` script
 runs on `bun install`. No hook manager: husky and lefthook would each be a
@@ -108,7 +142,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
   cannot load a `.ts` config, falls back to a default one, and writes a manifest
   with every Helix plugin missing while reporting success: measured on 18.16, a
   manifest 69,081 lines shorter. `engines.node` states the floor,
-  `bun run check:node` enforces it, and CI pins it.
+  `bun run check:pkg:node` enforces it, and CI pins it.
 
 ## Layout
 
@@ -133,7 +167,7 @@ tooling/   CI and build scripts
   `src/` until 26 Aug 2026, where they sorted among ninety families and read like
   two more, which is the only thing that was wrong with them.
 
-  **The bar is a file more than one family imports**, and `check:hooks` holds it:
+  **The bar is a file more than one family imports**, and `check:css:hooks` holds it:
   a sheet in there with one reader belongs inside that reader, and every folder
   under `shared/` is discovered rather than listed. That rule is separate from the
   naming exemption which lets `--chart-*` not be named after the family reading
@@ -184,7 +218,7 @@ workspace is about to hold two. This said "split it when Helix gains a Rust
 crate" until the split was done ahead of that crate, which is the right order:
 `release.yml` computes `helix` and `cortex` from separate tags, so a shared
 field would take two numbers and keep whichever stamped last. Three identical
-lines today is what lets them differ tomorrow, and `check:publishable` fails
+lines today is what lets them differ tomorrow, and `check:pkg:publishable` fails
 both on a crate taking `version.workspace = true` and on `[workspace.package]`
 declaring a version at all.
 
@@ -204,7 +238,7 @@ There is no private mode: a private Cargo release needs an alternate registry,
 declared as `publish = ["name"]`. Until there is a consumer worth standing one
 up for, `publish = false` is the honest setting, and anything needing a crate
 takes it as a git dependency pinned to the `cortex-v*` tag the release already
-pushes. `check:publishable` holds `publish` and `release.yml` to each other in
+pushes. `check:pkg:publishable` holds `publish` and `release.yml` to each other in
 both directions, so the day the flag changes is the day the workflow has to.
 
 ## Naming
@@ -224,7 +258,7 @@ both directions, so the day the flag changes is the day the workflow has to.
   both build tooling for this repository. Naming them `@fusion.dev/*` to say
   "does not publish" would file Helix-specific tooling beside the repository
   root and the site, and claim they are general Fusion tooling, which is the one
-  thing they are not. `bun run check:publishable` enforces the rest:
+  thing they are not. `bun run check:pkg:publishable` enforces the rest:
   `@fusion.dev/*` is always private, a published package may never depend on an
   unpublished one, and every published package agrees on visibility.
 - **CLI binaries drop `-cli`**: the crate `cortex-cli` ships `cortex`.
@@ -242,12 +276,12 @@ both directions, so the day the flag changes is the day the workflow has to.
 - **No em dashes** in code, docs, comments, or copy. Use periods, colons,
   commas, or parentheses.
 - **American spelling** everywhere, comments and prose alike, held by
-  `check:dialect`. It is checked rather than asked for because it was asked for
+  `check:prose:dialect`. It is checked rather than asked for because it was asked for
   once and did not survive: a sweep on 19 Aug 2026 took it from 658 occurrences
   to 239, and four days later it was 1,685 across 386 files. An unwritten
   convention is learned from the corpus, so prose in the wrong dialect teaches
   the next contributor to write it, which is why comments are in scope and not
-  only copy. `bun run dialect` rewrites; `check:dialect` judges.
+  only copy. `bun run fix:dialect` rewrites; `check:prose:dialect` judges.
 - **Alphabetize** object keys, interface members, and exported types
   (case-insensitive). Skip where order is semantic: positional arguments,
   middleware chains, CSS box-side shorthand, export conditions.
@@ -261,7 +295,7 @@ both directions, so the day the flag changes is the day the workflow has to.
 ### package.json key order
 
 Identity first (`name`, `description`, `version`), then consumption fields, then
-`scripts`, then alphabetical. `bun run order` applies it.
+`scripts`, then alphabetical. `bun run fix:order` applies it.
 
 **`exports` conditions are order-sensitive**: they match top to bottom, so
 `types` must precede `default` or TypeScript resolves the runtime entry and

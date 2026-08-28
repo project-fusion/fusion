@@ -350,7 +350,7 @@
 
    `inline-size` and `flex` rather than a grid, because these are `helix-flex`
    hosts: a document rule setting `display` on one wins from outside the shadow
-   root where the component cannot answer back, and `check:overruled` fails on
+   root where the component cannot answer back, and `check:css:overruled` fails on
    exactly that. */
 @media (width < 48rem) {
   .filterGroup {

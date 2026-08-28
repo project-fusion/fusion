@@ -1,4 +1,4 @@
-/* Generated from the built packages by `bun run metrics`. Do not edit. */
+/* Generated from the built packages by `bun run gen:metrics`. Do not edit. */
 
 export interface Claim {
   /** What was measured, in the fewest words that stay true. */

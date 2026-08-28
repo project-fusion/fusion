@@ -26,12 +26,12 @@
  * that went stable first are the ones an audit read end to end and found
  * nothing substantive in, and no script would have known that.
  *
- * Run with `bun run check:stable` (also part of `bun run verify`).
+ * Run with `bun run check:api:stable` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-/** Every family folder in a tier, by the same test `check:examples` uses. */
+/** Every family folder in a tier, by the same test `check:prose:examples` uses. */
 const families = (tier) =>
   readdirSync(tier, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && existsSync(join(tier, entry.name, 'index.ts')))

@@ -20,10 +20,10 @@
  *   fifty-seven on the page, because one component was added and the number was
  *   bumped by two.
  *
- * Third of its shape after `check:hooks` and `check:parts`, and the same
+ * Third of its shape after `check:css:hooks` and `check:api:parts`, and the same
  * argument: nothing about a missing entry fails, warns, or looks wrong.
  *
- * Run with `bun run check:art` (also part of `bun run verify`).
+ * Run with `bun run check:prose:art` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -156,7 +156,7 @@ const wordFor = (count) => {
     return count % 100 === 0 ? hundreds : `${hundreds} and ${wordFor(count % 100)}`
   }
   throw new Error(
-    `check:art: ${count} is past what wordFor spells. It stops below a thousand because ` +
+    `check:prose:art: ${count} is past what wordFor spells. It stops below a thousand because ` +
       'nothing here counts that high, and a count that does needs the thousands case written ' +
       'rather than a silent wrong answer.',
   )
@@ -179,7 +179,7 @@ const NUMBER_WORD =
 for (let n = FLOOR; n <= 200; n += 1) {
   if (!new RegExp(NUMBER_WORD).test(wordFor(n))) {
     throw new Error(
-      `check:art: wordFor(${n}) is "${wordFor(n)}" and NUMBER_WORD cannot match it. The two are ` +
+      `check:prose:art: wordFor(${n}) is "${wordFor(n)}" and NUMBER_WORD cannot match it. The two are ` +
         'built from the same arrays so that cannot happen by editing one; something has taught ' +
         'one of them a shape the other does not know.',
     )
@@ -190,7 +190,7 @@ const said = wordFor(families.size)
 /* Folders that are *families*, which is the question the prose is answering:
    how many more entries there are than there are components in `helix/styled`. A
    directory with an `index.ts` is what the barrel exports and what
-   `check:examples` already calls a family, and it is the difference that
+   `check:prose:examples` already calls a family, and it is the difference that
    matters: `field/` is a directory holding the shared field stylesheets, it
    exports nothing and has no element, so counting it made this check disagree
    with correct prose on its first run. */

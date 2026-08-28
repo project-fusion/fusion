@@ -133,14 +133,14 @@ export interface Example {
    * syntax error rather than a bad example, and three separate faults hit the
    * script-free ones as well.
    *
-   * `check:examples-paired` holds the two files to each other and
-   * `check:visual` holds the two pictures to each other.
+   * `check:prose:examples-paired` holds the two files to each other and
+   * `check:spec:visual` holds the two pictures to each other.
    */
   tsx: string
   /**
    * Which tier the example shows, read from what it renders.
    *
-   * Off the markup rather than off the filename, the same test `check:tokens`
+   * Off the markup rather than off the filename, the same test `check:css:tokens`
    * uses to know a headless example's stylesheet may write raw values: an
    * example is a headless one when it renders a `helix-headless-` element.
    * When this was written the file was called `headless.html` and the name
@@ -173,7 +173,7 @@ export interface Family {
  *
  * An example is up to two files, `<slug>.html` and an optional `<slug>.css`.
  * The HTML is the list: a stylesheet on its own is not an example, and
- * `check:examples` fails on one whose markup is missing rather than showing a
+ * `check:prose:examples` fails on one whose markup is missing rather than showing a
  * sandbox with a stylesheet and nothing to style.
  *
  * The pair is what the sandbox already shows, `index.html` beside `styles.css`,

@@ -6,7 +6,7 @@
   // **The platform is part of the hash, because turbo does not put it there and
   // the artifacts differ by it.** Measured 25 Aug 2026, the day the remote cache
   // started working: CI restored a build this laptop had written, and
-  // `check:metrics` then reported `@fusion.dev/helix-theme` at 566,424 bytes over 16
+  // `check:gen:metrics` then reported `@fusion.dev/helix-theme` at 566,424 bytes over 16
   // files where a Linux build produces 465,772 over 8. A check whose answer
   // depends on which machine warmed the cache is not a check.
   //
@@ -45,7 +45,7 @@
       // `@fusion.dev/helix-theme` shipping 8 files where the tree holds 16.
       //
       // A tracked source is never a task output. `files` still publishes
-      // `wasm`, `check:wasm` still measures it, and nothing builds it here.
+      // `wasm`, `check:css:wasm` still measures it, and nothing builds it here.
       //
       // **`public/sandbox` and `public/specs` are outputs and were not declared,
       // which is the mirror of the `wasm` fault and cost four CI jobs.** The

@@ -2,14 +2,14 @@
 /**
  * Measures other web-component libraries, and writes `helix/docs/peers.json`.
  *
- * **Separate from `bun run metrics` because this one needs the network.** It
+ * **Separate from `bun run gen:metrics` because this one needs the network.** It
  * writes a throwaway package into `.local`, installs four design systems at
  * pinned versions, and bundles the same five components out of each. `.local`
  * is the declared per-machine scratch and is gitignored, so nothing about those
  * installs enters this repository except the numbers.
  *
- * The numbers are committed, which is what lets `check:metrics` run in CI with
- * no registry access. Run `bun run metrics:peers` to refresh them, which is a
+ * The numbers are committed, which is what lets `check:gen:metrics` run in CI with
+ * no registry access. Run `bun run gen:peers` to refresh them, which is a
  * deliberate act with a date on it rather than something that happens on every
  * build.
  *

@@ -26,7 +26,7 @@ import { spawnSync } from 'node:child_process'
  * prevents drift; this only catches the cases where a source stopped being
  * wired up at all.
  *
- * Run with `bun run check:routes`, after `bun run catalog`.
+ * Run with `bun run check:gen:routes`, after `bun run gen:catalog`.
  */
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -79,7 +79,7 @@ if (drifted.length > 0) {
   console.error(
     `routes: helix/docs/dist is stale against its content (${drifted.join(' ')}).\n` +
       '  The route registry reads the built package and the catalog reads source.\n' +
-      '  Run `bun run build`, then `bun run catalog`.',
+      '  Run `bun run build`, then `bun run gen:catalog`.',
   )
   process.exit(1)
 }
@@ -231,8 +231,8 @@ if (problems.length === 0) {
        `git diff --exit-code` with the whole of the diff being one path.
     
        `check` fixes and `verify` judges, which `CLAUDE.md` states and
-       `check:dialect` already follows. The record is written under `--write`,
-       which `bun run routes` and `bun run regen` pass; without it the check
+       `check:prose:dialect` already follows. The record is written under `--write`,
+       which `bun run gen:routes` and `bun run regen` pass; without it the check
        says the file is behind and stops. */
     if (write) {
       writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
@@ -244,7 +244,7 @@ if (problems.length === 0) {
          and watching this branch report clean. */
       console.error(
         'routes: docs/insights/published.json is behind the routes that exist. Run ' +
-          '`bun run routes` and commit the result.\n',
+          '`bun run gen:routes` and commit the result.\n',
       )
       for (const path of merged.filter((one) => !published.paths.includes(one))) {
         console.error(`  ${path}`)

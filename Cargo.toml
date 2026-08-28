@@ -35,7 +35,7 @@ fusion-helix-theme = { path = "helix/theme" }
 # **No `version` here, and its absence is the point.**
 #
 # Everything else in this table is a fact about the workspace: the edition, the
-# licence, the toolchain floor. A version is a fact about a *domain*, and this
+# license, the toolchain floor. A version is a fact about a *domain*, and this
 # workspace is about to hold two. `version = "0.0.0-dev"` inherited by every
 # crate was the Cortex version only because every crate was Cortex, and the day
 # `fusion-helix-theme` lands with `version.workspace = true` the two domains are back
@@ -46,7 +46,7 @@ fusion-helix-theme = { path = "helix/theme" }
 # So each crate carries its own, which is three identical lines today and is
 # what makes them able to differ tomorrow. The value is the placeholder every
 # manifest in this repository holds; the release stamps the real number seconds
-# before packing and the tag is the record. `check:publishable` fails on a crate
+# before packing and the tag is the record. `check:pkg:publishable` fails on a crate
 # that inherits one, so this cannot quietly come back.
 [workspace.package]
 edition = "2021"

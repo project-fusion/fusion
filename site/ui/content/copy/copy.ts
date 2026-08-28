@@ -18,7 +18,7 @@
  *
  * So the layout stays in TSX and the words move here, which is the pattern
  * `verticals.ts` already is and already feeds several consumers. A page renders
- * it as Helix markup; `bun run catalog` renders the same object as markdown.
+ * it as Helix markup; `bun run gen:catalog` renders the same object as markdown.
  * Single source, no component protocol, no new machinery.
  *
  * **The rule that survives is narrower and still holds**: a component may not

@@ -53,7 +53,7 @@
  * to ignore a red build. `verify` does not run this. It is refreshed by hand,
  * the same as the peer table and for the same reason, and the page says when.
  *
- * Run with `bun run metrics:timing`.
+ * Run with `bun run gen:timings`.
  */
 
 import { execFileSync } from 'node:child_process'

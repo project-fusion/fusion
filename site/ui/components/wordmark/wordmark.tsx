@@ -13,7 +13,7 @@ import styles from '../chrome.module.css'
  * **The mark is `helix-icon`, and used to be a component of its own.** There
  * were two copies of one drawing: a `FusionLogo` here and `fusion.svg` in the
  * icon set, and they drifted exactly as the two headers had. The icon's stops
- * were the slate greys the mark was first exported with, so it was gray
+ * were the slate grays the mark was first exported with, so it was gray
  * everywhere it appeared while this one was blue, and nothing would have caught
  * that either. One drawing, read from one file.
  *

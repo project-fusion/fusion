@@ -35,7 +35,7 @@
  * subscribed, rather than a matching pair of calls, and that shape is what the
  * four fixed here now use.
  *
- * Run with `bun run check:leaks` (also part of `bun run verify`).
+ * Run with `bun run check:api:leaks` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -65,7 +65,7 @@ const sources = (root) => {
 
 /* Comments stripped, and the newlines kept so a line number still names the
    line it did. Class docs are full of prose about listeners a file does not
-   add, which is the same trap `check:composed` and `check:seams` both hit. */
+   add, which is the same trap `check:api:composed` and `check:api:seams` both hit. */
 const withoutComments = (text) =>
   text
     .replaceAll(/\/\*[\s\S]*?\*\//g, (match) => match.replaceAll(/[^\n]/g, ' '))

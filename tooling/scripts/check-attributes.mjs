@@ -8,7 +8,7 @@
  * exactly one navigation mode.
  *
  * **The failure this was written for.** The theme builder routed its two
- * coloured slider tracks with `.themeChannel[label="Saturation"]`. A `label`
+ * colored slider tracks with `.themeChannel[label="Saturation"]`. A `label`
  * attribute is only in the DOM when a *server* wrote the element into HTML: on a
  * client-side navigation React creates the element and assigns `label` as a
  * property, Lit does not reflect it, and the selector matches nothing. Measured
@@ -31,7 +31,7 @@
  * Global and `data-` attributes are exempt for the third reason: nothing
  * declares them as properties, so they are always written.
  *
- * Run with `bun run check:attributes` (also part of `bun run verify`).
+ * Run with `bun run check:api:attributes` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -145,7 +145,7 @@ for (const path of walk(SITE, (name) => name.endsWith('.css'))) {
     const where = selected.get(name) ?? []
     where.push({
       /* The compound the attribute sits in, so a rule naming a tag can be held
-         to that tag and a rule naming a class can be held to its neighbourhood.
+         to that tag and a rule naming a class can be held to its neighborhood.
          `.themeChannel[label=]` gives the empty tag and the class. */
       tag: /^helix-[a-z-]+$/.test(found[1]) ? found[1] : undefined,
       where: relative(ROOT, path),

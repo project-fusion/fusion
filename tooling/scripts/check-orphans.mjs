@@ -45,7 +45,7 @@
  * under a bullet. Without that distinction the same scan reported sixty-eight,
  * and forty-three were a tag's own words wrapping.
  *
- * Run with `bun run check:orphans` (also part of `bun run verify`).
+ * Run with `bun run check:prose:orphans` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

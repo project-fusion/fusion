@@ -28,7 +28,7 @@
  * all. A consumer cannot discover the dash-cased spelling by knowing HTML,
  * which is the entire premise of standing in for a platform element.
  *
- * **Not `check:platform-fidelity`, which cannot see this.** That one compares
+ * **Not `check:api:platform-fidelity`, which cannot see this.** That one compares
  * IDL *members* against `lib.dom.d.ts` and `fetchPriority` is present and
  * correctly named, so it passes while `fetchpriority` does nothing. The
  * divergence is in the content attribute, and the content attribute is the half
@@ -43,7 +43,7 @@
  * is free to be dash-cased and most of them are (`default-value`, `show-value`,
  * `back-label`).
  *
- * Run with `bun run check:attribute-names` (also part of `bun run verify`).
+ * Run with `bun run check:api:attribute-names` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -154,5 +154,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `check:attribute-names: every mirrored attribute answers to the platform's spelling (${Object.keys(PLATFORM).length} names known).`,
+  `check:api:attribute-names: every mirrored attribute answers to the platform's spelling (${Object.keys(PLATFORM).length} names known).`,
 )

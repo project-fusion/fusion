@@ -5,7 +5,7 @@
  * **A page cannot answer this for a component.** `@media print` does not cross a
  * shadow boundary, any more than a reduced-motion rule does, so a consumer who
  * wants a clean printout cannot write one: the rule has to be inside the sheet
- * the component adopts. That is the same finding `check:motion` already made
+ * the component adopts. That is the same finding `check:css:motion` already made
  * about motion, and this is the same check for the same reason.
  *
  * **Every family, now that every family has an answer.** This required two

@@ -51,7 +51,7 @@ helix/icons/src/generated.ts
 # Dev server output, kept apart from the cached `.next` build.
 .next-dev/
 
-# Spec bundles for the sandbox, built from the spec files by `bun run specs`.
+# Spec bundles for the sandbox, built from the spec files by `bun run gen:specs`.
 # Event probes, written by the `specs` step of `bun run dev`. Generated like
 # `public/specs` beside it, and ignored for the same reason: `biome ci` lints
 # what it can see, and a generated page failing lint fails the push.
@@ -59,7 +59,7 @@ site/ui/public/probe-events/
 
 site/ui/public/specs
 
-# The sandbox preview document, built from source by `bun run frame`.
+# The sandbox preview document, built from source by `bun run gen:frame`.
 site/ui/public/sandbox
 
 # Scratch pages written by hand to look at a composition in a real browser, and
@@ -71,7 +71,7 @@ site/ui/public/sandbox
 # see, and a scratch page failing format fails the push, which is what happened
 # when a `git add -A` swept one up mid-session. The commit that added this entry
 # read that as the parity harness's build and said so; it is not, and
-# `check:visual-parity` builds to `.local/parity`, as that commit's own message
+# `check:spec:visual-parity` builds to `.local/parity`, as that commit's own message
 # conceded it had not established.
 site/ui/public/check
 
@@ -95,7 +95,7 @@ site/ui/public/_lab/
 *.diff.png
 *.parity.png
 
-# Derived from the manifests and the example files by `bun run catalog`.
+# Derived from the manifests and the example files by `bun run gen:catalog`.
 site/ui/content/catalog/catalog.generated.json
 site/ui/public/helix/components/
 site/ui/public/helix/docs/
@@ -111,7 +111,7 @@ site/ui/public/insights/
 # has to compile Rust first is a deploy that fails on a platform we do not
 # control. Tracked, it is 419K that nothing has to rebuild.
 #
-# `check:wasm` is what keeps it honest, and it reads this artifact rather than
+# `check:css:wasm` is what keeps it honest, and it reads this artifact rather than
 # building a fresh one first, so the file measured is the file that ships. It
 # derives all seventeen themes through the tracked binary and holds them to
 # `oracle.json`, which carries them as the TypeScript derives them. `cargo test`

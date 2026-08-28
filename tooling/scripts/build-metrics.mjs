@@ -29,7 +29,7 @@
  * which `--check` reports as a version difference rather than as a stale file,
  * because the two failures have different fixes.
  *
- * Run `bun run metrics` to write it, `bun run check:metrics` to fail when it is
+ * Run `bun run gen:metrics` to write it, `bun run check:gen:metrics` to fail when it is
  * behind. `verify` runs the check, for the reason `verify` never writes.
  */
 import {
@@ -50,16 +50,16 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUTPUT = 'helix/docs/content/metrics.mdx'
 
 /**
- * What the other systems measured, from `bun run metrics:peers`.
+ * What the other systems measured, from `bun run gen:peers`.
  *
- * Committed, because measuring them needs a registry and `check:metrics` runs
+ * Committed, because measuring them needs a registry and `check:gen:metrics` runs
  * in CI. Our own side of that comparison is not in the file: it is measured
  * here on every run, so the column that can go stale against this repository
  * is the one that cannot.
  */
 const PEERS = 'helix/docs/peers.json'
 
-/** What a component costs in time, from `bun run metrics:timing`. */
+/** What a component costs in time, from `bun run gen:timings`. */
 const TIMINGS = 'helix/docs/timings.json'
 
 /**
@@ -82,7 +82,7 @@ const check = process.argv.includes('--check')
  * puts Metrics at the end of that section, and the end is a position rather
  * than a number: pages were inserted into the path twice while this was being
  * built, and the second time a hardcoded 6 collided with Versioning, which
- * `bun run docs` refuses. Reading the other pages' frontmatter makes the
+ * `bun run gen:docs` refuses. Reading the other pages' frontmatter makes the
  * intent survive the next insertion.
  */
 const lastInSection = () => {
@@ -115,7 +115,7 @@ const lastInSection = () => {
  * `@fusion.dev/helix-headless` is deliberately not in here. It is a tier rather than a
  * runtime: a page with one styled component has some of it and never all of
  * it, so a floor containing it would credit every family with code no page
- * loads. `check:barrels` is what keeps that true.
+ * loads. `check:api:barrels` is what keeps that true.
  *
  * **`export *`, not a bare import, and the difference is the whole floor.**
  * `@fusion.dev/helix-core` is `sideEffects: false`, so `import '@fusion.dev/helix-core'` for
@@ -487,7 +487,7 @@ const comparison = () => {
     return [
       '## Against other systems',
       '',
-      'Not measured. `bun run metrics:peers` installs the systems and writes',
+      'Not measured. `bun run gen:peers` installs the systems and writes',
       '`helix/docs/peers.json`, and this section renders whatever is in it.',
       '',
     ]
@@ -527,7 +527,7 @@ const comparison = () => {
   return [
     '## Against other systems',
     '',
-    `Four other libraries of custom elements, pinned and measured on ${peers.measured} by \`bun run metrics:peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run metrics\`**, so the column that could go stale against this repository is the one that cannot.`,
+    `Four other libraries of custom elements, pinned and measured on ${peers.measured} by \`bun run gen:peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.`,
     '',
     `**Every system here is built on Lit**, so the runtime under the comparison is the same library in every column and what is left is the components. A React component library is not in the table, because comparing a custom element with a React component measures the framework.`,
     '',
@@ -563,7 +563,7 @@ const timing = () => {
     return [
       '## What it costs in time',
       '',
-      'Not measured. `bun run metrics:timing` drives a real browser against the',
+      'Not measured. `bun run gen:timings` drives a real browser against the',
       'built packages and writes `helix/docs/timings.json`, and this section',
       'renders whatever is in it.',
       '',
@@ -572,7 +572,7 @@ const timing = () => {
   return [
     '## What it costs in time',
     '',
-    `Measured on ${timings.measured} by \`bun run metrics:timing\`, which drives a real browser against the built packages. The median of ${timings.runs} runs each, on one machine.`,
+    `Measured on ${timings.measured} by \`bun run gen:timings\`, which drives a real browser against the built packages. The median of ${timings.runs} runs each, on one machine.`,
     '',
     "**These never join the comparison above, and that is not a hedge.** Bytes are a fact about a package and can be held against anybody else's. A timing is a fact about a page, a machine and a day, so a column of somebody else's milliseconds would be comparing two laptops rather than two libraries.",
     '',
@@ -610,7 +610,7 @@ const lines = [
   '',
   '# Metrics',
   '',
-  '*Generated by `bun run metrics` from the built packages. Do not edit: every',
+  '*Generated by `bun run gen:metrics` from the built packages. Do not edit: every',
   'number here is measured, and an edited one is a number nothing produced.*',
   '',
   'Bundle size, and what a component costs in time. The two are kept apart on',
@@ -687,7 +687,7 @@ const lines = [
   '',
   `Across the tier: the cheapest is \`${cheapest.family}\` at ${grouped(cheapest.alone.gzip)} gzipped alone, the dearest \`${dearest.family}\` at ${grouped(dearest.alone.gzip)}, over ${styled.rows.length} components. Every family at once is ${grouped(wholeStyled.gzip)}.`,
   '',
-  `**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
+  `**No family imports a barrel, and \`check:api:barrels\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
   '',
   `The headless tier never had the problem, and it is the control: \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and a headless family is a median of ${grouped(median(headlessGzip))} bytes gzipped alone.`,
   '',
@@ -739,7 +739,7 @@ lines.push(
   'not say as much as for what it does.',
   '',
   '- **No whole-library comparison, and no fifth component.** The comparison above is five components against four systems. Widening it means naming the equivalent element in each system by hand, which is where a comparison table starts arguing, so each addition is a deliberate one rather than a sweep.',
-  '- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running `bun run metrics:peers`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.',
+  '- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running `bun run gen:peers`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.',
   '- **No load or rendering timings.** First paint, time to upgrade, and the cost of hydrating a server-rendered tree. These need a browser harness rather than a bundler, and they never join a cross-system table.',
   "- **No per-component stylesheet bytes.** There are none to report: a family's CSS is compiled into its JavaScript, so it is already inside every number above. `elements.css` is the light-DOM layer and is in the stylesheet table.",
   '',
@@ -791,7 +791,7 @@ const claims = [
 ]
 
 const claimsSource = [
-  '/* Generated from the built packages by `bun run metrics`. Do not edit. */',
+  '/* Generated from the built packages by `bun run gen:metrics`. Do not edit. */',
   '',
   'export interface Claim {',
   '  /** What was measured, in the fewest words that stay true. */',
@@ -825,7 +825,7 @@ if (check) {
   }
   if (claimsExisting !== claimsSource) {
     console.error(
-      `${CLAIMS_OUT} is behind the packages it measures. Run \`bun run metrics\` and commit the result.`,
+      `${CLAIMS_OUT} is behind the packages it measures. Run \`bun run gen:metrics\` and commit the result.`,
     )
     process.exit(1)
   }
@@ -845,7 +845,7 @@ if (check) {
       .filter(([was, now]) => was !== now)
 
     console.error(
-      `${OUTPUT} is behind the packages it measures. Run \`bun run metrics\` and commit the result.\n` +
+      `${OUTPUT} is behind the packages it measures. Run \`bun run gen:metrics\` and commit the result.\n` +
         `If the only difference is the numbers, check the bundler first: this run used Bun ${Bun.version}, ` +
         'and the pinned version is the one in `packageManager`.\n\n' +
         `${moved.length} line${moved.length === 1 ? '' : 's'} differ:\n` +

@@ -5,10 +5,10 @@
 # on every push, sharded, on a clean checkout, and it is better at all of it than
 # a laptop is: types, specs, browsers, Rust. What it cannot do is regenerate.
 # `docs/token-reference.md is behind helix/styles/tokens.json` is a red build that
-# stays red until somebody runs `bun run tokens` and pushes again, so catching it
+# stays red until somebody runs `bun run gen:tokens-reference` and pushes again, so catching it
 # here saves a round trip rather than duplicating a gate.
 #
-# **It judges and never writes.** `bun run check` rewrites files, and a hook that
+# **It judges and never writes.** `bun run fix` rewrites files, and a hook that
 # edits the tree during `git push` produces a push that does not contain the
 # edits, which is worse than the failure it was avoiding. So this reports and
 # names the command to run.
@@ -20,7 +20,7 @@
 #
 # *Widened 27 Aug 2026.* A second class earns a place: a check that is fast and
 # whose failure is otherwise silent. `biome ci` was always that and was never
-# described, and `check:reachable` is the second. The bar is the one this file
+# described, and `check:css:reachable` is the second. The bar is the one this file
 # already sets, seconds rather than minutes, and the reason is the same one the
 # regeneration argument makes: the cheapest place to learn is before the push.
 #
@@ -30,7 +30,7 @@ set -e
 
 printf 'pre-push: formatting and lint\n'
 bunx biome ci . >/dev/null 2>&1 || {
-  printf '\n  biome refuses this tree. Run `bun run check` and commit the result.\n\n'
+  printf '\n  biome refuses this tree. Run `bun run fix` and commit the result.\n\n'
   exit 1
 }
 
@@ -40,13 +40,13 @@ bunx biome ci . >/dev/null 2>&1 || {
 # unchanged by verifying it"* on three shards, which names nothing.
 #
 # `themed-page` was in neither for longer, and its failure is the worse shape:
-# `verify` runs `check:themed-page`, so CI went red naming the file, and `regen`
+# `verify` runs `check:gen:themed-page`, so CI went red naming the file, and `regen`
 # did not write it, so the remedy this repository documents did not produce the
 # fix. A check in `verify` whose writer is not in `regen` is a red build with no
 # published way out of it.
 
 # **One check here is not about generated files, and it is worth saying why.**
-# `check:reachable` reads `:host([x])` selectors against whether `x` reflects,
+# `check:css:reachable` reads `:host([x])` selectors against whether `x` reflects,
 # which CI can do perfectly well and does. It is here because the fault it
 # catches is silent in every other way: the component works, the attribute is
 # correct, and a rule simply never matches for anybody who sets the property
@@ -55,7 +55,7 @@ bunx biome ci . >/dev/null 2>&1 || {
 # finding out on the far side of a push is an afternoon. It runs in about a
 # second, which is the bar anything joining this list has to clear.
 printf 'pre-push: reachable host rules\n'
-bun run check:reachable >/tmp/pre-push-$$.log 2>&1 || {
+bun run check:css:reachable >/tmp/pre-push-$$.log 2>&1 || {
   printf '\n'
   grep -v '^\$' /tmp/pre-push-$$.log | tail -4 | sed 's/^/  /'
   printf '\n'
@@ -65,7 +65,9 @@ bun run check:reachable >/tmp/pre-push-$$.log 2>&1 || {
 rm -f /tmp/pre-push-$$.log
 
 printf 'pre-push: generated files\n'
-for task in reference element-events tokens-reference metrics docs samples routes content themed-page eval queue; do
+for task in gen:reference gen:element-events gen:tokens-reference gen:tokens-layer \
+            gen:metrics gen:docs gen:samples gen:routes gen:content gen:themed-page \
+            gen:eval prose:queue; do
   bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'

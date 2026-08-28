@@ -30,7 +30,7 @@
  * the two tiers and false of `@fusion.dev/helix-sandbox`, whose index forwards the JSX
  * helpers alone.
  *
- * Run with `bun run check:registration` (also part of `bun run verify`).
+ * Run with `bun run check:api:registration` (also part of `bun run verify`).
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'

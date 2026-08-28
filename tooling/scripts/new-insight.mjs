@@ -115,4 +115,4 @@ writeFileSync(
 
 console.log(`insight: docs/insights/content/${slug}.mdx`)
 console.log(`  /insights/${slug}`)
-console.log('  Fill in `description`, `kind` and `topic`, then `bun run content`.')
+console.log('  Fill in `description`, `kind` and `topic`, then `bun run gen:content`.')

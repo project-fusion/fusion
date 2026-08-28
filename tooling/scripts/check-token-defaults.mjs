@@ -2,7 +2,7 @@
 /**
  * A token a component reads has to resolve on a page that matches no state.
  *
- * **`check:tokens` verifies that a token is defined, not that it resolves, and
+ * **`check:css:tokens` verifies that a token is defined, not that it resolves, and
  * the difference is a component drawn at 950 pixels.** It builds its `defined`
  * set from any `--helix-*:` declaration anywhere in the styles package, so a
  * token declared only inside `[data-density]` counts as present. Every ordinary
@@ -18,7 +18,7 @@
  * listbox        66   -> 61      pagination  32 -> 24
  * ```
  *
- * `check:tokens` reported green throughout, because the four `[data-density*]`
+ * `check:css:tokens` reported green throughout, because the four `[data-density*]`
  * rules in `base.css` still declared them. Fifty-nine stylesheets were reading a
  * token that resolved to nothing on the default page.
  *
@@ -34,10 +34,10 @@
  * version of this analysis got wrong and reported all 186 tokens for. Most of
  * the layer is declared on `:root, [data-helix-theme]`, and a list applies if any
  * one of its selectors matches. Comments are stripped before the braces are
- * counted, for the reason `check:selectors` records: a `{` inside a comment ends
+ * counted, for the reason `check:css:selectors` records: a `{` inside a comment ends
  * the block early and every token after it reads as conditional.
  *
- * Run with `bun run check:token-defaults` (also part of `bun run verify`).
+ * Run with `bun run check:css:token-defaults` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'

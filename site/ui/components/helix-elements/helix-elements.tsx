@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react'
  * its own.** Next supports one per top-level route group, and that is the
  * version with no condition in it. It moves every route in the app into a
  * group, so it is not a change to make while another branch is holding thirty
- * files open in the same directory. `check:specs-isolated` fails if the specs
+ * files open in the same directory. `check:spec:specs-isolated` fails if the specs
  * document ever registers the library again, whichever way it is kept out.
  */
 const SPECS = '/helix/sandbox/specs'

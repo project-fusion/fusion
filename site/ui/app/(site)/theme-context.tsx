@@ -215,7 +215,7 @@ const applyScope = (
      declarations. Learned by `showcase.tsx` the hard way. */
   node.dataset.helixTheme = ''
   /* Not `--helix-*`: that prefix belongs to the design system, and squatting on
-     it made `check:tokens` read this as one of its tokens, renamed or mistyped.
+     it made `check:css:tokens` read this as one of its tokens, renamed or mistyped.
      It is a page-local flag and now says so. */
   node.style.setProperty('--preview-color-scheme', scheme)
   for (const token of theme.tokens) {

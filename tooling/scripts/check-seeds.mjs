@@ -52,7 +52,7 @@
  * because the seeds are the sharp edge and a renamed check loses its history in
  * commit messages that cite it.
  *
- * Run with `bun run check:seeds` (also part of `bun run verify`).
+ * Run with `bun run check:css:seeds` (also part of `bun run verify`).
  */
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -74,7 +74,7 @@ const PLANNED = new Map([
     'accent',
     '#141: the engine derives an accent and emits its tokens, but the CSS ramp ' +
       'takes a seed rather than the solved steps, so seeding it would hand the ' +
-      'stylesheet a second opinion on colours the engine already computed',
+      'stylesheet a second opinion on colors the engine already computed',
   ],
   ['accent-hue', "#141: same, and the relationship is the stylesheet's to apply"],
   ['neutral-chroma', '#141: the engine takes the cast and derives from it directly'],
@@ -86,8 +86,8 @@ const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 /* Comments hold seed names too: `primitives.css` explains the whole scheme in
    prose directly above the block, and `derive.ts` documents the two names it
    used to get wrong. Reading those in makes the check pass on the bug it was
-   written for, which is the trap `check:composed`, `check:seams` and
-   `check:grounds` each record hitting. */
+   written for, which is the trap `check:api:composed`, `check:api:seams` and
+   `check:css:grounds` each record hitting. */
 const uncommented = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
 
@@ -235,7 +235,7 @@ if (problems.length > 0) {
 }
 
 /* **The planned count is only printed when there is one**, and that is not
-   cosmetic. `check:floors` reads the integers out of this line and fails on a
+   cosmetic. `check:spec:floors` reads the integers out of this line and fails on a
    zero, on the grounds that a check with nothing to say should not report
    success. An empty `PLANNED` is the *good* outcome here, meaning the engine
    emits everything the stylesheet reads, so printing `0 planned` would turn

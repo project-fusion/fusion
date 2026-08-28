@@ -3,8 +3,8 @@
  *
  * **The claims are generated now; the comparison below is still by hand.**
  * `CLAIMS` came from this file until the copy drifted, and is emitted by
- * `bun run metrics` into `claims.generated.ts`. `BUTTON` has not moved yet: it
- * needs the peer numbers, which come from `bun run metrics:peers` and a set of
+ * `bun run gen:metrics` into `claims.generated.ts`. `BUTTON` has not moved yet: it
+ * needs the peer numbers, which come from `bun run gen:peers` and a set of
  * libraries installed into `.local`, so it is the same defect one step further
  * from the generator that could fix it.
  *
@@ -20,10 +20,10 @@
  * predicted.** The component count read 92 while the build measured 93, printed
  * under a heading that says every number on the page was produced rather than
  * written, and the token layer had moved from 1.9 kB to 2.0. Both were found by
- * comparing the page against `bun run metrics` rather than by anybody noticing.
+ * comparing the page against `bun run gen:metrics` rather than by anybody noticing.
  *
  * `build-metrics.mjs` emits `claims.generated.ts` beside the MDX now and
- * `check:metrics` judges it, so the front of the site quotes the same run as
+ * `check:gen:metrics` judges it, so the front of the site quotes the same run as
  * the docs. Re-exported rather than imported at each call site, so nothing
  * downstream had to change.
  */

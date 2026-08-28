@@ -77,7 +77,7 @@ const tags = index(tiers)
  *
  * `analyze` is a pure function of three fields, so the specs hand it those three
  * fields. What the parser does is a separate claim, held separately by
- * `check:diagnostics` in a real engine.
+ * `check:spec:diagnostics` in a real engine.
  */
 const ruled = (selector: string, declarations: string[] = []) => ({
   remove: () => {},

@@ -79,8 +79,8 @@ const entries = slugs.map((slug) => {
 })
 
 const generated = `/**
- * Every page's MDX, inlined by \`bun run content\`. Do not edit: the files in
- * \`content/\` are the source, and \`bun run check:content\` fails when this
+ * Every page's MDX, inlined by \`bun run gen:content\`. Do not edit: the files in
+ * \`content/\` are the source, and \`bun run check:gen:content\` fails when this
  * module and they disagree.
  */
 export const sitePageSources: Record<string, string> = {
@@ -94,7 +94,7 @@ ${entries.join('\n')}
  * called, so creating one is naming a file, two posts cannot silently share a
  * URL, and retitling is editing frontmatter rather than moving an address. A
  * deliberate rename is a `git mv`, which is visible in review and is where
- * `check:routes` asks for a redirect.
+ * `check:gen:routes` asks for a redirect.
  *
  * Two lists come out: the pages of the site, and the essays. They differ only
  * in which fields a card needs, and both are the frontmatter rather than a
@@ -146,8 +146,8 @@ const ESSAY_KEYS = [
 
 const registries = `/**
  * The site's pages and essays, derived from the frontmatter of each file by
- * \`bun run content\`. Do not edit: the files in \`content/\` are the source, and
- * \`bun run check:content\` fails when this module and they disagree.
+ * \`bun run gen:content\`. Do not edit: the files in \`content/\` are the source, and
+ * \`bun run check:gen:content\` fails when this module and they disagree.
  *
  * **The slug is the file name.** Nothing here assigns one.
  */
@@ -176,7 +176,7 @@ if (process.argv.includes('--check')) {
     readFileSync(PAGES, 'utf8') !== wantPages ? 'pages' : undefined,
   ].filter(Boolean)
   if (stale.length > 0) {
-    console.error(`content: ${stale.join(' and ')} stale. Run \`bun run content\``)
+    console.error(`content: ${stale.join(' and ')} stale. Run \`bun run gen:content\``)
     process.exit(1)
   }
   console.log(

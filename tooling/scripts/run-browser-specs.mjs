@@ -10,12 +10,12 @@ import { readFile } from 'node:fs/promises'
  * therefore ran only when a person opened the sandbox and clicked the Specs
  * tab. That is not a check, it is a habit.
  *
- * The same bundles the sandbox runs. `bun run specs` emits one module per
+ * The same bundles the sandbox runs. `bun run gen:specs` emits one module per
  * family, each exporting `run()`, and this loads every one of them in headless
  * Chromium and collects the results. No second suite, no rewriting: a spec
  * deleted from the source stops being reported here the same day.
  *
- * Run with `bun run specs:browser`, after `bun run specs`. A family name limits
+ * Run with `bun run specs:browser`, after `bun run gen:specs`. A family name limits
  * it to that one: `bun run specs:browser carousel`.
  *
  * **The whole suite is eighty-eight families and twenty minutes**, which is
@@ -97,8 +97,8 @@ const families = named
 if (families.length === 0) {
   console.error(
     only === undefined
-      ? 'browser specs: no bundles. Run `bun run specs` first.'
-      : `browser specs: no bundle for \`${only}\`. Run \`bun run specs\` first, and check the name.`,
+      ? 'browser specs: no bundles. Run `bun run gen:specs` first.'
+      : `browser specs: no bundle for \`${only}\`. Run \`bun run gen:specs\` first, and check the name.`,
   )
   process.exit(1)
 }

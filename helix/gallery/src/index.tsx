@@ -45,7 +45,7 @@ import { toolingArt } from './tooling'
  * carries the argument.
  *
  * No manifest annotation with it. The mapping is slug to slug, one to one by
- * name, and `check:art` already holds the two sets equal in both directions;
+ * name, and `check:prose:art` already holds the two sets equal in both directions;
  * `@documentation` earns its place because a URL is information a name does not
  * carry, and an art reference is not.
  *

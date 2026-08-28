@@ -14,7 +14,7 @@
  * hidden the whole time.
  *
  * **It is the same fault as a `[part=]` selector for a part nothing renders**,
- * which `check:selectors` already catches, and the module boundary makes it
+ * which `check:css:selectors` already catches, and the module boundary makes it
  * worse: the rule reads correctly, the name is spelled correctly, the name it
  * wants is right there in a sibling file, and there is no error, no warning and
  * no clue beyond the feature not happening.
@@ -33,7 +33,7 @@
  * Found by probing the first version with the fault it was written for, which
  * passed.
  *
- * Run with `bun run check:modules`. `check:attributes` is the neighbor, both
+ * Run with `bun run check:css:modules`. `check:api:attributes` is the neighbor, both
  * being a consumer reaching for a name it was never entitled to use.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'

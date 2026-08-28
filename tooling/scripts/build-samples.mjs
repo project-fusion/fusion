@@ -30,7 +30,7 @@
  * carry the idea; `#` is how Rust already says which is which, and honoring it
  * is what lets a sample be both.
  *
- * Run with `bun run samples`, or `bun run check:samples` for the check.
+ * Run with `bun run gen:samples`, or `bun run check:gen:samples` for the check.
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -262,7 +262,9 @@ if (problems.length > 0) {
 
 if (check) {
   if (stale.length > 0) {
-    console.error(`samples: a Rust sample is stale in ${stale.join(', ')}. Run \`bun run samples\``)
+    console.error(
+      `samples: a Rust sample is stale in ${stale.join(', ')}. Run \`bun run gen:samples\``,
+    )
     process.exit(1)
   }
   console.log(

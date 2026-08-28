@@ -21,7 +21,7 @@
  *      code looks correct.
  *
  * Scans `css` tagged templates in .ts files and plain .css files.
- * Run with `bun run check:tokens` (part of `check` and `verify`).
+ * Run with `bun run check:css:tokens` (part of `check` and `verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -31,7 +31,7 @@ import { join, relative } from 'node:path'
      ones the agent tooling makes, so a session working on a different branch
      puts a whole second copy of `helix/` inside this directory tree.
      
-     This was not theoretical. `check:tokens` passed locally and failed in CI on
+     This was not theoretical. `check:css:tokens` passed locally and failed in CI on
      the same commit, because the sibling worktree was checked out before
      `--helix-color-border-strong` was removed and its `tokens.css` put the
      token back into the "defined" set. A real violation on `main` was masked by
@@ -374,7 +374,7 @@ for (const file of walk(root)) {
 /* The third rule, and the one the other two could not see: a token named after
  * a component, that no component reads.
  *
- * `check:tokens` has always asked that every token *referenced* exists, which
+ * `check:css:tokens` has always asked that every token *referenced* exists, which
  * catches a rename. It cannot ask that every token *declared* is read, because
  * most of the ones that are not are scale rungs: `--helix-radii-lg` has no
  * reader today and is still part of a complete scale a consumer reaches into.

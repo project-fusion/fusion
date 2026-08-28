@@ -63,5 +63,5 @@ describe('jsx to html', () => {
    property it asserted.** It ran `jsxToHtml(htmlToJsx(markup))` over six
    examples and expected the markup back, which is a guarantee about a pair.
    There is no pair now: each syntax is a file somebody wrote, `htmlToJsx` is
-   deleted, and what holds the two to each other is `check:examples-paired` for
-   their existence and `check:visual` for their pictures. */
+   deleted, and what holds the two to each other is `check:prose:examples-paired` for
+   their existence and `check:spec:visual` for their pictures. */

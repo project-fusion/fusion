@@ -37,7 +37,7 @@
  * for this: an import at module scope runs on every route including the one
  * below, and no guard inside a hook can reach it.
  *
- * Run with `bun run check:specs-isolated`.
+ * Run with `bun run check:spec:specs-isolated`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative, sep } from 'node:path'

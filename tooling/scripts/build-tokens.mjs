@@ -24,11 +24,11 @@ import { execFileSync } from 'node:child_process'
  * **Readers are counted, because a token nothing reads is worth seeing.** Not a
  * fault on its own, a complete scale is part of the product and a consumer can
  * read a rung we do not, but it is the difference between a scale and a
- * leftover, and `check:tokens` cannot see it: that check asks that every token
+ * leftover, and `check:css:tokens` cannot see it: that check asks that every token
  * *referenced* exists, never that every token *declared* is read.
  *
- * Run `bun run tokens` to write it, and `bun run check:tokens-reference` to fail
- * when it is behind. `verify` runs the check rather than the writer, for the
+ * Run `bun run gen:tokens-reference` to write it, and
+ * `bun run check:gen:tokens-reference` to fail when it is behind. `verify` runs the check rather than the writer, for the
  * same reason it runs `biome ci`.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -199,21 +199,21 @@ const lines = [
   '# Token reference',
   '',
   '*Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by',
-  '`bun run tokens`. Do not edit.*',
+  '`bun run gen:tokens-reference`. Do not edit.*',
   '',
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,
   'one. These are the whole of what a component or an app may use. The primitive',
   "layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own",
-  'business and `check:tokens` fails on any reference to it from outside.',
+  'business and `check:css:tokens` fails on any reference to it from outside.',
   '',
   'Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are',
-  'not here. They are API, they default to a semantic token, and `check:hooks`',
+  'not here. They are API, they default to a semantic token, and `check:css:hooks`',
   'holds them to both directions.',
   '',
   '**Reads** counts every `var()` of that token across `helix` and',
   '`site`, the sandbox included. Zero is not a fault: a complete scale is part of what is shipped and',
   'a consumer can reach for a rung we happen not to use. It is worth seeing',
-  'because nothing else can see it, `check:tokens` asking only that every token',
+  'because nothing else can see it, `check:css:tokens` asking only that every token',
   '*referenced* exists.',
   '',
 ]
@@ -252,7 +252,9 @@ if (process.argv.includes('--check')) {
     existing = ''
   }
   if (existing !== written) {
-    console.error(`${OUTPUT} is behind ${SOURCE}. Run \`bun run tokens\` and commit the result.`)
+    console.error(
+      `${OUTPUT} is behind ${SOURCE}. Run \`bun run gen:tokens-reference\` and commit the result.`,
+    )
     process.exit(1)
   }
   console.log(`tokens: ${declared.length} tokens in ${CATEGORIES.length} categories, current`)

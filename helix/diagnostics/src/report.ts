@@ -5,7 +5,7 @@
  * **A bare pass is a lie this collector is structurally capable of telling.**
  * Cross-origin stylesheets throw on `.cssRules`, and a run that could not read
  * half its input reports the same empty array as a run that read all of it.
- * `check:dialect` shipped in exactly that condition for weeks: green, and
+ * `check:prose:dialect` shipped in exactly that condition for weeks: green, and
  * incapable of being anything else. So `Report` has no `findings` that can be
  * destructured away from the `coverage` that qualifies them, and the console
  * sink prints coverage first whether or not anything was found.

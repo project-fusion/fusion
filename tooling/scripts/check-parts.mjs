@@ -7,7 +7,7 @@
  * promise, and a part rendered without one is a working hook nobody is told
  * about and nothing stops a later edit from renaming.
  *
- * The same shape as `check:hooks`, for the same reason: three of these turned up
+ * The same shape as `check:css:hooks`, for the same reason: three of these turned up
  * in the audit and none of them could have been caught by reading, because a
  * `::part()` that resolves to nothing is valid CSS that matches nothing.
  * `Breadcrumbs` published a `nav` part the family does not render; `Checkbox`
@@ -20,9 +20,9 @@
  *
  * **Comments are stripped from both sides first.** The base card's JSDoc quotes
  * markup it does not render, and a check that read comments as renders passed on
- * the very bug it was written for. `check:selectors` learned that already.
+ * the very bug it was written for. `check:css:selectors` learned that already.
  *
- * Run with `bun run check:parts` (also part of `bun run verify`).
+ * Run with `bun run check:api:parts` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'

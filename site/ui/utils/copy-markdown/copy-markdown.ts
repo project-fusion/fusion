@@ -107,7 +107,7 @@ const STAGES: Record<string, string> = {
  *
  * The posts themselves are not here. Their bodies are TSX in `bodies.tsx` and
  * turning those into markdown needs a pipeline this app does not have yet, so
- * they keep the stub and `check:routes` keeps counting them.
+ * they keep the stub and `check:gen:routes` keeps counting them.
  */
 const insightsCopy = (): PageCopy => ({
   blocks: [{ from: 'insights', title: 'Everything published so far' }],
