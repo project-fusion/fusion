@@ -302,10 +302,10 @@ if (hasLayout()) {
       expect(host.value).toBe('2')
     })
 
-    test('a controlled rating announces the drag and waits to be told', async () => {
-      /* `value` is a claim of ownership, and the gesture does not override it:
-         the marks follow the pointer, the release asks, and nothing moves until
-         the consumer passes a new value back. */
+    /* A declared `value` is the native seed rather than a claim of ownership, so
+       the drag applies to it like any other. This pair used to be one test
+       asserting the opposite, which is the mode that was given up. See 294. */
+    test('a drag announces before it acts, whoever declared the value', async () => {
       const host = (await rating('value="1"')) as Rating
       let asked: string | undefined
       host.addEventListener('helix-before-change', (event) => {
@@ -314,6 +314,16 @@ if (hasLayout()) {
       await send(host, 'pointerdown', center(host, 4))
       await send(host, 'pointerup', center(host, 4))
       expect(asked).toBe('5')
+      expect(host.value).toBe('5')
+    })
+
+    test('and refusing the change is what holds it, so the consumer may own it', async () => {
+      const host = (await rating('value="1"')) as Rating
+      host.addEventListener('helix-before-change', (event) => {
+        event.preventDefault()
+      })
+      await send(host, 'pointerdown', center(host, 4))
+      await send(host, 'pointerup', center(host, 4))
       expect(host.value).toBe('1')
     })
 
