@@ -23,6 +23,7 @@
  */
 import type {
   Documented,
+  HelixCssProperty,
   HelixDeclaration,
   HelixManifest,
   HelixMember,
@@ -240,11 +241,20 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
       ['Part', 'Description'],
       cssParts.map((one: Documented) => [`\`${one.name}\``, cell(one.description)]),
     ).trimEnd(),
+    /* A "From" column, because a hook can now arrive from a component this one
+       borrowed a stylesheet from rather than be its own. Without it a borrowed
+       `--icon-button-radii` reads on the Copy Button page as a hook Copy Button
+       named, and a consumer who guesses `--copy-button-radii` from that gets
+       nothing. See 290. */
     table(
       depth + 1,
       'Custom properties',
-      ['Property', 'Description'],
-      cssProperties.map((one: Documented) => [`\`${one.name}\``, cell(one.description)]),
+      ['Property', 'From', 'Description'],
+      cssProperties.map((one: HelixCssProperty) => [
+        `\`${one.name}\``,
+        one.inheritedFrom?.name ? `\`${one.inheritedFrom.name}\`` : '-',
+        cell(one.description),
+      ]),
     ).trimEnd(),
     '',
   )

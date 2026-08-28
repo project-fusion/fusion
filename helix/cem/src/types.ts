@@ -61,6 +61,19 @@ export interface HelixAttribute extends Documented {
   inheritedFrom?: InheritedFrom
 }
 
+/**
+ * A published custom property, and the component it is answered on behalf of.
+ *
+ * `inheritedFrom` is set by `helix-borrowed-styles` for a hook a component
+ * answers because it borrowed another's stylesheet whole, which is a
+ * relationship the analyzer has no field for: not inheritance, not a mixin and
+ * not a part. The name still belongs to the lender, so recording it as the
+ * borrower's own would be a rename nobody performed. See 290.
+ */
+export interface HelixCssProperty extends Documented {
+  inheritedFrom?: InheritedFrom
+}
+
 export interface HelixMember extends Documented {
   /** Helix's own fields, namespaced the way the declaration's are. */
   helix?: {
@@ -276,7 +289,7 @@ export interface HelixMetadata {
 export interface HelixDeclaration extends Documented {
   attributes?: HelixAttribute[]
   cssParts?: Documented[]
-  cssProperties?: Documented[]
+  cssProperties?: HelixCssProperty[]
   customElement?: boolean
   events?: HelixEvent[]
   helix?: HelixMetadata

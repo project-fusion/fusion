@@ -318,6 +318,10 @@ describe('createHelixCemConfig', () => {
       'helix-source',
       'helix-declared-events',
       'helix-references',
+      // After the analyzer has filled each declaration's own `cssProperties`,
+      // which is what it copies across, and before `helix-stable-order` so the
+      // hooks it appends are sorted with everything else.
+      'helix-borrowed-styles',
       'helix-react-events',
       'helix-convention-lint',
       'helix-stable-order',
