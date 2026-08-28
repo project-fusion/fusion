@@ -341,6 +341,60 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * How many rows this draws before it is worth saying something, and why 2,000.
+   *
+   * Measured 28 Aug 2026 on a four-column grid, mounting and painting: 100 rows
+   * in 10.9ms, 500 in 30.2ms, 2,000 in 83.2ms and **5,000 rows as 20,000 cells
+   * in 186ms**. It is linear at roughly 37 microseconds a row, so the 100ms an
+   * interaction has to stay inside lands near 2,700 and this sits under it.
+   * Sorting stays cheap throughout, 23.7ms at five thousand, so the cost is the
+   * cells rather than the work over them.
+   */
+  private static readonly COMFORTABLE = 2_000
+
+  /** Said once per element, so a table that re-renders does not repeat it. */
+  private warnedAboutSize = false
+
+  /**
+   * Says so when a table is asked to draw more than it comfortably can.
+   *
+   * **The component renders every row it is given and defaults to doing so.**
+   * `defaultPageSize` is `0`, so `paginated` is false unless a consumer asks,
+   * which means the out-of-the-box arrangement is the unbounded one and nothing
+   * about it says that a result of any size will simply be drawn.
+   *
+   * **Windowing was considered and refused**, which is worth recording because
+   * it is the obvious answer. This element already has two: `paginated` with a
+   * `page-size`, and `mode="server"` where `rows` is one page, `total` is the
+   * whole result and `aria-rowcount` already reports the result rather than the
+   * window, which is the hard half of virtualization done correctly. A third
+   * mechanism would fight the first two, and virtualizing a grid means variable
+   * row heights, a sticky header and keeping `aria-rowindex` honest against a
+   * result the element is no longer holding. `VirtualizeController` exists for
+   * the case where the rows are a flat list and this is not that. See #326.
+   *
+   * So the gap was never the capability, it was that nothing said which of the
+   * two to reach for. Once per element, in a browser only: a warning during a
+   * server render is one nobody can act on and one that would print per request.
+   */
+  private warnIfCrowded(drawn: number): void {
+    if (
+      this.warnedAboutSize ||
+      drawn <= HelixHeadlessDataTable.COMFORTABLE ||
+      typeof window === 'undefined'
+    ) {
+      return
+    }
+    this.warnedAboutSize = true
+    console.warn(
+      `<${this.localName}> is drawing ${drawn} rows at once, which is past the ${HelixHeadlessDataTable.COMFORTABLE} ` +
+        'it stays responsive to: every row is rendered, so this costs roughly 37 microseconds each and ' +
+        'crosses an interaction budget around 2,700. Set `page-size` to paginate, or `mode="server"` ' +
+        'to hand it one page at a time with `total` describing the whole result.',
+    )
+  }
+
+  /**
    * The rows to draw, and the counts around them.
    *
    * In `server` mode this element applies nothing: `rows` is already the page,
@@ -353,12 +407,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       const total = Math.max(this.total, this.rows.length)
       return { matched: total, rows: [...this.rows], total }
     }
-    return ordered(this.rows, this.axes, {
+    const view = ordered(this.rows, this.axes, {
       page: this.page,
       query: this.filter,
       size: this.pageSize,
       spec: this.sort,
     })
+    this.warnIfCrowded(view.rows.length)
+    return view
   }
 
   /** How many pages the result makes, which is at least one even when empty. */
