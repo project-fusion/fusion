@@ -33,7 +33,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { ORACLE, pairs } from './theme-facts.mjs'
+import { ORACLE, pairs } from './lib/theme-facts.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 

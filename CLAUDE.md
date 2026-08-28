@@ -59,6 +59,18 @@ has an extra row. A flat `check:*` namespace of 77 entries had no way to run a
 subset and no way to run the whole set short of `verify`, which also compiles,
 tests and runs two cargo passes.
 
+**A bare name that is not a runner is the thing to avoid**, and every family had
+one. `check` was the fixer, `tokens` wrote the reference its own
+`check:tokens-reference` judged, `dev` did not run `dev:watch` and `test` did not
+run `test:template`. They are `watch` and `smoke:template` now, and `fix` runs
+all five of its members rather than three of them.
+
+**A family with no bare name is fine.** `gen`, `rs`, `smoke`, `probe`, `specs`
+and `visual` have none, because a runner over them would either be meaningless or
+wrong: `smoke:template` takes a domain and a registry tag, and the note above
+says why `gen` must not have one. The rule is that a bare name, if it exists,
+runs everything under it. It does not say one has to exist.
+
 **`regen` exists because the order is not obvious and getting it wrong is a red
 build.** Eleven generators have a `check:gen:` that judges them, and several read
 what an earlier one wrote: `gen:reference` and `gen:element-events` read the
@@ -160,6 +172,23 @@ tooling/   CI and build scripts
 
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
+- **In `tooling/scripts`, flat is runnable and `lib/` is importable.** 101 files
+  sit flat and every one is invoked by a script, a workflow, `turbo.json` or the
+  hook; six sit in `lib/` and nothing invokes any of them. So `ls
+  tooling/scripts` answers "what can I run" and the answer is exactly the script
+  names.
+
+  **The rule existed and was half applied.** `lib/` was added 22 Aug 2026 and
+  took the three modules written after it, while `workspace.mjs`,
+  `theme-facts.mjs` and `theme-intents.mjs` stayed flat among the hundred
+  commands, which is where a reader looks for something to run. Moving them
+  needed one thing beyond the import paths: both `workspace.mjs` and
+  `theme-facts.mjs` derive the repository root from their own directory, so a
+  file one level deeper resolved the root to `tooling/` and every check that
+  reads a manifest failed at once.
+
+  A shebang is not the signal, which is worth saying because it looks like one:
+  thirteen modules do not carry it and nine of those are invoked anyway.
 - **A folder inside a tier is a component family, except under `shared/`.**
   `helix/styled/src/shared/field` and `helix/styled/src/shared/chart` hold
   stylesheets several families import, and they are not families: `field/` is

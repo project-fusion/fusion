@@ -207,7 +207,7 @@ jobs:
       # a rebuild of it: installed from the registry, from outside the
       # workspace, the way a consumer gets it.
       - name: Prove the staged release installs
-        run: bun run test:template --domain "${{ matrix.target.domain }}" --registry-tag next
+        run: bun run smoke:template --domain "${{ matrix.target.domain }}" --registry-tag next
 
       # **Only at `on`.** At `experimental` the version is published, proved and
       # left at the `next` dist-tag: it exists, a consumer can install it by

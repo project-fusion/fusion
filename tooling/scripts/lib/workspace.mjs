@@ -23,7 +23,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
-export const root = resolve(import.meta.dirname, '../..')
+export const root = resolve(import.meta.dirname, '../../..')
 
 /**
  * The one scope, and the domains inside it. The scope used to name the domain,

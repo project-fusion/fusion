@@ -1601,7 +1601,7 @@ one client component.
 Two copies of the library are on that page and they are not the same build.
 
 The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
-module graph from `helix/styled/dist`, so `bun run dev:watch` rebuilds it and HMR
+module graph from `helix/styled/dist`, so `bun run watch` rebuilds it and HMR
 shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
 classic-script IIFE built by `bun run gen:frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).

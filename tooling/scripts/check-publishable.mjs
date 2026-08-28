@@ -60,7 +60,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { DOMAINS, domainOf, manifests, publishes, root, SCOPE } from './workspace.mjs'
+import { DOMAINS, domainOf, manifests, publishes, root, SCOPE } from './lib/workspace.mjs'
 
 /** Every `types`/`default` pair in an exports tree, in the order written. */
 function conditions(node, trail = []) {

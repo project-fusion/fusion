@@ -61,7 +61,7 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { DOMAINS, domainOf, manifests, root } from './workspace.mjs'
+import { DOMAINS, domainOf, manifests, root } from './lib/workspace.mjs'
 
 const LEVELS = ['major', 'minor', 'patch']
 

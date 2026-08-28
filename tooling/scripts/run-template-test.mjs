@@ -37,7 +37,7 @@
  * source packages straight back in and every one of these questions would be
  * answered by the thing being tested.
  *
- * The browser smoke (`bun run smoke`) is the other half and is not replaced:
+ * The browser smoke (`bun run smoke:examples`) is the other half and is not replaced:
  * it renders every example and can say a component throws on upgrade. It runs
  * against source. This runs against the tarball.
  *
@@ -48,8 +48,8 @@
  * promotion is about to point `latest` at, asked from the outside, over the
  * network, exactly as a consumer would get it.
  *
- *   bun run test:template
- *   bun run test:template --domain helix --registry-tag next
+ *   bun run smoke:template
+ *   bun run smoke:template --domain helix --registry-tag next
  */
 import { execFileSync } from 'node:child_process'
 import {
@@ -62,7 +62,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { domainOf, manifests, publishes, root } from './workspace.mjs'
+import { domainOf, manifests, publishes, root } from './lib/workspace.mjs'
 
 const run = (command, args, cwd) =>
   execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })

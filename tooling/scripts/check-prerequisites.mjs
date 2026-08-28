@@ -18,7 +18,7 @@
  *
  * This compares the two and fails on the difference. It does not run either.
  */
-import { manifests } from './workspace.mjs'
+import { manifests } from './lib/workspace.mjs'
 
 /**
  * The terminal step of a build, where generating stops and compiling starts.

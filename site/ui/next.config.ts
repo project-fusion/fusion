@@ -150,7 +150,7 @@ const config: NextConfig = {
    * sources import with the `.js` extension TypeScript emits, and mapping that
    * back to `.ts` is `resolve.extensionAlias`, which is webpack only. Turbopack
    * has no equivalent, so source resolution and Turbopack cannot both be had
-   * here. `bun run dev:watch` rebuilds `dist` on change instead.
+   * here. `bun run watch` rebuilds `dist` on change instead.
    */
   turbopack: {},
 }

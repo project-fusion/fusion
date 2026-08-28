@@ -24,7 +24,7 @@
  * **The cost is dev freshness**, which the reader this replaces was careful
  * about: it read the examples with `fs` precisely so that adding one showed up
  * without restarting. Editing an example now means re-running this, which
- * `bun run dev:watch` does. That is the trade the warning asks for, and it is
+ * `bun run watch` does. That is the trade the warning asks for, and it is
  * worth naming rather than discovering.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'

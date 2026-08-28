@@ -265,7 +265,7 @@ jobs:
           # you it throws on upgrade, names an element registered nowhere, or
           # lays out to nothing.
           - task: smoke
-            run: bun run smoke
+            run: bun run smoke:examples
           # Every example in both tiers, pixel for pixel against a committed
           # baseline. This is the one fault class the rest of `verify` cannot
           # reach: everything else reads source or asserts a fact somebody
@@ -380,7 +380,7 @@ jobs:
   # **One context to require, because the job names are not stable enough to
   # require directly.** A branch protection rule matches a job name, and this
   # workflow's are `checks (0)` through `checks (5)` and
-  # `browser (smoke, bun run smoke)`: the shard count is an argument and the
+  # `browser (smoke, bun run smoke:examples)`: the shard count is an argument and the
   # matrix label carries the command, so renaming a script or changing `--of 6`
   # silently un-requires whatever was named. Naming this one job instead means
   # the rule keeps holding, and a job added to `needs` is covered without anyone

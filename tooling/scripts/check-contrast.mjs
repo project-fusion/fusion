@@ -50,7 +50,7 @@ import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
-import { pairs } from './theme-facts.mjs'
+import { pairs } from './lib/theme-facts.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'site/ui/public/sandbox')

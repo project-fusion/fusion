@@ -30,7 +30,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { manifests, root } from './workspace.mjs'
+import { manifests, root } from './lib/workspace.mjs'
 
 const packages = manifests()
 

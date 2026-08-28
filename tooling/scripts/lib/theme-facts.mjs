@@ -24,7 +24,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { INTENTS } from './theme-intents.mjs'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 
 /** Where the answers live, named once so a message can point at it. */
 export const ORACLE = 'helix/theme/rust/oracle.json'

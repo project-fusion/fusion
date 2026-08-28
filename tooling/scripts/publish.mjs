@@ -4,7 +4,7 @@
  *
  * **What is packed is what is published.** Each package is packed once and that
  * exact file is handed to `npm publish`, rather than letting publish do its own
- * pack. It is the same tarball `bun run test:template` installed, byte for byte
+ * pack. It is the same tarball `bun run smoke:template` installed, byte for byte
  * and integrity hash for integrity hash, so "the tests passed" is a statement
  * about the artifact rather than about a build that preceded another build.
  *
@@ -52,7 +52,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { DOMAINS, domainOf, manifests, publishes, root } from './workspace.mjs'
+import { DOMAINS, domainOf, manifests, publishes, root } from './lib/workspace.mjs'
 
 const argument = (name) => {
   const at = process.argv.indexOf(`--${name}`)

@@ -122,7 +122,7 @@ jobs:
 
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
-      - run: bun run test:template
+      - run: bun run smoke:template
 
       - name: Publish under the pull request's own tag
         run: |

@@ -98,7 +98,7 @@
  *   node tooling/scripts/trust.mjs --apply
  */
 import { execFileSync } from 'node:child_process'
-import { domainOf, manifests, publishes } from './workspace.mjs'
+import { domainOf, manifests, publishes } from './lib/workspace.mjs'
 
 const REPOSITORY = 'project-fusion/fusion'
 
