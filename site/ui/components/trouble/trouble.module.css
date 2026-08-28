@@ -1,0 +1,69 @@
+/**
+ * The shape both dead ends share: a 404 and a caught exception.
+ *
+ * **One stylesheet because they are one layout.** A reader who asked for a page
+ * that is not there and a reader whose page threw are in the same position, a
+ * stopped journey needing a way on, and the only thing that differs is what the
+ * heading says and how many ways out there are. Two stylesheets would be the
+ * same rules under two names, drifting the first time one of them is adjusted.
+ *
+ * The root layout is above both, so the nav and the footer are already on the
+ * page. What is styled here is only the block between them, which is why there
+ * is no ground color and no chrome: inheriting the page is the point.
+ */
+.trouble {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-lg);
+  margin-inline: auto;
+  max-inline-size: 44rem;
+  padding-block: var(--helix-space-3xl);
+  padding-inline: var(--helix-space-lg);
+  text-align: center;
+}
+
+/* The status, as a word rather than a number in a headline. A large "404" is a
+   server talking to itself; the reader needs the sentence under it. */
+.troubleKicker {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  letter-spacing: var(--helix-tracking-wide);
+  text-transform: uppercase;
+}
+
+.troubleTitle {
+  font-size: var(--helix-text-3xl);
+  font-weight: var(--helix-weight-semibold);
+  line-height: var(--helix-leading-tight);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.troubleLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-loose);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* **The digest, and the reason it is shown at all.** In production the error
+   message is withheld from the client deliberately, so what a reader can tell
+   us is this hash and nothing else. Printing it turns "it broke" into a line we
+   can find in the logs. Monospace and quiet: it is for copying, not reading. */
+.troubleDigest {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  margin: 0;
+  user-select: all;
+}
+
+.troubleWays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm);
+  justify-content: center;
+}
