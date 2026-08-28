@@ -6303,7 +6303,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -6323,7 +6323,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -6395,7 +6395,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -6415,7 +6415,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -22323,7 +22323,7 @@ export type CustomElements = {
    * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
    * number a summary is told to trust was the number that was wrong.
    *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
    * enough on their own and these two are the estimate used until the first
    * measurement lands. Writing the attribute pins the value and stops the
    * measurement being consulted, which is what a container query or a transition
@@ -22434,9 +22434,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-inline-size`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
-   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
@@ -38865,7 +38865,7 @@ export type CustomElementsSolidJs = {
    * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
    * number a summary is told to trust was the number that was wrong.
    *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
    * enough on their own and these two are the estimate used until the first
    * measurement lands. Writing the attribute pins the value and stops the
    * measurement being consulted, which is what a container query or a transition
@@ -38976,9 +38976,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-inline-size`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
-   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
@@ -49610,12 +49610,12 @@ export type CustomCssProperties = {
   "--donut-chart-stroke"?: string;
   /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
   "--heatmap-cell-height"?: string;
+  /** How wide a cell is. The strip fits as many as the container allows. */
+  "--heatmap-cell-inline-size"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
   /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
-  /** How wide a cell is. The strip fits as many as the container allows. */
-  "--heatmap-cell-width"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */

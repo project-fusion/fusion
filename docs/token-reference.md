@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by
 `bun run tokens`. Do not edit.*
 
-179 semantic tokens in 15 categories, every one in exactly
+185 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-tracking-wider`, `--helix-material-blur-sm`, `--helix-size-avatar-md`, `--helix-layer-beneath`.
+Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-tracking-wider`, `--helix-material-blur-sm`, `--helix-size-checkbox-tight`, `--helix-size-checkbox-loose`, `--helix-size-avatar-md`, `--helix-layer-beneath`.
 
 ## color
 
@@ -259,6 +259,12 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 21 |
 | `--helix-size-control` | `var(--helix-size-control-md)` | 50 |
 | `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 5 |
+| `--helix-size-control-tight` | `calc(var(--helix-size-control) * 0.8)` | 25 |
+| `--helix-size-control-loose` | `calc(var(--helix-size-control) * 1.2)` | 3 |
+| `--helix-size-icon-tight` | `calc(var(--helix-size-icon) * 0.8)` | 31 |
+| `--helix-size-icon-loose` | `calc(var(--helix-size-icon) * 1.2)` | 18 |
+| `--helix-size-checkbox-tight` | `calc(var(--helix-size-checkbox) * 0.8)` | 0 |
+| `--helix-size-checkbox-loose` | `calc(var(--helix-size-checkbox) * 1.2)` | 0 |
 | `--helix-size-button` | `calc(12.5rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-badge` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-avatar` | `var(--helix-size-avatar-md)` | 2 |

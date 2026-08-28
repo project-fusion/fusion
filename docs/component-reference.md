@@ -39,10 +39,10 @@ the default: an accordion is a list, where a card is a surface.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--accordion-border-color` | Color of the seams, and of the frame when outlined. |
-| `--accordion-radii` | Corner radius of the stack, when outlined. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--accordion-border-color` | - | Color of the seams, and of the frame when outlined. |
+| `--accordion-radius` | - | Corner radius of the stack, when outlined. |
 
 ### Item (`helix-accordion-item`)
 
@@ -101,9 +101,9 @@ Usable on its own as a disclosure, with no accordion around it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--accordion-item-padding` | Inset of the trigger and content. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--accordion-item-padding` | - | Inset of the trigger and content. |
 
 ## Announcement
 
@@ -156,9 +156,9 @@ band across the top of the page, not a box that happens to be wide.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--announcement-inset` | Inline padding, matched to the page. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--announcement-inset` | - | Inline padding, matched to the page. |
 
 ## App Header
 
@@ -214,14 +214,14 @@ no shadow: the rule is the whole of it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--app-header-backdrop` | The filter behind it. `none` to pair it with a panel. |
-| `--app-header-background` | Fill behind the banner. |
-| `--app-header-border-color` | The line under the bar. None by default. |
-| `--app-header-height` | Height of the banner. |
-| `--app-header-inset` | Inline padding of the banner. |
-| `--app-header-max-inline-size` | Width the content is centered in. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--app-header-backdrop` | - | The filter behind it. `none` to pair it with a panel. |
+| `--app-header-background-color` | - | Fill behind the banner. |
+| `--app-header-block-size` | - | Height of the banner. |
+| `--app-header-border-color` | - | The line under the bar. None by default. |
+| `--app-header-max-inline-size` | - | Width the content is centered in. |
+| `--app-header-padding` | - | Inline padding of the banner. |
 
 ## Aura
 
@@ -347,10 +347,10 @@ every size, including one a consumer sets themselves through
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--avatar-background-color` | Fill behind the initials. |
-| `--avatar-size` | Edge length of the avatar. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--avatar-background-color` | - | Fill behind the initials. |
+| `--avatar-size` | - | Edge length of the avatar. |
 
 ### Group (`helix-avatar-group`)
 
@@ -393,10 +393,10 @@ its markup is the worse trade of the two.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--avatar-group-overlap` | How far each avatar sits over the one before it. |
-| `--avatar-group-ring-color` | The separation drawn between one avatar and the next. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--avatar-group-overlap` | - | How far each avatar sits over the one before it. |
+| `--avatar-group-ring-color` | - | The separation drawn between one avatar and the next. |
 
 ## Badge
 
@@ -433,11 +433,11 @@ on a dark icon reads as a bite taken out of the icon.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--badge-background-color` | Fill of the indicator. |
-| `--badge-offset` | Pulls the mark in from the corner, along both axes. |
-| `--badge-ring-color` | The ring separating it from what is behind. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--badge-background-color` | - | Fill of the indicator. |
+| `--badge-offset` | - | Pulls the mark in from the corner, along both axes. |
+| `--badge-ring-color` | - | The ring separating it from what is behind. |
 
 ## Bar Chart
 
@@ -502,19 +502,19 @@ it is measured against.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--bar-chart-band-color` | The slot the pointer is resting in. |
-| `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
-| `--bar-chart-bar-stroke` | Width of the edge an `outlined` or `subtle` column is drawn with. |
-| `--bar-chart-block-size` | Height of the drawing. |
-| `--bar-chart-gap` | Space between the drawing and its labels. |
-| `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
-| `--bar-chart-line-color` | A `lines` series, overriding its series color. |
-| `--bar-chart-line-width` | Thickness of a `lines` series. |
-| `--bar-chart-axis` | The color of a single-series axis, taken from that series. |
-| `--bar-chart-secondary` | The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
-| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--bar-chart-band-color` | - | The slot the pointer is resting in. |
+| `--bar-chart-bar-radius` | - | Corner radius at the far end of a column. |
+| `--bar-chart-bar-stroke` | - | Width of the edge an `outlined` or `subtle` column is drawn with. |
+| `--bar-chart-block-size` | - | Height of the drawing. |
+| `--bar-chart-gap` | - | Space between the drawing and its labels. |
+| `--bar-chart-gridline-color` | - | One rule across the plot, under `gridlines`. |
+| `--bar-chart-line-color` | - | A `lines` series, overriding its series color. |
+| `--bar-chart-line-width` | - | Thickness of a `lines` series. |
+| `--bar-chart-axis` | `HelixHeadlessBarChart` | The color of a single-series axis, taken from that series. |
+| `--bar-chart-secondary` | `HelixHeadlessBarChart` | The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
+| `--chart-bar-wash` | `HelixHeadlessBarChart` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
 
 ## Blockquote
 
@@ -551,9 +551,9 @@ top of that are the same thing said twice.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--blockquote-size` | Size of the quoted passage. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--blockquote-size` | - | Size of the quoted passage. |
 
 ## Breadcrumbs
 
@@ -580,9 +580,9 @@ because a truncated path tells the reader less than a two-line one.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--breadcrumbs-gap` | Space between items and separators. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--breadcrumbs-gap` | - | Space between items and separators. |
 
 ### Breadcrumb (`helix-breadcrumb`)
 
@@ -627,12 +627,12 @@ and leaves box and background to `::slotted`.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--breadcrumbs-control-padding-inline` | Inline padding of a control slotted into a crumb, matching the steps either side of it. |
-| `--breadcrumbs-control-size` | How tall a control slotted into a crumb is. |
-| `--breadcrumbs-hover-color` | Fill behind a step under the pointer. |
-| `--breadcrumbs-separator-color` | Color of the chevron. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--breadcrumbs-control-padding-inline` | - | Inline padding of a control slotted into a crumb, matching the steps either side of it. |
+| `--breadcrumbs-control-size` | - | How tall a control slotted into a crumb is. |
+| `--breadcrumbs-hover-color` | - | Fill behind a step under the pointer. |
+| `--breadcrumbs-separator-color` | - | Color of the chevron. |
 
 ## Button
 
@@ -699,22 +699,22 @@ ring is declared here rather than inherited, because the base layer's
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--button-background-color` | Fill behind the button, in every state. |
-| `--button-background-color-hover` | Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. |
-| `--button-foreground-color` | Label and icon color. |
-| `--button-gap` | Space between the label and whatever flanks it. |
-| `--button-inline-size` | Width taken by `width="standard"`. |
-| `--button-padding-inline` | Inline padding, for a container whose rhythm is not the control default. |
-| `--button-radii` | Corner radius of the control. |
-| `--button-radii-end` | Trailing corners, which a group flattens. |
-| `--button-radii-end-end` | The bottom trailing corner, for a group stacking down. |
-| `--button-radii-end-start` | The bottom leading corner, for a group stacking down. |
-| `--button-radii-start` | Leading corners, which a group flattens. |
-| `--button-radii-start-end` | The top trailing corner, for a group stacking down. |
-| `--button-radii-start-start` | The top leading corner, for a group stacking down. |
-| `--button-size` | Height of the control, for a container whose row is not one of the density steps. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--button-background-color` | - | Fill behind the button, in every state. |
+| `--button-background-color-hover` | - | Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. |
+| `--button-foreground-color` | - | Label and icon color. |
+| `--button-gap` | - | Space between the label and whatever flanks it. |
+| `--button-inline-size` | - | Width taken by `width="standard"`. |
+| `--button-padding-inline` | - | Inline padding, for a container whose rhythm is not the control default. |
+| `--button-radius` | - | Corner radius of the control. |
+| `--button-radius-end` | - | Trailing corners, which a group flattens. |
+| `--button-radius-end-end` | - | The bottom trailing corner, for a group stacking down. |
+| `--button-radius-end-start` | - | The bottom leading corner, for a group stacking down. |
+| `--button-radius-start` | - | Leading corners, which a group flattens. |
+| `--button-radius-start-end` | - | The top trailing corner, for a group stacking down. |
+| `--button-radius-start-start` | - | The top leading corner, for a group stacking down. |
+| `--button-size` | - | Height of the control, for a container whose row is not one of the density steps. |
 
 ## Button Group
 
@@ -749,9 +749,9 @@ therefore serves a consumer's own anchor styled as a button.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--button-group-gap` | Space between the buttons, when `spaced`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--button-group-gap` | - | Space between the buttons, when `spaced`. |
 
 ## Callout
 
@@ -792,10 +792,10 @@ headless tier; this tier only decides what that meaning looks like.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--callout-background-color` | Fill behind the callout. |
-| `--callout-radii` | Corner radius of the callout. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--callout-background-color` | - | Fill behind the callout. |
+| `--callout-radius` | - | Corner radius of the callout. |
 
 ## Card
 
@@ -840,18 +840,18 @@ element you slotted, not a wrapper around it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--card-align` | How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. |
-| `--card-backdrop` | Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card. |
-| `--card-background-color` | Surface behind the card. |
-| `--card-border-color` | Border color of the surface. |
-| `--card-border-width` | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |
-| `--card-media-block-size` | Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. |
-| `--card-media-size` | Width of the media column when horizontal. |
-| `--card-padding` | Inset applied to each region. |
-| `--card-radii` | Corner radius of the surface. |
-| `--card-shadow` | Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--card-align` | - | How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. |
+| `--card-backdrop` | - | Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card. |
+| `--card-background-color` | - | Surface behind the card. |
+| `--card-border-color` | - | Border color of the surface. |
+| `--card-border-width` | - | Width of the surface's edge. Follows `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a theme says otherwise. |
+| `--card-media-block-size` | - | Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. |
+| `--card-media-size` | - | Width of the media column when horizontal. |
+| `--card-padding` | - | Inset applied to each region. |
+| `--card-radius` | - | Corner radius of the surface. |
+| `--card-shadow` | - | Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. |
 
 ## Carousel
 
@@ -926,11 +926,11 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--carousel-bleed` | Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. |
-| `--carousel-block-size` | Height of a vertical track. |
-| `--carousel-gap` | Space between slides. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--carousel-bleed` | - | Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. |
+| `--carousel-block-size` | - | Height of a vertical track. |
+| `--carousel-gap` | - | Space between slides. |
 
 ## Chat
 
@@ -1004,15 +1004,15 @@ offering it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--chat-gap` | Space between turns. |
-| `--chat-max-height` | How tall the conversation may get before the transcript scrolls. |
-| `--chat-padding-inline` | Space either side of every region. |
-| `--chat-resume-border-color` | The edge around the way back. |
-| `--chat-resume-border-width` | How thick that edge is, for a surface over content. |
-| `--chat-resume-shadow` | The lift under the way back, which floats over the transcript. |
-| `--chat-rule` | The hairline under the header. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--chat-gap` | - | Space between turns. |
+| `--chat-max-block-size` | - | How tall the conversation may get before the transcript scrolls. |
+| `--chat-padding-inline` | - | Space either side of every region. |
+| `--chat-resume-border-color` | - | The edge around the way back. |
+| `--chat-resume-border-width` | - | How thick that edge is, for a surface over content. |
+| `--chat-resume-shadow` | - | The lift under the way back, which floats over the transcript. |
+| `--chat-rule` | - | The hairline under the header. |
 
 ### Composer (`helix-chat-composer`)
 
@@ -1071,11 +1071,11 @@ a ceiling eats the transcript it belongs to.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--chat-composer-background` | Fill behind the composer. |
-| `--chat-composer-border-width` | The composer's edge, so a theme can remove it. |
-| `--chat-composer-max-height` | How tall the field may grow. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--chat-composer-background-color` | - | Fill behind the composer. |
+| `--chat-composer-border-width` | - | The composer's edge, so a theme can remove it. |
+| `--chat-composer-max-block-size` | - | How tall the field may grow. |
 
 ### Message (`helix-chat-message`)
 
@@ -1136,12 +1136,12 @@ is the signal, and decorating it competes with the thing it is decorating.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--chat-message-background` | Fill behind a turn. |
-| `--chat-message-background-me` | Fill behind the reader's own turns. |
-| `--chat-message-color` | Ink in a turn. |
-| `--chat-message-measure` | How wide a turn may get before it wraps. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--chat-message-background-color` | - | Fill behind a turn. |
+| `--chat-message-background-color-me` | - | Fill behind the reader's own turns. |
+| `--chat-message-color` | - | Ink in a turn. |
+| `--chat-message-measure` | - | How wide a turn may get before it wraps. |
 
 ## Checkbox
 
@@ -1217,16 +1217,16 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--checkbox-background-color` | Fill of an unticked box. |
-| `--checkbox-border-color` | Edge of the box, in every state. |
-| `--checkbox-card-background-color` | Fill behind a card-shaped choice. |
-| `--checkbox-card-border-color` | Edge around one. |
-| `--checkbox-card-padding` | Inset of the card appearance. |
-| `--checkbox-checked-color` | Fill of a ticked box. |
-| `--checkbox-mark-color` | Ink the tick is drawn in. |
-| `--checkbox-size` | Width and height of the box. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--checkbox-background-color` | - | Fill of an unticked box. |
+| `--checkbox-border-color` | - | Edge of the box, in every state. |
+| `--checkbox-card-background-color` | - | Fill behind a card-shaped choice. |
+| `--checkbox-card-border-color` | - | Edge around one. |
+| `--checkbox-card-padding` | - | Inset of the card appearance. |
+| `--checkbox-checked-color` | - | Fill of a ticked box. |
+| `--checkbox-mark-color` | - | Ink the tick is drawn in. |
+| `--checkbox-size` | - | Width and height of the box. |
 
 ## Checkbox Group
 
@@ -1289,9 +1289,9 @@ line per answer rather than hunting along a row.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--checkbox-group-gap` | Space between the boxes. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--checkbox-group-gap` | - | Space between the boxes. |
 
 ## Code
 
@@ -1318,10 +1318,10 @@ around it at the same nominal size. `--code-size` overrides it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--code-padding` | Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. |
-| `--code-size` | The fragment's size. Defaults to `text-sm`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--code-padding` | - | Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. |
+| `--code-size` | - | The fragment's size. Defaults to `text-sm`. |
 
 ## Code Block
 
@@ -1365,13 +1365,13 @@ of a snippet a reader is most likely to be reading.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--code-block-backdrop` | A filter over what shows through the block and its header, for a translucent ground. |
-| `--code-block-background` | The ground behind the code, for a block that is not on the page. |
-| `--code-block-border-color` | The line around the block and its header. |
-| `--code-block-header-background` | The ground behind the name, where it should not be `surface-raised`. |
-| `--code-block-radii` | The corner on the header's top and the block's bottom, which are one shape. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--code-block-backdrop` | - | A filter over what shows through the block and its header, for a translucent ground. |
+| `--code-block-background-color` | - | The ground behind the code, for a block that is not on the page. |
+| `--code-block-border-color` | - | The line around the block and its header. |
+| `--code-block-header-background-color` | - | The ground behind the name, where it should not be `surface-raised`. |
+| `--code-block-radius` | - | The corner on the header's top and the block's bottom, which are one shape. |
 
 ## Color Input
 
@@ -1499,16 +1499,16 @@ pads its own lower rows.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--color-input-background-color` | Fill behind the field. |
-| `--color-input-border-color` | Color of the panel's edge. |
-| `--color-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--color-input-panel-size` | Width of the panel, and so of the square. |
-| `--color-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--color-input-swatch-radii` | Corner radius of that block. |
-| `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
-| `--color-input-swatch` | The chosen color, to paint over the transparency check. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--color-input-background-color` | - | Fill behind the field. |
+| `--color-input-border-color` | - | Color of the panel's edge. |
+| `--color-input-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--color-input-panel-size` | - | Width of the panel, and so of the square. |
+| `--color-input-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--color-input-swatch-radius` | - | Corner radius of that block. |
+| `--color-input-swatch-size` | - | Edge length of the block in `appearance="swatch"`. |
+| `--color-input-swatch` | `HelixHeadlessColorInput` | The chosen color, to paint over the transparency check. |
 
 ## Color Picker
 
@@ -1622,17 +1622,17 @@ brought its own card would be a card inside a card there.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--color-picker-grid-radii` | Corner radius of the square. |
-| `--color-picker-grid-ratio` | Aspect ratio of the square. |
-| `--color-picker-inset` | Inset of the rows under the square, and the bottom. |
-| `--color-picker-sample-size` | Edge length of the chip that copies the value. |
-| `--color-picker-swatch-size` | Edge length of one preset. |
-| `--color-picker-brightness` | The chosen brightness, 0 to 100, as a percentage. |
-| `--color-picker-hue` | The chosen hue, 0 to 360, unitless. |
-| `--color-picker-saturation` | The chosen saturation, 0 to 100, as a percentage. |
-| `--color-picker-swatch` | A color to paint: the current one on the sample, a preset's on each preset. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--color-picker-grid-radius` | - | Corner radius of the square. |
+| `--color-picker-grid-ratio` | - | Aspect ratio of the square. |
+| `--color-picker-padding` | - | Inset of the rows under the square, and the bottom. |
+| `--color-picker-sample-size` | - | Edge length of the chip that copies the value. |
+| `--color-picker-swatch-size` | - | Edge length of one preset. |
+| `--color-picker-brightness` | `HelixHeadlessColorPicker` | The chosen brightness, 0 to 100, as a percentage. |
+| `--color-picker-hue` | `HelixHeadlessColorPicker` | The chosen hue, 0 to 360, unitless. |
+| `--color-picker-saturation` | `HelixHeadlessColorPicker` | The chosen saturation, 0 to 100, as a percentage. |
+| `--color-picker-swatch` | `HelixHeadlessColorPicker` | A color to paint: the current one on the sample, a preset's on each preset. |
 
 ## Combobox
 
@@ -1742,14 +1742,14 @@ Input, Color Input and Date Input all take.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--combobox-background-color` | Fill behind the field. |
-| `--combobox-border-color` | Color of the panel's edge. |
-| `--combobox-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--combobox-control-size` | Smallest the text field shrinks to |
-| `--combobox-panel-size` | Width of the panel. Follows the field by default. |
-| `--combobox-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--combobox-background-color` | - | Fill behind the field. |
+| `--combobox-border-color` | - | Color of the panel's edge. |
+| `--combobox-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--combobox-control-size` | - | Smallest the text field shrinks to |
+| `--combobox-panel-size` | - | Width of the panel. Follows the field by default. |
+| `--combobox-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Command
 
@@ -1819,10 +1819,10 @@ otherwise walk up and down the screen under the words being typed.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--command-list-size` | How tall the list grows before it scrolls. |
-| `--command-size` | How wide the palette is. Defaults to `40rem`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--command-list-size` | - | How tall the list grows before it scrolls. |
+| `--command-size` | - | How wide the palette is. Defaults to `40rem`. |
 
 ## Copy Button
 
@@ -1893,6 +1893,14 @@ it for reassurance reads as a second, accidental press.
 | `mark` | The clipboard glyph, and the confirmation that replaces it. |
 | `tooltip` | The bubble, forwarded from the tooltip inside. |
 | `tooltip-arrow` | The point, resting against the trigger. |
+
+#### Custom properties
+
+| Property | From | Description |
+| --- | --- | --- |
+| `--icon-button-radius` | `HelixIconButton` | Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. |
+| `--icon-button-shadow` | `HelixIconButton` | What it casts, where it is raised off the page. |
+| `--icon-button-size` | `HelixIconButton` | Edge length of the control. |
 
 ## Data Table
 
@@ -1977,16 +1985,16 @@ limitation and worth repeating where a consumer chooses between the two: use
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--data-table-color` | Ink in a cell. |
-| `--data-table-columns` | Track list for the columns, which wins over the one the columns worked out. |
-| `--data-table-heading-color` | Ink in a heading. |
-| `--data-table-padding-block` | Space above and below a cell's content. |
-| `--data-table-padding-inline` | Space either side of a cell's content. |
-| `--data-table-rule` | The hairline between rows. |
-| `--data-table-text` | Type size, headings and cells alike. |
-| `--data-table-template` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--data-table-color` | - | Ink in a cell. |
+| `--data-table-columns` | - | Track list for the columns, which wins over the one the columns worked out. |
+| `--data-table-heading-color` | - | Ink in a heading. |
+| `--data-table-padding-block` | - | Space above and below a cell's content. |
+| `--data-table-padding-inline` | - | Space either side of a cell's content. |
+| `--data-table-rule` | - | The hairline between rows. |
+| `--data-table-text` | - | Type size, headings and cells alike. |
+| `--data-table-template` | `HelixHeadlessDataTable` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. |
 
 ## Date Input
 
@@ -2109,12 +2117,12 @@ whatever holds it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--date-input-background-color` | Fill behind the field. |
-| `--date-input-border-color` | Color of the panel's edge. |
-| `--date-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--date-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--date-input-background-color` | - | Fill behind the field. |
+| `--date-input-border-color` | - | Color of the panel's edge. |
+| `--date-input-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--date-input-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Date Picker
 
@@ -2211,15 +2219,15 @@ grid reads as a continuous run of dates.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--date-picker-columns` | Months per row. Two unless there is only one. |
-| `--date-picker-day-size` | Width and height of a day. |
-| `--date-picker-range-color` | Band behind the days in a range. |
-| `--date-picker-row-size` | Height of a week row. |
-| `--date-picker-selected-color` | Fill behind a selected day. |
-| `--date-picker-track-size` | Width of a column, which is what sets the space between days. |
-| `--date-picker-column-count` | How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--date-picker-columns` | - | Months per row. Two unless there is only one. |
+| `--date-picker-day-size` | - | Width and height of a day. |
+| `--date-picker-range-color` | - | Band behind the days in a range. |
+| `--date-picker-row-size` | - | Height of a week row. |
+| `--date-picker-selected-color` | - | Fill behind a selected day. |
+| `--date-picker-track-size` | - | Width of a column, which is what sets the space between days. |
+| `--date-picker-column-count` | `HelixHeadlessDatePicker` | How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. |
 
 ## Dialog
 
@@ -2282,16 +2290,16 @@ dialog rather than being a div somebody positioned.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--dialog-border-color` | Color of the panel's edge. |
-| `--dialog-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--dialog-icon-size` | How big the mark above the title is. |
-| `--dialog-inline-size` | Width of the panel. |
-| `--dialog-inset` | Padding inside the panel. |
-| `--dialog-rise` | How far the panel rises as it opens. Follows `--helix-space-lg`. |
-| `--dialog-scrim` | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
-| `--dialog-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--dialog-border-color` | - | Color of the panel's edge. |
+| `--dialog-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--dialog-icon-size` | - | How big the mark above the title is. |
+| `--dialog-inline-size` | - | Width of the panel. |
+| `--dialog-padding` | - | Padding inside the panel. |
+| `--dialog-rise` | - | How far the panel rises as it opens. Follows `--helix-space-lg`. |
+| `--dialog-scrim` | - | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
+| `--dialog-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Divider
 
@@ -2328,14 +2336,14 @@ tall that is.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--divider-color` | Color of the rule. |
-| `--divider-inset` | Space taken off both ends of it. |
-| `--divider-inset-end` | Off the far end only. |
-| `--divider-inset-start` | Off the near end only. |
-| `--divider-length` | How long a vertical rule is. Horizontal takes its width. |
-| `--divider-thickness` | How heavy the rule is. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--divider-color` | - | Color of the rule. |
+| `--divider-length` | - | How long a vertical rule is. Horizontal takes its width. |
+| `--divider-padding` | - | Space taken off both ends of it. |
+| `--divider-padding-end` | - | Off the far end only. |
+| `--divider-padding-start` | - | Off the near end only. |
+| `--divider-thickness` | - | How heavy the rule is. |
 
 ## Donut Chart
 
@@ -2404,12 +2412,12 @@ larger than the default.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--donut-chart-edge-stroke` | Thickness of the slice boundary under `outlined`. |
-| `--donut-chart-size` | Width and height of the ring. |
-| `--donut-chart-track-color` | Color of the ring under the slices. |
-| `--donut-chart-stroke` | How thick the ring is drawn, derived from `hole`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--donut-chart-edge-stroke` | - | Thickness of the slice boundary under `outlined`. |
+| `--donut-chart-size` | - | Width and height of the ring. |
+| `--donut-chart-track-color` | - | Color of the ring under the slices. |
+| `--donut-chart-stroke` | `HelixHeadlessDonutChart` | How thick the ring is drawn, derived from `hole`. |
 
 ## Drawer
 
@@ -2469,18 +2477,18 @@ rest is flat and the movement is what says something happened.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--drawer-backdrop` | Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. |
-| `--drawer-background-color` | Surface behind the panel. |
-| `--drawer-border-color` | Color of the panel's edge. |
-| `--drawer-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--drawer-inset` | Padding inside the panel. |
-| `--drawer-inset-block-start` | Padding above the content, which clears the close control. |
-| `--drawer-radii` | Corner radius on the edges that face the page. |
-| `--drawer-scrim` | The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
-| `--drawer-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--drawer-size` | Width or height of the panel. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--drawer-backdrop` | - | Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. |
+| `--drawer-background-color` | - | Surface behind the panel. |
+| `--drawer-border-color` | - | Color of the panel's edge. |
+| `--drawer-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--drawer-padding` | - | Padding inside the panel. |
+| `--drawer-padding-block-start` | - | Padding above the content, which clears the close control. |
+| `--drawer-radius` | - | Corner radius on the edges that face the page. |
+| `--drawer-scrim` | - | The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
+| `--drawer-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--drawer-size` | - | Width or height of the panel. |
 
 ## Drilldown
 
@@ -2542,10 +2550,10 @@ from: the page arriving was not in the DOM a frame ago. Under
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--drilldown-background` | Fill behind the pages. |
-| `--drilldown-inline-size` | Width of the region. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--drilldown-background-color` | - | Fill behind the pages. |
+| `--drilldown-inline-size` | - | Width of the region. |
 
 ### Item (`helix-drilldown-item`)
 
@@ -2598,9 +2606,9 @@ lines up with the edge the eye is already following down the list.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--drilldown-item-hover-color` | Fill when a row is under the pointer. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--drilldown-item-hover-color` | - | Fill when a row is under the pointer. |
 
 ## Empty
 
@@ -2631,9 +2639,9 @@ empty.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--empty-inset` | Space around the whole block. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--empty-padding` | - | Space around the whole block. |
 
 ## File Input
 
@@ -2732,10 +2740,10 @@ invisible.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--file-input-background-color` | Fill behind the field. |
-| `--file-input-inset` | Padding inside the field. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--file-input-background-color` | - | Fill behind the field. |
+| `--file-input-padding` | - | Padding inside the field. |
 
 ## Flex
 
@@ -2847,9 +2855,9 @@ Presentation only, so there is no headless tier.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--grid-columns` | An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--grid-columns` | - | An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. |
 
 ## Heatmap
 
@@ -2928,26 +2936,26 @@ compare two cells by. Both are hooks, so a page may answer differently.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--heatmap-cell-height` | How tall a cell is. A row of a tall thin cell is what a status page draws. |
-| `--heatmap-cell-radius` | How far a cell's corners are rounded. |
-| `--heatmap-cell-size` | The size a cell wants on both axes, where neither is given its own. |
-| `--heatmap-cell-width` | How wide a cell is. The strip fits as many as the container allows. |
-| `--heatmap-gap` | Space between cells. Zero is a continuous field rather than a grid of tiles. |
-| `--heatmap-tone-1` | The quietest step of the magnitude ramp, reached by `tones="1 …"`. |
-| `--heatmap-tone-2` | The second step of the magnitude ramp. |
-| `--heatmap-tone-3` | The third step of the magnitude ramp. |
-| `--heatmap-tone-4` | The fourth step of the magnitude ramp. |
-| `--heatmap-tone-5` | The loudest step of the magnitude ramp. |
-| `--heatmap-tone-accent` | What `accent` is worth. |
-| `--heatmap-tone-danger` | What `danger` is worth. |
-| `--heatmap-tone-info` | What `info` is worth. |
-| `--heatmap-tone-muted` | What `muted` is worth: the quiet ground, for a bucket that means nothing happened. |
-| `--heatmap-tone-primary` | What `primary` is worth. |
-| `--heatmap-tone-success` | What `success` is worth, as a name or a `data-tone`. |
-| `--heatmap-tone-warning` | What `warning` is worth. |
-| `--heatmap-tone` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--heatmap-cell-height` | `HelixHeadlessHeatmap` | How tall a cell is. A row of a tall thin cell is what a status page draws. |
+| `--heatmap-cell-inline-size` | `HelixHeadlessHeatmap` | How wide a cell is. The strip fits as many as the container allows. |
+| `--heatmap-cell-radius` | `HelixHeadlessHeatmap` | How far a cell's corners are rounded. |
+| `--heatmap-cell-size` | `HelixHeadlessHeatmap` | The size a cell wants on both axes, where neither is given its own. |
+| `--heatmap-gap` | `HelixHeadlessHeatmap` | Space between cells. Zero is a continuous field rather than a grid of tiles. |
+| `--heatmap-tone-1` | `HelixHeadlessHeatmap` | The quietest step of the magnitude ramp, reached by `tones="1 …"`. |
+| `--heatmap-tone-2` | `HelixHeadlessHeatmap` | The second step of the magnitude ramp. |
+| `--heatmap-tone-3` | `HelixHeadlessHeatmap` | The third step of the magnitude ramp. |
+| `--heatmap-tone-4` | `HelixHeadlessHeatmap` | The fourth step of the magnitude ramp. |
+| `--heatmap-tone-5` | `HelixHeadlessHeatmap` | The loudest step of the magnitude ramp. |
+| `--heatmap-tone-accent` | `HelixHeadlessHeatmap` | What `accent` is worth. |
+| `--heatmap-tone-danger` | `HelixHeadlessHeatmap` | What `danger` is worth. |
+| `--heatmap-tone-info` | `HelixHeadlessHeatmap` | What `info` is worth. |
+| `--heatmap-tone-muted` | `HelixHeadlessHeatmap` | What `muted` is worth: the quiet ground, for a bucket that means nothing happened. |
+| `--heatmap-tone-primary` | `HelixHeadlessHeatmap` | What `primary` is worth. |
+| `--heatmap-tone-success` | `HelixHeadlessHeatmap` | What `success` is worth, as a name or a `data-tone`. |
+| `--heatmap-tone-warning` | `HelixHeadlessHeatmap` | What `warning` is worth. |
+| `--heatmap-tone` | `HelixHeadlessHeatmap` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
 
 ## Icon
 
@@ -2977,9 +2985,9 @@ proportion as the button's own size changes.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--icon-size` | Edge length of the icon's box. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--icon-size` | - | Edge length of the icon's box. |
 
 ## Icon Button
 
@@ -3048,11 +3056,11 @@ common way a toolbar becomes unusable without sight.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--icon-button-radii` | Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. |
-| `--icon-button-shadow` | What it casts, where it is raised off the page. |
-| `--icon-button-size` | Edge length of the control. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--icon-button-radius` | - | Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. |
+| `--icon-button-shadow` | - | What it casts, where it is raised off the page. |
+| `--icon-button-size` | - | Edge length of the control. |
 
 ## Image
 
@@ -3110,13 +3118,13 @@ base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--image-aspect` | The ratio of the box, as `16 / 9`. |
-| `--image-fit` | How the picture fills it. |
-| `--image-placeholder-color` | The resting surface behind both stand-ins. |
-| `--image-position` | Which part survives a crop. |
-| `--image-radius` | Corner radius, under `rounded`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--image-aspect` | - | The ratio of the box, as `16 / 9`. |
+| `--image-fit` | - | How the picture fills it. |
+| `--image-placeholder-color` | - | The resting surface behind both stand-ins. |
+| `--image-position` | - | Which part survives a crop. |
+| `--image-radius` | - | Corner radius, under `rounded`. |
 
 ## Input
 
@@ -3211,10 +3219,10 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--input-background-color` | Fill behind the text. |
-| `--input-size` | Height of the field. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--input-background-color` | - | Fill behind the text. |
+| `--input-size` | - | Height of the field. |
 
 ## Kbd
 
@@ -3258,10 +3266,10 @@ than holding one size and looking wrong in a heading.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--kbd-background-color` | Fill of the key. |
-| `--kbd-border-color` | Color of the hairline and the edge. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--kbd-background-color` | - | Fill of the key. |
+| `--kbd-border-color` | - | Color of the hairline and the edge. |
 
 ## Legend
 
@@ -3304,12 +3312,12 @@ custom property set inline would be the headless tier naming a color.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--legend-direction` | `row`, which wraps, or `column`. |
-| `--legend-gap` | Space between entries. |
-| `--legend-swatch-size` | Size of the color patch. |
-| `--legend-swatch-stroke` | Width of the edge an `outlined` or `subtle` swatch is drawn with. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--legend-direction` | - | `row`, which wraps, or `column`. |
+| `--legend-gap` | - | Space between entries. |
+| `--legend-swatch-size` | - | Size of the color patch. |
+| `--legend-swatch-stroke` | - | Width of the edge an `outlined` or `subtle` swatch is drawn with. |
 
 ## Line Chart
 
@@ -3375,14 +3383,14 @@ answers for a shape.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--line-chart-area-opacity` | How much of a line's color its wash takes. |
-| `--line-chart-band-color` | The slot the pointer is resting in. |
-| `--line-chart-block-size` | Height of the drawing. |
-| `--line-chart-gap` | Space between the drawing and its labels. |
-| `--line-chart-gridline-color` | One rule across the plot, under `gridlines`. |
-| `--line-chart-width` | Thickness of a line. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--line-chart-area-opacity` | - | How much of a line's color its wash takes. |
+| `--line-chart-band-color` | - | The slot the pointer is resting in. |
+| `--line-chart-block-size` | - | Height of the drawing. |
+| `--line-chart-gap` | - | Space between the drawing and its labels. |
+| `--line-chart-gridline-color` | - | One rule across the plot, under `gridlines`. |
+| `--line-chart-width` | - | Thickness of a line. |
 
 ## List
 
@@ -3415,12 +3423,12 @@ decoration doing what emptiness already does.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--list-gap` | Space between rows. |
-| `--list-marker-gutter` | Room the ordered and unordered markers hang into. |
-| `--list-rail-style` | What a rail counts with. Any `list-style-type`. |
-| `--list-rail-width` | The width of the rail's track. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--list-gap` | - | Space between rows. |
+| `--list-marker-gutter` | - | Room the ordered and unordered markers hang into. |
+| `--list-rail-inline-size` | - | The width of the rail's track. |
+| `--list-rail-style` | - | What a rail counts with. Any `list-style-type`. |
 
 ### Item (`helix-list-item`)
 
@@ -3458,12 +3466,12 @@ hold their own width and the middle takes the rest.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--list-item-inset` | Padding inside the row. |
-| `--list-item-rail-content` | What the rail cell shows. Written by the list. |
-| `--list-item-rail-display` | Whether there is a rail at all. Written by the list. |
-| `--list-item-term-weight` | Weight of a description list's term. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--list-item-padding` | - | Padding inside the row. |
+| `--list-item-rail-content` | - | What the rail cell shows. Written by the list. |
+| `--list-item-rail-display` | - | Whether there is a rail at all. Written by the list. |
+| `--list-item-term-weight` | - | Weight of a description list's term. |
 
 ## Listbox
 
@@ -3557,9 +3565,9 @@ list moves under the reader rather than the reader moving to find it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--listbox-max-block-size` | How tall it gets before it scrolls. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--listbox-max-block-size` | - | How tall it gets before it scrolls. |
 
 ## Loader
 
@@ -3599,11 +3607,11 @@ to say so.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--loader-color` | Color of the moving arc. |
-| `--loader-size` | Diameter. Defaults to 1.5em. |
-| `--loader-track-color` | Color of the circle behind it. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--loader-color` | - | Color of the moving arc. |
+| `--loader-size` | - | Diameter. Defaults to 1.5em. |
+| `--loader-track-color` | - | Color of the circle behind it. |
 
 ## Megamenu
 
@@ -3658,16 +3666,16 @@ Everything about what opens it and what closes it is the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--megamenu-backdrop` | A filter behind the panel, for glass. |
-| `--megamenu-background` | The panel's own fill. |
-| `--megamenu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
-| `--megamenu-full-size` | How wide the band's contents may get, centered in it. |
-| `--megamenu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--megamenu-size` | How wide the panel may get. |
-| `--megamenu-top` | Where the panel starts, measured from the bar above it. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--megamenu-backdrop` | - | A filter behind the panel, for glass. |
+| `--megamenu-background-color` | - | The panel's own fill. |
+| `--megamenu-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--megamenu-column-size` | - | The narrowest a column goes before the grid wraps. |
+| `--megamenu-full-size` | - | How wide the band's contents may get, centered in it. |
+| `--megamenu-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--megamenu-size` | - | How wide the panel may get. |
+| `--megamenu-top` | `HelixHeadlessMegamenu` | Where the panel starts, measured from the bar above it. |
 
 ## Menu
 
@@ -3736,14 +3744,14 @@ one panel and reads the same on a phone as on a desk.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--menu-background-color` | Fill of the surface. |
-| `--menu-border-color` | Color of the panel's edge. |
-| `--menu-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--menu-max-block-size` | Tallest the surface grows before it scrolls. |
-| `--menu-min-inline-size` | Narrowest the surface gets. |
-| `--menu-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--menu-background-color` | - | Fill of the surface. |
+| `--menu-border-color` | - | Color of the panel's edge. |
+| `--menu-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--menu-max-block-size` | - | Tallest the surface grows before it scrolls. |
+| `--menu-min-inline-size` | - | Narrowest the surface gets. |
+| `--menu-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ### Item (`helix-menu-item`)
 
@@ -3804,10 +3812,10 @@ than as a ragged list.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--menu-item-hover-color` | Fill under the pointer. |
-| `--menu-item-start` | Width of the leading column, for a row carrying more than a mark. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--menu-item-hover-color` | - | Fill under the pointer. |
+| `--menu-item-start` | - | Width of the leading column, for a row carrying more than a mark. |
 
 ## Meter
 
@@ -3875,18 +3883,18 @@ reading are what say how far past.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--meter-color` | The fill, overriding the band's own tone. |
-| `--meter-ring-size` | Edge length of the drawing, in `ring` and `arc`. |
-| `--meter-ring-width` | Thickness of the stroke there. |
-| `--meter-size` | How thick the bar is. |
-| `--meter-tick-color` | The mark at a threshold. |
-| `--meter-track-color` | The groove behind the fill. |
-| `--meter-along` | Where a bound sits on the arc, as a length along it. |
-| `--meter-at` | Where a bound sits on a linear track, as a percentage. |
-| `--meter-fraction` | The value as a fraction of the range, 0 to 1. |
-| `--meter-sweep` | How much of the circle the arc covers, as a path length. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--meter-color` | - | The fill, overriding the band's own tone. |
+| `--meter-ring-size` | - | Edge length of the drawing, in `ring` and `arc`. |
+| `--meter-ring-width` | - | Thickness of the stroke there. |
+| `--meter-size` | - | How thick the bar is. |
+| `--meter-tick-color` | - | The mark at a threshold. |
+| `--meter-track-color` | - | The groove behind the fill. |
+| `--meter-along` | `HelixHeadlessMeter` | Where a bound sits on the arc, as a length along it. |
+| `--meter-at` | `HelixHeadlessMeter` | Where a bound sits on a linear track, as a percentage. |
+| `--meter-fraction` | `HelixHeadlessMeter` | The value as a fraction of the range, 0 to 1. |
+| `--meter-sweep` | `HelixHeadlessMeter` | How much of the circle the arc covers, as a path length. |
 
 ## Navigation
 
@@ -3922,10 +3930,10 @@ says where the current page was as well as where it is.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--navigation-gap` | Space between destinations. |
-| `--navigation-indicator-color` | Fill of the traveling marker. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--navigation-gap` | - | Space between destinations. |
+| `--navigation-indicator-color` | - | Fill of the traveling marker. |
 
 ## Notifications
 
@@ -3992,12 +4000,12 @@ holds thousands wants `helix-data-table` with a custom cell.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--notifications-max-height` | How tall the feed may get before the list scrolls. |
-| `--notifications-media-column` | The gutter every item holds open where something in the feed has media. |
-| `--notifications-padding-inline` | Space either side of the header and footer. |
-| `--notifications-rule` | The hairline between items and around the regions. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--notifications-max-block-size` | - | How tall the feed may get before the list scrolls. |
+| `--notifications-media-column` | - | The gutter every item holds open where something in the feed has media. |
+| `--notifications-padding-inline` | - | Space either side of the header and footer. |
+| `--notifications-rule` | - | The hairline between items and around the regions. |
 
 ### Notification (`helix-notification`)
 
@@ -4077,18 +4085,18 @@ viewport rule would hand it the wide branch.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--notifications-color` | Ink in an item that has been read. |
-| `--notifications-padding-block` | Space above and below an item. |
-| `--notifications-padding-inline` | Space either side of an item. |
-| `--notifications-rule` | The hairline between items. |
-| `--notifications-unread-block-size` | How long that mark is. |
-| `--notifications-unread-inline-size` | How thick that mark is. |
-| `--notifications-unread-inset` | How far it sits from the row's leading edge. |
-| `--notifications-unread-mark` | Color of the edge mark on an unread item. |
-| `--notifications-unread-offset` | How far it sits from the row's top. |
-| `--notifications-unread-radius` | Its corner radius, which is what turns it into a dot. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--notifications-color` | - | Ink in an item that has been read. |
+| `--notifications-padding-block` | - | Space above and below an item. |
+| `--notifications-padding-inline` | - | Space either side of an item. |
+| `--notifications-rule` | - | The hairline between items. |
+| `--notifications-unread-block-size` | - | How long that mark is. |
+| `--notifications-unread-inline-size` | - | How thick that mark is. |
+| `--notifications-unread-inset` | - | How far it sits from the row's leading edge. |
+| `--notifications-unread-mark` | - | Color of the edge mark on an unread item. |
+| `--notifications-unread-offset` | - | How far it sits from the row's top. |
+| `--notifications-unread-radius` | - | Its corner radius, which is what turns it into a dot. |
 
 ## Number Input
 
@@ -4240,12 +4248,12 @@ picked from what they are looking at.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--option-active-color` | Wash behind the option the keyboard is on. |
-| `--option-block-inset` | Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. |
-| `--option-inset` | Space before the label, shared with a group heading. |
-| `--option-radii` | Corner radius of the row. A listbox and a select flatten it. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--option-active-color` | - | Wash behind the option the keyboard is on. |
+| `--option-block-padding` | - | Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. |
+| `--option-padding` | - | Space before the label, shared with a group heading. |
+| `--option-radius` | - | Corner radius of the row. A listbox and a select flatten it. |
 
 ### Group (`helix-option-group`)
 
@@ -4323,10 +4331,10 @@ document is not always where the headings are.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--outline-indent` | How far each level is inset from the one above. |
-| `--outline-rail` | Width of the gutter the rule and the traveling mark share. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--outline-indent` | - | How far each level is inset from the one above. |
+| `--outline-rail` | - | Width of the gutter the rule and the traveling mark share. |
 
 ## Pagination
 
@@ -4417,12 +4425,12 @@ is a way through rather than a destination, so it does not compete.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--pagination-current-color` | Fill behind the page you are on. |
-| `--pagination-gap` | Space between one control and the next. |
-| `--pagination-hover-color` | Fill behind a control under the pointer. |
-| `--pagination-size` | The box every control in the row takes. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--pagination-current-color` | - | Fill behind the page you are on. |
+| `--pagination-gap` | - | Space between one control and the next. |
+| `--pagination-hover-color` | - | Fill behind a control under the pointer. |
+| `--pagination-size` | - | The box every control in the row takes. |
 
 ### Size (`helix-pagination-size`)
 
@@ -4558,9 +4566,9 @@ breathe as a code is typed into it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--pin-input-gap` | Space between one box and the next. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--pin-input-gap` | - | Space between one box and the next. |
 
 ## Popover
 
@@ -4624,14 +4632,14 @@ time.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--popover-border-color` | Color of the panel's edge. |
-| `--popover-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--popover-inline-size` | Width of the panel. |
-| `--popover-inset` | Space between the panel's edge and its contents. |
-| `--popover-max-block-size` | Tallest the panel grows before it scrolls. |
-| `--popover-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--popover-border-color` | - | Color of the panel's edge. |
+| `--popover-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--popover-inline-size` | - | Width of the panel. |
+| `--popover-max-block-size` | - | Tallest the panel grows before it scrolls. |
+| `--popover-padding` | - | Space between the panel's edge and its contents. |
+| `--popover-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Progress
 
@@ -4676,12 +4684,12 @@ thing advancing.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--progress-color` | Fill of the part that is done. |
-| `--progress-ring-size` | Diameter of the ring appearance. |
-| `--progress-ring-width` | Thickness of its stroke. |
-| `--progress-fraction` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--progress-color` | - | Fill of the part that is done. |
+| `--progress-ring-size` | - | Diameter of the ring appearance. |
+| `--progress-ring-width` | - | Thickness of its stroke. |
+| `--progress-fraction` | `HelixHeadlessProgress` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
 
 ## QR Code
 
@@ -4726,14 +4734,14 @@ So the ground is stated and the ink is the foreground it is chosen for.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--qr-code-background-color` | Behind them, including the quiet zone. |
-| `--qr-code-color` | The dark modules. Defaults to the page's ink. |
-| `--qr-code-finder-color` | The three corner squares. Defaults to the same ink as the modules. |
-| `--qr-code-logo-inset` | The quiet zone around that mark. |
-| `--qr-code-logo-size` | How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. |
-| `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--qr-code-background-color` | - | Behind them, including the quiet zone. |
+| `--qr-code-color` | - | The dark modules. Defaults to the page's ink. |
+| `--qr-code-finder-color` | - | The three corner squares. Defaults to the same ink as the modules. |
+| `--qr-code-logo-padding` | - | The quiet zone around that mark. |
+| `--qr-code-logo-size` | - | How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. |
+| `--qr-code-size` | - | How wide the square is. Defaults to `12rem`. |
 
 ## Quote
 
@@ -4766,9 +4774,9 @@ inside a paragraph is that paragraph's text with marks around it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--quote-color` | Color of the quoted text. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--quote-color` | - | Color of the quoted text. |
 
 ## Radio
 
@@ -4829,16 +4837,16 @@ and being chosen is an answer rather than a state.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--radio-background-color` | Fill of an unselected circle. |
-| `--radio-border-color` | Edge of the circle, in every state. |
-| `--radio-card-background-color` | Fill behind a card-shaped choice. |
-| `--radio-card-border-color` | Edge around one. |
-| `--radio-card-padding` | Inset of the card appearance. |
-| `--radio-chip-size` | Diameter of the chip appearance. |
-| `--radio-mark-color` | Color of the dot. |
-| `--radio-size` | Diameter of the circle. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--radio-background-color` | - | Fill of an unselected circle. |
+| `--radio-border-color` | - | Edge of the circle, in every state. |
+| `--radio-card-background-color` | - | Fill behind a card-shaped choice. |
+| `--radio-card-border-color` | - | Edge around one. |
+| `--radio-card-padding` | - | Inset of the card appearance. |
+| `--radio-chip-size` | - | Diameter of the chip appearance. |
+| `--radio-mark-color` | - | Color of the dot. |
+| `--radio-size` | - | Diameter of the circle. |
 
 ### Group (`helix-radio-group`)
 
@@ -4905,9 +4913,9 @@ group keeps its question above the row rather than beside the first choice.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--radio-group-gap` | Space between the choices. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--radio-group-gap` | - | Space between the choices. |
 
 ## Rating
 
@@ -4984,17 +4992,17 @@ Everything about what the score is and how it is chosen is the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--rating-color` | The color of a filled mark. |
-| `--rating-empty-color` | And of an unfilled one. |
-| `--rating-gap` | Space between marks. |
-| `--rating-mark` | The shape of one mark, as a mask image. |
-| `--rating-size` | How big one mark is. |
-| `--rating-full` | How many marks are wholly filled. |
-| `--rating-part` | How much of the next mark is filled, 0 to 1. |
-| `--rating-step` | The width of one step, as a fraction of a mark. |
-| `--rating-steps` | How many steps one mark is divided into. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--rating-color` | - | The color of a filled mark. |
+| `--rating-empty-color` | - | And of an unfilled one. |
+| `--rating-gap` | - | Space between marks. |
+| `--rating-mark` | - | The shape of one mark, as a mask image. |
+| `--rating-size` | - | How big one mark is. |
+| `--rating-full` | `HelixHeadlessRating` | How many marks are wholly filled. |
+| `--rating-part` | `HelixHeadlessRating` | How much of the next mark is filled, 0 to 1. |
+| `--rating-step` | `HelixHeadlessRating` | The width of one step, as a fraction of a mark. |
+| `--rating-steps` | `HelixHeadlessRating` | How many steps one mark is divided into. |
 
 ## Sandbox
 
@@ -5088,11 +5096,11 @@ what it meant when it was written.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--sandbox-grab` | The invisible width of a divider's drag target. |
-| `--sandbox-min-block-size` | Minimum height of the sandbox. |
-| `--sandbox-separator-color` | Color of the divider. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--sandbox-grab` | - | The invisible width of a divider's drag target. |
+| `--sandbox-min-block-size` | - | Minimum height of the sandbox. |
+| `--sandbox-separator-color` | - | Color of the divider. |
 
 ### Preview (`helix-sandbox-preview`)
 
@@ -5212,10 +5220,10 @@ is the documented escape hatch for exactly this trade.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--sandbox-source-background` | Fill behind the source. |
-| `--sandbox-source-min-block-size` | Minimum height of the pane. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--sandbox-source-background-color` | - | Fill behind the source. |
+| `--sandbox-source-min-block-size` | - | Minimum height of the pane. |
 
 ### Status Bar (`helix-sandbox-status-bar`)
 
@@ -5260,9 +5268,9 @@ empty, or the bar keeps a gap where a value is not.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--sandbox-status-bar-color` | Color of the bar's text. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--sandbox-status-bar-color` | - | Color of the bar's text. |
 
 ### Terminal (`helix-sandbox-terminal`)
 
@@ -5310,9 +5318,9 @@ the whole panel being re-announced each time.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--sandbox-terminal-size` | Height of the scrolling region. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--sandbox-terminal-size` | - | Height of the scrolling region. |
 
 ### Toolbar (`helix-sandbox-toolbar`)
 
@@ -5340,10 +5348,10 @@ Both slots are bare, so an unfilled one generates no box and costs no gap.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--sandbox-toolbar-gap` | Space between items. |
-| `--sandbox-toolbar-size` | The bar's height. Defaults to a large control. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--sandbox-toolbar-gap` | - | Space between items. |
+| `--sandbox-toolbar-size` | - | The bar's height. Defaults to a large control. |
 
 ## Scroll Area
 
@@ -5379,17 +5387,17 @@ have content past them is measured by the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--scroll-area-fade` | How deep the fades are, at both edges. |
-| `--scroll-area-fade-block-end` | And the bottom one. |
-| `--scroll-area-fade-block-start` | How deep the top one is, or `0` to drop it. |
-| `--scroll-area-fade-color` | What they fade to, which is the ground behind. |
-| `--scroll-area-fade-inline-end` | And the trailing one. |
-| `--scroll-area-fade-inline-start` | How deep the leading sideways one is, or `0` to drop it. |
-| `--scroll-area-scrollbar` | The scrollbar width keyword. |
-| `--scroll-area-thumb-color` | The scrollbar's handle. |
-| `--scroll-area-track-color` | And its track. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--scroll-area-fade` | - | How deep the fades are, at both edges. |
+| `--scroll-area-fade-block-end` | - | And the bottom one. |
+| `--scroll-area-fade-block-start` | - | How deep the top one is, or `0` to drop it. |
+| `--scroll-area-fade-color` | - | What they fade to, which is the ground behind. |
+| `--scroll-area-fade-inline-end` | - | And the trailing one. |
+| `--scroll-area-fade-inline-start` | - | How deep the leading sideways one is, or `0` to drop it. |
+| `--scroll-area-scrollbar` | - | The scrollbar width keyword. |
+| `--scroll-area-thumb-color` | - | The scrollbar's handle. |
+| `--scroll-area-track-color` | - | And its track. |
 
 ## Select
 
@@ -5492,12 +5500,12 @@ from the field it came out of.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--select-border-color` | Color of the panel's edge. |
-| `--select-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--select-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--select-surface-max-block-size` | How tall the panel gets. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--select-border-color` | - | Color of the panel's edge. |
+| `--select-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--select-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--select-surface-max-block-size` | - | How tall the panel gets. |
 
 ## Skeleton
 
@@ -5525,9 +5533,9 @@ the same one property animating either way.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--skeleton-size` | Diameter of the circle shape. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--skeleton-size` | - | Diameter of the circle shape. |
 
 ## Slider
 
@@ -5606,23 +5614,23 @@ the thumb being dragged.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--slider-fill-color` | The part behind the thumb. |
-| `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
-| `--slider-marker-color` | The ticks along the track. |
-| `--slider-thumb-color` | The handle. |
-| `--slider-thumb-length` | The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. |
-| `--slider-thumb-radii` | The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. |
-| `--slider-thumb-ring-color` | The fence separating the handle from the track, for a slider that is not on the page. |
-| `--slider-thumb-size` | The handle across the track. Square with the length by default, which is what makes it round. |
-| `--slider-track-color` | The part not yet chosen. |
-| `--slider-track-image` | The whole track, for a slider whose color is the value. |
-| `--slider-track-size` | How thick the track is. The progress bar's own size by default, the two being the same object. |
-| `--slider-fraction` | The value as a fraction of the range, 0 to 1. |
-| `--slider-from` | Where the filled span starts, as a percentage of the track. |
-| `--slider-marker-at` | Where one marker sits, as a percentage of the track. |
-| `--slider-to` | Where the filled span ends, as a percentage of the track. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--slider-fill-color` | - | The part behind the thumb. |
+| `--slider-length` | - | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
+| `--slider-marker-color` | - | The ticks along the track. |
+| `--slider-thumb-color` | - | The handle. |
+| `--slider-thumb-length` | - | The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. |
+| `--slider-thumb-radius` | - | The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. |
+| `--slider-thumb-ring-color` | - | The fence separating the handle from the track, for a slider that is not on the page. |
+| `--slider-thumb-size` | - | The handle across the track. Square with the length by default, which is what makes it round. |
+| `--slider-track-color` | - | The part not yet chosen. |
+| `--slider-track-image` | - | The whole track, for a slider whose color is the value. |
+| `--slider-track-size` | - | How thick the track is. The progress bar's own size by default, the two being the same object. |
+| `--slider-fraction` | `HelixHeadlessSlider` | The value as a fraction of the range, 0 to 1. |
+| `--slider-from` | `HelixHeadlessSlider` | Where the filled span starts, as a percentage of the track. |
+| `--slider-marker-at` | `HelixHeadlessSlider` | Where one marker sits, as a percentage of the track. |
+| `--slider-to` | `HelixHeadlessSlider` | Where the filled span ends, as a percentage of the track. |
 
 ## Sparkline
 
@@ -5678,19 +5686,19 @@ keeps it out of every other reason it might want to be bigger.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--chart-terminus-hole` | A fill for the middle of a `ring` terminus, which is otherwise open. |
-| `--chart-terminus-size` | Size of the mark on the last reading. |
-| `--sparkline-area-opacity` | How much of the line's color the wash takes where it meets the line. |
-| `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |
-| `--sparkline-bar-stroke` | Thickness of a column's edge under `outlined`. |
-| `--sparkline-block-size` | Height of the drawing. |
-| `--sparkline-color` | Color of the line, the wash, the columns and the mark. |
-| `--sparkline-inline-size` | Width of the drawing. |
-| `--sparkline-width` | Thickness of the line, overriding `weight`. |
-| `--chart-terminus-x` | Where the last point sits horizontally, as a percentage. |
-| `--chart-terminus-y` | Where the last point sits vertically, as a percentage. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--chart-terminus-hole` | - | A fill for the middle of a `ring` terminus, which is otherwise open. |
+| `--chart-terminus-size` | - | Size of the mark on the last reading. |
+| `--sparkline-area-opacity` | - | How much of the line's color the wash takes where it meets the line. |
+| `--sparkline-bar-radius` | - | Corner radius on a column, under `plot="bar"`. |
+| `--sparkline-bar-stroke` | - | Thickness of a column's edge under `outlined`. |
+| `--sparkline-block-size` | - | Height of the drawing. |
+| `--sparkline-color` | - | Color of the line, the wash, the columns and the mark. |
+| `--sparkline-inline-size` | - | Width of the drawing. |
+| `--sparkline-width` | - | Thickness of the line, overriding `weight`. |
+| `--chart-terminus-x` | `HelixHeadlessSparkline` | Where the last point sits horizontally, as a percentage. |
+| `--chart-terminus-y` | `HelixHeadlessSparkline` | Where the last point sits vertically, as a percentage. |
 
 ## Speed Dial
 
@@ -5746,9 +5754,9 @@ moves through it is the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--speed-dial-gap` | Space between the actions. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--speed-dial-gap` | - | Space between the actions. |
 
 ### Item (`helix-speed-dial-item`)
 
@@ -5799,9 +5807,9 @@ over. Everything about choosing it is the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--speed-dial-item-size` | Edge length of the mark. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--speed-dial-item-size` | - | Edge length of the mark. |
 
 ## Splitter
 
@@ -5889,17 +5897,17 @@ gesture.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--splitter-color` | The line between the panes. |
-| `--splitter-corner` | How wide the handle at a crossing is. |
-| `--splitter-drag-color` | The line while it is being moved. |
-| `--splitter-grip-color` | The grip beside the line, once it is shown. |
-| `--splitter-grip-length` | How far the grip runs along the divider. |
-| `--splitter-hover-color` | The target under the pointer. |
-| `--splitter-target` | How wide the draggable box is. |
-| `--splitter-corner-at` | Where a nested splitter crosses this one, as a percentage. |
-| `--splitter-position` | Where the divider sits, as a percentage of the box. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--splitter-color` | - | The line between the panes. |
+| `--splitter-corner` | - | How wide the handle at a crossing is. |
+| `--splitter-drag-color` | - | The line while it is being moved. |
+| `--splitter-grip-color` | - | The grip beside the line, once it is shown. |
+| `--splitter-grip-length` | - | How far the grip runs along the divider. |
+| `--splitter-hover-color` | - | The target under the pointer. |
+| `--splitter-target` | - | How wide the draggable box is. |
+| `--splitter-corner-at` | `HelixHeadlessSplitter` | Where a nested splitter crosses this one, as a percentage. |
+| `--splitter-position` | `HelixHeadlessSplitter` | Where the divider sits, as a percentage of the box. |
 
 ## Stat
 
@@ -5930,9 +5938,9 @@ pair reads as one object rather than as two lines of text.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--stat-value-size` | Size of the figure. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--stat-value-size` | - | Size of the figure. |
 
 ### Group (`helix-stat-group`)
 
@@ -5960,9 +5968,9 @@ same quantity.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--stat-group-gap` | Space between figures. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--stat-group-gap` | - | Space between figures. |
 
 ## Steps
 
@@ -6012,14 +6020,14 @@ second name for it here would be a second thing to keep in step.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--steps-complete-color` | The mark on a finished step. |
-| `--steps-connector-color` | The rule running through the steps. |
-| `--steps-connector-inset` | Air either side of a mark, before the rail. |
-| `--steps-current-color` | The mark on the current step. |
-| `--steps-gap` | Space between one step and the next. |
-| `--steps-marker-size` | Size of the mark, glyph or digit. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--steps-complete-color` | - | The mark on a finished step. |
+| `--steps-connector-color` | - | The rule running through the steps. |
+| `--steps-connector-inset` | - | Air either side of a mark, before the rail. |
+| `--steps-current-color` | - | The mark on the current step. |
+| `--steps-gap` | - | Space between one step and the next. |
+| `--steps-marker-size` | - | Size of the mark, glyph or digit. |
 
 ### Step (`helix-step`)
 
@@ -6093,7 +6101,7 @@ checkbox's** at every density rather than the same as it. A checkbox is a box
 with a mark in it; a switch is a track with a thumb inside it, and at the
 checkbox's height the thumb has two pixels of groove around it and the whole
 control reads as a small dash. The width follows the height, so setting
-`--switch-height` widens it too and the proportion is not something a
+`--switch-block-size` widens it too and the proportion is not something a
 consumer has to keep.
 
 #### Properties
@@ -6152,12 +6160,12 @@ consumer has to keep.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--switch-height` | Height of the track. The width follows it. |
-| `--switch-on-color` | Fill when it is on. |
-| `--switch-thumb-color` | The handle, in both states. |
-| `--switch-width` | Length of the track, if not the derived one. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--switch-block-size` | - | Height of the track. The width follows it. |
+| `--switch-inline-size` | - | Length of the track, if not the derived one. |
+| `--switch-on-color` | - | Fill when it is on. |
+| `--switch-thumb-color` | - | The handle, in both states. |
 
 ## Table
 
@@ -6200,10 +6208,10 @@ decorating none of it.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--table-columns` | Track list for the columns. |
-| `--table-template` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--table-columns` | `HelixHeadlessTable` | Track list for the columns. |
+| `--table-template` | `HelixHeadlessTable` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. |
 
 ### Cell (`helix-table-cell`)
 
@@ -6459,12 +6467,12 @@ the status colors gets the tints with them.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tag-background-color` | Fill behind the tag. |
-| `--tag-border-color` | Color of the edge, for a chip that separates by fill alone. |
-| `--tag-foreground-color` | Label color. |
-| `--tag-radii` | Corner radius of the tag. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tag-background-color` | - | Fill behind the tag. |
+| `--tag-border-color` | - | Color of the edge, for a chip that separates by fill alone. |
+| `--tag-foreground-color` | - | Label color. |
+| `--tag-radius` | - | Corner radius of the tag. |
 
 ## Text
 
@@ -6605,9 +6613,9 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--textarea-background-color` | Fill behind the text. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--textarea-background-color` | - | Fill behind the text. |
 
 ## Time Input
 
@@ -6739,12 +6747,12 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--time-input-background-color` | Fill behind the field. |
-| `--time-input-border-color` | Color of the panel's edge. |
-| `--time-input-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--time-input-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--time-input-background-color` | - | Fill behind the field. |
+| `--time-input-border-color` | - | Color of the panel's edge. |
+| `--time-input-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--time-input-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
 ## Time Picker
 
@@ -6755,7 +6763,7 @@ Picks a time, from a list of them.
 Extends `HelixHeadlessTimePicker`.
 
 A bounded list on a surface of its own, because ninety-six rows is taller than
-anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
+anywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height
 rather than a count of rows: what a panel has is room, and a row count would
 have to be recomputed every time the density changed.
 
@@ -6842,13 +6850,13 @@ card would be a card inside a card there.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--time-picker-list-height` | How tall the list is before it scrolls. |
-| `--time-picker-range-color` | Wash behind the times inside a range. |
-| `--time-picker-row-size` | Height and least width of one row in a wheel. |
-| `--time-picker-selected-color` | Fill on the chosen row of a wheel. |
-| `--time-picker-wheel-height` | How tall a wheel is. Five rows by default. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--time-picker-list-block-size` | - | How tall the list is before it scrolls. |
+| `--time-picker-range-color` | - | Wash behind the times inside a range. |
+| `--time-picker-row-size` | - | Height and least width of one row in a wheel. |
+| `--time-picker-selected-color` | - | Fill on the chosen row of a wheel. |
+| `--time-picker-wheel-block-size` | - | How tall a wheel is. Five rows by default. |
 
 ## Timeline
 
@@ -6875,9 +6883,9 @@ event and the next. Every entry draws its own mark and its own line.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--timeline-gap` | Space between one entry and the next. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--timeline-gap` | - | Space between one entry and the next. |
 
 ### Item (`helix-timeline-item`)
 
@@ -6916,11 +6924,11 @@ arrives at this entry from the one before.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--timeline-marker-radius` | How round the mark is. Zero is a square, and half its size is a disc. |
-| `--timeline-marker-size` | Edge length of the mark. |
-| `--timeline-rail-size` | Width of the line. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--timeline-marker-radius` | - | How round the mark is. Zero is a square, and half its size is a disc. |
+| `--timeline-marker-size` | - | Edge length of the mark. |
+| `--timeline-rail-size` | - | Width of the line. |
 
 ## Toast
 
@@ -6969,11 +6977,11 @@ into the top layer.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--toast-gap` | Space between one message and the next. |
-| `--toast-inline-size` | Width of a message. |
-| `--toast-inset` | Distance from the edges of the window. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--toast-gap` | - | Space between one message and the next. |
+| `--toast-inline-size` | - | Width of a message. |
+| `--toast-inset` | - | Distance from the edges of the window. |
 
 ### Item (`helix-toast-item`)
 
@@ -7034,13 +7042,13 @@ costs contrast for something the mark already says.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--toast-border-color` | Color of the panel's edge. |
-| `--toast-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--toast-item-inset` | Space between the message's edge and its contents. |
-| `--toast-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--toast-duration` | How long this message stays, in milliseconds, for a progress hint. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--toast-border-color` | - | Color of the panel's edge. |
+| `--toast-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--toast-item-padding` | - | Space between the message's edge and its contents. |
+| `--toast-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--toast-duration` | `HelixHeadlessToastItem` | How long this message stays, in milliseconds, for a progress hint. |
 
 ## Toggle
 
@@ -7161,9 +7169,9 @@ corner radius, which is worse than the exception.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--toggle-group-indicator-color` | Fill of the moving marker. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--toggle-group-indicator-color` | - | Fill of the moving marker. |
 
 ## Toolbar
 
@@ -7197,9 +7205,9 @@ them would be a second frame inside whatever already frames the bar.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--toolbar-gap` | Space between controls. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--toolbar-gap` | - | Space between controls. |
 
 ## Tooltip
 
@@ -7266,12 +7274,12 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tooltip-arrow-size` | Size of the point at the bubble's edge. |
-| `--tooltip-backdrop` | Blur behind a `glass` bubble. |
-| `--tooltip-background-color` | Fill of the bubble. |
-| `--tooltip-max-inline-size` | Widest the bubble grows before wrapping. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tooltip-arrow-size` | - | Size of the point at the bubble's edge. |
+| `--tooltip-backdrop` | - | Blur behind a `glass` bubble. |
+| `--tooltip-background-color` | - | Fill of the bubble. |
+| `--tooltip-max-inline-size` | - | Widest the bubble grows before wrapping. |
 
 ## Tour
 
@@ -7330,10 +7338,10 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tour-scrim-color` | The darkness outside the lit box. |
-| `--tour-spotlight-radius` | Corner radius of the lit box. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tour-scrim-color` | - | The darkness outside the lit box. |
+| `--tour-spotlight-radius` | - | Corner radius of the lit box. |
 
 ### Stop (`helix-tour-stop`)
 
@@ -7389,14 +7397,14 @@ name, on purpose.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tour-arrow-size` | The point's box, before it is rotated. |
-| `--tour-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
-| `--tour-bubble-size` | How wide the panel may grow. |
-| `--tour-padding` | Inset inside the panel. |
-| `--tour-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
-| `--tour-surface-color` | The panel's own surface. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tour-arrow-size` | - | The point's box, before it is rotated. |
+| `--tour-border-width` | - | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
+| `--tour-bubble-size` | - | How wide the panel may grow. |
+| `--tour-padding` | - | Inset inside the panel. |
+| `--tour-shadow` | - | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
+| `--tour-surface-color` | - | The panel's own surface. |
 
 ## Tree
 
@@ -7452,14 +7460,14 @@ to it is one more thing between the reader and the label.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tree-chevron-gap` | Set from `chevron-placement`; the space before the chevron. |
-| `--tree-chevron-order` | Set from `chevron-placement`; read by each item. |
-| `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
-| `--tree-gap` | Space between rows. |
-| `--tree-indent` | Indent added per level. |
-| `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tree-chevron-gap` | - | Set from `chevron-placement`; the space before the chevron. |
+| `--tree-chevron-order` | - | Set from `chevron-placement`; read by each item. |
+| `--tree-chevron-size` | - | Size of the chevron, and the gutter a leaf reserves. |
+| `--tree-gap` | - | Space between rows. |
+| `--tree-indent` | - | Indent added per level. |
+| `--tree-row-size` | - | Least height of a row, so rows with and without an icon match. |
 
 ### Item (`helix-tree-item`)
 
@@ -7530,13 +7538,13 @@ the row itself stays flat.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
-| `--tree-gap` | Space between rows. |
-| `--tree-indent` | Indent added per level. |
-| `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
-| `--tree-level` | How deep this row sits, counting from zero, for the indent. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--tree-chevron-size` | - | Size of the chevron, and the gutter a leaf reserves. |
+| `--tree-gap` | - | Space between rows. |
+| `--tree-indent` | - | Indent added per level. |
+| `--tree-row-size` | - | Least height of a row, so rows with and without an icon match. |
+| `--tree-level` | `HelixHeadlessTreeItem` | How deep this row sits, counting from zero, for the indent. |
 
 ## Trend
 
@@ -7592,10 +7600,10 @@ thing this component exists to stop.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--trend-color` | Color of the arrow, overriding the judgment. |
-| `--trend-icon-size` | Size of the arrow. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--trend-color` | - | Color of the arrow, overriding the judgment. |
+| `--trend-icon-size` | - | Size of the arrow. |
 
 ## Video
 
@@ -7744,18 +7752,18 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--video-accent-color` | The played part of the scrubber. |
-| `--video-aspect-ratio` | The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. |
-| `--video-controls-color` | The ink on the bar. |
-| `--video-radius` | The corner it is cut to. |
-| `--video-speed-size` | How wide the playback speed control is held, so the row does not move when the number changes. |
-| `--video-start-size` | Width of the mark that starts it. |
-| `--video-well-color` | Behind the picture, and in the letterbox bars. |
-| `--video-intrinsic-ratio` | The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. |
-| `--video-level` | The current volume, 0 to 1. |
-| `--video-progress` | How far playback has reached, as a fraction of the duration. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--video-accent-color` | - | The played part of the scrubber. |
+| `--video-aspect-ratio` | - | The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. |
+| `--video-controls-color` | - | The ink on the bar. |
+| `--video-radius` | - | The corner it is cut to. |
+| `--video-speed-size` | - | How wide the playback speed control is held, so the row does not move when the number changes. |
+| `--video-start-size` | - | Width of the mark that starts it. |
+| `--video-well-color` | - | Behind the picture, and in the letterbox bars. |
+| `--video-intrinsic-ratio` | `HelixHeadlessVideo` | The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. |
+| `--video-level` | `HelixHeadlessVideo` | The current volume, 0 to 1. |
+| `--video-progress` | `HelixHeadlessVideo` | How far playback has reached, as a fraction of the duration. |
 
 ## Video Playlist
 
@@ -7805,10 +7813,10 @@ entries sit in. Everything about which clip is current is the base class.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--video-playlist-layout` | Columns for the player and the list. |
-| `--video-playlist-size` | How tall the list gets before it scrolls. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--video-playlist-layout` | - | Columns for the player and the list. |
+| `--video-playlist-size` | - | How tall the list gets before it scrolls. |
 
 ### Item (`helix-video-playlist-item`)
 
@@ -7856,10 +7864,10 @@ playing. The base class holds what the entry is and what it announces.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--video-playlist-item-background-color` | Fill behind a row. |
-| `--video-playlist-media-size` | Width of the thumbnail column. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--video-playlist-item-background-color` | - | Fill behind a row. |
+| `--video-playlist-media-size` | - | Width of the thumbnail column. |
 
 ### Menu (`helix-video-playlist-menu`)
 
@@ -7924,11 +7932,11 @@ not.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--video-playlist-menu-color` | Color of the trigger, defaulting to the control bar's. |
-| `--video-playlist-menu-poster` | Width of an entry's still. |
-| `--video-playlist-menu-size` | Size of the trigger's glyph. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--video-playlist-menu-color` | - | Color of the trigger, defaulting to the control bar's. |
+| `--video-playlist-menu-poster` | - | Width of an entry's still. |
+| `--video-playlist-menu-size` | - | Size of the trigger's glyph. |
 
 ## Virtual List
 
@@ -7962,6 +7970,6 @@ did not write.
 
 #### Custom properties
 
-| Property | Description |
-| --- | --- |
-| `--virtual-list-block-size` | How tall the scrolling box is. |
+| Property | From | Description |
+| --- | --- | --- |
+| `--virtual-list-block-size` | - | How tall the scrolling box is. |

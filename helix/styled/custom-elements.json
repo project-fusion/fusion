@@ -665,7 +665,7 @@
             },
             {
               "description": "Corner radius of the stack, when outlined.",
-              "name": "--accordion-radii"
+              "name": "--accordion-radius"
             }
           ],
           "slots": [
@@ -1548,23 +1548,23 @@
             },
             {
               "description": "Fill behind the banner.",
-              "name": "--app-header-background"
+              "name": "--app-header-background-color"
+            },
+            {
+              "description": "Height of the banner.",
+              "name": "--app-header-block-size"
             },
             {
               "description": "The line under the bar. None by default.",
               "name": "--app-header-border-color"
             },
             {
-              "description": "Height of the banner.",
-              "name": "--app-header-height"
+              "description": "Width the content is centered in.",
+              "name": "--app-header-max-inline-size"
             },
             {
               "description": "Inline padding of the banner.",
-              "name": "--app-header-inset"
-            },
-            {
-              "description": "Width the content is centered in.",
-              "name": "--app-header-max-inline-size"
+              "name": "--app-header-padding"
             }
           ],
           "cssParts": [
@@ -7229,31 +7229,31 @@
             },
             {
               "description": "Corner radius of the control.",
-              "name": "--button-radii"
+              "name": "--button-radius"
             },
             {
               "description": "Trailing corners, which a group flattens.",
-              "name": "--button-radii-end"
+              "name": "--button-radius-end"
             },
             {
               "description": "The bottom trailing corner, for a group stacking down.",
-              "name": "--button-radii-end-end"
+              "name": "--button-radius-end-end"
             },
             {
               "description": "The bottom leading corner, for a group stacking down.",
-              "name": "--button-radii-end-start"
+              "name": "--button-radius-end-start"
             },
             {
               "description": "Leading corners, which a group flattens.",
-              "name": "--button-radii-start"
+              "name": "--button-radius-start"
             },
             {
               "description": "The top trailing corner, for a group stacking down.",
-              "name": "--button-radii-start-end"
+              "name": "--button-radius-start-end"
             },
             {
               "description": "The top leading corner, for a group stacking down.",
-              "name": "--button-radii-start-start"
+              "name": "--button-radius-start-start"
             },
             {
               "description": "Height of the control, for a container whose row is not one of the density steps.",
@@ -8255,7 +8255,7 @@
             },
             {
               "description": "Corner radius of the callout.",
-              "name": "--callout-radii"
+              "name": "--callout-radius"
             }
           ],
           "cssParts": [
@@ -8676,7 +8676,7 @@
             },
             {
               "description": "Corner radius of the surface.",
-              "name": "--card-radii"
+              "name": "--card-radius"
             },
             {
               "description": "Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover.",
@@ -10216,7 +10216,7 @@
           "cssProperties": [
             {
               "description": "Fill behind the composer.",
-              "name": "--chat-composer-background"
+              "name": "--chat-composer-background-color"
             },
             {
               "description": "The composer's edge, so a theme can remove it.",
@@ -10224,7 +10224,7 @@
             },
             {
               "description": "How tall the field may grow.",
-              "name": "--chat-composer-max-height"
+              "name": "--chat-composer-max-block-size"
             }
           ],
           "cssParts": [
@@ -10891,11 +10891,11 @@
           "cssProperties": [
             {
               "description": "Fill behind a turn.",
-              "name": "--chat-message-background"
+              "name": "--chat-message-background-color"
             },
             {
               "description": "Fill behind the reader's own turns.",
-              "name": "--chat-message-background-me"
+              "name": "--chat-message-background-color-me"
             },
             {
               "description": "Ink in a turn.",
@@ -11581,7 +11581,7 @@
             },
             {
               "description": "How tall the conversation may get before the transcript scrolls.",
-              "name": "--chat-max-height"
+              "name": "--chat-max-block-size"
             },
             {
               "description": "Space either side of every region.",
@@ -12592,7 +12592,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -13706,7 +13706,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -14660,7 +14660,7 @@
             },
             {
               "description": "The ground behind the code, for a block that is not on the page.",
-              "name": "--code-block-background"
+              "name": "--code-block-background-color"
             },
             {
               "description": "The line around the block and its header.",
@@ -14668,11 +14668,11 @@
             },
             {
               "description": "The ground behind the name, where it should not be `surface-raised`.",
-              "name": "--code-block-header-background"
+              "name": "--code-block-header-background-color"
             },
             {
               "description": "The corner on the header's top and the block's bottom, which are one shape.",
-              "name": "--code-block-radii"
+              "name": "--code-block-radius"
             }
           ],
           "members": [
@@ -15438,7 +15438,7 @@
             },
             {
               "description": "Corner radius of that block.",
-              "name": "--color-input-swatch-radii"
+              "name": "--color-input-swatch-radius"
             },
             {
               "description": "Edge length of the block in `appearance=\"swatch\"`.",
@@ -15777,7 +15777,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -17313,7 +17313,7 @@
           "cssProperties": [
             {
               "description": "Corner radius of the square.",
-              "name": "--color-picker-grid-radii"
+              "name": "--color-picker-grid-radius"
             },
             {
               "description": "Aspect ratio of the square.",
@@ -17321,7 +17321,7 @@
             },
             {
               "description": "Inset of the rows under the square, and the bottom.",
-              "name": "--color-picker-inset"
+              "name": "--color-picker-padding"
             },
             {
               "description": "Edge length of the chip that copies the value.",
@@ -19163,7 +19163,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -22783,6 +22783,32 @@
               }
             }
           ],
+          "cssProperties": [
+            {
+              "description": "Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.",
+              "name": "--icon-button-radius",
+              "inheritedFrom": {
+                "name": "HelixIconButton",
+                "module": "src/icon-button/root/icon-button-root.ts"
+              }
+            },
+            {
+              "description": "What it casts, where it is raised off the page.",
+              "name": "--icon-button-shadow",
+              "inheritedFrom": {
+                "name": "HelixIconButton",
+                "module": "src/icon-button/root/icon-button-root.ts"
+              }
+            },
+            {
+              "description": "Edge length of the control.",
+              "name": "--icon-button-size",
+              "inheritedFrom": {
+                "name": "HelixIconButton",
+                "module": "src/icon-button/root/icon-button-root.ts"
+              }
+            }
+          ],
           "modulePath": "src/copy-button/root/copy-button-root.ts",
           "definitionPath": "src/copy-button/root/copy-button-root.ts"
         }
@@ -23438,6 +23464,59 @@
               "privacy": "private",
               "description": "The track list, from the columns if there are any.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixHeadlessDataTable",
+                "module": "src/data-table/root/data-table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "COMFORTABLE",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "2_000",
+              "description": "How many rows this draws before it is worth saying something, and why 2,000.\n\nMeasured 28 Aug 2026 on a four-column grid, mounting and painting: 100 rows\nin 10.9ms, 500 in 30.2ms, 2,000 in 83.2ms and **5,000 rows as 20,000 cells\nin 186ms**. It is linear at roughly 37 microseconds a row, so the 100ms an\ninteraction has to stay inside lands near 2,700 and this sits under it.\nSorting stays cheap throughout, 23.7ms at five thousand, so the cost is the\ncells rather than the work over them.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDataTable",
+                "module": "src/data-table/root/data-table-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "warnedAboutSize",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Said once per element, so a table that re-renders does not repeat it.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessDataTable",
+                "module": "src/data-table/root/data-table-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "warnIfCrowded",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "drawn",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Says so when a table is asked to draw more than it comfortably can.\n\n**The component renders every row it is given and defaults to doing so.**\n`defaultPageSize` is `0`, so `paginated` is false unless a consumer asks,\nwhich means the out-of-the-box arrangement is the unbounded one and nothing\nabout it says that a result of any size will simply be drawn.\n\n**Windowing was considered and refused**, which is worth recording because\nit is the obvious answer. This element already has two: `paginated` with a\n`page-size`, and `mode=\"server\"` where `rows` is one page, `total` is the\nwhole result and `aria-rowcount` already reports the result rather than the\nwindow, which is the hard half of virtualization done correctly. A third\nmechanism would fight the first two, and virtualizing a grid means variable\nrow heights, a sticky header and keeping `aria-rowindex` honest against a\nresult the element is no longer holding. `VirtualizeController` exists for\nthe case where the rows are a flat list and this is not that. See #326.\n\nSo the gap was never the capability, it was that nothing said which of the\ntwo to reach for. Once per element, in a browser only: a warning during a\nserver render is one nobody can act on and one that would print per request.",
               "inheritedFrom": {
                 "name": "HelixHeadlessDataTable",
                 "module": "src/data-table/root/data-table-root.ts"
@@ -24652,7 +24731,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -28156,7 +28235,7 @@
             },
             {
               "description": "Padding inside the panel.",
-              "name": "--dialog-inset"
+              "name": "--dialog-padding"
             },
             {
               "description": "How far the panel rises as it opens. Follows `--helix-space-lg`.",
@@ -28485,7 +28564,7 @@
               "name": "handleBackdrop",
               "privacy": "private",
               "readonly": true,
-              "description": "A press on the backdrop, which lands on the dialog element itself.\n\n**The target alone is not enough here, where it is for `Drawer`.** A modal\n`<dialog>` attributes backdrop clicks to itself, which is the usual trick,\nand this panel also carries `--dialog-inset` of padding: a press in that\npadding has the same target as a press on the backdrop, so the trick alone\ncloses a dialog when a reader clicks just inside its own edge. The drawer\nescapes that because its panel is flush against the window and its content\nfills it. So the point is compared against the panel's box.",
+              "description": "A press on the backdrop, which lands on the dialog element itself.\n\n**The target alone is not enough here, where it is for `Drawer`.** A modal\n`<dialog>` attributes backdrop clicks to itself, which is the usual trick,\nand this panel also carries `--dialog-padding` of padding: a press in that\npadding has the same target as a press on the backdrop, so the trick alone\ncloses a dialog when a reader clicks just inside its own edge. The drawer\nescapes that because its panel is flush against the window and its content\nfills it. So the point is compared against the panel's box.",
               "inheritedFrom": {
                 "name": "HelixHeadlessDialog",
                 "module": "src/dialog/root/dialog-root.ts"
@@ -28981,20 +29060,20 @@
               "name": "--divider-color"
             },
             {
+              "description": "How long a vertical rule is. Horizontal takes its width.",
+              "name": "--divider-length"
+            },
+            {
               "description": "Space taken off both ends of it.",
-              "name": "--divider-inset"
+              "name": "--divider-padding"
             },
             {
               "description": "Off the far end only.",
-              "name": "--divider-inset-end"
+              "name": "--divider-padding-end"
             },
             {
               "description": "Off the near end only.",
-              "name": "--divider-inset-start"
-            },
-            {
-              "description": "How long a vertical rule is. Horizontal takes its width.",
-              "name": "--divider-length"
+              "name": "--divider-padding-start"
             },
             {
               "description": "How heavy the rule is.",
@@ -30218,15 +30297,15 @@
             },
             {
               "description": "Padding inside the panel.",
-              "name": "--drawer-inset"
+              "name": "--drawer-padding"
             },
             {
               "description": "Padding above the content, which clears the close control.",
-              "name": "--drawer-inset-block-start"
+              "name": "--drawer-padding-block-start"
             },
             {
               "description": "Corner radius on the edges that face the page.",
-              "name": "--drawer-radii"
+              "name": "--drawer-radius"
             },
             {
               "description": "The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
@@ -31422,7 +31501,7 @@
           "cssProperties": [
             {
               "description": "Fill behind the pages.",
-              "name": "--drilldown-background"
+              "name": "--drilldown-background-color"
             },
             {
               "description": "Width of the region.",
@@ -32176,7 +32255,7 @@
           "cssProperties": [
             {
               "description": "Space around the whole block.",
-              "name": "--empty-inset"
+              "name": "--empty-padding"
             }
           ],
           "members": [
@@ -32524,7 +32603,7 @@
             },
             {
               "description": "Padding inside the field.",
-              "name": "--file-input-inset"
+              "name": "--file-input-padding"
             }
           ],
           "members": [
@@ -32607,7 +32686,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -35378,6 +35457,14 @@
               }
             },
             {
+              "description": "How wide a cell is. The strip fits as many as the container allows.",
+              "name": "--heatmap-cell-inline-size",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
               "description": "How far a cell's corners are rounded.",
               "name": "--heatmap-cell-radius",
               "inheritedFrom": {
@@ -35388,14 +35475,6 @@
             {
               "description": "The size a cell wants on both axes, where neither is given its own.",
               "name": "--heatmap-cell-size",
-              "inheritedFrom": {
-                "name": "HelixHeadlessHeatmap",
-                "module": "src/heatmap/root/heatmap-root.ts"
-              }
-            },
-            {
-              "description": "How wide a cell is. The strip fits as many as the container allows.",
-              "name": "--heatmap-cell-width",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -35680,7 +35759,7 @@
                 "text": "number"
               },
               "default": "4",
-              "description": "The first guess at what this sheet draws, before it has been measured.\n\n**Not a contract any more, and it was a bad one.** `fits()` works against a\nmeasured width and a cell size it has to be told, and being told by hand\nmeant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:\nthe arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety\nday strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into\n342 at 390, overflowing the document both times while `visible` reported 59\nand 34. The number a summary is told to trust was the number that was wrong.\n\nThe strip is read back now, so nothing has to be kept in step and\n`--heatmap-cell-width` on its own is enough. These two remain because a\nmeasurement arrives one frame after the first paint, and a first paint from\nnumbers that match the sheet is one that does not move.",
+              "description": "The first guess at what this sheet draws, before it has been measured.\n\n**Not a contract any more, and it was a bad one.** `fits()` works against a\nmeasured width and a cell size it has to be told, and being told by hand\nmeant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:\nthe arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety\nday strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into\n342 at 390, overflowing the document both times while `visible` reported 59\nand 34. The number a summary is told to trust was the number that was wrong.\n\nThe strip is read back now, so nothing has to be kept in step and\n`--heatmap-cell-inline-size` on its own is enough. These two remain because a\nmeasurement arrives one frame after the first paint, and a first paint from\nnumbers that match the sheet is one that does not move.",
               "attribute": "gap",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -35895,7 +35974,7 @@
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "The cell and gap the strip is drawing, in pixels, once it has been read.\n\n**The arithmetic's inputs are a stylesheet's decisions, so the honest way to\nlearn them is to ask the stylesheet.** A cell's size is a length that only\nthe cascade can resolve: it may be a `rem` against a root font size, a\npercentage of a container, or whatever a container query chose this frame.\nEvery one of those is invisible to a number typed into an attribute, and\neach of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`\nadded one more way for the two to drift apart silently.\n\nReading it back is not styling and does not breach the tier: this asks what\nwas decided rather than deciding, which is the same direction as the facts\nthis component writes out as custom properties, run backwards.",
+              "description": "The cell and gap the strip is drawing, in pixels, once it has been read.\n\n**The arithmetic's inputs are a stylesheet's decisions, so the honest way to\nlearn them is to ask the stylesheet.** A cell's size is a length that only\nthe cascade can resolve: it may be a `rem` against a root font size, a\npercentage of a container, or whatever a container query chose this frame.\nEvery one of those is invisible to a number typed into an attribute, and\neach of `--heatmap-cell-inline-size`, `--heatmap-cell-height` and `--heatmap-gap`\nadded one more way for the two to drift apart silently.\n\nReading it back is not styling and does not breach the tier: this asks what\nwas decided rather than deciding, which is the same direction as the facts\nthis component writes out as custom properties, run backwards.",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -36406,7 +36485,7 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "The smallest a cell may get before the strip draws fewer of them, in CSS pixels.\n\n**Set this only to overrule what the strip actually draws.** The arithmetic\nneeds a width in pixels and the width is a length the stylesheet resolves,\nso for as long as this was the only answer it was a promise the consumer had\nto keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic\nbelieved a cell cost 10 pixels where it cost 16, and a ninety day strip ran\n940 pixels wide out of a 592 pixel box while `visible` reported 59. The one\nnumber a summary is told to trust was the number that was wrong.\n\nThe strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are\nenough on their own and these two are the estimate used until the first\nmeasurement lands. Writing the attribute pins the value and stops the\nmeasurement being consulted, which is what a container query or a transition\non the cell size wants, where what is drawn this frame is not what the\narithmetic should plan around.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
+              "description": "The smallest a cell may get before the strip draws fewer of them, in CSS pixels.\n\n**Set this only to overrule what the strip actually draws.** The arithmetic\nneeds a width in pixels and the width is a length the stylesheet resolves,\nso for as long as this was the only answer it was a promise the consumer had\nto keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic\nbelieved a cell cost 10 pixels where it cost 16, and a ninety day strip ran\n940 pixels wide out of a 592 pixel box while `visible` reported 59. The one\nnumber a summary is told to trust was the number that was wrong.\n\nThe strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are\nenough on their own and these two are the estimate used until the first\nmeasurement lands. Writing the attribute pins the value and stops the\nmeasurement being consulted, which is what a container query or a transition\non the cell size wants, where what is drawn this frame is not what the\narithmetic should plan around.\n\nZero turns the dropping off altogether, which is right for a strip in a\ncontainer that cannot get narrow.",
               "fieldName": "minCell",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
@@ -36522,8 +36601,8 @@
           "name": "HelixIconButton",
           "cssProperties": [
             {
-              "description": "Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`.",
-              "name": "--icon-button-radii"
+              "description": "Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.",
+              "name": "--icon-button-radius"
             },
             {
               "description": "What it casts, where it is raised off the page.",
@@ -39662,7 +39741,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -43124,7 +43203,7 @@
           "cssProperties": [
             {
               "description": "Padding inside the row.",
-              "name": "--list-item-inset"
+              "name": "--list-item-padding"
             },
             {
               "description": "What the rail cell shows. Written by the list.",
@@ -43540,12 +43619,12 @@
               "name": "--list-marker-gutter"
             },
             {
-              "description": "What a rail counts with. Any `list-style-type`.",
-              "name": "--list-rail-style"
+              "description": "The width of the rail's track.",
+              "name": "--list-rail-inline-size"
             },
             {
-              "description": "The width of the rail's track.",
-              "name": "--list-rail-width"
+              "description": "What a rail counts with. Any `list-style-type`.",
+              "name": "--list-rail-style"
             }
           ],
           "members": [
@@ -44298,7 +44377,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -46169,7 +46248,7 @@
             },
             {
               "description": "The panel's own fill.",
-              "name": "--megamenu-background"
+              "name": "--megamenu-background-color"
             },
             {
               "description": "Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise.",
@@ -50949,7 +51028,7 @@
           "cssProperties": [
             {
               "description": "How tall the feed may get before the list scrolls.",
-              "name": "--notifications-max-height"
+              "name": "--notifications-max-block-size"
             },
             {
               "description": "The gutter every item holds open where something in the feed has media.",
@@ -52043,7 +52122,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -53689,15 +53768,15 @@
             },
             {
               "description": "Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list.",
-              "name": "--option-block-inset"
+              "name": "--option-block-padding"
             },
             {
               "description": "Space before the label, shared with a group heading.",
-              "name": "--option-inset"
+              "name": "--option-padding"
             },
             {
               "description": "Corner radius of the row. A listbox and a select flatten it.",
-              "name": "--option-radii"
+              "name": "--option-radius"
             }
           ],
           "members": [
@@ -57405,7 +57484,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -57836,7 +57915,7 @@
               },
               "privacy": "private",
               "default": "''",
-              "description": "The code as it stood at the last commit, so a blur that changed nothing\nsays nothing.\n\n**The last commit, and not the value the reader arrived on**, which is what\nthe platform compares against. Taking that reading means recognizing the\narrival, and this component moves focus itself on every character, so the\n`focus` it would be reading is mostly one it caused: telling those apart\nrests entirely on `relatedTarget`, on an event the element dispatched to\nitself. The last commit rests on nothing, and it is the value the event\nwould carry anyway.\n\nThey agree everywhere a reader is involved, including the case the platform\nis careful about: typing a character and deleting it again leaves the code\nwhere it was, so neither reading commits. They part only when a script\nassigns while the field is unfocused, where this commits on the way out and\nthe platform does not, having taken its baseline after the assignment.\nAnnouncing a value a consumer set themselves is the safe half of that trade.\n\nSeeded in `firstUpdated`, a code in the markup being committed by whoever\nwrote it.",
+              "description": "The code as it stood when focus arrived, so a visit that changed nothing\nsays nothing.\n\n**This is the platform's reading, and it was the other one until it was\nmeasured.** It held the value at the last *commit*, on the argument that\nrecognizing an arrival is hard here: this component moves focus itself on\nevery character, so most `focus` events are ones it caused, and telling\nthose apart rests entirely on `relatedTarget`. That is true and it is not\nan obstacle, because `handleFocusOut` was already doing exactly that guard\none method away. The reasoning had talked itself out of a check it had\nalready written.\n\n**What the two readings do to a real browser**, measured in Chromium\nagainst a native `<input>` with real keystrokes:\n\n| | native | last commit | on arrival |\n|---|---|---|---|\n| types, leaves | `change` | `change` | `change` |\n| script assigns unfocused, visit with no edit | silent | **`change`** | silent |\n| script assigns unfocused, then edits | `change` | `change` | `change` |\n| types a character and deletes it | silent | silent | silent |\n\nOne row differed and it is the one that matters: a consumer who assigns\n`value` and then has a reader tab through the row was told the reader had\nentered a code. `change` on a field means \"the reader had a go at this\",\n`MixinField` treats it as exactly that, and announcing a value the consumer\nset themselves is a false positive rather than the safe half of a trade.\n\n**The narrower divergence that is left** is a script assigning while the row\nis focused, where the platform stays silent because no user edit happened\nand this commits on the way out. Closing it needs a dirty flag set from real\ncell input rather than a baseline, which is more machinery than the case has\nearned: a consumer writing to a field the reader is inside is already in a\nfight with them.\n\nSeeded in `firstUpdated`, a code in the markup being committed by whoever\nwrote it, and re-taken on every arrival from outside the row.",
               "inheritedFrom": {
                 "name": "HelixHeadlessPinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
@@ -57855,10 +57934,50 @@
             },
             {
               "kind": "field",
+              "name": "within",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether focus is currently somewhere inside the row.\n\n**The arrival is a transition, not a `relatedTarget` reading**, which is\nwhat the first version of this did and is what the exit still does. It does\nnot work on the way in for two separate reasons and the second is the one\nthat decides it. Every character moves focus to the next box, so an\nunguarded `focusin` re-baselines on each keystroke and the row can never\nreport anything: measured, the three commit specs went silent at once. And\n`focusin` carries `relatedTarget` in a browser and not in happy-dom, so a\nguard written on it is a guard that holds in production and not in the\nspecs, which is the worse half. This flag needs neither: entering is\n`focusin` while it is `false`, and nothing else is.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFocusIn",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes the baseline when focus arrives from outside the row.\n\nThe value at arrival is what the platform compares against, and the table\non `committed` is why.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleFocusOut",
               "privacy": "private",
               "readonly": true,
-              "description": "Commits when focus leaves the row, which is the moment every other field in\nthe library has and this one did not.\n\n`change` is one of the two events `MixinField` reads as \"the reader has had\na go at this\", so a code that was never completed was never `touched` and\nits own `tooShort` message could not show: two boxes of four filled and\ntabbed away from was answered with nothing at all. `Input` gets this for\nfree by relaying its control's own `change`; here the cells each fire one,\nnone of them means the code is entered, and neither does any single one of\nthem mean the reader has left.\n\n**Focus leaving the row, and not a cell.** Every character moves focus to\nthe next box, so a per-cell blur would commit on every keystroke, which is\nthe fault this exists to fix pointed the other way.\n\n`composed: false`, like the completion above and like the native event this\nstands in for. It is dispatched on the host, so a consumer hears it.",
+              "description": "Commits when focus leaves the row, which is the moment every other field in\nthe library has and this one did not.\n\n`change` is one of the two events `MixinField` reads as \"the reader has had\na go at this\", so a code that was never completed was never `touched` and\nits own `tooShort` message could not show: two boxes of four filled and\ntabbed away from was answered with nothing at all. `Input` gets this for\nfree by relaying its control's own `change`; here the cells each fire one,\nnone of them means the code is entered, and neither does any single one of\nthem mean the reader has left.\n\n**Focus leaving the row, and not a cell.** Every character moves focus to\nthe next box, so a per-cell blur would commit on every keystroke, which is\nthe fault this exists to fix pointed the other way.",
+              "inheritedFrom": {
+                "name": "HelixHeadlessPinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "commit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the code as entered, from whichever moment reached it first.\n\n**One writer, because the fact has two moments and only one meaning.** A\nfilled code and a row being left are both \"the reader is done with this\",\nand they were two dispatch sites kept from disagreeing by both remembering\nto update `committed`. They are one call now, so a third moment cannot be\nadded that fires without baselining, which is the way the pair would have\ndrifted.\n\nSilent when nothing moved since the baseline, which is what makes it safe\nto call from both: completing a code that is already the committed one, or\nleaving a row nobody edited, says nothing.\n\n`composed: false`, like the native event this stands in for. It is\ndispatched on the host, so a consumer hears it.",
               "inheritedFrom": {
                 "name": "HelixHeadlessPinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
@@ -57873,7 +57992,7 @@
                   "text": "void"
                 }
               },
-              "description": "Reports the code and a verdict on it.",
+              "description": "Reports the code and a verdict on it.\n\n**A half-entered code is invalid whether or not it is required, and that is\nthe platform's answer rather than ours.** It looked like an oversight worth\na question: `required` guards `valueMissing` and nothing guards `tooShort`,\nso an optional code is refused for being half filled. Measured in Chromium\nagainst a native `<input minlength=\"4\">` with real keystrokes, which is the\nfeature this is the same shape as:\n\n| | optional | required |\n|---|---|---|\n| typed `12` | `tooShort`, invalid | `tooShort`, invalid |\n| left empty | valid | `valueMissing` |\n| typed `1234` | valid | valid |\n\nSo `required` decides whether *nothing* is acceptable, and the length rule\napplies to anything that is not nothing. That is the right split for a code\nas well: two of four characters is not an optional code omitted, it is a\ncode got wrong, and submitting it would send a fragment. The gate on the\nmessage is `touched` rather than `required`, which is what stops a reader\nbeing told off before they have had a go.\n\n`execCommand('insertText')` is not enough to measure this: `tooShort`\napplies only to a value the user edited, and the first run of the probe\nreported every case valid because nothing had set that flag.",
               "inheritedFrom": {
                 "name": "HelixHeadlessPinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
@@ -58608,12 +58727,12 @@
               "name": "--popover-inline-size"
             },
             {
-              "description": "Space between the panel's edge and its contents.",
-              "name": "--popover-inset"
-            },
-            {
               "description": "Tallest the panel grows before it scrolls.",
               "name": "--popover-max-block-size"
+            },
+            {
+              "description": "Space between the panel's edge and its contents.",
+              "name": "--popover-padding"
             },
             {
               "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
@@ -59902,7 +60021,7 @@
             },
             {
               "description": "The quiet zone around that mark.",
-              "name": "--qr-code-logo-inset"
+              "name": "--qr-code-logo-padding"
             },
             {
               "description": "How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent.",
@@ -60913,7 +61032,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -62624,7 +62743,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -65136,7 +65255,7 @@
           "cssProperties": [
             {
               "description": "Fill behind the source.",
-              "name": "--sandbox-source-background"
+              "name": "--sandbox-source-background-color"
             },
             {
               "description": "Minimum height of the pane.",
@@ -67348,7 +67467,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -69072,7 +69191,7 @@
             },
             {
               "description": "The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.",
-              "name": "--slider-thumb-radii"
+              "name": "--slider-thumb-radius"
             },
             {
               "description": "The fence separating the handle from the track, for a slider that is not on the page.",
@@ -69331,7 +69450,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -75515,12 +75634,16 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A thumb traveling in a groove, which is the one place in the library color\nis used to say \"on\". A checkbox does not, because a tick is legible on its\nown; a switch has no mark, so the fill is the whole of what distinguishes the\ntwo states and there is nothing else for it to be.\n\nThe input itself is the hit target and is drawn as the track, stretched over\nit and invisible, so the press, the focus and the label forwarding are all\nthe platform's while the picture is ours.\n\n**Its height is `--helix-size-switch`, which is one step above the\ncheckbox's** at every density rather than the same as it. A checkbox is a box\nwith a mark in it; a switch is a track with a thumb inside it, and at the\ncheckbox's height the thumb has two pixels of groove around it and the whole\ncontrol reads as a small dash. The width follows the height, so setting\n`--switch-height` widens it too and the proportion is not something a\nconsumer has to keep.",
+          "description": "A thumb traveling in a groove, which is the one place in the library color\nis used to say \"on\". A checkbox does not, because a tick is legible on its\nown; a switch has no mark, so the fill is the whole of what distinguishes the\ntwo states and there is nothing else for it to be.\n\nThe input itself is the hit target and is drawn as the track, stretched over\nit and invisible, so the press, the focus and the label forwarding are all\nthe platform's while the picture is ours.\n\n**Its height is `--helix-size-switch`, which is one step above the\ncheckbox's** at every density rather than the same as it. A checkbox is a box\nwith a mark in it; a switch is a track with a thumb inside it, and at the\ncheckbox's height the thumb has two pixels of groove around it and the whole\ncontrol reads as a small dash. The width follows the height, so setting\n`--switch-block-size` widens it too and the proportion is not something a\nconsumer has to keep.",
           "name": "HelixSwitch",
           "cssProperties": [
             {
               "description": "Height of the track. The width follows it.",
-              "name": "--switch-height"
+              "name": "--switch-block-size"
+            },
+            {
+              "description": "Length of the track, if not the derived one.",
+              "name": "--switch-inline-size"
             },
             {
               "description": "Fill when it is on.",
@@ -75529,10 +75652,6 @@
             {
               "description": "The handle, in both states.",
               "name": "--switch-thumb-color"
-            },
-            {
-              "description": "Length of the track, if not the derived one.",
-              "name": "--switch-width"
             }
           ],
           "members": [
@@ -75726,7 +75845,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -79720,7 +79839,7 @@
             },
             {
               "description": "Corner radius of the tag.",
-              "name": "--tag-radii"
+              "name": "--tag-radius"
             }
           ],
           "cssParts": [
@@ -80749,7 +80868,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -82394,7 +82513,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -84245,12 +84364,12 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A bounded list on a surface of its own, because ninety-six rows is taller than\nanywhere it will be put. `--time-picker-list-height` is the bound and it is a height\nrather than a count of rows: what a panel has is room, and a row count would\nhave to be recomputed every time the density changed.\n\nNo border and no fill of its own. Flat on a page it takes what it is given,\nand in Time Input's panel the panel supplies both: a list that brought its own\ncard would be a card inside a card there.",
+          "description": "A bounded list on a surface of its own, because ninety-six rows is taller than\nanywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height\nrather than a count of rows: what a panel has is room, and a row count would\nhave to be recomputed every time the density changed.\n\nNo border and no fill of its own. Flat on a page it takes what it is given,\nand in Time Input's panel the panel supplies both: a list that brought its own\ncard would be a card inside a card there.",
           "name": "HelixTimePicker",
           "cssProperties": [
             {
               "description": "How tall the list is before it scrolls.",
-              "name": "--time-picker-list-height"
+              "name": "--time-picker-list-block-size"
             },
             {
               "description": "Wash behind the times inside a range.",
@@ -84266,7 +84385,7 @@
             },
             {
               "description": "How tall a wheel is. Five rows by default.",
-              "name": "--time-picker-wheel-height"
+              "name": "--time-picker-wheel-block-size"
             }
           ],
           "members": [
@@ -86582,7 +86701,7 @@
             },
             {
               "description": "Space between the message's edge and its contents.",
-              "name": "--toast-item-inset"
+              "name": "--toast-item-padding"
             },
             {
               "description": "Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default.",
@@ -87926,7 +88045,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.",
+              "description": "Whether the reader has had a go at the field yet.\n\nThis was `:user-invalid`, which is the platform's own answer to \"is this\nfield wrong *yet*\" and is the right idea. It does not work here, and the\nreason is structural rather than a browser bug: `:user-invalid` tracks\ninteraction with the element it is on, and nobody interacts with this\nelement. The reader types into an `<input>` inside its shadow root, so\nthe host's interaction flag is never set and the selector never matches.\nMeasured after submitting an invalid required field and again after\nediting one and leaving it: false both times, while `:invalid` matched\nboth times.\n\nSo the moments are listened for instead, and both of them demonstrably\nreach the host: `invalid` when a form is submitted with this control\nfailing, and `change` when the reader has edited and committed. Focus\nalone is deliberately not one of them. Tabbing past an empty required\nfield should not be answered with an error.\n\n**A composite control has to construct its own `change`, and this mixin\ndeliberately does not do it for them.** A native `change` is\n`composed: false`, so a control built from several inner inputs never\nrelays one to its host: `Input` gets this free from its one control, and\n`PinInput` had four boxes, none of whose `change` means the code is\nentered, so a half-entered code was never `touched` and could never say\nwhat was wrong with it. See 311.\n\n**The obvious shared fix is for `touched` to take a `focusout`, and it is\nthe wrong one**, because it is the paragraph above undone: a `focusout`\nfires on the reader who tabbed past and typed nothing, which is exactly\nthe case this refuses to call an error. What a composite needs is not a\nfocus moment, it is the native meaning of `change`, \"edited, then left\",\nand the editing half is the part a mixin up here cannot see.\n\n**Nor is there one shape to extract yet.** The two composites in the\nlibrary solve it differently and both are right: `PinInput` is\nfocus-driven, taking a baseline when focus arrives from outside the row\nand announcing on the way out if it moved, and `DateInput` is\nvalue-driven, stopping its inner `change` and announcing once the date\nitself moves. Generalizing from those two would be generalizing from one,\nsince only one of them has a leaving moment at all. The trigger for\nlifting it is a third control that needs the focus-driven shape, at which\npoint what moves up is the baseline-and-commit pair rather than `touched`.",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"

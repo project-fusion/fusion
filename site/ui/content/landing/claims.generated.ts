@@ -17,8 +17,8 @@ export const CLAIMS: readonly Claim[] = [
   },
   {
     label: 'The token layer, compressed',
-    note: '179 semantic tokens. Nothing on a Helix page paints without this file.',
-    value: '2.0 kB',
+    note: '185 semantic tokens. Nothing on a Helix page paints without this file.',
+    value: '2.1 kB',
   },
   {
     label: 'The derivation engine',

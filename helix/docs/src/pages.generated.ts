@@ -27,6 +27,12 @@ export const docPages: DocPage[] = [
     title: 'Browser support',
   },
   {
+    description: 'Using the headless tier as the foundation for a design system of your own.',
+    section: 'Essentials',
+    slug: 'building-on-the-headless-tier',
+    title: 'Building on the headless tier',
+  },
+  {
     description: 'The data channel nobody expects, and why it is a real table.',
     section: 'Essentials',
     slug: 'charting',

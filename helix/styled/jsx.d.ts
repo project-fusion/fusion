@@ -7711,7 +7711,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -7731,7 +7731,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -7803,7 +7803,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -7823,7 +7823,7 @@ believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
 number a summary is told to trust was the number that was wrong.
 
-The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -19414,7 +19414,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--accordion-border-color`: Color of the seams, and of the frame when outlined. (default: `undefined`)
-   * - `--accordion-radii`: Corner radius of the stack, when outlined. (default: `undefined`)
+   * - `--accordion-radius`: Corner radius of the stack, when outlined. (default: `undefined`)
    */
   "helix-accordion": Partial<
     HelixAccordionProps & BaseProps<HelixAccordion> & BaseEvents<HelixAccordion>
@@ -19652,11 +19652,11 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--app-header-backdrop`: The filter behind it. `none` to pair it with a panel. (default: `undefined`)
-   * - `--app-header-background`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-background-color`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-block-size`: Height of the banner. (default: `undefined`)
    * - `--app-header-border-color`: The line under the bar. None by default. (default: `undefined`)
-   * - `--app-header-height`: Height of the banner. (default: `undefined`)
-   * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
    * - `--app-header-max-inline-size`: Width the content is centered in. (default: `undefined`)
+   * - `--app-header-padding`: Inline padding of the banner. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20943,13 +20943,13 @@ export type CustomElements = {
    * - `--button-gap`: Space between the label and whatever flanks it. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-padding-inline`: Inline padding, for a container whose rhythm is not the control default. (default: `undefined`)
-   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
-   * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
-   * - `--button-radii-end-end`: The bottom trailing corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-end-start`: The bottom leading corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
-   * - `--button-radii-start-end`: The top trailing corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-start-start`: The top leading corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius`: Corner radius of the control. (default: `undefined`)
+   * - `--button-radius-end`: Trailing corners, which a group flattens. (default: `undefined`)
+   * - `--button-radius-end-end`: The bottom trailing corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-end-start`: The bottom leading corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-start`: Leading corners, which a group flattens. (default: `undefined`)
+   * - `--button-radius-start-end`: The top trailing corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-start-start`: The top leading corner, for a group stacking down. (default: `undefined`)
    * - `--button-size`: Height of the control, for a container whose row is not one of the density steps. (default: `undefined`)
    *
    * ## CSS Parts
@@ -21019,7 +21019,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
-   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   * - `--callout-radius`: Corner radius of the callout. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21163,7 +21163,7 @@ export type CustomElements = {
    * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
-   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   * - `--card-radius`: Corner radius of the surface. (default: `undefined`)
    * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
   "helix-card": Partial<HelixCardProps & BaseProps<HelixCard> & BaseEvents<HelixCard>>;
@@ -21471,9 +21471,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-composer-background`: Fill behind the composer. (default: `undefined`)
+   * - `--chat-composer-background-color`: Fill behind the composer. (default: `undefined`)
    * - `--chat-composer-border-width`: The composer's edge, so a theme can remove it. (default: `undefined`)
-   * - `--chat-composer-max-height`: How tall the field may grow. (default: `undefined`)
+   * - `--chat-composer-max-block-size`: How tall the field may grow. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21591,8 +21591,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-message-background`: Fill behind a turn. (default: `undefined`)
-   * - `--chat-message-background-me`: Fill behind the reader's own turns. (default: `undefined`)
+   * - `--chat-message-background-color`: Fill behind a turn. (default: `undefined`)
+   * - `--chat-message-background-color-me`: Fill behind the reader's own turns. (default: `undefined`)
    * - `--chat-message-color`: Ink in a turn. (default: `undefined`)
    * - `--chat-message-measure`: How wide a turn may get before it wraps. (default: `undefined`)
    *
@@ -21722,7 +21722,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--chat-gap`: Space between turns. (default: `undefined`)
-   * - `--chat-max-height`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
+   * - `--chat-max-block-size`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
    * - `--chat-resume-border-color`: The edge around the way back. (default: `undefined`)
    * - `--chat-resume-border-width`: How thick that edge is, for a surface over content. (default: `undefined`)
@@ -22155,10 +22155,10 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--code-block-backdrop`: A filter over what shows through the block and its header, for a translucent ground. (default: `undefined`)
-   * - `--code-block-background`: The ground behind the code, for a block that is not on the page. (default: `undefined`)
+   * - `--code-block-background-color`: The ground behind the code, for a block that is not on the page. (default: `undefined`)
    * - `--code-block-border-color`: The line around the block and its header. (default: `undefined`)
-   * - `--code-block-header-background`: The ground behind the name, where it should not be `surface-raised`. (default: `undefined`)
-   * - `--code-block-radii`: The corner on the header's top and the block's bottom, which are one shape. (default: `undefined`)
+   * - `--code-block-header-background-color`: The ground behind the name, where it should not be `surface-raised`. (default: `undefined`)
+   * - `--code-block-radius`: The corner on the header's top and the block's bottom, which are one shape. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22482,7 +22482,7 @@ export type CustomElements = {
    * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
-   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-swatch-radius`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
@@ -22743,9 +22743,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--color-picker-grid-radii`: Corner radius of the square. (default: `undefined`)
+   * - `--color-picker-grid-radius`: Corner radius of the square. (default: `undefined`)
    * - `--color-picker-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
-   * - `--color-picker-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-picker-padding`: Inset of the rows under the square, and the bottom. (default: `undefined`)
    * - `--color-picker-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
    * - `--color-picker-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
@@ -23440,6 +23440,14 @@ export type CustomElements = {
    * the fieldset's hold is not recorded. There is no callback to learn it from
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-button-radius`: Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. (default: `undefined`)
+   * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
+   * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -24359,7 +24367,7 @@ export type CustomElements = {
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
-   * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--dialog-padding`: Padding inside the panel. (default: `undefined`)
    * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
    * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--dialog-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
@@ -24433,10 +24441,10 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
-   * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
-   * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
    * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
+   * - `--divider-padding`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-padding-end`: Off the far end only. (default: `undefined`)
+   * - `--divider-padding-start`: Off the near end only. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
@@ -24813,9 +24821,9 @@ export type CustomElements = {
    * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
    * - `--drawer-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
-   * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
-   * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
-   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
+   * - `--drawer-padding`: Padding inside the panel. (default: `undefined`)
+   * - `--drawer-padding-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
+   * - `--drawer-radius`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--drawer-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
@@ -25000,7 +25008,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--drilldown-background`: Fill behind the pages. (default: `undefined`)
+   * - `--drilldown-background-color`: Fill behind the pages. (default: `undefined`)
    * - `--drilldown-inline-size`: Width of the region. (default: `undefined`)
    *
    * ## CSS Parts
@@ -25071,7 +25079,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-inset`: Space around the whole block. (default: `undefined`)
+   * - `--empty-padding`: Space around the whole block. (default: `undefined`)
    */
   "helix-empty": Partial<HelixEmptyProps & BaseProps<HelixEmpty> & BaseEvents<HelixEmpty>>;
 
@@ -25240,7 +25248,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--file-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--file-input-inset`: Padding inside the field. (default: `undefined`)
+   * - `--file-input-padding`: Padding inside the field. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -25532,7 +25540,7 @@ export type CustomElements = {
    * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
    * number a summary is told to trust was the number that was wrong.
    *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
    * enough on their own and these two are the estimate used until the first
    * measurement lands. Writing the attribute pins the value and stops the
    * measurement being consulted, which is what a container query or a transition
@@ -25632,9 +25640,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-inline-size`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
-   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
@@ -25929,7 +25937,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--icon-button-radii`: Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. (default: `undefined`)
+   * - `--icon-button-radius`: Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. (default: `undefined`)
    * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
    * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
    *
@@ -26901,7 +26909,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-padding`: Padding inside the row. (default: `undefined`)
    * - `--list-item-rail-content`: What the rail cell shows. Written by the list. (default: `undefined`)
    * - `--list-item-rail-display`: Whether there is a rail at all. Written by the list. (default: `undefined`)
    * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
@@ -27018,8 +27026,8 @@ export type CustomElements = {
    *
    * - `--list-gap`: Space between rows. (default: `undefined`)
    * - `--list-marker-gutter`: Room the ordered and unordered markers hang into. (default: `undefined`)
+   * - `--list-rail-inline-size`: The width of the rail's track. (default: `undefined`)
    * - `--list-rail-style`: What a rail counts with. Any `list-style-type`. (default: `undefined`)
-   * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
   "helix-list": Partial<HelixListProps & BaseProps<HelixList> & BaseEvents<HelixList>>;
 
@@ -27491,7 +27499,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
-   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-background-color`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centered in it. (default: `undefined`)
@@ -28254,7 +28262,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--notifications-max-height`: How tall the feed may get before the list scrolls. (default: `undefined`)
+   * - `--notifications-max-block-size`: How tall the feed may get before the list scrolls. (default: `undefined`)
    * - `--notifications-media-column`: The gutter every item holds open where something in the feed has media. (default: `undefined`)
    * - `--notifications-padding-inline`: Space either side of the header and footer. (default: `undefined`)
    * - `--notifications-rule`: The hairline between items and around the regions. (default: `undefined`)
@@ -28704,9 +28712,9 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
-   * - `--option-block-inset`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
-   * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
-   * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
+   * - `--option-block-padding`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
+   * - `--option-padding`: Space before the label, shared with a group heading. (default: `undefined`)
+   * - `--option-radius`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -29471,8 +29479,8 @@ export type CustomElements = {
    * - `--popover-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
-   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
+   * - `--popover-padding`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
@@ -29682,7 +29690,7 @@ export type CustomElements = {
    * - `--qr-code-background-color`: Behind them, including the quiet zone. (default: `undefined`)
    * - `--qr-code-color`: The dark modules. Defaults to the page's ink. (default: `undefined`)
    * - `--qr-code-finder-color`: The three corner squares. Defaults to the same ink as the modules. (default: `undefined`)
-   * - `--qr-code-logo-inset`: The quiet zone around that mark. (default: `undefined`)
+   * - `--qr-code-logo-padding`: The quiet zone around that mark. (default: `undefined`)
    * - `--qr-code-logo-size`: How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. (default: `undefined`)
    * - `--qr-code-size`: How wide the square is. Defaults to `12rem`. (default: `undefined`)
    *
@@ -30637,7 +30645,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-background-color`: Fill behind the source. (default: `undefined`)
    * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
    *
    * ## CSS Parts
@@ -31472,7 +31480,7 @@ export type CustomElements = {
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-thumb-length`: The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. (default: `undefined`)
-   * - `--slider-thumb-radii`: The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. (default: `undefined`)
+   * - `--slider-thumb-radius`: The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. (default: `undefined`)
    * - `--slider-thumb-ring-color`: The fence separating the handle from the track, for a slider that is not on the page. (default: `undefined`)
    * - `--slider-thumb-size`: The handle across the track. Square with the length by default, which is what makes it round. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
@@ -32438,7 +32446,7 @@ export type CustomElements = {
    * with a mark in it; a switch is a track with a thumb inside it, and at the
    * checkbox's height the thumb has two pixels of groove around it and the whole
    * control reads as a small dash. The width follows the height, so setting
-   * `--switch-height` widens it too and the proportion is not something a
+   * `--switch-block-size` widens it too and the proportion is not something a
    * consumer has to keep.
    *
    * ## Attributes & Properties
@@ -32596,10 +32604,10 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-block-size`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-inline-size`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
    * - `--switch-thumb-color`: The handle, in both states. (default: `undefined`)
-   * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33245,7 +33253,7 @@ export type CustomElements = {
    * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
    * - `--tag-border-color`: Color of the edge, for a chip that separates by fill alone. (default: `undefined`)
    * - `--tag-foreground-color`: Label color. (default: `undefined`)
-   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
+   * - `--tag-radius`: Corner radius of the tag. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -33894,7 +33902,7 @@ export type CustomElements = {
 
   /**
    * A bounded list on a surface of its own, because ninety-six rows is taller than
-   * anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
+   * anywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height
    * rather than a count of rows: what a panel has is room, and a row count would
    * have to be recomputed every time the density changed.
    *
@@ -34150,11 +34158,11 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--time-picker-list-height`: How tall the list is before it scrolls. (default: `undefined`)
+   * - `--time-picker-list-block-size`: How tall the list is before it scrolls. (default: `undefined`)
    * - `--time-picker-range-color`: Wash behind the times inside a range. (default: `undefined`)
    * - `--time-picker-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-picker-selected-color`: Fill on the chosen row of a wheel. (default: `undefined`)
-   * - `--time-picker-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
+   * - `--time-picker-wheel-block-size`: How tall a wheel is. Five rows by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34410,7 +34418,7 @@ export type CustomElements = {
    *
    * - `--toast-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
-   * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-item-padding`: Space between the message's edge and its contents. (default: `undefined`)
    * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
@@ -36500,7 +36508,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--accordion-border-color`: Color of the seams, and of the frame when outlined. (default: `undefined`)
-   * - `--accordion-radii`: Corner radius of the stack, when outlined. (default: `undefined`)
+   * - `--accordion-radius`: Corner radius of the stack, when outlined. (default: `undefined`)
    */
   "helix-accordion": Partial<
     HelixAccordionProps &
@@ -36744,11 +36752,11 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--app-header-backdrop`: The filter behind it. `none` to pair it with a panel. (default: `undefined`)
-   * - `--app-header-background`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-background-color`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-block-size`: Height of the banner. (default: `undefined`)
    * - `--app-header-border-color`: The line under the bar. None by default. (default: `undefined`)
-   * - `--app-header-height`: Height of the banner. (default: `undefined`)
-   * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
    * - `--app-header-max-inline-size`: Width the content is centered in. (default: `undefined`)
+   * - `--app-header-padding`: Inline padding of the banner. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -38066,13 +38074,13 @@ export type CustomElementsSolidJs = {
    * - `--button-gap`: Space between the label and whatever flanks it. (default: `undefined`)
    * - `--button-inline-size`: Width taken by `width="standard"`. (default: `undefined`)
    * - `--button-padding-inline`: Inline padding, for a container whose rhythm is not the control default. (default: `undefined`)
-   * - `--button-radii`: Corner radius of the control. (default: `undefined`)
-   * - `--button-radii-end`: Trailing corners, which a group flattens. (default: `undefined`)
-   * - `--button-radii-end-end`: The bottom trailing corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-end-start`: The bottom leading corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-start`: Leading corners, which a group flattens. (default: `undefined`)
-   * - `--button-radii-start-end`: The top trailing corner, for a group stacking down. (default: `undefined`)
-   * - `--button-radii-start-start`: The top leading corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius`: Corner radius of the control. (default: `undefined`)
+   * - `--button-radius-end`: Trailing corners, which a group flattens. (default: `undefined`)
+   * - `--button-radius-end-end`: The bottom trailing corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-end-start`: The bottom leading corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-start`: Leading corners, which a group flattens. (default: `undefined`)
+   * - `--button-radius-start-end`: The top trailing corner, for a group stacking down. (default: `undefined`)
+   * - `--button-radius-start-start`: The top leading corner, for a group stacking down. (default: `undefined`)
    * - `--button-size`: Height of the control, for a container whose row is not one of the density steps. (default: `undefined`)
    *
    * ## CSS Parts
@@ -38145,7 +38153,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--callout-background-color`: Fill behind the callout. (default: `undefined`)
-   * - `--callout-radii`: Corner radius of the callout. (default: `undefined`)
+   * - `--callout-radius`: Corner radius of the callout. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -38292,7 +38300,7 @@ export type CustomElementsSolidJs = {
    * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
-   * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
+   * - `--card-radius`: Corner radius of the surface. (default: `undefined`)
    * - `--card-shadow`: Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. (default: `undefined`)
    */
   "helix-card": Partial<
@@ -38605,9 +38613,9 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-composer-background`: Fill behind the composer. (default: `undefined`)
+   * - `--chat-composer-background-color`: Fill behind the composer. (default: `undefined`)
    * - `--chat-composer-border-width`: The composer's edge, so a theme can remove it. (default: `undefined`)
-   * - `--chat-composer-max-height`: How tall the field may grow. (default: `undefined`)
+   * - `--chat-composer-max-block-size`: How tall the field may grow. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -38728,8 +38736,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chat-message-background`: Fill behind a turn. (default: `undefined`)
-   * - `--chat-message-background-me`: Fill behind the reader's own turns. (default: `undefined`)
+   * - `--chat-message-background-color`: Fill behind a turn. (default: `undefined`)
+   * - `--chat-message-background-color-me`: Fill behind the reader's own turns. (default: `undefined`)
    * - `--chat-message-color`: Ink in a turn. (default: `undefined`)
    * - `--chat-message-measure`: How wide a turn may get before it wraps. (default: `undefined`)
    *
@@ -38862,7 +38870,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--chat-gap`: Space between turns. (default: `undefined`)
-   * - `--chat-max-height`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
+   * - `--chat-max-block-size`: How tall the conversation may get before the transcript scrolls. (default: `undefined`)
    * - `--chat-padding-inline`: Space either side of every region. (default: `undefined`)
    * - `--chat-resume-border-color`: The edge around the way back. (default: `undefined`)
    * - `--chat-resume-border-width`: How thick that edge is, for a surface over content. (default: `undefined`)
@@ -39303,10 +39311,10 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--code-block-backdrop`: A filter over what shows through the block and its header, for a translucent ground. (default: `undefined`)
-   * - `--code-block-background`: The ground behind the code, for a block that is not on the page. (default: `undefined`)
+   * - `--code-block-background-color`: The ground behind the code, for a block that is not on the page. (default: `undefined`)
    * - `--code-block-border-color`: The line around the block and its header. (default: `undefined`)
-   * - `--code-block-header-background`: The ground behind the name, where it should not be `surface-raised`. (default: `undefined`)
-   * - `--code-block-radii`: The corner on the header's top and the block's bottom, which are one shape. (default: `undefined`)
+   * - `--code-block-header-background-color`: The ground behind the name, where it should not be `surface-raised`. (default: `undefined`)
+   * - `--code-block-radius`: The corner on the header's top and the block's bottom, which are one shape. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -39635,7 +39643,7 @@ export type CustomElementsSolidJs = {
    * - `--color-input-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--color-input-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    * - `--color-input-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
-   * - `--color-input-swatch-radii`: Corner radius of that block. (default: `undefined`)
+   * - `--color-input-swatch-radius`: Corner radius of that block. (default: `undefined`)
    * - `--color-input-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--color-input-swatch`: The chosen color, to paint over the transparency check. (default: `undefined`)
    *
@@ -39899,9 +39907,9 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--color-picker-grid-radii`: Corner radius of the square. (default: `undefined`)
+   * - `--color-picker-grid-radius`: Corner radius of the square. (default: `undefined`)
    * - `--color-picker-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
-   * - `--color-picker-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
+   * - `--color-picker-padding`: Inset of the rows under the square, and the bottom. (default: `undefined`)
    * - `--color-picker-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
    * - `--color-picker-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-picker-brightness`: The chosen brightness, 0 to 100, as a percentage. (default: `undefined`)
@@ -40605,6 +40613,14 @@ export type CustomElementsSolidJs = {
    * the fieldset's hold is not recorded. There is no callback to learn it from
    * and reading `:disabled` here would answer about the attribute we are in the
    * middle of removing.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--icon-button-radius`: Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. (default: `undefined`)
+   * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
+   * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -41536,7 +41552,7 @@ export type CustomElementsSolidJs = {
    * - `--dialog-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
-   * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
+   * - `--dialog-padding`: Padding inside the panel. (default: `undefined`)
    * - `--dialog-rise`: How far the panel rises as it opens. Follows `--helix-space-lg`. (default: `undefined`)
    * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--dialog-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
@@ -41613,10 +41629,10 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
-   * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
-   * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
-   * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
    * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
+   * - `--divider-padding`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-padding-end`: Off the far end only. (default: `undefined`)
+   * - `--divider-padding-start`: Off the near end only. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
    *
    * ## CSS Parts
@@ -41999,9 +42015,9 @@ export type CustomElementsSolidJs = {
    * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
    * - `--drawer-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
-   * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
-   * - `--drawer-inset-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
-   * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
+   * - `--drawer-padding`: Padding inside the panel. (default: `undefined`)
+   * - `--drawer-padding-block-start`: Padding above the content, which clears the close control. (default: `undefined`)
+   * - `--drawer-radius`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--drawer-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
@@ -42192,7 +42208,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--drilldown-background`: Fill behind the pages. (default: `undefined`)
+   * - `--drilldown-background-color`: Fill behind the pages. (default: `undefined`)
    * - `--drilldown-inline-size`: Width of the region. (default: `undefined`)
    *
    * ## CSS Parts
@@ -42266,7 +42282,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--empty-inset`: Space around the whole block. (default: `undefined`)
+   * - `--empty-padding`: Space around the whole block. (default: `undefined`)
    */
   "helix-empty": Partial<
     HelixEmptyProps &
@@ -42440,7 +42456,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--file-input-background-color`: Fill behind the field. (default: `undefined`)
-   * - `--file-input-inset`: Padding inside the field. (default: `undefined`)
+   * - `--file-input-padding`: Padding inside the field. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -42742,7 +42758,7 @@ export type CustomElementsSolidJs = {
    * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
    * number a summary is told to trust was the number that was wrong.
    *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
    * enough on their own and these two are the estimate used until the first
    * measurement lands. Writing the attribute pins the value and stops the
    * measurement being consulted, which is what a container query or a transition
@@ -42842,9 +42858,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-inline-size`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
-   * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
@@ -43142,7 +43158,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--icon-button-radii`: Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. (default: `undefined`)
+   * - `--icon-button-radius`: Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. (default: `undefined`)
    * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
    * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
    *
@@ -44137,7 +44153,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--list-item-inset`: Padding inside the row. (default: `undefined`)
+   * - `--list-item-padding`: Padding inside the row. (default: `undefined`)
    * - `--list-item-rail-content`: What the rail cell shows. Written by the list. (default: `undefined`)
    * - `--list-item-rail-display`: Whether there is a rail at all. Written by the list. (default: `undefined`)
    * - `--list-item-term-weight`: Weight of a description list's term. (default: `undefined`)
@@ -44257,8 +44273,8 @@ export type CustomElementsSolidJs = {
    *
    * - `--list-gap`: Space between rows. (default: `undefined`)
    * - `--list-marker-gutter`: Room the ordered and unordered markers hang into. (default: `undefined`)
+   * - `--list-rail-inline-size`: The width of the rail's track. (default: `undefined`)
    * - `--list-rail-style`: What a rail counts with. Any `list-style-type`. (default: `undefined`)
-   * - `--list-rail-width`: The width of the rail's track. (default: `undefined`)
    */
   "helix-list": Partial<
     HelixListProps & HelixListSolidJsProps & BaseProps<HelixList> & BaseEvents<HelixList>
@@ -44738,7 +44754,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
-   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-background-color`: The panel's own fill. (default: `undefined`)
    * - `--megamenu-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centered in it. (default: `undefined`)
@@ -45520,7 +45536,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--notifications-max-height`: How tall the feed may get before the list scrolls. (default: `undefined`)
+   * - `--notifications-max-block-size`: How tall the feed may get before the list scrolls. (default: `undefined`)
    * - `--notifications-media-column`: The gutter every item holds open where something in the feed has media. (default: `undefined`)
    * - `--notifications-padding-inline`: Space either side of the header and footer. (default: `undefined`)
    * - `--notifications-rule`: The hairline between items and around the regions. (default: `undefined`)
@@ -45979,9 +45995,9 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
-   * - `--option-block-inset`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
-   * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
-   * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
+   * - `--option-block-padding`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
+   * - `--option-padding`: Space before the label, shared with a group heading. (default: `undefined`)
+   * - `--option-radius`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -46764,8 +46780,8 @@ export type CustomElementsSolidJs = {
    * - `--popover-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--popover-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--popover-inline-size`: Width of the panel. (default: `undefined`)
-   * - `--popover-inset`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-max-block-size`: Tallest the panel grows before it scrolls. (default: `undefined`)
+   * - `--popover-padding`: Space between the panel's edge and its contents. (default: `undefined`)
    * - `--popover-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    *
    * ## CSS Parts
@@ -46981,7 +46997,7 @@ export type CustomElementsSolidJs = {
    * - `--qr-code-background-color`: Behind them, including the quiet zone. (default: `undefined`)
    * - `--qr-code-color`: The dark modules. Defaults to the page's ink. (default: `undefined`)
    * - `--qr-code-finder-color`: The three corner squares. Defaults to the same ink as the modules. (default: `undefined`)
-   * - `--qr-code-logo-inset`: The quiet zone around that mark. (default: `undefined`)
+   * - `--qr-code-logo-padding`: The quiet zone around that mark. (default: `undefined`)
    * - `--qr-code-logo-size`: How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. (default: `undefined`)
    * - `--qr-code-size`: How wide the square is. Defaults to `12rem`. (default: `undefined`)
    *
@@ -47961,7 +47977,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-background-color`: Fill behind the source. (default: `undefined`)
    * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
    *
    * ## CSS Parts
@@ -48817,7 +48833,7 @@ export type CustomElementsSolidJs = {
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-thumb-color`: The handle. (default: `undefined`)
    * - `--slider-thumb-length`: The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. (default: `undefined`)
-   * - `--slider-thumb-radii`: The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. (default: `undefined`)
+   * - `--slider-thumb-radius`: The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. (default: `undefined`)
    * - `--slider-thumb-ring-color`: The fence separating the handle from the track, for a slider that is not on the page. (default: `undefined`)
    * - `--slider-thumb-size`: The handle across the track. Square with the length by default, which is what makes it round. (default: `undefined`)
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
@@ -49810,7 +49826,7 @@ export type CustomElementsSolidJs = {
    * with a mark in it; a switch is a track with a thumb inside it, and at the
    * checkbox's height the thumb has two pixels of groove around it and the whole
    * control reads as a small dash. The width follows the height, so setting
-   * `--switch-height` widens it too and the proportion is not something a
+   * `--switch-block-size` widens it too and the proportion is not something a
    * consumer has to keep.
    *
    * ## Attributes & Properties
@@ -49968,10 +49984,10 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--switch-height`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-block-size`: Height of the track. The width follows it. (default: `undefined`)
+   * - `--switch-inline-size`: Length of the track, if not the derived one. (default: `undefined`)
    * - `--switch-on-color`: Fill when it is on. (default: `undefined`)
    * - `--switch-thumb-color`: The handle, in both states. (default: `undefined`)
-   * - `--switch-width`: Length of the track, if not the derived one. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -50641,7 +50657,7 @@ export type CustomElementsSolidJs = {
    * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
    * - `--tag-border-color`: Color of the edge, for a chip that separates by fill alone. (default: `undefined`)
    * - `--tag-foreground-color`: Label color. (default: `undefined`)
-   * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
+   * - `--tag-radius`: Corner radius of the tag. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -51300,7 +51316,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * A bounded list on a surface of its own, because ninety-six rows is taller than
-   * anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
+   * anywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height
    * rather than a count of rows: what a panel has is room, and a row count would
    * have to be recomputed every time the density changed.
    *
@@ -51556,11 +51572,11 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--time-picker-list-height`: How tall the list is before it scrolls. (default: `undefined`)
+   * - `--time-picker-list-block-size`: How tall the list is before it scrolls. (default: `undefined`)
    * - `--time-picker-range-color`: Wash behind the times inside a range. (default: `undefined`)
    * - `--time-picker-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-picker-selected-color`: Fill on the chosen row of a wheel. (default: `undefined`)
-   * - `--time-picker-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
+   * - `--time-picker-wheel-block-size`: How tall a wheel is. Five rows by default. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -51825,7 +51841,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--toast-border-color`: Color of the panel's edge. (default: `undefined`)
    * - `--toast-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
-   * - `--toast-item-inset`: Space between the message's edge and its contents. (default: `undefined`)
+   * - `--toast-item-padding`: Space between the message's edge and its contents. (default: `undefined`)
    * - `--toast-shadow`: Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. (default: `undefined`)
    * - `--toast-duration`: How long this message stays, in milliseconds, for a progress hint. (default: `undefined`)
    *
@@ -53758,21 +53774,21 @@ export type CustomCssProperties = {
   /** Color of the seams, and of the frame when outlined. */
   "--accordion-border-color"?: string;
   /** Corner radius of the stack, when outlined. */
-  "--accordion-radii"?: string;
+  "--accordion-radius"?: string;
   /** Inline padding, matched to the page. */
   "--announcement-inset"?: string;
   /** The filter behind it. `none` to pair it with a panel. */
   "--app-header-backdrop"?: string;
   /** Fill behind the banner. */
-  "--app-header-background"?: string;
+  "--app-header-background-color"?: string;
+  /** Height of the banner. */
+  "--app-header-block-size"?: string;
   /** The line under the bar. None by default. */
   "--app-header-border-color"?: string;
-  /** Height of the banner. */
-  "--app-header-height"?: string;
-  /** Inline padding of the banner. */
-  "--app-header-inset"?: string;
   /** Width the content is centered in. */
   "--app-header-max-inline-size"?: string;
+  /** Inline padding of the banner. */
+  "--app-header-padding"?: string;
   /** How far each avatar sits over the one before it. */
   "--avatar-group-overlap"?: string;
   /** The separation drawn between one avatar and the next. */
@@ -53836,25 +53852,25 @@ export type CustomCssProperties = {
   /** Inline padding, for a container whose rhythm is not the control default. */
   "--button-padding-inline"?: string;
   /** Corner radius of the control. */
-  "--button-radii"?: string;
+  "--button-radius"?: string;
   /** Trailing corners, which a group flattens. */
-  "--button-radii-end"?: string;
+  "--button-radius-end"?: string;
   /** The bottom trailing corner, for a group stacking down. */
-  "--button-radii-end-end"?: string;
+  "--button-radius-end-end"?: string;
   /** The bottom leading corner, for a group stacking down. */
-  "--button-radii-end-start"?: string;
+  "--button-radius-end-start"?: string;
   /** Leading corners, which a group flattens. */
-  "--button-radii-start"?: string;
+  "--button-radius-start"?: string;
   /** The top trailing corner, for a group stacking down. */
-  "--button-radii-start-end"?: string;
+  "--button-radius-start-end"?: string;
   /** The top leading corner, for a group stacking down. */
-  "--button-radii-start-start"?: string;
+  "--button-radius-start-start"?: string;
   /** Height of the control, for a container whose row is not one of the density steps. */
   "--button-size"?: string;
   /** Fill behind the callout. */
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
-  "--callout-radii"?: string;
+  "--callout-radius"?: string;
   /** How the regions pack when the card is stretched taller than its content. `start` by default, so the slack is at the bottom; `space-between` puts a footer on the floor. */
   "--card-align"?: string;
   /** Filter applied behind a `frosted` or `glass` card. Follows the theme's material policy; set it to override the strength on one card. */
@@ -53872,7 +53888,7 @@ export type CustomCssProperties = {
   /** Inset applied to each region. */
   "--card-padding"?: string;
   /** Corner radius of the surface. */
-  "--card-radii"?: string;
+  "--card-radius"?: string;
   /** Shadow under the surface. What `elevated` sets, and what a `data-card` link raises on hover. */
   "--card-shadow"?: string;
   /** Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. */
@@ -53882,15 +53898,15 @@ export type CustomCssProperties = {
   /** Space between slides. */
   "--carousel-gap"?: string;
   /** Fill behind the composer. */
-  "--chat-composer-background"?: string;
+  "--chat-composer-background-color"?: string;
   /** The composer's edge, so a theme can remove it. */
   "--chat-composer-border-width"?: string;
   /** How tall the field may grow. */
-  "--chat-composer-max-height"?: string;
+  "--chat-composer-max-block-size"?: string;
   /** Fill behind a turn. */
-  "--chat-message-background"?: string;
+  "--chat-message-background-color"?: string;
   /** Fill behind the reader's own turns. */
-  "--chat-message-background-me"?: string;
+  "--chat-message-background-color-me"?: string;
   /** Ink in a turn. */
   "--chat-message-color"?: string;
   /** How wide a turn may get before it wraps. */
@@ -53898,7 +53914,7 @@ export type CustomCssProperties = {
   /** Space between turns. */
   "--chat-gap"?: string;
   /** How tall the conversation may get before the transcript scrolls. */
-  "--chat-max-height"?: string;
+  "--chat-max-block-size"?: string;
   /** Space either side of every region. */
   "--chat-padding-inline"?: string;
   /** The edge around the way back. */
@@ -53930,13 +53946,13 @@ export type CustomCssProperties = {
   /** A filter over what shows through the block and its header, for a translucent ground. */
   "--code-block-backdrop"?: string;
   /** The ground behind the code, for a block that is not on the page. */
-  "--code-block-background"?: string;
+  "--code-block-background-color"?: string;
   /** The line around the block and its header. */
   "--code-block-border-color"?: string;
   /** The ground behind the name, where it should not be `surface-raised`. */
-  "--code-block-header-background"?: string;
+  "--code-block-header-background-color"?: string;
   /** The corner on the header's top and the block's bottom, which are one shape. */
-  "--code-block-radii"?: string;
+  "--code-block-radius"?: string;
   /** Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. */
   "--code-padding"?: string;
   /** The fragment's size. Defaults to `text-sm`. */
@@ -53952,17 +53968,17 @@ export type CustomCssProperties = {
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--color-input-shadow"?: string;
   /** Corner radius of that block. */
-  "--color-input-swatch-radii"?: string;
+  "--color-input-swatch-radius"?: string;
   /** Edge length of the block in `appearance="swatch"`. */
   "--color-input-swatch-size"?: string;
   /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** Corner radius of the square. */
-  "--color-picker-grid-radii"?: string;
+  "--color-picker-grid-radius"?: string;
   /** Aspect ratio of the square. */
   "--color-picker-grid-ratio"?: string;
   /** Inset of the rows under the square, and the bottom. */
-  "--color-picker-inset"?: string;
+  "--color-picker-padding"?: string;
   /** Edge length of the chip that copies the value. */
   "--color-picker-sample-size"?: string;
   /** Edge length of one preset. */
@@ -53991,6 +54007,12 @@ export type CustomCssProperties = {
   "--command-list-size"?: string;
   /** How wide the palette is. Defaults to `40rem`. */
   "--command-size"?: string;
+  /** Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`. */
+  "--icon-button-radius"?: string;
+  /** What it casts, where it is raised off the page. */
+  "--icon-button-shadow"?: string;
+  /** Edge length of the control. */
+  "--icon-button-size"?: string;
   /** Ink in a cell. */
   "--data-table-color"?: string;
   /** Track list for the columns, which wins over the one the columns worked out. */
@@ -54038,7 +54060,7 @@ export type CustomCssProperties = {
   /** Width of the panel. */
   "--dialog-inline-size"?: string;
   /** Padding inside the panel. */
-  "--dialog-inset"?: string;
+  "--dialog-padding"?: string;
   /** How far the panel rises as it opens. Follows `--helix-space-lg`. */
   "--dialog-rise"?: string;
   /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
@@ -54047,14 +54069,14 @@ export type CustomCssProperties = {
   "--dialog-shadow"?: string;
   /** Color of the rule. */
   "--divider-color"?: string;
-  /** Space taken off both ends of it. */
-  "--divider-inset"?: string;
-  /** Off the far end only. */
-  "--divider-inset-end"?: string;
-  /** Off the near end only. */
-  "--divider-inset-start"?: string;
   /** How long a vertical rule is. Horizontal takes its width. */
   "--divider-length"?: string;
+  /** Space taken off both ends of it. */
+  "--divider-padding"?: string;
+  /** Off the far end only. */
+  "--divider-padding-end"?: string;
+  /** Off the near end only. */
+  "--divider-padding-start"?: string;
   /** How heavy the rule is. */
   "--divider-thickness"?: string;
   /** Thickness of the slice boundary under `outlined`. */
@@ -54074,11 +54096,11 @@ export type CustomCssProperties = {
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--drawer-border-width"?: string;
   /** Padding inside the panel. */
-  "--drawer-inset"?: string;
+  "--drawer-padding"?: string;
   /** Padding above the content, which clears the close control. */
-  "--drawer-inset-block-start"?: string;
+  "--drawer-padding-block-start"?: string;
   /** Corner radius on the edges that face the page. */
-  "--drawer-radii"?: string;
+  "--drawer-radius"?: string;
   /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
   "--drawer-scrim"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
@@ -54088,25 +54110,25 @@ export type CustomCssProperties = {
   /** Fill when a row is under the pointer. */
   "--drilldown-item-hover-color"?: string;
   /** Fill behind the pages. */
-  "--drilldown-background"?: string;
+  "--drilldown-background-color"?: string;
   /** Width of the region. */
   "--drilldown-inline-size"?: string;
   /** Space around the whole block. */
-  "--empty-inset"?: string;
+  "--empty-padding"?: string;
   /** Fill behind the field. */
   "--file-input-background-color"?: string;
   /** Padding inside the field. */
-  "--file-input-inset"?: string;
+  "--file-input-padding"?: string;
   /** An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say. */
   "--grid-columns"?: string;
   /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
   "--heatmap-cell-height"?: string;
+  /** How wide a cell is. The strip fits as many as the container allows. */
+  "--heatmap-cell-inline-size"?: string;
   /** How far a cell's corners are rounded. */
   "--heatmap-cell-radius"?: string;
   /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
-  /** How wide a cell is. The strip fits as many as the container allows. */
-  "--heatmap-cell-width"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
@@ -54135,12 +54157,6 @@ export type CustomCssProperties = {
   "--heatmap-tone-warning"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
-  /** Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. */
-  "--icon-button-radii"?: string;
-  /** What it casts, where it is raised off the page. */
-  "--icon-button-shadow"?: string;
-  /** Edge length of the control. */
-  "--icon-button-size"?: string;
   /** Edge length of the icon's box. */
   "--icon-size"?: string;
   /** The ratio of the box, as `16 / 9`. */
@@ -54182,7 +54198,7 @@ export type CustomCssProperties = {
   /** Thickness of a line. */
   "--line-chart-width"?: string;
   /** Padding inside the row. */
-  "--list-item-inset"?: string;
+  "--list-item-padding"?: string;
   /** What the rail cell shows. Written by the list. */
   "--list-item-rail-content"?: string;
   /** Whether there is a rail at all. Written by the list. */
@@ -54193,10 +54209,10 @@ export type CustomCssProperties = {
   "--list-gap"?: string;
   /** Room the ordered and unordered markers hang into. */
   "--list-marker-gutter"?: string;
+  /** The width of the rail's track. */
+  "--list-rail-inline-size"?: string;
   /** What a rail counts with. Any `list-style-type`. */
   "--list-rail-style"?: string;
-  /** The width of the rail's track. */
-  "--list-rail-width"?: string;
   /** How tall it gets before it scrolls. */
   "--listbox-max-block-size"?: string;
   /** Color of the moving arc. */
@@ -54208,7 +54224,7 @@ export type CustomCssProperties = {
   /** A filter behind the panel, for glass. */
   "--megamenu-backdrop"?: string;
   /** The panel's own fill. */
-  "--megamenu-background"?: string;
+  "--megamenu-background-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--megamenu-border-width"?: string;
   /** The narrowest a column goes before the grid wraps. */
@@ -54282,17 +54298,17 @@ export type CustomCssProperties = {
   /** Its corner radius, which is what turns it into a dot. */
   "--notifications-unread-radius"?: string;
   /** How tall the feed may get before the list scrolls. */
-  "--notifications-max-height"?: string;
+  "--notifications-max-block-size"?: string;
   /** The gutter every item holds open where something in the feed has media. */
   "--notifications-media-column"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
   /** Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. */
-  "--option-block-inset"?: string;
+  "--option-block-padding"?: string;
   /** Space before the label, shared with a group heading. */
-  "--option-inset"?: string;
+  "--option-padding"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */
-  "--option-radii"?: string;
+  "--option-radius"?: string;
   /** How far each level is inset from the one above. */
   "--outline-indent"?: string;
   /** Width of the gutter the rule and the traveling mark share. */
@@ -54313,10 +54329,10 @@ export type CustomCssProperties = {
   "--popover-border-width"?: string;
   /** Width of the panel. */
   "--popover-inline-size"?: string;
-  /** Space between the panel's edge and its contents. */
-  "--popover-inset"?: string;
   /** Tallest the panel grows before it scrolls. */
   "--popover-max-block-size"?: string;
+  /** Space between the panel's edge and its contents. */
+  "--popover-padding"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--popover-shadow"?: string;
   /** Fill of the part that is done. */
@@ -54334,7 +54350,7 @@ export type CustomCssProperties = {
   /** The three corner squares. Defaults to the same ink as the modules. */
   "--qr-code-finder-color"?: string;
   /** The quiet zone around that mark. */
-  "--qr-code-logo-inset"?: string;
+  "--qr-code-logo-padding"?: string;
   /** How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. */
   "--qr-code-logo-size"?: string;
   /** How wide the square is. Defaults to `12rem`. */
@@ -54384,7 +54400,7 @@ export type CustomCssProperties = {
   /** Color of the divider. */
   "--sandbox-separator-color"?: string;
   /** Fill behind the source. */
-  "--sandbox-source-background"?: string;
+  "--sandbox-source-background-color"?: string;
   /** Minimum height of the pane. */
   "--sandbox-source-min-block-size"?: string;
   /** Color of the bar's text. */
@@ -54434,7 +54450,7 @@ export type CustomCssProperties = {
   /** The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. */
   "--slider-thumb-length"?: string;
   /** The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. */
-  "--slider-thumb-radii"?: string;
+  "--slider-thumb-radius"?: string;
   /** The fence separating the handle from the track, for a slider that is not on the page. */
   "--slider-thumb-ring-color"?: string;
   /** The handle across the track. Square with the length by default, which is what makes it round. */
@@ -54514,13 +54530,13 @@ export type CustomCssProperties = {
   /** Size of the mark, glyph or digit. */
   "--steps-marker-size"?: string;
   /** Height of the track. The width follows it. */
-  "--switch-height"?: string;
+  "--switch-block-size"?: string;
+  /** Length of the track, if not the derived one. */
+  "--switch-inline-size"?: string;
   /** Fill when it is on. */
   "--switch-on-color"?: string;
   /** The handle, in both states. */
   "--switch-thumb-color"?: string;
-  /** Length of the track, if not the derived one. */
-  "--switch-width"?: string;
   /** Track list for the columns. */
   "--table-columns"?: string;
   /** The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set. */
@@ -54532,7 +54548,7 @@ export type CustomCssProperties = {
   /** Label color. */
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */
-  "--tag-radii"?: string;
+  "--tag-radius"?: string;
   /** Fill behind the text. */
   "--textarea-background-color"?: string;
   /** Fill behind the field. */
@@ -54544,7 +54560,7 @@ export type CustomCssProperties = {
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--time-input-shadow"?: string;
   /** How tall the list is before it scrolls. */
-  "--time-picker-list-height"?: string;
+  "--time-picker-list-block-size"?: string;
   /** Wash behind the times inside a range. */
   "--time-picker-range-color"?: string;
   /** Height and least width of one row in a wheel. */
@@ -54552,7 +54568,7 @@ export type CustomCssProperties = {
   /** Fill on the chosen row of a wheel. */
   "--time-picker-selected-color"?: string;
   /** How tall a wheel is. Five rows by default. */
-  "--time-picker-wheel-height"?: string;
+  "--time-picker-wheel-block-size"?: string;
   /** How round the mark is. Zero is a square, and half its size is a disc. */
   "--timeline-marker-radius"?: string;
   /** Edge length of the mark. */
@@ -54566,7 +54582,7 @@ export type CustomCssProperties = {
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
   "--toast-border-width"?: string;
   /** Space between the message's edge and its contents. */
-  "--toast-item-inset"?: string;
+  "--toast-item-padding"?: string;
   /** Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. */
   "--toast-shadow"?: string;
   /** How long this message stays, in milliseconds, for a progress hint. */
