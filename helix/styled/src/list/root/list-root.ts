@@ -21,8 +21,8 @@ import { styles } from './list-root.css.js'
  *
  * @cssproperty --list-gap - Space between rows.
  * @cssproperty --list-marker-gutter - Room the ordered and unordered markers hang into.
+ * @cssproperty --list-rail-inline-size - The width of the rail's track.
  * @cssproperty --list-rail-style - What a rail counts with. Any `list-style-type`.
- * @cssproperty --list-rail-width - The width of the rail's track.
  */
 @customElement('helix-list')
 export class HelixList extends HelixHeadlessList {

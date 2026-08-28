@@ -6,7 +6,7 @@
   background-color: var(--tag-background-color, var(--_tag-fill));
   block-size: var(--_tag-height);
   border: var(--helix-border-thin) solid var(--tag-border-color, var(--_tag-edge));
-  border-radius: var(--tag-radii, var(--helix-radii-sm));
+  border-radius: var(--tag-radius, var(--helix-radii-sm));
   color: var(--tag-foreground-color, var(--_tag-label));
   display: inline-flex;
   font-size: var(--_tag-text);

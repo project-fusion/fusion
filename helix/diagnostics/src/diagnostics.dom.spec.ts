@@ -173,7 +173,7 @@ describe('hooks', () => {
    * The three-percent false positive, and the two branches that fixed it.
    *
    * Measured on this repository before the fix: `landing.module.css` sets
-   * `--icon-button-radii` and `--icon-button-size` on `helix-copy-button`,
+   * `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
    * which answers neither, and both work, because a copy button renders an icon
    * button and custom properties inherit through the shadow boundary. Six
    * findings out of 197 declarations, every one wrong. A manifest cannot settle

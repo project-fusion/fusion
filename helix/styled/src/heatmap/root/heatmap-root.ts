@@ -43,9 +43,9 @@ import { styles } from './heatmap-root.css.js'
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
- * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
@@ -78,7 +78,7 @@ export class HelixHeatmap extends HelixHeadlessHeatmap {
    * and 34. The number a summary is told to trust was the number that was wrong.
    *
    * The strip is read back now, so nothing has to be kept in step and
-   * `--heatmap-cell-width` on its own is enough. These two remain because a
+   * `--heatmap-cell-inline-size` on its own is enough. These two remain because a
    * measurement arrives one frame after the first paint, and a first paint from
    * numbers that match the sheet is one that does not move.
    */

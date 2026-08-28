@@ -45,7 +45,7 @@ import { styles } from './color-input-root.css.js'
  * @cssproperty --color-input-shadow - Lift under the panel. Follows
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
  *   keeps a lift by default.
- * @cssproperty --color-input-swatch-radii - Corner radius of that block.
+ * @cssproperty --color-input-swatch-radius - Corner radius of that block.
  * @cssproperty --color-input-swatch-size - Edge length of the block in `appearance="swatch"`.
  */
 @customElement('helix-color-input')

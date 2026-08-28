@@ -193,10 +193,10 @@
      reason: the token is decided by what is behind the thumb, and `plain` has
      no track behind it. See `:host` above. */
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);
-  inline-size: var(--indicator-width, 0);
+  inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;

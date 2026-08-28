@@ -228,10 +228,10 @@ slot[name="end"]::slotted(*) {
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--combobox-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
-  inline-size: var(--combobox-panel-size, var(--floating-anchor-width, 100%));
+  inline-size: var(--combobox-panel-size, var(--floating-anchor-inline-size, 100%));
   inset: auto;
   margin: var(--helix-space-none);
-  max-block-size: var(--floating-available-height, none);
+  max-block-size: var(--floating-available-block-size, none);
   min-inline-size: max-content;
   overflow: hidden;
   padding: var(--helix-space-none);

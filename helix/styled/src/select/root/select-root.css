@@ -123,7 +123,7 @@
      a row inset from its container, where the corners have space to sit in; on
      a band that reaches both edges it rounds against nothing and reads as a
      rectangle with the corners nibbled. */
-  --option-radii: var(--helix-radii-none);
+  --option-radius: var(--helix-radii-none);
 
   background-color: var(--helix-color-surface-overlay);
   /* No border. A panel over the page is told apart by its shadow and by the
@@ -143,11 +143,11 @@
    * longer than the field widens the panel instead of wrapping or being cut.
    * A dropdown is read, and a name broken across two lines to fit a field it
    * has no relationship to is worse than a panel that sticks out. */
-  inline-size: var(--floating-anchor-width, 100%);
+  inline-size: var(--floating-anchor-inline-size, 100%);
   min-inline-size: max-content;
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
-  max-block-size: var(--floating-available-height, none);
+  max-block-size: var(--floating-available-block-size, none);
   /* Block only. The rows run the full width of the panel and bring their own
      inline padding, so a hovered or selected row is a band across the panel
      rather than a pill inset from its edges: the highlight lines up with the

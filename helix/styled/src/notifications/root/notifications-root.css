@@ -16,7 +16,7 @@
 
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  max-block-size: var(--notifications-max-height, none);
+  max-block-size: var(--notifications-max-block-size, none);
 }
 
 /* Something in the feed has media, so every item holds the column open by this

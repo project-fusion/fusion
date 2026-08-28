@@ -16,7 +16,7 @@
   /* Square rows, for the reason the select's panel gives: they run the full
      width of this box, and a radius on a band that reaches both edges rounds
      against nothing. */
-  --option-radii: var(--helix-radii-none);
+  --option-radius: var(--helix-radii-none);
 
   /* `surface`, not `surface-sunken`, and the rows are what decides it. A row
      hovers and selects at `raised`, which on a white page is a step *darker*

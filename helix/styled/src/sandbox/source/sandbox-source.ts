@@ -34,7 +34,7 @@ import { styles } from './sandbox-source.css.js'
  *
  * @csspart source - The editable region.
  *
- * @cssproperty --sandbox-source-background - Fill behind the source.
+ * @cssproperty --sandbox-source-background-color - Fill behind the source.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
  */
 @customElement('helix-sandbox-source')

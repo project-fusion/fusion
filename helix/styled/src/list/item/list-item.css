@@ -18,7 +18,7 @@
      this grid, by the argument the leading mark makes below, so an empty first
      track adds nothing rather than adding a gap beside nothing. */
   grid-template-columns: auto auto 1fr auto;
-  padding: var(--list-item-inset, var(--helix-space-sm) var(--helix-space-md));
+  padding: var(--list-item-padding, var(--helix-space-sm) var(--helix-space-md));
 }
 
 /* The rail: the ordinal, at the start edge of the block rather than beside the
@@ -62,7 +62,7 @@
   grid-row: 1;
   letter-spacing: var(--helix-tracking-wide);
   line-height: calc(var(--helix-text-sm) * var(--helix-leading-normal));
-  width: var(--list-rail-width, var(--helix-space-3xl));
+  inline-size: var(--list-rail-inline-size, var(--helix-space-3xl));
 }
 
 /* Written by the list, which is the only thing that knows the ordinal. An item

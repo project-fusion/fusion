@@ -18,15 +18,15 @@
  * boundaries away. A custom property set on the host crosses on its own,
  * however deep the group is.
  *
- * `Button` publishes the two hooks and defaults them to `--button-radii`, so a
- * button outside a group is unaffected and a consumer setting `--button-radii`
+ * `Button` publishes the two hooks and defaults them to `--button-radius`, so a
+ * button outside a group is unaffected and a consumer setting `--button-radius`
  * still gets it on the ends. */
 :host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
-  --button-radii-start: 0;
+  --button-radius-start: 0;
 }
 
 :host(:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
-  --button-radii-end: 0;
+  --button-radius-end: 0;
 }
 
 /* **Stacked, and the shape turns with it.**
@@ -50,15 +50,15 @@
   /* Cleared, or the row's pull is still in effect sideways and every button
      after the first sits a border to the left of the one above it. */
   margin-inline-start: 0;
-  --button-radii-start-start: 0;
-  --button-radii-start-end: 0;
-  --button-radii-start: var(--button-radii, var(--helix-radii-sm));
+  --button-radius-start-start: 0;
+  --button-radius-start-end: 0;
+  --button-radius-start: var(--button-radius, var(--helix-radii-sm));
 }
 
 :host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
-  --button-radii-end-end: 0;
-  --button-radii-end-start: 0;
-  --button-radii-end: var(--button-radii, var(--helix-radii-sm));
+  --button-radius-end-end: 0;
+  --button-radius-end-start: 0;
+  --button-radius-end: var(--button-radius, var(--helix-radii-sm));
 }
 
 /* A hovered or focused button has to draw above its neighbours, or the border

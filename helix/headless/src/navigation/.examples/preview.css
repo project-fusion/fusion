@@ -56,9 +56,9 @@ helix-headless-navigation::part(nav) {
 helix-headless-navigation::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: 2px;
-  inline-size: var(--indicator-width, 0);
+  inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   position: absolute;
-  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--indicator-height, 0px));
+  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--indicator-block-size, 0px));
 }

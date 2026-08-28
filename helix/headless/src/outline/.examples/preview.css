@@ -55,7 +55,7 @@ helix-headless-outline::part(nav) {
 
 helix-headless-outline::part(indicator) {
   background-color: var(--_gray-strong);
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   inline-size: 2px;
   inset-block-start: 0;
   inset-inline-start: 0;

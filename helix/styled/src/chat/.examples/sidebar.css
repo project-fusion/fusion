@@ -5,7 +5,7 @@
    composer off the bottom of the panel. */
 .sidebar {
   /* **The panel gives up its inset, which is the case the hook was written for.**
-     `--drawer-inset` defaults to `lg` and its own note names the exception: a
+     `--drawer-padding` defaults to `lg` and its own note names the exception: a
      drawer whose content runs to the edges sets it to zero and puts the inset on
      that content, "which is what it wants anyway". A conversation pads every
      region it owns, so the default put 24 pixels around a component that had
@@ -18,7 +18,7 @@
      drawing fault rather than as focus. That is four pixels rather than
      twenty-four, and it is the drawer's rule to keep rather than this example's
      to remove. */
-  --drawer-inset: var(--helix-space-none);
+  --drawer-padding: var(--helix-space-none);
   --drawer-size: 24rem;
 }
 

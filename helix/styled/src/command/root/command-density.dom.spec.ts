@@ -20,7 +20,7 @@ if (hasLayout()) {
     const inset = (host: HTMLElement): string =>
       globalThis
         .getComputedStyle(host.querySelector('helix-option') as Element)
-        .getPropertyValue('--option-block-inset')
+        .getPropertyValue('--option-block-padding')
         .trim()
 
     test('gives its rows room, because a palette is scanned rather than filled in', async () => {

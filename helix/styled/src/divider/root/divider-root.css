@@ -48,13 +48,19 @@
    pair under it for the rest, which is the shape `Drawer` uses for its own
    inset. */
 :host {
-  padding-inline-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
-  padding-inline-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+  padding-inline-end: var(--divider-padding-end, var(--divider-padding, var(--helix-space-none)));
+  padding-inline-start: var(
+    --divider-padding-start,
+    var(--divider-padding, var(--helix-space-none))
+  );
 }
 
 :host([orientation="vertical"]) {
-  padding-block-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
-  padding-block-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+  padding-block-end: var(--divider-padding-end, var(--divider-padding, var(--helix-space-none)));
+  padding-block-start: var(
+    --divider-padding-start,
+    var(--divider-padding, var(--helix-space-none))
+  );
   padding-inline: var(--helix-space-none);
 }
 

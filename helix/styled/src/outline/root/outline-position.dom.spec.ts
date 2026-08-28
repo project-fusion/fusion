@@ -152,9 +152,9 @@ if (hasLayout()) {
       await settle()
       expect(marked(nav)).toBe('#two')
       expect(mark.style.getPropertyValue('--indicator-y')).not.toBe(first)
-      expect(Number.parseFloat(mark.style.getPropertyValue('--indicator-height'))).toBeGreaterThan(
-        0,
-      )
+      expect(
+        Number.parseFloat(mark.style.getPropertyValue('--indicator-block-size')),
+      ).toBeGreaterThan(0)
     })
 
     test('the end of the page marks the last section, reachable or not', async () => {

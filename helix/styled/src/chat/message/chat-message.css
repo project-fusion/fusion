@@ -257,7 +257,7 @@
    1.38 light against 1.35 dark on the page. */
 [part="content"] {
   background-color: var(
-    --chat-message-background,
+    --chat-message-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
   );
   border-radius: var(--helix-radii-md);
@@ -298,7 +298,7 @@
 
 :host([author="me"]) [part="content"] {
   background-color: var(
-    --chat-message-background-me,
+    --chat-message-background-color-me,
     color-mix(in oklab, var(--helix-color-primary) 28%, transparent)
   );
 }

@@ -121,7 +121,7 @@ if (hasLayout()) {
     const host = (await select('open')) as unknown as HTMLElement
     const surface = part(host, 'surface') as HTMLElement
     await placed(surface)
-    expect(surface.style.getPropertyValue('--floating-anchor-width')).toMatch(/^\d+px$/)
+    expect(surface.style.getPropertyValue('--floating-anchor-inline-size')).toMatch(/^\d+px$/)
   })
 
   describe('select trigger text', () => {

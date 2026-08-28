@@ -25,9 +25,9 @@ import { styles } from './chat-composer.css.js'
  * @csspart send - The control that offers the turn.
  * @csspart tools - The row under the field.
  *
- * @cssproperty --chat-composer-background - Fill behind the composer.
+ * @cssproperty --chat-composer-background-color - Fill behind the composer.
  * @cssproperty --chat-composer-border-width - The composer's edge, so a theme can remove it.
- * @cssproperty --chat-composer-max-height - How tall the field may grow.
+ * @cssproperty --chat-composer-max-block-size - How tall the field may grow.
  */
 @customElement('helix-chat-composer')
 export class HelixChatComposer extends HelixHeadlessChatComposer {

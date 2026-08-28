@@ -100,7 +100,7 @@
   /* **Four corners, so a group can flatten the two it needs to.**
    *
    * One `border-radius` here meant `ButtonGroup` could not reach this control:
-   * the group hands `--button-radii-start` and `--button-radii-end` across as
+   * the group hands `--button-radius-start` and `--button-radius-end` across as
    * custom properties, which is the one thing that crosses a shadow boundary
    * however deep the group is, and `Button` publishes and reads them. This did
    * not, so a copy button beside a button in a group kept all four corners and
@@ -111,16 +111,19 @@
    * The same hook names as `Button`, deliberately. The group's contract is
    * those two properties, and an icon button that answered to different ones
    * would be a control a group cannot flatten by design rather than by
-   * omission. `--icon-button-radii` stays as this control's own override. */
-  border-end-end-radius: var(--button-radii-end, var(--icon-button-radii, var(--helix-radii-sm)));
+   * omission. `--icon-button-radius` stays as this control's own override. */
+  border-end-end-radius: var(--button-radius-end, var(--icon-button-radius, var(--helix-radii-sm)));
   border-end-start-radius: var(
-    --button-radii-start,
-    var(--icon-button-radii, var(--helix-radii-sm))
+    --button-radius-start,
+    var(--icon-button-radius, var(--helix-radii-sm))
   );
-  border-start-end-radius: var(--button-radii-end, var(--icon-button-radii, var(--helix-radii-sm)));
+  border-start-end-radius: var(
+    --button-radius-end,
+    var(--icon-button-radius, var(--helix-radii-sm))
+  );
   border-start-start-radius: var(
-    --button-radii-start,
-    var(--icon-button-radii, var(--helix-radii-sm))
+    --button-radius-start,
+    var(--icon-button-radius, var(--helix-radii-sm))
   );
   color: var(--_icon-button-ink);
   cursor: pointer;

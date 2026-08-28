@@ -17,9 +17,9 @@
 /* Behind the destinations and out of flow, so animating it reflows nothing. */
 [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   border-radius: var(--helix-radii-sm);
-  inline-size: var(--indicator-width, 0);
+  inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
   opacity: 0;

@@ -136,8 +136,8 @@
 /* Square corners on the picker's own square, since the panel is doing the
    rounding now, and the room the picker needs under it. */
 [part="picker"] {
-  --color-picker-grid-radii: var(--helix-radii-none);
-  --color-picker-inset: var(--helix-space-sm);
+  --color-picker-grid-radius: var(--helix-radii-none);
+  --color-picker-padding: var(--helix-space-sm);
 
   display: block;
 }
@@ -233,7 +233,7 @@
 :host([variant="swatch"]) [part="preview"] {
   block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--color-input-swatch-radii, var(--helix-radii-sm));
+  border-radius: var(--color-input-swatch-radius, var(--helix-radii-sm));
   inline-size: 100%;
 }
 

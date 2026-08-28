@@ -10,9 +10,9 @@
    * There was no `max-block-size` and no `overflow`, so a long menu ran off the
    * bottom of the screen and the keyboard path that walks the rows had nothing
    * to scroll: the rows below the fold were reachable by arrow and invisible.
-   * `--floating-available-height` is what the controller measures for exactly
+   * `--floating-available-block-size` is what the controller measures for exactly
    * this, and `Select`'s surface already reads it. */
-  max-block-size: var(--menu-max-block-size, var(--floating-available-height, none));
+  max-block-size: var(--menu-max-block-size, var(--floating-available-block-size, none));
   overflow-y: auto;
   /* Compact by nature, and it says so once, so a control slotted into a row is
      the size the rows are rather than the size a page is. */

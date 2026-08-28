@@ -34,9 +34,9 @@ import { styles } from './drawer-root.css.js'
  * @cssproperty --drawer-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
- * @cssproperty --drawer-inset - Padding inside the panel.
- * @cssproperty --drawer-inset-block-start - Padding above the content, which clears the close control.
- * @cssproperty --drawer-radii - Corner radius on the edges that face the page.
+ * @cssproperty --drawer-padding - Padding inside the panel.
+ * @cssproperty --drawer-padding-block-start - Padding above the content, which clears the close control.
+ * @cssproperty --drawer-radius - Corner radius on the edges that face the page.
  * @cssproperty --drawer-scrim - The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --drawer-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
  *   floating surface sits over content nobody can predict, so it keeps a lift by default.

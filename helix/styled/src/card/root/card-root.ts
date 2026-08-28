@@ -48,7 +48,7 @@ import { styles } from './card-root.css.js'
  *   `auto`, which is an image's own shape and is not a height a chart has.
  * @cssproperty --card-media-size - Width of the media column when horizontal.
  * @cssproperty --card-padding - Inset applied to each region.
- * @cssproperty --card-radii - Corner radius of the surface.
+ * @cssproperty --card-radius - Corner radius of the surface.
  * @cssproperty --card-shadow - Shadow under the surface. What `elevated` sets, and what a
  *   `data-card` link raises on hover.
  */

@@ -27,7 +27,7 @@ import { styles } from './callout-root.css.js'
  * @csspart icon - The icon region.
  *
  * @cssproperty --callout-background-color - Fill behind the callout.
- * @cssproperty --callout-radii - Corner radius of the callout.
+ * @cssproperty --callout-radius - Corner radius of the callout.
  */
 @customElement('helix-callout')
 export class HelixCallout extends HelixHeadlessCallout {

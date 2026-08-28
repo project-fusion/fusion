@@ -30,7 +30,7 @@
    * below are written once per orientation and each names the length. */
   --_slider-thumb: var(--slider-thumb-size, var(--helix-size-checkbox));
   --_slider-thumb-length: var(--slider-thumb-length, var(--_slider-thumb));
-  --_slider-thumb-radii: var(--slider-thumb-radii, var(--helix-radii-full));
+  --_slider-thumb-radii: var(--slider-thumb-radius, var(--helix-radii-full));
   /* The ring while the thumb is held or focused. The accent at low opacity, so
      it reads as the control's own color rather than as a second element. */
   /* A halo of the fill it is a halo of.

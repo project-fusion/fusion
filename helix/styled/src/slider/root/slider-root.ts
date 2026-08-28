@@ -30,7 +30,7 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-marker-color - The ticks along the track.
  * @cssproperty --slider-thumb-color - The handle.
  * @cssproperty --slider-thumb-length - The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval.
- * @cssproperty --slider-thumb-radii - The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.
+ * @cssproperty --slider-thumb-radius - The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.
  * @cssproperty --slider-thumb-ring-color - The fence separating the handle from the track, for a slider that is not on the page.
  * @cssproperty --slider-thumb-size - The handle across the track. Square with the length by default, which is what makes it round.
  * @cssproperty --slider-track-color - The part not yet chosen.

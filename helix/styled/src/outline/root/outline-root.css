@@ -82,7 +82,7 @@
   --_mark-width: var(--helix-border-thin);
 
   background-color: var(--helix-color-primary);
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   border-radius: var(--helix-radii-full);
   inline-size: var(--_mark-width);
   inset-block-start: 0;

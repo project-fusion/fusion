@@ -25,7 +25,7 @@
      everywhere else passed this file by: at `md` the corner is softer than the
      controls inside it and the container stops receding, which is the one thing a
      container should do. Everything a callout sits beside is `sm`. */
-  border-radius: var(--callout-radii, var(--helix-radii-sm));
+  border-radius: var(--callout-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   display: flex;
   gap: var(--helix-space-sm);

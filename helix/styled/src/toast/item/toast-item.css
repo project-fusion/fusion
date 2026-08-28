@@ -94,7 +94,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
-  padding: var(--toast-item-inset, var(--helix-space-sm));
+  padding: var(--toast-item-padding, var(--helix-space-sm));
   /* Room for the close, which is out of flow. Reserved here rather than by a
      grid column, because a column is only as tall as it needs to be and this
      one was 32px tall next to a 21px line: a one-line message paid eleven
@@ -220,7 +220,7 @@ slot[name="icon"]::slotted(*) {
      is what keeps it level with the mark. */
   position: absolute;
   inset-block-start: calc(
-    var(--toast-item-inset, var(--helix-space-sm)) +
+    var(--toast-item-padding, var(--helix-space-sm)) +
     (var(--_toast-line) - var(--helix-size-control-tight)) /
     2
   );

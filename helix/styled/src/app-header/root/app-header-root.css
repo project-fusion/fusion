@@ -38,7 +38,7 @@
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
 
-  background-color: var(--app-header-background, var(--helix-color-background));
+  background-color: var(--app-header-background-color, var(--helix-color-background));
   border-block-end: var(--helix-border-thin) solid var(--app-header-border-color, transparent);
   display: block;
   inline-size: 100%;
@@ -67,7 +67,7 @@
  * contributing at the top of a page is mostly the artifact. */
 :host([material="glass"]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  background-color: var(--app-header-background, var(--helix-material-translucent));
+  background-color: var(--app-header-background-color, var(--helix-material-translucent));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
@@ -75,7 +75,7 @@
    two move together because either without the other does nothing. See 270. */
 :host([material="frosted"]) {
   backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
-  background-color: var(--app-header-background, var(--helix-material-translucent-strong));
+  background-color: var(--app-header-background-color, var(--helix-material-translucent-strong));
 }
 
 /* Nothing behind it at all, until there is something to be legible over.
@@ -87,7 +87,7 @@
  * be over.
  *
  * That switch is the whole reason this is worth a material rather than a
- * consumer writing `--app-header-background: transparent`: the hook is one
+ * consumer writing `--app-header-background-color: transparent`: the hook is one
  * value and this is two, keyed on a state only the component knows. The hook
  * still wins where it is set, in both states, which is how a consumer tints a
  * scrolled bar to match their hero.
@@ -95,7 +95,7 @@
  * Content color is the consumer's. A pale wordmark over a dark hero is
  * `data-color-mode` on the header, the same way the toast inverts itself. */
 :host([material="transparent"]) {
-  background-color: var(--app-header-background, transparent);
+  background-color: var(--app-header-background-color, transparent);
 }
 
 /* Scrolled, it takes the glass rather than the opaque fill.
@@ -108,7 +108,7 @@
  * both states, which is how a scrolled bar gets tinted to match a hero. */
 :host([material="transparent"]:state(scrolled)) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  background-color: var(--app-header-background, var(--helix-material-translucent));
+  background-color: var(--app-header-background-color, var(--helix-material-translucent));
 }
 
 :host([sticky]) {
@@ -128,13 +128,13 @@
    there. */
 [part="row"] {
   align-items: center;
-  block-size: var(--app-header-height, var(--helix-size-header));
+  block-size: var(--app-header-block-size, var(--helix-size-header));
   display: grid;
   gap: var(--helix-space-lg);
   grid-template-columns: 1fr auto 1fr;
   margin-inline: auto;
   max-inline-size: var(--app-header-max-inline-size, 72rem);
-  padding-inline: var(--app-header-inset, var(--helix-space-lg));
+  padding-inline: var(--app-header-padding, var(--helix-space-lg));
 }
 
 [part="start"] {

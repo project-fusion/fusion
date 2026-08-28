@@ -487,7 +487,7 @@ helix-text[tone="danger"] {
   );
   block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
-  border-radius: var(--button-radii, var(--helix-radii-sm));
+  border-radius: var(--button-radius, var(--helix-radii-sm));
   color: var(--button-foreground-color, var(--_button-tone));
   cursor: pointer;
   display: inline-flex;
@@ -650,8 +650,8 @@ helix-text[tone="danger"] {
  * and the outer ones keep their radius.
  *
  * The component half of this left with everything else. `helix-button-group`
- * flattens a `helix-button` by handing it `--button-radii-start` and
- * `--button-radii-end` through `::slotted()`, which is a custom property
+ * flattens a `helix-button` by handing it `--button-radius-start` and
+ * `--button-radius-end` through `::slotted()`, which is a custom property
  * crossing a boundary rather than a rule reaching through two of them. This half
  * stays, because a `<Link data-button>` is in the light DOM and there is nothing
  * to cross.
@@ -1051,7 +1051,7 @@ helix-toggle[disabled]::part(item) {
  *
  * No hook for the inset, and that is deliberate rather than an omission. A hook
  * is a component's published API and this is a recipe, with no component to
- * publish it: `data-button` and `data-card` read `--button-*` and `--card-radii`
+ * publish it: `data-button` and `data-card` read `--button-*` and `--card-radius`
  * because those elements exist and document them. Nothing has to be invented
  * here, because the whole base layer is a cascade layer, so a consumer writing
  * `inset-block-end` on their own control already wins without asking.
@@ -1640,7 +1640,7 @@ helix-toggle[disabled]::part(item) {
   /* Matched to the card so the focus ring traces the surface rather than a
      rectangle around it, which is what this said while doing the opposite.
      `Card` falls back to `--helix-radii-lg` and this fell back to
-     `--helix-radii-sm`, so a link that did not set `--card-radii` drew its ring
+     `--helix-radii-sm`, so a link that did not set `--card-radius` drew its ring
      at 4px around a surface drawn at 12px. Measured on the component gallery,
      where the card is `12px` and the anchor around it was `4px`; reported as
      the border looking off kilter, which is exactly what a ring three quarters
@@ -1653,7 +1653,7 @@ helix-toggle[disabled]::part(item) {
      disagrees with the thing it is documented to wrap is wrong for every
      consumer who does not override it, and it was, silently, until one of them
      patched the radius back on locally instead. */
-  border-radius: var(--card-radii, var(--helix-radii-lg));
+  border-radius: var(--card-radius, var(--helix-radii-lg));
   color: inherit;
   display: block;
   /* Drawn transparent at rest rather than appearing on hover.

@@ -64,8 +64,8 @@ export interface IndicatorOptions {
  * one, in both directions, and the underscore these used to carry was what
  * exempted them from it.
  *
- * @cssproperty --indicator-height - How tall the active item is, in pixels.
- * @cssproperty --indicator-width - How wide the active item is, in pixels.
+ * @cssproperty --indicator-block-size - How tall the active item is, in pixels.
+ * @cssproperty --indicator-inline-size - How wide the active item is, in pixels.
  * @cssproperty --indicator-x - Where the active item starts, along the inline axis.
  * @cssproperty --indicator-y - Where the active item starts, along the block axis.
  */
@@ -185,8 +185,8 @@ export class IndicatorController implements ReactiveController {
 
     indicator.style.setProperty('--indicator-x', x)
     indicator.style.setProperty('--indicator-y', y)
-    indicator.style.setProperty('--indicator-width', `${box.width}px`)
-    indicator.style.setProperty('--indicator-height', `${box.height}px`)
+    indicator.style.setProperty('--indicator-inline-size', `${box.width}px`)
+    indicator.style.setProperty('--indicator-block-size', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
 
     if (!moved) {

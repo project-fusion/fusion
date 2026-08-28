@@ -55,7 +55,7 @@ export interface FloatingOptions {
   /**
    * Whether to cap the floating element to the space available.
    *
-   * On by default, written as `--floating-available-height` and
+   * On by default, written as `--floating-available-block-size` and
    * `--floating-available-width` rather than as a height. A list decides for
    * itself whether to scroll or to shrink; a controller that sets the height
    * has decided that for every element it places.
@@ -108,10 +108,10 @@ export interface FloatingOptions {
  * with a rule that reads one, in both directions, and the underscore these used
  * to carry was what exempted them from it.
  *
- * @cssproperty --floating-anchor-width - How wide the anchor is, for a panel that matches it.
+ * @cssproperty --floating-anchor-inline-size - How wide the anchor is, for a panel that matches it.
  * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, along the inline axis.
  * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, along the block axis.
- * @cssproperty --floating-available-height - How much room is left below, for a panel that scrolls.
+ * @cssproperty --floating-available-block-size - How much room is left below, for a panel that scrolls.
  */
 export class FloatingController implements ReactiveController {
   private readonly options: FloatingOptions
@@ -200,7 +200,7 @@ export class FloatingController implements ReactiveController {
              back the day a rule wants it, together with that rule. */
           apply: ({ availableHeight, elements, rects }) => {
             elements.floating.style.setProperty(
-              '--floating-available-height',
+              '--floating-available-block-size',
               `${Math.round(availableHeight)}px`,
             )
             /* The anchor's width, which a panel that has to match the control
@@ -211,7 +211,7 @@ export class FloatingController implements ReactiveController {
                edge. It looked like a positioning fault and was a percentage
                resolving against something the CSS could not see. */
             elements.floating.style.setProperty(
-              '--floating-anchor-width',
+              '--floating-anchor-inline-size',
               `${Math.round(rects.reference.width)}px`,
             )
           },

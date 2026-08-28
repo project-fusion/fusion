@@ -89,9 +89,9 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
- * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
@@ -157,7 +157,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
    * number a summary is told to trust was the number that was wrong.
    *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
+   * The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
    * enough on their own and these two are the estimate used until the first
    * measurement lands. Writing the attribute pins the value and stops the
    * measurement being consulted, which is what a container query or a transition
@@ -221,7 +221,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * the cascade can resolve: it may be a `rem` against a root font size, a
    * percentage of a container, or whatever a container query chose this frame.
    * Every one of those is invisible to a number typed into an attribute, and
-   * each of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`
+   * each of `--heatmap-cell-inline-size`, `--heatmap-cell-height` and `--heatmap-gap`
    * added one more way for the two to drift apart silently.
    *
    * Reading it back is not styling and does not breach the tier: this asks what

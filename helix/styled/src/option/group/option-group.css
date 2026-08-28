@@ -37,5 +37,5 @@
      heading sat four pixels right of every option it named. Measured at 13
      against 9. Two stylesheets naming one inset is what let them drift, and
      the comment is why it went unnoticed. */
-  padding-inline: var(--option-inset, var(--helix-space-xs));
+  padding-inline: var(--option-padding, var(--helix-space-xs));
 }

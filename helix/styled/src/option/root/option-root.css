@@ -15,7 +15,7 @@
      inset or full-bleed and only a row with space around it has corners worth
      rounding. A listbox on its own insets its rows and keeps the radius; the
      select's panel runs them edge to edge and sets this to none. */
-  border-radius: var(--option-radii, var(--helix-radii-sm));
+  border-radius: var(--option-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;
@@ -49,7 +49,7 @@
      wants roomier rows says one thing and the group headings move with them.
      `Command` is that panel, being a page of rows read at speed rather than a
      select's short list. */
-  padding-block: var(--option-block-inset, var(--helix-space-2xs));
+  padding-block: var(--option-block-padding, var(--helix-space-2xs));
   /* Twelve, matching the drilldown's rows and the select's own trigger. A row
      that reaches both edges of its panel needs its words held further in than
      one that sits inside a padded box: the inset is doing the work the box used
@@ -61,7 +61,7 @@
      the comment below records what happens when two stylesheets each name the
      inset themselves. A panel that wants its rows on some other column, as the
      command palette does, now moves both by saying one thing. */
-  padding-inline: var(--option-inset, var(--helix-space-xs));
+  padding-inline: var(--option-padding, var(--helix-space-xs));
   /* A picker, not prose. Its three sibling chooseable rows all say this;
      without it, dragging across a list selects the labels. */
   user-select: none;

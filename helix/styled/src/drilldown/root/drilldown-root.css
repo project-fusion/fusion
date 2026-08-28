@@ -1,7 +1,7 @@
 /* A region rather than an overlay: it sits where it is put, so it brings a fill
    and a width and no shadow. Whatever frames it is the consumer's. */
 :host {
-  background-color: var(--drilldown-background, var(--helix-color-surface));
+  background-color: var(--drilldown-background-color, var(--helix-color-surface));
   block-size: fit-content;
   display: block;
   inline-size: var(--drilldown-inline-size, 100%);

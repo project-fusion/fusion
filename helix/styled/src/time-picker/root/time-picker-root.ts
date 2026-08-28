@@ -14,7 +14,7 @@ import { styles } from './time-picker-root.css.js'
  *
  * @description
  * A bounded list on a surface of its own, because ninety-six rows is taller than
- * anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
+ * anywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height
  * rather than a count of rows: what a panel has is room, and a row count would
  * have to be recomputed every time the density changed.
  *
@@ -28,11 +28,11 @@ import { styles } from './time-picker-root.css.js'
  * @aliases Time, TimeList
  * @documentation https://helix.fusion.dev/components/time-picker
  *
- * @cssproperty --time-picker-list-height - How tall the list is before it scrolls.
+ * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
  * @cssproperty --time-picker-range-color - Wash behind the times inside a range.
  * @cssproperty --time-picker-row-size - Height and least width of one row in a wheel.
  * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.
- * @cssproperty --time-picker-wheel-height - How tall a wheel is. Five rows by default.
+ * @cssproperty --time-picker-wheel-block-size - How tall a wheel is. Five rows by default.
  */
 @customElement('helix-time-picker')
 export class HelixTimePicker extends HelixHeadlessTimePicker {

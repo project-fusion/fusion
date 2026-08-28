@@ -26,7 +26,7 @@
      A dialog is in the top layer, so a page scroll cannot reach it. */
   max-block-size: calc(100dvh - var(--helix-space-xl));
   overflow-y: auto;
-  padding: var(--dialog-inset, var(--helix-space-lg));
+  padding: var(--dialog-padding, var(--helix-space-lg));
 }
 
 /* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and

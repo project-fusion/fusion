@@ -15,9 +15,9 @@
    the panel's edge. */
 .launcher {
   --popover-inline-size: 22rem;
-  --popover-inset: var(--helix-space-none);
+  --popover-padding: var(--helix-space-none);
 }
 
 .launcher-chat {
-  --chat-max-height: 24rem;
+  --chat-max-block-size: 24rem;
 }

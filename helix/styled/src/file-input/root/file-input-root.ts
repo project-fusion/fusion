@@ -37,7 +37,7 @@ import { styles } from './file-input-root.css.js'
  * @documentation https://helix.fusion.dev/components/file-input
  *
  * @cssproperty --file-input-background-color - Fill behind the field.
- * @cssproperty --file-input-inset - Padding inside the field.
+ * @cssproperty --file-input-padding - Padding inside the field.
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixHeadlessFileInput {

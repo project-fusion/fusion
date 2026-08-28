@@ -178,7 +178,7 @@
 /* Four corners rather than one `border-radius`, so a group can flatten the two
  * it needs to.
  *
- * `--button-radii-start` and `--button-radii-end` are published for exactly
+ * `--button-radius-start` and `--button-radius-end` are published for exactly
  * that: `helix-button-group` sets them through `::slotted()`, which reaches the
  * host and hands the value across the boundary the way a custom property can and
  * a rule cannot. The group used to reach the corner itself with
@@ -194,20 +194,20 @@
  * stacking vertically has something to write. */
 [part="button"] {
   border-end-end-radius: var(
-    --button-radii-end-end,
-    var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)))
+    --button-radius-end-end,
+    var(--button-radius-end, var(--button-radius, var(--helix-radii-sm)))
   );
   border-end-start-radius: var(
-    --button-radii-end-start,
-    var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)))
+    --button-radius-end-start,
+    var(--button-radius-start, var(--button-radius, var(--helix-radii-sm)))
   );
   border-start-end-radius: var(
-    --button-radii-start-end,
-    var(--button-radii-end, var(--button-radii, var(--helix-radii-sm)))
+    --button-radius-start-end,
+    var(--button-radius-end, var(--button-radius, var(--helix-radii-sm)))
   );
   border-start-start-radius: var(
-    --button-radii-start-start,
-    var(--button-radii-start, var(--button-radii, var(--helix-radii-sm)))
+    --button-radius-start-start,
+    var(--button-radius-start, var(--button-radius, var(--helix-radii-sm)))
   );
 }
 

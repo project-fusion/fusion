@@ -40,7 +40,7 @@ helix-dialog::part(dialog) {
  *
  * One length, said once here and read by all four. */
 :host {
-  --option-inset: var(--helix-space-sm);
+  --option-padding: var(--helix-space-sm);
 }
 
 /* The list fills the panel, which is already the surface: a second border and a
@@ -82,7 +82,7 @@ helix-listbox::part(items) {
    one rule under it holding the results apart. */
 helix-listbox::part(search) {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding: var(--option-inset);
+  padding: var(--option-padding);
 }
 
 helix-listbox::part(search-field) {
@@ -124,7 +124,7 @@ helix-listbox::part(search-field) {
  * 2xs and the rule did nothing. A custom property inherits down the tree and
  * into each row's shadow root, which is the one thing that reaches them. */
 :host {
-  --option-block-inset: var(--_command-row);
+  --option-block-padding: var(--_command-row);
 }
 
 /* The keys a reader can press, under the list. Quiet, because it is a legend
@@ -137,7 +137,7 @@ helix-listbox::part(search-field) {
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-sm);
   /* The same column, being the last line of the same panel. */
-  padding: var(--helix-space-xs) var(--option-inset);
+  padding: var(--helix-space-xs) var(--option-padding);
 }
 
 [part="footer"][hidden] {

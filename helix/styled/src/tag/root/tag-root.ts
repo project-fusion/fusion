@@ -27,7 +27,7 @@ import { styles } from './tag-root.css.js'
  * @cssproperty --tag-background-color - Fill behind the tag.
  * @cssproperty --tag-border-color - Color of the edge, for a chip that separates by fill alone.
  * @cssproperty --tag-foreground-color - Label color.
- * @cssproperty --tag-radii - Corner radius of the tag.
+ * @cssproperty --tag-radius - Corner radius of the tag.
  */
 @customElement('helix-tag')
 export class HelixTag extends HelixHeadlessTag {

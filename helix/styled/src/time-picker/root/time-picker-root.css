@@ -10,7 +10,7 @@
  * count, because what a panel has is room, and a count would need recomputing
  * every time the density moved. */
 [part="list"] {
-  --listbox-max-block-size: var(--time-picker-list-height, 16rem);
+  --listbox-max-block-size: var(--time-picker-list-block-size, 16rem);
 
   display: block;
 }
@@ -142,7 +142,7 @@
      which is five of them. Written separately they drift, and the drift shows up
      as a wheel resting a few pixels off center. */
   --_time-row: var(--time-picker-row-size, var(--helix-size-control));
-  --listbox-max-block-size: var(--time-picker-wheel-height, calc(var(--_time-row) * 5));
+  --listbox-max-block-size: var(--time-picker-wheel-block-size, calc(var(--_time-row) * 5));
 
   flex: 1 1 auto;
   min-inline-size: max-content;

@@ -48,7 +48,7 @@ const parts = (selector: string): Array<{ names: string[]; tag: string }> => {
  *
  * **This is the check a static tool cannot make, and skipping it is a three
  * percent false-positive rate.** Measured on this repository: `landing.module.css`
- * sets `--icon-button-radii` and `--icon-button-size` on `helix-copy-button`,
+ * sets `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
  * which answers neither, and both work, because a copy button *renders* an icon
  * button and custom properties inherit through a shadow boundary. A rule that
  * reads the manifest alone calls those two dead. Six findings out of 197

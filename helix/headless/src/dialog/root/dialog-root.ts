@@ -266,7 +266,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    *
    * **The target alone is not enough here, where it is for `Drawer`.** A modal
    * `<dialog>` attributes backdrop clicks to itself, which is the usual trick,
-   * and this panel also carries `--dialog-inset` of padding: a press in that
+   * and this panel also carries `--dialog-padding` of padding: a press in that
    * padding has the same target as a press on the backdrop, so the trick alone
    * closes a dialog when a reader clicks just inside its own edge. The drawer
    * escapes that because its panel is flush against the window and its content

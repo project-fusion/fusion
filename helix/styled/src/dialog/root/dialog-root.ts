@@ -25,7 +25,7 @@ import { styles } from './dialog-root.css.js'
  *   theme says otherwise.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.
- * @cssproperty --dialog-inset - Padding inside the panel.
+ * @cssproperty --dialog-padding - Padding inside the panel.
  * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
  *   `--helix-space-lg`.
  * @cssproperty --dialog-scrim - The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.

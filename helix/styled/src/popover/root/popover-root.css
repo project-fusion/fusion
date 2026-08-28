@@ -39,7 +39,7 @@
   /* Never wider than the window, whatever it was asked for. A panel is placed
      against a trigger that can be anywhere, including hard against an edge. */
   max-inline-size: calc(100vw - var(--helix-space-lg));
-  padding: var(--popover-inset, var(--helix-space-md));
+  padding: var(--popover-padding, var(--helix-space-md));
   inline-size: var(--popover-inline-size, max-content);
 }
 
@@ -56,7 +56,7 @@
    inset, such as a list whose rows run to the edges so their hover reaches
    them. */
 :host([separation="plain"]) [part="popover"] {
-  padding: var(--popover-inset, var(--helix-space-none));
+  padding: var(--popover-padding, var(--helix-space-none));
 }
 
 /* It grows out of the edge it opened against, which `data-placement` is written
@@ -175,7 +175,7 @@
  * outside it: a scrolling panel clips the point off and scrolls it away with
  * the content. */
 [part="content"] {
-  max-block-size: var(--popover-max-block-size, var(--floating-available-height, none));
+  max-block-size: var(--popover-max-block-size, var(--floating-available-block-size, none));
   overflow: auto;
 }
 

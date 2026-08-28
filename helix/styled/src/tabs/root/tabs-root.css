@@ -140,7 +140,7 @@
   border: var(--_indicator-border, 0) solid var(--_indicator-border-color, transparent);
   border-radius: var(--_indicator-radius, var(--helix-radii-none));
   box-shadow: var(--_indicator-shadow, none);
-  inline-size: var(--indicator-width, 0);
+  inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;
@@ -198,7 +198,7 @@
 :host([variant="underlined"]) [part="indicator"] {
   --_indicator-block: var(--helix-border-thick);
   --_indicator-color: var(--helix-color-primary);
-  --_indicator-offset: calc(var(--indicator-height, 0px) - var(--helix-border-thick));
+  --_indicator-offset: calc(var(--indicator-block-size, 0px) - var(--helix-border-thick));
 }
 
 /* Segmented: the same mark, grown to the tab's own box. The pill travels rather
@@ -209,7 +209,7 @@
    "this one" would double at the moment of the change, and the one that cannot
    move would win the eye. */
 :host([variant="segmented"]) [part="indicator"] {
-  --_indicator-block: var(--indicator-height, 0);
+  --_indicator-block: var(--indicator-block-size, 0);
   --_indicator-color: var(--helix-color-surface-overlay);
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   --_indicator-shadow: var(--helix-shadow-sm);
@@ -228,7 +228,7 @@
    with nothing framing it, where the segmented one sits inside a sunken track.
    The same distinction the rest of the library makes. */
 :host(:not([variant])) [part="indicator"] {
-  --_indicator-block: var(--indicator-height, 0);
+  --_indicator-block: var(--indicator-block-size, 0);
   /* **`overlay` with an edge, not `raised`.** This pill lies on the page with
      nothing framing it, and `raised` put it a three per cent step off a white
      strip: the same place the hover wash lands, so the selected tab and a

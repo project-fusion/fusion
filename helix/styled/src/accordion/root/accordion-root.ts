@@ -22,7 +22,7 @@ import { styles } from './accordion-root.css.js'
  * @slot - The accordion's items.
  *
  * @cssproperty --accordion-border-color - Color of the seams, and of the frame when outlined.
- * @cssproperty --accordion-radii - Corner radius of the stack, when outlined.
+ * @cssproperty --accordion-radius - Corner radius of the stack, when outlined.
  */
 @customElement('helix-accordion')
 export class HelixAccordion extends HelixHeadlessAccordion {

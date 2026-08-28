@@ -28,8 +28,8 @@ import { styles } from './chat-message.css.js'
  * @csspart content - What was said.
  * @csspart meta - The time and the state together.
  *
- * @cssproperty --chat-message-background - Fill behind a turn.
- * @cssproperty --chat-message-background-me - Fill behind the reader's own turns.
+ * @cssproperty --chat-message-background-color - Fill behind a turn.
+ * @cssproperty --chat-message-background-color-me - Fill behind the reader's own turns.
  * @cssproperty --chat-message-color - Ink in a turn.
  * @cssproperty --chat-message-measure - How wide a turn may get before it wraps.
  */

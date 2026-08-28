@@ -44,9 +44,9 @@ import { styles } from './color-picker-root.css.js'
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *
- * @cssproperty --color-picker-grid-radii - Corner radius of the square.
+ * @cssproperty --color-picker-grid-radius - Corner radius of the square.
  * @cssproperty --color-picker-grid-ratio - Aspect ratio of the square.
- * @cssproperty --color-picker-inset - Inset of the rows under the square, and the bottom.
+ * @cssproperty --color-picker-padding - Inset of the rows under the square, and the bottom.
  * @cssproperty --color-picker-sample-size - Edge length of the chip that copies the value.
  * @cssproperty --color-picker-swatch-size - Edge length of one preset.
  */

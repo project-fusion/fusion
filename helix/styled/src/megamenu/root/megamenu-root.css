@@ -78,7 +78,7 @@
      the panel is composited against: `none` is the initial value and costs
      nothing. */
   backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background, var(--helix-color-background));
+  background-color: var(--megamenu-background-color, var(--helix-color-background));
   /* A hairline in the dark, and nothing in the light.
    *
    * A shadow is a light-mode device. It works by darkening what is behind it,
@@ -239,7 +239,7 @@
      the bar goes glass the band has to as well, or the seam between them is the
      one thing this rule exists to prevent. */
   backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background, var(--helix-color-background));
+  background-color: var(--megamenu-background-color, var(--helix-color-background));
   /* No edge at all. The bottom hairline was there to say where the band ends,
      which the shadow underneath it already says, and a line under a band that
      is meant to read as the header continuing downward turns the whole thing

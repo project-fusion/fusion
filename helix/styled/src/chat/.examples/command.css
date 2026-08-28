@@ -3,12 +3,12 @@
    top of that. The dialog gives up its padding for the same reason the other
    containers here do: the conversation pads its own regions. */
 .command::part(dialog) {
-  --dialog-inset: var(--helix-space-none);
+  --dialog-padding: var(--helix-space-none);
 
   gap: var(--helix-space-none);
   margin-block-start: 12vh;
 }
 
 .command-chat {
-  --chat-max-height: 22rem;
+  --chat-max-block-size: 22rem;
 }

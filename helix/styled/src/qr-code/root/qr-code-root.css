@@ -64,7 +64,7 @@
   max-inline-size: var(--qr-code-logo-size, 27%);
   min-block-size: var(--qr-code-logo-size, 27%);
   min-inline-size: var(--qr-code-logo-size, 27%);
-  padding: var(--qr-code-logo-inset, 6%);
+  padding: var(--qr-code-logo-padding, 6%);
   position: absolute;
   translate: -50% -50%;
 }

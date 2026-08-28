@@ -128,7 +128,7 @@
 :host([marker="rail"]) ::slotted(*) {
   --list-item-rail-content: counter(list-rail, var(--list-rail-style, decimal-leading-zero));
   /* The two things a row cannot work out for itself: that there is a rail at all,
-     and what number this row is. Its width it reads from `--list-rail-width`
+     and what number this row is. Its width it reads from `--list-rail-inline-size`
      directly, which a consumer sets on the list and every row inherits. */
   --list-item-rail-display: block;
   counter-increment: list-rail;

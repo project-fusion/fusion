@@ -11,7 +11,7 @@
 }
 
 [part="composer"] {
-  background-color: var(--chat-composer-background, var(--helix-color-surface));
+  background-color: var(--chat-composer-background-color, var(--helix-color-surface));
   border: var(--chat-composer-border-width, var(--helix-border-thin)) solid
     var(--helix-color-border);
   border-radius: var(--helix-radii-md);
@@ -40,7 +40,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
-  max-block-size: var(--chat-composer-max-height, 12rem);
+  max-block-size: var(--chat-composer-max-block-size, 12rem);
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);
   resize: none;

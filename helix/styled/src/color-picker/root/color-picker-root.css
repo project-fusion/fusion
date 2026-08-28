@@ -10,7 +10,7 @@
  * would inset the square too, which is what it did first. */
 :host {
   display: block;
-  padding-block-end: var(--color-picker-inset, var(--helix-space-none));
+  padding-block-end: var(--color-picker-padding, var(--helix-space-none));
 }
 
 /* The chip of the current color, and every preset: one square, two sizes.
@@ -57,7 +57,7 @@
     linear-gradient(to top, hsl(0 0% 0%), transparent),
     linear-gradient(to right, hsl(0 0% 100%), transparent),
     linear-gradient(hsl(var(--color-picker-hue) 100% 50%), hsl(var(--color-picker-hue) 100% 50%));
-  border-radius: var(--color-picker-grid-radii, var(--helix-radii-sm));
+  border-radius: var(--color-picker-grid-radius, var(--helix-radii-sm));
   cursor: crosshair;
   position: relative;
   touch-action: none;
@@ -111,7 +111,7 @@
   display: flex;
   gap: var(--helix-space-xs);
   padding-block-start: var(--helix-space-sm);
-  padding-inline: var(--color-picker-inset, var(--helix-space-none));
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
 }
 
 /* The chip, and it copies.
@@ -277,7 +277,7 @@
   display: flex;
   gap: var(--helix-space-xs);
   margin-block-start: var(--helix-space-sm);
-  padding-inline: var(--color-picker-inset, var(--helix-space-none));
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
 }
 
 [part="value"] {
@@ -377,7 +377,7 @@
      the square, the ramps and the tools above them all stopped short of it. The
      rule stays full width, because it is a separator and a separator that stops
      short of the edges reads as an underline on the thing above it. */
-  padding-inline: var(--color-picker-inset, var(--helix-space-none));
+  padding-inline: var(--color-picker-padding, var(--helix-space-none));
 }
 
 /* `icon-lg`, not `icon-md`. These are targets rather than marks: a preset is

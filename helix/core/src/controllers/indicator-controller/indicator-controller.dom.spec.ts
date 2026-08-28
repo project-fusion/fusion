@@ -89,7 +89,7 @@ const scene = (
 
 const at = (indicator: HTMLElement): Record<string, string> =>
   Object.fromEntries(
-    ['height', 'width', 'x', 'y'].map((name) => [
+    ['block-size', 'inline-size', 'x', 'y'].map((name) => [
       name,
       indicator.style.getPropertyValue(`--indicator-${name}`),
     ]),
@@ -99,7 +99,12 @@ describe('the geometry of the marked child', () => {
   test('is written as the four properties whoever draws the mark reads', () => {
     const one = scene()
     one.place()
-    expect(at(one.indicator)).toEqual({ height: '30px', width: '60px', x: '40px', y: '0px' })
+    expect(at(one.indicator)).toEqual({
+      'block-size': '30px',
+      'inline-size': '60px',
+      x: '40px',
+      y: '0px',
+    })
   })
 
   /* `getBoundingClientRect` gives the border box and the containing block is

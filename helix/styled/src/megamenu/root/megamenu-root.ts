@@ -17,7 +17,7 @@ import { styles } from './megamenu-root.css.js'
  * @documentation https://helix.fusion.dev/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - A filter behind the panel, for glass.
- * @cssproperty --megamenu-background - The panel's own fill.
+ * @cssproperty --megamenu-background-color - The panel's own fill.
  * @cssproperty --megamenu-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
