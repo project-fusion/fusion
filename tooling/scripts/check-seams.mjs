@@ -48,8 +48,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const TIER = 'helix/headless/src'
+const TIER = SOURCE.headless
 const EXEMPT = new Set(['icon'])
 
 /** Every `.ts` under a tier, specs excluded. */

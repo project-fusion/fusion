@@ -38,10 +38,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const EVENTS = 'helix/core/src/events/events.ts'
-const TIERS = ['helix/headless/src', 'helix/styled/src', 'helix/sandbox/src']
+const TIERS = [SOURCE.headless, SOURCE.styled, SOURCE.sandbox]
 
 /**
  * Whether each event class is cancelable, read from the class that builds it.

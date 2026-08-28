@@ -24,10 +24,11 @@
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const SOURCE = 'helix/styled/src'
+const TIER = SOURCE.styled
 
-const families = readdirSync(SOURCE, { withFileTypes: true })
+const families = readdirSync(TIER, { withFileTypes: true })
   .filter((one) => one.isDirectory())
   .map((one) => one.name)
   .sort()
@@ -36,7 +37,7 @@ const problems = []
 let answered = 0
 
 for (const family of families) {
-  const dir = join(SOURCE, family)
+  const dir = join(TIER, family)
   const sheets = []
   const walk = (at) => {
     for (const entry of readdirSync(at, { withFileTypes: true })) {

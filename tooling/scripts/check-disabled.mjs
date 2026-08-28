@@ -29,9 +29,10 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const WEB = 'helix/styled/src'
-const HEADLESS = 'helix/headless/src'
+const WEB = SOURCE.styled
+const HEADLESS = SOURCE.headless
 
 /** Every file under a directory whose name ends in one of `suffixes`. */
 const files = (dir, ...suffixes) => {

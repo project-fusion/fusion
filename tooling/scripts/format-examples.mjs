@@ -46,7 +46,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = ['helix/styled/src', 'helix/sandbox/src']
+const ROOTS = [SOURCE.styled, SOURCE.sandbox]
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
    is. `check:prose:examples` already holds these fences to the rules about inline
@@ -68,6 +68,7 @@ const walk = (dir, found = []) => {
 }
 
 import { format } from './lib/format-open-tags.mjs'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* Fenced HTML only, and the fence is reformatted in place rather than the file:
    an MDX page is mostly prose, and prose has angle brackets in it. */

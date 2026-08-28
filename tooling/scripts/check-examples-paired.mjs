@@ -37,10 +37,11 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = resolve(import.meta.dirname, '../..')
-const STYLED = join(ROOT, 'helix/styled/src')
-const HEADLESS = join(ROOT, 'helix/headless/src')
+const STYLED = join(ROOT, SOURCE.styled)
+const HEADLESS = join(ROOT, SOURCE.headless)
 
 /** The example every family has on both tiers. */
 const CANONICAL = 'preview.html'

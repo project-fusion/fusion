@@ -34,10 +34,11 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const HEADLESS = join(ROOT, 'helix/headless/src')
-const STYLED = join(ROOT, 'helix/styled/src')
+const HEADLESS = join(ROOT, SOURCE.headless)
+const STYLED = join(ROOT, SOURCE.styled)
 
 /** Every `*.ts` under a directory, minus the specs and the generated sheets. */
 const sources = (dir) => {

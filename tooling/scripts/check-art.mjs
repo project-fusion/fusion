@@ -27,13 +27,14 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 const MANIFESTS = [
   'helix/styled/custom-elements.json',
   'helix/headless/custom-elements.json',
   'helix/sandbox/custom-elements.json',
 ]
-const ART = 'helix/gallery/src'
+const ART = SOURCE.gallery
 
 /* The same derivation the catalog uses, so this cannot disagree with the page:
    a family is the first path segment under `src/` of a module that declares a

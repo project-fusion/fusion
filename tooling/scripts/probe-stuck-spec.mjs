@@ -48,6 +48,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, relative, resolve } from 'node:path'
 import { chromium } from 'playwright'
+import { TIERS } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const harness = join(root, 'helix/testing/src/browser.ts')
@@ -68,7 +69,7 @@ if (family === undefined || family.startsWith('--')) {
 }
 
 /** Every DOM spec that family has, on either tier. */
-const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src')]
+const SOURCES = TIERS
 const specs = []
 for (const source of SOURCES) {
   const folder = join(source, family)

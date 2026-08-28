@@ -21,8 +21,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styled/src', 'helix/sandbox/src']
+const TIERS = [SOURCE.core, SOURCE.headless, SOURCE.styled, SOURCE.sandbox]
 
 const walk = (dir, found = []) => {
   for (const entry of readdirSync(dir)) {

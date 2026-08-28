@@ -43,9 +43,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const SOURCE = join(ROOT, 'helix/styled/src')
+const TIER = join(ROOT, SOURCE.styled)
 
 const PAIRS = [
   { edge: '--helix-border-floating', kind: 'floating', lift: '--helix-shadow-floating' },
@@ -63,7 +64,7 @@ const walk = (dir) => {
     }
   }
 }
-walk(SOURCE)
+walk(TIER)
 
 /* Comments carry these names too: every converted stylesheet explains the
    policy above the rule, and a scan that does not blank them reports the

@@ -78,12 +78,13 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* Every tier that ships CSS or documents a component. `helix/styles` reads
    hooks without declaring any, which is exactly the pairing that made Button's
    go missing: the declaration stayed in one tier and the rule moved to
    another. */
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styles/src', 'helix/styled/src']
+const TIERS = [SOURCE.core, SOURCE.headless, SOURCE.styles, SOURCE.styled]
 
 const walk = (dir, found = []) => {
   for (const entry of readdirSync(dir)) {

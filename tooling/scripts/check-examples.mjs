@@ -20,6 +20,7 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* The frame's layout modes, from `preview-frame.css`. Named here because an
    example may ask for one by name and a name that matches no rule is silent. */
@@ -35,7 +36,7 @@ const LAYOUTS = ['centered', 'fullscreen', 'hug', 'padded']
  * example could not be validated at all, so a typo in one would have rendered
  * an inert unknown element and passed. */
 const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-elements.json']
-const ROOT = 'helix/styled/src'
+const ROOT = SOURCE.styled
 
 /**
  * Attributes any element may carry, so no component declares them.

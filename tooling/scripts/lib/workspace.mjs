@@ -34,6 +34,39 @@ export const root = resolve(import.meta.dirname, '../../..')
 export const SCOPE = '@fusion.dev/'
 export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
 
+/**
+ * Where source lives, named once because a folder rename found every copy the
+ * hard way.
+ *
+ * **Twenty-seven of these lists were written out across twenty-five scripts**,
+ * and moving `docs/` and `site/` into `fusion/` on 28 Aug 2026 broke ten of
+ * them in three separate rounds: two found by the checks failing, seven by a
+ * grep, and `check-exportparts` by none of that, surfacing only when its group
+ * ran. Every one reported `ENOENT: scandir 'docs'`, which is a check that
+ * cannot start rather than one that fails, so nothing in the message says what
+ * was going unchecked.
+ *
+ * **Named places rather than one list**, because the lists are not the same
+ * question and collapsing them would lose that: `check:css:motion` reads the
+ * styles, the styled tier, the sandbox and the gallery, while `check:api:parts`
+ * reads core, both tiers and the sandbox. Each script still says what it looks
+ * at. What it no longer says is where those things are.
+ */
+export const SOURCE = {
+  core: 'helix/core/src',
+  gallery: 'helix/gallery/src',
+  headless: 'helix/headless/src',
+  sandbox: 'helix/sandbox/src',
+  styled: 'helix/styled/src',
+  styles: 'helix/styles/src',
+}
+
+/** The two component tiers, which is the set six checks read on their own. */
+export const TIERS = [SOURCE.headless, SOURCE.styled]
+
+/** Every domain folder, for a check whose subject is the repository. */
+export const ROOTS = ['cortex', 'fusion', 'helix']
+
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {
   const { workspaces } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))

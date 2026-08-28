@@ -48,9 +48,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/sandbox/src', 'helix/styled/src']
+const TIERS = [SOURCE.core, SOURCE.headless, SOURCE.sandbox, SOURCE.styled]
 
 /**
  * IDL member to the content attribute HTML spells it with.

@@ -43,6 +43,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { TIERS } from './lib/workspace.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -60,7 +61,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  * Select should run what Select is tested by, and which tier a file sits in is
  * a fact about this repository rather than about the component.
  */
-const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src')]
+const SOURCES = TIERS
 const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'fusion/site/public/specs')

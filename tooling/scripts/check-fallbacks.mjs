@@ -42,8 +42,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-
-const TIERS = ['helix/headless/src', 'helix/styled/src']
+import { TIERS } from './lib/workspace.mjs'
 
 /** Every `.ts` under a tier, specs and generated stylesheets excluded. */
 const sources = (root) => {

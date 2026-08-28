@@ -34,10 +34,11 @@ import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { ORACLE, pairs } from './lib/theme-facts.mjs'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const SOURCE = join(ROOT, 'helix/styled/src')
+const TIER = join(ROOT, SOURCE.styled)
 
 /**
  * Pairs a component paints on purpose that the model deliberately omits, with
@@ -68,7 +69,7 @@ const walk = (dir) => {
     }
   }
 }
-walk(SOURCE)
+walk(TIER)
 
 /* **The pairs the engine measures, read from what it emitted.** This used to
    match the model's TypeScript with a regular expression, and two things ended

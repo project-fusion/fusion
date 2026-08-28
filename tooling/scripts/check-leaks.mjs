@@ -39,8 +39,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/styled/src']
+const TIERS = [SOURCE.core, SOURCE.headless, SOURCE.styled]
 
 /* Events the element owns by construction: fired by something inside its own
    shadow root, which is discarded with it. Listening to these without removing

@@ -29,12 +29,13 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* Resolved from this file rather than from the working directory, because
    turbo runs a package's `build` with the package as its cwd and a contributor
    runs `bun run gen:styles-dist` from the root. */
 const ROOT = join(import.meta.dirname, '../..')
-const SOURCE = join(ROOT, 'helix/styles/src')
+const INPUT = join(ROOT, SOURCE.styles)
 const OUT = join(ROOT, 'helix/styles/dist')
 
 /**
@@ -111,10 +112,10 @@ let raw = 0
 let shipped = 0
 const written = []
 
-for (const name of readdirSync(SOURCE)
+for (const name of readdirSync(INPUT)
   .filter((one) => one.endsWith('.css'))
   .sort()) {
-  const source = readFileSync(join(SOURCE, name), 'utf8')
+  const source = readFileSync(join(INPUT, name), 'utf8')
   const stripped = withoutComments(source)
     .replace(/[ \t]+$/gm, '')
     .replace(/\n{2,}/g, '\n')

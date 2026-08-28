@@ -53,8 +53,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const TIER = 'helix/styled/src'
+const TIER = SOURCE.styled
 const TOKEN = '--helix-color-background'
 
 /* The properties that put a color on the page. A custom property is excluded

@@ -72,8 +72,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-
-const TIERS = ['helix/headless/src', 'helix/styled/src']
+import { TIERS } from './lib/workspace.mjs'
 
 /* **Where a tag can be written by something that is not a component.**
  *

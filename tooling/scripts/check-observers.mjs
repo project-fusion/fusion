@@ -27,8 +27,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { TIERS } from './lib/workspace.mjs'
 
-const ROOTS = ['helix/headless/src', 'helix/styled/src']
+const ROOTS = TIERS
 const OBSERVER = /new\s+(?:Intersection|Mutation|Resize|Performance)Observer\b/
 
 const sources = (root) => {

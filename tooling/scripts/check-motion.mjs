@@ -40,12 +40,13 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* `helix/styles/src` is in the list, and leaving it out was the gap that let two
    moving `::part()` rules ship unanswered. `::part()` is the one construct that
    lets a document sheet write into a shadow tree, so it is the one place a
    component genuinely cannot answer for itself. */
-const TIERS = ['helix/styles/src', 'helix/styled/src', 'helix/sandbox/src', 'helix/gallery/src']
+const TIERS = [SOURCE.styles, SOURCE.styled, SOURCE.sandbox, SOURCE.gallery]
 
 /* `transition` and `animation` both, because both are capped by the rule that
    does not reach here, and a transition on `opacity` moves a reader exactly as
