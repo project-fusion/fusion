@@ -629,6 +629,7 @@ and leaves box and background to `::slotted`.
 
 | Property | Description |
 | --- | --- |
+| `--breadcrumbs-control-padding-inline` | Inline padding of a control slotted into a crumb, matching the steps either side of it. |
 | `--breadcrumbs-control-size` | How tall a control slotted into a crumb is. |
 | `--breadcrumbs-hover-color` | Fill behind a step under the pointer. |
 | `--breadcrumbs-separator-color` | Color of the chevron. |
@@ -703,7 +704,9 @@ ring is declared here rather than inherited, because the base layer's
 | `--button-background-color` | Fill behind the button, in every state. |
 | `--button-background-color-hover` | Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover. |
 | `--button-foreground-color` | Label and icon color. |
+| `--button-gap` | Space between the label and whatever flanks it. |
 | `--button-inline-size` | Width taken by `width="standard"`. |
+| `--button-padding-inline` | Inline padding, for a container whose rhythm is not the control default. |
 | `--button-radii` | Corner radius of the control. |
 | `--button-radii-end` | Trailing corners, which a group flattens. |
 | `--button-radii-end-end` | The bottom trailing corner, for a group stacking down. |
