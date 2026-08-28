@@ -92,10 +92,16 @@ exact one the paragraph above is about, under a name promising the opposite.
 
 **A writer and its judge share a name.** `gen:reference` writes what
 `check:gen:reference` reads. That pairing was kept by hand and lost twice,
-`element-events` and `themed-page` each landing in one list and not the other,
-and a third time in `catalog`, which is regenerated and has no judge at all.
+`element-events` and `themed-page` each landing in one list and not the other.
 Three of them did not even share a word before this: `check:gen:eval` judged
 `eval:build`, and `eval` was a different command that ran the corpus.
+
+**`gen:catalog` has no judge and should not have one.** A staleness check
+compares committed output against its source, and the catalog's output is
+gitignored, so there is nothing about it that can go stale. `verify` runs the
+writer instead, which proves the only thing left to prove: that it still runs.
+Every artifact that does carry a `check:gen:` is tracked, and that is the test
+for whether one is owed.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
 push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`
