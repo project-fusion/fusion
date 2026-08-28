@@ -6001,6 +6001,7 @@ second name for it here would be a second thing to keep in step.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the active step changes. |
 
 #### Slots
@@ -6316,6 +6317,7 @@ a movement instead of two separate fills.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current tab moves, and cancelable. The only way to refuse one. |
 | `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. |
 
@@ -7431,6 +7433,7 @@ to it is one more thing between the reader and the label.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. |
+| `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current node moves, and cancelable. The only way to refuse one. |
 
 #### Slots
@@ -7783,6 +7786,7 @@ entries sit in. Everything about which clip is current is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current entry changes, and cancelable. |
 
 #### Slots
