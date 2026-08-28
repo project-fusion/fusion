@@ -20,7 +20,10 @@
    * expression measured 23.59 against links of 27.5, four pixels short and in
    * the same row. The token pair is absolute at both ends, and it is the shape
    * `Checkbox` already computes its box from. */
-  --icon-button-size: var(--breadcrumbs-control-size, calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2));
+  --icon-button-size: var(
+    --breadcrumbs-control-size,
+    calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
+  );
 
   /* And the same for a labelled one, which the rule above cannot reach.
    *
@@ -30,7 +33,10 @@
    * icon button did. Two hooks because they are two components; one number,
    * because the crumb's height is the only thing either of them is agreeing
    * with. */
-  --button-size: var(--breadcrumbs-control-size, calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2));
+  --button-size: var(
+    --breadcrumbs-control-size,
+    calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
+  );
 
   align-items: center;
   display: inline-flex;

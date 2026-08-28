@@ -153,7 +153,7 @@ Font size.
 | `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 12 |
-| `--helix-text-control` | `var(--helix-text-sm)` | 3 |
+| `--helix-text-control` | `var(--helix-text-sm)` | 5 |
 
 ## weight
 
@@ -172,7 +172,7 @@ Line height. The three steps are unitless and scale with the size; the heading o
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-leading-tight` | `1.2` | 23 |
-| `--helix-leading-normal` | `1.5` | 33 |
+| `--helix-leading-normal` | `1.5` | 35 |
 | `--helix-leading-loose` | `1.7` | 0 |
 | `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | 9 |
 

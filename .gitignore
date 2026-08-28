@@ -62,6 +62,12 @@ site/ui/public/specs
 # The sandbox preview document, built from source by `bun run frame`.
 site/ui/public/sandbox
 
+# The parity harness's build, wiped and rebuilt by `check:visual-parity` on every
+# run. Ignored for the reason `public/specs` gives: `biome ci` lints what it can
+# see, and a generated page failing format fails the push. It was briefly tracked
+# after a `git add -A` swept it up mid-run, which is how the reason was found.
+site/ui/public/check
+
 # Worktrees an agent made for isolation. A second checkout of this repo, so
 # tracking it would track everything twice and linting it collides with this
 # tree's own root config.
