@@ -60,8 +60,8 @@ export interface IndicatorOptions {
  * **Declared here because this is what writes them.** They carry a measurement
  * no stylesheet can take, they are read by whoever draws the mark, and `core`
  * ships no CSS, so there is no reader inside this package and nothing about
- * them is private. `check:hooks` pairs a `@cssproperty` with a rule that reads
- * one, in both directions, and the underscore these used to carry was what
+ * them is private. A documented hook is paired with a rule that reads one, in
+ * both directions, and the underscore these used to carry was what
  * exempted them from it.
  *
  * @cssproperty --indicator-block-size - How tall the active item is, in pixels.

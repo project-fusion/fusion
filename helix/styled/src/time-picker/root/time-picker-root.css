@@ -59,8 +59,8 @@
      a fill that is not the accent and not black, without depending on which way
      round the scheme happens to be.
 
-     Found by `check:pairings`, which reported this as a pair the model did not
-     declare and therefore one nothing measured. */
+     Found as a pair the model did not declare and therefore one nothing
+     measured. */
   background-color: var(--helix-color-surface-inverse);
   color: var(--helix-color-foreground-inverse);
 }
@@ -130,7 +130,7 @@
 
 /* Shorter than the single list, which is a different job: a list is read down
    and a dial is read around its middle, so it wants enough rows to show the
-   neighbours and not so many that the center stops being a center. */
+   neighbors and not so many that the center stops being a center. */
 /* Each column is at least as wide as its own widest row, and they share what is
    left equally. `flex-basis: 0` with a zero floor was the first version and it
    collapsed them: inside a panel sized to its content there is no content to

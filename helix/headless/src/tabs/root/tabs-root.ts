@@ -160,8 +160,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
      * reordering a list left this permanently dead: the observer gone, nothing
      * to rebuild it, and the component still rendering as though it were
      * watching. Guarded on `hasUpdated`, because the first connection happens
-     * before the first render and there is nothing to watch yet.
-     * `check:observers` holds it. */
+     * before the first render and there is nothing to watch yet. */
     if (this.hasUpdated) {
       this.measure()
       this.watch()

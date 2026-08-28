@@ -34,7 +34,7 @@ describe('trend', () => {
   })
 
   test('the direction is a word as well as an arrow', async () => {
-    /* A coloured arrow says nothing to a reader who is not looking at it. The
+    /* A colored arrow says nothing to a reader who is not looking at it. The
        word is clipped out of sight by the styled tier and stays in the
        accessibility tree, which `display: none` would not. */
     expect(word(await trend('direction="up"'))).toBe('Up')
@@ -43,7 +43,7 @@ describe('trend', () => {
     expect(arrow(await trend('direction="down"'))).toBe('arrow-down')
   })
 
-  test('nothing to report is neutral, and so is a word nobody recognises', async () => {
+  test('nothing to report is neutral, and so is a word nobody recognizes', async () => {
     // An attribute is a string and a consumer can write anything into it, so an
     // unrecognised direction has to draw something rather than throw in render.
     expect(word(await trend(''))).toBe('Unchanged')

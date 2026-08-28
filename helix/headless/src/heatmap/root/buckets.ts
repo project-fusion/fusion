@@ -3,7 +3,7 @@
  *
  * Kept apart from the element because both answers are arithmetic and both are
  * easy to get subtly wrong in ways a picture hides: a threshold comparison off
- * by one boundary colours a handful of cells wrong out of ninety, and a fit
+ * by one boundary colors a handful of cells wrong out of ninety, and a fit
  * calculation off by one drops a day silently. Neither is visible in a
  * screenshot of a strip.
  */
@@ -20,7 +20,7 @@ export interface Reading {
  * **The cell's own tone wins**, and that ordering is the whole reason both
  * exist. A status page already knows a day was degraded; making it encode that
  * as a number so a component can decode it again is work for nothing, and the
- * encoding would have to agree with the thresholds or the colours would drift
+ * encoding would have to agree with the thresholds or the colors would drift
  * from the truth. A contribution graph has only counts and wants the buckets.
  *
  * Thresholds are read as lower bounds, in the order given, and the last one that

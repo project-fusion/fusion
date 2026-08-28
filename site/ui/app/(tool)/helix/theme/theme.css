@@ -82,7 +82,7 @@
   inline-size: var(--helix-size-icon-md);
 }
 
-/* The two coloured tracks are not routed from here any more. They set
+/* The two colored tracks are not routed from here any more. They set
    `--slider-track-image` inline, because these rules selected on a `label`
    attribute that only exists when a server wrote the element: after a
    client-side navigation React assigns `label` as a property, Lit does not

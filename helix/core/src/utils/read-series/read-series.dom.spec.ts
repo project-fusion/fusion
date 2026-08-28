@@ -100,7 +100,7 @@ describe('reading a table as series', () => {
 describe('a cell that carries its own tone', () => {
   /**
    * **Tone is a per-point fact here and a per-series fact everywhere else**,
-   * which is the exception a heatmap needs: a strip of ninety days coloured by
+   * which is the exception a heatmap needs: a strip of ninety days colored by
    * how each day went would otherwise be ninety series, and that is the whole
    * argument for the family existing rather than being a bar chart with flat
    * values.

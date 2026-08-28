@@ -61,7 +61,7 @@
   --button-radius-end: var(--button-radius, var(--helix-radii-sm));
 }
 
-/* A hovered or focused button has to draw above its neighbours, or the border
+/* A hovered or focused button has to draw above its neighbors, or the border
    it lights up is half covered by the one overlapping it. */
 ::slotted(*:hover),
 ::slotted(*:focus-within) {
@@ -72,8 +72,8 @@
      *Narrowed 28 Aug 2026, because the sentence overstated the rule.* It read
      "every other `z-index` in the styled tier names a `--helix-layer-*`, and
      this was the last one that did not", and `steps/step/step.css` has three
-     bare ones. Those are correct: `check:tokens` covers `z-index` and permits
-     `0` and `1` by name, in a set it calls values that are structural rather
+     bare ones. Those are correct: `z-index` permits `0` and `1` by name, as
+     values that are structural rather
      than design decisions, and a two-layer stack local to one component is
      exactly that. The rule is "a layer token unless the value is structurally 0
      or 1", which is not what a reader of the old sentence would have inferred

@@ -86,7 +86,7 @@ const SYSTEM: Face = { category: 0, family: '', label: 'System default' }
  *
  * The nine hardcoded here were a list, not a judgment: they carried the exact
  * weights the token layer uses because each was written out by hand, which is
- * precisely what does not scale and precisely what `bun run faces` now does for
+ * precisely what does not scale and precisely what `bun run gen:faces` now does for
  * two thousand of them. A family is offered when it can serve at least one of 400, 500
  * and 600, and asked for the ones it has: the same request against a family
  * shipping only 400 and 700 returns a stylesheet missing two weights and a page
@@ -1340,7 +1340,7 @@ export function ThemeBuilder({
                 stylesheet reached it: nineteen bare `helix-*` rules in
                 `site.css`, and three of them landed here. Measured, the preview's
                 header computed `--app-header-backdrop: none` and
-                `--app-header-background: transparent` because the masthead sets
+                `--app-header-background-color: transparent` because the masthead sets
                 those for itself, so the material control could be dragged from
                 zero to forty and the one surface most likely to be glass never
                 moved. The drawer took the site's header clearance too, for a

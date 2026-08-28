@@ -4,7 +4,7 @@
  * Every token in this library is a `light-dark()` pair and `light-dark()`
  * follows `color-scheme`, so one declaration resolves the whole subtree the way
  * a dark page would: the ink comes out light, the surfaces come out dark, and
- * the controls stop needing colours chosen for them one at a time.
+ * the controls stop needing colors chosen for them one at a time.
  *
  * It also puts the answer where a consumer can change it. Setting
  * `data-color-mode` on the element wins through `tokens.css`, which is the same
@@ -181,8 +181,8 @@
  * `download` and `more` had already had to be remembered once. `rewind` and
  * `forward` were not remembered: they rendered as raw `<button>`, measured at
  * 36x29 with a gray fill and a 2px border, beside 24x24 transparent for every
- * control next to them. Nothing caught it, and nothing could: `check:selectors`
- * asks whether a selector has a part, which is the other direction.
+ * control next to them. Nothing caught it, and nothing could: the static rule asks whether a selector
+ * has a part, which is the other direction.
  *
  * A list that has to be joined is a list that will be forgotten, so the
  * question is now "is it a control on this bar", which the next one will answer
@@ -345,7 +345,7 @@
      logical axes, and an absolutely positioned box resolves its insets in its
      own writing mode, not its container's: `inset-inline-start` became an
      offset from the top and put the slider outside the control it belongs to.
-     `left` with a `translate` centres regardless of direction, and `bottom` has
+     `left` with a `translate` centers regardless of direction, and `bottom` has
      no direction to be wrong about. */
   left: 50%;
   opacity: 0;
@@ -395,7 +395,7 @@
   border-radius: var(--helix-radii-full);
   content: "";
   block-size: calc(var(--_video-level-size) + var(--helix-space-xs) * 2);
-  /* One pad lower than the track, which is what centres a ground that is one
+  /* One pad lower than the track, which is what centers a ground that is one
      pad taller at each end. */
   bottom: calc(var(--_video-level-lift) - var(--helix-space-xs));
   inline-size: var(--helix-size-icon-loose);
@@ -624,7 +624,7 @@
  * Centered on the stage rather than in a corner, because it is standing in for
  * the frame that has not arrived and that is where a reader is already looking.
  * On the media surface tokens, so it reads on a picture rather than on the page:
- * whatever is behind it is a photograph, and a panel in page colours over a
+ * whatever is behind it is a photograph, and a panel in page colors over a
  * photograph is a panel nobody can read. */
 [part="loading"],
 [part="failure"] {

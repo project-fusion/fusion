@@ -7,7 +7,7 @@ import { DismissController } from './dismiss-controller.js'
  *
  * Both, because they are different intentions with the same meaning: Escape is
  * the keyboard's way out and clicking away is the pointer's, and an overlay
- * honouring only one is one half its readers cannot dismiss.
+ * honoring only one is one half its readers cannot dismiss.
  *
  * **The case worth the most here is two overlays open at once.** Every one of
  * them listens on `document`, so they are siblings on a single node and the

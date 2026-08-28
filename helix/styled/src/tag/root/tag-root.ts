@@ -42,7 +42,7 @@ export class HelixTag extends HelixHeadlessTag {
    * **Written before there was a registry, and it turned out to be the first
    * instance of a general fault rather than a local one.** `appearance` was not
    * a treatment either: it held four different questions across 21 components,
-   * and this file found one of them the hard way. The rest is `check:axes`.
+   * and this file found one of them the hard way.
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'

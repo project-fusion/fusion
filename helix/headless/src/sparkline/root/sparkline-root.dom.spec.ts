@@ -124,7 +124,7 @@ describe('sparkline', () => {
     const tallest = heights[2] as number
     expect(Math.abs((heights[0] as number) / tallest - 1 / 9)).toBeLessThan(1e-6)
     expect(Math.abs((heights[1] as number) / tallest - 5 / 9)).toBeLessThan(1e-6)
-    // Inset inside its slot, so neighbours do not touch.
+    // Inset inside its slot, so neighbors do not touch.
     expect(Number(columns[0]?.getAttribute('width'))).toBeLessThan(100 / 3)
   })
 

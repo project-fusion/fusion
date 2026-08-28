@@ -70,7 +70,7 @@ const THICKNESS: Record<string, number> = {
  *
  * **It refuses negative values rather than drawing them.** A share of a whole
  * cannot be less than nothing, and an arc for a negative number either runs
- * backwards over its neighbours or is silently dropped. Those rows are skipped
+ * backwards over its neighbors or is silently dropped. Those rows are skipped
  * and the total is of what is left, which is the only reading that stays true.
  *
  * **The shape is drawn with a dashed stroke, not with arc commands.** One
@@ -390,7 +390,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
          says `fill: none` in its own stylesheet, so the shape was invisible
          there and four black slices covering the ring everywhere else. Caught
          by retaking the visual baselines: the headless donut lost two of its
-         four greys to a closed shape nobody had told to stop filling.
+         four grays to a closed shape nobody had told to stop filling.
 
          A presentation attribute loses to any CSS rule, so the styled tier
          still decides and a consumer can still fill this if they want one.

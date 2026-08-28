@@ -130,7 +130,7 @@ pub fn tokens<'de, D: Deserializer<'de>>(
         type Value = Vec<(String, Color)>;
 
         fn expecting(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            out.write_str("an object of token names to colours")
+            out.write_str("an object of token names to colors")
         }
 
         fn visit_map<M: MapAccess<'de>>(self, mut entries: M) -> Result<Self::Value, M::Error> {

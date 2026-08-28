@@ -136,7 +136,7 @@
   --_legend-through: calc(0.88 * var(--helix-material-opacity));
 }
 
-/* Print: what the colours in the drawing beside it mean.
+/* Print: what the colors in the drawing beside it mean.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

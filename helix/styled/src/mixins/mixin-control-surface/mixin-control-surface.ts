@@ -45,7 +45,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
      * means": the axis was named correctly in prose and filed under the word
      * four axes shared. A Card's `outlined` says where a surface ends and this
      * one says how much ink a control claims, and one word cannot keep saying
-     * both. `check:axes` holds the vocabulary now.
+     * both.
      *
      * Reflected because the stylesheet selects on it, and undefaulted because
      * it reflects: a reflected property with a default writes its attribute

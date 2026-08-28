@@ -30,8 +30,8 @@ import { property } from 'lit/decorators.js'
  * all four, and the comments at the two call sites say so. The class doc did
  * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
  * the whole time: a spec three files away existing to contradict the prose is
- * the same shape as `Stat`'s `detail` slot, which is what `check:references`
- * was written after and is the half it cannot see.
+ * the same shape as `Stat`'s `detail` slot, and it is the half a mechanical
+ * check cannot see.
  *
  * Opened declaratively with the platform's invoker attributes:
  *

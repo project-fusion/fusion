@@ -138,7 +138,6 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * about the part it renamed for the same kind of reason: there is no
    * `helix-v` tag, so no consumer is holding the old spelling, and this is free
    * today and a deprecation after the first release.
-   * `check:attribute-names` holds it from here.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false

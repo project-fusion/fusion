@@ -2,7 +2,7 @@ import { customElement, HelixElement, type Series, SourceController } from '@fus
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
-/** How many colours the series palette has, and so where it starts over. */
+/** How many colors the series palette has, and so where it starts over. */
 const PALETTE = 24
 
 /**
@@ -31,7 +31,7 @@ const PALETTE = 24
  * tell it.
  *
  * **Not hidden from a screen reader, though the mapping it draws is a color
- * one.** The argument for hiding it is real: the colours mean nothing to a
+ * one.** The argument for hiding it is real: the colors mean nothing to a
  * reader who cannot see them, and the names are already in the table. It stays
  * because the cost of being wrong runs one way. A duplicated list of three
  * words is noise; a consumer who took the table out of the accessibility tree

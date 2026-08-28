@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-listbox>` and a
    custom element registers on import. Inherited from the base along with the
    template, which is why it is restated here: this file has no `<helix-listbox>`
-   in it to remind anyone. `check:composed` enforces it. */
+   in it to remind anyone. */
 import '../../listbox/index.js'
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'

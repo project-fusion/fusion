@@ -11,10 +11,10 @@ import type { Row } from '../read-series/read-series.js'
  * A mixin's members reach a subclass only through its declared interface, and an
  * interface cannot carry a protected one: TypeScript refuses to widen a class to
  * an interface across a protected member. Declaring it public would make a
- * render seam part of the published API and break the convention
- * `check:seams` holds, that a composed thing sits behind
- * `protected render…()`. So the markup is shared here, the way `drawIcon`
- * shares a glyph, and each chart keeps a one-line seam of its own.
+ * render seam part of the published API and break the convention that a
+ * composed thing sits behind `protected render…()`. So the markup is shared
+ * here, the way `drawIcon` shares a glyph, and each chart keeps a one-line
+ * seam of its own.
  *
  *
  * **The tooltip's tag is an argument, because this file is on the wrong tier to
@@ -22,10 +22,10 @@ import type { Row } from '../read-series/read-series.js'
  * and `@fusion.dev/helix-headless` does not, so a consumer of the headless tier alone
  * got an inert unknown element where the reading should be: the chart correct,
  * the markup correct, and resting a pointer on a bar doing nothing. Nothing
- * here could catch it. `check:composed` holds a *component* to interpolating
- * its tag through `tier` and this is a free function with no class to read one
- * from, and both the sandbox frame and the docs site import the whole library,
- * so every environment a test runs in has the styled tag registered and the
+ * here could catch it: the rule about interpolating a tag through `tier` holds
+ * a *component*, and this is a free function with no class to read one from,
+ * and both the sandbox frame and the docs site import the whole library, so
+ * every environment a test runs in has the styled tag registered and the
  * element upgrades.
  *
  * So the caller passes `this.tag('tooltip')` and each tier answers with its own

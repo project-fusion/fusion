@@ -185,7 +185,7 @@ if (hasLayout()) {
 
     test('a plain link in a group starts where its heading does', async () => {
       /* The panel is inside the nav, so its anchors match the nav bar's own
-         rule, which centres a word in a horizontal strip. Left unanswered, a
+         rule, which centers a word in a horizontal strip. Left unanswered, a
          column of plain links came out centered under a heading that was not. */
       const bar = (await mount(
         `<nav style="padding:40px">

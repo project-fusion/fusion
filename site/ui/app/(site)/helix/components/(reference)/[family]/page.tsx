@@ -1,5 +1,5 @@
 /* Server only, which is what makes this free. The highlighter is a Lezer parse
-   and a tree walk, so it runs during the build and the page ships coloured
+   and a tree walk, so it runs during the build and the page ships colored
    markup with no client JavaScript spent on it. `helix/styled` never sees it. */
 
 import { startCase } from '@fusion.dev/helix-docs'
@@ -141,7 +141,7 @@ function Code({ children }: { children: string }) {
 }
 
 /*
- * Colours a type annotation by what each part of it is.
+ * Colors a type annotation by what each part of it is.
  *
  * Split rather than highlighted: a type is not a program, and running a real
  * tokenizer over `'primary' | 'neutral'` would be a parser shipped to color
@@ -161,7 +161,7 @@ function Code({ children }: { children: string }) {
  * `string` belongs here and not with the literals. It is the same kind of word
  * as `boolean`: a name the language supplies, sitting where a type goes.
  * `"primary"` is a different kind of thing entirely, a value standing in for a
- * type, and colouring the two alike made a union of literals read as though it
+ * type, and coloring the two alike made a union of literals read as though it
  * were a list of primitives.
  */
 const BUILTIN = new Set([
@@ -198,7 +198,7 @@ const kindOf = (token: string): string => {
  * column then had nowhere to break. Measured on Input: the text ran 108px in an
  * 83px box and the last nine landed on top of the description beside it.
  *
- * Same colours and the same quote swap, because it is still code and a reader
+ * Same colors and the same quote swap, because it is still code and a reader
  * still copies it out. What it does not inherit is the union machinery.
  */
 function DefaultText({ children }: { children: string }) {
@@ -284,7 +284,7 @@ const union = (type: string): string[] => {
   return members.map((one) => one.trim()).filter(Boolean)
 }
 
-/** One member, coloured by what each token is. */
+/** One member, colored by what each token is. */
 function tokens(member: string) {
   const parts = member.split(/("[^"]*"|[A-Za-z_$][\w$]*)/g).filter(Boolean)
   return (

@@ -6,7 +6,7 @@ import { tags } from '@lezer/highlight'
 /*
  * Shell, with the command named.
  *
- * **The stock mode colours nothing in the commands this documentation actually
+ * **The stock mode colors nothing in the commands this documentation actually
  * contains.** It knows sh: builtins, keywords, redirects, quoting, comments.
  * Every shell fence here is `bun add @fusion.dev/helix`, and to that mode `bun` is
  * an ordinary word, so all three blocks came out entirely gray. A highlighter

@@ -3,8 +3,7 @@ import { HelixHeadlessFileInput } from '@fusion.dev/helix-headless/file-input'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-icon>` for each
    file's remove control and a custom element registers on import. Inherited from
-   the base along with the template, which is why it is restated here.
-   `check:composed` enforces it. */
+   the base along with the template, which is why it is restated here. */
 import '../../icon/index.js'
 import '../../tag/index.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'

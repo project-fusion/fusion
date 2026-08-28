@@ -70,7 +70,7 @@ pub fn derive_tokens(resolved: &Resolved) -> Derived {
 /// What the color phases produced, before any of it is named.
 ///
 /// Split from the assembly because the two answer different questions: this is
-/// "which colours does this intent imply", and [`assemble`] is "what does the
+/// "which colors does this intent imply", and [`assemble`] is "what does the
 /// emitted file call them, and in what order". A change to one is almost never a
 /// change to the other, and holding both in one function is what let the
 /// 615-line original hide each behind the other.
@@ -133,7 +133,7 @@ impl Phases {
     }
 }
 
-/// Names the colours, in the order the emitted file carries them.
+/// Names the colors, in the order the emitted file carries them.
 fn assemble(
     resolved: &Resolved,
     ctx: &Deriving,

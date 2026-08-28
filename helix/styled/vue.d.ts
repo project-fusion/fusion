@@ -650,7 +650,7 @@ export type HelixBadgeVueProps = {
 emphasis question, and the values answer a different one.** `danger` and
 `neutral` are meanings: the stylesheet picks a fill by what the count *is*,
 not by how loudly it is drawn. Filed under `appearance` it read as a
-treatment, which is the confusion `check:axes` exists to stop. */
+treatment, which is the confusion the split exists to stop. */
   tone?: HelixBadge["tone"];
   /** The count or short text to show.
 
@@ -994,7 +994,7 @@ really was.** "How filled it is drawn", sitting beside `tone`, "What it
 means": the axis was named correctly in prose and filed under the word
 four axes shared. A Card's `outlined` says where a surface ends and this
 one says how much ink a control claims, and one word cannot keep saying
-both. `check:axes` holds the vocabulary now.
+both.
 
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
@@ -1600,8 +1600,8 @@ conversation most people are now building.
   fill reads as a wall.
 
 **On this tier, because it is where the surface ends and nothing else.**
-`check:axes` keeps `separation` off the headless tier for the reason it
-keeps every painted axis off it: that tier has no ground to end. The two
+`separation` stays off the headless tier for the reason every painted axis
+does: that tier has no ground to end. The two
 values are a subset of the registry's four; `elevated` and `outlined` are
 available and neither is a thing a turn should be, a lifted message reading
 as a card and an outlined one as an input. */
@@ -2510,7 +2510,7 @@ really was.** "How filled it is drawn", sitting beside `tone`, "What it
 means": the axis was named correctly in prose and filed under the word
 four axes shared. A Card's `outlined` says where a surface ends and this
 one says how much ink a control claims, and one word cannot keep saying
-both. `check:axes` holds the vocabulary now.
+both.
 
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
@@ -4045,7 +4045,7 @@ really was.** "How filled it is drawn", sitting beside `tone`, "What it
 means": the axis was named correctly in prose and filed under the word
 four axes shared. A Card's `outlined` says where a surface ends and this
 one says how much ink a control claims, and one word cannot keep saying
-both. `check:axes` holds the vocabulary now.
+both.
 
 Reflected because the stylesheet selects on it, and undefaulted because
 it reflects: a reflected property with a default writes its attribute
@@ -4393,8 +4393,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   readonly?: HelixInput["readOnly"];
   /** Whether the field refuses input while still submitting its value.
 
@@ -4416,8 +4415,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   readOnly?: HelixInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
@@ -6327,7 +6325,7 @@ the corners are the thing being drawn and a joined run has none in the
 middle. That cost is paid only by a code that asks for them.
 
 A scanner reads contrast between cells, not their shape, so all three
-scan. `dots` sits a little under half a module so neighbours do not touch,
+scan. `dots` sits a little under half a module so neighbors do not touch,
 which is what makes it read as dots rather than as a softened square code. */
   shape?: HelixQrCode["shape"];
   /** How much of the code can be lost and still read.
@@ -6701,7 +6699,7 @@ the reader's own machine, and wrong for one whose tool has a scheme control.
 It matters more than a background: `light-dark()` is compiled to a shim
 keyed on this attribute, and of the 56 tokens that differ by scheme the
 theme engine emits 19. The other 37 would stay light in a dark preview,
-including every one of the 24 series colours a chart reads. */
+including every one of the 24 series colors a chart reads. */
   "color-mode"?: HelixSandboxPreview["colorMode"];
   /** Which half of the palette the frame renders in.
 
@@ -6715,7 +6713,7 @@ the reader's own machine, and wrong for one whose tool has a scheme control.
 It matters more than a background: `light-dark()` is compiled to a shim
 keyed on this attribute, and of the 56 tokens that differ by scheme the
 theme engine emits 19. The other 37 would stay light in a dark preview,
-including every one of the 24 series colours a chart reads. */
+including every one of the 24 series colors a chart reads. */
   colorMode?: HelixSandboxPreview["colorMode"];
   /** Document the frame loads, which brings the styles and the elements. */
   src?: HelixSandboxPreview["src"];
@@ -6951,7 +6949,7 @@ inside a sentence.
 **`emphasis` and not `separation`, which the registry decides rather than
 taste.** Emphasis is asked of controls, how loud this one is; separation is
 asked of containers, where the surface ends. A trigger is a control, and
-`check:axes` refuses a family that declares both. Two of the four values are
+a family may not declare both. Two of the four values are
 taken: `solid` and `subtle` are a button's way of being the one thing to
 press, which is not a thing an answer should ever be.
 
@@ -8024,7 +8022,7 @@ not exist.
 **Written before there was a registry, and it turned out to be the first
 instance of a general fault rather than a local one.** `appearance` was not
 a treatment either: it held four different questions across 21 components,
-and this file found one of them the hard way. The rest is `check:axes`. */
+and this file found one of them the hard way. */
   tone?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
@@ -9575,7 +9573,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   muted?: HelixVideo["defaultMuted"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
@@ -9587,7 +9585,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   defaultMuted?: HelixVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   playsinline?: HelixVideo["playsInline"];
@@ -10733,7 +10731,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixAccordionItemVueProps,
     HelixAccordionItemVueEvents
   >;
-  /** Items share one rule between neighbours rather than each drawing its own, so the seam between two items is one pixel and not two. Those seams are what carry the grouping, which is why the surrounding frame is opt-in rather than the default: an accordion is a list, where a card is a surface. */
+  /** Items share one rule between neighbors rather than each drawing its own, so the seam between two items is one pixel and not two. Those seams are what carry the grouping, which is why the surrounding frame is opt-in rather than the default: an accordion is a list, where a card is a surface. */
   "helix-accordion": DefineCustomElement<
     HelixAccordion,
     HelixAccordionVueProps,
@@ -10913,7 +10911,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixDateInputVueProps,
     HelixDateInputVueEvents
   >;
-  /** Six week rows always, so the grid keeps one height and a month change does not move whatever sits beneath it.  The column track is wider than the day, and the day is centered in it. The difference is the space between days, which belongs to the track rather than to a 'gap', so a range can paint across the whole track and stay continuous.  Days from the neighbouring months stay in place and stay selectable, marked quieter rather than hidden, so the first and last weeks are whole and the grid reads as a continuous run of dates. */
+  /** Six week rows always, so the grid keeps one height and a month change does not move whatever sits beneath it.  The column track is wider than the day, and the day is centered in it. The difference is the space between days, which belongs to the track rather than to a 'gap', so a range can paint across the whole track and stay continuous.  Days from the neighboring months stay in place and stay selectable, marked quieter rather than hidden, so the first and last weeks are whole and the grid reads as a continuous run of dates. */
   "helix-date-picker": DefineCustomElement<
     HelixDatePicker,
     HelixDatePickerVueProps,
@@ -11021,7 +11019,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixKbdVueProps,
     HelixKbdVueEvents
   >;
-  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a color. */
+  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--legend-direction' to 'column' where it sits beside one instead.  The eight series colors are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a color. */
   "helix-legend": DefineCustomElement<
     HelixLegend,
     HelixLegendVueProps,
@@ -11159,7 +11157,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixProgressVueProps,
     HelixProgressVueEvents
   >;
-  /** The picture is the headless tier's. What this adds is a size that can be set once, the colours a scanner needs, and the box that holds a center mark.  **The ink is 'currentColor' and the ground is a real fill.** A code has to be dark on light to read, and the pair that guarantees it is not the page's foreground and background: those invert together in dark mode, and a code drawn light-on-dark is refused by a good half of the scanners in the world. So the ground is stated and the ink is the foreground it is chosen for. */
+  /** The picture is the headless tier's. What this adds is a size that can be set once, the colors a scanner needs, and the box that holds a center mark.  **The ink is 'currentColor' and the ground is a real fill.** A code has to be dark on light to read, and the pair that guarantees it is not the page's foreground and background: those invert together in dark mode, and a code drawn light-on-dark is refused by a good half of the scanners in the world. So the ground is stated and the ink is the foreground it is chosen for. */
   "helix-qr-code": DefineCustomElement<
     HelixQrCode,
     HelixQrCodeVueProps,
@@ -11446,7 +11444,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixTreeVueProps,
     HelixTreeVueEvents
   >;
-  /** The arrow takes the judgment color and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it.  **No visual axis applies here, and that is the answer rather than a gap.** This family carries '@groups charts', so 'check:axes' reports it beside eight that do declare one. Each of the three was asked and each refuses for a reason about what this is rather than about the axis. 'emphasis' is how much ink a mark claims, and there is no mark: an arrow glyph and two runs of text, whose weight is 'Text''s business and whose size is the region's. 'material' is what reads through a surface, and a 13px glyph has nothing behind it. 'wash' is a gradient across an area, and there is no area.  The meaning axis is here and is *derived*, which is the more interesting half: 'direction' and 'good' together resolve to success, danger or muted, so a consumer states the metric's polarity once rather than picking a color. A declared 'tone' would let the color disagree with the arrow, which is the one thing this component exists to stop. */
+  /** The arrow takes the judgment color and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it.  **No visual axis applies here, and that is the answer rather than a gap.** This family carries '@groups charts', so it sits beside eight that do declare one. Each of the three was asked and each refuses for a reason about what this is rather than about the axis. 'emphasis' is how much ink a mark claims, and there is no mark: an arrow glyph and two runs of text, whose weight is 'Text''s business and whose size is the region's. 'material' is what reads through a surface, and a 13px glyph has nothing behind it. 'wash' is a gradient across an area, and there is no area.  The meaning axis is here and is *derived*, which is the more interesting half: 'direction' and 'good' together resolve to success, danger or muted, so a consumer states the metric's polarity once rather than picking a color. A declared 'tone' would let the color disagree with the arrow, which is the one thing this component exists to stop. */
   "helix-trend": DefineCustomElement<
     HelixTrend,
     HelixTrendVueProps,

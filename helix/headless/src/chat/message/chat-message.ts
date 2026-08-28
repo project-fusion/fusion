@@ -63,7 +63,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * anything else is a name the consumer styles.
    */
   /* **No initialiser, because a reflected default is an attribute.**
-     `check:reflected-defaults` permits an empty string on the stated grounds
+     An empty string is permitted on the stated grounds
      that it "writes nothing", which is measurably untrue: Lit writes
      `author=""`, and a consumer who server-renders this gets an attribute React
      never sent. Undefined reflects nothing at all, which is what the resting

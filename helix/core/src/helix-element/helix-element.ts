@@ -373,7 +373,7 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * React binds a hyphenated prop directly on the element, so our own events are
  * reached by name and are safe to bind again: same type, same callback, same
  * capture flag is a no-op by specification. A native name is different. React
- * recognises `onChange` and `onLoad` as its own registration names and attaches
+ * recognizes `onChange` and `onLoad` as its own registration names and attaches
  * nothing to the element for either; it relies on a delegated listener at the
  * root, which sees an event only if it **bubbles**, and on a non-delegated list
  * it sets up for `<video>`, `<audio>` and `<img>` and never for a custom

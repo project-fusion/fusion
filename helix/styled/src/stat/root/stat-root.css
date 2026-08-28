@@ -44,8 +44,8 @@
  *
  * Each is its own step of the ramp divided by the base, which is exactly the
  * multiplier that reproduces today's size and says where it came from: a raw
- * `3.143em` would be the same number with the reasoning thrown away, and
- * `check:tokens` refuses one anyway. Divide the ramp again and the figures
+ * `3.143em` would be the same number with the reasoning thrown away, and is
+ * refused anyway. Divide the ramp again and the figures
  * follow, which a hand-written multiplier would not.
  *
  * So a `Stat` on a page is the size it always was, and a `Stat` in a container

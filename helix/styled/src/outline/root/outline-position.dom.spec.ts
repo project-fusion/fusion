@@ -136,8 +136,8 @@ if (hasLayout()) {
     test('the mark travels to the section being read, and is sized to it', async () => {
       /* A border on each link can only appear and disappear. This is one
          element that moves, so it has to be measured, and a measurement is
-         something only a browser has. `check:selectors` cannot catch an
-         indicator that renders and never places: the selector matches, the
+         something only a browser has. No static rule catches an indicator
+         that renders and never places: the selector matches, the
          element is there, and it sits at the top of the list forever. */
       const nav = await build()
       const mark = part(nav, 'indicator') as HTMLElement

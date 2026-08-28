@@ -142,7 +142,7 @@
  * keep letters off the edge, and a single centered glyph does not need it on
  * both sides of nothing. */
 .statusMark {
-  --tag-radii: var(--helix-radii-sm);
+  --tag-radius: var(--helix-radii-sm);
 
   aspect-ratio: 1;
   justify-content: center;

@@ -164,8 +164,7 @@
   /* **The edge that goes with the lift.** The separation policy pairs
      `--helix-border-floating` with `--helix-shadow-floating`, and this hooked the
      lift and left the edge to whatever the slotted control already had:
-     themeable in one direction and fixed in the other, which `check:separation`
-     names as half-converted. Written the way `Drawer`, `Toast` and the two
+     themeable in one direction and fixed in the other, which is half-converted. Written the way `Drawer`, `Toast` and the two
      inputs write it, so the width is a hook and the default is the policy's. */
   border: var(--chat-resume-border-width, var(--helix-border-floating)) solid
     var(--chat-resume-border-color, var(--helix-color-border));

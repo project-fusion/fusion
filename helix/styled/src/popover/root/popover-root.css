@@ -152,8 +152,7 @@
    opacity gate stays, because that is placement rather than motion.
  *
  * Named one selector at a time, because a reduce rule written looser than the
- * rule it answers loses on specificity and does nothing. `check:motion`
- * compares them, which is what turned this from invisible into mechanical. */
+ * rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   [part="popover"],
   [part="popover"][data-placed] {

@@ -104,8 +104,8 @@ export interface FloatingOptions {
  * **The custom properties are declared here because this is what writes them.**
  * Each carries a measurement taken against the viewport that no stylesheet can
  * take for itself, and `core` ships no CSS, so there is no reader inside this
- * package and none of them is private. `check:hooks` pairs a `@cssproperty`
- * with a rule that reads one, in both directions, and the underscore these used
+ * package and none of them is private. A documented hook is paired with a rule
+ * that reads one, in both directions, and the underscore these used
  * to carry was what exempted them from it.
  *
  * @cssproperty --floating-anchor-inline-size - How wide the anchor is, for a panel that matches it.
@@ -195,8 +195,8 @@ export class FloatingController implements ReactiveController {
              rule reading this asks for a `max-block-size`; nothing in the
              library has ever asked for the inline twin, so writing it was a
              `setProperty` on every reposition of every floating element for
-             nobody. `check:hooks` is what says so out loud: declared and never
-             read is a promise on the API page with nothing behind it. It comes
+             nobody. Declared and never read is a promise on the API page with
+             nothing behind it. It comes
              back the day a rule wants it, together with that rule. */
           apply: ({ availableHeight, elements, rects }) => {
             elements.floating.style.setProperty(

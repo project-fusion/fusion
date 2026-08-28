@@ -105,7 +105,7 @@
  * The block stopped looking centered, which it no longer was.
  *
  * A headline that is genuinely long wraps, and that is ordinary. What is not
- * ordinary is a page whose text has two different centres. */
+ * ordinary is a page whose text has two different centers. */
 
 /* Larger than a section title and smaller than the hero's, which is the whole
    scale a document needs: it is the only heading on the page at this level and
@@ -171,7 +171,7 @@
      x=24 and the rail at x=40, so the numbers did not line up with the headings
      they run beside, which is the whole thing a rail is for. The gap above
      already separates the claims. */
-  --list-item-inset: var(--helix-space-none);
+  --list-item-padding: var(--helix-space-none);
 }
 
 /* Air between the blocks, said once here rather than on every element: the base

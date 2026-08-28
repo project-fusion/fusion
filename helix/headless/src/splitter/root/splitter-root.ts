@@ -967,8 +967,7 @@ export class HelixHeadlessSplitter extends HelixElement {
       /* The width watch too, and it belongs here for a plainer reason than the
          one above: `disconnectedCallback` drops the observer on every move, so
          a splitter reordered in the DOM would stop watching its own width and
-         `auto` would freeze on whatever it last saw. `check:observers` is what
-         said so. */
+         `auto` would freeze on whatever it last saw. */
       this.watchWidth()
       this.findOuter()
     }

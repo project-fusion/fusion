@@ -73,7 +73,7 @@
 /* Butt caps, not round.
  *
  * A round cap adds half the stroke width to each end of every slice, so the
- * arcs overlap their neighbours and the last one laps the first. On a ring of
+ * arcs overlap their neighbors and the last one laps the first. On a ring of
  * many small shares that reads as slices in the wrong order. */
 [part="segment"] {
   stroke-linecap: butt;
@@ -127,7 +127,7 @@
   /* Centered in the plot, which it now sits inside rather than beside.
    *
    * **`pointer-events: none`, and the slices stop responding without it.**
-   * `inset: 0` with `margin: auto` centres a box and also stretches it: with no
+   * `inset: 0` with `margin: auto` centers a box and also stretches it: with no
    * block size of its own it filled the plot's height, so a transparent column
    * lay over the middle of the ring and took every `pointerenter` the slices
    * were listening for. The tooltip simply stopped appearing, and nothing about

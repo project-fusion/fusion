@@ -308,9 +308,9 @@ export const formsArt: Record<string, ReactNode> = {
       {/* The button holds the center and everything it holds is inside it.
        *
        * Balancing the pair's bounding box put the clipboard at 130 to 170 and
-       * the tick beyond it, which centres the ink and reads left-heavy: the
+       * the tick beyond it, which centers the ink and reads left-heavy: the
        * clipboard is the object and the tick is a mark beside it, so the eye
-       * centres on the clipboard and finds it off to one side. The button is
+       * centers on the clipboard and finds it off to one side. The button is
        * back on 140 to 180, which is the card's own middle.
        *
        * **The tick came with it and it had not.** It stayed at 186 to 200,

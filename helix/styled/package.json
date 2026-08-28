@@ -43,8 +43,8 @@
     "build": "tsc -p tsconfig.json",
     "styles": "node ../../tooling/scripts/build-styles.mjs . && node ../../tooling/scripts/build-elements-css.mjs .",
     "test": "bun run test:pure && bun run test:dom && bun run test:ssr",
-    "test:pure": "bun test pure.spec",
     "test:dom": "bun test dom.spec",
+    "test:pure": "bun test pure.spec",
     "test:ssr": "bun test ssr.spec",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

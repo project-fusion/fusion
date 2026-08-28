@@ -1,4 +1,4 @@
-//! An emphasis role: the brand or the accent, and the five colours each becomes.
+//! An emphasis role: the brand or the accent, and the five colors each becomes.
 //!
 //! **Solved the same way whichever role it is.** The brand and the accent
 //! behaving differently from each other is a difference a consumer would have to

@@ -25,7 +25,7 @@ pub struct Oklch {
     pub lightness: f64,
 }
 
-/// Linear-light sRGB, unclamped so out-of-gamut colours stay detectable.
+/// Linear-light sRGB, unclamped so out-of-gamut colors stay detectable.
 #[derive(Clone, Copy, Debug)]
 pub struct LinearRgb {
     pub b: f64,
@@ -171,7 +171,7 @@ fn ratio(la: f64, lb: f64) -> f64 {
     (lighter + 0.05) / (darker + 0.05)
 }
 
-/// WCAG contrast ratio between two colours, from 1 to 21.
+/// WCAG contrast ratio between two colors, from 1 to 21.
 #[must_use]
 pub fn contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(relative_luminance(a), relative_luminance(b))
@@ -196,7 +196,7 @@ pub fn shipped_luminance(color: Oklch) -> f64 {
     0.2126 * quantise(rgb.r) + 0.7152 * quantise(rgb.g) + 0.0722 * quantise(rgb.b)
 }
 
-/// WCAG contrast ratio between two colours as they will be written to hex.
+/// WCAG contrast ratio between two colors as they will be written to hex.
 #[must_use]
 pub fn shipped_contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(shipped_luminance(a), shipped_luminance(b))

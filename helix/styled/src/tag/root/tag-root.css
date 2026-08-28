@@ -101,7 +101,7 @@ slot:not([name]) {
  * whole of what anyone sees.
  *
  * `middle` rather than blocking the icon out of the line, and the difference is
- * a regression rather than a preference. `display: block` centres a lone icon
+ * a regression rather than a preference. `display: block` centers a lone icon
  * exactly, and `::slotted(helix-icon:only-child)` looks like it scopes that to a
  * tag holding nothing else. It does not: `:only-child` counts elements, so an
  * icon beside a bare text label is still an only child, and blocking it puts it

@@ -444,7 +444,7 @@
    A traveling mark was tried here instead, on the argument that one thing
    moving is more legible than two things resizing, and it is not: the pill is
    three times a dot's width, so a mark that does not take room in the row has to
-   sit over its neighbours, and the pitch had to go from 12 to 20 to make space
+   sit over its neighbors, and the pitch had to go from 12 to 20 to make space
    for it. The run stopped being a run. What the reader wants is the growth
    itself, so the growth is what this animates. */
 [part="indicator"] {
@@ -602,8 +602,7 @@
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
+   rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   [part="indicator"],
   :host([indicator-placement="inline-start"]) [part="indicator"],

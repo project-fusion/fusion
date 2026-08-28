@@ -179,7 +179,7 @@ describe('a handler prop attached to nothing', () => {
 })
 
 describe('a relayed native event', () => {
-  /* React recognises `onError` and `onLoad` as its own and attaches nothing to
+  /* React recognizes `onError` and `onLoad` as its own and attaches nothing to
      a custom element for either: the delegated listener at the root sees only
      what bubbles, and the non-delegated list it sets up for `<video>` and
      `<img>` is never set up for a custom element. Avatar relays `load` and

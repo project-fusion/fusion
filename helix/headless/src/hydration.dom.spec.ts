@@ -16,7 +16,7 @@ let definitions: { ctor: CustomElementConstructor; tag: string }[] = []
  * React consumer reports that as a hydration mismatch and does not patch it up.
  *
  * **This is a mount rather than a read of the source, because the source cannot
- * be read for it.** `check:reflected-defaults` guards one route to the fault,
+ * be read for it.** One route to the fault is guarded statically,
  * Lit reflecting a property whose default is non-empty, and there are others it
  * cannot see: a `setAttribute` in `updated`, a `toggleAttribute`, a `dataset`
  * write. Every one of those produces the identical symptom from a place a

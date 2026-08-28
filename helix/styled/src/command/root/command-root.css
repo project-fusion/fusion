@@ -98,7 +98,7 @@ helix-listbox::part(search-field) {
  * together: the comment there records what happened when two stylesheets each
  * named the inset themselves.
  *
- * `data-density` is honoured because a consumer putting a palette in a dense
+ * `data-density` is honored because a consumer putting a palette in a dense
  * region means it, and the recipes in `headless.css` set the same attribute on
  * buttons and fields. Read from the host as well as from an ancestor, so
  * `<helix-command data-density="sm">` works as well as a region around it. */

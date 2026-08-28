@@ -67,7 +67,7 @@ const pathFor = (
   }
 
   /* A circle for `dots` and a squircle for `rounded`, both drawn as arcs on a
-     one-unit square. The radius is a little under half so neighbouring dots do
+     one-unit square. The radius is a little under half so neighboring dots do
      not touch, which is what makes a dotted code read as dots rather than as a
      square one with soft edges. */
   const r = style === 'dots' ? 0.45 : 0.28
@@ -159,7 +159,7 @@ export class HelixHeadlessQrCode extends HelixElement {
    * middle. That cost is paid only by a code that asks for them.
    *
    * A scanner reads contrast between cells, not their shape, so all three
-   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
    */
   @property()

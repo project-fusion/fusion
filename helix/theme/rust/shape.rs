@@ -1,8 +1,8 @@
 //! The JSON shape a JavaScript consumer sees.
 //!
 //! **Shared by the boundary and the bless, so the two cannot disagree.** The
-//! oracle records what a theme looks like from JavaScript and `check:wasm`
-//! compares the boundary against those records; if each built its own object
+//! oracle records what a theme looks like from JavaScript and the boundary is
+//! compared against those records; if each built its own object
 //! literal, a renamed field would move both at once and the comparison would go
 //! on passing.
 //!

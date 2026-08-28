@@ -49,7 +49,7 @@ describe('a token read where there is no canvas to convert with', () => {
   })
 
   /* A copy, not the caller's own array. Every caller here is writing into a
-     shader, and one that normalises the triple it was handed would be
+     shader, and one that normalizes the triple it was handed would be
      rewriting the fallback it passes on the next frame. */
   test('and a copy of it, so a caller writing into the triple keeps its own', () => {
     const color = new TokenColorController(host() as never)

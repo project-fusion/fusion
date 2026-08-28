@@ -9,7 +9,7 @@ import { type Row, readRows, readSeries, type Series } from '../../utils/read-se
 type Constructor<T> = new (...args: any[]) => T
 
 /**
- * How many colours the series palette has, and so where it starts over.
+ * How many colors the series palette has, and so where it starts over.
  *
  * Here rather than in each chart, which is what it was. Four families held the
  * same `const PALETTE = 24` and the legend held a fifth: when the palette went

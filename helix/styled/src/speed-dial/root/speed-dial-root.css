@@ -184,8 +184,7 @@
      pale ink this trigger puts on it: measured, `foreground-on-accent` over
      `primary` is 2.96:1 in dark against 4.50:1 over `primary-surface`.
      `primary-surface` exists for exactly this and its own comment says so.
-     Found by `check:pairings`, which reported the pair as one no model declared
-     and therefore one nothing measured. */
+     Found as a pair no model declared and therefore one nothing measured. */
   background-color: var(--helix-color-primary-surface);
   block-size: var(--helix-size-control);
   border-radius: var(--helix-radii-full);

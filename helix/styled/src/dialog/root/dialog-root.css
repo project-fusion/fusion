@@ -285,8 +285,7 @@
 /* Two `animation: none` blocks stood here answering the keyframes this panel
    used to arrive on. The keyframes went when the entrance became a transition
    so it could also leave, and the reduce rules for them stayed, naming a
-   property nothing sets. `check:motion` compares reduce rules against the rules
-   that move and cannot see one that answers nothing. */
+   property nothing sets. */
 
 /* Saying no, by moving.
  *

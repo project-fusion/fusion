@@ -69,7 +69,7 @@ export class HelixSelect extends HelixHeadlessSelect {
    * **`emphasis` and not `separation`, which the registry decides rather than
    * taste.** Emphasis is asked of controls, how loud this one is; separation is
    * asked of containers, where the surface ends. A trigger is a control, and
-   * `check:axes` refuses a family that declares both. Two of the four values are
+   * a family may not declare both. Two of the four values are
    * taken: `solid` and `subtle` are a button's way of being the one thing to
    * press, which is not a thing an answer should ever be.
    *

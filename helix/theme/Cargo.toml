@@ -6,8 +6,8 @@ license.workspace = true
 publish.workspace = true
 rust-version.workspace = true
 # Its own, never `workspace = true`. See the note in the root manifest: a version
-# is a fact about a domain and this workspace holds two. `check:publishable`
-# fails on a crate that inherits one.
+# is a fact about a domain and this workspace holds two. A crate that inherits
+# one fails the build.
 version = "0.0.0-dev"
 
 # **One folder, two source trees, and the lib path is what buys that.**

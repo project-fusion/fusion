@@ -17,7 +17,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 /* Side-effect import, because this template interpolates the family's tag and a
    custom element registers on import. Both tiers import it, each resolving to
-   its own; `check:composed` enforces that. */
+   its own; */
 import '../../format-date/index.js'
 
 /**
@@ -212,8 +212,8 @@ export class HelixHeadlessNotification extends HelixElement {
    * it.** A fallback answers a consumer and a seam answers the tier above, which
    * are different people: the styled tier wants an icon here, and with the slot
    * written inline the only way to change it is to reimplement the whole
-   * template. `check:fallbacks` holds that, and moving only the fallback out was
-   * not enough, which is the right rule: the slot is the thing a tier redraws.
+   * template. That is the rule, and moving only the fallback out was not
+   * enough, which is right: the slot is the thing a tier redraws.
    *
    * **The mark is drawn rather than typed, which is what lets it align.** It was
    * `&times;`, and a character is placed by its font rather than by its box:
@@ -254,8 +254,7 @@ export class HelixHeadlessNotification extends HelixElement {
    *
    * The tag is interpolated rather than written, so each tier renders its own:
    * the base tier may not name a styled element, and a styled item inherits this
-   * template without having a tag of its own to remind anybody. `check:composed`
-   * holds both halves.
+   * template without having a tag of its own to remind anybody.
    *
    * `exportparts` and no `part` of its own, which is the rule about a part
    * already named for its role: the child publishes `time`, the role here is

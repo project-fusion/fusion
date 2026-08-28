@@ -305,8 +305,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        that does not exist is a thing every server reading this form has to know
        to discard, and the reason the platform sends one is compatibility with
        form encodings that predate `FormData` rather than anything a reader wants.
-       `check:platform-fidelity` excuses `value` on this family already, for the
-       neighbouring reason that the native one is `C:\fakepath\name`; this is
+       `value` is excused on this family already, for the
+       neighboring reason that the native one is `C:\fakepath\name`; this is
        the same component declining to reproduce a lie, one level down. Recorded
        here because a divergence nobody wrote down is indistinguishable from one
        nobody noticed. */
@@ -426,7 +426,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * element saying two things and two methods would be two places to keep in
    * step. Both parts are written out rather than passed in, and that is not
    * style: a part name behind an interpolation is a part the manifest cannot
-   * see, so `check:selectors` reported the stylesheet as matching nothing the
+   * see, so the stylesheet matched nothing the
    * moment this took the name as an argument.
    *
    * A method rather than a fragment inline, so a tier above can render its own,

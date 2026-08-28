@@ -11,7 +11,7 @@ import { useThemeControls } from './theme-context'
  * **The short form of `helix-color-picker`, not `helix-color-input`.** The input
  * is a hex field with a swatch beside it, which asks a reader to know what a hex
  * code is before they can change anything. The picker is a square and two ramps,
- * so a color is chosen by looking at colours. `no-value`, `no-format` and
+ * so a color is chosen by looking at colors. `no-value`, `no-format` and
  * `no-eyedropper` take off the text field, the format switcher and the screen
  * sampler, leaving the part that does the job.
  *

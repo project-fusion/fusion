@@ -69,7 +69,7 @@
    in a sentence is as wide as its answer. The trigger stops spacing its two
    halves apart, so the mark sits against the value rather than at the far end of
    a width nothing is using. And the step comes down, because a control drawn
-   without a frame beside 32 pixel neighbours is 40 pixels of empty air.
+   without a frame beside 32 pixel neighbors is 40 pixels of empty air.
 
    The label is unaffected and deliberately so: a field with no visible label
    sets `aria-label` and gets a clipped one, which is a separate question from
@@ -324,8 +324,7 @@
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
+   rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   [part="trigger"] {
     transition: none;

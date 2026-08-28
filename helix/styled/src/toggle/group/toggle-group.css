@@ -173,8 +173,8 @@
   /* **The row, and this is what finally reads `--_toggle-height`.** The property
      was written here and by nothing else, and consumed by nothing at all: the
      item sized itself with a literal `block-size: 100%` in its own sheet. A
-     private property nobody reads is invisible to `check:hooks`, which exempts
-     `--_` names as a component talking to itself, and this was a component
+     private property nobody reads is invisible: `--_` names are exempt as a
+     component talking to itself, and this was a component
      talking to no one. Wrapping is what gave it something true to say. */
   block-size: var(--_toggle-height);
   flex: 1 1 auto;

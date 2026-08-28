@@ -238,7 +238,7 @@ export class HelixHeadlessSparkline extends HelixElement {
         ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
         : ''
 
-    /* One column per reading, inset so neighbours do not touch.
+    /* One column per reading, inset so neighbors do not touch.
      *
      * A rect rather than a thick stroked line, because a bar has two ends and a
      * stroke has a cap: `stroke-linecap` would round or square both ends of
@@ -292,7 +292,7 @@ export class HelixHeadlessSparkline extends HelixElement {
       >
         ${
           /* The ramp the area is poured with, drawn here because a gradient is
-             an element and elements are this tier's business, and coloured
+             an element and elements are this tier's business, and colored
              above because a color is not. Measured rather than assumed: a
              fragment id inside a shadow root resolves within that root, so two
              sparklines on a page carrying the same id stay independent, and CSS

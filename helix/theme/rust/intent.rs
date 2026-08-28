@@ -47,7 +47,7 @@ impl std::fmt::Display for Color {
 ///
 /// Written as a relationship rather than a second color because a literal
 /// drifts out of relation the moment anybody rethemes, which is the failure of
-/// every palette with two hardcoded colours in it.
+/// every palette with two hardcoded colors in it.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(
     feature = "serde",

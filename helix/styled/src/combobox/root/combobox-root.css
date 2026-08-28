@@ -105,7 +105,7 @@
 
 /* Beside the tags it counts, not at the far end of the row.
  *
- * It is a fact about the set, and a summary separated from what it summarises
+ * It is a fact about the set, and a summary separated from what it summarizes
  * by a text field is one the reader has to work out. Pushed right it also sits
  * against the caret and reads as chrome, and the distance between the tags and
  * their own count then changes as the field is typed into, which is the clearest

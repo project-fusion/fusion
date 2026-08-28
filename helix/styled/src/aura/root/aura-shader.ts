@@ -64,8 +64,7 @@ export const VERTEX = `#version 300 es
  * **No backticks anywhere inside this string, including in comments.** One ends
  * the template literal early, and what follows is parsed as JavaScript: it has
  * silently stripped every brace out of a shader and left the driver reporting a
- * syntax error two hundred lines from the cause. `bun run check:shaders` fails
- * the build on it.
+ * syntax error two hundred lines from the cause. The build fails on it.
  */
 export const FRAGMENT = `#version 300 es
   precision highp float;
@@ -376,9 +375,9 @@ export const FRAGMENT = `#version 300 es
        same count arrives horizontal, which is what says they belong to the
        shape's own axes rather than to the screen.
     
-       Visiting the neighbours and weighting each by its own distance is the
+       Visiting the neighbors and weighting each by its own distance is the
        same answer particles already uses for the same reason. The weight
-       reaches zero between centres, so nothing is left to step. */
+       reaches zero between centers, so nothing is left to step. */
     /* **Fewer lanes, and not all of them carry anything.** At 2.4 a frame held
        a dozen streaks at once and read as rain: a streak is an event, and a
        field of simultaneous events is a texture. Sixteen hundredths of the
@@ -466,7 +465,7 @@ export const FRAGMENT = `#version 300 es
       /* 0.06, which is what the profile it replaces actually measured. Lanes
          sit 0.417 apart and the old exp(-|within| * 4) was half-height at 0.072
          of a lane, so a sigma of 0.15 was two and a half times too wide: every
-         lane overlapped both neighbours and the frame came out a blue wash with
+         lane overlapped both neighbors and the frame came out a blue wash with
          no streaks in it at all. */
       /* Thinner, and paired with the longer tail below. Length against width is
          what makes a streak read as a streak: at a ratio near four these were
@@ -645,7 +644,7 @@ export const FRAGMENT = `#version 300 es
    *
    * One per cell of a coarse lattice, jittered off center so the lattice never
    * shows, and drifting on its own small orbit. Nine cells are visited because a
-   * point near a boundary has to be drawn by its neighbours too, which is what
+   * point near a boundary has to be drawn by its neighbors too, which is what
    * stops them popping in and out at the seams.
    *
    * The pointer repels. Pushing along the offset rather than by its sign keeps
@@ -690,7 +689,7 @@ export const FRAGMENT = `#version 300 es
     
            The halo stays. An order of magnitude wider and a tenth the strength,
            so a mote sits in the field rather than on top of it: a hard little
-           disc on a dark ground is a pixel, and light has a neighbourhood. */
+           disc on a dark ground is a pixel, and light has a neighborhood. */
         float core = falloff(dot(off, off), grade);
         float halo = falloff(dot(off, off), grade * 0.16) * 0.1;
         lit += (core + halo) * mix(0.8, 0.35 + a * 0.9, v);
@@ -771,7 +770,7 @@ export const FRAGMENT = `#version 300 es
     /* Limited, because an unbounded displacement folds and a fold is a crease.
     
        Where the map from sample to displaced sample stops being one to one,
-       neighbouring samples land on the same value and the pattern piles into a
+       neighboring samples land on the same value and the pattern piles into a
        hard bright line: a caustic, which is what a sharp diagonal with a bright
        wedge beside it always is. The sum runs over eight segments of unit
        tangents, so near the stroke it reached several times the width of the
@@ -847,7 +846,7 @@ export const FRAGMENT = `#version 300 es
    *
    * **A caustic is where a wavefront folds, not where it is bright.** Sampling
    * a noise field and lighting the high parts gives clouds; what makes the
-   * pattern on a pool floor is that the surface bends light and neighbouring
+   * pattern on a pool floor is that the surface bends light and neighboring
    * rays land on the same spot. The cheap stand-in for that is the *zero* of a
    * displaced wave sum rather than its peak: 1 - |sum| is thin and bright
    * exactly where the sum crosses, which is the fold.

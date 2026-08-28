@@ -2,7 +2,7 @@
  * The semantic token layer, as data.
  *
  * **`tokens.css` is generated from this file**, along with `tokens.json`, by
- * `bun run tokens:build`. It used to be the other way round: the stylesheet was
+ * `bun run gen:tokens-layer`. It used to be the other way round: the stylesheet was
  * the source and everything that needed to know a token's name parsed CSS to
  * find out, or did not bother.
  *
@@ -12,7 +12,7 @@
  * token names in those pages did not exist, and a one-line diff found them
  * hours after they shipped. And the authoritative set of names was already
  * split, since `derive()` emits `--helix-seed-*` that appear in no stylesheet,
- * which is what `check:seeds` exists to police.
+ * and the two name sets have to be held to each other.
  *
  * **`@fusion.dev/helix-styles` still ships pure CSS with no JavaScript.** The generated
  * stylesheet is committed, exactly as `elements.css` and every
@@ -196,8 +196,8 @@ export const TOKENS: Token[] = [
      **It composites, which is the point and also the limit.** A translucent fill
      takes the color of what it sits on, so a field over a photograph is tinted
      by the picture rather than legible against it. That case wants an opaque
-     ground and says so through the control's own background hook, which
-     `check:grounds` exists to guarantee every component publishes.
+     ground and says so through the control's own background hook, which every
+     component publishes.
 
      Ten controls read this, the resting field box of each. Tracks, grooves,
      swatches, hover washes and chart bands still name `surface-sunken`: they are
@@ -406,11 +406,11 @@ export const TOKENS: Token[] = [
      rather than for danger alone. A 500 measures between 2.63 and 3.80 against
      the light surfaces, which is enough for a fill or a mark and short of what
      a word needs, so these tokens could not be used for the thing their names
-     most suggest. `Trend` colours an arrow rather than its number because of
+     most suggest. `Trend` colors an arrow rather than its number because of
      it, and that comment can go now. */
   /* A series is a thing being compared, not a thing being reported.
 
-     Separate from the status colours on purpose: `success` and `danger` mean
+     Separate from the status colors on purpose: `success` and `danger` mean
      something, and a chart's third line meaning "danger" because it happened to
      land there is hue used as a claim nobody made. These say only "not the
      other one".
@@ -434,7 +434,7 @@ export const TOKENS: Token[] = [
      rest from 17 to 24.
 
      **The muted eight are close to each other on purpose and should not be used
-     to tell eight things apart.** At chroma 0.05 they are near-greys separated
+     to tell eight things apart.** At chroma 0.05 they are near-grays separated
      only by hue, measured at 0.064 in OKLab, which is below what anybody
      reliably distinguishes. They are a background for something else to stand
      out of.
@@ -567,7 +567,7 @@ export const TOKENS: Token[] = [
      dark, against 0.091 and 0.142 for the vivid eight and 0.113 and 0.129 for
      the balanced eight. Half the separation of either, for a band meant to
      carry the same eight things, and eight hues at that little chroma are eight
-     greys with an opinion.
+     grays with an opinion.
 
      0.07 puts them at 0.095 and 0.096, which is above the vivid band's own
      worst pair, so the quiet set is now at least as separable as the loud one.
@@ -952,7 +952,7 @@ export const TOKENS: Token[] = [
   ['space-control', 'var(--helix-space-md)'],
   ['size-control-lg', 'calc(3rem * var(--_helix-seed-density))'],
   /* **A step either side of whatever step is current**, for a control that is
-     deliberately not the same size as its neighbours: a row in a floating panel,
+     deliberately not the same size as its neighbors: a row in a floating panel,
      a caret inside a trigger, the arrows on a carousel. The named steps are the
      scale and never move and the unsuffixed one is the step a region is at, and
      the set had no word for *relative*, so thirty-five stylesheets said `-sm` or

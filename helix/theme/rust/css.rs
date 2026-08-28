@@ -2,12 +2,11 @@
 //!
 //! **The seeds are emitted beside the tokens, and that is what stops the two
 //! derivations disagreeing.** `helix/styles` derives a ramp of its own from
-//! `--helix-seed-*`, including the twenty-four series colours a chart reads, and
+//! `--helix-seed-*`, including the twenty-four series colors a chart reads, and
 //! nothing in the engine reaches those. Emitting the tokens alone moved the
 //! buttons, the tags and the surfaces and left every chart on the page the
 //! original blue, which the marketing site worked around by writing the seed
-//! itself. `check:seeds` holds the two name sets to each other now, in both
-//! directions.
+//! itself. The two name sets are held to each other now, in both directions.
 //!
 //! Everything below the tokens is emitted **only where it was asked for**. An
 //! omitted policy leaves the stylesheet's own defaults standing, which is not
@@ -23,7 +22,7 @@ const DURATIONS: [(&str, f64); 3] = [("fast", 120.0), ("normal", 200.0), ("slow"
 /// What each mechanism means for an edge.
 ///
 /// `fill` and `space` both come out as no edge and no lift, which is not a bug:
-/// the difference between them lives in the surface colours and in `density`.
+/// the difference between them lives in the surface colors and in `density`.
 fn edge(mechanism: Mechanism) -> &'static str {
     match mechanism {
         Mechanism::Border => "1px",

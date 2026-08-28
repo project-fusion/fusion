@@ -20,7 +20,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * settles with no index, no counting parent and no script. `Steps` and
  * `Breadcrumbs` both do it this way and for the same reason.
  *
- * `tone` says what kind of event it was, and it is the only thing that colours
+ * `tone` says what kind of event it was, and it is the only thing that colors
  * the mark. It takes `Announcement`'s vocabulary rather than a second one.
  *
  * @since 0.1.0
@@ -71,8 +71,8 @@ export class HelixHeadlessTimelineItem extends HelixElement {
    *
    * **A `protected render…()` and not a getter, which is what it was.** A slot's
    * fallback answers a consumer and a seam answers the tier above, and a getter
-   * answers neither: `check:fallbacks` permits `${this.x}` because a property is
-   * not markup a tier would redraw, and it tests for parentheses, so a getter
+   * answers neither: `${this.x}` is permitted because a property is not markup
+   * a tier would redraw, and the test is for parentheses, so a getter
    * returning a template reads as a bare reference and was let through. That is
    * the same hole the check's own comment records closing for a static helper,
    * reopened by a different spelling of the same thing.

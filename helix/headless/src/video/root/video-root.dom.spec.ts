@@ -178,7 +178,7 @@ describe('the mark that starts it', () => {
 
 describe('the download control', () => {
   test('claims nothing it cannot do, and does not take the page with it', async () => {
-    /* `download` is honoured for a same-origin file and ignored for any other,
+    /* `download` is honored for a same-origin file and ignored for any other,
        whatever headers come back. Measured on a cross-origin clip: the press
        navigated the whole page to the mp4, which reads as the player
        disappearing. An attribute the browser will ignore is a lie in the

@@ -214,8 +214,8 @@ slot[name="caption"]::slotted(*) {
    **Named by what it is not, and that is not a stylistic choice.** The other
    child of this column is the format-date element, whose tag is
    `helix-format-date` here and `helix-headless-format-date` a tier down, so
-   neither tag can be written. `[part="time"]` cannot either, and
-   `check:selectors` is what said so: the part belongs to the child and arrives
+   neither tag can be written. `[part="time"]` cannot either: the
+   part belongs to the child and arrives
    through `exportparts`, so a rule in this sheet naming it matches nothing at
    all. Valid CSS, no error, and a timestamp drawn at the inherited size.
 

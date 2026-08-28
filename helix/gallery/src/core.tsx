@@ -45,7 +45,7 @@ import type { CSSProperties, ReactNode } from 'react'
  */
 export const coreArt: Record<string, ReactNode> = {
   /**
-   * Items flush against each other, one hairline between neighbours, and a
+   * Items flush against each other, one hairline between neighbors, and a
    * disclosure indicator on every header.
    *
    * The indicators are the whole fix. Without them this was a stack of text

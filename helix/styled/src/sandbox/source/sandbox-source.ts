@@ -85,7 +85,7 @@ export class HelixSandboxSource extends HelixElement {
    * package they cannot install.
    *
    * That is the gap rather than a dead event: the editor has dispatched this
-   * since it was written, and `check:events` has always seen it. What was
+   * since it was written. What was
    * missing was the half of the pair that ships.
    *
    * The textarea is the only thing that knows, so this is where it belongs.

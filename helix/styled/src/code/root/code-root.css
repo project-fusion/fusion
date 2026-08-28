@@ -37,7 +37,7 @@
   /* The prose's own ink, pulled back towards it, and not a syntax color.
    *
    * It was `syntax-name`, which is blue: a fragment of code inside a sentence
-   * is one word of that sentence, and a coloured word in running text reads as
+   * is one word of that sentence, and a colored word in running text reads as
    * a link. Nothing here is being highlighted either, so borrowing a
    * highlighter color was saying a thing that is not true. The fill and the
    * face already say it is code, so the ink only has to be read.
@@ -60,8 +60,8 @@
   /* **A ratio of the text it sits in, not a rung of the scale.**
    *
    * This was `var(--helix-text-sm)`, a fixed 13px, on the reasoning that a ratio
-   * was the better default and was unavailable because `check:tokens` refuses a
-   * raw value inside a fallback too. The first half was right and the second was
+   * was the better default and was unavailable because a raw value inside a
+   * fallback is refused too. The first half was right and the second was
    * wrong, and the cost was paid in every heading: measured on the metrics page,
    * `## What lands in node_modules` set the heading at 32px and the chip at 13,
    * a ratio of 0.41, so a fragment of code in a heading rendered at body size

@@ -75,7 +75,7 @@
   /* Not raised, which it was.
    *
    * There was a `translate: 0 -0.1em` here, measured when the mark was a
-   * `<span>` this sheet drew a circle on: a bare dot centres on the line box,
+   * `<span>` this sheet drew a circle on: a bare dot centers on the line box,
    * and a line box carries descender space whether or not the words have a
    * descender in them, so the dot read low and was lifted.
    *

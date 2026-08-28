@@ -7,17 +7,17 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* The judgment colours the arrow and the number both, which is a correction to
+/* The judgment colors the arrow and the number both, which is a correction to
  * a correction and the second one is the interesting half.
  *
- * Colouring the metric is the dashboard convention and it was the first version
+ * Coloring the metric is the dashboard convention and it was the first version
  * here. It was taken out because `--helix-color-success` painted 3.8:1 on the
  * light surface, fine for a glyph under 1.4.11 and short of the 4.5:1 that 13px
  * text needs, and there was no darker green in the ramp to reach for.
  *
  * **The ramp was the fault, not the component.** Success, warning and info all
  * stopped at a 500 and only danger had ever been extended, so three of the four
- * semantic status colours could be a fill and could not be a word. Extending
+ * semantic status colors could be a fill and could not be a word. Extending
  * them was #97; measured now, the worst of the four is 4.87 in the light and
  * 4.53 in the dark, so the number can carry the color as it always should
  * have. Working around a token in a component would have left the same hole for
@@ -55,7 +55,7 @@
  *
  * The clip rather than `display: none` or `visibility: hidden`, both of which
  * would take the word out of the tree and leave the direction carried by a
- * coloured arrow alone. `[data-hidden-visually]` in the base layer is the same
+ * colored arrow alone. `[data-hidden-visually]` in the base layer is the same
  * recipe, and it is a global stylesheet, which no shadow root inherits. */
 [part="direction"] {
   block-size: 1px;

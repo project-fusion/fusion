@@ -287,8 +287,8 @@ describe('dialog framing', () => {
  * Focus after `showModal()` is the browser's own behavior and happy-dom does not
  * implement it, so a focus assertion would pass vacuously in `bun run test` and
  * only mean something in `specs:browser`. The deferral is the change, it is
- * observable in both, and `check:visual-parity` holds the focus outcome by
- * rendering the two twins and comparing them.
+ * observable in both, and the focus outcome is held by rendering the two twins
+ * and comparing them.
  */
 describe('a dialog opening on its own', () => {
   test('waits for a slotted element to render before it opens', async () => {

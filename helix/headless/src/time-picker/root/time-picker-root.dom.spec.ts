@@ -26,7 +26,7 @@ describe('time', () => {
     expect(options(await picker())).toHaveLength(96)
   })
 
-  test('the step is honoured, and counted from `min` rather than from midnight', async () => {
+  test('the step is honored, and counted from `min` rather than from midnight', async () => {
     /* A list starting at nine should step from nine, not offer 09:20 because
        that is where the twenty minute marks from midnight happen to land. */
     const host = await picker('min="09:00" max="10:00" step="20"')

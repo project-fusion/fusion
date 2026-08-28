@@ -286,7 +286,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        for a name the template did not render, found null, and `scrollItemIntoView`
        ran with no scroller and took the page behind the menu with it, which is
        the one thing that method exists to prevent. What the comment could not
-       know is that `check:vocabulary` later renamed the part *to* `surface`, so
+       know is that the part was later renamed *to* `surface`, so
        a note naming `menu` as the right answer now teaches the opposite of the
        rule that settled it. The lookup and the part have agreed since. */
     const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')

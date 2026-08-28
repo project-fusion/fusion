@@ -725,7 +725,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * no bundler can shake a runtime lookup, so every consumer of any component
    * that renders one ships all 50kB of path data; a named import ships one
    * path. The import is checked when the package compiles, where a `name`
-   * string is checked only when `check:icons` runs. And `helix-icon` is not
+   * string is checked only by a later name lookup. And `helix-icon` is not
    * registered on the headless tier at all, which registers `helix-headless-icon`,
    * so a headless consumer got an inert unknown element and no mark whatsoever.
    */

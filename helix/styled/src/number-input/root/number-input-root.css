@@ -55,8 +55,7 @@
    `<input>` in the shadow root, so the host's own flag is never set. `Input`
    carries the same rule and the full measurement.
 
-   Written wrong here first, as `:host([invalid])`, and `check:selectors` caught
-   it: it works, which is the problem, because it would have been an API in a
+   Written wrong here first, as `:host([invalid])`: it works, which is the problem, because it would have been an API in a
    stylesheet and nowhere else. All four states, so the edge turns whichever
    route it arrives by. */
 :host(:state(invalid)) [part="field"],

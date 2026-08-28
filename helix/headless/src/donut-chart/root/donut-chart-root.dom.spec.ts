@@ -81,7 +81,7 @@ describe('donut chart', () => {
 
   test('drops a negative row rather than drawing it backwards', async () => {
     /* A share of a whole cannot be less than nothing. An arc for a negative
-       either runs backwards over its neighbours or vanishes, and the total it
+       either runs backwards over its neighbors or vanishes, and the total it
        was counted in is wrong either way. The remaining two are 75 and 25 of a
        hundred, not of ninety. */
     const host = await chart(NEGATIVE, 'for="negative"')

@@ -112,7 +112,7 @@
 /* Both the consumer's and ours. `::slotted()` never matches fallback content,
    which belongs to the shadow tree that wrote it, so a rule for the slotted
    image alone would leave the one this element draws unsized. `CopyButton`
-   records the same failure: a correctly coloured control containing a 0x0
+   records the same failure: a correctly colored control containing a 0x0
    glyph. */
 [part="media"] ::slotted(*),
 [part="thumbnail"] {

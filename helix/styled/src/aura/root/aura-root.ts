@@ -417,8 +417,7 @@ export class HelixAura extends HelixElement {
    * of the page's life, with no error anywhere.
    *
    * Guarded at the call site on `hasUpdated`, because the first connection
-   * happens before the first render and there is no canvas yet.
-   * `check:observers` holds the pairing. */
+   * happens before the first render and there is no canvas yet. */
   private start(): void {
     /* Client only, and by contract. There is no canvas on a server, so the
        shader is an enhancement over markup that already renders a gradient. */

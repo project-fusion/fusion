@@ -80,7 +80,7 @@
   object-fit: contain;
 }
 
-/* Nothing at all where nobody filled it, rather than a ground-coloured square
+/* Nothing at all where nobody filled it, rather than a ground-colored square
    over the middle of every code.
  
    On the attribute the element writes, because CSS cannot ask this. `:empty` is

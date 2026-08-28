@@ -996,7 +996,7 @@ helix-toggle[disabled]::part(item) {
   /* A floor as well as the percentage, because the percentage only resolves for
      a direct child of the bar.
    
-     `Navigation` is a fixed-height flex row that centres its items, so an
+     `Navigation` is a fixed-height flex row that centers its items, so an
      anchor sitting straight in it takes the full 32 from `block-size: 100%`.
      Nest one, and there is nothing to be a percentage of: a `Megamenu` slots
      its trigger inside its own auto-height host, so the height resolved to
@@ -1543,8 +1543,8 @@ helix-toggle[disabled]::part(item) {
  *
  * **The values are the axis's own, verbatim**, so one word means one thing on a
  * component and on a `<section>`. That is the argument for these existing rather
- * than each page inventing a translucent background: `check:axes` already holds
- * the components to this list, and a document recipe spelling it differently
+ * than each page inventing a translucent background: the components are already
+ * held to this list, and a document recipe spelling it differently
  * would be a second vocabulary for one idea.
  *
  * There is no collision with the component attribute. A component takes
@@ -1794,8 +1794,7 @@ helix-toast:not([data-color-mode]) {
  *
  * The component cannot turn it off for itself: an outer-tree `::part` rule beats
  * an inner-tree `:host` rule for normal declarations, so a `transition: none` in
- * `toggle-root.css` would be a rule that never applies. `check:motion` cannot
- * see it either until it scans this directory, which it now does.
+ * `toggle-root.css` would be a rule that never applies.
  *
  * Button was here too and no longer is. Its transition is declared in its own
  * stylesheet now, so its own reduced-motion rule reaches it, and at any depth:

@@ -121,7 +121,7 @@ export class HelixSandboxPreview extends HelixElement {
    * It matters more than a background: `light-dark()` is compiled to a shim
    * keyed on this attribute, and of the 56 tokens that differ by scheme the
    * theme engine emits 19. The other 37 would stay light in a dark preview,
-   * including every one of the 24 series colours a chart reads.
+   * including every one of the 24 series colors a chart reads.
    */
   @property({ attribute: 'color-mode' })
   colorMode?: 'dark' | 'light'

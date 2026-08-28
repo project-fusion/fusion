@@ -10,8 +10,7 @@
  * `--helix-color-primary` resolves to without every component knowing which
  * step of which ramp it happened to be.
  *
- * `bun run check:tokens` fails the build on any component reaching past this
- * line.
+ * A component reaching past this line fails the build.
  *
  * Colors are authored in OKLCH: equal numeric steps in sRGB are not equal
  * perceptual steps, which makes both ramp generation and contrast math
@@ -39,7 +38,7 @@
    *
    * **The public names are the ones without the underscore, and that is not
    * cosmetic.** The convention here is that a single leading underscore means
-   * `helix/styles` only, and `check:tokens` enforces it from the outside. These
+   * `helix/styles` only, and it is enforced from the outside. These
    * three are the *entry point to theming*: they are the only color inputs the
    * whole palette derives from, primary and its steps solve off the brand, the
    * twenty-four series are hue rotations of it, and the neutrals take the cast.
@@ -137,14 +136,14 @@
    * the raw file so the tokens do resolve, measured, but a parse error that is
    * survivable today is a parse error. One line per step and it goes. */
   --_helix-neutral-cast: var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue);
-  /* The two intent inputs that are not colours, public for the same reason the
+  /* The two intent inputs that are not colors, public for the same reason the
    * four above are: they are what a consumer writes to move the whole spacing
    * scale and every corner in the library, and there is nothing else to write.
    *
    * **They were private with no public name at all**, which is the half of #110
    * that was never looked at, and the engine had been emitting into the gap.
    * `toCss` wrote `--helix-seed-density` and `--helix-seed-radius`, so a theme
-   * derived by `@fusion.dev/helix-theme` and applied to a page moved its colours and
+   * derived by `@fusion.dev/helix-theme` and applied to a page moved its colors and
    * left its density and its corners exactly where they were: two of the five
    * `ThemeIntent` knobs inert, with a spec asserting one of the dead names.
    *
@@ -303,7 +302,7 @@
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
-  /* Eight colours for eight things that are not each other.
+  /* Eight colors for eight things that are not each other.
    *
    * Hue rotates off the brand seed, so a theme that moves its brand moves these
    * with it. **Lightness does not.** The first attempt offset it from the seed,
@@ -352,7 +351,7 @@
      not.** This rung is `--helix-color-primary` in dark mode, and at `+ 0.12`
      it measured 4.431:1 against `surface-raised` and `surface-overlay`, the two
      lightest grounds a dark page has. Under AA, on the pair a dark theme uses
-     most, and shipped that way because nothing looked: `check:contrast` reads
+     most, and shipped that way because nothing looked: the measurement reads
      what the examples render and no example puts primary text on either of
      them, which is the same blind spot that hid the engine's own rounding.
      Measured in a browser by walking the lightness: 0.664 gives 4.48 and 0.669

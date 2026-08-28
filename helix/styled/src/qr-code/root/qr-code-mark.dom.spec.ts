@@ -73,7 +73,7 @@ if (hasLayout()) {
   describe('qr code with a mark in the middle', () => {
     test('it is ink on paper, and stays that way in a dark page', async () => {
       /* A code drawn light on dark is refused by a good half of the scanners in
-         the world. The first version stated both colours, which is right, and
+         the world. The first version stated both colors, which is right, and
          stated them with tokens that turn over with the mode, which undid it: on
          a dark page the ground went dark and the modules went light. The media
          pair is the only one here that does not turn over, so a code uses it

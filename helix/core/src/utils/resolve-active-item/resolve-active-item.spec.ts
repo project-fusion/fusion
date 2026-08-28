@@ -5,7 +5,7 @@ import { resolveActiveItem } from './resolve-active-item.js'
  * `items.find(match) ?? items[0]` written once instead of four times, and the
  * asymmetry in it is the whole reason it is a function.
  *
- * The match honours a disabled item and the fallback refuses one, which reads
+ * The match honors a disabled item and the fallback refuses one, which reads
  * like an inconsistency and is the point: naming a disabled item is a consumer's
  * decision and quietly moving off it would be the component overruling them,
  * while falling back *onto* one is the component choosing, and it should not

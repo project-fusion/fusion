@@ -452,7 +452,7 @@ describe('carousel indicators', () => {
   test('the run is the dots themselves, each one its own state', async () => {
     /* A single traveling mark was tried here and taken out again. The pill is
        three times a dot's width, so a mark that takes no room in the row has to
-       sit over its neighbours, and the pitch had to grow from 12 to 20 to make
+       sit over its neighbors, and the pitch had to grow from 12 to 20 to make
        space for it. The run stopped reading as a run. */
     const host = await carousel('default-index="1"')
     await host.updateComplete

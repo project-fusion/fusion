@@ -327,7 +327,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     /* Through each reading rather than between them. A rule on the boundary
        divides two catchments, which is a fact about the pointer; a rule on the
        reading is the line a reader traces down to the label, which is what a
-       category grid is for. The readings sit at slot centres, so the two are
+       category grid is for. The readings sit at slot centers, so the two are
        half a slot apart and only one of them lands under a point. */
     const down = this.rulesCategory
       ? Array.from(

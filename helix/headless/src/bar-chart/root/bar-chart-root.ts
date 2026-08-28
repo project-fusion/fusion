@@ -282,7 +282,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     /* The second axis wears its series' color when exactly one series is on it,
        which is the case worth helping and the only one a single color can
        describe honestly: with two sharing it, painting the axis either of their
-       colours says it belongs to that one.
+       colors says it belongs to that one.
      *
        **Written onto the axis and not onto the plot**, which is where it went
        first and where it did nothing. The axis is the plot's sibling now that it
@@ -332,7 +332,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        Passing the first for both is what the first version did, and it was
        visible: with `Target` drawn as a line, `Forecast` moved up into its slot
        *and* into its color, so a chart of four series painted three columns in
-       the first three colours and the line in the third one as well. */
+       the first three colors and the line in the third one as well. */
     const scaled = this.scaled
     const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
     /* The scale a series is measured against, resolved once per series rather
@@ -417,7 +417,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
              tier's: `wash="gradient"` there switches `fill` to
              `--chart-bar-wash` and this is what it would find.
 
-             Coloured through the series property rather than an attribute, so
+             Colored through the series property rather than an attribute, so
              the stops read a token this tier never names. The id resolves
              within the shadow root, so two charts on a page carrying the same
              ids stay independent, which the sparkline measured before relying
@@ -582,8 +582,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    * thing by lighting the region the pointer is actually in, and the region is
    * the whole slot, because that is the catchment the pointer resolves against.
    *
-   * Both are kept. The fade separates the active group from its neighbours and
-   * the band says where the neighbourhood is, and on a chart of two categories
+   * Both are kept. The fade separates the active group from its neighbors and
+   * the band says where the neighborhood is, and on a chart of two categories
    * the fade alone is ambiguous about which half is lit.
    */
   protected renderBand(count: number, sideways: boolean): TemplateResult | typeof nothing {
@@ -628,7 +628,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       const along = y(point.value)
       return sideways ? [along, across] : [across, along]
     })
-    /* Straight between the category centres, and no `curve` property to change
+    /* Straight between the category centers, and no `curve` property to change
        it. A bar chart's other axis is categorical: there is nothing between
        Gateway and Billing, so a curve through them draws values at positions
        that do not exist and bulges past the readings on the way. `LineChart`

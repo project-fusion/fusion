@@ -88,7 +88,7 @@
 /* The caption, quieter than the words above it and on one line for the reason
    the label gives: a list whose rows are different heights is a list the
    keyboard moves through unevenly, and a caption that wraps to two lines makes
-   one row twice its neighbours. */
+   one row twice its neighbors. */
 [part="description"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);

@@ -6,7 +6,7 @@
  * consumer needs from this package is the vocabulary rather than the solver. A
  * type is erased at build time, so nothing here is a second implementation of
  * anything: it cannot drift into disagreeing with the engine about an *answer*,
- * only about a *field name*, which is what `check:wasm` compares.
+ * only about a *field name*, which is what is compared.
  *
  * The prose is kept whole from the files it came from. It is the argument for
  * why each field exists, and it was never about how any of them was computed.
@@ -27,7 +27,7 @@ export type Color = Oklch | string
  *
  * Written as a relationship rather than a second color because a literal
  * drifts out of relation the moment anybody rethemes, which is the failure of
- * every palette with two hardcoded colours in it.
+ * every palette with two hardcoded colors in it.
  */
 export interface Relation {
   /**
@@ -250,7 +250,7 @@ export interface ThemeIntent {
    * rather than a comment asking nicely.
    *
    * `fill` and `space` produce the same edge and lift, which is none of
-   * either: the difference between them lives in the surface colours and in
+   * either: the difference between them lives in the surface colors and in
    * `density`, not here. Said out loud because two values with one output
    * looks like a bug until it is explained.
    */
@@ -414,7 +414,7 @@ export interface DerivedTheme {
   pairings: Pairing[]
   /**
    * The seed values a consumer must write for `helix/styles` to re-derive the
-   * halves this engine does not compute: the twenty-four series colours, the
+   * halves this engine does not compute: the twenty-four series colors, the
    * spacing scale and the corner radii.
    *
    * **Data rather than only a line of CSS**, because the two consumers apply it

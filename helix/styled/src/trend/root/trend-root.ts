@@ -18,8 +18,8 @@ import { styles } from './trend-root.css.js'
  * reads and the judgment is a gloss on it.
  *
  * **No visual axis applies here, and that is the answer rather than a gap.**
- * This family carries `@groups charts`, so `check:axes` reports it beside eight
- * that do declare one. Each of the three was asked and each refuses for a reason
+ * This family carries `@groups charts`, so it sits beside eight that do
+ * declare one. Each of the three was asked and each refuses for a reason
  * about what this is rather than about the axis. `emphasis` is how much ink a
  * mark claims, and there is no mark: an arrow glyph and two runs of text, whose
  * weight is `Text`'s business and whose size is the region's. `material` is what

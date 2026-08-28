@@ -670,7 +670,7 @@
    showing, and the grid takes the rest so the fade lands on real content. */
 /* **No `align-items` on the grid, only on the row that wants it.**
  *
- * Centering every row centres the views row too, and the views are taller than
+ * Centering every row centers the views row too, and the views are taller than
  * the `1fr` they are given: a centered overflow spills in both directions, so
  * the first card of each view climbed over the switch and into the anchor. What
  * wanted centering was the switch beside the color, which can ask for itself.
@@ -833,7 +833,7 @@
    * The pull-back is separate and only handles the inline axis: the control's
    * padding is hit area rather than space, so left alone the gap on the right
    * came out larger than the inset on the left. */
-  --icon-button-radii: var(--helix-radii-xs);
+  --icon-button-radius: var(--helix-radii-xs);
   --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
 
   margin-inline-end: calc(var(--helix-space-2xs) * -1);

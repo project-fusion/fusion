@@ -13,7 +13,7 @@ import { styles } from './legend-root.css.js'
  * and there is no arrangement of eight names that fits every width. Set
  * `--legend-direction` to `column` where it sits beside one instead.
  *
- * The eight series colours are mapped here rather than in the tier below, which
+ * The eight series colors are mapped here rather than in the tier below, which
  * carries the index and holds no tokens. Written as eight rules for the reason
  * `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
  * custom property set inline would be the headless tier naming a color.

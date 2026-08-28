@@ -37,7 +37,7 @@
    * of cards whose footers should sit at one height wants `space-between`, which
    * is what the site's insight cards ask for. Written as a plain declaration here
    * that would be a document rule overruling a shadow one, which is dead in a way
-   * nothing reports: `check:overruled` catches exactly that and did. A custom
+   * nothing reports, and exactly that happened here. A custom
    * property is the door this library already publishes for a single knob. */
   align-content: var(--card-align, start);
   display: grid;

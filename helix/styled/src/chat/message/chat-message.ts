@@ -58,8 +58,8 @@ export class HelixChatMessage extends HelixHeadlessChatMessage {
    *   fill reads as a wall.
    *
    * **On this tier, because it is where the surface ends and nothing else.**
-   * `check:axes` keeps `separation` off the headless tier for the reason it
-   * keeps every painted axis off it: that tier has no ground to end. The two
+   * `separation` stays off the headless tier for the reason every painted axis
+   * does: that tier has no ground to end. The two
    * values are a subset of the registry's four; `elevated` and `outlined` are
    * available and neither is a thing a turn should be, a lifted message reading
    * as a card and an outlined one as an input.

@@ -1,4 +1,4 @@
-//! The three colours solved against something other than the page ladder: the
+//! The three colors solved against something other than the page ladder: the
 //! inverse pair, the focus ring, and the brand as a mark.
 
 use crate::derive::{Cast, Deriving};
@@ -59,7 +59,7 @@ pub fn focus_ring(brand: Oklch, ctx: &Deriving) -> Oklch {
 ///
 /// **It walks down before up, where the hue repair walks up before down.** Both
 /// are "step outward and take the first that clears" and they disagree on which
-/// side is first, which decides the answer for every brand whose two neighbours
+/// side is first, which decides the answer for every brand whose two neighbors
 /// both clear at the same step. Down first is right here: a mark that fails is
 /// usually a pale one on a white page, so the near side is the dark side, and
 /// trying it first is what makes the search terminate a step earlier rather than
@@ -90,7 +90,7 @@ pub fn brand_mark(brand: Oklch, grounds: &[Oklch]) -> Oklch {
 /// clears, **trying the darker side of each step first**.
 ///
 /// Extracted for the reason [`repair_hue`] was: the order is a decision that no
-/// output can show. It only decides an answer when both neighbours clear at the
+/// output can show. It only decides an answer when both neighbors clear at the
 /// same step, and no brand in the oracle produces that tie, so reversing the two
 /// entries leaves all thirteen themes byte-identical. Measured by making the
 /// edit and watching the suite stay green, which is the only way to find out

@@ -138,8 +138,8 @@ pub static GROUNDS: LazyLock<Vec<Ground>> = LazyLock::new(|| {
     grounds.push(unbounded("color-surface-media"));
     /* The scrim itself, which `Video` paints its own controls over. Translucent
     by definition, so what is behind it is the video: unbounded for the same
-    reason as the surface above, and found by `check:pairings` reporting a pair
-    the model had never heard of. */
+    reason as the surface above, and found as a pair the model had never heard
+    of. */
     grounds.push(unbounded("color-overlay"));
     /* A field's fill is a percentage of the foreground mixed toward transparent,
     so what is behind it is whatever the control was dropped onto: a page, a

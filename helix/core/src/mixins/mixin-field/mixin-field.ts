@@ -154,12 +154,12 @@ export declare class MixinFieldInterface {
  *
  * **The label, the hint and the feedback are documented on each component that
  * applies this, rather than here.** Eight of the eighteen did and ten did not,
- * which is what `check:parts` now refuses in both directions. Declaring them
+ * which is now refused in both directions. Declaring them
  * once on this mixin is the obvious fix and does not work: the analyzer reads
  * `@csspart` off a custom element class, so a class-level tag here reaches the
  * manifest as nothing at all, on this JSDoc and on the inner class alike.
  * Measured both ways, and the inner-class version is the dangerous one, since
- * it satisfies `check:parts` while every API page stays exactly as wrong as
+ * it satisfies the rule while every API page stays exactly as wrong as
  * before. Members are different and do inherit, which is what the note about
  * the inner class in the area rules is about.
  */

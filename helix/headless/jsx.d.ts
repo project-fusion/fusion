@@ -7022,8 +7022,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   readonly?: HelixHeadlessInput["readOnly"];
   /** Whether the field refuses input while still submitting its value.
 
@@ -7045,8 +7044,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   readOnly?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
@@ -7220,8 +7218,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   "bool:readonly"?: HelixHeadlessInput["readOnly"];
   /** Whether the field refuses input while still submitting its value.
 
@@ -7243,8 +7240,7 @@ rename: `readOnly` came back `false`.
 Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release.
-`check:attribute-names` holds it from here. */
+today and a deprecation after the first release. */
   "prop:readOnly"?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
@@ -10574,7 +10570,7 @@ the corners are the thing being drawn and a joined run has none in the
 middle. That cost is paid only by a code that asks for them.
 
 A scanner reads contrast between cells, not their shape, so all three
-scan. `dots` sits a little under half a module so neighbours do not touch,
+scan. `dots` sits a little under half a module so neighbors do not touch,
 which is what makes it read as dots rather than as a softened square code. */
   shape?: HelixHeadlessQrCode["shape"];
   /** How much of the code can be lost and still read.
@@ -10604,7 +10600,7 @@ the corners are the thing being drawn and a joined run has none in the
 middle. That cost is paid only by a code that asks for them.
 
 A scanner reads contrast between cells, not their shape, so all three
-scan. `dots` sits a little under half a module so neighbours do not touch,
+scan. `dots` sits a little under half a module so neighbors do not touch,
 which is what makes it read as dots rather than as a softened square code. */
   "prop:shape"?: HelixHeadlessQrCode["shape"];
   /** How much of the code can be lost and still read.
@@ -15899,7 +15895,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   muted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
@@ -15911,7 +15907,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   defaultMuted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   playsinline?: HelixHeadlessVideo["playsInline"];
@@ -16144,7 +16140,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   "bool:muted"?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
@@ -16156,7 +16152,7 @@ bound it to the attribute, and tracked the live state privately as
 `silent`, so `<helix-video>.muted` answered what the author wrote rather
 than whether there was sound. A name matching the platform's while meaning
 something else is worse than a name the platform does not have, and
-`check:platform-fidelity` could not see it: it compares names. */
+a name comparison could not see it. */
   "prop:defaultMuted"?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   "bool:playsinline"?: HelixHeadlessVideo["playsInline"];
@@ -21347,7 +21343,7 @@ export type CustomElements = {
    *
    * **It refuses negative values rather than drawing them.** A share of a whole
    * cannot be less than nothing, and an arc for a negative number either runs
-   * backwards over its neighbours or is silently dropped. Those rows are skipped
+   * backwards over its neighbors or is silently dropped. Those rows are skipped
    * and the total is of what is left, which is the only reading that stays true.
    *
    * **The shape is drawn with a dashed stroke, not with arc commands.** One
@@ -21531,8 +21527,8 @@ export type CustomElements = {
    * all four, and the comments at the two call sites say so. The class doc did
    * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
    * the whole time: a spec three files away existing to contradict the prose is
-   * the same shape as `Stat`'s `detail` slot, which is what `check:references`
-   * was written after and is the half it cannot see.
+   * the same shape as `Stat`'s `detail` slot, and it is the half a mechanical
+   * check cannot see.
    *
    * Opened declaratively with the platform's invoker attributes:
    *
@@ -22251,7 +22247,7 @@ export type CustomElements = {
    *
    * **What it cannot be is a bar chart with flat values**, and the data model is
    * what closes that rather than taste: chart color is per *series* everywhere
-   * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+   * else here, `--chart-series-1` through `-15`, so ninety differently colored
    * cells would be ninety series.
    *
    * The data is a real `<table>` named by `for`, the same convention every chart
@@ -22983,7 +22979,6 @@ export type CustomElements = {
    * about the part it renamed for the same kind of reason: there is no
    * `helix-v` tag, so no consumer is holding the old spelling, and this is free
    * today and a deprecation after the first release.
-   * `check:attribute-names` holds it from here.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -23337,7 +23332,7 @@ export type CustomElements = {
    * tell it.
    *
    * **Not hidden from a screen reader, though the mapping it draws is a color
-   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * one.** The argument for hiding it is real: the colors mean nothing to a
    * reader who cannot see them, and the names are already in the table. It stays
    * because the cost of being wrong runs one way. A duplicated list of three
    * words is noise; a consumer who took the table out of the accessibility tree
@@ -26579,7 +26574,7 @@ export type CustomElements = {
    * middle. That cost is paid only by a code that asks for them.
    *
    * A scanner reads contrast between cells, not their shape, so all three
-   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
    * - `correction`: How much of the code can be lost and still read.
    *
@@ -26989,7 +26984,7 @@ export type CustomElements = {
    * fill is the same marks over the same marks, cut off partway, so any mark works
    * and any fraction does.
    *
-   * **Read-only is not this control greyed out, it is a different thing.** The
+   * **Read-only is not this control grayed out, it is a different thing.** The
    * commoner use is showing a score nobody is being asked for, a product's
    * average, and that is not a control at all: it takes no focus, answers no keys,
    * has no options to choose between, and reads as one thing rather than as five.
@@ -30536,7 +30531,7 @@ export type CustomElements = {
    * settles with no index, no counting parent and no script. `Steps` and
    * `Breadcrumbs` both do it this way and for the same reason.
    *
-   * `tone` says what kind of event it was, and it is the only thing that colours
+   * `tone` says what kind of event it was, and it is the only thing that colors
    * the mark. It takes `Announcement`'s vocabulary rather than a second one.
    *
    * ## Attributes & Properties
@@ -32035,7 +32030,7 @@ export type CustomElements = {
    * which is the cheaper failure. State the metric's polarity once and the
    * component does the part that varies.
    *
-   * The direction is also written as a word, because a coloured arrow says
+   * The direction is also written as a word, because a colored arrow says
    * nothing to a reader who is not looking at it. `part="direction"` is what the
    * styled tier clips out of sight and leaves in the accessibility tree.
    *
@@ -32500,7 +32495,7 @@ export type CustomElements = {
    * `silent`, so `<helix-video>.muted` answered what the author wrote rather
    * than whether there was sound. A name matching the platform's while meaning
    * something else is worse than a name the platform does not have, and
-   * `check:platform-fidelity` could not see it: it compares names.
+   * a name comparison could not see it.
    * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *
@@ -37874,7 +37869,7 @@ export type CustomElementsSolidJs = {
    *
    * **It refuses negative values rather than drawing them.** A share of a whole
    * cannot be less than nothing, and an arc for a negative number either runs
-   * backwards over its neighbours or is silently dropped. Those rows are skipped
+   * backwards over its neighbors or is silently dropped. Those rows are skipped
    * and the total is of what is left, which is the only reading that stays true.
    *
    * **The shape is drawn with a dashed stroke, not with arc commands.** One
@@ -38059,8 +38054,8 @@ export type CustomElementsSolidJs = {
    * all four, and the comments at the two call sites say so. The class doc did
    * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
    * the whole time: a spec three files away existing to contradict the prose is
-   * the same shape as `Stat`'s `detail` slot, which is what `check:references`
-   * was written after and is the half it cannot see.
+   * the same shape as `Stat`'s `detail` slot, and it is the half a mechanical
+   * check cannot see.
    *
    * Opened declaratively with the platform's invoker attributes:
    *
@@ -38793,7 +38788,7 @@ export type CustomElementsSolidJs = {
    *
    * **What it cannot be is a bar chart with flat values**, and the data model is
    * what closes that rather than taste: chart color is per *series* everywhere
-   * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+   * else here, `--chart-series-1` through `-15`, so ninety differently colored
    * cells would be ninety series.
    *
    * The data is a real `<table>` named by `for`, the same convention every chart
@@ -39535,7 +39530,6 @@ export type CustomElementsSolidJs = {
    * about the part it renamed for the same kind of reason: there is no
    * `helix-v` tag, so no consumer is holding the old spelling, and this is free
    * today and a deprecation after the first release.
-   * `check:attribute-names` holds it from here.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -39895,7 +39889,7 @@ export type CustomElementsSolidJs = {
    * tell it.
    *
    * **Not hidden from a screen reader, though the mapping it draws is a color
-   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * one.** The argument for hiding it is real: the colors mean nothing to a
    * reader who cannot see them, and the names are already in the table. It stays
    * because the cost of being wrong runs one way. A duplicated list of three
    * words is noise; a consumer who took the table out of the accessibility tree
@@ -43190,7 +43184,7 @@ export type CustomElementsSolidJs = {
    * middle. That cost is paid only by a code that asks for them.
    *
    * A scanner reads contrast between cells, not their shape, so all three
-   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
    * - `correction`: How much of the code can be lost and still read.
    *
@@ -43610,7 +43604,7 @@ export type CustomElementsSolidJs = {
    * fill is the same marks over the same marks, cut off partway, so any mark works
    * and any fraction does.
    *
-   * **Read-only is not this control greyed out, it is a different thing.** The
+   * **Read-only is not this control grayed out, it is a different thing.** The
    * commoner use is showing a score nobody is being asked for, a product's
    * average, and that is not a control at all: it takes no focus, answers no keys,
    * has no options to choose between, and reads as one thing rather than as five.
@@ -47224,7 +47218,7 @@ export type CustomElementsSolidJs = {
    * settles with no index, no counting parent and no script. `Steps` and
    * `Breadcrumbs` both do it this way and for the same reason.
    *
-   * `tone` says what kind of event it was, and it is the only thing that colours
+   * `tone` says what kind of event it was, and it is the only thing that colors
    * the mark. It takes `Announcement`'s vocabulary rather than a second one.
    *
    * ## Attributes & Properties
@@ -48755,7 +48749,7 @@ export type CustomElementsSolidJs = {
    * which is the cheaper failure. State the metric's polarity once and the
    * component does the part that varies.
    *
-   * The direction is also written as a word, because a coloured arrow says
+   * The direction is also written as a word, because a colored arrow says
    * nothing to a reader who is not looking at it. `part="direction"` is what the
    * styled tier clips out of sight and leaves in the accessibility tree.
    *
@@ -49226,7 +49220,7 @@ export type CustomElementsSolidJs = {
    * `silent`, so `<helix-video>.muted` answered what the author wrote rather
    * than whether there was sound. A name matching the platform's while meaning
    * something else is worse than a name the platform does not have, and
-   * `check:platform-fidelity` could not see it: it compares names.
+   * a name comparison could not see it.
    * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *

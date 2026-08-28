@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-slider>` and a
    custom element registers on import. Inherited from the base along with the
    template, which is why it has to be restated here: this file has no
-   `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
+   `<helix-slider>` in it to remind anyone. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../icon/index.js'

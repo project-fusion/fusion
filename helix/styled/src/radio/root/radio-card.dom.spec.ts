@@ -58,8 +58,8 @@ if (hasLayout()) {
   describe('the card appearance in a browser', () => {
     /* Browser-only, and the reason is the fault this is written against: a rule
        whose selector matches nothing is valid CSS that silently does nothing.
-       `check:selectors` catches a `[part=]` naming a part nothing renders, and
-       it cannot catch a `:host([variant="card"])` that never matches because
+       A static rule catches a `[part=]` naming a part nothing renders, and
+       cannot catch a `:host([variant="card"])` that never matches because
        the property was never reflected. Only a computed style can. */
     test('the row becomes a bounded surface, and the plain one does not', async () => {
       const find = await board(

@@ -262,7 +262,7 @@
   border-color: transparent;
 }
 
-/* A wash with no line, for a button that should read as coloured without
+/* A wash with no line, for a button that should read as colored without
    reading as the one thing to press. */
 :host([emphasis="subtle"]) [part="button"] {
   background-color: var(

@@ -212,7 +212,7 @@
  *
  * The same 6% wash `Button` uses, not a fixed neutral. This was `surface`, which
  * is opaque, while the text button beside it filled with 6% of the foreground:
- * measured side by side, two different background colours behind the same
+ * measured side by side, two different background colors behind the same
  * border and radius, so a row holding one of each read as two kinds of control.
  * A percentage of the ink is a step away from whatever it sits on in either
  * mode, where a fixed neutral is not. */

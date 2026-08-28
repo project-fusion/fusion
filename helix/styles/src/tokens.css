@@ -3,7 +3,7 @@
  *
  * Every token here answers "what is this for", never "what value is it".
  * Components reference these and nothing else: not primitives, not raw hex,
- * not bare pixel values. `bun run check:tokens` enforces it.
+ * not bare pixel values. The build enforces it.
  *
  * Categories, all of them prefixed `--helix-<category>-`:
  *
@@ -108,7 +108,7 @@
  *
  * The cost is one extra copy of the block per scoped subtree, which is what a
  * theme scope is. */
-/* GENERATED from src/tokens.ts by `bun run tokens:build`. Do not edit below. */
+/* GENERATED from src/tokens.ts by `bun run gen:tokens-layer`. Do not edit below. */
 :root,
 [data-helix-theme] {
   /* One declaration per token, both modes inside it. Which half resolves is
@@ -214,8 +214,8 @@
      **It composites, which is the point and also the limit.** A translucent fill
      takes the color of what it sits on, so a field over a photograph is tinted
      by the picture rather than legible against it. That case wants an opaque
-     ground and says so through the control's own background hook, which
-     `check:grounds` exists to guarantee every component publishes.
+     ground and says so through the control's own background hook, which every
+     component publishes.
 
      Ten controls read this, the resting field box of each. Tracks, grooves,
      swatches, hover washes and chart bands still name `surface-sunken`: they are
@@ -424,11 +424,11 @@
      rather than for danger alone. A 500 measures between 2.63 and 3.80 against
      the light surfaces, which is enough for a fill or a mark and short of what
      a word needs, so these tokens could not be used for the thing their names
-     most suggest. `Trend` colours an arrow rather than its number because of
+     most suggest. `Trend` colors an arrow rather than its number because of
      it, and that comment can go now. */
   /* A series is a thing being compared, not a thing being reported.
 
-     Separate from the status colours on purpose: `success` and `danger` mean
+     Separate from the status colors on purpose: `success` and `danger` mean
      something, and a chart's third line meaning "danger" because it happened to
      land there is hue used as a claim nobody made. These say only "not the
      other one".
@@ -452,7 +452,7 @@
      rest from 17 to 24.
 
      **The muted eight are close to each other on purpose and should not be used
-     to tell eight things apart.** At chroma 0.05 they are near-greys separated
+     to tell eight things apart.** At chroma 0.05 they are near-grays separated
      only by hue, measured at 0.064 in OKLab, which is below what anybody
      reliably distinguishes. They are a background for something else to stand
      out of.
@@ -681,7 +681,7 @@
      dark, against 0.091 and 0.142 for the vivid eight and 0.113 and 0.129 for
      the balanced eight. Half the separation of either, for a band meant to
      carry the same eight things, and eight hues at that little chroma are eight
-     greys with an opinion.
+     grays with an opinion.
 
      0.07 puts them at 0.095 and 0.096, which is above the vivid band's own
      worst pair, so the quiet set is now at least as separable as the loud one.
@@ -1097,7 +1097,7 @@
   --helix-space-control: var(--helix-space-md);
   --helix-size-control-lg: calc(3rem * var(--_helix-seed-density));
   /* **A step either side of whatever step is current**, for a control that is
-     deliberately not the same size as its neighbours: a row in a floating panel,
+     deliberately not the same size as its neighbors: a row in a floating panel,
      a caret inside a trigger, the arrows on a carousel. The named steps are the
      scale and never move and the unsuffixed one is the step a region is at, and
      the set had no word for *relative*, so thirty-five stylesheets said `-sm` or

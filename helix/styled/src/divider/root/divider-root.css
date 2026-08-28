@@ -32,9 +32,8 @@
 /* Nothing set in, so no region and no gap either side of it: the two halves meet
    and the divider is one continuous line. `:empty` cannot ask this, since the
    region always holds a `<slot>` however little is assigned, and
-   `:host(:has(...))` is invalid CSS dropped at parse time. `check:selectors`
-   caught that rule here, written by an author who had already read the note
-   saying so. The component answers it instead, as `Announcement` and `List` do.
+   `:host(:has(...))` is invalid CSS dropped at parse time. That rule was written
+   here anyway, by an author who had already read the note saying so. The component answers it instead, as `Announcement` and `List` do.
 
    `display: none` rather than a zero size, because a flex gap is drawn beside
    an item of no width just the same. */
@@ -103,8 +102,8 @@
  *
  * The site had this as `block-size` on the element, which is a document rule
  * against a shadow one and therefore not a fight the component can lose
- * gracefully: it wins outright, whatever the component says, and
- * `check:overruled` fails on it for that reason. A hook is the same effect
+ * gracefully: it wins outright, whatever the component says. A hook is the
+ * same effect
  * through the published door. */
 :host([orientation="vertical"]) {
   block-size: var(--divider-length, auto);

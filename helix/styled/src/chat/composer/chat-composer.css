@@ -111,13 +111,13 @@
    **The recipe is `Button`'s ghost, value for value, and that is the whole
    reason to take it rather than tune one.** The tools slotted beside this are
    `helix-icon-button` elements at `emphasis="ghost"`, so the same 8% mix means
-   send and its neighbours light up identically under the pointer instead of
+   send and its neighbors light up identically under the pointer instead of
    nearly so. The tone is the foreground rather than the brand for the same kind
    of reason the strength came down: blue put a second color in a composer that
    already has one on the reader's own turns above it, and pointed at the least
    surprising control in the component. Nobody needs telling which button sends.
 
-   What tells it apart from its neighbours is the glyph and the corner it sits
+   What tells it apart from its neighbors is the glyph and the corner it sits
    in, which is what tells it apart in every composer anybody has used.
 
    **The ink follows `IconButton`'s two, and this rule was the only glyph in the
@@ -131,7 +131,7 @@
 
    The size is `sm` less the smallest space, which is 28. A control that sits on
    a page takes a step off the control ladder; this one sits inside another
-   control, so it is deliberately a notch inside the step its neighbours take,
+   control, so it is deliberately a notch inside the step its neighbors take,
    and 28 still clears the 24 a pointer target is meant to. Drawn at 32, 28 and
    24 and compared: 24 crowds the glyph and spends the whole target allowance,
    32 is the same size as a slotted tool and reads as one. */

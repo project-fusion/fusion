@@ -214,8 +214,9 @@ export interface TourAskDetail {
  * has to hear it across that boundary.
  *
  * **A class rather than the raw `CustomEvent` this was.** It dispatched, it
- * bubbled, and it was invisible: `check:events` matches `new HelixSomethingEvent(`,
- * so a hand-rolled `CustomEvent` was not held to being declared, and nothing
+ * bubbled, and it was invisible: a dispatch is matched as
+ * `new HelixSomethingEvent(`, so a hand-rolled `CustomEvent` was not held to
+ * being declared, and nothing
  * carried it into the manifest. Consumers could hear it and could not find it,
  * which is the trap #75 is about, in its purest form.
  */
@@ -259,8 +260,7 @@ export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
  * different work in each.
  *
  * **A class rather than the bare `Event` these were.** They dispatched, they
- * bubbled, `ColorInput` bound both, and `check:events` matched
- * `new CustomEvent(` and so held neither to being declared: two pieces of
+ * bubbled, `ColorInput` bound both, and neither was held to being declared: two pieces of
  * public API that a consumer could hear and could not find. The check reads
  * `new Event(` now as well.
  *
@@ -349,7 +349,7 @@ export interface ChangeDetail {
  * platform uses for a committed value, which is 294's whole complaint read from
  * the other end: `Tabs` moving to another tab, `Tree` marking another row and
  * `Steps` advancing are not a value changing, they are a set choosing. One word
- * for four questions is what `appearance` was before `check:axes`.
+ * for four questions is what `appearance` was.
  *
  * `active` names which child is current, so `activate` is the verb, and unlike
  * `change` the platform has no claim on it.
@@ -1044,8 +1044,8 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
  * is why two of the nine went missing.
  *
  * Derived, a class that is in here is typed and a class that is not is absent
- * from both halves at once, so the two cannot disagree. `check:events` fails
- * the build on an exported event class left out of this object, which is the
+ * from both halves at once, so the two cannot disagree. The build fails
+ * on an exported event class left out of this object, which is the
  * only step left that can be forgotten.
  */
 const registry = {

@@ -88,7 +88,7 @@ describe('progress', () => {
     expect(bar.internals?.ariaValueMax).toBe('100')
   })
 
-  test('a value is ignored while it is set, rather than half-honoured', async () => {
+  test('a value is ignored while it is set, rather than half-honored', async () => {
     const bar = await progress('indeterminate value="40"')
     expect(bar.internals?.ariaValueNow ?? null).toBeNull()
   })

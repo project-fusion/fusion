@@ -18,7 +18,7 @@ const action = async (attributes = 'value="save"'): Promise<HTMLElement> =>
  * order the actions come out in and focus moving between them: it is named 20
  * times in this family's specs. What one action owns alone is that it is a real
  * disabled button rather than a dressed one, which is the opposite of the
- * neighbouring drilldown row and is a decision rather than an inconsistency: a
+ * neighboring drilldown row and is a decision rather than an inconsistency: a
  * dial is a fan of controls a reader steps through, not a menu page they read
  * down.
  */

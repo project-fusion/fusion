@@ -7,10 +7,10 @@
  * shapes with it.
  *
  * **It was here for weeks before the second chart existed**, which made every
- * `--chart-terminus-*` hook a shared name read by one family: the condition
- * `check:hooks` calls a family hook that has drifted, while its own `SHARED`
- * exemption was what allowed it. `check:hooks` asks the question now, so a sheet
- * in this folder has to have the second reader the folder exists for.
+ * `--chart-terminus-*` hook a shared name read by one family: exactly the drift
+ * a family hook is watched for, while the `SHARED` exemption was what allowed
+ * it. A sheet in this folder has to have the second reader the folder exists
+ * for.
  *
  * An element rather than a shape inside the drawing, and that is not a
  * preference. A chart that fills its box uses `preserveAspectRatio="none"`,

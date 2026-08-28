@@ -175,9 +175,9 @@ describe('line chart', () => {
        the gridlines *between* the label columns, which are equal shares of the
        width. Measured in a browser before this: the first name centered at a
        twelfth of the width with its point at zero, every label off by half a
-       slot. Inset, all six centres landed on their vertices exactly.
+       slot. Inset, all six centers landed on their vertices exactly.
      *
-       Three readings, so the slots are a third each and the centres are at
+       Three readings, so the slots are a third each and the centers are at
        16.67, 50 and 83.33. */
     const host = await chart(SESSIONS, 'for="sessions"')
     const xs = anchors(d(lines(host)[0])).map(([x]) => x)

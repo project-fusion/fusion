@@ -190,7 +190,7 @@ fn hex_matches_the_typescript_for_every_colour() {
     }
     assert!(
         wrong.is_empty(),
-        "{} of {} colours render to a different hex:\n  {}",
+        "{} of {} colors render to a different hex:\n  {}",
         wrong.len(),
         colors.len(),
         wrong.join("\n  ")
@@ -349,7 +349,7 @@ fn fitting_to_gamut_lands_where_the_typescript_lands() {
     chroma.assert("fitted chroma", colors.len(), EXACT);
     assert!(
         wrong_hex.is_empty(),
-        "{} of {} fitted colours render to a different hex:\n  {}",
+        "{} of {} fitted colors render to a different hex:\n  {}",
         wrong_hex.len(),
         colors.len(),
         wrong_hex.join("\n  ")
@@ -1374,7 +1374,7 @@ fn every_token_of_every_theme_matches() {
 
 /// **The brand mark walks down before up, which no theme's output can show.**
 ///
-/// The direction only decides an answer when both neighbours clear at the same
+/// The direction only decides an answer when both neighbors clear at the same
 /// step, and for every brand in the oracle either the mark does not move at all
 /// or exactly one side clears first. Reversing the two entries left all thirteen
 /// themes byte-identical: measured by making that edit and watching the suite
@@ -1388,7 +1388,7 @@ fn every_token_of_every_theme_matches() {
 /// obstacle.
 #[test]
 fn the_brand_mark_prefers_the_darker_side_of_a_tie() {
-    /* Both neighbours of the fifth step clear and nothing nearer does, so the
+    /* Both neighbors of the fifth step clear and nothing nearer does, so the
     two entries in the walk are the only thing deciding the answer. */
     let tie = |lightness: f64| (lightness - 0.5).abs() >= 0.05 - 1e-9;
     assert!(

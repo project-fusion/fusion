@@ -206,9 +206,9 @@ export const DerivationDiagram = () => (
           looks at first was the one visibly detached from its own wire. The
           section label sat at 112 and was therefore *inside* that swatch.
 
-          Glyph centres and text baselines are now derived from the tap rather
+          Glyph centers and text baselines are now derived from the tap rather
           than set by hand, and the label clears the first row. */}
-      {/* **Outside the frame, and that is what centres the drawing.**
+      {/* **Outside the frame, and that is what centers the drawing.**
           These are annotations about the figure rather than parts of it, and
           sitting inside the dashed rectangle they added mass at the top with
           nothing balancing it below: the four rows are centered on the hub at

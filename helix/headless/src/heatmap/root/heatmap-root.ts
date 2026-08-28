@@ -13,7 +13,7 @@ import '../../tooltip/index.js'
 import { fits, numbers, toneOf, words } from './buckets.js'
 
 /**
- * @summary A strip of cells coloured by how each one went: uptime, contributions, activity.
+ * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
  * **One family covers both readings, and the split people expect does not
@@ -25,7 +25,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  *
  * **What it cannot be is a bar chart with flat values**, and the data model is
  * what closes that rather than taste: chart color is per *series* everywhere
- * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+ * else here, `--chart-series-1` through `-15`, so ninety differently colored
  * cells would be ninety series.
  *
  * The data is a real `<table>` named by `for`, the same convention every chart

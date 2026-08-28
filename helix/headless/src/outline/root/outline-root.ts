@@ -323,7 +323,7 @@ export class HelixHeadlessOutline extends HelixElement {
    * it when taking you somewhere, which is the same number meaning two things.
    *
    * `scroll-margin-block-start` rather than an interception, because it is the
-   * property the platform provides for exactly this and the UA honours it on
+   * property the platform provides for exactly this and the UA honors it on
    * ordinary fragment navigation, on `scrollIntoView`, and on a browser
    * restoring a position. Nothing has to be taken over to get it.
    *

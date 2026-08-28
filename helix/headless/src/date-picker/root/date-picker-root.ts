@@ -819,7 +819,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
               const iso = toIso(date)
               const disabled = this.barred(date)
               const selected = this.isSelected(iso)
-              /* A day from a neighbouring month is filler, so the grid is a
+              /* A day from a neighboring month is filler, so the grid is a
                  rectangle, and nothing else. It takes no click and shows no
                  selection.
                  It used to take both, and at `months="2"` that put the same

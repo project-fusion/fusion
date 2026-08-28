@@ -31,7 +31,7 @@ export class HelixBadge extends HelixHeadlessBadge {
    * emphasis question, and the values answer a different one.** `danger` and
    * `neutral` are meanings: the stylesheet picks a fill by what the count *is*,
    * not by how loudly it is drawn. Filed under `appearance` it read as a
-   * treatment, which is the confusion `check:axes` exists to stop.
+   * treatment, which is the confusion the split exists to stop.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'neutral'

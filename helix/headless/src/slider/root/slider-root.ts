@@ -454,8 +454,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
      * member. As a `/**` above `markerLabels` it never closed, so it swallowed
      * that property's one-line description and the manifest shipped this whole
      * argument as the text for "whether each mark says which value it stands
-     * at". `check:orphans` cannot see an unclosed block, only one sitting on
-     * another. */
+     * at". Nothing catches an unclosed block, only one sitting on another. */
     return html`${this.renderLabel()}
     <div
       part="field"

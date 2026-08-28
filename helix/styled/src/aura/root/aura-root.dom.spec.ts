@@ -166,8 +166,8 @@ describe('aura', () => {
  *
  * In this file rather than a lane of its own because this is the lane that runs
  * twice. `bun test` runs it under happy-dom and `specs:browser` runs the same
- * file in a real browser, and `check:matchers` reads `.dom.spec.ts` for
- * matchers both of those have. Pure arithmetic needs neither environment and
+ * file in a real browser, and a `.dom.spec.ts` may only use matchers both of
+ * those have. Pure arithmetic needs neither environment and
  * loses nothing by being in the one that is already wired. */
 describe('aura axis', () => {
   /* The three the docstring names, at four boxes including the two the hero has

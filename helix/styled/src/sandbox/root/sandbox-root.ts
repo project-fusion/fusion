@@ -482,8 +482,7 @@ export class HelixSandbox extends HelixElement {
        watching it. The observer itself survives, being a field rather than
        something `firstUpdated` built, but a disconnected one reports nothing
        until something calls `observe` again, and only `firstUpdated` did. So a
-       sandbox moved in the DOM came back with its panel sizes frozen.
-       `check:observers` holds this. */
+       sandbox moved in the DOM came back with its panel sizes frozen. */
     if (this.hasUpdated) {
       this.watchBody()
     }

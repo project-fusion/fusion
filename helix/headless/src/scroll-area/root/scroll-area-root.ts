@@ -132,9 +132,7 @@ export class HelixHeadlessScrollArea extends HelixElement {
      * the component went on rendering.
      *
      * Guarded on `hasUpdated`, because the first connection happens before the
-     * first render and there is no scroller to find yet. `check:observers`
-     * holds it, and had to be tightened to see it: asking for `new` *or*
-     * `observe` passed this on the half that was fine. */
+     * first render and there is no scroller to find yet. */
     if (this.hasUpdated) {
       this.watchContent()
     }

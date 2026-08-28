@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, because the tier below renders both of these and a custom
    element registers on import. Inherited from the base along with the template,
    which is why they are restated here: this file has neither tag in it to remind
-   anyone. `check:composed` enforces it. */
+   anyone. */
 import '../../listbox/index.js'
 import '../../option/index.js'
 import { styles } from './time-picker-root.css.js'

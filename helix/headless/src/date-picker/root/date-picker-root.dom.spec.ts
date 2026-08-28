@@ -388,7 +388,7 @@ describe('date picker as a form control', () => {
   })
 })
 
-describe('a day from a neighbouring month is filler', () => {
+describe('a day from a neighboring month is filler', () => {
   const outside = (cal: DatePicker): HTMLElement[] =>
     days(cal).filter((one) => one.hasAttribute('data-outside'))
 

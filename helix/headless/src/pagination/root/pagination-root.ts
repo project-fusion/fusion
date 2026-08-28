@@ -613,9 +613,8 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Everything a step needs, computed once, so the markup below is only markup.
    *
-   * Split out because the part name has to be a literal. `check:parts` reads
-   * `part="name"` out of the source, so a computed one is a part the tooling
-   * cannot see: nothing pairs it with its `@csspart` and a later rename takes
+   * Split out because the part name has to be a literal. A part name is read
+   * from the source, so a computed one is a part nothing can see: nothing pairs it with its `@csspart` and a later rename takes
    * the promise silently. With four controls and two shapes each that is eight
    * literals, and eight copies of the arithmetic behind them would be the
    * actual duplication. This is the arithmetic, written once.

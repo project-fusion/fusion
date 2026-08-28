@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './heatmap-root.css.js'
 
 /**
- * @summary A strip of cells coloured by how each one went: uptime, contributions, activity.
+ * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
  * One grid, filled down the column and then across, which is what a calendar

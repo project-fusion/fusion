@@ -3,7 +3,7 @@ import { HelixHeadlessTimeInput } from '@fusion.dev/helix-headless/time-input'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, because the tier below renders both of these and a custom
    element registers on import. Inherited from the base along with the template,
-   which is why they are restated here. `check:composed` enforces it. */
+   which is why they are restated here. */
 import '../../icon/index.js'
 import '../../tag/index.js'
 import '../../time-picker/index.js'

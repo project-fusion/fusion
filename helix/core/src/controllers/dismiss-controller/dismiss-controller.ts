@@ -61,7 +61,7 @@ const listening = new Set<DismissController>()
  *
  * Both, because they are different intentions with the same meaning: Escape is
  * the keyboard's way out and clicking away is the pointer's, and an overlay
- * that honours only one is one half its readers cannot dismiss.
+ * that honors only one is one half its readers cannot dismiss.
  *
  * The outside press is watched on `pointerdown` rather than `click`, so a press
  * that starts outside and drags across the overlay still counts as leaving

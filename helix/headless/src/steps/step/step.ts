@@ -7,7 +7,7 @@ import { html } from 'lit/static-html.js'
 /* Side-effect import, because this renders a button and a custom element
    registers on import. The path is relative, so this registers the base button
    and the styled file's identical import registers the styled one; `tier` picks
-   which name the template asks for. `check:composed` enforces both. */
+   which name the template asks for. */
 import '../../button/index.js'
 
 /**

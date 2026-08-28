@@ -370,7 +370,7 @@
  * is still the palette drawn.
  *
  * `:has()` on a plain descendant, which is supported: the invalid form is
- * `:host(:has(...))`, and `check:selectors` fails on that one. */
+ * `:host(:has(...))`. */
 [part="plot"]:has([data-active]) [part="group"]:not([data-active]) {
   opacity: 0.45;
 }
@@ -632,7 +632,7 @@
 /* The secondary scale wears its series' color when exactly one series is on
    it, which is the case worth helping and the only one a single color can
    describe honestly. Two series sharing a second axis get the neutral, because
-   picking one of their colours would say the axis belongs to that one. The tier
+   picking one of their colors would say the axis belongs to that one. The tier
    below writes the property only in the lone case. */
 
 /* **Emphasis, which is how much ink a column claims.** Two knobs rather than a
@@ -754,7 +754,7 @@
 }
 
 /* **Gradient, into the wash the headless tier already draws.** One per series,
-   coloured through `--chart-series` so the stops read a token that tier never
+   colored through `--chart-series` so the stops read a token that tier never
    names, and pointed at per bar because CSS cannot build a fragment id from a
    variable.
 

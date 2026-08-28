@@ -554,7 +554,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        to refuse, and `preventDefault()` could not un-drag it. This is the case
        the controlled-change helper's own documentation distinguishes, a native
        control that has already moved, and putting it on that path would offer a
-       refusal that cannot be honoured. */
+       refusal that cannot be honored. */
     if (nearest === this.index) {
       return
     }

@@ -28,7 +28,7 @@ import { property, state } from 'lit/decorators.js'
  * fill is the same marks over the same marks, cut off partway, so any mark works
  * and any fraction does.
  *
- * **Read-only is not this control greyed out, it is a different thing.** The
+ * **Read-only is not this control grayed out, it is a different thing.** The
  * commoner use is showing a score nobody is being asked for, a product's
  * average, and that is not a control at all: it takes no focus, answers no keys,
  * has no options to choose between, and reads as one thing rather than as five.
@@ -425,9 +425,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
        rather than a count of the filled ones.
      
        Written out twice rather than through one helper taking the part name:
-       `check:selectors` reads the literals to know what this renders, and a
-       `part=${name}` binding is invisible to it. It called the stylesheet's
-       `[part="track"]` and `[part="fill"]` dead. */
+       a part is read from the source as a literal, and a `part=${name}`
+       binding is invisible. The stylesheet's `[part="track"]` and
+       `[part="fill"]` read as dead. */
     const marksIn = (layer: string): unknown =>
       Array.from({ length: count }, (_, index) => mark(layer, index))
 

@@ -248,7 +248,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * `silent`, so `<helix-video>.muted` answered what the author wrote rather
    * than whether there was sound. A name matching the platform's while meaning
    * something else is worse than a name the platform does not have, and
-   * `check:platform-fidelity` could not see it: it compares names.
+   * a name comparison could not see it.
    */
   @property({ attribute: 'muted', reflect: true, type: Boolean })
   defaultMuted = false
@@ -1455,8 +1455,8 @@ export class HelixHeadlessVideo extends HelixElement {
     /* Two templates rather than one with the name bound in, for the reason
        written under `previous` below: a part is read from the source, so
        `part=${one}` is a part no check can prove anything about. These two were
-       left bound when that pair was split, and `check:parts` had them exactly
-       right: both were documented and neither could be found. */
+       left bound when that pair was split: both were documented and neither
+       could be found. */
     if (one === 'rewind') {
       return html`<button
         part="rewind"
@@ -1488,9 +1488,9 @@ export class HelixHeadlessVideo extends HelixElement {
       </button>`
     }
     /* Two templates rather than one with the name bound in, because a part is
-       read from the source: `check:selectors` scans for the literal, so a part
-       written as `part=${one}` is a part no stylesheet can be proved to reach,
-       and `check:parts` cannot find it to match against the documentation
+       read from the source as a literal, so a part written as `part=${one}` is
+       a part no stylesheet can be proved to reach, and nothing can match it
+       against the documentation
        either. It reported both of these as matching nothing. */
     if (one === 'previous') {
       return html`<button
@@ -1516,7 +1516,7 @@ export class HelixHeadlessVideo extends HelixElement {
       /* A real anchor, because saving a file is the browser's job and there is
          no scripted version of it worth having.
        *
-       * **`download` only where it means something.** The attribute is honoured
+       * **`download` only where it means something.** The attribute is honored
        * for a same-origin file and ignored for any other, whatever headers come
        * back, so on a video served from a CDN it does nothing and the press
        * *navigates*: measured, clicking it took the whole page to the mp4, which

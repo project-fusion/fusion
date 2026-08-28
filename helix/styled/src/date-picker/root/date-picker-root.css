@@ -106,7 +106,7 @@
  * `::slotted()` never matches fallback content and a `[part=]` rule never
  * reaches an assigned node, so the shadow-tree caret and a consumer's own mark
  * need one rule each or the swap changes the size of the control. The area
- * notes carry the measurement: `CopyButton` shipped two correctly coloured
+ * notes carry the measurement: `CopyButton` shipped two correctly colored
  * glyphs at 0x0 for exactly this. */
 [part="previous"] svg,
 [part="next"] svg,
