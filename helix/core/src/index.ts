@@ -200,6 +200,7 @@ export {
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'
 export {
   type HelixStatusTone,

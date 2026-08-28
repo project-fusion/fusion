@@ -5,7 +5,7 @@ export function Example() {
       hint="Ask an owner to change this"
       label="Workspace id"
       name="workspace"
-      read-only
+      readonly
     ></helix-input>
   )
 }

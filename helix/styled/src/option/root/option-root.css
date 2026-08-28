@@ -25,13 +25,25 @@
   /* A stated height rather than one that falls out of the padding, so every
      row in a list is the same height whatever is slotted into it: a row with an
      icon in it was taller than the one above it, and a list whose rows differ by
-     two pixels reads as a list nobody measured. `control-sm` because a row in a
-     panel is a small control, and it is the token that moves with density
-     rather than a number that does not. */
+     two pixels reads as a list nobody measured.
+
+     **`control-sm` is a fixed step of the ramp, and this comment used to claim
+     the opposite.** *Corrected 28 Aug 2026.* It read "it is the token that moves
+     with density rather than a number that does not", and the density rules
+     redeclare the unsuffixed `--helix-size-control`; the `-sm`, `-md` and `-lg`
+     tokens are the scale and never move. Measured across the three regions, an
+     option row is 32px in every one of them while a button beside it is 32, 40
+     and 48.
+
+     Left pinned rather than swept, because whether a row in a floating panel
+     *should* follow the region's density is a real question and this file cannot
+     answer it alone: twenty stylesheets across seventeen families read a fixed
+     step, and eleven more are dense by nature and redeclare the current step on
+     their own host, which is the mechanism that works. See #321. */
   /* A floor, not a fixed height. The `start` slot is documented for an avatar,
      and an avatar at its default size is taller than a dense row: fixed, it
      overflowed into the rows above and below. */
-  min-block-size: var(--helix-size-control-sm);
+  min-block-size: var(--helix-size-control-tight);
   box-sizing: border-box;
   /* Through a hook, for the reason the inline inset above is: a panel that
      wants roomier rows says one thing and the group headings move with them.
@@ -114,9 +126,9 @@
 :host(:state(selected)) [part="item"]::after {
   content: "";
   background-color: currentColor;
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
   margin-inline-start: auto;
   mask-image: var(--_option-check);
   mask-position: center;

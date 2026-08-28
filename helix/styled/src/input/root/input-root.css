@@ -159,7 +159,7 @@ slot[name="end"]::slotted(*) {
  * whatever is behind it. So read-only is the absence of that recess rather than
  * a second color: no fill, the ground showing through, distinct from the
  * resting state on every ground and needing no token to stay that way. */
-:host([read-only]) [part="field"] {
+:host([readonly]) [part="field"] {
   background-color: transparent;
 }
 
@@ -177,7 +177,7 @@ slot[name="end"]::slotted(*) {
 [part="clear"],
 [part="reveal"] {
   all: unset;
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-tight);
 
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -187,8 +187,8 @@ slot[name="end"]::slotted(*) {
   display: flex;
   flex: 0 0 auto;
   justify-content: center;
-  min-block-size: var(--helix-size-icon-lg);
-  min-inline-size: var(--helix-size-icon-lg);
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

@@ -4,7 +4,7 @@ export function Example() {
       idle-delay="1500"
       loop
       muted
-      plays-inline
+      playsinline
       poster="/media/reel-poster.jpg"
       preload="metadata"
       src="/media/reel.mp4"

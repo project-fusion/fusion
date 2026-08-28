@@ -155,12 +155,18 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-xs);
+  gap: var(--button-gap, var(--helix-space-xs));
   inline-size: 100%;
   justify-content: center;
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-tight);
-  padding-inline: var(--helix-space-control);
+  /* The inline rhythm, for the same container that already sets `--button-size`.
+   *
+   * Height alone is not "looks like it belongs": a trigger pinned to a crumb's
+   * height still carried `space-control`, which is `md`, beside crumbs padded
+   * `xs`, so it read as a chunk wedged into a light row. Two properties because
+   * the box has two axes and a container that knows one knows the other. */
+  padding-inline: var(--button-padding-inline, var(--helix-space-control));
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),

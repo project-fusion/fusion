@@ -5,6 +5,12 @@
   rel="stylesheet"
 />
 
-<helix-headless-tooltip content="Lorem ipsum dolor sit amet">
-  <helix-headless-button>Button</helix-headless-button>
-</helix-headless-tooltip>
+<helix-headless-button
+  aria-describedby="save-tip"
+  id="save"
+>Button</helix-headless-button>
+<helix-headless-tooltip
+  content="Lorem ipsum dolor sit amet"
+  for="save"
+  id="save-tip"
+></helix-headless-tooltip>

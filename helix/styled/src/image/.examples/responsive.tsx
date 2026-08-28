@@ -3,7 +3,7 @@ export function Example() {
     <helix-flex direction="column" gap="md">
       <helix-image
         alt="A harbour at first light"
-        fetch-priority="high"
+        fetchpriority="high"
         loading="eager"
         sizes="(min-width: 40rem) 32rem, 100vw"
         src="/media/harbour-800.jpg"

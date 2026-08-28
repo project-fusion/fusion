@@ -124,17 +124,6 @@
   translate: 0 -3px;
 }
 
-/* **The anchor takes the card's corner, or the ring is a rectangle around a
-   rounded thing.** An `outline` follows the border box of the element it is on,
-   and the element it is on is the `Link`: a box with no radius wrapped around a
-   `helix-card` that has one. The ring traced the anchor and the card sat inside
-   it visibly out of register, which is what reads as the border being off
-   kilter. Nothing else about the anchor changes, since it draws no background
-   and no border of its own. */
-.insightCard {
-  border-radius: var(--helix-radii-lg);
-}
-
 .insightCard:focus-visible {
   outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-space-2xs);

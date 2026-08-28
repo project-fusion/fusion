@@ -93,7 +93,7 @@
  * whatever is behind it. So read-only is the absence of that recess rather than
  * a second color: no fill, the ground showing through, distinct from the
  * resting state on every ground and needing no token to stay that way. */
-:host([read-only]) [part="field"] {
+:host([readonly]) [part="field"] {
   background-color: transparent;
 }
 
@@ -185,8 +185,8 @@ slot[name="end"]::slotted(*) {
 
 [part="decrement"] svg,
 [part="increment"] svg {
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -216,7 +216,7 @@ slot[name="end"]::slotted(*) {
 
 /* Nothing to drag when there is nothing to change. */
 :host([scrub]:disabled) [part="label"],
-:host([scrub][read-only]) [part="label"] {
+:host([scrub][readonly]) [part="label"] {
   cursor: default;
 }
 

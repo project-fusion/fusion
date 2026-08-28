@@ -13,6 +13,39 @@ const RELATIONSHIPS = [
 ] as const
 
 /**
+ * The state attributes a host may carry and mean for the control inside it.
+ *
+ * **Copied rather than resolved, which is what makes them a separate list.** A
+ * relationship above names ids in the consumer's tree and can only travel as an
+ * element reference; these are plain strings and the value means the same thing
+ * wherever it is written, so the whole of the work is putting it on the node the
+ * accessibility tree actually exposes.
+ *
+ * **The case that asked for it was a disclosure with a slotted trigger.**
+ * `Megamenu` and `SpeedDial` write `aria-expanded` onto whatever a consumer
+ * slots, and where that is a `<helix-button>` the attribute landed on a host the
+ * tree reports as `generic`: measured through Chrome's own tree, a button named
+ * "Mega" with no expanded state at all, on a component whose comment says the
+ * write exists so a screen reader is not "told the control was a plain button
+ * forever". A plain `<button slot="trigger">` never had the problem, because
+ * there the host *is* the focusable node.
+ *
+ * **Only what this controller put there is ever taken away, and getting that
+ * wrong broke three components.** The first version removed any of these from
+ * the control whenever the host lacked it, which reads as the obvious way to
+ * keep the two in step and quietly deletes what the component renders for
+ * itself: `Combobox` writes `aria-controls="listbox"` onto its own input and
+ * `Select` writes `aria-expanded` onto its own trigger, and both were wiped on
+ * every update by a controller carrying nothing. Their own specs caught it.
+ *
+ * So the record below holds what was forwarded last time, and a host that stops
+ * carrying one removes exactly that and nothing else. A control's own attribute
+ * is untouched either way, which is the only rule that can be right: this
+ * controller knows what the host said and cannot know what the template meant.
+ */
+const STATES = ['aria-expanded', 'aria-haspopup', 'aria-controls'] as const
+
+/**
  * Carries a host's ARIA references down to the control inside it.
  *
  * **The gap this closes, measured.** `<helix-button aria-describedby="tip">` puts
@@ -58,6 +91,9 @@ export class AriaForwardController implements ReactiveController {
 
   private observer: MutationObserver | undefined
 
+  /** Which state attributes this controller wrote, so only those are removed. */
+  private readonly forwarded = new Set<string>()
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
@@ -94,12 +130,25 @@ export class AriaForwardController implements ReactiveController {
       ;(target as unknown as Record<string, Element[] | null>)[property] =
         elements.length > 0 ? elements : null
     }
+    for (const attribute of STATES) {
+      const value = this.host.getAttribute(attribute)
+      if (value === null) {
+        // Only if this controller is what put it there. See the note above.
+        if (this.forwarded.has(attribute)) {
+          target.removeAttribute(attribute)
+          this.forwarded.delete(attribute)
+        }
+        continue
+      }
+      target.setAttribute(attribute, value)
+      this.forwarded.add(attribute)
+    }
   }
 
   hostConnected(): void {
     this.observer = new MutationObserver(() => this.forward())
     this.observer.observe(this.host, {
-      attributeFilter: RELATIONSHIPS.map(([attribute]) => attribute),
+      attributeFilter: [...RELATIONSHIPS.map(([attribute]) => attribute), ...STATES],
     })
   }
 

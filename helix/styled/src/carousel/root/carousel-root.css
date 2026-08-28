@@ -244,13 +244,13 @@
      it: any `*` rule loses to the one that did the unsetting. */
   box-sizing: border-box;
   align-items: center;
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--helix-size-control-sm);
+  inline-size: var(--helix-size-control-tight);
   justify-content: center;
 }
 
@@ -359,9 +359,14 @@
  * The component wraps each slide in a `[part="slide"]` and assigns it there, so
  * the consumer's element carries no attribute of ours: see `assign` in the
  * headless root. The pane is therefore the flex item and the box that snaps, and
- * the sizing had to move onto it with the layout. `display: grid` is what passes
- * the size through, a lone grid item stretching both axes, so a slide still
- * fills the space it used to occupy directly. */
+ * the sizing had to move onto it with the layout. `display: flex` is what
+ * passes the size through, the slide below being a lone flex child told to grow
+ * into both axes, so it still fills the space it used to occupy directly.
+ *
+ * *The word was `grid` here until 28 Aug 2026 and the rule has always said
+ * `flex`.* A comment describing a different implementation from the one under it
+ * is the kind this repository treats as a defect rather than a typo: it is read
+ * by whoever changes the rule next. */
 [part="slide"] {
   display: flex;
   flex: 0 0

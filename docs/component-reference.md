@@ -658,6 +658,7 @@ ring is declared here rather than inherited, because the base layer's
 | `commandForElement` | - | `Element \| null` | - | `HelixHeadlessButton` | The element this button's command is sent to, resolved. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
+| `expanded` | - | `boolean \| undefined` | - | `HelixHeadlessButton` | Whether this button is a disclosure trigger, and whether its panel is open. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
@@ -1843,6 +1844,7 @@ it for reassurance reads as a second, accidental press.
 | `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixHeadlessCopyButton` | What it is called, and says, after one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
+| `expanded` | - | `boolean \| undefined` | - | `HelixHeadlessButton` | Whether this button is a disclosure trigger, and whether its panel is open. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
@@ -2031,7 +2033,7 @@ whatever holds it.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixHeadlessDateInput` | What the field says before a date is in it. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessDateInput` | Whether the control refuses changes while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessDateInput` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `step` | `step` | `number` | `1` | `HelixHeadlessDateInput` | How far apart the selectable dates are, in days. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixHeadlessDateInput` | Accessible name for the control that opens the calendar. |
@@ -2154,7 +2156,7 @@ grid reads as a continuous run of dates.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages forward. |
 | `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixHeadlessDatePicker` | Accessible name for the control that pages back. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the control refuses changes while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the form refuses to submit while nothing is chosen. |
 | `step` | `step` | `number` | `1` | `HelixHeadlessDatePicker` | How far apart the selectable dates are, in days. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -3002,6 +3004,7 @@ common way a toolbar becomes unusable without sight.
 | `commandForElement` | - | `Element \| null` | - | `HelixHeadlessButton` | The element this button's command is sent to, resolved. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `emphasis` | `emphasis` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | `MixinControlSurface` | How filled it is drawn. |
+| `expanded` | - | `boolean \| undefined` | - | `HelixHeadlessButton` | Whether this button is a disclosure trigger, and whether its panel is open. |
 | `focusable` | - | `boolean` | `true` | `HelixHeadlessButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAction` | `formaction` | `string` | `''` | `HelixHeadlessButton` | Where this button's submission goes, overriding the form's own. |
@@ -3069,7 +3072,7 @@ base class.
 | `crossOrigin` | `crossorigin` | `'anonymous' \| 'use-credentials' \| null` | `null` | `HelixHeadlessImage` | How the picture is fetched across origins, which decides whether a canvas can read it. |
 | `currentSrc` | - | `string` | - | `HelixHeadlessImage` | Which candidate the browser actually chose out of `srcset`. |
 | `decoding` | `decoding` | `'async' \| 'auto' \| 'sync'` | `'async'` | `HelixHeadlessImage` | Whether the browser may decode off the main thread. |
-| `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixHeadlessImage` | How urgently to fetch it, for the one picture that is the page. |
+| `fetchPriority` | `fetchpriority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixHeadlessImage` | How urgently to fetch it, for the one picture that is the page. |
 | `loading` | `loading` | `'eager' \| 'lazy' \| undefined` | - | `HelixHeadlessImage` | Whether to wait until it is nearly on screen. |
 | `naturalHeight` | - | `number` | - | `HelixHeadlessImage` | The picture's own height in pixels, and zero until it has arrived. |
 | `naturalWidth` | - | `number` | - | `HelixHeadlessImage` | The picture's own width in pixels, and zero until it has arrived. |
@@ -3152,7 +3155,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `pattern` | `pattern` | `string` | `''` | `HelixHeadlessInput` | A regular expression the value has to match, as the platform reads it. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessInput` | Shown while the field is empty. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field refuses input while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `reveal` | `reveal` | `boolean` | `false` | `HelixHeadlessInput` | Whether a password field offers a toggle that shows what was typed. |
 | `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixHeadlessInput` | What the reveal toggle is called. |
@@ -4125,7 +4128,7 @@ three times as long to cross.
 | `min` | `min` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Smallest value the reader may reach. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessNumberInput` | Shown while the field is empty. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether the field refuses input while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `scrub` | `scrub` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
@@ -4514,7 +4517,7 @@ breathe as a code is typed into it.
 | `mask` | `mask` | `boolean` | `false` | `HelixHeadlessPinInput` | Whether the characters are hidden, the way a password is. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessPinInput` | What an empty box shows, usually a single dot. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessPinInput` | Whether the boxes refuse input while still submitting their value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessPinInput` | Whether the boxes refuse input while still submitting their value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixHeadlessPinInput` | Focus is delegated, so the host is never the focus target. |
 | `type` | `type` | `PinType` | `'numeric'` | `HelixHeadlessPinInput` | What a box accepts, which decides the keyboard a phone offers. |
@@ -6554,7 +6557,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `minLength` | `minlength` | `number \| undefined` | - | `HelixHeadlessTextarea` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessTextarea` | Shown while the field is empty. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the field refuses input while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `rows` | `rows` | `number` | `3` | `HelixHeadlessTextarea` | How many lines the box is before anything is typed. |
 | `selectionDirection` | - | `SelectionDirection` | - | `HelixHeadlessTextarea` | The caret and the selection, under the platform's own names. |
@@ -6641,7 +6644,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixHeadlessTimeInput` | What the field says before a time is in it. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTimeInput` | Whether the control refuses changes while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessTimeInput` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `step` | `step` | `number` | `15` | `HelixHeadlessTimeInput` | How far apart the offered times are, in minutes. |
 | `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixHeadlessTimeInput` | Whether the field writes the time out, or holds the value as it is. |
@@ -6772,7 +6775,7 @@ card would be a card inside a card there.
 | `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimePicker` | Earliest time offered, as `HH:mm`. |
 | `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixHeadlessTimePicker` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the control refuses changes while still submitting its value. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the control refuses changes while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the form refuses to submit while nothing is chosen. |
 | `step` | `step` | `number` | `15` | `HelixHeadlessTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -7623,8 +7626,8 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `currentTime` | - | `number` | - | `HelixHeadlessVideo` | Where playback has reached, in seconds. |
 | `defaultMuted` | `muted` | `boolean` | `false` | `HelixHeadlessVideo` | Whether it *starts* silent, which is what an autoplaying video must do. |
 | `defaultPlaybackRate` | - | `number` | - | `HelixHeadlessVideo` | The rate playback returns to, which `defaultPlaybackRate` names natively. |
-| `disablePictureInPicture` | `disable-picture-in-picture` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer picture in picture. |
-| `disableRemotePlayback` | `disable-remote-playback` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer playback on a remote device. |
+| `disablePictureInPicture` | `disablepictureinpicture` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer picture in picture. |
+| `disableRemotePlayback` | `disableremoteplayback` | `boolean` | `false` | `HelixHeadlessVideo` | Whether the browser may offer playback on a remote device. |
 | `duration` | - | `number` | - | `HelixHeadlessVideo` | How long the media runs, in seconds, and `NaN` until that is known. |
 | `ended` | - | `boolean` | - | `HelixHeadlessVideo` | Whether playback has run off the end. |
 | `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixHeadlessVideo` | And what they are told when it will not play at all. |
@@ -7639,7 +7642,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixHeadlessVideo` | And while it would stop it. |
 | `playbackRate` | - | `number` | - | `HelixHeadlessVideo` | How fast it plays, where 1 is the recorded speed. |
 | `playLabel` | `play-label` | `string` | `'Play'` | `HelixHeadlessVideo` | What the play control is called while it would start the video. |
-| `playsInline` | `plays-inline` | `boolean` | `true` | `HelixHeadlessVideo` | Whether it plays where it sits rather than taking over the screen. |
+| `playsInline` | `playsinline` | `boolean` | `true` | `HelixHeadlessVideo` | Whether it plays where it sits rather than taking over the screen. |
 | `poster` | `poster` | `string` | `''` | `HelixHeadlessVideo` | A still shown before it plays, which the platform draws itself. |
 | `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixHeadlessVideo` | How much to fetch before anything is asked for. |
 | `preservesPitch` | - | `boolean` | - | `HelixHeadlessVideo` | Whether pitch is held steady when the rate changes. |

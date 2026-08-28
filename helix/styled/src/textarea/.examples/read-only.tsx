@@ -6,7 +6,7 @@ export function Example() {
       hint="Generated from the run"
       label="Build log"
       name="log"
-      read-only
+      readonly
     ></helix-textarea>
   )
 }

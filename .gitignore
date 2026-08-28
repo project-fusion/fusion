@@ -62,10 +62,17 @@ site/ui/public/specs
 # The sandbox preview document, built from source by `bun run frame`.
 site/ui/public/sandbox
 
-# The parity harness's build, wiped and rebuilt by `check:visual-parity` on every
-# run. Ignored for the reason `public/specs` gives: `biome ci` lints what it can
-# see, and a generated page failing format fails the push. It was briefly tracked
-# after a `git add -A` swept it up mid-run, which is how the reason was found.
+# Scratch pages written by hand to look at a composition in a real browser, and
+# served by the dev server because the sandbox preview cannot be: the in-app
+# browser refuses `public/sandbox/frame.html` outright. Nothing generates this
+# and no script rebuilds it.
+#
+# It is ignored for the reason `public/specs` gives: `biome ci` lints what it can
+# see, and a scratch page failing format fails the push, which is what happened
+# when a `git add -A` swept one up mid-session. The commit that added this entry
+# read that as the parity harness's build and said so; it is not, and
+# `check:visual-parity` builds to `.local/parity`, as that commit's own message
+# conceded it had not established.
 site/ui/public/check
 
 # Worktrees an agent made for isolation. A second checkout of this repo, so

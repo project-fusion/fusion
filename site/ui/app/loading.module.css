@@ -74,36 +74,6 @@
    no motion at all: the delay is kept, because a wait that is too short to be
    worth reporting is too short whatever a reader thinks of animation. */
 @media (prefers-reduced-motion: reduce) {
-  /**
-   * The mark, breathing rather than spinning.
-   *
-   * A spinner claims to know how long this takes and a dot claims nothing at all.
-   * A slow pulse on the site's own mark says the page is coming and whose it is,
-   * which is the whole of what a reader needs from a wait this short.
-   */
-  .loadingMark {
-    animation: siteLoadingBreathe var(--helix-duration-slow) var(--helix-easing-standard) infinite
-      alternate;
-  }
-
-  @keyframes siteLoadingBreathe {
-    from {
-      opacity: 0.55;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* A mark that pulses is motion for its own sake once a reader has asked for
-   none, and the mark alone still says the same thing. */
-  @media (prefers-reduced-motion: reduce) {
-    .loadingMark {
-      animation: none;
-    }
-  }
-
   .loading {
     animation-duration: var(--helix-duration-instant);
   }

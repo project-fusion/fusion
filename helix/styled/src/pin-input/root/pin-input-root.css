@@ -78,7 +78,7 @@
  * whatever is behind it. So read-only is the absence of that recess rather than
  * a second color: no fill, the ground showing through, distinct from the
  * resting state on every ground and needing no token to stay that way. */
-:host([read-only]) [part="cell"] {
+:host([readonly]) [part="cell"] {
   background-color: transparent;
 }
 

@@ -5,7 +5,7 @@ export function Example() {
       hint="Read it out to the caller"
       label="Verification code"
       length={4}
-      read-only
+      readonly
     ></helix-pin-input>
   )
 }

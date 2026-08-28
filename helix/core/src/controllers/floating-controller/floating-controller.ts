@@ -117,6 +117,22 @@ export class FloatingController implements ReactiveController {
   private readonly options: FloatingOptions
   private cleanup: (() => void) | undefined
 
+  /**
+   * Which run of placements the results coming back belong to.
+   *
+   * `computePosition` is async, so a measurement started before `stop()` still
+   * resolves after it and wrote its result onto a surface that had just been
+   * taken down: the inline `position` and `translate` went back on, and so did
+   * `data-placed`, which is the attribute five families gate visibility on.
+   * Opening and closing inside one task is all it takes, since the write lands
+   * a microtask later.
+   *
+   * A counter rather than an `AbortController`, because there is nothing to
+   * abort: the work is already done by the time the answer arrives and the only
+   * question is whether anybody still wants it.
+   */
+  private run = 0
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: FloatingOptions) {
     this.options = options
     // Registered so the host's disconnect releases the tracking, which is the
@@ -139,6 +155,9 @@ export class FloatingController implements ReactiveController {
 
   /** Stops placing and releases everything it was tracking. */
   stop(): void {
+    // Before the teardown, so a measurement already in flight is disowned
+    // rather than racing the attribute removal below.
+    this.run += 1
     this.cleanup?.()
     this.cleanup = undefined
     this.options.floating()?.removeAttribute('data-placed')
@@ -151,6 +170,7 @@ export class FloatingController implements ReactiveController {
     if (!anchor || !floating) {
       return
     }
+    const run = this.run
 
     const pointer = this.options.arrow?.()
     const gap =
@@ -211,6 +231,12 @@ export class FloatingController implements ReactiveController {
       // clipping rather than about which coordinates are correct.
       strategy: 'fixed',
     }).then(({ middlewareData, placement, x, y }) => {
+      /* Stopped while this was being measured, so the answer is about a surface
+         nobody is showing any more. Writing it would re-mark a closed panel as
+         placed. */
+      if (run !== this.run) {
+        return
+      }
       this.placement = placement
       Object.assign(floating.style, {
         insetBlockStart: '0',

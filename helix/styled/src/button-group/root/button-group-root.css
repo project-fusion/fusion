@@ -66,10 +66,18 @@
 ::slotted(*:hover),
 ::slotted(*:focus-within) {
   position: relative;
-  /* The raised step, not a bare 1. Every other `z-index` in the styled tier
-     names a `--helix-layer-*`, and this was the last one that did not: a
-     component with its own number cannot be reasoned about against a theme that
-     moves the scale. */
+  /* The raised step, not a bare 1. A component with its own number cannot be
+     reasoned about against a theme that moves the scale.
+
+     *Narrowed 28 Aug 2026, because the sentence overstated the rule.* It read
+     "every other `z-index` in the styled tier names a `--helix-layer-*`, and
+     this was the last one that did not", and `steps/step/step.css` has three
+     bare ones. Those are correct: `check:tokens` covers `z-index` and permits
+     `0` and `1` by name, in a set it calls values that are structural rather
+     than design decisions, and a two-layer stack local to one component is
+     exactly that. The rule is "a layer token unless the value is structurally 0
+     or 1", which is not what a reader of the old sentence would have inferred
+     the first time they wrote a `z-index`. */
   z-index: var(--helix-layer-raised);
 }
 

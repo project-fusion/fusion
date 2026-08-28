@@ -110,9 +110,9 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-none` | `var(--_helix-scale-0)` | 135 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 203 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 152 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 167 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 112 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 97 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 166 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 113 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 96 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 44 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 50 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 13 |
@@ -125,7 +125,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 32 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 128 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 127 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 21 |
 | `--helix-radii-full` | `9999px` | 44 |
@@ -146,9 +146,9 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 69 |
-| `--helix-text-sm` | `var(--_helix-size-13)` | 82 |
-| `--helix-text-md` | `var(--_helix-size-14)` | 32 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 68 |
+| `--helix-text-sm` | `var(--_helix-size-13)` | 83 |
+| `--helix-text-md` | `var(--_helix-size-14)` | 31 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 23 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
@@ -235,7 +235,7 @@ How long something takes.
 | `--helix-duration-instant` | `0ms` | 5 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 193 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 74 |
-| `--helix-duration-slow` | `var(--_helix-ms-320)` | 25 |
+| `--helix-duration-slow` | `var(--_helix-ms-320)` | 24 |
 
 ## easing
 
@@ -243,7 +243,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 173 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 172 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 34 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
