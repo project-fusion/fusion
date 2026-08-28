@@ -108,8 +108,8 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 135 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 203 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 152 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 204 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 166 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 113 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 96 |
@@ -255,10 +255,10 @@ Heights and widths a component takes, all of them multiplied by the density seed
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-size-control-md` | `calc(2.5rem * var(--_helix-seed-density))` | 11 |
-| `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 46 |
-| `--helix-size-control` | `var(--helix-size-control-md)` | 37 |
-| `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 8 |
+| `--helix-size-control-md` | `calc(2.5rem * var(--_helix-seed-density))` | 6 |
+| `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 21 |
+| `--helix-size-control` | `var(--helix-size-control-md)` | 50 |
+| `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 5 |
 | `--helix-size-button` | `calc(12.5rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-badge` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-avatar` | `var(--helix-size-avatar-md)` | 2 |
@@ -271,7 +271,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-tag-sm` | `calc(1.5rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 4 |
 | `--helix-size-meter` | `calc(1rem * var(--_helix-seed-density))` | 1 |
-| `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 4 |
+| `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 12 |
 | `--helix-size-checkbox-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-checkbox-md` | `calc(1.25rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox-sm` | `calc(1rem * var(--_helix-seed-density))` | 5 |
@@ -283,10 +283,10 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 4 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
-| `--helix-size-icon` | `var(--helix-size-icon-md)` | 50 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 27 |
-| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 12 |
-| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 55 |
+| `--helix-size-icon` | `var(--helix-size-icon-md)` | 60 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 9 |
+| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 10 |
+| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 24 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 75 |
 | `--helix-size-focus-offset` | `2px` | 63 |
 | `--helix-size-focus-reach` | `calc(var(--helix-size-focus-ring) + var(--helix-size-focus-offset))` | 4 |
