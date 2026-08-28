@@ -92,7 +92,7 @@ const PLANTED = `
   helix-button::part(button) { color: green }
   helix-button { --button-backgruond-color: red }
   helix-button { --my-own-app-gap: 4px }
-  helix-copy-button { --icon-button-size: 2rem; --icon-button-radii: 4px }
+  helix-copy-button { --icon-button-size: 2rem; --icon-button-radius: 4px }
   helix-button { --icon-button-size: 2rem }
   @media (min-width: 1px) { helix-button::part(insidemedia) { color: red } }
 `
