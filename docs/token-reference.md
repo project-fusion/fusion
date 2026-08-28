@@ -163,7 +163,7 @@ The three weights.
 |---|---|---|
 | `--helix-weight-regular` | `400` | 12 |
 | `--helix-weight-medium` | `500` | 75 |
-| `--helix-weight-semibold` | `600` | 39 |
+| `--helix-weight-semibold` | `600` | 38 |
 
 ## leading
 

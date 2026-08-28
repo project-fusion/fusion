@@ -21,7 +21,7 @@ import { styles } from './drawer-root.css.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the drawer opens or closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart content - The scrolling content region.
  * @csspart header - The header region.

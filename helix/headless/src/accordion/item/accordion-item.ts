@@ -44,7 +44,7 @@ const TRIGGER_ID = 'trigger'
  * @slot summary - The always-visible trigger content.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the section closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the item opens or closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart chevron - The open and close indicator.

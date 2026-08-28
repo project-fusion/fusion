@@ -68,7 +68,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *   cannot share a name, assignment goes to whichever comes first in the tree,
  *   and the tone mark is the one a consumer reaches for.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart actions - The region holding what to do about it.
  * @csspart content - The message.

@@ -53,7 +53,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  *
  * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the answer moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart divider - The rule after an inline label, separating it from the items.

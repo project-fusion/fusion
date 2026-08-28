@@ -235,7 +235,7 @@ keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   readOnly?: HelixSandboxEditor["readOnly"];
 
-  /** Fired when the source is edited. */
+  /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-edit"?: (
     e: HelixSandboxEditorHelixBeforeEditElementEvent,
   ) => void;
@@ -266,7 +266,7 @@ cursor in it to read a long line. What it stops is the typing. */
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   "prop:readOnly"?: HelixSandboxEditor["readOnly"];
-  /** Fired when the source is edited. */
+  /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-edit"?: (
     e: HelixSandboxEditorHelixBeforeEditElementEvent,
   ) => void;
@@ -371,7 +371,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-edit`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-caret`: Fired when the cursor moves, with its line and column.
    *
    * ## Methods
@@ -546,7 +546,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-edit`: Fired when the source is edited.
+   * - `helix-before-edit`: Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-caret`: Fired when the cursor moves, with its line and column.
    *
    * ## Methods

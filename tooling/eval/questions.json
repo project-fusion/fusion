@@ -2957,7 +2957,7 @@
       "answer": "format-date/preview",
       "id": "example-422",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"The same instant, read four ways: elapsed, and three arrangements of a date.\"",
+      "prompt": "Which Helix example shows this? \"An elapsed reading, and three arrangements of a fixed date.\"",
       "tag": "helix-format-date"
     },
     {

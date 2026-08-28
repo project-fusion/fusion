@@ -72,7 +72,7 @@ import '../../button/index.js'
  * @slot description - A line under the name, for what the stage is for.
  * @slot marker - Replaces the number, or the check a complete step shows.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
+ * @event {HelixSelectEvent} helix-select - Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.

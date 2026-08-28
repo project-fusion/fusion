@@ -60,9 +60,8 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * @slot - The stops, in the order they should be visited.
  *
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired when the current stop moves,
- * carrying the new index.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when the reader leaves early.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.

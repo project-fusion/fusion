@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @slot media - A thumbnail. Falls back to an image of `poster`.
  * @slot meta - After the name. A duration, or a date.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart container - The `listitem`, which the button sits in.
  * @csspart item - The row, which is a button.

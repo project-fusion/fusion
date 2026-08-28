@@ -346,7 +346,7 @@
               "type": {
                 "text": "HelixBeforeEditEvent"
               },
-              "description": "Fired when the source is edited.",
+              "description": "Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-edit",
               "reactProp": "onhelix-before-edit"
             },

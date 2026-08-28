@@ -38,7 +38,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The slides.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index.
+ * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart controls - The row of controls.
  * @csspart indicator - One of them, and a way to reach that slide.

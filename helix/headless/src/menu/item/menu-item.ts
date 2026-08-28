@@ -32,7 +32,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Before the label. A mark about the row.
  * @slot submenu - Rows this one opens, which makes it a way in.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
  * @csspart mark - The trailing mark: a tick when checked, a caret when it opens.

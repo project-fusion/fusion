@@ -42,8 +42,9 @@ const KEYS = new Set([
  *
  * @slot - The tree's items.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart empty - Shown when there are no rows to show.
  * @csspart loading - Shown while the rows are still on their way.

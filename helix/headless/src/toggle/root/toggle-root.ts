@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The item's label.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart item - The radio button.
  */

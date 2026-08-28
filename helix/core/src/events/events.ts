@@ -352,9 +352,27 @@ export interface ChangeDetail {
  * for four questions is what `appearance` was before `check:axes`.
  *
  * `active` names which child is current, so `activate` is the verb, and unlike
- * `change` the platform has no claim on it. There is no notification half here:
- * a native `change` would be a lie about what moved, and no other native event
- * means this. The before event is the whole channel.
+ * `change` the platform has no claim on it.
+ *
+ * **It has a notification half now, and this said it did not.** *Reversed 28 Aug
+ * 2026.* The paragraph here read "there is no notification half: a native
+ * `change` would be a lie about what moved, and no other native event means
+ * this. The before event is the whole channel." The first half of that is still
+ * exactly right, which is why the pair is `helix-activate` and not `change`. The
+ * conclusion did not follow: that no *native* word fits is an argument against
+ * borrowing one, not an argument against having a notification at all.
+ *
+ * What the missing half cost is the thing 294 fixed for values and left here.
+ * A consumer who only wants to know which child is current now had one channel,
+ * and it fires *before* `apply`: `currentTarget.active` still holds the previous
+ * value inside the handler, and `detail.value` is a proposal another listener may
+ * refuse. Measured across the four families taking this mixin, nothing at all was
+ * announced afterwards. `Tabs` and `Tree` looked covered because `helix-select`
+ * bubbles up from a child, which fires when an item is *chosen* and not when
+ * `active` is assigned; `Steps` and `Video Playlist` had nothing.
+ *
+ * So the shape is the one `MixinControllerOpen` already has, a cancelable
+ * request and a plain notification after the state has moved. See #325.
  */
 export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-activate'
@@ -363,6 +381,36 @@ export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
     super(HelixBeforeActivateEvent.eventName, {
       bubbles: true,
       cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A set has made a different child current.
+ *
+ * The notification half of `helix-before-activate`, dispatched after the state
+ * has moved, so `currentTarget.active` is the new value and the detail is a fact
+ * rather than a proposal.
+ *
+ * **Not cancelable**, for the reason every notification here is not: the
+ * decision was taken by the event before it, and a second refusable event for
+ * one transition is two answers to one question.
+ *
+ * **Prefixed, and it has to be.** `activate` unprefixed is not in any
+ * `*EventMap` in the DOM library, checked rather than assumed, but the prefix is
+ * what stops an event dispatched inside a shadow root and retargeted to the host
+ * being mistaken for something the host's own contents sent. That is the same
+ * argument `helix-select` and `helix-resize` are excused under.
+ */
+export class HelixActivateEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-activate'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixActivateEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
       composed: true,
       detail,
     })
@@ -1001,6 +1049,7 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
  * only step left that can be forgotten.
  */
 const registry = {
+  HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,

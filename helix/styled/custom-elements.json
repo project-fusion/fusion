@@ -503,7 +503,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the item opens or closes.",
+              "description": "Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -1466,7 +1466,7 @@
               "type": {
                 "text": "HelixDismissEvent"
               },
-              "description": "Fired when the reader asks to close it.",
+              "description": "Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
@@ -10153,7 +10153,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the slide in view changes, with its index.",
+              "description": "Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -13384,7 +13384,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when any box changes, with the whole set.",
+              "description": "Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -16867,7 +16867,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the color changes.",
+              "description": "Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -16879,7 +16879,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -16891,7 +16891,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the panel opens.",
+              "description": "Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -18474,7 +18474,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the color changes.",
+              "description": "Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -20543,7 +20543,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the chosen option changes.",
+              "description": "Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -20555,7 +20555,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -20567,7 +20567,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the panel opens.",
+              "description": "Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -21597,7 +21597,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -21609,7 +21609,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the palette opens.",
+              "description": "Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -21621,7 +21621,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when a command is chosen.",
+              "description": "Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -26102,7 +26102,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the date changes.",
+              "description": "Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -26114,7 +26114,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -26126,7 +26126,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the calendar opens.",
+              "description": "Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -30721,7 +30721,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the drawer opens or closes.",
+              "description": "Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -31359,7 +31359,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the row is chosen.",
+              "description": "Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -32092,7 +32092,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when a row with no page is chosen.",
+              "description": "Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -33807,7 +33807,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the chosen files change, with their names.",
+              "description": "Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -34757,7 +34757,7 @@
             "part": "Root",
             "examples": [
               {
-                "description": "The same instant, read four ways: elapsed, and three arrangements of a date.",
+                "description": "An elapsed reading, and three arrangements of a fixed date.",
                 "slug": "preview"
               }
             ],
@@ -47788,7 +47788,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the row is chosen.",
+              "description": "Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -48825,7 +48825,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when an item is chosen.",
+              "description": "Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -54246,7 +54246,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when this choice is made.",
+              "description": "Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -54903,7 +54903,7 @@
               "type": {
                 "text": "HelixBeforeActivateEvent"
               },
-              "description": "The section being read has changed, carrying its id as the value.",
+              "description": "The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-activate",
               "reactProp": "onhelix-before-activate",
               "inheritedFrom": {
@@ -62275,7 +62275,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when this choice is made.",
+              "description": "Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -64941,7 +64941,7 @@
               "type": {
                 "text": "HelixBeforePanelResizeEvent"
               },
-              "description": "Fired when the panel's divider is let go, with its height in pixels.",
+              "description": "Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-panel-resize",
               "reactProp": "onhelix-before-panel-resize"
             },
@@ -64949,7 +64949,7 @@
               "type": {
                 "text": "HelixBeforeSplitEvent"
               },
-              "description": "Fired when the panes' divider is let go, with the lead pane's share.",
+              "description": "Fired before the panes' divider is let go, with the lead pane's share. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-split",
               "reactProp": "onhelix-before-split"
             }
@@ -65424,7 +65424,7 @@
               "type": {
                 "text": "HelixBeforeEditEvent"
               },
-              "description": "Fired when the source is edited.",
+              "description": "Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-edit",
               "reactProp": "onhelix-before-edit"
             },
@@ -68336,7 +68336,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Relayed from the listbox when the answer changes.",
+              "description": "Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -68348,7 +68348,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -68360,7 +68360,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the list opens.",
+              "description": "Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -71577,7 +71577,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the action is chosen.",
+              "description": "Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -74464,6 +74464,29 @@
             },
             {
               "kind": "method",
+              "name": "announceActivated",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Says the current child moved, once it has.\n\n**This was the only one of the four mixins with no notification**, and the\nevent class said so deliberately: no native word means \"a set chose a\ndifferent member\", so borrowing `change` would be a lie about what moved.\nThat half still holds, and is why the pair is `helix-activate`. What did\nnot follow is that a set should therefore announce nothing.\n\nThe cost is the one 294 fixed for values and left here. A consumer who\nonly wants to know which child is current had one channel and it fires\n*before* `apply`, so `currentTarget.active` is the previous value inside\nthe handler and `detail.value` is a proposal another listener may refuse.\nMeasured across the four families taking this: `Tabs` and `Tree` looked\ncovered because `helix-select` bubbles up from a child, which fires when an\nitem is *chosen* and not when `active` is assigned, and `Steps` and\n`Video Playlist` announced nothing at all.\n\n**After `apply`, which is the whole reason it is a second event**, so the\nstate is on the element by the time a handler reads it. Not cancelable:\nthe decision was taken by the event before this one, and two refusable\nevents for one transition are two answers to one question. See #325.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "resolveActive",
               "privacy": "protected",
               "return": {
@@ -74866,24 +74889,36 @@
               }
             }
           ],
-          "slots": [
+          "events": [
             {
-              "description": "The steps, which are `helix-step` elements.",
-              "name": "",
+              "type": {
+                "text": "HelixActivateEvent"
+              },
+              "description": "Fired once the current one has moved, so the element already holds it.",
+              "name": "helix-activate",
+              "reactProp": "onhelix-activate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixBeforeActivateEvent"
+              },
+              "description": "Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves.",
+              "name": "helix-before-activate",
+              "reactProp": "onhelix-before-activate",
               "inheritedFrom": {
                 "name": "HelixHeadlessSteps",
                 "module": "src/steps/root/steps-root.ts"
               }
             }
           ],
-          "events": [
+          "slots": [
             {
-              "type": {
-                "text": "HelixBeforeActivateEvent"
-              },
-              "description": "Fired when the active step changes.",
-              "name": "helix-before-activate",
-              "reactProp": "onhelix-before-activate",
+              "description": "The steps, which are `helix-step` elements.",
+              "name": "",
               "inheritedFrom": {
                 "name": "HelixHeadlessSteps",
                 "module": "src/steps/root/steps-root.ts"
@@ -75407,7 +75442,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the step is pressed.",
+              "description": "Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -78677,6 +78712,29 @@
             },
             {
               "kind": "method",
+              "name": "announceActivated",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Says the current child moved, once it has.\n\n**This was the only one of the four mixins with no notification**, and the\nevent class said so deliberately: no native word means \"a set chose a\ndifferent member\", so borrowing `change` would be a lie about what moved.\nThat half still holds, and is why the pair is `helix-activate`. What did\nnot follow is that a set should therefore announce nothing.\n\nThe cost is the one 294 fixed for values and left here. A consumer who\nonly wants to know which child is current had one channel and it fires\n*before* `apply`, so `currentTarget.active` is the previous value inside\nthe handler and `detail.value` is a proposal another listener may refuse.\nMeasured across the four families taking this: `Tabs` and `Tree` looked\ncovered because `helix-select` bubbles up from a child, which fires when an\nitem is *chosen* and not when `active` is assigned, and `Steps` and\n`Video Playlist` announced nothing at all.\n\n**After `apply`, which is the whole reason it is a second event**, so the\nstate is on the element by the time a handler reads it. Not cancelable:\nthe decision was taken by the event before this one, and two refusable\nevents for one transition are two answers to one question. See #325.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "resolveActive",
               "privacy": "protected",
               "return": {
@@ -79153,6 +79211,18 @@
           "events": [
             {
               "type": {
+                "text": "HelixActivateEvent"
+              },
+              "description": "Fired once the current one has moved, so the element already holds it.",
+              "name": "helix-activate",
+              "reactProp": "onhelix-activate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
+            },
+            {
+              "type": {
                 "text": "HelixBeforeActivateEvent"
               },
               "description": "Fired before the current tab moves, and cancelable. The only way to refuse one.",
@@ -79167,7 +79237,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.",
+              "description": "Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -79560,7 +79630,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the tab is chosen.",
+              "description": "Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -79958,7 +80028,7 @@
               "type": {
                 "text": "HelixDismissEvent"
               },
-              "description": "Fired when the reader asks to remove the tag.",
+              "description": "Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
@@ -83702,7 +83772,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the time changes.",
+              "description": "Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -83714,7 +83784,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when it closes.",
+              "description": "Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -83726,7 +83796,7 @@
               "type": {
                 "text": "HelixBeforeOpenEvent"
               },
-              "description": "Fired when the list opens.",
+              "description": "Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-open",
               "reactProp": "onhelix-before-open",
               "inheritedFrom": {
@@ -85461,7 +85531,7 @@
               "type": {
                 "text": "HelixBeforeChangeEvent"
               },
-              "description": "Fired when the time changes.",
+              "description": "Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-change",
               "reactProp": "onhelix-before-change",
               "inheritedFrom": {
@@ -87145,7 +87215,7 @@
               "type": {
                 "text": "HelixDismissEvent"
               },
-              "description": "Fired when it asks to go, whether by the control or by its timer.",
+              "description": "Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
@@ -88644,7 +88714,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when an item is chosen. Dispatched by the item and listened for here.",
+              "description": "Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -89136,7 +89206,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the item is chosen.",
+              "description": "Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -91510,7 +91580,7 @@
               "type": {
                 "text": "HelixBeforeActivateEvent"
               },
-              "description": "Fired when the current stop moves, carrying the new index.",
+              "description": "Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-activate",
               "reactProp": "onhelix-before-activate",
               "inheritedFrom": {
@@ -91522,7 +91592,7 @@
               "type": {
                 "text": "HelixBeforeCloseEvent"
               },
-              "description": "Fired when the reader leaves early.",
+              "description": "Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-before-close",
               "reactProp": "onhelix-before-close",
               "inheritedFrom": {
@@ -92920,7 +92990,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the item is chosen.",
+              "description": "Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -93411,6 +93481,29 @@
             },
             {
               "kind": "method",
+              "name": "announceActivated",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Says the current child moved, once it has.\n\n**This was the only one of the four mixins with no notification**, and the\nevent class said so deliberately: no native word means \"a set chose a\ndifferent member\", so borrowing `change` would be a lie about what moved.\nThat half still holds, and is why the pair is `helix-activate`. What did\nnot follow is that a set should therefore announce nothing.\n\nThe cost is the one 294 fixed for values and left here. A consumer who\nonly wants to know which child is current had one channel and it fires\n*before* `apply`, so `currentTarget.active` is the previous value inside\nthe handler and `detail.value` is a proposal another listener may refuse.\nMeasured across the four families taking this: `Tabs` and `Tree` looked\ncovered because `helix-select` bubbles up from a child, which fires when an\nitem is *chosen* and not when `active` is assigned, and `Steps` and\n`Video Playlist` announced nothing at all.\n\n**After `apply`, which is the whole reason it is a second event**, so the\nstate is on the element by the time a handler reads it. Not cancelable:\nthe decision was taken by the event before this one, and two refusable\nevents for one transition are two answers to one question. See #325.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "resolveActive",
               "privacy": "protected",
               "return": {
@@ -93761,9 +93854,21 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.",
+              "description": "Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
+              "inheritedFrom": {
+                "name": "HelixHeadlessTree",
+                "module": "src/tree/root/tree-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixActivateEvent"
+              },
+              "description": "Fired once the current one has moved, so the element already holds it.",
+              "name": "helix-activate",
+              "reactProp": "onhelix-activate",
               "inheritedFrom": {
                 "name": "HelixHeadlessTree",
                 "module": "src/tree/root/tree-root.ts"
@@ -94810,7 +94915,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired when the entry is chosen.",
+              "description": "Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -95375,7 +95480,7 @@
               "type": {
                 "text": "HelixSelectEvent"
               },
-              "description": "Fired with the chosen entry's value. The playlist listens for it.",
+              "description": "Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves.",
               "name": "helix-select",
               "reactProp": "onhelix-select",
               "inheritedFrom": {
@@ -95510,6 +95615,29 @@
               },
               "type": {
                 "text": "requestActive(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announceActivated",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Says the current child moved, once it has.\n\n**This was the only one of the four mixins with no notification**, and the\nevent class said so deliberately: no native word means \"a set chose a\ndifferent member\", so borrowing `change` would be a lie about what moved.\nThat half still holds, and is why the pair is `helix-activate`. What did\nnot follow is that a set should therefore announce nothing.\n\nThe cost is the one 294 fixed for values and left here. A consumer who\nonly wants to know which child is current had one channel and it fires\n*before* `apply`, so `currentTarget.active` is the previous value inside\nthe handler and `detail.value` is a proposal another listener may refuse.\nMeasured across the four families taking this: `Tabs` and `Tree` looked\ncovered because `helix-select` bubbles up from a child, which fires when an\nitem is *chosen* and not when `active` is assigned, and `Steps` and\n`Video Playlist` announced nothing at all.\n\n**After `apply`, which is the whole reason it is a second event**, so the\nstate is on the element by the time a handler reads it. Not cancelable:\nthe decision was taken by the event before this one, and two refusable\nevents for one transition are two answers to one question. See #325.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
               }
             },
             {
@@ -95915,6 +96043,32 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixActivateEvent"
+              },
+              "description": "Fired once the current one has moved, so the element already holds it.",
+              "name": "helix-activate",
+              "reactProp": "onhelix-activate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixBeforeActivateEvent"
+              },
+              "description": "Fired before the current entry changes, and cancelable.",
+              "name": "helix-before-activate",
+              "reactProp": "onhelix-before-activate",
+              "inheritedFrom": {
+                "name": "HelixHeadlessVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            }
+          ],
           "slots": [
             {
               "description": "The entries.",
@@ -95945,20 +96099,6 @@
             {
               "description": "The region holding the player.",
               "name": "player",
-              "inheritedFrom": {
-                "name": "HelixHeadlessVideoPlaylist",
-                "module": "src/video-playlist/root/video-playlist-root.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixBeforeActivateEvent"
-              },
-              "description": "Fired before the current entry changes, and cancelable.",
-              "name": "helix-before-activate",
-              "reactProp": "onhelix-before-activate",
               "inheritedFrom": {
                 "name": "HelixHeadlessVideoPlaylist",
                 "module": "src/video-playlist/root/video-playlist-root.ts"

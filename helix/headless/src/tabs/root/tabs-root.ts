@@ -33,8 +33,9 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @slot - The tabs.
  * @slot panels - The panels.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current tab moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+ * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart indicator - The mark that travels to the selected tab.
  * @csspart panels - The panel container.

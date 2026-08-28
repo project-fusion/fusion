@@ -52,7 +52,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
- * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart indicator - The mark that travels to the section being read.
  * @csspart nav - The navigation landmark.

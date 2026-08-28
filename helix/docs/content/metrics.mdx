@@ -59,10 +59,10 @@ repository does that. The per-component tables are what a page pays.
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 132,489 | 43,947 | 37,794 | Element base class, mixins, decorators, floating positioning. |
-| `@fusion.dev/helix-headless` | 515,359 | 130,663 | 102,485 | Every headless family, which is what the barrel means. |
+| `@fusion.dev/helix-headless` | 515,427 | 130,669 | 102,456 | Every headless family, which is what the barrel means. |
 | `@fusion.dev/helix-icons` | 46,295 | 14,855 | 12,542 | The whole glyph set. |
 | `@fusion.dev/helix-theme` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@fusion.dev/helix` | 963,398 | 217,839 | 160,031 | Every styled family. |
+| `@fusion.dev/helix` | 963,466 | 217,845 | 160,111 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -79,15 +79,15 @@ is the whole cost of adopting the base layer on its own.
 | `elements.css` | 8,336 | 1,905 | 1,614 | The components' own layer, generated from every family's stylesheet. |
 | `all.css` | 179 | 142 | 110 | The three above in one import, in the order they have to be in. |
 | `primitives.css` | 6,274 | 1,233 | 1,055 | The primitive layer. Private, shipped because `tokens.css` resolves into it. |
-| `tokens.css` | 19,989 | 2,466 | 2,079 | The 179 semantic tokens. Nothing paints without this. |
+| `tokens.css` | 19,583 | 2,412 | 2,014 | The 179 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
 **Most of a first component is the runtime under it.** The median styled family is 13,976 bytes gzipped alone and adds 2,474 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `code` at 9,057 gzipped alone, the dearest `data-table` at 49,141, over 93 components. Every family at once is 217,839.
+Across the tier: the cheapest is `code` at 9,057 gzipped alone, the dearest `data-table` at 49,141, over 93 components. Every family at once is 217,845.
 
-**No family imports a barrel, and `check:barrels` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 130,663 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
+**No family imports a barrel, and `check:barrels` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 130,669 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
 The headless tier never had the problem, and it is the control: `@fusion.dev/helix-core` is `sideEffects: false`, and a headless family is a median of 16,083 bytes gzipped alone.
 
@@ -382,11 +382,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 907,191 | 113 | 160,112 | `@floating-ui/dom`, `@fusion.dev/helix-icons` |
-| `@fusion.dev/helix-headless` | 10,037,751 | 422 | 736,778 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
+| `@fusion.dev/helix-headless` | 10,062,025 | 422 | 736,824 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
 | `@fusion.dev/helix-icons` | 65,119 | 11 | 20,405 | none |
-| `@fusion.dev/helix-styles` | 82,361 | 5 | 0 | none |
+| `@fusion.dev/helix-styles` | 81,955 | 5 | 0 | none |
 | `@fusion.dev/helix-theme` | 465,772 | 8 | 4,793 | none |
-| `@fusion.dev/helix` | 9,956,828 | 717 | 287,498 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
+| `@fusion.dev/helix` | 9,990,486 | 717 | 287,546 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
 
 ## Not measured yet
 

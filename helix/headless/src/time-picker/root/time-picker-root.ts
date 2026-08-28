@@ -102,7 +102,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * @documentation https://helix.fusion.dev/components/time-picker
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart column - One of them.

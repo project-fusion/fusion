@@ -122,9 +122,9 @@ const isInsertion = (event: Event): boolean =>
  * @slot start - Before the text, for an icon.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen option changes.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the panel opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
  * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.

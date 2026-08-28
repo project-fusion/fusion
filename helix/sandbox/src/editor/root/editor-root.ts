@@ -54,7 +54,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * @aliases Code editor, Source pane
  * @documentation https://helix.fusion.dev/sandbox/editor
  *
- * @event {HelixBeforeEditEvent} helix-before-edit - Fired when the source is edited.
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.
  *
  * @csspart editor - The element CodeMirror is mounted into.

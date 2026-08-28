@@ -39,6 +39,7 @@ import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item
  * @slot - The entries.
  * @slot player - The `helix-video` they play in.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current entry changes, and cancelable.
  *
  * @csspart items - The list of entries.

@@ -20,7 +20,7 @@ import { styles } from './tree-root.css.js'
  *
  * @slot - The tree's items.
  *
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart tree - The tree container.
  *

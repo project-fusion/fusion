@@ -93,7 +93,7 @@ interface EyeDropperConstructor {
  * @slot eyedropper-icon - The glyph on the screen-sampling control, usually a dropper.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
  * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
  * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.

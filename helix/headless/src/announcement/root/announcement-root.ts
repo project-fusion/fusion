@@ -43,7 +43,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot actions - What to do about it, usually a link or a button.
  * @slot icon - Replaces the glyph inside the dismiss control.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart actions - The trailing action region.
  * @csspart content - The message region.

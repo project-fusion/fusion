@@ -34,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * chip has to hide one and show the other, and they are both in the same place
  * otherwise.
  *
- * @event {HelixSelectEvent} helix-select - Fired when this choice is made.
+ * @event {HelixSelectEvent} helix-select - Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart box - The circle.
  * @csspart item - The button, which is the whole row.

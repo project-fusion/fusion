@@ -2019,7 +2019,7 @@
         },
         {
           "kind": "class",
-          "description": "A set is about to make a different child current, and can be refused.\n\n**The generic `helix-change` covered this and should not have.** Eleven\nfamilies that are not form controls announced their state under the word the\nplatform uses for a committed value, which is 294's whole complaint read from\nthe other end: `Tabs` moving to another tab, `Tree` marking another row and\n`Steps` advancing are not a value changing, they are a set choosing. One word\nfor four questions is what `appearance` was before `check:axes`.\n\n`active` names which child is current, so `activate` is the verb, and unlike\n`change` the platform has no claim on it. There is no notification half here:\na native `change` would be a lie about what moved, and no other native event\nmeans this. The before event is the whole channel.",
+          "description": "A set is about to make a different child current, and can be refused.\n\n**The generic `helix-change` covered this and should not have.** Eleven\nfamilies that are not form controls announced their state under the word the\nplatform uses for a committed value, which is 294's whole complaint read from\nthe other end: `Tabs` moving to another tab, `Tree` marking another row and\n`Steps` advancing are not a value changing, they are a set choosing. One word\nfor four questions is what `appearance` was before `check:axes`.\n\n`active` names which child is current, so `activate` is the verb, and unlike\n`change` the platform has no claim on it.\n\n**It has a notification half now, and this said it did not.** *Reversed 28 Aug\n2026.* The paragraph here read \"there is no notification half: a native\n`change` would be a lie about what moved, and no other native event means\nthis. The before event is the whole channel.\" The first half of that is still\nexactly right, which is why the pair is `helix-activate` and not `change`. The\nconclusion did not follow: that no *native* word fits is an argument against\nborrowing one, not an argument against having a notification at all.\n\nWhat the missing half cost is the thing 294 fixed for values and left here.\nA consumer who only wants to know which child is current now had one channel,\nand it fires *before* `apply`: `currentTarget.active` still holds the previous\nvalue inside the handler, and `detail.value` is a proposal another listener may\nrefuse. Measured across the four families taking this mixin, nothing at all was\nannounced afterwards. `Tabs` and `Tree` looked covered because `helix-select`\nbubbles up from a child, which fires when an item is *chosen* and not when\n`active` is assigned; `Steps` and `Video Playlist` had nothing.\n\nSo the shape is the one `MixinControllerOpen` already has, a cancelable\nrequest and a plain notification after the state has moved. See #325.",
           "name": "HelixBeforeActivateEvent",
           "members": [
             {
@@ -2031,6 +2031,28 @@
               "static": true,
               "readonly": true,
               "default": "'helix-before-activate'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "A set has made a different child current.\n\nThe notification half of `helix-before-activate`, dispatched after the state\nhas moved, so `currentTarget.active` is the new value and the detail is a fact\nrather than a proposal.\n\n**Not cancelable**, for the reason every notification here is not: the\ndecision was taken by the event before it, and a second refusable event for\none transition is two answers to one question.\n\n**Prefixed, and it has to be.** `activate` unprefixed is not in any\n`*EventMap` in the DOM library, checked rather than assumed, but the prefix is\nwhat stops an event dispatched inside a shadow root and retargeted to the host\nbeing mistaken for something the host's own contents sent. That is the same\nargument `helix-select` and `helix-resize` are excused under.",
+          "name": "HelixActivateEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-activate'"
             }
           ],
           "superclass": {
@@ -2603,6 +2625,14 @@
           "name": "HelixBeforeActivateEvent",
           "declaration": {
             "name": "HelixBeforeActivateEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixActivateEvent",
+          "declaration": {
+            "name": "HelixActivateEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -3642,6 +3672,14 @@
           "name": "FilterDetail",
           "declaration": {
             "name": "FilterDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixActivateEvent",
+          "declaration": {
+            "name": "HelixActivateEvent",
             "module": "./events/events.js"
           }
         },
@@ -5330,6 +5368,25 @@
             },
             {
               "kind": "method",
+              "name": "announceActivated",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Says the current child moved, once it has.\n\n**This was the only one of the four mixins with no notification**, and the\nevent class said so deliberately: no native word means \"a set chose a\ndifferent member\", so borrowing `change` would be a lie about what moved.\nThat half still holds, and is why the pair is `helix-activate`. What did\nnot follow is that a set should therefore announce nothing.\n\nThe cost is the one 294 fixed for values and left here. A consumer who\nonly wants to know which child is current had one channel and it fires\n*before* `apply`, so `currentTarget.active` is the previous value inside\nthe handler and `detail.value` is a proposal another listener may refuse.\nMeasured across the four families taking this: `Tabs` and `Tree` looked\ncovered because `helix-select` bubbles up from a child, which fires when an\nitem is *chosen* and not when `active` is assigned, and `Steps` and\n`Video Playlist` announced nothing at all.\n\n**After `apply`, which is the whole reason it is a second event**, so the\nstate is on the element by the time a handler reads it. Not cancelable:\nthe decision was taken by the event before this one, and two refusable\nevents for one transition are two answers to one question. See #325."
+            },
+            {
+              "kind": "method",
               "name": "resolveActive",
               "privacy": "protected",
               "return": {
@@ -5346,6 +5403,13 @@
                 }
               ],
               "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before\nits consumer has chosen and a set whose current item has just been\nremoved. Disabled items are skipped in the fallback but not in the match:\na consumer who names a disabled item meant it, and quietly moving to\nanother would be the component overruling them."
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixActivateEvent"
+              }
             }
           ],
           "attributes": [

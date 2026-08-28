@@ -59,7 +59,7 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  *
  * @slot trigger - Replaces the button that opens the menu.
  *
- * @event {HelixSelectEvent} helix-select - Fired with the chosen entry's value. The playlist listens for it.
+ * @event {HelixSelectEvent} helix-select - Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart entry - One entry in the menu.
  * @csspart entry-item - The row, which is an `<a>` where `href` is set.

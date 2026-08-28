@@ -55,9 +55,9 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @slot trigger - The mark on the field saying a list opens.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *

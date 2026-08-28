@@ -44,7 +44,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  *
  * @slot - The rows of the top page.
  *
- * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart back - The control that returns one page.
  * @csspart back-mark - The glyph on the back control.

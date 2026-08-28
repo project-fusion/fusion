@@ -22,7 +22,7 @@ import { styles } from './accordion-item.css.js'
  * @slot - The content revealed when open.
  * @slot summary - The always-visible trigger content.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the item opens or closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart chevron - The open and close indicator.
  * @csspart container - The outer wrapper.

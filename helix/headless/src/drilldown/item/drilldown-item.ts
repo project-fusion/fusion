@@ -30,7 +30,7 @@ import { property } from 'lit/decorators.js'
  * @slot page - The rows of the page this one opens.
  * @slot start - Before the words, usually an icon.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart item - The row itself.
  * @csspart label - The words.

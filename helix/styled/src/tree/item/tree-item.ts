@@ -24,7 +24,7 @@ import { styles } from './tree-item.css.js'
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target.

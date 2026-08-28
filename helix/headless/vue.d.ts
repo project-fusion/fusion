@@ -145,6 +145,7 @@ import type {
   HelixCompleteEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
+  HelixActivateEvent,
   HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -270,7 +271,7 @@ is what the mirror has always been for. */
 export type HelixHeadlessAccordionItemVueEvents = {
   /** Fired before the section closes, and cancelable. */
   "helix-before-close": HelixHeadlessAccordionItemHelixBeforeCloseElementEvent;
-  /** Fired when the item opens or closes. */
+  /** Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessAccordionItemHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessAccordionItemElementEvent;
@@ -341,7 +342,7 @@ would catch. */
 };
 
 export type HelixHeadlessAnnouncementVueEvents = {
-  /** Fired when the reader asks to close it. */
+  /** Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-dismiss": HelixHeadlessAnnouncementHelixDismissElementEvent;
 };
 
@@ -954,7 +955,7 @@ case is the absent attribute, and the styles read it that way. */
 };
 
 export type HelixHeadlessCarouselVueEvents = {
-  /** Fired when the slide in view changes, with its index. */
+  /** Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessCarouselHelixSelectElementEvent;
 };
 
@@ -1167,7 +1168,7 @@ reflected none of them. */
 export type HelixHeadlessCheckboxGroupVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessCheckboxGroupElementEvent;
-  /** Fired when any box changes, with the whole set. */
+  /** Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessCheckboxGroupElementEvent;
@@ -1458,11 +1459,11 @@ reflected none of them. */
 export type HelixHeadlessColorInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessColorInputElementEvent;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessColorInputHelixBeforeChangeElementEvent;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessColorInputHelixBeforeCloseElementEvent;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessColorInputHelixBeforeOpenElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessColorInputElementEvent;
@@ -1605,7 +1606,7 @@ reflected none of them. */
 export type HelixHeadlessColorPickerVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessColorPickerElementEvent;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessColorPickerHelixBeforeChangeElementEvent;
   /** Fired when the color is put on the clipboard. */
   "helix-copy": HelixHeadlessColorPickerHelixCopyElementEvent;
@@ -1814,11 +1815,11 @@ differently: they are one chooser to a consumer. */
 export type HelixHeadlessComboboxVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessComboboxElementEvent;
-  /** Fired when the chosen option changes. */
+  /** Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessComboboxHelixBeforeChangeElementEvent;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessComboboxHelixBeforeCloseElementEvent;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessComboboxHelixBeforeOpenElementEvent;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
   "helix-create": HelixHeadlessComboboxHelixCreateElementEvent;
@@ -1889,11 +1890,11 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessCommandVueEvents = {
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessCommandHelixBeforeCloseElementEvent;
-  /** Fired when the palette opens. */
+  /** Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessCommandHelixBeforeOpenElementEvent;
-  /** Fired when a command is chosen. */
+  /** Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessCommandHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessCommandElementEvent;
@@ -2481,11 +2482,11 @@ reader makes in one of these. */
 export type HelixHeadlessDateInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessDateInputElementEvent;
-  /** Fired when the date changes. */
+  /** Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessDateInputHelixBeforeChangeElementEvent;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessDateInputHelixBeforeCloseElementEvent;
-  /** Fired when the calendar opens. */
+  /** Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessDateInputHelixBeforeOpenElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessDateInputElementEvent;
@@ -2969,7 +2970,7 @@ export type HelixHeadlessDrawerVueEvents = {
   close: HelixHeadlessDrawerElementEvent;
   /** Fired before the panel closes, and cancelable. */
   "helix-before-close": HelixHeadlessDrawerHelixBeforeCloseElementEvent;
-  /** Fired when the drawer opens or closes. */
+  /** Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessDrawerHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessDrawerElementEvent;
@@ -3012,7 +3013,7 @@ lands inside this shadow root instead. */
 };
 
 export type HelixHeadlessDrilldownItemVueEvents = {
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessDrilldownItemHelixSelectElementEvent;
 };
 
@@ -3049,7 +3050,7 @@ say that without the component knowing what a row looks like. */
 };
 
 export type HelixHeadlessDrilldownVueEvents = {
-  /** Fired when a row with no page is chosen. */
+  /** Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessDrilldownHelixSelectElementEvent;
 };
 
@@ -3142,7 +3143,7 @@ export type HelixHeadlessFileInputVueEvents = {
   input: HelixHeadlessFileInputElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessFileInputElementEvent;
-  /** Fired when the chosen files change, with their names. */
+  /** Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessFileInputHelixBeforeChangeElementEvent;
 };
 
@@ -4328,7 +4329,7 @@ page has to keep the slot even when it shows no row of its own. */
 };
 
 export type HelixHeadlessMenuItemVueEvents = {
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessMenuItemHelixSelectElementEvent;
 };
 
@@ -4409,7 +4410,7 @@ export type HelixHeadlessMenuVueEvents = {
   "helix-before-close": HelixHeadlessMenuHelixBeforeCloseElementEvent;
   /** Fired before it opens, and cancelable. */
   "helix-before-open": HelixHeadlessMenuHelixBeforeOpenElementEvent;
-  /** Fired when an item is chosen. */
+  /** Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessMenuHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessMenuElementEvent;
@@ -4862,7 +4863,7 @@ on, which is a change of its own rather than a property being added. */
 };
 
 export type HelixHeadlessOptionVueEvents = {
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessOptionHelixSelectElementEvent;
 };
 
@@ -4907,7 +4908,7 @@ JavaScript rather than CSS decides. */
 };
 
 export type HelixHeadlessOutlineVueEvents = {
-  /** The section being read has changed, carrying its id as the value. */
+  /** The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-activate": HelixHeadlessOutlineHelixBeforeActivateElementEvent;
 };
 
@@ -5559,7 +5560,7 @@ on, which is a change of its own rather than a property being added. */
 };
 
 export type HelixHeadlessRadioVueEvents = {
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessRadioHelixSelectElementEvent;
 };
 
@@ -5851,11 +5852,11 @@ differently: they are one chooser to a consumer. */
 export type HelixHeadlessSelectVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessSelectElementEvent;
-  /** Relayed from the listbox when the answer changes. */
+  /** Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessSelectHelixBeforeChangeElementEvent;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessSelectHelixBeforeCloseElementEvent;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessSelectHelixBeforeOpenElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessSelectElementEvent;
@@ -6085,7 +6086,7 @@ export type HelixHeadlessSpeedDialItemVueProps = {
 };
 
 export type HelixHeadlessSpeedDialItemVueEvents = {
-  /** Fired when the action is chosen. */
+  /** Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessSpeedDialItemHelixSelectElementEvent;
 };
 
@@ -6305,6 +6306,9 @@ export type HelixHeadlessStepsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSteps,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessStepsHelixActivateElementEvent =
+  HelixHeadlessStepsElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessStepsHelixBeforeActivateElementEvent =
   HelixHeadlessStepsElementEvent<HelixBeforeActivateEvent>;
@@ -6363,7 +6367,9 @@ Ignored once `active` is written. */
 };
 
 export type HelixHeadlessStepsVueEvents = {
-  /** Fired when the active step changes. */
+  /** Fired once the current one has moved, so the element already holds it. */
+  "helix-activate": HelixHeadlessStepsHelixActivateElementEvent;
+  /** Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-activate": HelixHeadlessStepsHelixBeforeActivateElementEvent;
 };
 
@@ -6388,7 +6394,7 @@ export type HelixHeadlessStepVueProps = {
 };
 
 export type HelixHeadlessStepVueEvents = {
-  /** Fired when the step is pressed. */
+  /** Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessStepHelixSelectElementEvent;
 };
 
@@ -6611,6 +6617,9 @@ export type HelixHeadlessTabsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTabs,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessTabsHelixActivateElementEvent =
+  HelixHeadlessTabsElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessTabsHelixBeforeActivateElementEvent =
   HelixHeadlessTabsElementEvent<HelixBeforeActivateEvent>;
@@ -6676,9 +6685,11 @@ Ignored once `active` is written. */
 };
 
 export type HelixHeadlessTabsVueEvents = {
+  /** Fired once the current one has moved, so the element already holds it. */
+  "helix-activate": HelixHeadlessTabsHelixActivateElementEvent;
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "helix-before-activate": HelixHeadlessTabsHelixBeforeActivateElementEvent;
-  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
+  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessTabsHelixSelectElementEvent;
 };
 
@@ -6701,7 +6712,7 @@ export type HelixHeadlessTabVueProps = {
 };
 
 export type HelixHeadlessTabVueEvents = {
-  /** Fired when the tab is chosen. */
+  /** Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessTabHelixSelectElementEvent;
 };
 
@@ -6734,7 +6745,7 @@ would catch. */
 };
 
 export type HelixHeadlessTagVueEvents = {
-  /** Fired when the reader asks to remove the tag. */
+  /** Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-dismiss": HelixHeadlessTagHelixDismissElementEvent;
 };
 
@@ -7104,11 +7115,11 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 export type HelixHeadlessTimeInputVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessTimeInputElementEvent;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessTimeInputHelixBeforeChangeElementEvent;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessTimeInputHelixBeforeCloseElementEvent;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessTimeInputHelixBeforeOpenElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessTimeInputElementEvent;
@@ -7304,7 +7315,7 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 export type HelixHeadlessTimePickerVueEvents = {
   /** Announced once the value has moved. */
   change: HelixHeadlessTimePickerElementEvent;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-change": HelixHeadlessTimePickerHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessTimePickerElementEvent;
@@ -7388,7 +7399,7 @@ would catch. */
 };
 
 export type HelixHeadlessToastItemVueEvents = {
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-dismiss": HelixHeadlessToastItemHelixDismissElementEvent;
 };
 
@@ -7520,7 +7531,7 @@ export type HelixHeadlessToggleGroupVueEvents = {
   change: HelixHeadlessToggleGroupElementEvent;
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
   "helix-before-change": HelixHeadlessToggleGroupHelixBeforeChangeElementEvent;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessToggleGroupHelixSelectElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessToggleGroupElementEvent;
@@ -7567,7 +7578,7 @@ hydration reports and does not patch up. */
 };
 
 export type HelixHeadlessToggleVueEvents = {
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessToggleHelixSelectElementEvent;
 };
 
@@ -7770,9 +7781,9 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 };
 
 export type HelixHeadlessTourVueEvents = {
-  /** Fired when the current stop moves, carrying the new index. */
+  /** Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-activate": HelixHeadlessTourHelixBeforeActivateElementEvent;
-  /** Fired when the reader leaves early. */
+  /** Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-close": HelixHeadlessTourHelixBeforeCloseElementEvent;
   /** Fired when the last stop is finished. */
   "helix-complete": HelixHeadlessTourHelixCompleteElementEvent;
@@ -7919,7 +7930,7 @@ export type HelixHeadlessTreeItemVueEvents = {
   "helix-before-close": HelixHeadlessTreeItemHelixBeforeCloseElementEvent;
   /** Fired before a branch opens, and cancelable. */
   "helix-before-open": HelixHeadlessTreeItemHelixBeforeOpenElementEvent;
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessTreeItemHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTreeItemElementEvent;
@@ -7930,6 +7941,9 @@ export type HelixHeadlessTreeElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTree,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessTreeHelixActivateElementEvent =
+  HelixHeadlessTreeElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessTreeHelixBeforeActivateElementEvent =
   HelixHeadlessTreeElementEvent<HelixBeforeActivateEvent>;
@@ -7979,9 +7993,11 @@ Ignored once `active` is written. */
 };
 
 export type HelixHeadlessTreeVueEvents = {
+  /** Fired once the current one has moved, so the element already holds it. */
+  "helix-activate": HelixHeadlessTreeHelixActivateElementEvent;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "helix-before-activate": HelixHeadlessTreeHelixBeforeActivateElementEvent;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessTreeHelixSelectElementEvent;
 };
 
@@ -8039,7 +8055,7 @@ which one is playing. */
 };
 
 export type HelixHeadlessVideoPlaylistItemVueEvents = {
-  /** Fired when the entry is chosen. */
+  /** Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessVideoPlaylistItemHelixSelectElementEvent;
 };
 
@@ -8066,7 +8082,7 @@ opening downward from there opens off the player. */
 };
 
 export type HelixHeadlessVideoPlaylistMenuVueEvents = {
-  /** Fired with the chosen entry's value. The playlist listens for it. */
+  /** Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-select": HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent;
 };
 
@@ -8075,6 +8091,9 @@ export type HelixHeadlessVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixHeadlessVideoPlaylist,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessVideoPlaylistHelixActivateElementEvent =
+  HelixHeadlessVideoPlaylistElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent =
   HelixHeadlessVideoPlaylistElementEvent<HelixBeforeActivateEvent>;
@@ -8107,6 +8126,8 @@ Ignored once `active` is written. */
 };
 
 export type HelixHeadlessVideoPlaylistVueEvents = {
+  /** Fired once the current one has moved, so the element already holds it. */
+  "helix-activate": HelixHeadlessVideoPlaylistHelixActivateElementEvent;
   /** Fired before the current entry changes, and cancelable. */
   "helix-before-activate": HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent;
 };

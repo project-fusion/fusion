@@ -81,7 +81,7 @@ cursor in it to read a long line. What it stops is the typing. */
 };
 
 export type HelixSandboxEditorVueEvents = {
-  /** Fired when the source is edited. */
+  /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-edit": HelixSandboxEditorHelixBeforeEditElementEvent;
   /** Fired when the cursor moves, with its line and column. */
   "helix-caret": HelixSandboxEditorHelixCaretElementEvent;

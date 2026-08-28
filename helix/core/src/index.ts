@@ -70,6 +70,7 @@ export {
   type CreateDetail,
   type DismissDetail,
   type FilterDetail,
+  HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,

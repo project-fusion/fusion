@@ -35,7 +35,7 @@ import { property } from 'lit/decorators.js'
  * @slot end - After them, for a shortcut or a count.
  * @slot start - Before the words, for an icon or an avatar.
  *
- * @event {HelixSelectEvent} helix-select - Fired when this choice is made.
+ * @event {HelixSelectEvent} helix-select - Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart description - The caption under the words, when there is one.
  * @csspart item - The row.

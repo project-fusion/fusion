@@ -104,7 +104,7 @@ const kind = (file: File): string => {
  * @slot trigger - What the reader presses to open the picker.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen files change, with their names.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart control - The file input itself, which carries the label and validity.

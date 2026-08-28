@@ -78,7 +78,7 @@ Usable on its own as a disclosure, with no accordion around it.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the item opens or closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the section closes, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
@@ -135,7 +135,7 @@ band across the top of the page, not a box that happens to be wide.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to close it. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -900,7 +900,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the slide in view changes, with its index. |
+| `helix-select` | `HelixSelectEvent` | Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -1267,7 +1267,7 @@ line per answer rather than hunting along a row.
 | Event | Type | Description |
 | --- | --- | --- |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when any box changes, with the whole set. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves. |
 | `input` | `Event` | Announced once the value has moved. |
 
 #### Slots
@@ -1441,9 +1441,9 @@ pads its own lower rows.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -1577,7 +1577,7 @@ brought its own card would be a card inside a card there.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
 | `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a color was taken. |
 | `helix-sample-start` | `HelixSampleStartEvent` | The eyedropper is opening, so anything covering the page should get out of the way. |
@@ -1695,9 +1695,9 @@ Input, Color Input and Date Input all take.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the chosen option changes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
@@ -1787,9 +1787,9 @@ otherwise walk up and down the screen under the words being typed.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the palette opens. |
-| `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -2062,9 +2062,9 @@ whatever holds it.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the date changes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the calendar opens. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -2447,7 +2447,7 @@ rest is flat and the movement is what says something happened.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the drawer opens or closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves. |
 | `close` | `Event` | Relayed, because the platform's own does not escape. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the panel closes, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
@@ -2520,7 +2520,7 @@ from: the page arriving was not in the DOM a frame ago. Under
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when a row with no page is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -2578,7 +2578,7 @@ lines up with the edge the eye is already following down the list.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -2694,7 +2694,7 @@ invisible.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the chosen files change, with their names. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -3712,7 +3712,7 @@ one panel and reads the same on a phone as on a desk.
 | --- | --- | --- |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
 | `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -3784,7 +3784,7 @@ than as a ragged list.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -4219,7 +4219,7 @@ picked from what they are looking at.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. |
+| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -4306,7 +4306,7 @@ document is not always where the headings are.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-activate` | `HelixBeforeActivateEvent` | The section being read has changed, carrying its id as the value. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -4809,7 +4809,7 @@ and being chosen is an answer rather than a state.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. |
+| `helix-select` | `HelixSelectEvent` | Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -5062,8 +5062,8 @@ what it meant when it was written.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-panel-resize` | `HelixBeforePanelResizeEvent` | Fired when the panel's divider is let go, with its height in pixels. |
-| `helix-before-split` | `HelixBeforeSplitEvent` | Fired when the panes' divider is let go, with the lead pane's share. |
+| `helix-before-panel-resize` | `HelixBeforePanelResizeEvent` | Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-split` | `HelixBeforeSplitEvent` | Fired before the panes' divider is let go, with the lead pane's share. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -5201,7 +5201,7 @@ is the documented escape hatch for exactly this trade.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-edit` | `HelixBeforeEditEvent` | Fired when the source is edited. |
+| `helix-before-edit` | `HelixBeforeEditEvent` | Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-caret` | `HelixCaretEvent` | Fired when the cursor moves. |
 
 #### Parts
@@ -5451,9 +5451,9 @@ from the field it came out of.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Relayed from the listbox when the answer changes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -5780,7 +5780,7 @@ over. Everything about choosing it is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the action is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6002,7 +6002,7 @@ second name for it here would be a second thing to keep in step.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
-| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the active step changes. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6046,7 +6046,7 @@ Extends `HelixHeadlessStep`.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the step is pressed. |
+| `helix-select` | `HelixSelectEvent` | Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6319,7 +6319,7 @@ a movement instead of two separate fills.
 | --- | --- | --- |
 | `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current tab moves, and cancelable. The only way to refuse one. |
-| `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. |
+| `helix-select` | `HelixSelectEvent` | Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6395,7 +6395,7 @@ a movement instead of two separate fills.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the tab is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6440,7 +6440,7 @@ the status colors gets the tints with them.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to remove the tag. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -6677,9 +6677,9 @@ belongs to. That is the same reasoning Select gives for its own list.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the time changes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -6805,7 +6805,7 @@ card would be a card inside a card there.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the time changes. |
+| `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Parts
 
@@ -7008,7 +7008,7 @@ costs contrast for something the mark already says.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -7075,7 +7075,7 @@ one fill appearing as another disappears.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -7139,7 +7139,7 @@ corner radius, which is worse than the exception.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired before the answer moves, and cancelable. The only way to refuse one. |
-| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here. |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -7311,8 +7311,8 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the current stop moves, carrying the new index. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired when the reader leaves early. |
+| `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
@@ -7432,7 +7432,7 @@ to it is one more thing between the reader and the label.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. |
+| `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-activate` | `HelixActivateEvent` | Fired once the current one has moved, so the element already holds it. |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired before the current node moves, and cancelable. The only way to refuse one. |
 
@@ -7504,7 +7504,7 @@ the row itself stays flat.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before a branch closes, and cancelable. |
 | `helix-before-open` | `HelixBeforeOpenEvent` | Fired before a branch opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
@@ -7834,7 +7834,7 @@ playing. The base class holds what the entry is and what it announces.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when the entry is chosen. |
+| `helix-select` | `HelixSelectEvent` | Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 
@@ -7894,7 +7894,7 @@ not.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired with the chosen entry's value. The playlist listens for it. |
+| `helix-select` | `HelixSelectEvent` | Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves. |
 
 #### Slots
 

@@ -2,6 +2,7 @@ import type {
   EDGES,
   FOLDS_UP_TO,
   Helix,
+  HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
@@ -428,7 +429,7 @@ is what the mirror has always been for. */
   "onhelix-before-close"?: (
     e: HelixHeadlessAccordionItemHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the item opens or closes. */
+  /** Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessAccordionItemHelixBeforeOpenElementEvent,
   ) => void;
@@ -505,7 +506,7 @@ is what the mirror has always been for. */
   "on:helix-before-close"?: (
     e: HelixHeadlessAccordionItemHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the item opens or closes. */
+  /** Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessAccordionItemHelixBeforeOpenElementEvent,
   ) => void;
@@ -596,7 +597,7 @@ reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixHeadlessAnnouncement["dismissLabel"];
 
-  /** Fired when the reader asks to close it. */
+  /** Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-dismiss"?: (
     e: HelixHeadlessAnnouncementHelixDismissElementEvent,
   ) => void;
@@ -641,7 +642,7 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixHeadlessAnnouncement["dismissLabel"];
-  /** Fired when the reader asks to close it. */
+  /** Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-dismiss"?: (
     e: HelixHeadlessAnnouncementHelixDismissElementEvent,
   ) => void;
@@ -1757,7 +1758,7 @@ server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
   perView?: HelixHeadlessCarousel["perView"];
 
-  /** Fired when the slide in view changes, with its index. */
+  /** Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessCarouselHelixSelectElementEvent) => void;
 };
 
@@ -1859,7 +1860,7 @@ its attribute on upgrade, and the host then carries something a consumer's
 server markup never had, which React reports as a mismatch. The one-across
 case is the absent attribute, and the styles read it that way. */
   "prop:perView"?: HelixHeadlessCarousel["perView"];
-  /** Fired when the slide in view changes, with its index. */
+  /** Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessCarouselHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -2207,7 +2208,7 @@ reflected none of them. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
-  /** Fired when any box changes, with the whole set. */
+  /** Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
@@ -2257,7 +2258,7 @@ reflected none of them. */
   "prop:name"?: HelixHeadlessCheckboxGroup["name"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
-  /** Fired when any box changes, with the whole set. */
+  /** Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
@@ -2683,15 +2684,15 @@ reflected none of them. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -2835,15 +2836,15 @@ reflected none of them. */
   "prop:name"?: HelixHeadlessColorInput["name"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -2991,7 +2992,7 @@ reflected none of them. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
   ) => void;
@@ -3123,7 +3124,7 @@ reflected none of them. */
   "prop:name"?: HelixHeadlessColorPicker["name"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Fired when the color changes. */
+  /** Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
   ) => void;
@@ -3341,15 +3342,15 @@ differently: they are one chooser to a consumer. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Fired when the chosen option changes. */
+  /** Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
   ) => void;
@@ -3537,15 +3538,15 @@ differently: they are one chooser to a consumer. */
   "prop:selectedIndex"?: HelixHeadlessCombobox["selectedIndex"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Fired when the chosen option changes. */
+  /** Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the panel opens. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
   ) => void;
@@ -3621,15 +3622,15 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessCommand["defaultOpen"];
 
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the palette opens. */
+  /** Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when a command is chosen. */
+  /** Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessCommandElementEvent) => void;
@@ -3678,15 +3679,15 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessCommand["defaultOpen"];
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the palette opens. */
+  /** Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when a command is chosen. */
+  /** Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessCommandElementEvent) => void;
@@ -4579,15 +4580,15 @@ reader makes in one of these. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Fired when the date changes. */
+  /** Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the calendar opens. */
+  /** Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -4841,15 +4842,15 @@ reader makes in one of these. */
   "prop:valueAsNumber"?: HelixHeadlessDateInput["valueAsNumber"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Fired when the date changes. */
+  /** Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the calendar opens. */
+  /** Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -5704,7 +5705,7 @@ survives to it and a consumer reading one back gets what they wrote. */
   "onhelix-before-close"?: (
     e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the drawer opens or closes. */
+  /** Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
   ) => void;
@@ -5805,7 +5806,7 @@ survives to it and a consumer reading one back gets what they wrote. */
   "on:helix-before-close"?: (
     e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the drawer opens or closes. */
+  /** Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
   ) => void;
@@ -5853,7 +5854,7 @@ change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
   focusable?: HelixHeadlessDrilldownItem["focusable"];
 
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (
     e: HelixHeadlessDrilldownItemHelixSelectElementEvent,
   ) => void;
@@ -5884,7 +5885,7 @@ elements, and writing `tabindex` onto a host the consumer rendered is a
 change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
   "prop:focusable"?: HelixHeadlessDrilldownItem["focusable"];
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessDrilldownItemHelixSelectElementEvent,
   ) => void;
@@ -5926,7 +5927,7 @@ say that without the component knowing what a row looks like. */
   /** What is said where there are none, and none are coming. */
   emptyText?: HelixHeadlessDrilldown["emptyText"];
 
-  /** Fired when a row with no page is chosen. */
+  /** Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessDrilldownHelixSelectElementEvent) => void;
 };
 
@@ -5951,7 +5952,7 @@ say that without the component knowing what a row looks like. */
   "attr:empty-text"?: HelixHeadlessDrilldown["emptyText"];
   /** What is said where there are none, and none are coming. */
   "prop:emptyText"?: HelixHeadlessDrilldown["emptyText"];
-  /** Fired when a row with no page is chosen. */
+  /** Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessDrilldownHelixSelectElementEvent,
   ) => void;
@@ -6067,7 +6068,7 @@ reflected none of them. */
   oninput?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessFileInputElementEvent) => void;
-  /** Fired when the chosen files change, with their names. */
+  /** Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
   ) => void;
@@ -6133,7 +6134,7 @@ reflected none of them. */
   "on:input"?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessFileInputElementEvent) => void;
-  /** Fired when the chosen files change, with their names. */
+  /** Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
   ) => void;
@@ -8401,7 +8402,7 @@ nowhere to be assigned and are never laid out. The element that holds the
 page has to keep the slot even when it shows no row of its own. */
   showingSubmenu?: HelixHeadlessMenuItem["showingSubmenu"];
 
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessMenuItemHelixSelectElementEvent) => void;
 };
 
@@ -8465,7 +8466,7 @@ that basis takes its `slot[name="submenu"]` with it: the rows inside have
 nowhere to be assigned and are never laid out. The element that holds the
 page has to keep the slot even when it shows no row of its own. */
   "prop:showingSubmenu"?: HelixHeadlessMenuItem["showingSubmenu"];
-  /** Fired when the row is chosen. */
+  /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessMenuItemHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -8553,7 +8554,7 @@ is what the mirror has always been for. */
   "onhelix-before-open"?: (
     e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when an item is chosen. */
+  /** Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessMenuElementEvent) => void;
@@ -8622,7 +8623,7 @@ is what the mirror has always been for. */
   "on:helix-before-open"?: (
     e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when an item is chosen. */
+  /** Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessMenuElementEvent) => void;
@@ -9406,7 +9407,7 @@ consumer's markup. Splitting them means moving what every stylesheet selects
 on, which is a change of its own rather than a property being added. */
   defaultSelected?: HelixHeadlessOption["defaultSelected"];
 
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessOptionHelixSelectElementEvent) => void;
 };
 
@@ -9500,7 +9501,7 @@ declaration's name is the fault `TreeItem` already avoids by mirroring to
 consumer's markup. Splitting them means moving what every stylesheet selects
 on, which is a change of its own rather than a property being added. */
   "prop:defaultSelected"?: HelixHeadlessOption["defaultSelected"];
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessOptionHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -9548,7 +9549,7 @@ the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   behavior?: HelixHeadlessOutline["behavior"];
 
-  /** The section being read has changed, carrying its id as the value. */
+  /** The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessOutlineHelixBeforeActivateElementEvent,
   ) => void;
@@ -9583,7 +9584,7 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   "prop:behavior"?: HelixHeadlessOutline["behavior"];
-  /** The section being read has changed, carrying its id as the value. */
+  /** The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessOutlineHelixBeforeActivateElementEvent,
   ) => void;
@@ -10834,7 +10835,7 @@ consumer's markup. Splitting them means moving what every stylesheet selects
 on, which is a change of its own rather than a property being added. */
   defaultSelected?: HelixHeadlessRadio["defaultSelected"];
 
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessRadioHelixSelectElementEvent) => void;
 };
 
@@ -10861,7 +10862,7 @@ declaration's name is the fault `TreeItem` already avoids by mirroring to
 consumer's markup. Splitting them means moving what every stylesheet selects
 on, which is a change of its own rather than a property being added. */
   "prop:defaultSelected"?: HelixHeadlessRadio["defaultSelected"];
-  /** Fired when this choice is made. */
+  /** Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessRadioHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11303,15 +11304,15 @@ differently: they are one chooser to a consumer. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Relayed from the listbox when the answer changes. */
+  /** Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
   ) => void;
@@ -11440,15 +11441,15 @@ differently: they are one chooser to a consumer. */
   "prop:selectedIndex"?: HelixHeadlessSelect["selectedIndex"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Relayed from the listbox when the answer changes. */
+  /** Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
   ) => void;
@@ -11885,7 +11886,7 @@ export type HelixHeadlessSpeedDialItemProps = {
   /** Whether the action can be chosen. */
   disabled?: HelixHeadlessSpeedDialItem["disabled"];
 
-  /** Fired when the action is chosen. */
+  /** Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (
     e: HelixHeadlessSpeedDialItemHelixSelectElementEvent,
   ) => void;
@@ -11896,7 +11897,7 @@ export type HelixHeadlessSpeedDialItemSolidJsProps = {
   "prop:value"?: HelixHeadlessSpeedDialItem["value"];
   /** Whether the action can be chosen. */
   "prop:disabled"?: HelixHeadlessSpeedDialItem["disabled"];
-  /** Fired when the action is chosen. */
+  /** Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessSpeedDialItemHelixSelectElementEvent,
   ) => void;
@@ -12328,6 +12329,9 @@ export type HelixHeadlessStepsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSteps,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessStepsHelixActivateElementEvent =
+  HelixHeadlessStepsElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessStepsHelixBeforeActivateElementEvent =
   HelixHeadlessStepsElementEvent<HelixBeforeActivateEvent>;
@@ -12384,7 +12388,9 @@ Ignored once `active` is written. */
 Ignored once `active` is written. */
   defaultActive?: HelixHeadlessSteps["defaultActive"];
 
-  /** Fired when the active step changes. */
+  /** Fired once the current one has moved, so the element already holds it. */
+  "onhelix-activate"?: (e: HelixHeadlessStepsHelixActivateElementEvent) => void;
+  /** Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessStepsHelixBeforeActivateElementEvent,
   ) => void;
@@ -12441,7 +12447,11 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessSteps["defaultActive"];
-  /** Fired when the active step changes. */
+  /** Fired once the current one has moved, so the element already holds it. */
+  "on:helix-activate"?: (
+    e: HelixHeadlessStepsHelixActivateElementEvent,
+  ) => void;
+  /** Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessStepsHelixBeforeActivateElementEvent,
   ) => void;
@@ -12471,7 +12481,7 @@ export type HelixHeadlessStepProps = {
   /** What this stage is called when it announces itself. */
   value?: HelixHeadlessStep["value"];
 
-  /** Fired when the step is pressed. */
+  /** Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessStepHelixSelectElementEvent) => void;
 };
 
@@ -12484,7 +12494,7 @@ export type HelixHeadlessStepSolidJsProps = {
   "prop:disabled"?: HelixHeadlessStep["disabled"];
   /** What this stage is called when it announces itself. */
   "prop:value"?: HelixHeadlessStep["value"];
-  /** Fired when the step is pressed. */
+  /** Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessStepHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12926,6 +12936,9 @@ export type HelixHeadlessTabsElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTabs,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessTabsHelixActivateElementEvent =
+  HelixHeadlessTabsElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessTabsHelixBeforeActivateElementEvent =
   HelixHeadlessTabsElementEvent<HelixBeforeActivateEvent>;
@@ -12989,11 +13002,13 @@ Ignored once `active` is written. */
 Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTabs["defaultActive"];
 
+  /** Fired once the current one has moved, so the element already holds it. */
+  "onhelix-activate"?: (e: HelixHeadlessTabsHelixActivateElementEvent) => void;
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessTabsHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
+  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessTabsHelixSelectElementEvent) => void;
 };
 
@@ -13052,11 +13067,13 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessTabs["defaultActive"];
+  /** Fired once the current one has moved, so the element already holds it. */
+  "on:helix-activate"?: (e: HelixHeadlessTabsHelixActivateElementEvent) => void;
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessTabsHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
+  /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessTabsHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -13082,7 +13099,7 @@ export type HelixHeadlessTabProps = {
   /** Whether the tab can be chosen. */
   disabled?: HelixHeadlessTab["disabled"];
 
-  /** Fired when the tab is chosen. */
+  /** Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessTabHelixSelectElementEvent) => void;
 };
 
@@ -13093,7 +13110,7 @@ export type HelixHeadlessTabSolidJsProps = {
   "prop:selected"?: HelixHeadlessTab["selected"];
   /** Whether the tab can be chosen. */
   "prop:disabled"?: HelixHeadlessTab["disabled"];
-  /** Fired when the tab is chosen. */
+  /** Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessTabHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -13129,7 +13146,7 @@ reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixHeadlessTag["dismissLabel"];
 
-  /** Fired when the reader asks to remove the tag. */
+  /** Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-dismiss"?: (e: HelixHeadlessTagHelixDismissElementEvent) => void;
 };
 
@@ -13150,7 +13167,7 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixHeadlessTag["dismissLabel"];
-  /** Fired when the reader asks to remove the tag. */
+  /** Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-dismiss"?: (e: HelixHeadlessTagHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -13676,15 +13693,15 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-open"?: (
     e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -13884,15 +13901,15 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   "prop:valueAsNumber"?: HelixHeadlessTimeInput["valueAsNumber"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when it closes. */
+  /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
   ) => void;
-  /** Fired when the list opens. */
+  /** Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-open"?: (
     e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
   ) => void;
@@ -14093,7 +14110,7 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 
   /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessTimePickerElementEvent) => void;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-change"?: (
     e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
@@ -14277,7 +14294,7 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   "prop:valueAsNumber"?: HelixHeadlessTimePicker["valueAsNumber"];
   /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessTimePickerElementEvent) => void;
-  /** Fired when the time changes. */
+  /** Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
@@ -14388,7 +14405,7 @@ reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixHeadlessToastItem["dismissLabel"];
 
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-dismiss"?: (
     e: HelixHeadlessToastItemHelixDismissElementEvent,
   ) => void;
@@ -14440,7 +14457,7 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixHeadlessToastItem["dismissLabel"];
-  /** Fired when it asks to go, whether by the control or by its timer. */
+  /** Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-dismiss"?: (
     e: HelixHeadlessToastItemHelixDismissElementEvent,
   ) => void;
@@ -14603,7 +14620,7 @@ reflected none of them. */
   "onhelix-before-change"?: (
     e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
   ) => void;
@@ -14703,7 +14720,7 @@ reflected none of them. */
   "on:helix-before-change"?: (
     e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
   ) => void;
@@ -14755,7 +14772,7 @@ by the group, with no attribute: it is coordination between elements, and
 hydration reports and does not patch up. */
   focusable?: HelixHeadlessToggle["focusable"];
 
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessToggleHelixSelectElementEvent) => void;
 };
 
@@ -14788,7 +14805,7 @@ by the group, with no attribute: it is coordination between elements, and
 `tabindex` on a host the consumer rendered is the change a React consumer's
 hydration reports and does not patch up. */
   "prop:focusable"?: HelixHeadlessToggle["focusable"];
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessToggleHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -15130,11 +15147,11 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   /** Label for the control that leaves the tour. */
   skipLabel?: HelixHeadlessTour["skipLabel"];
 
-  /** Fired when the current stop moves, carrying the new index. */
+  /** Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessTourHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when the reader leaves early. */
+  /** Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTourHelixBeforeCloseElementEvent,
   ) => void;
@@ -15186,11 +15203,11 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   "attr:skip-label"?: HelixHeadlessTour["skipLabel"];
   /** Label for the control that leaves the tour. */
   "prop:skipLabel"?: HelixHeadlessTour["skipLabel"];
-  /** Fired when the current stop moves, carrying the new index. */
+  /** Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessTourHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when the reader leaves early. */
+  /** Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTourHelixBeforeCloseElementEvent,
   ) => void;
@@ -15390,7 +15407,7 @@ is what the mirror has always been for. */
   "onhelix-before-open"?: (
     e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTreeItemElementEvent) => void;
@@ -15472,7 +15489,7 @@ is what the mirror has always been for. */
   "on:helix-before-open"?: (
     e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
   ) => void;
-  /** Fired when the item is chosen. */
+  /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTreeItemElementEvent) => void;
@@ -15488,6 +15505,9 @@ export type HelixHeadlessTreeElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTree,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessTreeHelixActivateElementEvent =
+  HelixHeadlessTreeElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessTreeHelixBeforeActivateElementEvent =
   HelixHeadlessTreeElementEvent<HelixBeforeActivateEvent>;
@@ -15535,11 +15555,13 @@ Ignored once `active` is written. */
 Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTree["defaultActive"];
 
+  /** Fired once the current one has moved, so the element already holds it. */
+  "onhelix-activate"?: (e: HelixHeadlessTreeHelixActivateElementEvent) => void;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessTreeHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixHeadlessTreeHelixSelectElementEvent) => void;
 };
 
@@ -15582,11 +15604,13 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessTree["defaultActive"];
+  /** Fired once the current one has moved, so the element already holds it. */
+  "on:helix-activate"?: (e: HelixHeadlessTreeHelixActivateElementEvent) => void;
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessTreeHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
+  /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixHeadlessTreeHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -15669,7 +15693,7 @@ selection is: an entry that made itself current would be a second answer to
 which one is playing. */
   current?: HelixHeadlessVideoPlaylistItem["current"];
 
-  /** Fired when the entry is chosen. */
+  /** Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (
     e: HelixHeadlessVideoPlaylistItemHelixSelectElementEvent,
   ) => void;
@@ -15696,7 +15720,7 @@ Written by the playlist rather than by the entry, the way an option's
 selection is: an entry that made itself current would be a second answer to
 which one is playing. */
   "prop:current"?: HelixHeadlessVideoPlaylistItem["current"];
-  /** Fired when the entry is chosen. */
+  /** Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessVideoPlaylistItemHelixSelectElementEvent,
   ) => void;
@@ -15728,7 +15752,7 @@ component cannot know which one it is in. */
 opening downward from there opens off the player. */
   placement?: HelixHeadlessVideoPlaylistMenu["placement"];
 
-  /** Fired with the chosen entry's value. The playlist listens for it. */
+  /** Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (
     e: HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent,
   ) => void;
@@ -15745,7 +15769,7 @@ component cannot know which one it is in. */
 `top-end` because a control bar sits at the foot of the picture, and a menu
 opening downward from there opens off the player. */
   "prop:placement"?: HelixHeadlessVideoPlaylistMenu["placement"];
-  /** Fired with the chosen entry's value. The playlist listens for it. */
+  /** Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (
     e: HelixHeadlessVideoPlaylistMenuHelixSelectElementEvent,
   ) => void;
@@ -15761,6 +15785,9 @@ export type HelixHeadlessVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixHeadlessVideoPlaylist,
   E
 >;
+/** `helix-activate` event type */
+export type HelixHeadlessVideoPlaylistHelixActivateElementEvent =
+  HelixHeadlessVideoPlaylistElementEvent<HelixActivateEvent>;
 /** `helix-before-activate` event type */
 export type HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent =
   HelixHeadlessVideoPlaylistElementEvent<HelixBeforeActivateEvent>;
@@ -15791,6 +15818,10 @@ Ignored once `active` is written. */
 Ignored once `active` is written. */
   defaultActive?: HelixHeadlessVideoPlaylist["defaultActive"];
 
+  /** Fired once the current one has moved, so the element already holds it. */
+  "onhelix-activate"?: (
+    e: HelixHeadlessVideoPlaylistHelixActivateElementEvent,
+  ) => void;
   /** Fired before the current entry changes, and cancelable. */
   "onhelix-before-activate"?: (
     e: HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent,
@@ -15822,6 +15853,10 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessVideoPlaylist["defaultActive"];
+  /** Fired once the current one has moved, so the element already holds it. */
+  "on:helix-activate"?: (
+    e: HelixHeadlessVideoPlaylistHelixActivateElementEvent,
+  ) => void;
   /** Fired before the current entry changes, and cancelable. */
   "on:helix-before-activate"?: (
     e: HelixHeadlessVideoPlaylistHelixBeforeActivateElementEvent,
@@ -16457,7 +16492,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-before-close`: Fired before the section closes, and cancelable.
-   * - `helix-before-open`: Fired when the item opens or closes.
+   * - `helix-before-open`: Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -16650,7 +16685,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
+   * - `helix-dismiss`: Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -18089,7 +18124,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the slide in view changes, with its index.
+   * - `helix-select`: Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -18547,7 +18582,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when any box changes, with the whole set.
+   * - `helix-before-change`: Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Slots
@@ -19119,9 +19154,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the color changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -19404,7 +19439,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
@@ -19750,9 +19785,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the chosen option changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
@@ -19954,9 +19989,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the palette opens.
-   * - `helix-select`: Fired when a command is chosen.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-select`: Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -20675,9 +20710,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the date changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-change`: Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -21607,7 +21642,7 @@ export type CustomElements = {
    *
    * - `close`: Relayed, because the platform's own does not escape.
    * - `helix-before-close`: Fired before the panel closes, and cancelable.
-   * - `helix-before-open`: Fired when the drawer opens or closes.
+   * - `helix-before-open`: Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -21710,7 +21745,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the row is chosen.
+   * - `helix-select`: Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -21805,7 +21840,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a row with no page is chosen.
+   * - `helix-select`: Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -22012,7 +22047,7 @@ export type CustomElements = {
    *
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the chosen files change, with their names.
+   * - `helix-before-change`: Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -24392,7 +24427,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the row is chosen.
+   * - `helix-select`: Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -24518,7 +24553,7 @@ export type CustomElements = {
    *
    * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `helix-before-open`: Fired before it opens, and cancelable.
-   * - `helix-select`: Fired when an item is chosen.
+   * - `helix-select`: Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -25477,7 +25512,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when this choice is made.
+   * - `helix-select`: Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -25606,7 +25641,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: The section being read has changed, carrying its id as the value.
+   * - `helix-before-activate`: The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -26911,7 +26946,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when this choice is made.
+   * - `helix-select`: Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -27411,9 +27446,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Relayed from the listbox when the answer changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -28017,7 +28052,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the action is chosen.
+   * - `helix-select`: Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -28651,7 +28686,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: Fired when the active step changes.
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
+   * - `helix-before-activate`: Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -28762,7 +28798,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the step is pressed.
+   * - `helix-select`: Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -29472,8 +29508,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current tab moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -29551,7 +29588,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the tab is chosen.
+   * - `helix-select`: Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -29626,7 +29663,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when the reader asks to remove the tag.
+   * - `helix-dismiss`: Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -30066,9 +30103,9 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the time changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -30377,7 +30414,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Methods
@@ -30736,7 +30773,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -30995,7 +31032,7 @@ export type CustomElements = {
    *
    * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
+   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Slots
@@ -31141,7 +31178,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the item is chosen.
+   * - `helix-select`: Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -31549,8 +31586,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
-   * - `helix-before-close`: Fired when the reader leaves early.
+   * - `helix-before-activate`: Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-complete`: Fired when the last stop is finished.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -31824,7 +31861,7 @@ export type CustomElements = {
    *
    * - `helix-before-close`: Fired before a branch closes, and cancelable.
    * - `helix-before-open`: Fired before a branch opens, and cancelable.
-   * - `helix-select`: Fired when the item is chosen.
+   * - `helix-select`: Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -31949,8 +31986,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current node moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -32142,7 +32180,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the entry is chosen.
+   * - `helix-select`: Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -32242,7 +32280,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it.
+   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -32350,6 +32388,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current entry changes, and cancelable.
    *
    * ## Slots
@@ -32909,7 +32948,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-before-close`: Fired before the section closes, and cancelable.
-   * - `helix-before-open`: Fired when the item opens or closes.
+   * - `helix-before-open`: Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -33106,7 +33145,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when the reader asks to close it.
+   * - `helix-dismiss`: Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -34572,7 +34611,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the slide in view changes, with its index.
+   * - `helix-select`: Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -35038,7 +35077,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when any box changes, with the whole set.
+   * - `helix-before-change`: Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Slots
@@ -35620,9 +35659,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the color changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -35906,7 +35945,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the color changes.
+   * - `helix-before-change`: Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
@@ -36253,9 +36292,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the chosen option changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
@@ -36460,9 +36499,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the palette opens.
-   * - `helix-select`: Fired when a command is chosen.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-select`: Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -37188,9 +37227,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the date changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-change`: Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -38131,7 +38170,7 @@ export type CustomElementsSolidJs = {
    *
    * - `close`: Relayed, because the platform's own does not escape.
    * - `helix-before-close`: Fired before the panel closes, and cancelable.
-   * - `helix-before-open`: Fired when the drawer opens or closes.
+   * - `helix-before-open`: Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -38237,7 +38276,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the row is chosen.
+   * - `helix-select`: Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -38333,7 +38372,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a row with no page is chosen.
+   * - `helix-select`: Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -38546,7 +38585,7 @@ export type CustomElementsSolidJs = {
    *
    * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the chosen files change, with their names.
+   * - `helix-before-change`: Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -40967,7 +41006,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the row is chosen.
+   * - `helix-select`: Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -41096,7 +41135,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `helix-before-open`: Fired before it opens, and cancelable.
-   * - `helix-select`: Fired when an item is chosen.
+   * - `helix-select`: Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -42066,7 +42105,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when this choice is made.
+   * - `helix-select`: Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -42198,7 +42237,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: The section being read has changed, carrying its id as the value.
+   * - `helix-before-activate`: The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -43525,7 +43564,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when this choice is made.
+   * - `helix-select`: Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -44032,9 +44071,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Relayed from the listbox when the answer changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -44650,7 +44689,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the action is chosen.
+   * - `helix-select`: Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -45297,7 +45336,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: Fired when the active step changes.
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
+   * - `helix-before-activate`: Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -45411,7 +45451,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the step is pressed.
+   * - `helix-select`: Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -46140,8 +46180,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current tab moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+   * - `helix-select`: Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -46222,7 +46263,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the tab is chosen.
+   * - `helix-select`: Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -46300,7 +46341,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when the reader asks to remove the tag.
+   * - `helix-dismiss`: Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -46746,9 +46787,9 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the time changes.
-   * - `helix-before-close`: Fired when it closes.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-open`: Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -47060,7 +47101,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `change`: Announced once the value has moved.
-   * - `helix-before-change`: Fired when the time changes.
+   * - `helix-before-change`: Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Methods
@@ -47424,7 +47465,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -47689,7 +47730,7 @@ export type CustomElementsSolidJs = {
    *
    * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
+   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.
    * - `input`: Announced once the value has moved.
    *
    * ## Slots
@@ -47836,7 +47877,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the item is chosen.
+   * - `helix-select`: Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -48253,8 +48294,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
-   * - `helix-before-close`: Fired when the reader leaves early.
+   * - `helix-before-activate`: Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves.
+   * - `helix-before-close`: Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.
    * - `helix-complete`: Fired when the last stop is finished.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -48534,7 +48575,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-before-close`: Fired before a branch closes, and cancelable.
    * - `helix-before-open`: Fired before a branch opens, and cancelable.
-   * - `helix-select`: Fired when the item is chosen.
+   * - `helix-select`: Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -48662,8 +48703,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current node moves, and cancelable. The only way to refuse one.
-   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+   * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -48861,7 +48903,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the entry is chosen.
+   * - `helix-select`: Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -48962,7 +49004,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it.
+   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves.
    *
    * ## Slots
    *
@@ -49071,6 +49113,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-activate`: Fired once the current one has moved, so the element already holds it.
    * - `helix-before-activate`: Fired before the current entry changes, and cancelable.
    *
    * ## Slots

@@ -69,9 +69,9 @@ const parse = (hotkey: string) => {
  * @slot - The commands, which are `helix-option` elements and their groups.
  * @slot footer - Under the list, for the keys a reader can press.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the palette opens.
- * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart dialog - The overlay's own box, forwarded from the dialog.

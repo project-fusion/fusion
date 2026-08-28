@@ -26,7 +26,7 @@ import { property } from 'lit/decorators.js'
  * @slot - The action's name.
  * @slot icon - The mark, which is what a dial is read by.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the action is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart icon - The mark's box.
  * @csspart item - The control.

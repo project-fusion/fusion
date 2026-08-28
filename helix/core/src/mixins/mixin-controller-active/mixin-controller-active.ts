@@ -1,5 +1,5 @@
 import { property } from 'lit/decorators.js'
-import { HelixBeforeActivateEvent } from '../../events/events.js'
+import { HelixActivateEvent, HelixBeforeActivateEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 import {
@@ -126,7 +126,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
       if (next === this.active) {
         return true
       }
-      return requestChange({
+      const applied = requestChange({
         apply: (value) => {
           const previous = this.active
           this.activeState = value
@@ -136,6 +136,37 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
         host: this,
         next,
       })
+      if (applied) {
+        this.announceActivated(next)
+      }
+      return applied
+    }
+
+    /**
+     * Says the current child moved, once it has.
+     *
+     * **This was the only one of the four mixins with no notification**, and the
+     * event class said so deliberately: no native word means "a set chose a
+     * different member", so borrowing `change` would be a lie about what moved.
+     * That half still holds, and is why the pair is `helix-activate`. What did
+     * not follow is that a set should therefore announce nothing.
+     *
+     * The cost is the one 294 fixed for values and left here. A consumer who
+     * only wants to know which child is current had one channel and it fires
+     * *before* `apply`, so `currentTarget.active` is the previous value inside
+     * the handler and `detail.value` is a proposal another listener may refuse.
+     * Measured across the four families taking this: `Tabs` and `Tree` looked
+     * covered because `helix-select` bubbles up from a child, which fires when an
+     * item is *chosen* and not when `active` is assigned, and `Steps` and
+     * `Video Playlist` announced nothing at all.
+     *
+     * **After `apply`, which is the whole reason it is a second event**, so the
+     * state is on the element by the time a handler reads it. Not cancelable:
+     * the decision was taken by the event before this one, and two refusable
+     * events for one transition are two answers to one question. See #325.
+     */
+    private announceActivated(value: string): void {
+      this.dispatchEvent(new HelixActivateEvent({ value }))
     }
 
     /**

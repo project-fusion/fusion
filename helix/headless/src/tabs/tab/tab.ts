@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The tab's label.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen.
+ * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart tab - The tab itself.
  */

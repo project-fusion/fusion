@@ -45,7 +45,7 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @slot label - Richer than a string, where the label is more than one.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when any box changes, with the whole set.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart feedback - What is wrong with it.
