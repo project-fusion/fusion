@@ -143,13 +143,24 @@ jobs:
           bun-version: 1.1.43
 
       # bun runs the repo; npm does the publishing, and trusted publishing needs
-      # npm 11.5.1 or later on Node 22.14 or later. The runner's default npm is
-      # older than that, and the failure it gives is an authentication error
-      # rather than a version one.
+      # npm 11.5.1 or later on Node 22.14 or later.
       - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
           registry-url: 'https://registry.npmjs.org'
+
+      # The pin above meets half that floor and `setup-node` undoes the other
+      # half: it installs whatever npm ships with the Node it pins, and 22.20.0
+      # ships npm 10.9.x, which predates trusted publishing entirely. The floor
+      # was written above for months with nothing enforcing it, and a run that
+      # finds out reports an authentication failure rather than naming a
+      # version, so it reads as a registry problem and not a runner one.
+      #
+      # Pinned rather than floated to `^11.5.1`: 11.18.0 is the npm the packages
+      # were bootstrapped with by hand, so CI authenticates the way the registry
+      # has already accepted, and a bad npm release cannot reach a publish job
+      # on its own.
+      - run: npm install -g npm@11.18.0
 
       - run: bun install --frozen-lockfile
 

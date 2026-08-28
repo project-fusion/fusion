@@ -128,14 +128,29 @@ function npm(args, doing) {
           'what stops a number being handed out twice.',
       )
     }
-    if (/two-factor|bypass 2fa|otp/i.test(output)) {
+    /* `EOTP` and the sentence npm prints beside it, and nothing looser. The
+       previous pattern also matched `bypass 2fa`, which npm prints as a
+       deprecation notice on every token-authenticated command, so any failure
+       under a token arrived wearing two-factor advice whatever its cause. That
+       is the same misreading `trust.mjs` records against its own 403. */
+    if (/EOTP|one-time password/i.test(output)) {
       console.error(
-        '\n  npm requires two-factor authentication to publish. This applies to a person at a ' +
-          'keyboard and not to CI, where trusted publishing authenticates by OIDC and is exempt, ' +
-          'which is the whole reason it is worth having.\n\n' +
-          '  Enable 2FA on the account. If you set it to "authorization only", publishing needs ' +
-          'no code and this command works as it is. If you set it to "authorization and writes", ' +
-          'pass the code: --otp 123456.',
+        '\n  npm wants a one-time password, which means two-factor is set to "authorization and ' +
+          'writes". Two-factor is already on: this is not a prompt to enable it.\n\n' +
+          '  Three ways past it, and the first is usually the one wanted here.\n\n' +
+          '    A token in the environment. A granular or automation token publishes with no ' +
+          'one-time password:\n\n' +
+          '      env "npm_config_//registry.npmjs.org/:_authToken=$NPM_ADMIN_TOKEN" \\\n' +
+          '        node tooling/scripts/publish.mjs --domain <domain> --tag bootstrap\n\n' +
+          '    A token cannot do `npm trust`, so it finishes the bootstrap and none of the ' +
+          'registrations that follow it.\n\n' +
+          '    Two-factor on "authorization only", set in the web settings and set back after. ' +
+          'Login stays behind whatever guards it.\n\n' +
+          '    `--otp 123456`, if the account has an authenticator app. A passkey account has no ' +
+          'code to pass: npm offers a browser challenge instead, and this script cannot present ' +
+          'one, because it pipes stdio and the prompt reaches no terminal.\n\n' +
+          '  CI meets none of this. Trusted publishing authenticates by OIDC and is exempt, which ' +
+          'is the whole reason it is worth having.',
       )
     }
     if (/payment required|402|paid|private packages/i.test(output)) {

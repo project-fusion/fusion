@@ -83,12 +83,15 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      # Trusted publishing needs npm 11.5.1+ on Node 22.14+, which is newer than
-      # the runner default.
+      # Trusted publishing needs npm 11.5.1+ on Node 22.14+.
       - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
           registry-url: 'https://registry.npmjs.org'
+
+      # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
+      # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
+      - run: npm install -g npm@11.18.0
 
       - run: bun install --frozen-lockfile
 
