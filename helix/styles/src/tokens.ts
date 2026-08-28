@@ -951,6 +951,35 @@ export const TOKENS: Token[] = [
   ['text-control', 'var(--helix-text-sm)'],
   ['space-control', 'var(--helix-space-md)'],
   ['size-control-lg', 'calc(3rem * var(--_helix-seed-density))'],
+  /* **A step either side of whatever step is current**, for a control that is
+     deliberately not the same size as its neighbours: a row in a floating panel,
+     a caret inside a trigger, the arrows on a carousel. The named steps are the
+     scale and never move and the unsuffixed one is the step a region is at, and
+     the set had no word for *relative*, so thirty-five stylesheets said `-sm` or
+     `-lg` outright, which reads correctly and silently opts the component out of
+     density: measured across the three regions, an option row was 32px in all of
+     them while the trigger above it went 32, 40, 48.
+
+     **The multipliers are the ramps' own rather than a taste.** `control`,
+     `icon` and `checkbox` each step by exactly a fifth, so at the resting
+     density these resolve to precisely the tokens they replace and the sweep off
+     the fixed steps changed nothing at `md`. `switch`, `tag`, `avatar` and
+     `loader` step at 0.833, 0.857, 0.75 and 0.667, so they get no relative pair:
+     a multiplier right for none of them would be worse than the absence.
+
+     **`base.css` recomputes these wherever it redeclares the step they read**,
+     which is what makes them relative to the region rather than to the document;
+     a custom property substitutes at computed-value time, so one resolved on
+     `:root` is what every descendant inherits whatever region it is in. This is
+     the default for a page in no density region, which is most pages, and losing
+     it is not a subtle failure: measured with it absent, a select's caret drew at
+     950px and a menu item at 18. See #321 and #331. */
+  ['size-control-tight', 'calc(var(--helix-size-control) * 0.8)'],
+  ['size-control-loose', 'calc(var(--helix-size-control) * 1.2)'],
+  ['size-icon-tight', 'calc(var(--helix-size-icon) * 0.8)'],
+  ['size-icon-loose', 'calc(var(--helix-size-icon) * 1.2)'],
+  ['size-checkbox-tight', 'calc(var(--helix-size-checkbox) * 0.8)'],
+  ['size-checkbox-loose', 'calc(var(--helix-size-checkbox) * 1.2)'],
   /* How wide a button is when it is asked to take a standard width rather than
      its label's. A real decision rather than a convenience: a row of actions
      whose widths follow their words has one button per word length, and the eye
@@ -1032,7 +1061,7 @@ export const TOKENS: Token[] = [
      same row, not a different scale.
 
      The width is derived from this rather than declared, so the proportion
-     holds at every step and through `--switch-height` as well. */
+     holds at every step and through `--switch-block-size` as well. */
   ['size-switch', 'var(--helix-size-switch-md)'],
   ['size-switch-lg', 'calc(1.75rem * var(--_helix-seed-density))'],
   ['size-switch-md', 'calc(1.5rem * var(--_helix-seed-density))'],
