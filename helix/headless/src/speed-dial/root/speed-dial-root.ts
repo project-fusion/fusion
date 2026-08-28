@@ -48,17 +48,19 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @slot - The actions.
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.
  *
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart actions - The region the actions are drawn in.
  * @csspart icon - A glyph this component draws.
  * @csspart trigger - The default trigger, where none was slotted.
- * @csspart actions - The region the actions are drawn in.
- *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
-  /** Names the trigger and the set of actions it opens. */
+  /**
+   * Names the trigger and the set of actions it opens.
+   */
   @property()
   label = 'Actions'
 
@@ -71,7 +73,9 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   @property()
   placement: Placement = 'top-end'
 
-  /** Space between the trigger and the actions, in pixels. */
+  /**
+   * Space between the trigger and the actions, in pixels.
+   */
   @property({ type: Number })
   offset = 12
 

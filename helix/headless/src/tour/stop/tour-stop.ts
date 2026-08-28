@@ -50,29 +50,33 @@ import '../../button/index.js'
  * @category overlays
  * @documentation https://helix.fusion.dev/components/tour
  *
- * @event {HelixTourAskEvent} helix-tour-ask - A stop asking the tour to move, from its own controls.
- *
  * @slot - What this stop says. A card, a heading and a line, anything.
  * @slot actions - Replaces the controls, which are Back, Next and Skip.
  *
- * @csspart bubble - The panel that points at the target.
- * @csspart arrow - The point, which the floating pass places against the target.
- * @csspart content - The region holding the slotted content.
+ * @event {HelixTourAskEvent} helix-tour-ask - A stop asking the tour to move, from its own controls.
+ *
  * @csspart actions - The row the controls sit in.
+ * @csspart arrow - The point, which the floating pass places against the target.
  * @csspart back - The control that goes to the previous stop.
- * @csspart next - The control that goes on, and finishes on the last stop.
- * @csspart skip - The control that leaves the tour.
  * @csspart back-button - The inner control.
+ * @csspart bubble - The panel that points at the target.
+ * @csspart content - The region holding the slotted content.
+ * @csspart next - The control that goes on, and finishes on the last stop.
  * @csspart next-button - The inner control.
+ * @csspart skip - The control that leaves the tour.
  * @csspart skip-button - The inner control.
  */
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
-  /** The id of the element this stop is about. */
+  /**
+   * The id of the element this stop is about.
+   */
   @property()
   for = ''
 
-  /** Which side of the target the panel prefers. */
+  /**
+   * Which side of the target the panel prefers.
+   */
   @property()
   placement: Placement = 'bottom'
 
@@ -88,27 +92,39 @@ export class HelixHeadlessTourStop extends HelixElement {
   @property({ reflect: true, type: Boolean })
   current = false
 
-  /** Whether this is the last stop, so the control says Done. */
+  /**
+   * Whether this is the last stop, so the control says Done.
+   */
   @property({ reflect: true, type: Boolean })
   last = false
 
-  /** Whether this is the first stop, so there is nowhere back to. */
+  /**
+   * Whether this is the first stop, so there is nowhere back to.
+   */
   @property({ reflect: true, type: Boolean })
   first = false
 
-  /** Label for the control that goes back. */
+  /**
+   * Label for the control that goes back.
+   */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 
-  /** Label for the control that goes on. */
+  /**
+   * Label for the control that goes on.
+   */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next'
 
-  /** Label for the control that goes on from the last stop. */
+  /**
+   * Label for the control that goes on from the last stop.
+   */
   @property({ attribute: 'done-label' })
   doneLabel = 'Done'
 
-  /** Label for the control that leaves the tour. */
+  /**
+   * Label for the control that leaves the tour.
+   */
   @property({ attribute: 'skip-label' })
   skipLabel = 'Skip'
 

@@ -19,8 +19,8 @@ import { styles } from './loader-root.css.js'
  * @aliases Spinner, Busy, Activity
  * @documentation https://helix.fusion.dev/components/loader
  *
- * @cssproperty --loader-size - Diameter. Defaults to 1.5em.
  * @cssproperty --loader-color - Color of the moving arc.
+ * @cssproperty --loader-size - Diameter. Defaults to 1.5em.
  * @cssproperty --loader-track-color - Color of the circle behind it.
  */
 @customElement('helix-loader')
@@ -43,7 +43,9 @@ export class HelixLoader extends HelixHeadlessLoader {
   @property({ reflect: true })
   variant?: 'pulse'
 
-  /** Diameter relative to the surrounding text. */
+  /**
+   * Diameter relative to the surrounding text.
+   */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg'
 

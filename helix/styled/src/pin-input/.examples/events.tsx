@@ -30,7 +30,7 @@ export function Example() {
   }
 
   const committed = (event: Event & { currentTarget: HelixPinInput }) => {
-    say('change', `"${event.currentTarget.value}", a filled code is the commit`)
+    say('change', `"${event.currentTarget.value}", filled or left, either is a commit`)
   }
 
   return (

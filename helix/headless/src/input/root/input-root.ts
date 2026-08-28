@@ -68,21 +68,21 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @aliases TextField, Field, TextInput
  * @documentation https://helix.fusion.dev/components/input
  *
- * @slot start - Before the text, for an icon or a prefix.
  * @slot end - After the text, for an icon or a unit.
+ * @slot start - Before the text, for an icon or a prefix.
  *
+ * @event {Event} change - Relayed from the input once the reader has finished.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Relayed from the input once the reader has finished.
  *
- * @csspart field - The box holding everything.
- * @csspart control - The input itself.
  * @csspart clear - The button that empties the field.
- * @csspart icon - A glyph this component draws.
- * @csspart reveal - The button that shows and hides a password.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart control - The input itself.
  * @csspart feedback - What is wrong with it.
+ * @csspart field - The box holding everything.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart icon - A glyph this component draws.
+ * @csspart label - The question, over the field.
+ * @csspart reveal - The button that shows and hides a password.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -98,11 +98,17 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   @property()
   autocomplete = ''
 
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /**
+   * Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
+   */
   @property()
   placeholder = ''
 
-  /** Whether the field refuses input while still submitting its value. */
+  /**
+   * Whether the field refuses input while still submitting its value.
+   */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
 
@@ -136,7 +142,9 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   @property({ type: Boolean })
   clearable = false
 
-  /** What the clear button is called, since an icon has no name of its own. */
+  /**
+   * What the clear button is called, since an icon has no name of its own.
+   */
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 
@@ -151,7 +159,11 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   @property({ type: Boolean })
   reveal = false
 
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /**
+   * What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
+   */
   @property({ attribute: 'reveal-label' })
   revealLabel = 'Show password'
 
@@ -381,11 +393,15 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   @property()
   pattern = ''
 
-  /** Fewest characters the value may have. */
+  /**
+   * Fewest characters the value may have.
+   */
   @property({ attribute: 'minlength', type: Number })
   minLength?: number
 
-  /** Most characters the value may have. */
+  /**
+   * Most characters the value may have.
+   */
   @property({ attribute: 'maxlength', type: Number })
   maxLength?: number
 

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, HelixScrolledEvent, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -6,12 +6,26 @@ import { property } from 'lit/decorators.js'
  * @summary Page-level banner holding brand, navigation, and actions.
  *
  * @description
- * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
- * the styled tier can lift the bar off the page without a scroll handler of its
- * own. Scroll position is the one piece of state the server genuinely cannot
- * know, so it is read on connect rather than derived: a fresh load starts at
- * the top, which is what the server rendered, and a reload part-way down
- * corrects on hydration.
+ * Tracks whether the page has scrolled and carries it as the custom state
+ * `scrolled`, so the styled tier can lift the bar off the page without a scroll
+ * handler of its own. Scroll position is the one piece of state the server
+ * genuinely cannot know, so it is read on connect rather than derived: a fresh
+ * load starts at the top, which is what the server rendered, and a reload
+ * part-way down corrects on hydration.
+ *
+ * **A custom state and not `data-scrolled`, which is what this used to be.**
+ * The attribute was written onto the host by the element itself, so a server
+ * sent the header without it and the element added it on upgrade. A framework
+ * hydrating the page then found an attribute it had not rendered and reported
+ * the tree as mismatched: intermittently, because it only happens when the
+ * reader reloads far enough down the page to pass the threshold. Every
+ * server-rendered consumer paid for that, and could only answer it by
+ * suppressing hydration warnings on an element they did not write.
+ *
+ * `ElementInternals.states` is deliberately not in the DOM, so there is nothing
+ * for a hydration pass to disagree with, and `:state(scrolled)` selects it. The
+ * base class made the same move for `data-settled` and its note explains the
+ * rest.
  *
  * The listener is passive and reads `scrollY` only, so it never blocks
  * scrolling.
@@ -35,14 +49,19 @@ import { property } from 'lit/decorators.js'
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://helix.fusion.dev/components/app-header
  *
- * @slot start - Leading content, usually a wordmark.
  * @slot - The middle region, usually a `Navigation`.
  * @slot end - Trailing content.
+ * @slot start - Leading content, usually a wordmark.
  *
- * @csspart row - The centered row inside the banner.
- * @csspart start - The leading region.
+ * @event {HelixScrolledEvent} helix-scrolled - Fired when the page crosses the
+ * threshold, with the new state. A custom state cannot be observed the way an
+ * attribute could, so the header says when it changes rather than leaving
+ * consumers to run a second scroll listener and disagree about the hysteresis.
+ *
  * @csspart content - The middle region.
  * @csspart end - The trailing region.
+ * @csspart row - The centered row inside the banner.
+ * @csspart start - The leading region.
  */
 @customElement('helix-headless-app-header')
 export class HelixHeadlessAppHeader extends HelixElement {
@@ -96,7 +115,15 @@ export class HelixHeadlessAppHeader extends HelixElement {
       return
     }
     this.scrolled = next
-    this.toggleAttribute('data-scrolled', next)
+    /* The state is what CSS selects; the event is what anything outside this
+       element can hear. Both, because neither covers the other: a state cannot
+       be observed and an event cannot be styled. */
+    if (next) {
+      this.internals.states.add('scrolled')
+    } else {
+      this.internals.states.delete('scrolled')
+    }
+    this.dispatchEvent(new HelixScrolledEvent({ scrolled: next }))
   }
 
   protected override willUpdate(changed: PropertyValues): void {

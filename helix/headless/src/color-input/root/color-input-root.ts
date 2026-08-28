@@ -52,32 +52,43 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @aliases ColorField, ColourInput, InputColor
  * @documentation https://helix.fusion.dev/components/color-input
  *
- * @slot start - Content at the leading end of the field, inside its border.
  * @slot end - Content at the trailing end, before the trigger.
- * @slot trigger - The mark on the field saying a panel opens.
- * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
+ * @slot hint - Help under the field.
+ * @slot start - Content at the leading end of the field, inside its border.
+ * @slot trigger - The mark on the field saying a panel opens.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the panel opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the panel opens.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
- * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input carrying the value. Absent in `swatch`.
- * @csspart trigger - The control that opens the panel.
- * @csspart preview - The chip showing the color, inside the trigger.
- * @csspart surface - The floating panel.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The box holding the text and the trigger.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart label - The question, over the field.
  * @csspart picker - The color picker inside it.
  * @csspart picker-actions - The group holding the eyedropper and the syntax toggle.
  * @csspart picker-channel - One ramp.
+ * @csspart picker-channel-control - The range input.
+ * @csspart picker-channel-feedback - What is wrong with it.
+ * @csspart picker-channel-field - The row: the control and its readout.
+ * @csspart picker-channel-hint - Help under the track, while nothing is wrong.
+ * @csspart picker-channel-label - The question, over the track.
+ * @csspart picker-channel-marker - One mark.
+ * @csspart picker-channel-marker-label - The value a mark stands at, when `marker-labels` is set.
+ * @csspart picker-channel-markers - The row of marks along the track.
+ * @csspart picker-channel-output - The current value, shown beside it.
  * @csspart picker-channels - The ramps beside it.
  * @csspart picker-controls - The row under the square.
  * @csspart picker-eyedropper - The control that samples a color from the screen.
+ * @csspart picker-eyedropper-button - The inner control.
  * @csspart picker-footer - The row holding the value and the tools.
  * @csspart picker-format - The control that changes the syntax the value is written in.
+ * @csspart picker-format-button - The inner control.
  * @csspart picker-grid - The saturation and brightness square.
  * @csspart picker-grid-brightness - The range input for its vertical axis.
  * @csspart picker-grid-handle - The mark showing where in the square the color sits.
@@ -87,20 +98,9 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart picker-swatch - One preset.
  * @csspart picker-swatches - The row of presets.
  * @csspart picker-value - The color as text, which can be typed or pasted.
- * @csspart picker-channel-control - The range input.
- * @csspart picker-channel-field - The row: the control and its readout.
- * @csspart picker-channel-marker - One mark.
- * @csspart picker-channel-marker-label - The value a mark stands at, when `marker-labels` is set.
- * @csspart picker-channel-markers - The row of marks along the track.
- * @csspart picker-channel-output - The current value, shown beside it.
- * @csspart picker-eyedropper-button - The inner control.
- * @csspart picker-format-button - The inner control.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
- * @csspart picker-channel-feedback - What is wrong with it.
- * @csspart picker-channel-hint - Help under the track, while nothing is wrong.
- * @csspart picker-channel-label - The question, over the track.
+ * @csspart preview - The chip showing the color, inside the trigger.
+ * @csspart surface - The floating panel.
+ * @csspart trigger - The control that opens the panel.
  *
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
@@ -139,7 +139,9 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   @property({ reflect: true })
   variant?: 'swatch'
 
-  /** Whether the color carries an alpha channel. */
+  /**
+   * Whether the color carries an alpha channel.
+   */
   @property({ reflect: true, type: Boolean })
   alpha = false
 
@@ -158,19 +160,27 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   @property({ reflect: true })
   format?: ColorFormat
 
-  /** Whether the reader may change the format from the panel. */
+  /**
+   * Whether the reader may change the format from the panel.
+   */
   @property({ attribute: 'no-format', type: Boolean })
   noFormat = false
 
-  /** What the field says before a color is in it. */
+  /**
+   * What the field says before a color is in it.
+   */
   @property()
   placeholder = '#000000'
 
-  /** Colors offered under the picker, as a comma-separated list. */
+  /**
+   * Colors offered under the picker, as a comma-separated list.
+   */
   @property()
   swatches = ''
 
-  /** Accessible name for the control that opens the panel. */
+  /**
+   * Accessible name for the control that opens the panel.
+   */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a color'
 

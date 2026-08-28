@@ -37,14 +37,14 @@ import { styles } from './pagination-root.css.js'
  * @aliases Pager, Page nav
  * @documentation https://helix.fusion.dev/components/pagination
  *
- * @csspart list - The run of pages.
- * @csspart item - One slot in the run, holding a page or a gap.
- * @csspart page - The control for one page.
- * @csspart gap - The control standing over pages not shown, which jumps into them.
- * @csspart previous - The control that moves back one page.
- * @csspart next - The control that moves forward one page.
  * @csspart first - The control that jumps to the first page, under `ends`.
+ * @csspart gap - The control standing over pages not shown, which jumps into them.
+ * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
+ * @csspart list - The run of pages.
+ * @csspart next - The control that moves forward one page.
+ * @csspart page - The control for one page.
+ * @csspart previous - The control that moves back one page.
  * @csspart status - The reading of where you are, in `compact`.
  *
  * @cssproperty --pagination-current-color - Fill behind the page you are on.

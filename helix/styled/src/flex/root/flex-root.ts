@@ -32,27 +32,39 @@ import { styles } from './flex-root.css.js'
  */
 @customElement('helix-flex')
 export class HelixFlex extends HelixElement {
-  /** Whether items run across or down. */
+  /**
+   * Whether items run across or down.
+   */
   @property({ reflect: true })
   direction?: 'row' | 'column'
 
-  /** Space between items, named on the space scale. */
+  /**
+   * Space between items, named on the space scale.
+   */
   @property({ reflect: true })
   gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
-  /** Alignment across the direction. */
+  /**
+   * Alignment across the direction.
+   */
   @property({ reflect: true })
   align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
 
-  /** Distribution along the direction. */
+  /**
+   * Distribution along the direction.
+   */
   @property({ reflect: true })
   justify?: 'start' | 'center' | 'end' | 'between' | 'around'
 
-  /** Whether items wrap onto more lines. */
+  /**
+   * Whether items wrap onto more lines.
+   */
   @property({ reflect: true, type: Boolean })
   wrap = false
 
-  /** Flows with surrounding text instead of taking the full width. */
+  /**
+   * Flows with surrounding text instead of taking the full width.
+   */
   @property({ reflect: true, type: Boolean })
   inline = false
 

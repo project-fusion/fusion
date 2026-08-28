@@ -41,11 +41,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-icon')
 export class HelixHeadlessIcon extends HelixElement {
-  /** Name of the icon in the Helix set. */
+  /**
+   * Name of the icon in the Helix set.
+   */
   @property()
   name = ''
 
-  /** Accessible name, for an icon that is not decorative. */
+  /**
+   * Accessible name, for an icon that is not decorative.
+   */
   @property()
   label = ''
 

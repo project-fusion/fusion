@@ -98,59 +98,73 @@ const kind = (file: File): string => {
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
  * @documentation https://helix.fusion.dev/components/file-input
  *
- * @slot trigger - What the reader presses to open the picker.
- * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
+ * @slot hint - Help under the field.
+ * @slot trigger - What the reader presses to open the picker.
  *
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen files change, with their names.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
  *
- * @csspart field - The box that is pressed and dropped on.
  * @csspart control - The file input itself, which carries the label and validity.
- * @csspart icon - A glyph this component draws.
- * @csspart trigger - The label that opens the picker.
- * @csspart list - The chosen files.
- * @csspart file - One chosen file.
  * @csspart detail - Its name and its reading, stacked.
- * @csspart name - Its name.
- * @csspart meta - The row holding its size and kind.
- * @csspart size - How big it is.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The box that is pressed and dropped on.
+ * @csspart file - One chosen file.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart icon - A glyph this component draws.
  * @csspart kind - What kind of file it is.
- * @csspart remove - The control that takes it back out.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart kind-prefix - The category before the label.
+ * @csspart label - The question, over the field.
+ * @csspart list - The chosen files.
+ * @csspart meta - The row holding its size and kind.
+ * @csspart name - Its name.
+ * @csspart remove - The control that takes it back out.
+ * @csspart size - How big it is.
  * @csspart size-dismiss - The remove button, when `dismissible`.
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart size-prefix - The category before the label.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
+ * @csspart trigger - The label that opens the picker.
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
-  /** Which files the picker offers, as a native `accept` list. */
+  /**
+   * Which files the picker offers, as a native `accept` list.
+   */
   @property()
   accept = ''
 
-  /** Whether more than one file can be chosen. */
+  /**
+   * Whether more than one file can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   multiple = false
 
-  /** Which camera or microphone a mobile picker should offer, if any. */
+  /**
+   * Which camera or microphone a mobile picker should offer, if any.
+   */
   @property()
   capture?: 'environment' | 'user'
 
-  /** What the trigger reads, where nothing is slotted into it. */
+  /**
+   * What the trigger reads, where nothing is slotted into it.
+   */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose files'
 
-  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  /**
+   * Language tag the sizes are written in.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** What the control removing one file is called, per file. */
+  /**
+   * What the control removing one file is called, per file.
+   */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove'
 

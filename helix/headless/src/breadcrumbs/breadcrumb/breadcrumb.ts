@@ -43,9 +43,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot - The step's label. Without an `href` this may be the consumer's own
  * anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the
  * outer tree and cannot be reached from this component's styles.
- * @slot start - Before the label, for an icon.
  * @slot end - After it, for a count or a mark.
  * @slot separator - Replaces the chevron shown before this item.
+ * @slot start - Before the label, for an icon.
  *
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
@@ -53,7 +53,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
-  /** Whether this item is the page the reader is on. */
+  /**
+   * Whether this item is the page the reader is on.
+   */
   @property({ reflect: true, type: Boolean })
   current = false
 
@@ -82,11 +84,17 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   @property({ reflect: true })
   href?: string
 
-  /** Where the link opens, for the rare crumb that leaves the site. */
+  /**
+   * Where the link opens, for the rare crumb that leaves the site.
+   */
   @property()
   target = ''
 
-  /** What the link declares about where it goes. The consumer's decision. */
+  /**
+   * What the link declares about where it goes.
+   *
+   * The consumer's decision.
+   */
   @property()
   rel = ''
 

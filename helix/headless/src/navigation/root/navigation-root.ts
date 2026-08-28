@@ -30,8 +30,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The destinations, as the consumer's own links.
  *
- * @csspart nav - The navigation landmark.
  * @csspart indicator - The marker that travels to the current destination.
+ * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-navigation')
 export class HelixHeadlessNavigation extends HelixElement {
@@ -45,7 +45,9 @@ export class HelixHeadlessNavigation extends HelixElement {
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
   })
 
-  /** Accessible name for the landmark. */
+  /**
+   * Accessible name for the landmark.
+   */
   @property()
   label = 'Main'
 

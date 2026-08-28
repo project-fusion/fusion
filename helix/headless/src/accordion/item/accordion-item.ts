@@ -35,18 +35,18 @@ const TRIGGER_ID = 'trigger'
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://helix.fusion.dev/components/accordion
  *
- * @slot summary - The always-visible trigger content.
  * @slot - The content revealed when open.
- *
- * @csspart container - The outer wrapper.
- * @csspart trigger - The clickable summary row.
- * @csspart chevron - The open and close indicator.
- * @csspart content - The revealed region.
- * @csspart content-inner - The clipping box inside the animated region.
+ * @slot summary - The always-visible trigger content.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the section closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the item opens or closes.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart chevron - The open and close indicator.
+ * @csspart container - The outer wrapper.
+ * @csspart content - The revealed region.
+ * @csspart content-inner - The clipping box inside the animated region.
+ * @csspart trigger - The clickable summary row.
  */
 @customElement('helix-headless-accordion-item')
 export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {

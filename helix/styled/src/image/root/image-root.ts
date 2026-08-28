@@ -20,9 +20,9 @@ import { styles } from './image-root.css.js'
  *
  * @cssproperty --image-aspect - The ratio of the box, as `16 / 9`.
  * @cssproperty --image-fit - How the picture fills it.
+ * @cssproperty --image-placeholder-color - The resting surface behind both stand-ins.
  * @cssproperty --image-position - Which part survives a crop.
  * @cssproperty --image-radius - Corner radius, under `rounded`.
- * @cssproperty --image-placeholder-color - The resting surface behind both stand-ins.
  */
 @customElement('helix-image')
 export class HelixImage extends HelixHeadlessImage {

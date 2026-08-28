@@ -39,14 +39,16 @@ import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item
  * @slot - The entries.
  * @slot player - The `helix-video` they play in.
  *
- * @csspart player - The region holding the player.
- * @csspart items - The list of entries.
- *
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current entry changes, and cancelable.
+ *
+ * @csspart items - The list of entries.
+ * @csspart player - The region holding the player.
  */
 @customElement('helix-headless-video-playlist')
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
-  /** Accessible name for the list, which usually has no visible heading. */
+  /**
+   * Accessible name for the list, which usually has no visible heading.
+   */
   @property()
   label = 'Playlist'
 

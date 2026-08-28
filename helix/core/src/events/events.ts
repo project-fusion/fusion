@@ -537,6 +537,15 @@ export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
   }
 }
 
+/** Detail carried by `helix-scrolled`. */
+export interface ScrolledDetail {
+  /**
+   * Whether the page is scrolled away from the top, as a boolean and not a word
+   * that reads like one. Follows `helix-toggle`'s rule for the same reason.
+   */
+  scrolled: boolean
+}
+
 /** Detail carried by `helix-toggle`. */
 export interface ToggleDetail {
   /** The state being asked for, as a boolean and not a word that reads like one. */
@@ -654,6 +663,7 @@ export interface ResizeDetail {
  * clamps it: what arrives is what was drawn, which for an empty example is
  * nearly nothing and for a long one is more than a page.
  */
+
 export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
   static readonly eventName = 'helix-resize'
 
@@ -666,6 +676,47 @@ export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
          the result. So `preventDefault()` on it was accepted and ignored, which
          is worse than refusing the call: a consumer had every reason to believe
          they had stopped something. */
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Fired when a header crosses the threshold between resting at the top of the
+ * page and floating over it.
+ *
+ * **State a consumer used to read off an attribute, said out loud instead.**
+ * The header reflected this as `data-scrolled` on its own host, which is an
+ * attribute nobody rendered: a server sends the element without it and the
+ * element adds it on upgrade, so a framework hydrating the page finds markup
+ * that no longer matches what it sent. The threshold now lives in a custom
+ * state, which is deliberately not in the DOM and therefore not something a
+ * hydration pass can disagree with.
+ *
+ * That closes the observability the attribute accidentally provided. A
+ * `MutationObserver` can watch an attribute and there is no equivalent for
+ * `ElementInternals.states`, so a component holding a boolean nothing can read
+ * is a component with a private opinion its consumers demonstrably need: the
+ * bar's own backdrop is drawn by the page around it, and the page has to know
+ * when to light it.
+ *
+ * Not cancelable. It reports where the page is rather than asking permission to
+ * be there, and refusing it would leave the state and the announcement
+ * disagreeing.
+ *
+ * The hysteresis stays inside the header, which is the point of announcing at
+ * all: a consumer listening to `scroll` itself would be a second opinion on
+ * when the page counts as scrolled, and the two would part company at the eight
+ * pixels of travel this waits for.
+ */
+export class HelixScrolledEvent extends CustomEvent<ScrolledDetail> {
+  static readonly eventName = 'helix-scrolled'
+
+  constructor(detail: ScrolledDetail) {
+    super(HelixScrolledEvent.eventName, {
+      bubbles: true,
       cancelable: false,
       composed: true,
       detail,
@@ -975,6 +1026,7 @@ const registry = {
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
+  HelixScrolledEvent,
   HelixSelectEvent,
   HelixSendEvent,
   HelixShortcutEvent,

@@ -40,6 +40,31 @@ describe('aura', () => {
     expect(host.isConnected).toBe(true)
   })
 
+  test('the fallback never paints the brand color at full strength', async () => {
+    /* **A regression guard on a bug nobody could catch by looking once.** The
+       canvas is transparent until its first paint, so whatever the host paints
+       is what a reader sees on every load. The hot stop of that gradient was
+       `--helix-color-primary` undiluted, which is the top of the shader's range
+       and far from its average: measured on a page at half opacity it sat at
+       68.3 luma against a settled 20.8 in dark, and 174 against 231 in light.
+       Every hard reload flashed, brighter in one scheme and darker in the other,
+       and a screen recording is what finally named it.
+
+       Asserted against the sheet rather than a rendered pixel because happy-dom
+       has no WebGL and no compositor: there is nothing here that could paint the
+       comparison. What is checkable is that the stop is mixed into the ground,
+       which is the property that was wrong. */
+    /* Imported here rather than at the top of the file, for the reason the
+       note above `beforeAll` gives: this module calls `createSheet` at
+       evaluation, and a static import would run that before `registerDom` has
+       installed a DOM to build a stylesheet against. Doing it statically took
+       out five unrelated tests in this file. */
+    const { styles } = await import('./aura-root.css.js')
+    const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
+    expect(sheet).toContain('color-mix(in oklab, var(--helix-color-primary) 38%')
+    expect(sheet).not.toMatch(/var\(--helix-color-primary\)\s+0%/)
+  })
+
   test('the variant reflects and the numbers do not', async () => {
     // Reflection exists so a selector can reach a value. The fallback gradient
     // selects on `variant`; nothing selects on `speed`.

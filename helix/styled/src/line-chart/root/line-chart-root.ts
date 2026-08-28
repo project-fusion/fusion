@@ -30,15 +30,34 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://helix.fusion.dev/components/line-chart
  *
- * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
- * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --line-chart-area-opacity - How much of a line's color its wash takes.
+ * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
+ * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --line-chart-width - Thickness of a line.
  */
 @customElement('helix-line-chart')
 export class HelixLineChart extends HelixHeadlessLineChart {
+  /**
+   * **The styled tier, so the tooltip this renders is the styled one.**
+   *
+   * `tag()` builds a child's tag name from this prefix, and the base declares
+   * `helix-headless-`. Every other styled component that renders a child
+   * overrides it; the three charts that draw a tooltip did not, so a
+   * `helix-bar-chart` on a page put a `helix-headless-tooltip` in its shadow
+   * root: the behavior with none of the surface. What showed was the browser's
+   * own popover defaults, a white 1.5px border, square corners, `0.25em` of
+   * padding and the page's font size, which is why the reading bubble looked
+   * like no other tooltip on the site.
+   *
+   * Measured before the fix: the chart's bubble computed
+   * `border: 1.5px solid rgb(255, 255, 255)`, `border-radius: 0px`,
+   * `padding: 3.5px`, `font-size: 14px`. The masthead's, a `helix-tooltip`,
+   * had the component's own `none`, `radii-sm`, `2xs xs` and `text-xs`.
+   */
+  static override tier = 'helix-'
+
   /**
    * How much ink the lines claim.
    *

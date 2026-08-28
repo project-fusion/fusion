@@ -109,9 +109,9 @@ const onApple = (): boolean =>
  *
  * @slot - The key's label, where `keys` is not set.
  *
- * @csspart kbd - The key.
- *
  * @event {HelixShortcutEvent} helix-shortcut - Fired when the chord is pressed, and cancelable.
+ *
+ * @csspart kbd - The key.
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {

@@ -28,26 +28,32 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Message box, Prompt input
  * @documentation https://helix.fusion.dev/components/chat
  *
- * @slot start - Under the field, at the leading edge: attachments, a model picker.
  * @slot end - Under the field, beside the send control.
- *
- * @csspart composer - The whole composer.
- * @csspart field - The text field.
- * @csspart tools - The row under the field.
- * @csspart start - The leading slot's box.
- * @csspart end - The trailing slot's box.
- * @csspart send - The control that offers the turn.
- * @csspart mark - The glyph inside the send control.
+ * @slot start - Under the field, at the leading edge: attachments, a model picker.
  *
  * @event {HelixSendEvent} helix-send - Fired when the reader offers their turn, and cancelable.
+ *
+ * @csspart composer - The whole composer.
+ * @csspart end - The trailing slot's box.
+ * @csspart field - The text field.
+ * @csspart mark - The glyph inside the send control.
+ * @csspart send - The control that offers the turn.
+ * @csspart start - The leading slot's box.
+ * @csspart tools - The row under the field.
  */
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixElement {
-  /** What the reader has written. Read it, or set it to seed a draft. */
+  /**
+   * What the reader has written.
+   *
+   * Read it, or set it to seed a draft.
+   */
   @property()
   value = ''
 
-  /** Shown in an empty field. */
+  /**
+   * Shown in an empty field.
+   */
   @property()
   placeholder = ''
 
@@ -61,19 +67,29 @@ export class HelixHeadlessChatComposer extends HelixElement {
   @property({ attribute: 'submit-on' })
   submitOn: 'button' | 'enter' = 'enter'
 
-  /** Whether the composer refuses input, while a turn is in flight say. */
+  /**
+   * Whether the composer refuses input, while a turn is in flight say.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Accessible name for the field. */
+  /**
+   * Accessible name for the field.
+   */
   @property()
   label = 'Message'
 
-  /** Label for the control that sends. */
+  /**
+   * Label for the control that sends.
+   */
   @property({ attribute: 'send-label' })
   sendLabel = 'Send'
 
-  /** How many rows the field opens at. It grows from there. */
+  /**
+   * How many rows the field opens at.
+   *
+   * It grows from there.
+   */
   @property({ type: Number })
   rows = 1
 

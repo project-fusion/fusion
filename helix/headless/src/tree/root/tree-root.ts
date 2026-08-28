@@ -41,18 +41,19 @@ const KEYS = new Set([
  * @documentation https://helix.fusion.dev/components/tree
  *
  * @slot - The tree's items.
-
- *
- * @csspart tree - The tree container.
- * @csspart empty - Shown when there are no rows to show.
- * @csspart loading - Shown while the rows are still on their way.
  *
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
+ *
+ * @csspart empty - Shown when there are no rows to show.
+ * @csspart loading - Shown while the rows are still on their way.
+ * @csspart tree - The tree container.
  */
 @customElement('helix-headless-tree')
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
-  /** Accessible name for the tree. */
+  /**
+   * Accessible name for the tree.
+   */
   @property()
   label = 'Tree'
 

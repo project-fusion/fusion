@@ -7,6 +7,35 @@ import { styles } from './aura-root.css.js'
 import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from './aura-shader.js'
 
 /**
+ * The widest either edge of the drawing buffer may get, in device pixels.
+ *
+ * Past `MAX_RENDERBUFFER_SIZE` a canvas does not draw at all, and WebGL2
+ * guarantees only 2048. Desktop parts report 16384 and older integrated ones
+ * report 8192, which a page-length field can pass.
+ */
+const MAX_CANVAS_EDGE = 4096
+
+/**
+ * The most device pixels the drawing buffer may hold, at 2048 squared.
+ *
+ * Every one of them runs five octaves of noise through two warps on every
+ * frame, so this is the fill rate rather than the fidelity: roughly what the
+ * component already cost over the two screens it was designed against.
+ */
+const MAX_CANVAS_PIXELS = 4_194_304
+
+/**
+ * How long the opening frame will wait for the box to stop changing, in ms.
+ *
+ * The field is scaled by its box, so painting a box that is still settling draws
+ * the same shape at several sizes and reads as the background zooming out. The
+ * wait ends one animation frame after the last change; this is only the cap, for
+ * a page that never stops resizing it. Longer than any load takes to settle and
+ * shorter than a reader takes to conclude the background is just a gradient.
+ */
+const OPENING_PATIENCE = 500
+
+/**
  * @summary A lit, drifting background, drawn from the token layer.
  *
  * @description
@@ -144,23 +173,33 @@ export class HelixAura extends HelixElement {
   @property({ reflect: true, type: Boolean })
   interactive = false
 
-  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  /**
+   * How soft the falloff is, `0` tight and `1` diffuse.
+   */
   @property({ type: Number })
   bloom = 0.5
 
-  /** Overall brightness, as a multiplier on the field. */
+  /**
+   * Overall brightness, as a multiplier on the field.
+   */
   @property({ type: Number })
   gain = 1
 
-  /** Feature size, as a multiplier on the sampled coordinates. */
+  /**
+   * Feature size, as a multiplier on the sampled coordinates.
+   */
   @property({ type: Number })
   scale = 1
 
-  /** How fast it drifts, as a multiplier on time. */
+  /**
+   * How fast it drifts, as a multiplier on time.
+   */
   @property({ type: Number })
   speed = 1
 
-  /** The field's rotation, in degrees. */
+  /**
+   * The field's rotation, in degrees.
+   */
   @property({ type: Number })
   tilt = 14
 
@@ -315,6 +354,43 @@ export class HelixAura extends HelixElement {
   /** Watches the element's own size, so no frame has to ask for it. */
   private sized: ResizeObserver | undefined
 
+  /**
+   * Whether the field has drawn its opening frame yet.
+   *
+   * **The box changes shape while a page is arriving, and this shader is scaled
+   * by the box.** `p.y` spans [-1, 1] over the element's height, so a feature's
+   * size in pixels is proportional to how tall the box happens to be when the
+   * frame is drawn. A page that upgrades its custom elements, loads its fonts
+   * and settles its images passes through several heights on the way to its
+   * final one, and painting each of them draws the same field at several
+   * scales: it opens coarse and tightens, which reads as the background zooming
+   * out on load rather than as a background.
+   *
+   * Refusing the degenerate 0 by 0 box fixed the worst of it, a 2 by 2 drawing
+   * buffer smeared over the page, and left the ordinary case: a first real box
+   * that is simply not the last one.
+   *
+   * So the opening frame waits for the box to stop moving. Nothing paints until
+   * a measurement has stood unchanged for one animation frame, which is the
+   * cheapest definition of settled that is not a guess, and the host's own
+   * gradient covers the wait. After that a resize repaints immediately, because
+   * by then a change is the window moving rather than the page arriving.
+   */
+  private opened = false
+
+  /** The pending opening frame, canceled and rescheduled by each new box. */
+  private opening = 0
+
+  /**
+   * When to stop waiting and draw anyway.
+   *
+   * A page that resizes the field every frame forever would otherwise never get
+   * an opening frame at all. Half a second is far longer than a load takes to
+   * settle and far shorter than a reader waits before deciding the background is
+   * simply a gradient.
+   */
+  private openBy = 0
+
   protected override render(): TemplateResult {
     /* `aria-hidden` on the canvas rather than on the host, because a consumer
        may want to label the region this sits behind and a hidden host would
@@ -370,15 +446,31 @@ export class HelixAura extends HelixElement {
     window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
 
     this.sized = new ResizeObserver(() => {
-      this.measure()
-      this.paintOnce()
+      /* **A resize repaints unconditionally, where a resize used to ask.**
+         `measure` clears the drawing buffer whenever it resizes it, because
+         assigning `canvas.width` is a reset and not a hint. `paintOnce` declines
+         while the loop holds a frame handle, which is right for a property
+         change the loop is about to draw anyway and wrong here: the canvas is
+         already transparent by the time it declines, so the fallback gradient
+         underneath showed through until the next tick landed. One frame, on
+         every reflow that changed the box. */
+      if (!this.measure()) {
+        this.paintOnce()
+        return
+      }
+      if (this.opened) {
+        this.paint()
+        this.play()
+        return
+      }
+      this.open()
     })
     this.sized.observe(this)
 
-    this.measure()
     this.readPalette()
-    this.paintOnce()
-    this.play()
+    if (this.measure()) {
+      this.open()
+    }
   }
 
   /**
@@ -598,8 +690,11 @@ export class HelixAura extends HelixElement {
    * layout read, and doing it in `tick` meant a forced synchronous layout on
    * every single frame to learn a number that changes when the box changes and
    * at no other time. A `ResizeObserver` is told when that is.
+   *
+   * Returns whether the drawing buffer was resized, which is the same question
+   * as whether it was cleared, and so whether the caller owes it a frame.
    */
-  private measure(): void {
+  private measure(): boolean {
     /* Read through `this` rather than destructured, which is not a style
        preference: `noUnusedPrivateClassMembers` does not count a destructured
        read, so a `const { canvas } = this` here is the field's only use and the
@@ -608,14 +703,35 @@ export class HelixAura extends HelixElement {
     const canvas = this.canvas
     const gl = this.gl
     if (!canvas || !gl) {
-      return
+      return false
     }
     const rect = this.getBoundingClientRect()
+
+    /* **An empty rect is layout that has not happened, not a box a pixel
+       across.** These two were `Math.max(rect.width, 1)`, which never reports a
+       bad measurement and instead manufactures a plausible one. Before first
+       layout the rect is 0 by 0, so the clamp produced a 1 by 1 box, and every
+       line below faithfully computed a drawing buffer for it: two pixels by
+       two. The shader then painted four pixels and the compositor stretched
+       them over the whole page.
+
+       That is the settle. The field opened as one enormous soft blob, held it
+       until a real box arrived, and snapped to its true feature size, which
+       reads as the background scaling down. Instrumented on a reload it logged
+       `boxH: 1, bufH: 2` at 216ms with `readyState: "complete"`.
+
+       Declining is the whole fix. There is nothing worth drawing yet and the
+       observer below is already waiting to say when there is; the host's own
+       gradient covers the gap, which is what it is for. */
+    if (rect.width < 1 || rect.height < 1) {
+      return false
+    }
+
     this.box = {
-      height: Math.max(rect.height, 1),
+      height: rect.height,
       left: rect.left,
       top: rect.top,
-      width: Math.max(rect.width, 1),
+      width: rect.width,
     }
 
     /* Capped at two, and a little under native beneath that. Every pixel runs
@@ -623,11 +739,45 @@ export class HelixAura extends HelixElement {
        ratio is four times the work for a gradient nobody can resolve. Not as
        far under as it was: a parallax shift resolves on the buffer's own grid,
        so an aggressive scale makes the field step as it slides. */
-    const dpr = Math.min(window.devicePixelRatio || 1, 2) * 0.85
+    let dpr = Math.min(window.devicePixelRatio || 1, 2) * 0.85
+
+    /* **Then capped again against the box, because a ratio is not a budget.**
+       The number above answers "how fine per CSS pixel" and says nothing about
+       how many there are, which is fine while a field is a screen or two and
+       stops being fine the moment one is asked to light a whole page. Measured
+       on the landing page at 1280 by 6330: 2176 by 10761, or 23.4 million
+       pixels of five-octave noise every frame, against the 5.3 million the same
+       component costs over two screens.
+
+       Two separate ceilings, because they fail differently.
+
+       An edge past `MAX_RENDERBUFFER_SIZE` does not render slowly, it does not
+       render. WebGL2 guarantees only 2048, and while desktops report 16384 the
+       8192 that older integrated parts report is under that same 10761: the
+       aura would have been missing outright rather than expensive, and only on
+       the machines least able to say so. 4096 clears the guarantee twice over
+       and is far more than a field with no edge in it can show.
+
+       The pixel budget is the fill rate, and 2048 squared is close to what the
+       component already cost at the size it was designed for, so a page-length
+       field now costs about what a hero-sized one did rather than four of them.
+
+       Both are applied to `dpr` rather than to the dimensions, so width and
+       height come down together. The shader corrects for aspect off
+       `uResolution`, and scaling one axis alone would stretch the shape. */
+    const edge = Math.max(this.box.width, this.box.height) * dpr
+    if (edge > MAX_CANVAS_EDGE) {
+      dpr *= MAX_CANVAS_EDGE / edge
+    }
+    const pixels = this.box.width * this.box.height * dpr * dpr
+    if (pixels > MAX_CANVAS_PIXELS) {
+      dpr *= Math.sqrt(MAX_CANVAS_PIXELS / pixels)
+    }
+
     const width = Math.round(this.box.width * dpr)
     const height = Math.round(this.box.height * dpr)
     if (width === this.width && height === this.height) {
-      return
+      return false
     }
     this.width = width
     this.height = height
@@ -635,11 +785,17 @@ export class HelixAura extends HelixElement {
     canvas.height = height
     gl.viewport(0, 0, width, height)
     gl.uniform2f(this.uniforms.uResolution ?? null, width, height)
+    return true
   }
 
   private paint(): void {
     const { gl, uniforms } = this
-    if (!gl || !this.program) {
+    /* `width` is zero until a measurement succeeded, and a paint before that is
+       a paint into the degenerate buffer described on `measure`. Guarded here
+       rather than at each caller because `play` is started from the
+       intersection observer and from `visibilitychange` as well as from setup,
+       and one of those running early is the whole fault. */
+    if (!gl || !this.program || !this.width) {
       return
     }
     const { glow, ground, haze, peak } = this.palette
@@ -680,6 +836,34 @@ export class HelixAura extends HelixElement {
       Math.max(0, INTERACTIONS.indexOf(this.interaction ?? 'native')),
     )
     gl.drawArrays(gl.TRIANGLES, 0, 3)
+  }
+
+  /**
+   * The opening frame, one animation frame after the box last changed.
+   *
+   * Each new measurement cancels the pending frame and books another, so a run
+   * of resizes collapses to a single paint at the end of it rather than one per
+   * step. `openBy` stops that from being unbounded.
+   */
+  private open(): void {
+    if (this.opening) {
+      cancelAnimationFrame(this.opening)
+      this.opening = 0
+    }
+    if (this.openBy === 0) {
+      this.openBy = performance.now() + OPENING_PATIENCE
+    }
+    const draw = (): void => {
+      this.opening = 0
+      this.opened = true
+      this.paint()
+      this.play()
+    }
+    if (performance.now() >= this.openBy) {
+      draw()
+      return
+    }
+    this.opening = requestAnimationFrame(draw)
   }
 
   /** One frame, now, for a change that has to show while the loop is stopped. */
@@ -795,7 +979,14 @@ export class HelixAura extends HelixElement {
   }
 
   private play(): void {
-    if (this.frame || this.motion?.matches || document.hidden || !this.gl) {
+    if (
+      this.frame ||
+      this.motion?.matches ||
+      document.hidden ||
+      !this.gl ||
+      !this.width ||
+      !this.opened
+    ) {
       return
     }
     this.frame = requestAnimationFrame(this.tick)

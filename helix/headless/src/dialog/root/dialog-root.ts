@@ -53,20 +53,22 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/dialog
  *
  * @slot - The dialog's content.
- * @slot icon - A single mark above the title, for a dialog that warns.
- * @slot header - The title, and anything beside it.
  * @slot footer - The actions.
+ * @slot header - The title, and anything beside it.
+ * @slot icon - A single mark above the title, for a dialog that warns.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {Event} close - Relayed, because the platform's own does not escape.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
  */
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
-  /** Accessible name for the dialog. */
+  /**
+   * Accessible name for the dialog.
+   */
   @property()
   label = ''
 

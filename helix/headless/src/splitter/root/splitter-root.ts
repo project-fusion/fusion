@@ -130,16 +130,16 @@ const STACK_BELOW = 512
  * @aliases SplitPane, Resizable, SplitView
  * @documentation https://helix.fusion.dev/components/splitter
  *
- * @slot start - The pane before the divider.
  * @slot end - The pane after it.
+ * @slot start - The pane before the divider.
  *
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and cancelable.
  * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and cancelable.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and cancelable.
  *
- * @csspart start - The box holding the first pane.
+ * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
- * @csspart corner - The handle where two dividers cross, added on the client.
+ * @csspart start - The box holding the first pane.
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
@@ -207,7 +207,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.requestUpdate('position', previous)
   }
 
-  /** Where the divider starts, where nothing declared it. */
+  /**
+   * Where the divider starts, where nothing declared it.
+   */
   @property({ attribute: 'default-position', type: Number })
   defaultPosition = 50
 
@@ -245,7 +247,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.requestUpdate('collapsed', previous)
   }
 
-  /** Which pane starts shut, where nothing declared it. */
+  /**
+   * Which pane starts shut, where nothing declared it.
+   */
   @property({ attribute: 'default-collapsed' })
   defaultCollapsed?: 'end' | 'start'
 
@@ -282,7 +286,9 @@ export class HelixHeadlessSplitter extends HelixElement {
   @property()
   min: number | string = 0
 
-  /** Nearest it may come to the end, on the same terms as `min`. */
+  /**
+   * Nearest it may come to the end, on the same terms as `min`.
+   */
   @property()
   max: number | string = 100
 
@@ -329,15 +335,21 @@ export class HelixHeadlessSplitter extends HelixElement {
     return this.toPercent(this.max, 100)
   }
 
-  /** How far one arrow press moves it, as a percentage. */
+  /**
+   * How far one arrow press moves it, as a percentage.
+   */
   @property({ type: Number })
   step = 2
 
-  /** Accessible name for the divider. */
+  /**
+   * Accessible name for the divider.
+   */
   @property()
   label = 'Resize panes'
 
-  /** Accessible name for the handle where two dividers cross. */
+  /**
+   * Accessible name for the handle where two dividers cross.
+   */
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize both'
 
@@ -500,7 +512,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     return Math.min(max, Math.max(min, Number.isFinite(next) ? next : min))
   }
 
-  /** Whether `auto` has resolved to stacked, which only the observer sets. */
+  /**
+   * Whether `auto` has resolved to stacked, which only the observer sets.
+   */
   @state()
   private stacked = false
 

@@ -24,16 +24,16 @@ import '../notification/notification.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - The notifications, as `helix-notification` children.
- * @slot header - Above the list, for a title and the mark-all control.
  * @slot footer - Below the list, for a link to everything.
+ * @slot header - Above the list, for a title and the mark-all control.
  *
  * @csspart list - The list itself.
  * @csspart mark-all - The control that marks everything read.
  *
  * @cssproperty --notifications-max-height - How tall the feed may get before the list scrolls.
  * @cssproperty --notifications-media-column - The gutter every item holds open where something in the feed has media.
- * @cssproperty --notifications-rule - The hairline between items and around the regions.
  * @cssproperty --notifications-padding-inline - Space either side of the header and footer.
+ * @cssproperty --notifications-rule - The hairline between items and around the regions.
  */
 @customElement('helix-notifications')
 export class HelixNotifications extends HelixHeadlessNotifications {

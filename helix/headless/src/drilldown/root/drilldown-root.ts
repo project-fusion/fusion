@@ -48,22 +48,26 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  *
  * @csspart back - The control that returns one page.
  * @csspart back-mark - The glyph on the back control.
+ * @csspart empty - Shown when there are no entries to show.
  * @csspart header - The bar above a page, holding the way back and its name.
+ * @csspart loading - Shown while the entries are still on their way.
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
- * @csspart empty - Shown when there are no entries to show.
- * @csspart loading - Shown while the entries are still on their way.
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
-  /** Accessible name for the region. */
+  /**
+   * Accessible name for the region.
+   */
   @property()
   /* Not "Menu", which is what it was: this component's own description is built
      around not being one, and a default accessible name is the one place that
      claim reaches a reader. */
   label = 'Navigation'
 
-  /** What the control returning from a page reads. */
+  /**
+   * What the control returning from a page reads.
+   */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 

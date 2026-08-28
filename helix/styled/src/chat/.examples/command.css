@@ -9,13 +9,6 @@
   margin-block-start: 12vh;
 }
 
-/* No rule of its own. The conversation already draws one above its composer, and
-   a second line a few pixels under the first reads as a thicker one drawn badly. */
-.command helix-text[slot="footer"] {
-  padding-block: var(--helix-space-xs);
-  padding-inline: var(--helix-space-md);
-}
-
 .command-chat {
   --chat-max-height: 22rem;
 }

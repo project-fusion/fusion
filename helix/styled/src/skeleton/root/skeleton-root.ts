@@ -18,9 +18,9 @@ import { styles } from './skeleton-root.css.js'
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://helix.fusion.dev/components/skeleton
  *
- * @cssproperty --skeleton-size - Diameter of the circle shape.
- *
  * @csspart skeleton - The placeholder surface.
+ *
+ * @cssproperty --skeleton-size - Diameter of the circle shape.
  */
 @customElement('helix-skeleton')
 export class HelixSkeleton extends HelixHeadlessSkeleton {

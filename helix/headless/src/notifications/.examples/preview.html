@@ -4,19 +4,19 @@
 <helix-headless-notifications id="raw" label="Notifications" mark-all>
   <h2 slot="header">Notifications</h2>
 
-  <helix-headless-notifications-item dismissible>
+  <helix-headless-notification dismissible>
     Ada Okonjo approved your deploy to production.
     <button slot="actions" type="button">View</button>
-  </helix-headless-notifications-item>
+  </helix-headless-notification>
 
-  <helix-headless-notifications-item dismissible>
+  <helix-headless-notification dismissible>
     Build #4821 failed on main
     <button slot="actions" type="button">Logs</button>
-  </helix-headless-notifications-item>
+  </helix-headless-notification>
 
-  <helix-headless-notifications-item default-read dismissible>
+  <helix-headless-notification default-read dismissible>
     Your invitation to Fusion Design was accepted.
-  </helix-headless-notifications-item>
+  </helix-headless-notification>
 
   <a href="#all" slot="footer" >See everything</a>
 </helix-headless-notifications>
@@ -24,7 +24,7 @@
 <script>
   const raw = document.getElementById('raw')
   const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
-  const items = raw.querySelectorAll('helix-headless-notifications-item')
+  const items = raw.querySelectorAll('helix-headless-notification')
   items[0].at = ago(3)
   items[1].at = ago(42)
   items[2].at = ago(1500)

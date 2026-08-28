@@ -8,7 +8,7 @@ export function Example() {
              writes both back as a reader drags them. `default-split` and
              `default-panel-size` beside them are a different question: where a double
              click puts them back to. */}{' '}
-      <helix-sandbox default-panel-size="180" default-split="50" panel-size="240" split="35">
+      <helix-sandbox default-panel-size="180" default-split={50} panel-size="240" split={35}>
         {' '}
         <helix-tree label="Files" slot="panel">
           {' '}

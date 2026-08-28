@@ -170,13 +170,13 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @documentation https://helix.fusion.dev/components/listbox
  *
  * @slot - The options, and any groups of them.
- * @slot label - Richer than a string.
  * @slot hint - Richer than a string.
+ * @slot label - Richer than a string.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired before the list narrows, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  *
  * @csspart empty - Shown when a filter has hidden everything.
  * @csspart feedback - What is wrong with it.
@@ -185,9 +185,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart hint - Help under the list.
  * @csspart items - The list itself.
  * @csspart label - The question, over the list.
+ * @csspart loading - Shown while the options are still on their way.
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
- * @csspart loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-listbox')
 export class HelixHeadlessListbox extends MixinCollection(
@@ -225,7 +225,9 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.requestUpdate('filter', previous)
   }
 
-  /** What to start narrowed to, where nothing declared it. */
+  /**
+   * What to start narrowed to, where nothing declared it.
+   */
   @property({ attribute: 'default-filter' })
   defaultFilter = ''
 
@@ -245,11 +247,15 @@ export class HelixHeadlessListbox extends MixinCollection(
   @property({ attribute: 'filterable', reflect: true, type: Boolean })
   filterable = false
 
-  /** Placeholder for the field that narrows the list. */
+  /**
+   * Placeholder for the field that narrows the list.
+   */
   @property({ attribute: 'filter-label' })
   filterLabel = 'Filter'
 
-  /** Whether more than one option can be the answer. */
+  /**
+   * Whether more than one option can be the answer.
+   */
   @property({ reflect: true, type: Boolean })
   multiple = false
 
@@ -264,7 +270,9 @@ export class HelixHeadlessListbox extends MixinCollection(
   @property({ attribute: 'empty-text' })
   override emptyText = 'No matches'
 
-  /** Which option the keyboard is on, which is not what is chosen. */
+  /**
+   * Which option the keyboard is on, which is not what is chosen.
+   */
   @state()
   private activeValue = ''
 

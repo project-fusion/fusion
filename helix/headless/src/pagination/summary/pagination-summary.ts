@@ -48,15 +48,21 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-pagination-summary')
 export class HelixHeadlessPaginationSummary extends HelixElement {
-  /** The page on show, one-based. */
+  /**
+   * The page on show, one-based.
+   */
   @property({ type: Number })
   page = 1
 
-  /** How many items are on a page. */
+  /**
+   * How many items are on a page.
+   */
   @property({ attribute: 'page-size', type: Number })
   pageSize = 0
 
-  /** How many items there are across every page. */
+  /**
+   * How many items there are across every page.
+   */
   @property({ type: Number })
   total = 0
 
@@ -78,7 +84,11 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
   @property()
   format = '{from}-{to} of {total}'
 
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /**
+   * Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 

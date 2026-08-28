@@ -32,17 +32,17 @@ import { styles } from './video-root.css.js'
  * @category media
  * @documentation https://helix.fusion.dev/components/video
  *
- * @property separation - Whether the bar floats on the picture or sits on its own ground.
- *
+ * @cssproperty --video-accent-color - The played part of the scrubber.
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
  * video's own once known, and `16 / 9` until then.
- * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
+ * @cssproperty --video-controls-color - The ink on the bar.
+ * @cssproperty --video-radius - The corner it is cut to.
  * @cssproperty --video-speed-size - How wide the playback speed control is
  * held, so the row does not move when the number changes.
- * @cssproperty --video-radius - The corner it is cut to.
- * @cssproperty --video-controls-color - The ink on the bar.
- * @cssproperty --video-accent-color - The played part of the scrubber.
  * @cssproperty --video-start-size - Width of the mark that starts it.
+ * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
+ *
+ * @property separation - Whether the bar floats on the picture or sits on its own ground.
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixHeadlessVideo {

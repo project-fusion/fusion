@@ -50,15 +50,25 @@ const LABELS: Record<string, string> = {
  */
 @customElement('helix-sandbox-status-bar')
 export class HelixSandboxStatusBar extends HelixElement {
-  /** One-based column of the cursor. Absent shows no readout. */
+  /**
+   * One-based column of the cursor.
+   *
+   * Absent shows no readout.
+   */
   @property({ type: Number })
   column?: number
 
-  /** The language being edited, as a name or one the editor knows. */
+  /**
+   * The language being edited, as a name or one the editor knows.
+   */
   @property()
   language?: string
 
-  /** One-based line of the cursor. Absent shows no readout. */
+  /**
+   * One-based line of the cursor.
+   *
+   * Absent shows no readout.
+   */
   @property({ type: Number })
   line?: number
 

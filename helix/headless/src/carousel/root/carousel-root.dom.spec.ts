@@ -13,6 +13,11 @@ type Carousel = HTMLElement & {
   internals?: ElementInternals
 }
 
+/** The panes the component renders, one per slide, in order. */
+const panes = (cal: Carousel): HTMLElement[] => [
+  ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="slide"]') ?? []),
+]
+
 const carousel = async (attrs = ''): Promise<Carousel> =>
   (await mount(`<helix-headless-carousel label="Verticals" ${attrs}>
     <div>Design</div>
@@ -32,21 +37,55 @@ describe('carousel', () => {
     // Without it a reader is told "group" three times and cannot tell where
     // they are in the run.
     const cal = await carousel()
-    expect([...cal.children].map((slide) => slide.getAttribute('aria-label'))).toEqual([
+    expect(panes(cal).map((pane) => pane.getAttribute('aria-label'))).toEqual([
       '1 of 3',
       '2 of 3',
       '3 of 3',
     ])
-    expect([...cal.children].every((s) => s.getAttribute('aria-roledescription') === 'slide')).toBe(
-      true,
-    )
+    expect(
+      panes(cal).every(
+        (pane) =>
+          pane.getAttribute('aria-roledescription') === 'slide' &&
+          pane.getAttribute('role') === 'group',
+      ),
+    ).toBe(true)
   })
 
-  test('a slide that names itself keeps its own name', async () => {
+  test('and writes nothing at all onto the slides themselves', async () => {
+    /* The slides are the consumer's own elements, and on a React page they are
+       nodes React is in the middle of hydrating. Writing the ARIA onto them put
+       `role` and `aria-roledescription` on six anchors before React reached
+       them, which React reports as a mismatch and does not patch up. Deferring
+       the write was tried and is a race rather than an ordering; a pane the
+       component renders is neither.
+
+       And the role was wrong on its own terms: `role="group"` on an `<a href>`
+       replaces the link role rather than adding to it, so a slide that was a
+       link stopped being announced as one. Both faults are the same write, so
+       the assertion is that the write does not happen.
+
+       This is `hydration.dom.spec.ts` one level down: that lane asks what an
+       element writes onto its *own* host, and says in its own comments that a
+       write a parent makes to its children is the case it cannot reach, having
+       no markup to mount. Here there is markup, so the question is askable. */
+    const cal = await carousel()
+    await cal.updateComplete
+    expect([...cal.children].map((slide) => slide.getAttributeNames())).toEqual([[], [], []])
+  })
+
+  test('a slide that names itself keeps its own name, and stays what it is', async () => {
+    /* The pane carries the position and the slide carries itself, so a link is
+       still announced as a link inside a group that says where it sits. While
+       the role was written onto the slide, this anchor was a group and left the
+       links list entirely. */
     const cal = (await mount(
-      '<helix-headless-carousel label="x"><div aria-label="Fusion Design">D</div></helix-headless-carousel>',
+      '<helix-headless-carousel label="x"><a href="/d" aria-label="Fusion Design">D</a></helix-headless-carousel>',
     )) as Carousel
-    expect(cal.children[0]?.getAttribute('aria-label')).toBe('Fusion Design')
+    await cal.updateComplete
+    const slide = cal.children[0]
+    expect(slide?.getAttribute('aria-label')).toBe('Fusion Design')
+    expect(slide?.getAttribute('role')).toBeNull()
+    expect(panes(cal)[0]?.getAttribute('aria-label')).toBe('1 of 1')
   })
 
   test('moving reports the slide now in view', async () => {
@@ -276,8 +315,15 @@ describe('carousel settling', () => {
        computes no padding, so the numbers there are the ones they always
        were. */
     const bleed = Number.parseFloat(getComputedStyle(track).paddingLeft) || 0
-    for (const [at, slide] of [...host.children].entries()) {
-      Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: at * 100 + bleed })
+    /* Stated on the panes rather than on the slides, because the pane is the
+       box the track lays out: the component wraps each slide in a
+       `[part="slide"]` and assigns it there, so a slide has no offset of its own
+       within the scroller. Faking the offset on the element the component does
+       not measure left every position reading zero, which reads as the index
+       never moving. */
+    const panes = [...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part="slide"]') ?? [])]
+    for (const [at, pane] of panes.entries()) {
+      Object.defineProperty(pane, 'offsetLeft', { configurable: true, value: at * 100 + bleed })
     }
     Object.defineProperty(track, 'offsetLeft', { configurable: true, value: 0 })
     /* And `scrollLeft`, which is the one that has to be stated in a browser.

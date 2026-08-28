@@ -69,9 +69,14 @@ const parse = (hotkey: string) => {
  * @slot - The commands, which are `helix-option` elements and their groups.
  * @slot footer - Under the list, for the keys a reader can press.
  *
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the palette opens.
+ * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
  * @csspart dialog - The overlay's own box, forwarded from the dialog.
- * @csspart listbox - The list inside it.
  * @csspart footer - The row under the list.
+ * @csspart listbox - The list inside it.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
  * @csspart listbox-feedback - What is wrong with it.
  * @csspart listbox-filter-icon - The mark beside that field.
@@ -79,26 +84,27 @@ const parse = (hotkey: string) => {
  * @csspart listbox-hint - Help under the list.
  * @csspart listbox-items - The list itself.
  * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-loading - Shown while the options are still on their way.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
- * @csspart listbox-loading - Shown while the options are still on their way.
- *
- * @event {HelixSelectEvent} helix-select - Fired when a command is chosen.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the palette opens.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
-  /** Accessible name for the overlay, which has no visible heading. */
+  /**
+   * Accessible name for the overlay, which has no visible heading.
+   */
   @property()
   label = 'Commands'
 
-  /** Shown in the field before anything is typed. */
+  /**
+   * Shown in the field before anything is typed.
+   */
   @property()
   placeholder = 'Search commands'
 
-  /** Words shown where the filter has matched nothing. */
+  /**
+   * Words shown where the filter has matched nothing.
+   */
   @property({ attribute: 'empty-text' })
   emptyText = 'No commands'
 

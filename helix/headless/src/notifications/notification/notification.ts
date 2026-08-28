@@ -55,25 +55,25 @@ import '../../format-date/index.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
+ * @slot actions - What a reader can do about it.
  * @slot caption - A second line qualifying it, quieter than the first. A bare
  * slot rather than a box, so an item without one pays nothing for it; style it
  * through `::slotted()`.
  * @slot media - An avatar or icon identifying who or what it came from.
- * @slot actions - What a reader can do about it.
  *
- * @csspart item - The whole notification.
- * @csspart media - The leading slot's box.
- * @csspart body - The label and the caption together.
- * @csspart label - What happened, on the first line.
- * @csspart trailing - The column holding the time and the controls.
- * @csspart time - When it happened, read the way a person reads one.
- * @csspart controls - The actions and the dismiss, which replace the time.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
+ * @event {HelixReadEvent} helix-read - Fired when the item is marked read or unread, and cancelable.
+ *
  * @csspart actions - The trailing slot's box.
+ * @csspart body - The label and the caption together.
+ * @csspart controls - The actions and the dismiss, which replace the time.
  * @csspart dismiss - The control that removes it.
  * @csspart dismiss-mark - The glyph on that control, where none is slotted.
- *
- * @event {HelixReadEvent} helix-read - Fired when the item is marked read or unread, and cancelable.
- * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
+ * @csspart item - The whole notification.
+ * @csspart label - What happened, on the first line.
+ * @csspart media - The leading slot's box.
+ * @csspart time - When it happened, read the way a person reads one.
+ * @csspart trailing - The column holding the time and the controls.
  */
 @customElement('helix-headless-notification')
 export class HelixHeadlessNotification extends HelixElement {
@@ -119,19 +119,29 @@ export class HelixHeadlessNotification extends HelixElement {
     this.requestUpdate('read', previous)
   }
 
-  /** State to open with, where nothing declared one. */
+  /**
+   * State to open with, where nothing declared one.
+   */
   @property({ attribute: 'default-read', type: Boolean })
   defaultRead = false
 
-  /** Whether a reader may remove it. */
+  /**
+   * Whether a reader may remove it.
+   */
   @property({ type: Boolean })
   dismissible = false
 
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /**
+   * Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** Accessible name for the dismiss control. */
+  /**
+   * Accessible name for the dismiss control.
+   */
   @property({ attribute: 'dismiss-label' })
   dismissLabel = 'Dismiss'
 

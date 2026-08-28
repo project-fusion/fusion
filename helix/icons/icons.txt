@@ -107,3 +107,5 @@ x-circle-fill
 arrow-clockwise
 arrow-counter-clockwise
 archive
+linkedin-logo
+x-logo

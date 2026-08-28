@@ -101,14 +101,11 @@ const isTwelveHour = (locale?: string): boolean =>
  * @aliases Time, TimeList
  * @documentation https://helix.fusion.dev/components/time-picker
  *
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
  *
- * @csspart list - The listbox holding the times, in `list`.
- * @csspart columns - The row of columns, in `wheels`.
  * @csspart column - One of them.
- * @csspart option - One time in it. Carries `data-between` inside a range.
  * @csspart column-empty - Shown when a filter has hidden everything.
  * @csspart column-feedback - What is wrong with it.
  * @csspart column-filter-icon - The mark beside that field.
@@ -116,8 +113,11 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart column-hint - Help under the list.
  * @csspart column-items - The list itself.
  * @csspart column-label - The question, over the list.
+ * @csspart column-loading - Shown while the options are still on their way.
  * @csspart column-search - The region holding the field that narrows the list.
  * @csspart column-search-field - The field itself.
+ * @csspart columns - The row of columns, in `wheels`.
+ * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - Shown when a filter has hidden everything.
  * @csspart list-feedback - What is wrong with it.
  * @csspart list-filter-icon - The mark beside that field.
@@ -125,14 +125,14 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list-hint - Help under the list.
  * @csspart list-items - The list itself.
  * @csspart list-label - The question, over the list.
+ * @csspart list-loading - Shown while the options are still on their way.
  * @csspart list-search - The region holding the field that narrows the list.
  * @csspart list-search-field - The field itself.
+ * @csspart option - One time in it. Carries `data-between` inside a range.
  * @csspart option-description - The caption under the words, when there is one.
  * @csspart option-item - The row.
  * @csspart option-label - The words.
  * @csspart option-text - The words and the caption, as one column.
- * @csspart column-loading - Shown while the options are still on their way.
- * @csspart list-loading - Shown while the options are still on their way.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
@@ -159,11 +159,15 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   @property({ type: Number })
   step = 15
 
-  /** Earliest time offered, as `HH:mm`. */
+  /**
+   * Earliest time offered, as `HH:mm`.
+   */
   @property()
   min = '00:00'
 
-  /** Latest time offered, as `HH:mm`. */
+  /**
+   * Latest time offered, as `HH:mm`.
+   */
   @property()
   max = '23:59'
 
@@ -182,11 +186,17 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   @property({ attribute: 'disable-times' })
   disableTimes = ''
 
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /**
+   * Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** Accessible name for the list, which has no visible one of its own. */
+  /**
+   * Accessible name for the list, which has no visible one of its own.
+   */
   @property()
   label = 'Time'
 
@@ -469,7 +479,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return super.requestValue(next)
   }
 
-  /** Whether the form refuses to submit while nothing is chosen. */
+  /**
+   * Whether the form refuses to submit while nothing is chosen.
+   */
   @property({ reflect: true, type: Boolean })
   required = false
 

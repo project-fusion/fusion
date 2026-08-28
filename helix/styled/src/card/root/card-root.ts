@@ -29,10 +29,10 @@ import { styles } from './card-root.css.js'
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
- * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
- * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
+ * @slot header - Title and any actions for the whole card.
+ * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  *
  * @cssproperty --card-align - How the regions pack when the card is stretched
  *   taller than its content. `start` by default, so the slack is at the bottom;
@@ -116,7 +116,9 @@ export class HelixCard extends HelixHeadlessCard {
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'
 
-  /** Whether media sits above the content stack or beside it. */
+  /**
+   * Whether media sits above the content stack or beside it.
+   */
   @property({ reflect: true })
   orientation?: 'vertical' | 'horizontal'
 

@@ -22,7 +22,9 @@ import { styles } from './stat-group.css.js'
  */
 @customElement('helix-stat-group')
 export class HelixStatGroup extends HelixHeadlessStatGroup {
-  /** Whether the figures are separated by a rule as well as by space. */
+  /**
+   * Whether the figures are separated by a rule as well as by space.
+   */
   @property({ reflect: true, type: Boolean })
   divided = false
 

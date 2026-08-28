@@ -84,24 +84,24 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * @documentation https://helix.fusion.dev/components/data-table
  *
  * @slot - The columns, declared as `helix-table-column` children.
- * @slot toolbar - Above the grid, for a search field or actions.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
+ * @slot toolbar - Above the grid, for a search field or actions.
  *
- * @csspart table - The grid.
- * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
- * @csspart row - One row of data.
- * @csspart cell - One cell.
- * @csspart toolbar - The region above the grid.
- * @csspart footer - The region below the grid.
- * @csspart pagination - The pagination, where this draws one.
- * @csspart empty - Shown when no rows match.
- * @csspart loading - Shown while the rows are still on their way.
- *
- * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.
- *
- * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired when the query changes, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired when a reader asks for another page, and cancelable.
+ * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
+ *
+ * @csspart cell - One cell.
+ * @csspart empty - Shown when no rows match.
+ * @csspart footer - The region below the grid.
+ * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
+ * @csspart loading - Shown while the rows are still on their way.
+ * @csspart pagination - The pagination, where this draws one.
+ * @csspart row - One row of data.
+ * @csspart table - The grid.
+ * @csspart toolbar - The region above the grid.
+ *
+ * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
@@ -170,7 +170,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ type: Number })
   total = 0
 
-  /** Accessible name for the grid. */
+  /**
+   * Accessible name for the grid.
+   */
   @property()
   label = ''
 
@@ -194,7 +196,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate('sort', previous)
   }
 
-  /** Order to open on, where nothing declared one. */
+  /**
+   * Order to open on, where nothing declared one.
+   */
   @property({ attribute: 'default-sort' })
   defaultSort = ''
 
@@ -218,7 +222,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate('filter', previous)
   }
 
-  /** Query to open with, where nothing declared one. */
+  /**
+   * Query to open with, where nothing declared one.
+   */
   @property({ attribute: 'default-filter' })
   defaultFilter = ''
 
@@ -243,7 +249,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate('page', previous)
   }
 
-  /** Page to open on, where nothing declared one. */
+  /**
+   * Page to open on, where nothing declared one.
+   */
   @property({ attribute: 'default-page', type: Number })
   defaultPage = 1
 
@@ -267,7 +275,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate('pageSize', previous)
   }
 
-  /** Page size to open with, where nothing declared one. */
+  /**
+   * Page size to open with, where nothing declared one.
+   */
   @property({ attribute: 'default-page-size', type: Number })
   defaultPageSize = 0
 

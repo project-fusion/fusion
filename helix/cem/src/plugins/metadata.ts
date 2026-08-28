@@ -26,11 +26,11 @@ const text = (comment: unknown): string => {
  * Carries Helix's own JSDoc tags into the manifest.
  *
  * `@summary` is part of the CEM spec and the analyzer captures it. `@since`,
- * `@status`, `@documentation`, `@alias`, and an explicit `@description` are
- * not, so without this they exist only as comments: invisible to the docs site,
- * to the convention linter, and to any agent reading the manifest. A
- * `@status experimental` that cannot put a badge on a page or warn a consumer
- * is decoration.
+ * `@status`, `@category`, `@documentation`, `@aliases`, `@groups`, and an
+ * explicit `@description` are not, so without this they exist only as comments:
+ * invisible to the docs site, to the convention linter, and to any agent
+ * reading the manifest. A `@status experimental` that cannot put a badge on a
+ * page or warn a consumer is decoration.
  *
  * `@aliases` is comma-separated. It records the names people search for that
  * are not the component's own: Tag is also a Chip, Toast is also a Snackbar.

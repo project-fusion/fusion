@@ -139,6 +139,7 @@ import type {
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
+  HelixScrolledEvent,
   HelixSelectEvent,
   HelixSendEvent,
   HelixShortcutEvent,
@@ -651,6 +652,15 @@ would catch. */
   textContent?: string | number;
 };
 
+/** `HelixHeadlessAppHeader` component event */
+export type HelixHeadlessAppHeaderElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessAppHeader,
+  E
+>;
+/** `helix-scrolled` event type */
+export type HelixHeadlessAppHeaderHelixScrolledElementEvent =
+  HelixHeadlessAppHeaderElementEvent<HelixScrolledEvent>;
+
 export type HelixHeadlessAppHeaderProps = {
   /** Where the middle region sits in the bar.
 
@@ -686,6 +696,11 @@ breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   contentAlign?: HelixHeadlessAppHeader["contentAlign"];
+
+  /** Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis. */
+  "onhelix-scrolled"?: (
+    e: HelixHeadlessAppHeaderHelixScrolledElementEvent,
+  ) => void;
 };
 
 export type HelixHeadlessAppHeaderSolidJsProps = {
@@ -723,6 +738,10 @@ breadcrumb trail as readily as a nav, and a header that centered its search
 box would have been setting `nav-align` to do it. The part is called
 `content`, so the property is too. */
   "prop:contentAlign"?: HelixHeadlessAppHeader["contentAlign"];
+  /** Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis. */
+  "on:helix-scrolled"?: (
+    e: HelixHeadlessAppHeaderHelixScrolledElementEvent,
+  ) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -800,26 +819,34 @@ export type HelixHeadlessAvatarElementEvent<E = Event> = TypedEvent<
 >;
 
 export type HelixHeadlessAvatarProps = {
-  /** Image to show. Falls back to the slot, or to initials, if it fails. */
+  /** Image to show.
+
+Falls back to the slot, or to initials, if it fails. */
   src?: HelixHeadlessAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
+  /** Name of the person or entity.
+
+Used for the label and the initials. */
   name?: HelixHeadlessAvatar["name"];
 
-  /** Relayed from the image once it has loaded. */
-  onload?: (e: HelixHeadlessAvatarElementEvent) => void;
   /** Relayed from the image when it fails. */
   onerror?: (e: HelixHeadlessAvatarElementEvent) => void;
+  /** Relayed from the image once it has loaded. */
+  onload?: (e: HelixHeadlessAvatarElementEvent) => void;
 };
 
 export type HelixHeadlessAvatarSolidJsProps = {
-  /** Image to show. Falls back to the slot, or to initials, if it fails. */
+  /** Image to show.
+
+Falls back to the slot, or to initials, if it fails. */
   "prop:src"?: HelixHeadlessAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
+  /** Name of the person or entity.
+
+Used for the label and the initials. */
   "prop:name"?: HelixHeadlessAvatar["name"];
-  /** Relayed from the image once it has loaded. */
-  "on:load"?: (e: HelixHeadlessAvatarElementEvent) => void;
   /** Relayed from the image when it fails. */
   "on:error"?: (e: HelixHeadlessAvatarElementEvent) => void;
+  /** Relayed from the image once it has loaded. */
+  "on:load"?: (e: HelixHeadlessAvatarElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -828,20 +855,32 @@ export type HelixHeadlessAvatarSolidJsProps = {
 };
 
 export type HelixHeadlessBadgeProps = {
-  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
+  /** The count or short text to show.
+
+Absent shows a dot, zero shows nothing. */
   value?: HelixHeadlessBadge["value"];
-  /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
+  /** Cap for a numeric value.
+
+Past it the indicator reads `{max}+`. */
   max?: HelixHeadlessBadge["max"];
-  /** Accessible name. Required for a dot, which has no text to read. */
+  /** Accessible name.
+
+Required for a dot, which has no text to read. */
   label?: HelixHeadlessBadge["label"];
 };
 
 export type HelixHeadlessBadgeSolidJsProps = {
-  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
+  /** The count or short text to show.
+
+Absent shows a dot, zero shows nothing. */
   "prop:value"?: HelixHeadlessBadge["value"];
-  /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
+  /** Cap for a numeric value.
+
+Past it the indicator reads `{max}+`. */
   "prop:max"?: HelixHeadlessBadge["max"];
-  /** Accessible name. Required for a dot, which has no text to read. */
+  /** Accessible name.
+
+Required for a dot, which has no text to read. */
   "prop:label"?: HelixHeadlessBadge["label"];
 
   /** Set the innerHTML of the element */
@@ -1057,13 +1096,30 @@ export type HelixHeadlessBreadcrumbProps = {
   current?: HelixHeadlessBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
 
-Empty rather than optional and unreflected: an `href` written onto every
-host would be a link to the current page on every crumb nobody asked to be
-one, and nothing selects on it. */
+**Optional and reflected, because a stylesheet does select on it.**
+`breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+block padding off a crumb that is not a link, so the attribute is what
+decides how tall a crumb is. Unreflected, an `href` set from script reached
+the property, rendered the anchor, and left the host looking unlinked: the
+crumb drew at 20px where a markup twin drew at 28.
+
+*This said the opposite until 27 Aug 2026*, and named the reason as
+"nothing selects on it", which was not true when it was written. The
+paragraph is worth keeping because the rest of it is right and is what makes
+this optional rather than defaulted: an `href` written onto every host would
+be a link to the current page on every crumb nobody asked to be one. That is
+the general rule as well, that a reflected property takes no default, so the
+two agree.
+
+Found by the picture comparison rather than by reading: React assigns a
+matching property instead of an attribute, so every crumb in the React twin
+of `breadcrumbs/links` lost its padding at once. */
   href?: HelixHeadlessBreadcrumb["href"];
   /** Where the link opens, for the rare crumb that leaves the site. */
   target?: HelixHeadlessBreadcrumb["target"];
-  /** What the link declares about where it goes. The consumer's decision. */
+  /** What the link declares about where it goes.
+
+The consumer's decision. */
   rel?: HelixHeadlessBreadcrumb["rel"];
 };
 
@@ -1072,13 +1128,30 @@ export type HelixHeadlessBreadcrumbSolidJsProps = {
   "prop:current"?: HelixHeadlessBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
 
-Empty rather than optional and unreflected: an `href` written onto every
-host would be a link to the current page on every crumb nobody asked to be
-one, and nothing selects on it. */
+**Optional and reflected, because a stylesheet does select on it.**
+`breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+block padding off a crumb that is not a link, so the attribute is what
+decides how tall a crumb is. Unreflected, an `href` set from script reached
+the property, rendered the anchor, and left the host looking unlinked: the
+crumb drew at 20px where a markup twin drew at 28.
+
+*This said the opposite until 27 Aug 2026*, and named the reason as
+"nothing selects on it", which was not true when it was written. The
+paragraph is worth keeping because the rest of it is right and is what makes
+this optional rather than defaulted: an `href` written onto every host would
+be a link to the current page on every crumb nobody asked to be one. That is
+the general rule as well, that a reflected property takes no default, so the
+two agree.
+
+Found by the picture comparison rather than by reading: React assigns a
+matching property instead of an attribute, so every crumb in the React twin
+of `breadcrumbs/links` lost its padding at once. */
   "prop:href"?: HelixHeadlessBreadcrumb["href"];
   /** Where the link opens, for the rare crumb that leaves the site. */
   "prop:target"?: HelixHeadlessBreadcrumb["target"];
-  /** What the link declares about where it goes. The consumer's decision. */
+  /** What the link declares about where it goes.
+
+The consumer's decision. */
   "prop:rel"?: HelixHeadlessBreadcrumb["rel"];
 
   /** Set the innerHTML of the element */
@@ -1751,7 +1824,9 @@ export type HelixHeadlessChatComposerHelixSendElementEvent =
   HelixHeadlessChatComposerElementEvent<HelixSendEvent>;
 
 export type HelixHeadlessChatComposerProps = {
-  /** What the reader has written. Read it, or set it to seed a draft. */
+  /** What the reader has written.
+
+Read it, or set it to seed a draft. */
   value?: HelixHeadlessChatComposer["value"];
   /** Shown in an empty field. */
   placeholder?: HelixHeadlessChatComposer["placeholder"];
@@ -1775,7 +1850,9 @@ has to mean a new line and nothing else. */
   "send-label"?: HelixHeadlessChatComposer["sendLabel"];
   /** Label for the control that sends. */
   sendLabel?: HelixHeadlessChatComposer["sendLabel"];
-  /** How many rows the field opens at. It grows from there. */
+  /** How many rows the field opens at.
+
+It grows from there. */
   rows?: HelixHeadlessChatComposer["rows"];
 
   /** Fired when the reader offers their turn, and cancelable. */
@@ -1783,7 +1860,9 @@ has to mean a new line and nothing else. */
 };
 
 export type HelixHeadlessChatComposerSolidJsProps = {
-  /** What the reader has written. Read it, or set it to seed a draft. */
+  /** What the reader has written.
+
+Read it, or set it to seed a draft. */
   "prop:value"?: HelixHeadlessChatComposer["value"];
   /** Shown in an empty field. */
   "prop:placeholder"?: HelixHeadlessChatComposer["placeholder"];
@@ -1807,7 +1886,9 @@ has to mean a new line and nothing else. */
   "attr:send-label"?: HelixHeadlessChatComposer["sendLabel"];
   /** Label for the control that sends. */
   "prop:sendLabel"?: HelixHeadlessChatComposer["sendLabel"];
-  /** How many rows the field opens at. It grows from there. */
+  /** How many rows the field opens at.
+
+It grows from there. */
   "prop:rows"?: HelixHeadlessChatComposer["rows"];
   /** Fired when the reader offers their turn, and cancelable. */
   "on:helix-send"?: (e: HelixHeadlessChatComposerHelixSendElementEvent) => void;
@@ -1839,12 +1920,16 @@ anything else is a name the consumer styles. */
   /** What has happened to it.
 
 Reflected, because every one of the four is a visual state and a stylesheet
-has no other way to know. Empty is a settled message with nothing to report,
-which is what most of a transcript is. */
+has no other way to know. Absent is a settled message with nothing to
+report, which is what most of a transcript is, and it is the absence of the
+attribute rather than a value of it: there is no initializer, so nothing is
+reflected until something happens. */
   state?: HelixHeadlessChatMessage["state"];
   /** When it was said, as anything `Date` parses. */
   at?: HelixHeadlessChatMessage["at"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessChatMessage["locale"];
   /** What to call each state, for a reader who cannot see it. */
   "sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
@@ -1871,12 +1956,16 @@ anything else is a name the consumer styles. */
   /** What has happened to it.
 
 Reflected, because every one of the four is a visual state and a stylesheet
-has no other way to know. Empty is a settled message with nothing to report,
-which is what most of a transcript is. */
+has no other way to know. Absent is a settled message with nothing to
+report, which is what most of a transcript is, and it is the absence of the
+attribute rather than a value of it: there is no initializer, so nothing is
+reflected until something happens. */
   "prop:state"?: HelixHeadlessChatMessage["state"];
   /** When it was said, as anything `Date` parses. */
   "prop:at"?: HelixHeadlessChatMessage["at"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   "prop:locale"?: HelixHeadlessChatMessage["locale"];
   /** What to call each state, for a reader who cannot see it. */
   "attr:sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
@@ -2062,14 +2151,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessCheckboxGroup["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
   /** Fired when any box changes, with the whole set. */
   "onhelix-before-change"?: (
     e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
 };
 
 export type HelixHeadlessCheckboxGroupSolidJsProps = {
@@ -2112,14 +2201,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessCheckboxGroup["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
   /** Fired when any box changes, with the whole set. */
   "on:helix-before-change"?: (
     e: HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessCheckboxGroupElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2197,14 +2286,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessCheckbox["name"];
 
+  /** Relayed from the input once the state has changed. */
+  onchange?: (e: HelixHeadlessCheckboxElementEvent) => void;
   /** Fired before the state changes, and cancelable. */
   "onhelix-before-toggle"?: (
     e: HelixHeadlessCheckboxHelixBeforeToggleElementEvent,
   ) => void;
   /** Announced once the state has moved. */
   oninput?: (e: HelixHeadlessCheckboxElementEvent) => void;
-  /** Relayed from the input once the state has changed. */
-  onchange?: (e: HelixHeadlessCheckboxElementEvent) => void;
 };
 
 export type HelixHeadlessCheckboxSolidJsProps = {
@@ -2267,14 +2356,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessCheckbox["name"];
+  /** Relayed from the input once the state has changed. */
+  "on:change"?: (e: HelixHeadlessCheckboxElementEvent) => void;
   /** Fired before the state changes, and cancelable. */
   "on:helix-before-toggle"?: (
     e: HelixHeadlessCheckboxHelixBeforeToggleElementEvent,
   ) => void;
   /** Announced once the state has moved. */
   "on:input"?: (e: HelixHeadlessCheckboxElementEvent) => void;
-  /** Relayed from the input once the state has changed. */
-  "on:change"?: (e: HelixHeadlessCheckboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2292,7 +2381,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   "no-copy"?: HelixHeadlessCodeBlock["noCopy"];
   /** Whether to leave the copy button off.
 
@@ -2301,7 +2402,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   noCopy?: HelixHeadlessCodeBlock["noCopy"];
 };
 
@@ -2315,7 +2428,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   "bool:no-copy"?: HelixHeadlessCodeBlock["noCopy"];
   /** Whether to leave the copy button off.
 
@@ -2324,7 +2449,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   "prop:noCopy"?: HelixHeadlessCodeBlock["noCopy"];
 
   /** Set the innerHTML of the element */
@@ -2350,12 +2487,12 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessColorInputHelixBeforeCloseElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessColorInputProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -2490,22 +2627,22 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessColorInput["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the color changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Fired when the panel opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the panel opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessColorInputElementEvent) => void;
 };
@@ -2642,22 +2779,22 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessColorInput["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Fired when the color changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessColorInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessColorInputElementEvent) => void;
-  /** Fired when the panel opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessColorInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the panel opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessColorInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessColorInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessColorInputElementEvent) => void;
 
@@ -2672,18 +2809,18 @@ export type HelixHeadlessColorPickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessColorPicker,
   E
 >;
-/** `helix-sample-end` event type */
-export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixSampleEndEvent>;
-/** `helix-sample-start` event type */
-export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
 /** `helix-before-change` event type */
 export type HelixHeadlessColorPickerHelixBeforeChangeElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-copy` event type */
 export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
+/** `helix-sample-end` event type */
+export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleEndEvent>;
+/** `helix-sample-start` event type */
+export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
 
 export type HelixHeadlessColorPickerProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -2798,6 +2935,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessColorPicker["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessColorPickerElementEvent) => void;
+  /** Fired when the color changes. */
+  "onhelix-before-change"?: (
+    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Fired when the color is put on the clipboard. */
+  "onhelix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
   /** The eyedropper has closed, whether or not a color was taken. */
   "onhelix-sample-end"?: (
     e: HelixHeadlessColorPickerHelixSampleEndElementEvent,
@@ -2806,16 +2951,8 @@ reflected none of them. */
   "onhelix-sample-start"?: (
     e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
-  /** Fired when the color changes. */
-  "onhelix-before-change"?: (
-    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
-  ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Fired when the color is put on the clipboard. */
-  "onhelix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 };
 
 export type HelixHeadlessColorPickerSolidJsProps = {
@@ -2930,6 +3067,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessColorPicker["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessColorPickerElementEvent) => void;
+  /** Fired when the color changes. */
+  "on:helix-before-change"?: (
+    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
+  ) => void;
+  /** Fired when the color is put on the clipboard. */
+  "on:helix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
   /** The eyedropper has closed, whether or not a color was taken. */
   "on:helix-sample-end"?: (
     e: HelixHeadlessColorPickerHelixSampleEndElementEvent,
@@ -2938,16 +3083,8 @@ reflected none of them. */
   "on:helix-sample-start"?: (
     e: HelixHeadlessColorPickerHelixSampleStartElementEvent,
   ) => void;
-  /** Fired when the color changes. */
-  "on:helix-before-change"?: (
-    e: HelixHeadlessColorPickerHelixBeforeChangeElementEvent,
-  ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessColorPickerElementEvent) => void;
-  /** Fired when the color is put on the clipboard. */
-  "on:helix-copy"?: (e: HelixHeadlessColorPickerHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -2963,15 +3100,15 @@ export type HelixHeadlessComboboxElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
   HelixHeadlessComboboxElementEvent<HelixBeforeChangeEvent>;
-/** `helix-create` event type */
-export type HelixHeadlessComboboxHelixCreateElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessComboboxHelixBeforeCloseElementEvent =
   HelixHeadlessComboboxElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
+/** `helix-create` event type */
+export type HelixHeadlessComboboxHelixCreateElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
 
 export type HelixHeadlessComboboxProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -3148,24 +3285,24 @@ what keeps a composed control and the control inside it from answering
 differently: they are one chooser to a consumer. */
   selectedIndex?: HelixHeadlessCombobox["selectedIndex"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Fired when the chosen option changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Fired when the reader asks for something the list does not hold, and cancelable. */
-  "onhelix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
-  /** Fired when the panel opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the panel opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "onhelix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessComboboxElementEvent) => void;
 };
@@ -3344,24 +3481,24 @@ same two properties are implemented. Delegating rather than recomputing is
 what keeps a composed control and the control inside it from answering
 differently: they are one chooser to a consumer. */
   "prop:selectedIndex"?: HelixHeadlessCombobox["selectedIndex"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Fired when the chosen option changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessComboboxHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessComboboxElementEvent) => void;
-  /** Fired when the reader asks for something the list does not hold, and cancelable. */
-  "on:helix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
-  /** Fired when the panel opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessComboboxHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the panel opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessComboboxHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "on:helix-create"?: (e: HelixHeadlessComboboxHelixCreateElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessComboboxElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessComboboxElementEvent) => void;
 
@@ -3376,15 +3513,15 @@ export type HelixHeadlessCommandElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCommand,
   E
 >;
-/** `helix-select` event type */
-export type HelixHeadlessCommandHelixSelectElementEvent =
-  HelixHeadlessCommandElementEvent<HelixSelectEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
-  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessCommandHelixBeforeCloseElementEvent =
   HelixHeadlessCommandElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
+/** `helix-select` event type */
+export type HelixHeadlessCommandHelixSelectElementEvent =
+  HelixHeadlessCommandElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessCommandProps = {
   /** Accessible name for the overlay, which has no visible heading. */
@@ -3430,16 +3567,16 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessCommand["defaultOpen"];
 
-  /** Fired when a command is chosen. */
-  "onhelix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
-  /** Fired when the palette opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the palette opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when a command is chosen. */
+  "onhelix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessCommandElementEvent) => void;
 };
@@ -3487,16 +3624,16 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessCommand["defaultOpen"];
-  /** Fired when a command is chosen. */
-  "on:helix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
-  /** Fired when the palette opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessCommandHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the palette opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessCommandHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when a command is chosen. */
+  "on:helix-select"?: (e: HelixHeadlessCommandHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessCommandElementEvent) => void;
 
@@ -3818,15 +3955,15 @@ export type HelixHeadlessDataTableElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDataTable,
   E
 >;
-/** `helix-sort` event type */
-export type HelixHeadlessDataTableHelixSortElementEvent =
-  HelixHeadlessDataTableElementEvent<HelixSortEvent>;
 /** `helix-filter` event type */
 export type HelixHeadlessDataTableHelixFilterElementEvent =
   HelixHeadlessDataTableElementEvent<HelixFilterEvent>;
 /** `helix-navigate` event type */
 export type HelixHeadlessDataTableHelixNavigateElementEvent =
   HelixHeadlessDataTableElementEvent<HelixNavigateEvent>;
+/** `helix-sort` event type */
+export type HelixHeadlessDataTableHelixSortElementEvent =
+  HelixHeadlessDataTableElementEvent<HelixSortEvent>;
 
 export type HelixHeadlessDataTableProps = {
   /** The field naming a row's stable identity.
@@ -3938,14 +4075,14 @@ this one, because a consumer's array may be the same object their own state
 holds and reordering it under them is a mutation they did not ask for. */
   rows?: HelixHeadlessDataTable["rows"];
 
-  /** Fired when a reader asks for a different order, and cancelable. */
-  "onhelix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
   /** Fired when the query changes, and cancelable. */
   "onhelix-filter"?: (e: HelixHeadlessDataTableHelixFilterElementEvent) => void;
   /** Fired when a reader asks for another page, and cancelable. */
   "onhelix-navigate"?: (
     e: HelixHeadlessDataTableHelixNavigateElementEvent,
   ) => void;
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "onhelix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
 };
 
 export type HelixHeadlessDataTableSolidJsProps = {
@@ -4057,8 +4194,6 @@ already fetched and none of the three is applied.
 this one, because a consumer's array may be the same object their own state
 holds and reordering it under them is a mutation they did not ask for. */
   "prop:rows"?: HelixHeadlessDataTable["rows"];
-  /** Fired when a reader asks for a different order, and cancelable. */
-  "on:helix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
   /** Fired when the query changes, and cancelable. */
   "on:helix-filter"?: (
     e: HelixHeadlessDataTableHelixFilterElementEvent,
@@ -4067,6 +4202,8 @@ holds and reordering it under them is a mutation they did not ask for. */
   "on:helix-navigate"?: (
     e: HelixHeadlessDataTableHelixNavigateElementEvent,
   ) => void;
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "on:helix-sort"?: (e: HelixHeadlessDataTableHelixSortElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4082,12 +4219,12 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessDateInputHelixBeforeCloseElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDateInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -4332,22 +4469,22 @@ reader makes in one of these. */
   /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
   valueAsNumber?: HelixHeadlessDateInput["valueAsNumber"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the date changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Fired when the calendar opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the calendar opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessDateInputElementEvent) => void;
 };
@@ -4594,22 +4731,22 @@ reader makes in one of these. */
   "prop:valueAsDate"?: HelixHeadlessDateInput["valueAsDate"];
   /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
   "prop:valueAsNumber"?: HelixHeadlessDateInput["valueAsNumber"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Fired when the date changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessDateInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessDateInputElementEvent) => void;
-  /** Fired when the calendar opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessDateInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the calendar opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessDateInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessDateInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessDateInputElementEvent) => void;
 
@@ -4636,7 +4773,9 @@ export type HelixHeadlessDatePickerProps = {
   mode?: HelixHeadlessDatePicker["mode"];
   /** How many months to show, side by side. */
   months?: HelixHeadlessDatePicker["months"];
-  /** Locale for month and day names. Absent uses the runtime's own. */
+  /** Locale for month and day names.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessDatePicker["locale"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
   "disable-dates"?: HelixHeadlessDatePicker["disableDates"];
@@ -4790,18 +4929,18 @@ reader makes in one of these. */
   /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
   valueAsNumber?: HelixHeadlessDatePicker["valueAsNumber"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the dates change, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessDatePickerHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessDatePickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the month on show changes, and cancelable. */
   "onhelix-navigate"?: (
     e: HelixHeadlessDatePickerHelixNavigateElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessDatePickerElementEvent) => void;
 };
 
 export type HelixHeadlessDatePickerSolidJsProps = {
@@ -4809,7 +4948,9 @@ export type HelixHeadlessDatePickerSolidJsProps = {
   "prop:mode"?: HelixHeadlessDatePicker["mode"];
   /** How many months to show, side by side. */
   "prop:months"?: HelixHeadlessDatePicker["months"];
-  /** Locale for month and day names. Absent uses the runtime's own. */
+  /** Locale for month and day names.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessDatePicker["locale"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
   "attr:disable-dates"?: HelixHeadlessDatePicker["disableDates"];
@@ -4962,18 +5103,18 @@ reader makes in one of these. */
   "prop:valueAsDate"?: HelixHeadlessDatePicker["valueAsDate"];
   /** The value as milliseconds since the epoch, or `NaN` while there is no date. */
   "prop:valueAsNumber"?: HelixHeadlessDatePicker["valueAsNumber"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the dates change, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessDatePickerHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessDatePickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessDatePickerElementEvent) => void;
   /** Fired before the month on show changes, and cancelable. */
   "on:helix-navigate"?: (
     e: HelixHeadlessDatePickerHelixNavigateElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessDatePickerElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4986,12 +5127,12 @@ export type HelixHeadlessDialogElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDialog,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
-  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessDialogHelixBeforeCloseElementEvent =
   HelixHeadlessDialogElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDialogProps = {
   /** Accessible name for the dialog. */
@@ -5074,16 +5215,16 @@ Held here as well as on the element, so a value set before the first render
 survives to it and a consumer reading one back gets what they wrote. */
   returnValue?: HelixHeadlessDialog["returnValue"];
 
-  /** Fired before it opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
-  ) => void;
+  /** Relayed, because the platform's own does not escape. */
+  onclose?: (e: HelixHeadlessDialogElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessDialogHelixBeforeCloseElementEvent,
   ) => void;
-  /** Relayed, because the platform's own does not escape. */
-  onclose?: (e: HelixHeadlessDialogElementEvent) => void;
+  /** Fired before it opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
+  ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessDialogElementEvent) => void;
 };
@@ -5168,16 +5309,16 @@ which button was pressed is the ordinary case and had no answer.
 Held here as well as on the element, so a value set before the first render
 survives to it and a consumer reading one back gets what they wrote. */
   "prop:returnValue"?: HelixHeadlessDialog["returnValue"];
-  /** Fired before it opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
-  ) => void;
+  /** Relayed, because the platform's own does not escape. */
+  "on:close"?: (e: HelixHeadlessDialogElementEvent) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessDialogHelixBeforeCloseElementEvent,
   ) => void;
-  /** Relayed, because the platform's own does not escape. */
-  "on:close"?: (e: HelixHeadlessDialogElementEvent) => void;
+  /** Fired before it opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessDialogHelixBeforeOpenElementEvent,
+  ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessDialogElementEvent) => void;
 
@@ -5449,12 +5590,12 @@ Held here as well as on the element, so a value set before the first render
 survives to it and a consumer reading one back gets what they wrote. */
   returnValue?: HelixHeadlessDrawer["returnValue"];
 
+  /** Relayed, because the platform's own does not escape. */
+  onclose?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired before the panel closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
   ) => void;
-  /** Relayed, because the platform's own does not escape. */
-  onclose?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "onhelix-before-open"?: (
     e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
@@ -5550,12 +5691,12 @@ alone, and `Dialog`'s `close()` is the one that takes the value directly.
 Held here as well as on the element, so a value set before the first render
 survives to it and a consumer reading one back gets what they wrote. */
   "prop:returnValue"?: HelixHeadlessDrawer["returnValue"];
+  /** Relayed, because the platform's own does not escape. */
+  "on:close"?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired before the panel closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessDrawerHelixBeforeCloseElementEvent,
   ) => void;
-  /** Relayed, because the platform's own does not escape. */
-  "on:close"?: (e: HelixHeadlessDrawerElementEvent) => void;
   /** Fired when the drawer opens or closes. */
   "on:helix-before-open"?: (
     e: HelixHeadlessDrawerHelixBeforeOpenElementEvent,
@@ -5583,9 +5724,13 @@ export type HelixHeadlessDrilldownItemProps = {
   disabled?: HelixHeadlessDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
   value?: HelixHeadlessDrilldownItem["value"];
-  /** Whether the page showing is the one this row is on. Written by the stack. */
+  /** Whether the page showing is the one this row is on.
+
+Written by the stack. */
   onPage?: HelixHeadlessDrilldownItem["onPage"];
-  /** Whether this row's own page is the one showing. Written by the stack. */
+  /** Whether this row's own page is the one showing.
+
+Written by the stack. */
   showingPage?: HelixHeadlessDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
@@ -5611,9 +5756,13 @@ export type HelixHeadlessDrilldownItemSolidJsProps = {
   "prop:disabled"?: HelixHeadlessDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
   "prop:value"?: HelixHeadlessDrilldownItem["value"];
-  /** Whether the page showing is the one this row is on. Written by the stack. */
+  /** Whether the page showing is the one this row is on.
+
+Written by the stack. */
   "prop:onPage"?: HelixHeadlessDrilldownItem["onPage"];
-  /** Whether this row's own page is the one showing. Written by the stack. */
+  /** Whether this row's own page is the one showing.
+
+Written by the stack. */
   "prop:showingPage"?: HelixHeadlessDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
@@ -5760,7 +5909,9 @@ export type HelixHeadlessFileInputProps = {
   "trigger-label"?: HelixHeadlessFileInput["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
   triggerLabel?: HelixHeadlessFileInput["triggerLabel"];
-  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  /** Language tag the sizes are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessFileInput["locale"];
   /** What the control removing one file is called, per file. */
   "remove-label"?: HelixHeadlessFileInput["removeLabel"];
@@ -5805,13 +5956,13 @@ reflected none of them. */
   name?: HelixHeadlessFileInput["name"];
 
   /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessFileInputElementEvent) => void;
+  /** Announced once the value has moved. */
   onchange?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Fired when the chosen files change, with their names. */
   "onhelix-before-change"?: (
     e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessFileInputElementEvent) => void;
 };
 
 export type HelixHeadlessFileInputSolidJsProps = {
@@ -5825,7 +5976,9 @@ export type HelixHeadlessFileInputSolidJsProps = {
   "attr:trigger-label"?: HelixHeadlessFileInput["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
   "prop:triggerLabel"?: HelixHeadlessFileInput["triggerLabel"];
-  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  /** Language tag the sizes are written in.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessFileInput["locale"];
   /** What the control removing one file is called, per file. */
   "attr:remove-label"?: HelixHeadlessFileInput["removeLabel"];
@@ -5869,13 +6022,13 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessFileInput["name"];
   /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessFileInputElementEvent) => void;
+  /** Announced once the value has moved. */
   "on:change"?: (e: HelixHeadlessFileInputElementEvent) => void;
   /** Fired when the chosen files change, with their names. */
   "on:helix-before-change"?: (
     e: HelixHeadlessFileInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessFileInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5909,7 +6062,9 @@ few characters and a date is not. */
   elapsed?: HelixHeadlessFormatDate["elapsed"];
   /** How the hour is written, where a time of day is shown. */
   hour?: HelixHeadlessFormatDate["hour"];
-  /** Locale for the reading. Empty is the runtime's own. */
+  /** Locale for the reading.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessFormatDate["locale"];
   /** How the minute is written, where a time of day is shown. */
   minute?: HelixHeadlessFormatDate["minute"];
@@ -5917,9 +6072,13 @@ few characters and a date is not. */
   month?: HelixHeadlessFormatDate["month"];
   /** How the second is written, where a time of day is shown. */
   second?: HelixHeadlessFormatDate["second"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   "time-zone"?: HelixHeadlessFormatDate["timeZone"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   timeZone?: HelixHeadlessFormatDate["timeZone"];
   /** Whether to name the time zone, and how. */
   "time-zone-name"?: HelixHeadlessFormatDate["timeZoneName"];
@@ -5957,7 +6116,9 @@ few characters and a date is not. */
   "prop:elapsed"?: HelixHeadlessFormatDate["elapsed"];
   /** How the hour is written, where a time of day is shown. */
   "prop:hour"?: HelixHeadlessFormatDate["hour"];
-  /** Locale for the reading. Empty is the runtime's own. */
+  /** Locale for the reading.
+
+Empty is the runtime's own. */
   "prop:locale"?: HelixHeadlessFormatDate["locale"];
   /** How the minute is written, where a time of day is shown. */
   "prop:minute"?: HelixHeadlessFormatDate["minute"];
@@ -5965,9 +6126,13 @@ few characters and a date is not. */
   "prop:month"?: HelixHeadlessFormatDate["month"];
   /** How the second is written, where a time of day is shown. */
   "prop:second"?: HelixHeadlessFormatDate["second"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   "attr:time-zone"?: HelixHeadlessFormatDate["timeZone"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   "prop:timeZone"?: HelixHeadlessFormatDate["timeZone"];
   /** Whether to name the time zone, and how. */
   "attr:time-zone-name"?: HelixHeadlessFormatDate["timeZoneName"];
@@ -6059,7 +6224,8 @@ arithmetic should plan around.
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   minCell?: HelixHeadlessHeatmap["minCell"];
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
+number. */
   gap?: HelixHeadlessHeatmap["gap"];
   /** Shown when the table has no readings in it. */
   "empty-text"?: HelixHeadlessHeatmap["emptyText"];
@@ -6150,7 +6316,8 @@ arithmetic should plan around.
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "prop:minCell"?: HelixHeadlessHeatmap["minCell"];
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
+number. */
   "prop:gap"?: HelixHeadlessHeatmap["gap"];
   /** Shown when the table has no readings in it. */
   "attr:empty-text"?: HelixHeadlessHeatmap["emptyText"];
@@ -6530,9 +6697,11 @@ right for a picture in a page, and `sync` is what a consumer reaches for
 when the picture is about to be composited with something else and a tear
 would show. */
   decoding?: HelixHeadlessImage["decoding"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   crossorigin?: HelixHeadlessImage["crossOrigin"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   crossOrigin?: HelixHeadlessImage["crossOrigin"];
   /** How much of the referring URL to send with the request. */
   referrerpolicy?: HelixHeadlessImage["referrerPolicy"];
@@ -6549,16 +6718,21 @@ hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
 back declares that a picture has arrived which this element has never
 fetched. The `data-` name is the library's answer to both, being a
 different name a re-parse cannot mistake for a declaration, and it is what
-`data-open` and `data-checked` already do.
+`data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+own moved to `:state(scrolled)` for the hydration reason recorded there.
+A picture arrives after somebody fetched it, which puts this on the safe
+side of hydration: a fact that can be true on the *first* update mirrors to
+a custom state instead, which is what `:state(open)` and `:state(checked)`
+became on 27 Aug 2026 for exactly that reason.
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
   status?: HelixHeadlessImage["status"];
 
-  /** Relayed, because the platform's own does not escape. */
-  onload?: (e: HelixHeadlessImageElementEvent) => void;
   /** Relayed for the same reason. */
   onerror?: (e: HelixHeadlessImageElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  onload?: (e: HelixHeadlessImageElementEvent) => void;
 };
 
 export type HelixHeadlessImageSolidJsProps = {
@@ -6604,9 +6778,11 @@ right for a picture in a page, and `sync` is what a consumer reaches for
 when the picture is about to be composited with something else and a tear
 would show. */
   "prop:decoding"?: HelixHeadlessImage["decoding"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   "attr:crossorigin"?: HelixHeadlessImage["crossOrigin"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   "prop:crossOrigin"?: HelixHeadlessImage["crossOrigin"];
   /** How much of the referring URL to send with the request. */
   "attr:referrerpolicy"?: HelixHeadlessImage["referrerPolicy"];
@@ -6623,15 +6799,20 @@ hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
 back declares that a picture has arrived which this element has never
 fetched. The `data-` name is the library's answer to both, being a
 different name a re-parse cannot mistake for a declaration, and it is what
-`data-open` and `data-checked` already do.
+`data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+own moved to `:state(scrolled)` for the hydration reason recorded there.
+A picture arrives after somebody fetched it, which puts this on the safe
+side of hydration: a fact that can be true on the *first* update mirrors to
+a custom state instead, which is what `:state(open)` and `:state(checked)`
+became on 27 Aug 2026 for exactly that reason.
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
   "prop:status"?: HelixHeadlessImage["status"];
-  /** Relayed, because the platform's own does not escape. */
-  "on:load"?: (e: HelixHeadlessImageElementEvent) => void;
   /** Relayed for the same reason. */
   "on:error"?: (e: HelixHeadlessImageElementEvent) => void;
+  /** Relayed, because the platform's own does not escape. */
+  "on:load"?: (e: HelixHeadlessImageElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6654,7 +6835,9 @@ export type HelixHeadlessInputProps = {
 Empty leaves the attribute off, which is the browser's default. Set it to
 a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   autocomplete?: HelixHeadlessInput["autocomplete"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessInput["readOnly"];
@@ -6693,9 +6876,13 @@ that does nothing visible, and guarding it here rather than asking the
 consumer not to means the property can be set once on a component that
 changes type. */
   reveal?: HelixHeadlessInput["reveal"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   "reveal-label"?: HelixHeadlessInput["revealLabel"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   revealLabel?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -6788,14 +6975,14 @@ be anyway. */
   /** Where the selection starts, as an offset into the value. */
   selectionStart?: HelixHeadlessInput["selectionStart"];
 
+  /** Relayed from the input once the reader has finished. */
+  onchange?: (e: HelixHeadlessInputElementEvent) => void;
   /** Fired as the text changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessInputHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessInputElementEvent) => void;
-  /** Relayed from the input once the reader has finished. */
-  onchange?: (e: HelixHeadlessInputElementEvent) => void;
 };
 
 export type HelixHeadlessInputSolidJsProps = {
@@ -6804,7 +6991,9 @@ export type HelixHeadlessInputSolidJsProps = {
 Empty leaves the attribute off, which is the browser's default. Set it to
 a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "prop:autocomplete"?: HelixHeadlessInput["autocomplete"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "bool:read-only"?: HelixHeadlessInput["readOnly"];
@@ -6843,9 +7032,13 @@ that does nothing visible, and guarding it here rather than asking the
 consumer not to means the property can be set once on a component that
 changes type. */
   "prop:reveal"?: HelixHeadlessInput["reveal"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   "attr:reveal-label"?: HelixHeadlessInput["revealLabel"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   "prop:revealLabel"?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -6937,14 +7130,14 @@ be anyway. */
   "prop:selectionEnd"?: HelixHeadlessInput["selectionEnd"];
   /** Where the selection starts, as an offset into the value. */
   "prop:selectionStart"?: HelixHeadlessInput["selectionStart"];
+  /** Relayed from the input once the reader has finished. */
+  "on:change"?: (e: HelixHeadlessInputElementEvent) => void;
   /** Fired as the text changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessInputHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessInputElementEvent) => void;
-  /** Relayed from the input once the reader has finished. */
-  "on:change"?: (e: HelixHeadlessInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7500,16 +7693,16 @@ answers: a single index cannot describe a set, and `value` is the property
 that can. */
   selectedIndex?: HelixHeadlessListbox["selectedIndex"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired when the answer changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessListboxHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessListboxElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
   "onhelix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessListboxElementEvent) => void;
 };
 
 export type HelixHeadlessListboxSolidJsProps = {
@@ -7636,16 +7829,16 @@ With `multiple` it is the first chosen one, which is also what the platform
 answers: a single index cannot describe a set, and `value` is the property
 that can. */
   "prop:selectedIndex"?: HelixHeadlessListbox["selectedIndex"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired when the answer changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessListboxHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessListboxElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessListboxElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
   "on:helix-filter"?: (e: HelixHeadlessListboxHelixFilterElementEvent) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessListboxElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7673,12 +7866,12 @@ export type HelixHeadlessMegamenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMegamenu,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessMegamenuHelixBeforeCloseElementEvent =
   HelixHeadlessMegamenuElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessMegamenuProps = {
   /** The section's name, which names the default trigger and the panel. */
@@ -7772,13 +7965,13 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessMegamenu["defaultOpen"];
 
-  /** Fired before it opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessMegamenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessMegamenuElementEvent) => void;
@@ -7875,13 +8068,13 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessMegamenu["defaultOpen"];
-  /** Fired before it opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessMegamenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessMegamenuHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessMegamenuElementEvent) => void;
@@ -8040,18 +8233,20 @@ export type HelixHeadlessMenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMenu,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
-  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessMenuHelixBeforeCloseElementEvent =
   HelixHeadlessMenuElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessMenuHelixSelectElementEvent =
   HelixHeadlessMenuElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessMenuProps = {
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessMenu["placement"];
   /** Space between the trigger and the surface, in pixels. */
   offset?: HelixHeadlessMenu["offset"];
@@ -8104,13 +8299,13 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessMenu["defaultOpen"];
 
-  /** Fired before it opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessMenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when an item is chosen. */
   "onhelix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
@@ -8119,7 +8314,9 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessMenuSolidJsProps = {
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   "prop:placement"?: HelixHeadlessMenu["placement"];
   /** Space between the trigger and the surface, in pixels. */
   "prop:offset"?: HelixHeadlessMenu["offset"];
@@ -8171,13 +8368,13 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessMenu["defaultOpen"];
-  /** Fired before it opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessMenuHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessMenuHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when an item is chosen. */
   "on:helix-select"?: (e: HelixHeadlessMenuHelixSelectElementEvent) => void;
@@ -8202,11 +8399,17 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   max?: HelixHeadlessMeter["max"];
-  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
+  /** Where the reading sits between `min` and `max`.
+
+Outside them, it clamps. */
   value?: HelixHeadlessMeter["value"];
-  /** Top of the low band. Absent leaves the range unbanded. */
+  /** Top of the low band.
+
+Absent leaves the range unbanded. */
   low?: HelixHeadlessMeter["low"];
-  /** Bottom of the high band. Absent leaves the range unbanded. */
+  /** Bottom of the high band.
+
+Absent leaves the range unbanded. */
   high?: HelixHeadlessMeter["high"];
   /** Where in the range it is best to be.
 
@@ -8288,11 +8491,17 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   "prop:max"?: HelixHeadlessMeter["max"];
-  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
+  /** Where the reading sits between `min` and `max`.
+
+Outside them, it clamps. */
   "prop:value"?: HelixHeadlessMeter["value"];
-  /** Top of the low band. Absent leaves the range unbanded. */
+  /** Top of the low band.
+
+Absent leaves the range unbanded. */
   "prop:low"?: HelixHeadlessMeter["low"];
-  /** Bottom of the high band. Absent leaves the range unbanded. */
+  /** Bottom of the high band.
+
+Absent leaves the range unbanded. */
   "prop:high"?: HelixHeadlessMeter["high"];
   /** Where in the range it is best to be.
 
@@ -8387,12 +8596,12 @@ export type HelixHeadlessNotificationElementEvent<E = Event> = TypedEvent<
   HelixHeadlessNotification,
   E
 >;
-/** `helix-read` event type */
-export type HelixHeadlessNotificationHelixReadElementEvent =
-  HelixHeadlessNotificationElementEvent<HelixReadEvent>;
 /** `helix-dismiss` event type */
 export type HelixHeadlessNotificationHelixDismissElementEvent =
   HelixHeadlessNotificationElementEvent<HelixDismissEvent>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationHelixReadElementEvent =
+  HelixHeadlessNotificationElementEvent<HelixReadEvent>;
 
 export type HelixHeadlessNotificationProps = {
   /** When it happened, as anything `Date` parses.
@@ -8425,19 +8634,21 @@ one. */
   defaultRead?: HelixHeadlessNotification["defaultRead"];
   /** Whether a reader may remove it. */
   dismissible?: HelixHeadlessNotification["dismissible"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessNotification["locale"];
   /** Accessible name for the dismiss control. */
   "dismiss-label"?: HelixHeadlessNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
   dismissLabel?: HelixHeadlessNotification["dismissLabel"];
 
-  /** Fired when the item is marked read or unread, and cancelable. */
-  "onhelix-read"?: (e: HelixHeadlessNotificationHelixReadElementEvent) => void;
   /** Fired when a reader asks to remove it, and cancelable. */
   "onhelix-dismiss"?: (
     e: HelixHeadlessNotificationHelixDismissElementEvent,
   ) => void;
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "onhelix-read"?: (e: HelixHeadlessNotificationHelixReadElementEvent) => void;
 };
 
 export type HelixHeadlessNotificationSolidJsProps = {
@@ -8471,18 +8682,20 @@ one. */
   "prop:defaultRead"?: HelixHeadlessNotification["defaultRead"];
   /** Whether a reader may remove it. */
   "prop:dismissible"?: HelixHeadlessNotification["dismissible"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   "prop:locale"?: HelixHeadlessNotification["locale"];
   /** Accessible name for the dismiss control. */
   "attr:dismiss-label"?: HelixHeadlessNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
   "prop:dismissLabel"?: HelixHeadlessNotification["dismissLabel"];
-  /** Fired when the item is marked read or unread, and cancelable. */
-  "on:helix-read"?: (e: HelixHeadlessNotificationHelixReadElementEvent) => void;
   /** Fired when a reader asks to remove it, and cancelable. */
   "on:helix-dismiss"?: (
     e: HelixHeadlessNotificationHelixDismissElementEvent,
   ) => void;
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "on:helix-read"?: (e: HelixHeadlessNotificationHelixReadElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8582,9 +8795,13 @@ lets autofill work at all. This used to be hardcoded `off`, so a reader
 could never have a birthday or a postal code filled in for them and a
 consumer had no way to ask for it. See 295. */
   autocomplete?: HelixHeadlessNumberInput["autocomplete"];
-  /** Smallest value the reader may reach. Absent has no floor. */
+  /** Smallest value the reader may reach.
+
+Absent has no floor. */
   min?: HelixHeadlessNumberInput["min"];
-  /** Largest value the reader may reach. Absent has no ceiling. */
+  /** Largest value the reader may reach.
+
+Absent has no ceiling. */
   max?: HelixHeadlessNumberInput["max"];
   /** How far one step moves. */
   step?: HelixHeadlessNumberInput["step"];
@@ -8600,7 +8817,9 @@ Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
   largeStep?: HelixHeadlessNumberInput["largeStep"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessNumberInput["readOnly"];
@@ -8685,14 +8904,14 @@ is zero, so an empty control would report a number it does not hold and a
 form would submit it. */
   valueAsNumber?: HelixHeadlessNumberInput["valueAsNumber"];
 
+  /** Relayed from the field once the reader has finished. */
+  onchange?: (e: HelixHeadlessNumberInputElementEvent) => void;
   /** Fired as the value changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessNumberInputHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessNumberInputElementEvent) => void;
-  /** Relayed from the field once the reader has finished. */
-  onchange?: (e: HelixHeadlessNumberInputElementEvent) => void;
 };
 
 export type HelixHeadlessNumberInputSolidJsProps = {
@@ -8703,9 +8922,13 @@ lets autofill work at all. This used to be hardcoded `off`, so a reader
 could never have a birthday or a postal code filled in for them and a
 consumer had no way to ask for it. See 295. */
   "prop:autocomplete"?: HelixHeadlessNumberInput["autocomplete"];
-  /** Smallest value the reader may reach. Absent has no floor. */
+  /** Smallest value the reader may reach.
+
+Absent has no floor. */
   "prop:min"?: HelixHeadlessNumberInput["min"];
-  /** Largest value the reader may reach. Absent has no ceiling. */
+  /** Largest value the reader may reach.
+
+Absent has no ceiling. */
   "prop:max"?: HelixHeadlessNumberInput["max"];
   /** How far one step moves. */
   "prop:step"?: HelixHeadlessNumberInput["step"];
@@ -8721,7 +8944,9 @@ Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
   "prop:largeStep"?: HelixHeadlessNumberInput["largeStep"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "bool:read-only"?: HelixHeadlessNumberInput["readOnly"];
@@ -8805,14 +9030,14 @@ reflected none of them. */
 is zero, so an empty control would report a number it does not hold and a
 form would submit it. */
   "prop:valueAsNumber"?: HelixHeadlessNumberInput["valueAsNumber"];
+  /** Relayed from the field once the reader has finished. */
+  "on:change"?: (e: HelixHeadlessNumberInputElementEvent) => void;
   /** Fired as the value changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessNumberInputHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessNumberInputElementEvent) => void;
-  /** Relayed from the field once the reader has finished. */
-  "on:change"?: (e: HelixHeadlessNumberInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8867,11 +9092,17 @@ time, so the component can decline to draw the box at all.
 It does not reflect, per the rule that payload state stays off the host: a
 string is not a fact a selector needs. */
   description?: HelixHeadlessOption["description"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   "data-active"?: HelixHeadlessOption["active"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   active?: HelixHeadlessOption["active"];
-  /** Whether this choice is currently chosen. Written by the listbox. */
+  /** Whether this choice is currently chosen.
+
+Written by the listbox. */
   selected?: HelixHeadlessOption["selected"];
   /** A shorter name for this choice, for where the row does not fit.
 
@@ -8956,11 +9187,17 @@ time, so the component can decline to draw the box at all.
 It does not reflect, per the rule that payload state stays off the host: a
 string is not a fact a selector needs. */
   "prop:description"?: HelixHeadlessOption["description"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   "bool:data-active"?: HelixHeadlessOption["active"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   "prop:active"?: HelixHeadlessOption["active"];
-  /** Whether this choice is currently chosen. Written by the listbox. */
+  /** Whether this choice is currently chosen.
+
+Written by the listbox. */
   "prop:selected"?: HelixHeadlessOption["selected"];
   /** A shorter name for this choice, for where the row does not fit.
 
@@ -9436,7 +9673,9 @@ Reading gives the real one; writing declares it the consumer's, and
   defaultValue?: HelixHeadlessPaginationSize["defaultValue"];
   /** The words beside the control. */
   label?: HelixHeadlessPaginationSize["label"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessPaginationSize["locale"];
 
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
@@ -9464,7 +9703,9 @@ Reading gives the real one; writing declares it the consumer's, and
   "prop:defaultValue"?: HelixHeadlessPaginationSize["defaultValue"];
   /** The words beside the control. */
   "prop:label"?: HelixHeadlessPaginationSize["label"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessPaginationSize["locale"];
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
   "on:helix-before-change"?: (
@@ -9500,7 +9741,9 @@ of the element, so calling it `label` put one word on three jobs inside one
 family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
 which each label something; this labels nothing, it *is* the thing. */
   format?: HelixHeadlessPaginationSummary["format"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessPaginationSummary["locale"];
 };
 
@@ -9527,7 +9770,9 @@ of the element, so calling it `label` put one word on three jobs inside one
 family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
 which each label something; this labels nothing, it *is* the thing. */
   "prop:format"?: HelixHeadlessPaginationSummary["format"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessPaginationSummary["locale"];
 
   /** Set the innerHTML of the element */
@@ -9658,18 +9903,18 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessPinInput["name"];
 
-  /** Announced with it, a filled code being the commit. */
+  /** Announced with a filled code, and when an edited one loses focus. */
   onchange?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired as the code changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessPinInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "onhelix-complete"?: (
     e: HelixHeadlessPinInputHelixCompleteElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessPinInputElementEvent) => void;
 };
 
 export type HelixHeadlessPinInputSolidJsProps = {
@@ -9781,18 +10026,18 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessPinInput["name"];
-  /** Announced with it, a filled code being the commit. */
+  /** Announced with a filled code, and when an edited one loses focus. */
   "on:change"?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired as the code changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessPinInputHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessPinInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "on:helix-complete"?: (
     e: HelixHeadlessPinInputHelixCompleteElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessPinInputElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9805,19 +10050,21 @@ export type HelixHeadlessPopoverElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPopover,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessPopoverHelixBeforeCloseElementEvent =
   HelixHeadlessPopoverElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessPopoverProps = {
   /** Accessible name for the panel. */
   label?: HelixHeadlessPopover["label"];
   /** Space between the trigger and the panel, in pixels. */
   offset?: HelixHeadlessPopover["offset"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
@@ -9848,13 +10095,13 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessPopover["defaultOpen"];
 
-  /** Fired before it opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessPopoverHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessPopoverElementEvent) => void;
@@ -9865,7 +10112,9 @@ export type HelixHeadlessPopoverSolidJsProps = {
   "prop:label"?: HelixHeadlessPopover["label"];
   /** Space between the trigger and the panel, in pixels. */
   "prop:offset"?: HelixHeadlessPopover["offset"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   "prop:placement"?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
@@ -9895,13 +10144,13 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessPopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessPopover["defaultOpen"];
-  /** Fired before it opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessPopoverHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessPopoverHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessPopoverElementEvent) => void;
@@ -10216,14 +10465,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessRadioGroup["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessRadioGroupElementEvent) => void;
   /** Fired when the answer changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessRadioGroupHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessRadioGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessRadioGroupElementEvent) => void;
 };
 
 export type HelixHeadlessRadioGroupSolidJsProps = {
@@ -10291,14 +10540,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessRadioGroup["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessRadioGroupElementEvent) => void;
   /** Fired when the answer changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessRadioGroupHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessRadioGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessRadioGroupElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10318,7 +10567,9 @@ export type HelixHeadlessRadioHelixSelectElementEvent =
 export type HelixHeadlessRadioProps = {
   /** Whether this choice can be made. */
   disabled?: HelixHeadlessRadio["disabled"];
-  /** Whether this is the current choice. Written by the group. */
+  /** Whether this is the current choice.
+
+Written by the group. */
   selected?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   value?: HelixHeadlessRadio["value"];
@@ -10344,7 +10595,9 @@ on, which is a change of its own rather than a property being added. */
 export type HelixHeadlessRadioSolidJsProps = {
   /** Whether this choice can be made. */
   "prop:disabled"?: HelixHeadlessRadio["disabled"];
-  /** Whether this is the current choice. Written by the group. */
+  /** Whether this is the current choice.
+
+Written by the group. */
   "prop:selected"?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   "prop:value"?: HelixHeadlessRadio["value"];
@@ -10503,14 +10756,14 @@ is zero, so an empty control would report a number it does not hold and a
 form would submit it. */
   valueAsNumber?: HelixHeadlessRating["valueAsNumber"];
 
+  /** Announced with it, the choice being the commit. */
+  onchange?: (e: HelixHeadlessRatingElementEvent) => void;
   /** Fired before the score changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessRatingHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessRatingElementEvent) => void;
-  /** Announced with it, the choice being the commit. */
-  onchange?: (e: HelixHeadlessRatingElementEvent) => void;
 };
 
 export type HelixHeadlessRatingSolidJsProps = {
@@ -10635,14 +10888,14 @@ reflected none of them. */
 is zero, so an empty control would report a number it does not hold and a
 form would submit it. */
   "prop:valueAsNumber"?: HelixHeadlessRating["valueAsNumber"];
+  /** Announced with it, the choice being the commit. */
+  "on:change"?: (e: HelixHeadlessRatingElementEvent) => void;
   /** Fired before the score changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessRatingHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessRatingElementEvent) => void;
-  /** Announced with it, the choice being the commit. */
-  "on:change"?: (e: HelixHeadlessRatingElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10677,12 +10930,12 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
-  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessSelectHelixBeforeCloseElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessSelectProps = {
   /** Whether the list can be narrowed by typing.
@@ -10802,22 +11055,22 @@ what keeps a composed control and the control inside it from answering
 differently: they are one chooser to a consumer. */
   selectedIndex?: HelixHeadlessSelect["selectedIndex"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Relayed from the listbox when the answer changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Fired when the list opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the list opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessSelectElementEvent) => void;
 };
@@ -10939,22 +11192,22 @@ same two properties are implemented. Delegating rather than recomputing is
 what keeps a composed control and the control inside it from answering
 differently: they are one chooser to a consumer. */
   "prop:selectedIndex"?: HelixHeadlessSelect["selectedIndex"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Relayed from the listbox when the answer changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessSelectHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessSelectElementEvent) => void;
-  /** Fired when the list opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessSelectHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the list opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessSelectHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessSelectElementEvent) => void;
 
@@ -11084,14 +11337,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessSlider["name"];
 
+  /** Relayed once the reader has let go. */
+  onchange?: (e: HelixHeadlessSliderElementEvent) => void;
   /** Fired as the value changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessSliderHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessSliderElementEvent) => void;
-  /** Relayed once the reader has let go. */
-  onchange?: (e: HelixHeadlessSliderElementEvent) => void;
 };
 
 export type HelixHeadlessSliderSolidJsProps = {
@@ -11195,14 +11448,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessSlider["name"];
+  /** Relayed once the reader has let go. */
+  "on:change"?: (e: HelixHeadlessSliderElementEvent) => void;
   /** Fired as the value changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessSliderHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessSliderElementEvent) => void;
-  /** Relayed once the reader has let go. */
-  "on:change"?: (e: HelixHeadlessSliderElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11413,12 +11666,12 @@ export type HelixHeadlessSpeedDialElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSpeedDial,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessSpeedDialHelixBeforeCloseElementEvent =
   HelixHeadlessSpeedDialElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessSpeedDialProps = {
   /** Names the trigger and the set of actions it opens. */
@@ -11459,13 +11712,13 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessSpeedDial["defaultOpen"];
 
-  /** Fired before it opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessSpeedDialHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessSpeedDialElementEvent) => void;
@@ -11509,13 +11762,13 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessSpeedDial["defaultOpen"];
-  /** Fired before it opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessSpeedDialHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before it opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessSpeedDialHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessSpeedDialElementEvent) => void;
@@ -11531,12 +11784,12 @@ export type HelixHeadlessSplitterElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSplitter,
   E
 >;
-/** `helix-before-resize` event type */
-export type HelixHeadlessSplitterHelixBeforeResizeElementEvent =
-  HelixHeadlessSplitterElementEvent<HelixBeforeResizeEvent>;
 /** `helix-before-collapse` event type */
 export type HelixHeadlessSplitterHelixBeforeCollapseElementEvent =
   HelixHeadlessSplitterElementEvent<HelixBeforeCollapseEvent>;
+/** `helix-before-resize` event type */
+export type HelixHeadlessSplitterHelixBeforeResizeElementEvent =
+  HelixHeadlessSplitterElementEvent<HelixBeforeResizeEvent>;
 
 export type HelixHeadlessSplitterProps = {
   /** Which way the panes are laid out.
@@ -11634,13 +11887,13 @@ passes through. */
   /** Accessible name for the handle where two dividers cross. */
   cornerLabel?: HelixHeadlessSplitter["cornerLabel"];
 
-  /** Fired before the divider settles, and cancelable. */
-  "onhelix-before-resize"?: (
-    e: HelixHeadlessSplitterHelixBeforeResizeElementEvent,
-  ) => void;
   /** Fired before a pane shuts or reopens, and cancelable. */
   "onhelix-before-collapse"?: (
     e: HelixHeadlessSplitterHelixBeforeCollapseElementEvent,
+  ) => void;
+  /** Fired before the divider settles, and cancelable. */
+  "onhelix-before-resize"?: (
+    e: HelixHeadlessSplitterHelixBeforeResizeElementEvent,
   ) => void;
 };
 
@@ -11739,13 +11992,13 @@ passes through. */
   "attr:corner-label"?: HelixHeadlessSplitter["cornerLabel"];
   /** Accessible name for the handle where two dividers cross. */
   "prop:cornerLabel"?: HelixHeadlessSplitter["cornerLabel"];
-  /** Fired before the divider settles, and cancelable. */
-  "on:helix-before-resize"?: (
-    e: HelixHeadlessSplitterHelixBeforeResizeElementEvent,
-  ) => void;
   /** Fired before a pane shuts or reopens, and cancelable. */
   "on:helix-before-collapse"?: (
     e: HelixHeadlessSplitterHelixBeforeCollapseElementEvent,
+  ) => void;
+  /** Fired before the divider settles, and cancelable. */
+  "on:helix-before-resize"?: (
+    e: HelixHeadlessSplitterHelixBeforeResizeElementEvent,
   ) => void;
 
   /** Set the innerHTML of the element */
@@ -11876,9 +12129,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessSteps["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessSteps["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessSteps["defaultActive"];
 
   /** Fired when the active step changes. */
@@ -11930,9 +12187,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   "prop:active"?: HelixHeadlessSteps["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "attr:default-active"?: HelixHeadlessSteps["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessSteps["defaultActive"];
   /** Fired when the active step changes. */
   "on:helix-before-activate"?: (
@@ -12052,14 +12313,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessSwitch["name"];
 
+  /** Relayed from the input once the state has changed. */
+  onchange?: (e: HelixHeadlessSwitchElementEvent) => void;
   /** Fired before the state changes, and cancelable. */
   "onhelix-before-toggle"?: (
     e: HelixHeadlessSwitchHelixBeforeToggleElementEvent,
   ) => void;
   /** Announced once the state has moved. */
   oninput?: (e: HelixHeadlessSwitchElementEvent) => void;
-  /** Relayed from the input once the state has changed. */
-  onchange?: (e: HelixHeadlessSwitchElementEvent) => void;
 };
 
 export type HelixHeadlessSwitchSolidJsProps = {
@@ -12118,14 +12379,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessSwitch["name"];
+  /** Relayed from the input once the state has changed. */
+  "on:change"?: (e: HelixHeadlessSwitchElementEvent) => void;
   /** Fired before the state changes, and cancelable. */
   "on:helix-before-toggle"?: (
     e: HelixHeadlessSwitchHelixBeforeToggleElementEvent,
   ) => void;
   /** Announced once the state has moved. */
   "on:input"?: (e: HelixHeadlessSwitchElementEvent) => void;
-  /** Relayed from the input once the state has changed. */
-  "on:change"?: (e: HelixHeadlessSwitchElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12473,9 +12734,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessTabs["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessTabs["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTabs["defaultActive"];
 
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
@@ -12533,9 +12798,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   "prop:active"?: HelixHeadlessTabs["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "attr:default-active"?: HelixHeadlessTabs["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessTabs["defaultActive"];
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "on:helix-before-activate"?: (
@@ -12663,7 +12932,9 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   autoGrow?: HelixHeadlessTextarea["autoGrow"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessTextarea["readOnly"];
@@ -12697,7 +12968,8 @@ no form at all and forwarding the attribute would have looked right and
 submitted nothing. `ElementInternals` takes a `FormData`, which is how one
 element sends two entries, and that is what this does. */
   dirName?: HelixHeadlessTextarea["dirName"];
-  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  /** How the browser wraps the text, and whether the breaks are submitted with
+it. */
   wrap?: HelixHeadlessTextarea["wrap"];
   /** Fewest characters the value may have.
 
@@ -12789,14 +13061,14 @@ which is where an empty field's caret would be anyway. */
   /** Where the selection starts, as an offset into the value. */
   selectionStart?: HelixHeadlessTextarea["selectionStart"];
 
+  /** Relayed from the textarea once the reader has finished. */
+  onchange?: (e: HelixHeadlessTextareaElementEvent) => void;
   /** Fired as the text changes, and cancelable. */
   "onhelix-before-change"?: (
     e: HelixHeadlessTextareaHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessTextareaElementEvent) => void;
-  /** Relayed from the textarea once the reader has finished. */
-  onchange?: (e: HelixHeadlessTextareaElementEvent) => void;
 };
 
 export type HelixHeadlessTextareaSolidJsProps = {
@@ -12809,7 +13081,9 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "bool:auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   "prop:autoGrow"?: HelixHeadlessTextarea["autoGrow"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "bool:read-only"?: HelixHeadlessTextarea["readOnly"];
@@ -12843,7 +13117,8 @@ no form at all and forwarding the attribute would have looked right and
 submitted nothing. `ElementInternals` takes a `FormData`, which is how one
 element sends two entries, and that is what this does. */
   "prop:dirName"?: HelixHeadlessTextarea["dirName"];
-  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  /** How the browser wraps the text, and whether the breaks are submitted with
+it. */
   "prop:wrap"?: HelixHeadlessTextarea["wrap"];
   /** Fewest characters the value may have.
 
@@ -12934,14 +13209,14 @@ which is where an empty field's caret would be anyway. */
   "prop:selectionEnd"?: HelixHeadlessTextarea["selectionEnd"];
   /** Where the selection starts, as an offset into the value. */
   "prop:selectionStart"?: HelixHeadlessTextarea["selectionStart"];
+  /** Relayed from the textarea once the reader has finished. */
+  "on:change"?: (e: HelixHeadlessTextareaElementEvent) => void;
   /** Fired as the text changes, and cancelable. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTextareaHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessTextareaElementEvent) => void;
-  /** Relayed from the textarea once the reader has finished. */
-  "on:change"?: (e: HelixHeadlessTextareaElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12957,12 +13232,12 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTimeInputHelixBeforeCloseElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessTimeInputProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -13025,7 +13300,9 @@ for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
   timeStyle?: HelixHeadlessTimeInput["timeStyle"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessTimeInput["locale"];
   /** What the field says before a time is in it. */
   placeholder?: HelixHeadlessTimeInput["placeholder"];
@@ -13151,22 +13428,22 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   /** The value as milliseconds since midnight, or `NaN` while there is no time. */
   valueAsNumber?: HelixHeadlessTimeInput["valueAsNumber"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the time changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Fired when the list opens. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the list opens. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTimeInputElementEvent) => void;
 };
@@ -13232,7 +13509,9 @@ for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
   "prop:timeStyle"?: HelixHeadlessTimeInput["timeStyle"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessTimeInput["locale"];
   /** What the field says before a time is in it. */
   "prop:placeholder"?: HelixHeadlessTimeInput["placeholder"];
@@ -13357,22 +13636,22 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   "prop:valueAsDate"?: HelixHeadlessTimeInput["valueAsDate"];
   /** The value as milliseconds since midnight, or `NaN` while there is no time. */
   "prop:valueAsNumber"?: HelixHeadlessTimeInput["valueAsNumber"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Fired when the time changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimeInputHelixBeforeChangeElementEvent,
-  ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessTimeInputElementEvent) => void;
-  /** Fired when the list opens. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
   ) => void;
   /** Fired when it closes. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTimeInputHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the list opens. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTimeInputHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessTimeInputElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTimeInputElementEvent) => void;
 
@@ -13433,7 +13712,9 @@ A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
   disableTimes?: HelixHeadlessTimePicker["disableTimes"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   label?: HelixHeadlessTimePicker["label"];
@@ -13564,14 +13845,14 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   /** The value as milliseconds since midnight, or `NaN` while there is no time. */
   valueAsNumber?: HelixHeadlessTimePicker["valueAsNumber"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessTimePickerElementEvent) => void;
   /** Fired when the time changes. */
   "onhelix-before-change"?: (
     e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   oninput?: (e: HelixHeadlessTimePickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessTimePickerElementEvent) => void;
 };
 
 export type HelixHeadlessTimePickerSolidJsProps = {
@@ -13616,7 +13897,9 @@ A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
   "prop:disableTimes"?: HelixHeadlessTimePicker["disableTimes"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   "prop:locale"?: HelixHeadlessTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   "prop:label"?: HelixHeadlessTimePicker["label"];
@@ -13746,14 +14029,14 @@ a consumer handing over `new Date()` gets the time of day they expected. */
   "prop:valueAsDate"?: HelixHeadlessTimePicker["valueAsDate"];
   /** The value as milliseconds since midnight, or `NaN` while there is no time. */
   "prop:valueAsNumber"?: HelixHeadlessTimePicker["valueAsNumber"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessTimePickerElementEvent) => void;
   /** Fired when the time changes. */
   "on:helix-before-change"?: (
     e: HelixHeadlessTimePickerHelixBeforeChangeElementEvent,
   ) => void;
   /** Announced once the value has moved. */
   "on:input"?: (e: HelixHeadlessTimePickerElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessTimePickerElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14068,18 +14351,18 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixHeadlessToggleGroup["name"];
 
+  /** Announced once the value has moved. */
+  onchange?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
   "onhelix-before-change"?: (
     e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  oninput?: (e: HelixHeadlessToggleGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  onchange?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "onhelix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  oninput?: (e: HelixHeadlessToggleGroupElementEvent) => void;
 };
 
 export type HelixHeadlessToggleGroupSolidJsProps = {
@@ -14168,18 +14451,18 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixHeadlessToggleGroup["name"];
+  /** Announced once the value has moved. */
+  "on:change"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
   "on:helix-before-change"?: (
     e: HelixHeadlessToggleGroupHelixBeforeChangeElementEvent,
   ) => void;
-  /** Announced once the value has moved. */
-  "on:input"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
-  /** Announced once the value has moved. */
-  "on:change"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "on:helix-select"?: (
     e: HelixHeadlessToggleGroupHelixSelectElementEvent,
   ) => void;
+  /** Announced once the value has moved. */
+  "on:input"?: (e: HelixHeadlessToggleGroupElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14292,12 +14575,12 @@ export type HelixHeadlessTooltipElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTooltip,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTooltipHelixBeforeCloseElementEvent =
   HelixHeadlessTooltipElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessTooltipProps = {
   /** The text shown in the bubble.
@@ -14324,7 +14607,9 @@ through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
   for?: HelixHeadlessTooltip["for"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
@@ -14405,13 +14690,13 @@ is what the mirror has always been for. */
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixHeadlessTooltip["defaultOpen"];
 
-  /** Fired before the bubble shows, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it hides, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTooltipHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before the bubble shows, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTooltipElementEvent) => void;
@@ -14442,7 +14727,9 @@ through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
   "prop:for"?: HelixHeadlessTooltip["for"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   "prop:placement"?: HelixHeadlessTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
@@ -14522,13 +14809,13 @@ is what the mirror has always been for. */
   "bool:default-open"?: HelixHeadlessTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixHeadlessTooltip["defaultOpen"];
-  /** Fired before the bubble shows, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before it hides, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTooltipHelixBeforeCloseElementEvent,
+  ) => void;
+  /** Fired before the bubble shows, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTooltipHelixBeforeOpenElementEvent,
   ) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTooltipElementEvent) => void;
@@ -14547,12 +14834,12 @@ export type HelixHeadlessTourElementEvent<E = Event> = TypedEvent<
 /** `helix-before-activate` event type */
 export type HelixHeadlessTourHelixBeforeActivateElementEvent =
   HelixHeadlessTourElementEvent<HelixBeforeActivateEvent>;
-/** `helix-complete` event type */
-export type HelixHeadlessTourHelixCompleteElementEvent =
-  HelixHeadlessTourElementEvent<HelixCompleteEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTourHelixBeforeCloseElementEvent =
   HelixHeadlessTourElementEvent<HelixBeforeCloseEvent>;
+/** `helix-complete` event type */
+export type HelixHeadlessTourHelixCompleteElementEvent =
+  HelixHeadlessTourElementEvent<HelixCompleteEvent>;
 
 export type HelixHeadlessTourProps = {
   /** Whether the tour is running. */
@@ -14601,12 +14888,12 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   "onhelix-before-activate"?: (
     e: HelixHeadlessTourHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when the last stop is finished. */
-  "onhelix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTourHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the last stop is finished. */
+  "onhelix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTourElementEvent) => void;
 };
@@ -14657,12 +14944,12 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   "on:helix-before-activate"?: (
     e: HelixHeadlessTourHelixBeforeActivateElementEvent,
   ) => void;
-  /** Fired when the last stop is finished. */
-  "on:helix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Fired when the reader leaves early. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTourHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired when the last stop is finished. */
+  "on:helix-complete"?: (e: HelixHeadlessTourHelixCompleteElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTourElementEvent) => void;
 
@@ -14770,15 +15057,15 @@ export type HelixHeadlessTreeItemElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTreeItem,
   E
 >;
-/** `helix-select` event type */
-export type HelixHeadlessTreeItemHelixSelectElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTreeItemHelixBeforeCloseElementEvent =
   HelixHeadlessTreeItemElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
+/** `helix-select` event type */
+export type HelixHeadlessTreeItemHelixSelectElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessTreeItemProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
@@ -14849,16 +15136,16 @@ is what the mirror has always been for. */
   /** Whether this item holds the tree's single tab stop. */
   focusable?: HelixHeadlessTreeItem["focusable"];
 
-  /** Fired when the item is chosen. */
-  "onhelix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
-  /** Fired before a branch opens, and cancelable. */
-  "onhelix-before-open"?: (
-    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before a branch closes, and cancelable. */
   "onhelix-before-close"?: (
     e: HelixHeadlessTreeItemHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired before a branch opens, and cancelable. */
+  "onhelix-before-open"?: (
+    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when the item is chosen. */
+  "onhelix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   ontoggle?: (e: HelixHeadlessTreeItemElementEvent) => void;
 };
@@ -14931,16 +15218,16 @@ is what the mirror has always been for. */
   "prop:defaultOpen"?: HelixHeadlessTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
   "prop:focusable"?: HelixHeadlessTreeItem["focusable"];
-  /** Fired when the item is chosen. */
-  "on:helix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
-  /** Fired before a branch opens, and cancelable. */
-  "on:helix-before-open"?: (
-    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
-  ) => void;
   /** Fired before a branch closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixHeadlessTreeItemHelixBeforeCloseElementEvent,
   ) => void;
+  /** Fired before a branch opens, and cancelable. */
+  "on:helix-before-open"?: (
+    e: HelixHeadlessTreeItemHelixBeforeOpenElementEvent,
+  ) => void;
+  /** Fired when the item is chosen. */
+  "on:helix-select"?: (e: HelixHeadlessTreeItemHelixSelectElementEvent) => void;
   /** Says the state moved, carrying `newState` and `oldState`. */
   "on:toggle"?: (e: HelixHeadlessTreeItemElementEvent) => void;
 
@@ -14993,9 +15280,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessTree["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessTree["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTree["defaultActive"];
 
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
@@ -15037,9 +15328,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   "prop:active"?: HelixHeadlessTree["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "attr:default-active"?: HelixHeadlessTree["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessTree["defaultActive"];
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "on:helix-before-activate"?: (
@@ -15241,9 +15536,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessVideoPlaylist["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessVideoPlaylist["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessVideoPlaylist["defaultActive"];
 
   /** Fired before the current entry changes, and cancelable. */
@@ -15269,9 +15568,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   "prop:active"?: HelixHeadlessVideoPlaylist["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "attr:default-active"?: HelixHeadlessVideoPlaylist["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "prop:defaultActive"?: HelixHeadlessVideoPlaylist["defaultActive"];
   /** Fired before the current entry changes, and cancelable. */
   "on:helix-before-activate"?: (
@@ -15347,9 +15650,11 @@ the browser's policy and not this element's, and `play()` already swallows
 the refusal: what follows a refused autoplay is a paused player showing its
 start control, which is the correct thing to be looking at. */
   autoplay?: HelixHeadlessVideo["autoplay"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   crossorigin?: HelixHeadlessVideo["crossOrigin"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   crossOrigin?: HelixHeadlessVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
   "disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
@@ -15527,16 +15832,16 @@ past the end is the one write the platform answers with an exception. */
   /** How loud it plays, 0 to 1. */
   volume?: HelixHeadlessVideo["volume"];
 
+  /** Relayed for the same reason. */
+  onended?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Fired when the reader asks for the next item. */
   "onhelix-next"?: (e: HelixHeadlessVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
   "onhelix-previous"?: (e: HelixHeadlessVideoHelixPreviousElementEvent) => void;
-  /** Relayed, because it does not cross a shadow boundary. */
-  onplay?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
   onpause?: (e: HelixHeadlessVideoElementEvent) => void;
-  /** Relayed for the same reason. */
-  onended?: (e: HelixHeadlessVideoElementEvent) => void;
+  /** Relayed, because it does not cross a shadow boundary. */
+  onplay?: (e: HelixHeadlessVideoElementEvent) => void;
 };
 
 export type HelixHeadlessVideoSolidJsProps = {
@@ -15590,9 +15895,11 @@ the browser's policy and not this element's, and `play()` already swallows
 the refusal: what follows a refused autoplay is a paused player showing its
 start control, which is the correct thing to be looking at. */
   "prop:autoplay"?: HelixHeadlessVideo["autoplay"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   "attr:crossorigin"?: HelixHeadlessVideo["crossOrigin"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   "prop:crossOrigin"?: HelixHeadlessVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
   "bool:disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
@@ -15769,18 +16076,18 @@ past the end is the one write the platform answers with an exception. */
   "prop:preservesPitch"?: HelixHeadlessVideo["preservesPitch"];
   /** How loud it plays, 0 to 1. */
   "prop:volume"?: HelixHeadlessVideo["volume"];
+  /** Relayed for the same reason. */
+  "on:ended"?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Fired when the reader asks for the next item. */
   "on:helix-next"?: (e: HelixHeadlessVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
   "on:helix-previous"?: (
     e: HelixHeadlessVideoHelixPreviousElementEvent,
   ) => void;
-  /** Relayed, because it does not cross a shadow boundary. */
-  "on:play"?: (e: HelixHeadlessVideoElementEvent) => void;
   /** Relayed for the same reason. */
   "on:pause"?: (e: HelixHeadlessVideoElementEvent) => void;
-  /** Relayed for the same reason. */
-  "on:ended"?: (e: HelixHeadlessVideoElementEvent) => void;
+  /** Relayed, because it does not cross a shadow boundary. */
+  "on:play"?: (e: HelixHeadlessVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15911,8 +16218,8 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `summary`: The always-visible trigger content.
    * - `(default)`: The content revealed when open.
+   * - `summary`: The always-visible trigger content.
    *
    * ## Methods
    *
@@ -15937,11 +16244,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The outer wrapper.
-   * - `trigger`: The clickable summary row.
    * - `chevron`: The open and close indicator.
+   * - `container`: The outer wrapper.
    * - `content`: The revealed region.
    * - `content-inner`: The clipping box inside the animated region.
+   * - `trigger`: The clickable summary row.
    */
   "helix-headless-accordion-item": Partial<
     HelixHeadlessAccordionItemProps &
@@ -16129,12 +16436,26 @@ export type CustomElements = {
   >;
 
   /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
+   * Tracks whether the page has scrolled and carries it as the custom state
+   * `scrolled`, so the styled tier can lift the bar off the page without a scroll
+   * handler of its own. Scroll position is the one piece of state the server
+   * genuinely cannot know, so it is read on connect rather than derived: a fresh
+   * load starts at the top, which is what the server rendered, and a reload
+   * part-way down corrects on hydration.
+   *
+   * **A custom state and not `data-scrolled`, which is what this used to be.**
+   * The attribute was written onto the host by the element itself, so a server
+   * sent the header without it and the element added it on upgrade. A framework
+   * hydrating the page then found an attribute it had not rendered and reported
+   * the tree as mismatched: intermittently, because it only happens when the
+   * reader reloads far enough down the page to pass the threshold. Every
+   * server-rendered consumer paid for that, and could only answer it by
+   * suppressing hydration warnings on an element they did not write.
+   *
+   * `ElementInternals.states` is deliberately not in the DOM, so there is nothing
+   * for a hydration pass to disagree with, and `:state(scrolled)` selects it. The
+   * base class made the same move for `data-settled` and its note explains the
+   * rest.
    *
    * The listener is passive and reads `scrollY` only, so it never blocks
    * scrolling.
@@ -16197,22 +16518,28 @@ export type CustomElements = {
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
    * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-scrolled`: Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Leading content, usually a wordmark.
    * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
+   * - `start`: Leading content, usually a wordmark.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `row`: The centered row inside the banner.
-   * - `start`: The leading region.
    * - `content`: The middle region.
    * - `end`: The trailing region.
+   * - `row`: The centered row inside the banner.
+   * - `start`: The leading region.
    */
   "helix-headless-app-header": Partial<
     HelixHeadlessAppHeaderProps & BaseProps<HelixHeadlessAppHeader> & BaseEvents<HelixHeadlessAppHeader>
@@ -16351,8 +16678,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `src`: Image to show. Falls back to the slot, or to initials, if it fails.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `src`: Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
+   * - `name`: Name of the person or entity.
+   *
+   * Used for the label and the initials.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -16382,8 +16713,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `load`: Relayed from the image once it has loaded.
    * - `error`: Relayed from the image when it fails.
+   * - `load`: Relayed from the image once it has loaded.
    *
    * ## Slots
    *
@@ -16422,9 +16753,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The count or short text to show. Absent shows a dot, zero shows nothing.
-   * - `max`: Cap for a numeric value. Past it the indicator reads `{max}+`.
-   * - `label`: Accessible name. Required for a dot, which has no text to read.
+   * - `value`: The count or short text to show.
+   *
+   * Absent shows a dot, zero shows nothing.
+   * - `max`: Cap for a numeric value.
+   *
+   * Past it the indicator reads `{max}+`.
+   * - `label`: Accessible name.
+   *
+   * Required for a dot, which has no text to read.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -16636,9 +16973,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16720,8 +17057,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `blockquote`: The quotation.
    * - `attribution`: The footer carrying the source.
+   * - `blockquote`: The quotation.
    */
   "helix-headless-blockquote": Partial<
     HelixHeadlessBlockquoteProps &
@@ -16764,11 +17101,28 @@ export type CustomElements = {
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
-   * Empty rather than optional and unreflected: an `href` written onto every
-   * host would be a link to the current page on every crumb nobody asked to be
-   * one, and nothing selects on it.
+   * **Optional and reflected, because a stylesheet does select on it.**
+   * `breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+   * block padding off a crumb that is not a link, so the attribute is what
+   * decides how tall a crumb is. Unreflected, an `href` set from script reached
+   * the property, rendered the anchor, and left the host looking unlinked: the
+   * crumb drew at 20px where a markup twin drew at 28.
+   *
+   * *This said the opposite until 27 Aug 2026*, and named the reason as
+   * "nothing selects on it", which was not true when it was written. The
+   * paragraph is worth keeping because the rest of it is right and is what makes
+   * this optional rather than defaulted: an `href` written onto every host would
+   * be a link to the current page on every crumb nobody asked to be one. That is
+   * the general rule as well, that a reflected property takes no default, so the
+   * two agree.
+   *
+   * Found by the picture comparison rather than by reading: React assigns a
+   * matching property instead of an attribute, so every crumb in the React twin
+   * of `breadcrumbs/links` lost its padding at once.
    * - `target`: Where the link opens, for the rare crumb that leaves the site.
-   * - `rel`: What the link declares about where it goes. The consumer's decision.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * The consumer's decision.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -16799,9 +17153,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step's label. Without an `href` this may be the consumer's own anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
-   * - `start`: Before the label, for an icon.
    * - `end`: After it, for a count or a mark.
    * - `separator`: Replaces the chevron shown before this item.
+   * - `start`: Before the label, for an icon.
    *
    * ## CSS Parts
    *
@@ -17145,8 +17499,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -17328,10 +17682,10 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
+   * - `header`: Title and any actions for the whole card.
+   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
    */
   "helix-headless-card": Partial<
     HelixHeadlessCardProps & BaseProps<HelixHeadlessCard> & BaseEvents<HelixHeadlessCard>
@@ -17342,10 +17696,12 @@ export type CustomElements = {
    * and the browser's own momentum all work without being reimplemented. The
    * controls scroll it; they do not drive a transform.
    *
-   * Slides are the consumer's own elements. Each is given
+   * Slides are the consumer's own elements, and nothing is written onto them. The
+   * component renders a pane per slide carrying `role="group"`,
    * `aria-roledescription="slide"` and a name reading its position in the set,
-   * which is what a screen-reader user needs to know where they are. Where a
-   * slide carries its own `aria-label`, that one is left alone.
+   * and assigns the slide into it: a screen-reader user hears where they are, and
+   * a slide that is itself a link is still a link, which it was not while the role
+   * was being written on top of it. See `assign`.
    *
    * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
    * The APG is explicit: rotation must not resume unless the reader asks for it,
@@ -17488,6 +17844,7 @@ export type CustomElements = {
    * - `previous-mark`: The glyph on the previous control.
    * - `rotation`: The control that stops and starts rotation.
    * - `rotation-mark`: The glyph on the play and pause control.
+   * - `slide`: The pane one slide is shown in, and the box the track snaps to.
    * - `track`: The scroller the slides sit in.
    */
   "helix-headless-carousel": Partial<
@@ -17513,7 +17870,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the reader has written. Read it, or set it to seed a draft.
+   * - `value`: What the reader has written.
+   *
+   * Read it, or set it to seed a draft.
    * - `placeholder`: Shown in an empty field.
    * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
    *
@@ -17523,7 +17882,9 @@ export type CustomElements = {
    * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
    * - `label`: Accessible name for the field.
    * - `send-label`/`sendLabel`: Label for the control that sends.
-   * - `rows`: How many rows the field opens at. It grows from there.
+   * - `rows`: How many rows the field opens at.
+   *
+   * It grows from there.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -17559,8 +17920,8 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Under the field, at the leading edge: attachments, a model picker.
    * - `end`: Under the field, beside the send control.
+   * - `start`: Under the field, at the leading edge: attachments, a model picker.
    *
    * ## Methods
    *
@@ -17577,12 +17938,12 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `composer`: The whole composer.
-   * - `field`: The text field.
-   * - `tools`: The row under the field.
-   * - `start`: The leading slot's box.
    * - `end`: The trailing slot's box.
-   * - `send`: The control that offers the turn.
+   * - `field`: The text field.
    * - `mark`: The glyph inside the send control.
+   * - `send`: The control that offers the turn.
+   * - `start`: The leading slot's box.
+   * - `tools`: The row under the field.
    */
   "helix-headless-chat-composer": Partial<
     HelixHeadlessChatComposerProps &
@@ -17616,10 +17977,14 @@ export type CustomElements = {
    * - `state`: What has happened to it.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
-   * has no other way to know. Empty is a settled message with nothing to report,
-   * which is what most of a transcript is.
+   * has no other way to know. Absent is a settled message with nothing to
+   * report, which is what most of a transcript is, and it is the absence of the
+   * attribute rather than a value of it: there is no initializer, so nothing is
+   * reflected until something happens.
    * - `at`: When it was said, as anything `Date` parses.
-   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -17658,25 +18023,25 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: What was said.
+   * - `actions`: What can be done with it: copy, retry, react.
    * - `avatar`: Who said it.
    * - `sources`: What it was said from: citations, documents, a retrieved page.
-   * - `actions`: What can be done with it: copy, retry, react.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `message`: The whole turn.
+   * - `actions`: The controls offered on the turn, beside its time.
    * - `avatar`: The leading slot's box.
    * - `body`: What was said, and the line under it.
    * - `content`: The consumer's own markup.
-   * - `sources`: What the turn was drawn from, under it and outside the bubble.
-   * - `meta`: The line under a turn: its time, its state, and its controls.
-   * - `time`: When it was said.
-   * - `state`: What has happened to it, where that is worth saying.
    * - `mark`: The status glyph beside a failure.
+   * - `message`: The whole turn.
+   * - `meta`: The line under a turn: its time, its state, and its controls.
    * - `retry`: The control offered on a failed message.
-   * - `actions`: The controls offered on the turn, beside its time.
+   * - `sources`: What the turn was drawn from, under it and outside the bubble.
+   * - `state`: What has happened to it, where that is worth saying.
+   * - `time`: When it was said.
    */
   "helix-headless-chat-message": Partial<
     HelixHeadlessChatMessageProps &
@@ -17788,11 +18153,11 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The turns, as `helix-chat-message` children.
-   * - `header`: Above the transcript: what this conversation is.
    * - `actions`: Beside the header: what can be done to the conversation itself.
    * - `composer`: Below the transcript, where the reader writes.
-   * - `status`: Beside the composer: somebody typing, connection lost.
+   * - `header`: Above the transcript: what this conversation is.
    * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
+   * - `status`: Beside the composer: somebody typing, connection lost.
    *
    * ## Methods
    *
@@ -17808,14 +18173,14 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `header`: The region above the transcript.
    * - `actions`: The controls for the conversation, at the header's trailing edge.
+   * - `composer`: The region the composer sits in.
+   * - `empty`: Shown when the conversation has no turns.
+   * - `header`: The region above the transcript.
+   * - `loading`: Shown while the history is still on its way.
    * - `log`: The transcript, which is the thing that scrolls.
    * - `resume`: The affordance offered while the reader is away from the bottom.
    * - `status`: The status region, which is not part of the log.
-   * - `composer`: The region the composer sits in.
-   * - `empty`: Shown when the conversation has no turns.
-   * - `loading`: Shown while the history is still on its way.
    */
   "helix-headless-chat": Partial<
     HelixHeadlessChatProps & BaseProps<HelixHeadlessChat> & BaseEvents<HelixHeadlessChat>
@@ -17909,17 +18274,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when any box changes, with the whole set.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The checkboxes.
-   * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string, where the label is more than one.
    *
    * ## Methods
    *
@@ -17963,10 +18328,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The group's name, over the set.
-   * - `items`: The list itself, which is what `orientation` lays out.
-   * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the set.
+   * - `items`: The list itself, which is what `orientation` lays out.
+   * - `label`: The group's name, over the set.
    */
   "helix-headless-checkbox-group": Partial<
     HelixHeadlessCheckboxGroupProps &
@@ -18075,9 +18440,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the state has changed.
    * - `helix-before-toggle`: Fired before the state changes, and cancelable.
    * - `input`: Announced once the state has moved.
-   * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
    *
@@ -18151,13 +18516,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
+   * - `hint`: Help under the control, while nothing is wrong.
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
-   * - `hint`: Help under the control, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-checkbox": Partial<
     HelixHeadlessCheckboxProps & BaseProps<HelixHeadlessCheckbox> & BaseEvents<HelixHeadlessCheckbox>
@@ -18195,6 +18560,18 @@ export type CustomElements = {
    * present, which is true. Measured, and it is why this is named the other way
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+   * reserves the copy button's width with `:host(:not([no-copy]))`, so the
+   * attribute is what decides whether the block pays for a control. Set from
+   * script the button went away, `render` reading the property, and the 40px it
+   * stood in stayed reserved: the exact waste that rule was written to stop,
+   * arrived at from the other side.
+   *
+   * A false boolean reflects as the attribute's absence, so this costs no
+   * `no-copy=""` on hosts that never asked for one, and the rule about a
+   * reflected property taking no default is satisfied by the default being
+   * `false`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -18232,14 +18609,14 @@ export type CustomElements = {
    *
    * - `block`: The scrolling `<pre>`.
    * - `code`: The `<code>` inside it.
-   * - `frame`: The code and the copy button beside it.
-   * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
-   * - `label`: The file name or language, where one is given.
    * - `copy-button`: The inner button.
    * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
    * - `copy-tooltip-arrow`: The point, resting against the trigger.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `label`: The file name or language, where one is given.
    */
   "helix-headless-code-block": Partial<
     HelixHeadlessCodeBlockProps & BaseProps<HelixHeadlessCodeBlock> & BaseEvents<HelixHeadlessCodeBlock>
@@ -18469,22 +18846,22 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the color changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired when the color changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Content at the leading end of the field, inside its border.
    * - `end`: Content at the trailing end, before the trigger.
-   * - `trigger`: The mark on the field saying a panel opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `start`: Content at the leading end of the field, inside its border.
+   * - `trigger`: The mark on the field saying a panel opens.
    *
    * ## Methods
    *
@@ -18562,19 +18939,30 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input carrying the value. Absent in `swatch`.
-   * - `trigger`: The control that opens the panel.
-   * - `preview`: The chip showing the color, inside the trigger.
-   * - `surface`: The floating panel.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    * - `picker`: The color picker inside it.
    * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
    * - `picker-channel`: One ramp.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-feedback`: What is wrong with it.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
+   * - `picker-channel-label`: The question, over the track.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
    * - `picker-channels`: The ramps beside it.
    * - `picker-controls`: The row under the square.
    * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-eyedropper-button`: The inner control.
    * - `picker-footer`: The row holding the value and the tools.
    * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-format-button`: The inner control.
    * - `picker-grid`: The saturation and brightness square.
    * - `picker-grid-brightness`: The range input for its vertical axis.
    * - `picker-grid-handle`: The mark showing where in the square the color sits.
@@ -18584,20 +18972,9 @@ export type CustomElements = {
    * - `picker-swatch`: One preset.
    * - `picker-swatches`: The row of presets.
    * - `picker-value`: The color as text, which can be typed or pasted.
-   * - `picker-channel-control`: The range input.
-   * - `picker-channel-field`: The row: the control and its readout.
-   * - `picker-channel-marker`: One mark.
-   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `picker-channel-markers`: The row of marks along the track.
-   * - `picker-channel-output`: The current value, shown beside it.
-   * - `picker-eyedropper-button`: The inner control.
-   * - `picker-format-button`: The inner control.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `picker-channel-feedback`: What is wrong with it.
-   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
-   * - `picker-channel-label`: The question, over the track.
+   * - `preview`: The chip showing the color, inside the trigger.
+   * - `surface`: The floating panel.
+   * - `trigger`: The control that opens the panel.
    */
   "helix-headless-color-input": Partial<
     HelixHeadlessColorInputProps &
@@ -18754,12 +19131,12 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `helix-copy`: Fired when the color is put on the clipboard.
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
-   * - `helix-before-change`: Fired when the color changes.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
-   * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Slots
    *
@@ -18837,33 +19214,33 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the color sits.
-   * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `grid-brightness`: The range input for its vertical axis.
-   * - `controls`: The row under the square.
-   * - `icon`: A glyph this component draws.
-   * - `sample`: The chip of the current color, which copies it when pressed.
-   * - `channels`: The ramps beside it.
-   * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
-   * - `eyedropper`: The control that samples a color from the screen.
-   * - `footer`: The row holding the value and the tools.
-   * - `value`: The color as text, which can be typed or pasted.
-   * - `format`: The control that changes the syntax the value is written in.
-   * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `channel`: One ramp.
    * - `channel-control`: The range input.
+   * - `channel-feedback`: What is wrong with it.
    * - `channel-field`: The row: the control and its readout.
+   * - `channel-hint`: Help under the track, while nothing is wrong.
+   * - `channel-label`: The question, over the track.
    * - `channel-marker`: One mark.
    * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `channel-markers`: The row of marks along the track.
    * - `channel-output`: The current value, shown beside it.
+   * - `channels`: The ramps beside it.
+   * - `controls`: The row under the square.
+   * - `eyedropper`: The control that samples a color from the screen.
    * - `eyedropper-button`: The inner control.
+   * - `footer`: The row holding the value and the tools.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `format-button`: The inner control.
-   * - `channel-feedback`: What is wrong with it.
-   * - `channel-hint`: Help under the track, while nothing is wrong.
-   * - `channel-label`: The question, over the track.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `grid-handle`: The mark showing where in the square the color sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `icon`: A glyph this component draws.
+   * - `sample`: The chip of the current color, which copies it when pressed.
+   * - `swatch`: One preset.
+   * - `swatches`: The row of presets.
+   * - `value`: The color as text, which can be typed or pasted.
    */
   "helix-headless-color-picker": Partial<
     HelixHeadlessColorPickerProps &
@@ -19100,12 +19477,12 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the chosen option changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired when the chosen option changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -19113,9 +19490,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, which are `helix-option` elements.
-   * - `start`: Before the text, for an icon.
    * - `end`: After it, for a unit or a clear button.
    * - `indicator`: Replaces the caret saying the field opens.
+   * - `start`: Before the text, for an icon.
    *
    * ## Methods
    *
@@ -19186,14 +19563,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
-   * - `tags`: The row of chosen options, when `multiple` is set.
-   * - `tag`: One chosen option.
-   * - `rest`: The count of choices held beyond `max-tags`.
    * - `create`: The row offering to add what was typed.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box around the text and its marks.
+   * - `hint`: Help under the field, while nothing is wrong.
    * - `indicator`: The caret.
-   * - `surface`: The floating panel.
+   * - `label`: The question, over the field.
    * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
@@ -19202,15 +19578,16 @@ export type CustomElements = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `rest`: The count of choices held beyond `max-tags`.
+   * - `surface`: The floating panel.
+   * - `tag`: One chosen option.
    * - `tag-dismiss`: The remove button, when `dismissible`.
    * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `tag-prefix`: The category before the label.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
+   * - `tags`: The row of chosen options, when `multiple` is set.
    */
   "helix-headless-combobox": Partial<
     HelixHeadlessComboboxProps & BaseProps<HelixHeadlessCombobox> & BaseEvents<HelixHeadlessCombobox>
@@ -19305,9 +19682,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a command is chosen.
-   * - `helix-before-open`: Fired when the palette opens.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the palette opens.
+   * - `helix-select`: Fired when a command is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -19336,8 +19713,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
-   * - `listbox`: The list inside it.
    * - `footer`: The row under the list.
+   * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
    * - `listbox-filter-icon`: The mark beside that field.
@@ -19345,9 +19722,9 @@ export type CustomElements = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
-   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-headless-command": Partial<
     HelixHeadlessCommandProps & BaseProps<HelixHeadlessCommand> & BaseEvents<HelixHeadlessCommand>
@@ -19519,8 +19896,8 @@ export type CustomElements = {
    *
    * - `(default)`: The resting icon. Falls back to a clipboard.
    * - `copied`: What replaces it once the write succeeds. Falls back to a check.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -19732,17 +20109,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
    * - `helix-filter`: Fired when the query changes, and cancelable.
    * - `helix-navigate`: Fired when a reader asks for another page, and cancelable.
+   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The columns, declared as `helix-table-column` children.
-   * - `toolbar`: Above the grid, for a search field or actions.
    * - `footer`: Below the grid, replacing the pagination this would otherwise draw.
+   * - `toolbar`: Above the grid, for a search field or actions.
    *
    * ## Methods
    *
@@ -19768,15 +20145,15 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `table`: The grid.
-   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
-   * - `row`: One row of data.
    * - `cell`: One cell.
-   * - `toolbar`: The region above the grid.
-   * - `footer`: The region below the grid.
-   * - `pagination`: The pagination, where this draws one.
    * - `empty`: Shown when no rows match.
+   * - `footer`: The region below the grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `loading`: Shown while the rows are still on their way.
+   * - `pagination`: The pagination, where this draws one.
+   * - `row`: One row of data.
+   * - `table`: The grid.
+   * - `toolbar`: The region above the grid.
    */
   "helix-headless-data-table": Partial<
     HelixHeadlessDataTableProps & BaseProps<HelixHeadlessDataTable> & BaseEvents<HelixHeadlessDataTable>
@@ -19999,20 +20376,20 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the date changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-change`: Fired when the date changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the calendar opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: The mark on the field saying a calendar opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: The mark on the field saying a calendar opens.
    *
    * ## Methods
    *
@@ -20077,17 +20454,16 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
    * - `date`: One held date, as a tag, in `multiple`.
-   * - `rest`: How many dates are held beyond the ones shown.
-   * - `trigger`: The control that opens the calendar.
-   * - `trigger-icon`: The mark on the button that opens the calendar.
-   * - `surface`: The floating panel.
-   * - `picker`: The date picker inside it.
    * - `date-dismiss`: The remove button, when `dismissible`.
    * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `date-prefix`: The category before the label.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
+   * - `picker`: The date picker inside it.
    * - `picker-cell`: One column of a row, which is what a range paints.
    * - `picker-day`: The shape inside a cell, which is what a single date paints.
    * - `picker-grid`: The grid of days.
@@ -20101,9 +20477,10 @@ export type CustomElements = {
    * - `picker-previous-mark`: The glyph on the previous month control.
    * - `picker-week`: One row of days.
    * - `picker-weekday`: A column header naming a day of the week.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `rest`: How many dates are held beyond the ones shown.
+   * - `surface`: The floating panel.
+   * - `trigger`: The control that opens the calendar.
+   * - `trigger-icon`: The mark on the button that opens the calendar.
    */
   "helix-headless-date-input": Partial<
     HelixHeadlessDateInputProps & BaseProps<HelixHeadlessDateInput> & BaseEvents<HelixHeadlessDateInput>
@@ -20157,7 +20534,9 @@ export type CustomElements = {
    *
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `locale`: Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
    * - `invalid`: Whether the current selection fails validation.
@@ -20288,17 +20667,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired before the dates change, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired before the dates change, and cancelable.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
    * - `next-icon`: The glyph on the control that moves forward a month, usually a caret.
+   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
    *
    * ## Methods
    *
@@ -20507,9 +20886,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
-   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -20517,9 +20896,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
-   * - `icon`: A single mark above the title, for a dialog that warns.
-   * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
+   * - `header`: The title, and anything beside it.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    *
    * ## Methods
    *
@@ -20618,8 +20997,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself, or each half of it where something is set in.
    * - `content`: What is set into it.
+   * - `line`: The rule itself, or each half of it where something is set in.
    */
   "helix-headless-divider": Partial<
     HelixHeadlessDividerProps & BaseProps<HelixHeadlessDivider> & BaseEvents<HelixHeadlessDivider>
@@ -20782,16 +21161,16 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `center`: The middle of the ring, holding whatever is slotted.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
-   * - `segment`: One slice.
-   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `track`: The ring the slices are drawn on.
    */
   "helix-headless-donut-chart": Partial<
@@ -20928,8 +21307,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `helix-before-open`: Fired when the drawer opens or closes.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -20958,9 +21337,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `panel`: The sliding panel.
-   * - `header`: The header region.
    * - `content`: The scrolling content region.
+   * - `header`: The header region.
+   * - `panel`: The sliding panel.
    */
   "helix-headless-drawer": Partial<
     HelixHeadlessDrawerProps & BaseProps<HelixHeadlessDrawer> & BaseEvents<HelixHeadlessDrawer>
@@ -20987,8 +21366,12 @@ export type CustomElements = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
-   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   * - `onPage`: Whether the page showing is the one this row is on.
+   *
+   * Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing.
+   *
+   * Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
@@ -21036,9 +21419,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this row.
+   * - `end`: After the words, usually a mark or a count.
    * - `page`: The rows of the page this one opens.
    * - `start`: Before the words, usually an icon.
-   * - `end`: After the words, usually a mark or a count.
    *
    * ## Methods
    *
@@ -21149,11 +21532,11 @@ export type CustomElements = {
    *
    * - `back`: The control that returns one page.
    * - `back-mark`: The glyph on the back control.
+   * - `empty`: Shown when there are no entries to show.
    * - `header`: The bar above a page, holding the way back and its name.
+   * - `loading`: Shown while the entries are still on their way.
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
-   * - `empty`: Shown when there are no entries to show.
-   * - `loading`: Shown while the entries are still on their way.
    */
   "helix-headless-drilldown": Partial<
     HelixHeadlessDrilldownProps & BaseProps<HelixHeadlessDrilldown> & BaseEvents<HelixHeadlessDrilldown>
@@ -21211,10 +21594,10 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `icon`: A mark above the heading.
-   * - `heading`: What is missing.
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
+   * - `heading`: What is missing.
+   * - `icon`: A mark above the heading.
    */
   "helix-headless-empty": Partial<
     HelixHeadlessEmptyProps & BaseProps<HelixHeadlessEmpty> & BaseEvents<HelixHeadlessEmpty>
@@ -21258,7 +21641,9 @@ export type CustomElements = {
    * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
    * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
-   * - `locale`: Language tag the sizes are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the sizes are written in.
+   *
+   * Absent uses the runtime's own.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -21327,17 +21712,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the chosen files change, with their names.
-   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: What the reader presses to open the picker.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: What the reader presses to open the picker.
    *
    * ## Methods
    *
@@ -21397,27 +21782,27 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
-   * - `icon`: A glyph this component draws.
-   * - `trigger`: The label that opens the picker.
-   * - `list`: The chosen files.
-   * - `file`: One chosen file.
    * - `detail`: Its name and its reading, stacked.
-   * - `name`: Its name.
-   * - `meta`: The row holding its size and kind.
-   * - `size`: How big it is.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box that is pressed and dropped on.
+   * - `file`: One chosen file.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `icon`: A glyph this component draws.
    * - `kind`: What kind of file it is.
-   * - `remove`: The control that takes it back out.
    * - `kind-dismiss`: The remove button, when `dismissible`.
    * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `kind-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `list`: The chosen files.
+   * - `meta`: The row holding its size and kind.
+   * - `name`: Its name.
+   * - `remove`: The control that takes it back out.
+   * - `size`: How big it is.
    * - `size-dismiss`: The remove button, when `dismissible`.
    * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `size-prefix`: The category before the label.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `trigger`: The label that opens the picker.
    */
   "helix-headless-file-input": Partial<
     HelixHeadlessFileInputProps & BaseProps<HelixHeadlessFileInput> & BaseEvents<HelixHeadlessFileInput>
@@ -21474,11 +21859,15 @@ export type CustomElements = {
    * this is and a stylesheet has a reason to know: a compact reading is a fixed
    * few characters and a date is not.
    * - `hour`: How the hour is written, where a time of day is shown.
-   * - `locale`: Locale for the reading. Empty is the runtime's own.
+   * - `locale`: Locale for the reading.
+   *
+   * Empty is the runtime's own.
    * - `minute`: How the minute is written, where a time of day is shown.
    * - `month`: How the month is written, where a date is shown.
    * - `second`: How the second is written, where a time of day is shown.
-   * - `time-zone`/`timeZone`: The time zone to read the timestamp in. Empty is the runtime's own.
+   * - `time-zone`/`timeZone`: The time zone to read the timestamp in.
+   *
+   * Empty is the runtime's own.
    * - `time-zone-name`/`timeZoneName`: Whether to name the time zone, and how.
    * - `weekday`: How the weekday is written, where one is shown.
    * - `year`: How the year is written, where a date is shown.
@@ -21610,7 +21999,8 @@ export type CustomElements = {
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
-   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
    * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `for`: The id of the table to read.
    *
@@ -21702,45 +22092,45 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
+   * - `end`: Below the strip, at the trailing edge: usually the newest date.
    * - `start`: Below the strip, at the leading edge: usually the oldest date.
    * - `summary`: Below the strip, in the middle: the reading over the range drawn.
-   * - `end`: Below the strip, at the trailing edge: usually the newest date.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
+   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
    * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
-   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
-   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
-   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
-   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
-   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
-   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
-   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
-   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
-   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-4`: The fourth step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-5`: The loudest step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `strip`: The grid of cells.
    * - `cell`: One reading.
-   * - `footer`: The three-slot row under the strip.
-   * - `start`: The leading slot's box.
-   * - `summary`: The middle slot's box.
-   * - `end`: The trailing slot's box.
    * - `empty`: Shown when the table has no readings in it.
+   * - `end`: The trailing slot's box.
+   * - `footer`: The three-slot row under the strip.
    * - `mark`: The invisible point the tooltip is anchored to.
+   * - `start`: The leading slot's box.
+   * - `strip`: The grid of cells.
+   * - `summary`: The middle slot's box.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
@@ -21904,8 +22294,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The icon.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -22081,7 +22471,8 @@ export type CustomElements = {
    * right for a picture in a page, and `sync` is what a consumer reaches for
    * when the picture is about to be composited with something else and a tear
    * would show.
-   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas can read it.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
    * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
@@ -22094,7 +22485,12 @@ export type CustomElements = {
    * back declares that a picture has arrived which this element has never
    * fetched. The `data-` name is the library's answer to both, being a
    * different name a re-parse cannot mistake for a declaration, and it is what
-   * `data-open` and `data-checked` already do.
+   * `data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+   * own moved to `:state(scrolled)` for the hydration reason recorded there.
+   * A picture arrives after somebody fetched it, which puts this on the safe
+   * side of hydration: a fact that can be true on the *first* update mirrors to
+   * a custom state instead, which is what `:state(open)` and `:state(checked)`
+   * became on 27 Aug 2026 for exactly that reason.
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
@@ -22131,23 +22527,23 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `load`: Relayed, because the platform's own does not escape.
    * - `error`: Relayed for the same reason.
+   * - `load`: Relayed, because the platform's own does not escape.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `placeholder`: Shown until the picture arrives.
    * - `fallback`: Shown instead of it, if it never does.
+   * - `placeholder`: Shown until the picture arrives.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `fallback`: What stands in when it fails.
    * - `image`: The picture itself.
    * - `placeholder`: What stands in until it arrives.
-   * - `fallback`: What stands in when it fails.
    */
   "helix-headless-image": Partial<
     HelixHeadlessImageProps & BaseProps<HelixHeadlessImage> & BaseEvents<HelixHeadlessImage>
@@ -22204,7 +22600,9 @@ export type CustomElements = {
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
@@ -22233,7 +22631,9 @@ export type CustomElements = {
    * that does nothing visible, and guarding it here rather than asking the
    * consumer not to means the property can be set once on a component that
    * changes type.
-   * - `reveal-label`/`revealLabel`: What the reveal toggle is called. The state is `aria-pressed`, not this.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -22335,16 +22735,16 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the reader has finished.
    * - `helix-before-change`: Fired as the text changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the text, for an icon or a prefix.
    * - `end`: After the text, for an icon or a unit.
+   * - `start`: Before the text, for an icon or a prefix.
    *
    * ## Methods
    *
@@ -22415,14 +22815,14 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding everything.
-   * - `control`: The input itself.
    * - `clear`: The button that empties the field.
-   * - `icon`: A glyph this component draws.
-   * - `reveal`: The button that shows and hides a password.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
+   * - `control`: The input itself.
    * - `feedback`: What is wrong with it.
+   * - `field`: The box holding everything.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `icon`: A glyph this component draws.
+   * - `label`: The question, over the field.
+   * - `reveal`: The button that shows and hides a password.
    */
   "helix-headless-input": Partial<
     HelixHeadlessInputProps & BaseProps<HelixHeadlessInput> & BaseEvents<HelixHeadlessInput>
@@ -22879,10 +23279,10 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Leading content, usually an icon or an avatar.
    * - `(default)`: The label.
-   * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   * - `start`: Leading content, usually an icon or an avatar.
+   * - `supporting`: Secondary text under the label.
    *
    * ## CSS Parts
    *
@@ -23156,18 +23556,18 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the answer changes, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
    * - `helix-filter`: Fired before the list narrows, and cancelable.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, and any groups of them.
-   * - `label`: Richer than a string.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string.
    *
    * ## Methods
    *
@@ -23268,9 +23668,9 @@ export type CustomElements = {
    * - `hint`: Help under the list.
    * - `items`: The list itself.
    * - `label`: The question, over the list.
+   * - `loading`: Shown while the options are still on their way.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
-   * - `loading`: Shown while the options are still on their way.
    */
   "helix-headless-listbox": Partial<
     HelixHeadlessListboxProps & BaseProps<HelixHeadlessListbox> & BaseEvents<HelixHeadlessListbox>
@@ -23337,10 +23737,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `svg`: The rotating circle pair.
+   * - `track`: The full circle behind the indicator.
    */
   "helix-headless-loader": Partial<
     HelixHeadlessLoaderProps & BaseProps<HelixHeadlessLoader> & BaseEvents<HelixHeadlessLoader>
@@ -23486,8 +23886,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -23521,8 +23921,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `trigger`: The default trigger, where none was slotted.
    * - `surface`: The floating panel, which is what opens.
+   * - `trigger`: The default trigger, where none was slotted.
    */
   "helix-headless-megamenu": Partial<
     HelixHeadlessMegamenuProps & BaseProps<HelixHeadlessMegamenu> & BaseEvents<HelixHeadlessMegamenu>
@@ -23676,8 +24076,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row, which is an `<a>` where `href` is set.
+   * - `mark`: The trailing mark: a tick when checked, a caret when it opens. a page. One column, because a row is never both.
    * - `start`: The leading column, which is a slot and is always there.
-   * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-headless-menu-item": Partial<
     HelixHeadlessMenuItemProps & BaseProps<HelixHeadlessMenuItem> & BaseEvents<HelixHeadlessMenuItem>
@@ -23705,7 +24105,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
@@ -23769,8 +24171,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -23803,11 +24205,11 @@ export type CustomElements = {
    *
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
+   * - `empty`: Shown when there are no items to show.
    * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `loading`: Shown while the items are still on their way.
    * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
-   * - `empty`: Shown when there are no items to show.
-   * - `loading`: Shown while the items are still on their way.
    */
   "helix-headless-menu": Partial<
     HelixHeadlessMenuProps & BaseProps<HelixHeadlessMenu> & BaseEvents<HelixHeadlessMenu>
@@ -23855,9 +24257,15 @@ export type CustomElements = {
    * takes and what a consumer writing `value="72"` means. A range of zero to one
    * is a fraction, and a component that reads `value="72"` as seventy-two times
    * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: Where the reading sits between `min` and `max`. Outside them, it clamps.
-   * - `low`: Top of the low band. Absent leaves the range unbanded.
-   * - `high`: Bottom of the high band. Absent leaves the range unbanded.
+   * - `value`: Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
+   * - `low`: Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   * - `high`: Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
    * - `optimum`: Where in the range it is best to be.
    *
    * Defaults to the middle of whatever bands are declared, which is the
@@ -23949,10 +24357,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The whole range, or the drawing in `ring` and `arc`.
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
+   * - `track`: The whole range, or the drawing in `ring` and `arc`.
    * - `value`: The reading, under `show-value`.
    */
   "helix-headless-meter": Partial<
@@ -24016,8 +24424,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
+   * - `nav`: The navigation landmark.
    */
   "helix-headless-navigation": Partial<
     HelixHeadlessNavigationProps &
@@ -24078,7 +24486,9 @@ export type CustomElements = {
    * one.
    * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
    * - `dismissible`: Whether a reader may remove it.
-   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -24109,17 +24519,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
    * - `helix-dismiss`: Fired when a reader asks to remove it, and cancelable.
+   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: What happened, in the consumer's own markup.
+   * - `actions`: What a reader can do about it.
    * - `caption`: A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.
    * - `media`: An avatar or icon identifying who or what it came from.
-   * - `actions`: What a reader can do about it.
    *
    * ## Methods
    *
@@ -24135,16 +24545,16 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The whole notification.
-   * - `media`: The leading slot's box.
-   * - `body`: The label and the caption together.
-   * - `label`: What happened, on the first line.
-   * - `trailing`: The column holding the time and the controls.
-   * - `time`: When it happened, read the way a person reads one.
-   * - `controls`: The actions and the dismiss, which replace the time.
    * - `actions`: The trailing slot's box.
+   * - `body`: The label and the caption together.
+   * - `controls`: The actions and the dismiss, which replace the time.
    * - `dismiss`: The control that removes it.
    * - `dismiss-mark`: The glyph on that control, where none is slotted.
+   * - `item`: The whole notification.
+   * - `label`: What happened, on the first line.
+   * - `media`: The leading slot's box.
+   * - `time`: When it happened, read the way a person reads one.
+   * - `trailing`: The column holding the time and the controls.
    */
   "helix-headless-notification": Partial<
     HelixHeadlessNotificationProps &
@@ -24238,8 +24648,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The notifications, as `helix-notification` children.
-   * - `header`: Above the list, for a title and the mark-all control.
    * - `footer`: Below the list, for a link to everything.
+   * - `header`: Above the list, for a title and the mark-all control.
    *
    * ## Methods
    *
@@ -24256,12 +24666,12 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `empty`: Shown when there is nothing in the feed.
+   * - `footer`: The region below the list.
    * - `header`: The region above the list.
    * - `list`: The list itself.
-   * - `footer`: The region below the list.
-   * - `mark-all`: The control that marks everything read.
-   * - `empty`: Shown when there is nothing in the feed.
    * - `loading`: Shown while the feed is still on its way.
+   * - `mark-all`: The control that marks everything read.
    */
   "helix-headless-notifications": Partial<
     HelixHeadlessNotificationsProps &
@@ -24315,15 +24725,21 @@ export type CustomElements = {
    * lets autofill work at all. This used to be hardcoded `off`, so a reader
    * could never have a birthday or a postal code filled in for them and a
    * consumer had no way to ask for it. See 295.
-   * - `min`: Smallest value the reader may reach. Absent has no floor.
-   * - `max`: Largest value the reader may reach. Absent has no ceiling.
+   * - `min`: Smallest value the reader may reach.
+   *
+   * Absent has no floor.
+   * - `max`: Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
    * - `step`: How far one step moves.
    * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
    *
    * Ten steps, which is the convention every spinner on the platform follows,
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
    *
@@ -24416,16 +24832,16 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the field once the reader has finished.
    * - `helix-before-change`: Fired as the value changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the number, for a unit or an icon.
    * - `end`: After it.
+   * - `start`: Before the number, for a unit or an icon.
    *
    * ## Methods
    *
@@ -24498,12 +24914,12 @@ export type CustomElements = {
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
    * - `decrement-mark`: The glyph on the step down control.
+   * - `feedback`: What is wrong with it.
    * - `field`: The box holding everything.
+   * - `hint`: Help under the field, while nothing is wrong.
    * - `increment`: The control that steps up.
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-number-input": Partial<
     HelixHeadlessNumberInputProps &
@@ -24561,8 +24977,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The heading.
    * - `items`: The run itself.
+   * - `label`: The heading.
    */
   "helix-headless-option-group": Partial<
     HelixHeadlessOptionGroupProps &
@@ -24614,8 +25030,12 @@ export type CustomElements = {
    *
    * It does not reflect, per the rule that payload state stays off the host: a
    * string is not a fact a selector needs.
-   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
-   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on.
+   *
+   * Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
    * - `label`: A shorter name for this choice, for where the row does not fit.
    *
    * `<option label>`'s own meaning: the text a chooser shows when it has less
@@ -24719,8 +25139,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this choice.
-   * - `start`: Before the words, for an icon or an avatar.
    * - `end`: After them, for a shortcut or a count.
+   * - `start`: Before the words, for an icon or an avatar.
    *
    * ## Methods
    *
@@ -24732,10 +25152,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The row.
-   * - `text`: The words and the caption under them, as one column.
-   * - `label`: The words.
    * - `description`: The caption under the words, when there is one.
+   * - `item`: The row.
+   * - `label`: The words.
+   * - `text`: The words and the caption under them, as one column.
    */
   "helix-headless-option": Partial<
     HelixHeadlessOptionProps & BaseProps<HelixHeadlessOption> & BaseEvents<HelixHeadlessOption>
@@ -24853,8 +25273,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
+   * - `nav`: The navigation landmark.
    */
   "helix-headless-outline": Partial<
     HelixHeadlessOutlineProps & BaseProps<HelixHeadlessOutline> & BaseEvents<HelixHeadlessOutline>
@@ -25052,9 +25472,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `first-icon`: The glyph on the jump-to-first control, usually a double caret.
-   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
-   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
    * - `last-icon`: The glyph on the jump-to-last control, usually a double caret.
+   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
+   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
    *
    * ## CSS Parts
    *
@@ -25132,7 +25552,9 @@ export type CustomElements = {
    * `Pagination.page` and the calendar's `month`.
    * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
-   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `locale`: Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -25235,7 +25657,9 @@ export type CustomElements = {
    * of the element, so calling it `label` put one word on three jobs inside one
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
-   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `locale`: Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -25411,10 +25835,10 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `change`: Announced with it, a filled code being the commit.
+   * - `change`: Announced with a filled code, and when an edited one loses focus.
    * - `helix-before-change`: Fired as the code changes, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `helix-complete`: Fired when the last box is filled.
+   * - `input`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -25478,11 +25902,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row of boxes.
    * - `cell`: One box.
-   * - `label`: The question, over the boxes.
-   * - `hint`: Help under the boxes, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The row of boxes.
+   * - `hint`: Help under the boxes, while nothing is wrong.
+   * - `label`: The question, over the boxes.
    */
   "helix-headless-pin-input": Partial<
     HelixHeadlessPinInputProps & BaseProps<HelixHeadlessPinInput> & BaseEvents<HelixHeadlessPinInput>
@@ -25516,7 +25940,9 @@ export type CustomElements = {
    *
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -25570,16 +25996,16 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: What opens it.
    * - `(default)`: The contents of the panel.
+   * - `trigger`: What opens it.
    *
    * ## Methods
    *
@@ -25723,9 +26149,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The full length the work is measured against.
-   * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
+   * - `indicator`: The part of it that is done.
+   * - `track`: The full length the work is measured against.
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-headless-progress": Partial<
@@ -25818,9 +26244,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `code`: The square itself.
-   * - `modules`: Everything but the three corner squares.
    * - `finders`: The three corner squares, which can take their own color.
    * - `logo`: The box holding the center mark.
+   * - `modules`: Everything but the three corner squares.
    */
   "helix-headless-qr-code": Partial<
     HelixHeadlessQrCodeProps & BaseProps<HelixHeadlessQrCode> & BaseEvents<HelixHeadlessQrCode>
@@ -25990,17 +26416,17 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the answer changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The radios.
-   * - `label`: Richer than a string, where the question is more than one.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string, where the question is more than one.
    *
    * ## Methods
    *
@@ -26062,10 +26488,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the set.
-   * - `items`: The choices, which is what `orientation` lays out.
-   * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the set.
+   * - `items`: The choices, which is what `orientation` lays out.
+   * - `label`: The question, over the set.
    */
   "helix-headless-radio-group": Partial<
     HelixHeadlessRadioGroupProps &
@@ -26094,7 +26520,9 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `disabled`: Whether this choice can be made.
-   * - `selected`: Whether this is the current choice. Written by the group.
+   * - `selected`: Whether this is the current choice.
+   *
+   * Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
@@ -26158,10 +26586,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The button, which is the whole row.
    * - `box`: The circle.
-   * - `mark`: The dot inside it.
+   * - `item`: The button, which is the whole row.
    * - `label`: The words beside it.
+   * - `mark`: The dot inside it.
    */
   "helix-headless-radio": Partial<
     HelixHeadlessRadioProps & BaseProps<HelixHeadlessRadio> & BaseEvents<HelixHeadlessRadio>
@@ -26323,9 +26751,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced with it, the choice being the commit.
    * - `helix-before-change`: Fired before the score changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced with it, the choice being the commit.
    *
    * ## Methods
    *
@@ -26396,15 +26824,15 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marks`: The row of marks.
-   * - `track`: The unfilled marks.
-   * - `fill`: The filled marks, clipped to the score.
-   * - `mark`: One mark, in either layer.
-   * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
-   * - `label`: The question, over the marks.
-   * - `hint`: Help under the marks, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `fill`: The filled marks, clipped to the score.
+   * - `hint`: Help under the marks, while nothing is wrong.
+   * - `label`: The question, over the marks.
+   * - `mark`: One mark, in either layer.
+   * - `marks`: The row of marks.
+   * - `option`: One place a reader can press, which is one step.
+   * - `track`: The unfilled marks.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-headless-rating": Partial<
     HelixHeadlessRatingProps & BaseProps<HelixHeadlessRating> & BaseEvents<HelixHeadlessRating>
@@ -26486,8 +26914,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `viewport`: The scrolling box.
    * - `edges`: Where the sideways edge cues are drawn.
+   * - `viewport`: The scrolling box.
    */
   "helix-headless-scroll-area": Partial<
     HelixHeadlessScrollAreaProps &
@@ -26637,11 +27065,11 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Relayed from the listbox when the answer changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -26649,11 +27077,11 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, and any groups of them.
-   * - `start`: Before the chosen value, for an icon or a prefix.
    * - `end`: After it, for a count, a unit, or a clear button.
+   * - `hint`: Richer than a string.
    * - `indicator`: The mark on the trigger saying this opens, usually a caret.
    * - `label`: Richer than a string.
-   * - `hint`: Richer than a string.
+   * - `start`: Before the chosen value, for an icon or a prefix.
    *
    * ## Methods
    *
@@ -26724,14 +27152,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the trigger.
-   * - `value`: The chosen option's text inside the trigger.
-   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
-   * - `trigger`: The closed control, which says what is chosen.
-   * - `surface`: The floating panel.
-   * - `listbox`: The list inside it.
-   * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the trigger.
+   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
+   * - `label`: The question, over the trigger.
+   * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
    * - `listbox-filter-icon`: The mark beside that field.
@@ -26739,9 +27164,12 @@ export type CustomElements = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
-   * - `listbox-loading`: Shown while the options are still on their way.
+   * - `surface`: The floating panel.
+   * - `trigger`: The closed control, which says what is chosen.
+   * - `value`: The chosen option's text inside the trigger.
    */
   "helix-headless-select": Partial<
     HelixHeadlessSelectProps & BaseProps<HelixHeadlessSelect> & BaseEvents<HelixHeadlessSelect>
@@ -26953,9 +27381,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed once the reader has let go.
    * - `helix-before-change`: Fired as the value changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
    *
@@ -27026,15 +27454,15 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row: the control and its readout.
    * - `control`: The range input.
-   * - `markers`: The row of marks along the track.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The row: the control and its readout.
+   * - `hint`: Help under the track, while nothing is wrong.
+   * - `label`: The question, over the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `markers`: The row of marks along the track.
    * - `output`: The current value, shown beside it.
-   * - `label`: The question, over the track.
-   * - `hint`: Help under the track, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-slider": Partial<
     HelixHeadlessSliderProps & BaseProps<HelixHeadlessSlider> & BaseEvents<HelixHeadlessSlider>
@@ -27265,8 +27693,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The control.
    * - `icon`: The mark's box.
+   * - `item`: The control.
    * - `label`: The name beside it.
    */
   "helix-headless-speed-dial-item": Partial<
@@ -27361,8 +27789,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -27390,9 +27818,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `actions`: The region the actions are drawn in.
    * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
-   * - `actions`: The region the actions are drawn in.
    */
   "helix-headless-speed-dial": Partial<
     HelixHeadlessSpeedDialProps & BaseProps<HelixHeadlessSpeedDial> & BaseEvents<HelixHeadlessSpeedDial>
@@ -27603,15 +28031,15 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
    * - `helix-before-collapse`: Fired before a pane shuts or reopens, and cancelable.
+   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: The pane before the divider.
    * - `end`: The pane after it.
+   * - `start`: The pane before the divider.
    *
    * ## Methods
    *
@@ -27643,10 +28071,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `start`: The box holding the first pane.
+   * - `corner`: The handle where two dividers cross, added on the client.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client.
+   * - `start`: The box holding the first pane.
    */
   "helix-headless-splitter": Partial<
     HelixHeadlessSplitterProps & BaseProps<HelixHeadlessSplitter> & BaseEvents<HelixHeadlessSplitter>
@@ -27846,7 +28274,9 @@ export type CustomElements = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27994,9 +28424,9 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step's name.
+   * - `content`: What the stage holds, shown while it is the current one.
    * - `description`: A line under the name, for what the stage is for.
    * - `marker`: Replaces the number, or the check a complete step shows.
-   * - `content`: What the stage holds, shown while it is the current one.
    *
    * ## Methods
    *
@@ -28012,11 +28442,11 @@ export type CustomElements = {
    * - `content`: What the stage holds, while it is open.
    * - `description`: The line under it.
    * - `label`: The step's name, which is a `helix-button`.
+   * - `label-button`: The inner control.
    * - `lead`: The half line arriving from the step before.
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
-   * - `label-button`: The inner control.
    */
   "helix-headless-step": Partial<
     HelixHeadlessStepProps & BaseProps<HelixHeadlessStep> & BaseEvents<HelixHeadlessStep>
@@ -28118,9 +28548,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the state has changed.
    * - `helix-before-toggle`: Fired before the state changes, and cancelable.
    * - `input`: Announced once the state has moved.
-   * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
    *
@@ -28194,13 +28624,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row: the track and its label.
-   * - `track`: The groove the thumb travels in.
    * - `control`: The input.
-   * - `thumb`: The part that moves.
-   * - `label`: The words beside it.
-   * - `hint`: Help under the control, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The row: the track and its label.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `label`: The words beside it.
+   * - `thumb`: The part that moves.
+   * - `track`: The groove the thumb travels in.
    */
   "helix-headless-switch": Partial<
     HelixHeadlessSwitchProps & BaseProps<HelixHeadlessSwitch> & BaseEvents<HelixHeadlessSwitch>
@@ -28489,10 +28919,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
-   * - `table`: The grid.
    * - `empty`: Shown when there are no rows to show.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `loading`: Shown while the rows are still on their way.
+   * - `table`: The grid.
    */
   "helix-headless-table": Partial<
     HelixHeadlessTableProps & BaseProps<HelixHeadlessTable> & BaseEvents<HelixHeadlessTable>
@@ -28665,7 +29095,9 @@ export type CustomElements = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -28723,8 +29155,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `indicator`: The mark that travels to the selected tab.
-   * - `tabs`: The tab list.
    * - `panels`: The panel container.
+   * - `tabs`: The tab list.
    */
   "helix-headless-tabs": Partial<
     HelixHeadlessTabsProps & BaseProps<HelixHeadlessTabs> & BaseEvents<HelixHeadlessTabs>
@@ -28855,8 +29287,8 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `prefix`: A category the label belongs to, set before it and weightier.
    * - `(default)`: The tag's label.
+   * - `prefix`: A category the label belongs to, set before it and weightier.
    *
    * ## Methods
    *
@@ -28901,7 +29333,9 @@ export type CustomElements = {
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
@@ -28919,7 +29353,8 @@ export type CustomElements = {
    * no form at all and forwarding the attribute would have looked right and
    * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
    * element sends two entries, and that is what this does.
-   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with it.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -29018,9 +29453,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the textarea once the reader has finished.
    * - `helix-before-change`: Fired as the text changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
    *
@@ -29090,11 +29525,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the control.
    * - `control`: The textarea itself.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the control.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    */
   "helix-headless-textarea": Partial<
     HelixHeadlessTextareaProps & BaseProps<HelixHeadlessTextarea> & BaseEvents<HelixHeadlessTextarea>
@@ -29161,7 +29596,9 @@ export type CustomElements = {
    * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
    * swaps to the value while the caret is in it either way, so the rendering is
    * never something this element would refuse to read back.
-   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
    * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
@@ -29283,20 +29720,20 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the time changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Fired when the time changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: The mark on the field saying a list opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: The mark on the field saying a list opens.
    *
    * ## Methods
    *
@@ -29361,21 +29798,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
-   * - `time`: One held time, as a tag, in `multiple`.
-   * - `rest`: How many times are held beyond the ones shown.
-   * - `trigger`: The control that opens the list.
-   * - `trigger-icon`: The mark on the button that opens the clock.
-   * - `surface`: The floating panel.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    * - `picker`: The list inside it.
    * - `picker-column`: One of them.
-   * - `picker-columns`: The row of columns, in `wheels`.
-   * - `picker-list`: The listbox holding the times, in `list`.
-   * - `picker-option`: One time in it. Carries `data-between` inside a range.
-   * - `time-dismiss`: The remove button, when `dismissible`.
-   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `time-prefix`: The category before the label.
    * - `picker-column-empty`: Shown when a filter has hidden everything.
    * - `picker-column-feedback`: What is wrong with it.
    * - `picker-column-filter-icon`: The mark beside that field.
@@ -29383,8 +29812,11 @@ export type CustomElements = {
    * - `picker-column-hint`: Help under the list.
    * - `picker-column-items`: The list itself.
    * - `picker-column-label`: The question, over the list.
+   * - `picker-column-loading`: Shown while the options are still on their way.
    * - `picker-column-search`: The region holding the field that narrows the list.
    * - `picker-column-search-field`: The field itself.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-list`: The listbox holding the times, in `list`.
    * - `picker-list-empty`: Shown when a filter has hidden everything.
    * - `picker-list-feedback`: What is wrong with it.
    * - `picker-list-filter-icon`: The mark beside that field.
@@ -29392,17 +29824,22 @@ export type CustomElements = {
    * - `picker-list-hint`: Help under the list.
    * - `picker-list-items`: The list itself.
    * - `picker-list-label`: The question, over the list.
+   * - `picker-list-loading`: Shown while the options are still on their way.
    * - `picker-list-search`: The region holding the field that narrows the list.
    * - `picker-list-search-field`: The field itself.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
    * - `picker-option-description`: The caption under the words, when there is one.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
    * - `picker-option-text`: The words and the caption, as one column.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `picker-column-loading`: Shown while the options are still on their way.
-   * - `picker-list-loading`: Shown while the options are still on their way.
+   * - `rest`: How many times are held beyond the ones shown.
+   * - `surface`: The floating panel.
+   * - `time`: One held time, as a tag, in `multiple`.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `trigger`: The control that opens the list.
+   * - `trigger-icon`: The mark on the button that opens the clock.
    */
   "helix-headless-time-input": Partial<
     HelixHeadlessTimeInputProps & BaseProps<HelixHeadlessTimeInput> & BaseEvents<HelixHeadlessTimeInput>
@@ -29457,7 +29894,9 @@ export type CustomElements = {
    * A time not on the step is simply never offered, so it is not an error to
    * name one, and naming every time in the list is how the empty state is
    * reached honestly rather than by handing over an empty range.
-   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.
    *
@@ -29592,9 +30031,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the time changes.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -29667,10 +30106,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The listbox holding the times, in `list`.
-   * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `option`: One time in it. Carries `data-between` inside a range.
    * - `column-empty`: Shown when a filter has hidden everything.
    * - `column-feedback`: What is wrong with it.
    * - `column-filter-icon`: The mark beside that field.
@@ -29678,8 +30114,11 @@ export type CustomElements = {
    * - `column-hint`: Help under the list.
    * - `column-items`: The list itself.
    * - `column-label`: The question, over the list.
+   * - `column-loading`: Shown while the options are still on their way.
    * - `column-search`: The region holding the field that narrows the list.
    * - `column-search-field`: The field itself.
+   * - `columns`: The row of columns, in `wheels`.
+   * - `list`: The listbox holding the times, in `list`.
    * - `list-empty`: Shown when a filter has hidden everything.
    * - `list-feedback`: What is wrong with it.
    * - `list-filter-icon`: The mark beside that field.
@@ -29687,14 +30126,14 @@ export type CustomElements = {
    * - `list-hint`: Help under the list.
    * - `list-items`: The list itself.
    * - `list-label`: The question, over the list.
+   * - `list-loading`: Shown while the options are still on their way.
    * - `list-search`: The region holding the field that narrows the list.
    * - `list-search-field`: The field itself.
+   * - `option`: One time in it. Carries `data-between` inside a range.
    * - `option-description`: The caption under the words, when there is one.
    * - `option-item`: The row.
    * - `option-label`: The words.
    * - `option-text`: The words and the caption, as one column.
-   * - `column-loading`: Shown while the options are still on their way.
-   * - `list-loading`: Shown while the options are still on their way.
    */
   "helix-headless-time-picker": Partial<
     HelixHeadlessTimePickerProps &
@@ -29766,8 +30205,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `connector`: The line arriving at this entry.
-   * - `dot`: The mark drawn where nothing was slotted for one.
    * - `content`: What happened, and the time above it.
+   * - `dot`: The mark drawn where nothing was slotted for one.
    * - `marker`: The mark on the line.
    * - `rail`: The column holding the mark and the line.
    * - `time`: When it happened.
@@ -29960,8 +30399,8 @@ export type CustomElements = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    *
    * ## Methods
    *
@@ -30209,10 +30648,10 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -30280,13 +30719,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `row`: The line the track sits on, with whatever flanks it.
-   * - `track`: The bar the items sit in.
    * - `divider`: The rule after an inline label, separating it from the items.
+   * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the row, while nothing is wrong.
    * - `indicator`: The moving marker behind the selected item.
    * - `label`: The question, over the row.
-   * - `hint`: Help under the row, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `row`: The line the track sits on, with whatever flanks it.
+   * - `track`: The bar the items sit in.
    */
   "helix-headless-toggle-group": Partial<
     HelixHeadlessToggleGroupProps &
@@ -30525,7 +30964,9 @@ export type CustomElements = {
    * through as attributes. Both paths reach the same place through Lit, so
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
@@ -30621,8 +31062,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
    * - `helix-before-close`: Fired before it hides, and cancelable.
+   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -30764,8 +31205,8 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
-   * - `helix-complete`: Fired when the last stop is finished.
    * - `helix-before-close`: Fired when the reader leaves early.
+   * - `helix-complete`: Fired when the last stop is finished.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -30889,15 +31330,15 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `bubble`: The panel that points at the target.
-   * - `arrow`: The point, which the floating pass places against the target.
-   * - `content`: The region holding the slotted content.
    * - `actions`: The row the controls sit in.
+   * - `arrow`: The point, which the floating pass places against the target.
    * - `back`: The control that goes to the previous stop.
-   * - `next`: The control that goes on, and finishes on the last stop.
-   * - `skip`: The control that leaves the tour.
    * - `back-button`: The inner control.
+   * - `bubble`: The panel that points at the target.
+   * - `content`: The region holding the slotted content.
+   * - `next`: The control that goes on, and finishes on the last stop.
    * - `next-button`: The inner control.
+   * - `skip`: The control that leaves the tour.
    * - `skip-button`: The inner control.
    */
   "helix-headless-tour-stop": Partial<
@@ -31036,9 +31477,9 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the item is chosen.
-   * - `helix-before-open`: Fired before a branch opens, and cancelable.
    * - `helix-before-close`: Fired before a branch closes, and cancelable.
+   * - `helix-before-open`: Fired before a branch opens, and cancelable.
+   * - `helix-select`: Fired when the item is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -31047,8 +31488,8 @@ export type CustomElements = {
    *
    * - `(default)`: The item's label.
    * - `children`: Nested items, which make this a branch.
-   * - `start`: Before the label, after the chevron. A mark about the item.
    * - `end`: After the label, at the row's far side. A count, or a state.
+   * - `start`: Before the label, after the chevron. A mark about the item.
    *
    * ## Methods
    *
@@ -31087,11 +31528,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `group`: The container for nested items.
    * - `item`: The node, and the focus target unless `href` moves it to the row.
+   * - `label`: The label text.
    * - `row`: The clickable label row, which is an `<a>` where `href` is set.
    * - `toggle`: The expand and collapse control.
-   * - `label`: The label text.
-   * - `group`: The container for nested items.
    */
   "helix-headless-tree-item": Partial<
     HelixHeadlessTreeItemProps & BaseProps<HelixHeadlessTreeItem> & BaseEvents<HelixHeadlessTreeItem>
@@ -31131,7 +31572,9 @@ export type CustomElements = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -31187,9 +31630,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tree`: The tree container.
    * - `empty`: Shown when there are no rows to show.
    * - `loading`: Shown while the rows are still on their way.
+   * - `tree`: The tree container.
    */
   "helix-headless-tree": Partial<
     HelixHeadlessTreeProps & BaseProps<HelixHeadlessTree> & BaseEvents<HelixHeadlessTree>
@@ -31370,9 +31813,9 @@ export type CustomElements = {
    *
    * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
+   * - `label`: The name and whatever follows it.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
-   * - `label`: The name and whatever follows it.
    */
   "helix-headless-video-playlist-item": Partial<
     HelixHeadlessVideoPlaylistItemProps &
@@ -31467,20 +31910,20 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
-   * - `icon`: The glyph on the trigger.
-   * - `poster`: An entry's still, where it has one.
-   * - `menu`: The menu that holds the entries.
-   * - `trigger`: The button that opens it.
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
    * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
    * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `icon`: The glyph on the trigger.
+   * - `menu`: The menu that holds the entries.
    * - `menu-back`: The control that returns from a submenu.
    * - `menu-back-mark`: The glyph on the back control of a submenu.
-   * - `menu-header`: The bar above a submenu, holding the way back and its name.
-   * - `menu-title`: The name of the submenu that is showing.
-   * - `menu-surface`: The floating panel the menu is drawn on.
    * - `menu-empty`: Shown when there are no items to show.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
    * - `menu-loading`: Shown while the items are still on their way.
+   * - `menu-surface`: The floating panel the menu is drawn on.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `poster`: An entry's still, where it has one.
+   * - `trigger`: The button that opens it.
    */
   "helix-headless-video-playlist-menu": Partial<
     HelixHeadlessVideoPlaylistMenuProps &
@@ -31530,7 +31973,9 @@ export type CustomElements = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -31586,8 +32031,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `player`: The region holding the player.
    * - `items`: The list of entries.
+   * - `player`: The region holding the player.
    */
   "helix-headless-video-playlist": Partial<
     HelixHeadlessVideoPlaylistProps &
@@ -31684,7 +32129,8 @@ export type CustomElements = {
    * the browser's policy and not this element's, and `play()` already swallows
    * the refusal: what follows a refused autoplay is a paused player showing its
    * start control, which is the correct thing to be looking at.
-   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can be read.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
+   * be read.
    * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
    * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
@@ -31826,11 +32272,11 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `ended`: Relayed for the same reason.
    * - `helix-next`: Fired when the reader asks for the next item.
    * - `helix-previous`: Fired when they ask for the previous one.
-   * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `play`: Relayed, because it does not cross a shadow boundary.
    *
    * ## Slots
    *
@@ -31867,54 +32313,54 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `icon`: A glyph this component draws.
-   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
-   * - `video`: The video itself.
-   * - `poster`: What covers it before it plays.
    * - `back`: The region top left, for a way out of a set.
-   * - `failure`: What is said when the source will not play.
-   * - `loading`: What is said while the picture waits for more of itself.
-   * - `loading-mark`: The part of that which spins.
-   * - `cue`: The caption on screen now, drawn by this element.
-   * - `controls`: The bar along the bottom.
-   * - `play`: Play and pause.
-   * - `scrubber`: Where it is, and where to go.
-   * - `time`: The position and the duration.
-   * - `sound`: The speaker and its level, which are one control.
-   * - `mute`: Sound on and off.
-   * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
    * - `captions-menu`: The language menu, where there is more than one.
-   * - `rewind`: The control that goes back ten seconds.
-   * - `forward`: The control that goes on ten seconds.
-   * - `remote`: Play on another device, where one is available.
-   * - `speed`: Playback speed, where it was asked for.
-   * - `pip`: Picture in picture, where it was asked for and exists.
-   * - `start`: The mark over the picture before anything has played.
-   * - `next`: Asks for the next item, where it was asked for.
-   * - `previous`: Asks for the previous one.
-   * - `download`: Saves the file, where it was asked for.
-   * - `overflow`: The menu holding the controls kept off the bar.
-   * - `more`: The button that opens it.
-   * - `fullscreen`: The whole screen, and back.
    * - `captions-menu-back`: The control that returns from a submenu.
    * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-empty`: Shown when there are no items to show.
    * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-loading`: Shown while the items are still on their way.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
    * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `controls`: The bar along the bottom.
+   * - `cue`: The caption on screen now, drawn by this element.
+   * - `download`: Saves the file, where it was asked for.
    * - `entry`: One row in a menu this player opens.
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
-   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens.
    * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `failure`: What is said when the source will not play.
+   * - `forward`: The control that goes on ten seconds.
+   * - `fullscreen`: The whole screen, and back.
+   * - `icon`: A glyph this component draws.
+   * - `loading`: What is said while the picture waits for more of itself.
+   * - `loading-mark`: The part of that which spins.
+   * - `more`: The button that opens it.
+   * - `mute`: Sound on and off.
+   * - `next`: Asks for the next item, where it was asked for.
+   * - `overflow`: The menu holding the controls kept off the bar.
    * - `overflow-back`: The control that returns from a submenu.
    * - `overflow-back-mark`: The glyph on the back control of a submenu.
-   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
-   * - `overflow-title`: The name of the submenu that is showing.
-   * - `captions-menu-surface`: The floating panel the menu is drawn on.
-   * - `overflow-surface`: The floating panel the menu is drawn on.
-   * - `captions-menu-empty`: Shown when there are no items to show.
-   * - `captions-menu-loading`: Shown while the items are still on their way.
    * - `overflow-empty`: Shown when there are no items to show.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
    * - `overflow-loading`: Shown while the items are still on their way.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `play`: Play and pause.
+   * - `poster`: What covers it before it plays.
+   * - `previous`: Asks for the previous one.
+   * - `remote`: Play on another device, where one is available.
+   * - `rewind`: The control that goes back ten seconds.
+   * - `scrubber`: Where it is, and where to go.
+   * - `sound`: The speaker and its level, which are one control.
+   * - `speed`: Playback speed, where it was asked for.
+   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
+   * - `start`: The mark over the picture before anything has played.
+   * - `time`: The position and the duration.
+   * - `video`: The video itself.
+   * - `volume`: How loud.
    */
   "helix-headless-video": Partial<
     HelixHeadlessVideoProps & BaseProps<HelixHeadlessVideo> & BaseEvents<HelixHeadlessVideo>
@@ -32125,8 +32571,8 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `summary`: The always-visible trigger content.
    * - `(default)`: The content revealed when open.
+   * - `summary`: The always-visible trigger content.
    *
    * ## Methods
    *
@@ -32151,11 +32597,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `container`: The outer wrapper.
-   * - `trigger`: The clickable summary row.
    * - `chevron`: The open and close indicator.
+   * - `container`: The outer wrapper.
    * - `content`: The revealed region.
    * - `content-inner`: The clipping box inside the animated region.
+   * - `trigger`: The clickable summary row.
    */
   "helix-headless-accordion-item": Partial<
     HelixHeadlessAccordionItemProps &
@@ -32348,12 +32794,26 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Tracks whether the page has scrolled and reflects it as `data-scrolled`, so
-   * the styled tier can lift the bar off the page without a scroll handler of its
-   * own. Scroll position is the one piece of state the server genuinely cannot
-   * know, so it is read on connect rather than derived: a fresh load starts at
-   * the top, which is what the server rendered, and a reload part-way down
-   * corrects on hydration.
+   * Tracks whether the page has scrolled and carries it as the custom state
+   * `scrolled`, so the styled tier can lift the bar off the page without a scroll
+   * handler of its own. Scroll position is the one piece of state the server
+   * genuinely cannot know, so it is read on connect rather than derived: a fresh
+   * load starts at the top, which is what the server rendered, and a reload
+   * part-way down corrects on hydration.
+   *
+   * **A custom state and not `data-scrolled`, which is what this used to be.**
+   * The attribute was written onto the host by the element itself, so a server
+   * sent the header without it and the element added it on upgrade. A framework
+   * hydrating the page then found an attribute it had not rendered and reported
+   * the tree as mismatched: intermittently, because it only happens when the
+   * reader reloads far enough down the page to pass the threshold. Every
+   * server-rendered consumer paid for that, and could only answer it by
+   * suppressing hydration warnings on an element they did not write.
+   *
+   * `ElementInternals.states` is deliberately not in the DOM, so there is nothing
+   * for a hydration pass to disagree with, and `:state(scrolled)` selects it. The
+   * base class made the same move for `data-settled` and its note explains the
+   * rest.
    *
    * The listener is passive and reads `scrollY` only, so it never blocks
    * scrolling.
@@ -32416,22 +32876,28 @@ export type CustomElementsSolidJs = {
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
    * against a timeout; `readyToMove` does exactly that. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-scrolled`: Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Leading content, usually a wordmark.
    * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
+   * - `start`: Leading content, usually a wordmark.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `row`: The centered row inside the banner.
-   * - `start`: The leading region.
    * - `content`: The middle region.
    * - `end`: The trailing region.
+   * - `row`: The centered row inside the banner.
+   * - `start`: The leading region.
    */
   "helix-headless-app-header": Partial<
     HelixHeadlessAppHeaderProps &
@@ -32574,8 +33040,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `src`: Image to show. Falls back to the slot, or to initials, if it fails.
-   * - `name`: Name of the person or entity. Used for the label and the initials.
+   * - `src`: Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
+   * - `name`: Name of the person or entity.
+   *
+   * Used for the label and the initials.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -32605,8 +33075,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `load`: Relayed from the image once it has loaded.
    * - `error`: Relayed from the image when it fails.
+   * - `load`: Relayed from the image once it has loaded.
    *
    * ## Slots
    *
@@ -32648,9 +33118,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The count or short text to show. Absent shows a dot, zero shows nothing.
-   * - `max`: Cap for a numeric value. Past it the indicator reads `{max}+`.
-   * - `label`: Accessible name. Required for a dot, which has no text to read.
+   * - `value`: The count or short text to show.
+   *
+   * Absent shows a dot, zero shows nothing.
+   * - `max`: Cap for a numeric value.
+   *
+   * Past it the indicator reads `{max}+`.
+   * - `label`: Accessible name.
+   *
+   * Required for a dot, which has no text to read.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -32865,9 +33341,9 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    * - `--bar-chart-axis`: The color of a single-series axis, taken from that series. (default: `undefined`)
    * - `--bar-chart-secondary`: The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. (default: `undefined`)
+   * - `--chart-bar-wash`: The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -32952,8 +33428,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `blockquote`: The quotation.
    * - `attribution`: The footer carrying the source.
+   * - `blockquote`: The quotation.
    */
   "helix-headless-blockquote": Partial<
     HelixHeadlessBlockquoteProps &
@@ -32997,11 +33473,28 @@ export type CustomElementsSolidJs = {
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
-   * Empty rather than optional and unreflected: an `href` written onto every
-   * host would be a link to the current page on every crumb nobody asked to be
-   * one, and nothing selects on it.
+   * **Optional and reflected, because a stylesheet does select on it.**
+   * `breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+   * block padding off a crumb that is not a link, so the attribute is what
+   * decides how tall a crumb is. Unreflected, an `href` set from script reached
+   * the property, rendered the anchor, and left the host looking unlinked: the
+   * crumb drew at 20px where a markup twin drew at 28.
+   *
+   * *This said the opposite until 27 Aug 2026*, and named the reason as
+   * "nothing selects on it", which was not true when it was written. The
+   * paragraph is worth keeping because the rest of it is right and is what makes
+   * this optional rather than defaulted: an `href` written onto every host would
+   * be a link to the current page on every crumb nobody asked to be one. That is
+   * the general rule as well, that a reflected property takes no default, so the
+   * two agree.
+   *
+   * Found by the picture comparison rather than by reading: React assigns a
+   * matching property instead of an attribute, so every crumb in the React twin
+   * of `breadcrumbs/links` lost its padding at once.
    * - `target`: Where the link opens, for the rare crumb that leaves the site.
-   * - `rel`: What the link declares about where it goes. The consumer's decision.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * The consumer's decision.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -33032,9 +33525,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step's label. Without an `href` this may be the consumer's own anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
-   * - `start`: Before the label, for an icon.
    * - `end`: After it, for a count or a mark.
    * - `separator`: Replaces the chevron shown before this item.
+   * - `start`: Before the label, for an icon.
    *
    * ## CSS Parts
    *
@@ -33381,8 +33874,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The button's label.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -33570,10 +34063,10 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
-   * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
+   * - `header`: Title and any actions for the whole card.
+   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
    */
   "helix-headless-card": Partial<
     HelixHeadlessCardProps &
@@ -33587,10 +34080,12 @@ export type CustomElementsSolidJs = {
    * and the browser's own momentum all work without being reimplemented. The
    * controls scroll it; they do not drive a transform.
    *
-   * Slides are the consumer's own elements. Each is given
+   * Slides are the consumer's own elements, and nothing is written onto them. The
+   * component renders a pane per slide carrying `role="group"`,
    * `aria-roledescription="slide"` and a name reading its position in the set,
-   * which is what a screen-reader user needs to know where they are. Where a
-   * slide carries its own `aria-label`, that one is left alone.
+   * and assigns the slide into it: a screen-reader user hears where they are, and
+   * a slide that is itself a link is still a link, which it was not while the role
+   * was being written on top of it. See `assign`.
    *
    * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
    * The APG is explicit: rotation must not resume unless the reader asks for it,
@@ -33733,6 +34228,7 @@ export type CustomElementsSolidJs = {
    * - `previous-mark`: The glyph on the previous control.
    * - `rotation`: The control that stops and starts rotation.
    * - `rotation-mark`: The glyph on the play and pause control.
+   * - `slide`: The pane one slide is shown in, and the box the track snaps to.
    * - `track`: The scroller the slides sit in.
    */
   "helix-headless-carousel": Partial<
@@ -33761,7 +34257,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the reader has written. Read it, or set it to seed a draft.
+   * - `value`: What the reader has written.
+   *
+   * Read it, or set it to seed a draft.
    * - `placeholder`: Shown in an empty field.
    * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
    *
@@ -33771,7 +34269,9 @@ export type CustomElementsSolidJs = {
    * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
    * - `label`: Accessible name for the field.
    * - `send-label`/`sendLabel`: Label for the control that sends.
-   * - `rows`: How many rows the field opens at. It grows from there.
+   * - `rows`: How many rows the field opens at.
+   *
+   * It grows from there.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -33807,8 +34307,8 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Under the field, at the leading edge: attachments, a model picker.
    * - `end`: Under the field, beside the send control.
+   * - `start`: Under the field, at the leading edge: attachments, a model picker.
    *
    * ## Methods
    *
@@ -33825,12 +34325,12 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `composer`: The whole composer.
-   * - `field`: The text field.
-   * - `tools`: The row under the field.
-   * - `start`: The leading slot's box.
    * - `end`: The trailing slot's box.
-   * - `send`: The control that offers the turn.
+   * - `field`: The text field.
    * - `mark`: The glyph inside the send control.
+   * - `send`: The control that offers the turn.
+   * - `start`: The leading slot's box.
+   * - `tools`: The row under the field.
    */
   "helix-headless-chat-composer": Partial<
     HelixHeadlessChatComposerProps &
@@ -33865,10 +34365,14 @@ export type CustomElementsSolidJs = {
    * - `state`: What has happened to it.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
-   * has no other way to know. Empty is a settled message with nothing to report,
-   * which is what most of a transcript is.
+   * has no other way to know. Absent is a settled message with nothing to
+   * report, which is what most of a transcript is, and it is the absence of the
+   * attribute rather than a value of it: there is no initializer, so nothing is
+   * reflected until something happens.
    * - `at`: When it was said, as anything `Date` parses.
-   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -33907,25 +34411,25 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: What was said.
+   * - `actions`: What can be done with it: copy, retry, react.
    * - `avatar`: Who said it.
    * - `sources`: What it was said from: citations, documents, a retrieved page.
-   * - `actions`: What can be done with it: copy, retry, react.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `message`: The whole turn.
+   * - `actions`: The controls offered on the turn, beside its time.
    * - `avatar`: The leading slot's box.
    * - `body`: What was said, and the line under it.
    * - `content`: The consumer's own markup.
-   * - `sources`: What the turn was drawn from, under it and outside the bubble.
-   * - `meta`: The line under a turn: its time, its state, and its controls.
-   * - `time`: When it was said.
-   * - `state`: What has happened to it, where that is worth saying.
    * - `mark`: The status glyph beside a failure.
+   * - `message`: The whole turn.
+   * - `meta`: The line under a turn: its time, its state, and its controls.
    * - `retry`: The control offered on a failed message.
-   * - `actions`: The controls offered on the turn, beside its time.
+   * - `sources`: What the turn was drawn from, under it and outside the bubble.
+   * - `state`: What has happened to it, where that is worth saying.
+   * - `time`: When it was said.
    */
   "helix-headless-chat-message": Partial<
     HelixHeadlessChatMessageProps &
@@ -34038,11 +34542,11 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The turns, as `helix-chat-message` children.
-   * - `header`: Above the transcript: what this conversation is.
    * - `actions`: Beside the header: what can be done to the conversation itself.
    * - `composer`: Below the transcript, where the reader writes.
-   * - `status`: Beside the composer: somebody typing, connection lost.
+   * - `header`: Above the transcript: what this conversation is.
    * - `resume`: The way back to the bottom, shown while the reader has scrolled away.
+   * - `status`: Beside the composer: somebody typing, connection lost.
    *
    * ## Methods
    *
@@ -34058,14 +34562,14 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `header`: The region above the transcript.
    * - `actions`: The controls for the conversation, at the header's trailing edge.
+   * - `composer`: The region the composer sits in.
+   * - `empty`: Shown when the conversation has no turns.
+   * - `header`: The region above the transcript.
+   * - `loading`: Shown while the history is still on its way.
    * - `log`: The transcript, which is the thing that scrolls.
    * - `resume`: The affordance offered while the reader is away from the bottom.
    * - `status`: The status region, which is not part of the log.
-   * - `composer`: The region the composer sits in.
-   * - `empty`: Shown when the conversation has no turns.
-   * - `loading`: Shown while the history is still on its way.
    */
   "helix-headless-chat": Partial<
     HelixHeadlessChatProps &
@@ -34162,17 +34666,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when any box changes, with the whole set.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The checkboxes.
-   * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string, where the label is more than one.
    *
    * ## Methods
    *
@@ -34216,10 +34720,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The group's name, over the set.
-   * - `items`: The list itself, which is what `orientation` lays out.
-   * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the set.
+   * - `items`: The list itself, which is what `orientation` lays out.
+   * - `label`: The group's name, over the set.
    */
   "helix-headless-checkbox-group": Partial<
     HelixHeadlessCheckboxGroupProps &
@@ -34329,9 +34833,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the state has changed.
    * - `helix-before-toggle`: Fired before the state changes, and cancelable.
    * - `input`: Announced once the state has moved.
-   * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
    *
@@ -34405,13 +34909,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row the box and its label share, and the surface the card appearance draws.
    * - `box`: The frame the input is painted as, and the mark sits over.
    * - `control`: The input.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The row the box and its label share, and the surface the card appearance draws.
+   * - `hint`: Help under the control, while nothing is wrong.
    * - `label`: The label beside it.
    * - `mark`: The tick, or the dash when the box is indeterminate.
-   * - `hint`: Help under the control, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-checkbox": Partial<
     HelixHeadlessCheckboxProps &
@@ -34452,6 +34956,18 @@ export type CustomElementsSolidJs = {
    * present, which is true. Measured, and it is why this is named the other way
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+   * reserves the copy button's width with `:host(:not([no-copy]))`, so the
+   * attribute is what decides whether the block pays for a control. Set from
+   * script the button went away, `render` reading the property, and the 40px it
+   * stood in stayed reserved: the exact waste that rule was written to stop,
+   * arrived at from the other side.
+   *
+   * A false boolean reflects as the attribute's absence, so this costs no
+   * `no-copy=""` on hosts that never asked for one, and the rule about a
+   * reflected property taking no default is satisfied by the default being
+   * `false`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -34489,14 +35005,14 @@ export type CustomElementsSolidJs = {
    *
    * - `block`: The scrolling `<pre>`.
    * - `code`: The `<code>` inside it.
-   * - `frame`: The code and the copy button beside it.
-   * - `header`: The bar carrying the name, where there is one.
    * - `copy`: The copy button.
-   * - `label`: The file name or language, where one is given.
    * - `copy-button`: The inner button.
    * - `copy-mark`: The clipboard glyph, and the confirmation that replaces it.
    * - `copy-tooltip`: The bubble, forwarded from the tooltip inside.
    * - `copy-tooltip-arrow`: The point, resting against the trigger.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `label`: The file name or language, where one is given.
    */
   "helix-headless-code-block": Partial<
     HelixHeadlessCodeBlockProps &
@@ -34732,22 +35248,22 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the color changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired when the color changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Content at the leading end of the field, inside its border.
    * - `end`: Content at the trailing end, before the trigger.
-   * - `trigger`: The mark on the field saying a panel opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `start`: Content at the leading end of the field, inside its border.
+   * - `trigger`: The mark on the field saying a panel opens.
    *
    * ## Methods
    *
@@ -34825,19 +35341,30 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input carrying the value. Absent in `swatch`.
-   * - `trigger`: The control that opens the panel.
-   * - `preview`: The chip showing the color, inside the trigger.
-   * - `surface`: The floating panel.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    * - `picker`: The color picker inside it.
    * - `picker-actions`: The group holding the eyedropper and the syntax toggle.
    * - `picker-channel`: One ramp.
+   * - `picker-channel-control`: The range input.
+   * - `picker-channel-feedback`: What is wrong with it.
+   * - `picker-channel-field`: The row: the control and its readout.
+   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
+   * - `picker-channel-label`: The question, over the track.
+   * - `picker-channel-marker`: One mark.
+   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `picker-channel-markers`: The row of marks along the track.
+   * - `picker-channel-output`: The current value, shown beside it.
    * - `picker-channels`: The ramps beside it.
    * - `picker-controls`: The row under the square.
    * - `picker-eyedropper`: The control that samples a color from the screen.
+   * - `picker-eyedropper-button`: The inner control.
    * - `picker-footer`: The row holding the value and the tools.
    * - `picker-format`: The control that changes the syntax the value is written in.
+   * - `picker-format-button`: The inner control.
    * - `picker-grid`: The saturation and brightness square.
    * - `picker-grid-brightness`: The range input for its vertical axis.
    * - `picker-grid-handle`: The mark showing where in the square the color sits.
@@ -34847,20 +35374,9 @@ export type CustomElementsSolidJs = {
    * - `picker-swatch`: One preset.
    * - `picker-swatches`: The row of presets.
    * - `picker-value`: The color as text, which can be typed or pasted.
-   * - `picker-channel-control`: The range input.
-   * - `picker-channel-field`: The row: the control and its readout.
-   * - `picker-channel-marker`: One mark.
-   * - `picker-channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `picker-channel-markers`: The row of marks along the track.
-   * - `picker-channel-output`: The current value, shown beside it.
-   * - `picker-eyedropper-button`: The inner control.
-   * - `picker-format-button`: The inner control.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `picker-channel-feedback`: What is wrong with it.
-   * - `picker-channel-hint`: Help under the track, while nothing is wrong.
-   * - `picker-channel-label`: The question, over the track.
+   * - `preview`: The chip showing the color, inside the trigger.
+   * - `surface`: The floating panel.
+   * - `trigger`: The control that opens the panel.
    */
   "helix-headless-color-input": Partial<
     HelixHeadlessColorInputProps &
@@ -35018,12 +35534,12 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the color changes.
+   * - `helix-copy`: Fired when the color is put on the clipboard.
    * - `helix-sample-end`: The eyedropper has closed, whether or not a color was taken.
    * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
-   * - `helix-before-change`: Fired when the color changes.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
-   * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Slots
    *
@@ -35101,33 +35617,33 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the color sits.
-   * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `grid-brightness`: The range input for its vertical axis.
-   * - `controls`: The row under the square.
-   * - `icon`: A glyph this component draws.
-   * - `sample`: The chip of the current color, which copies it when pressed.
-   * - `channels`: The ramps beside it.
-   * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
-   * - `eyedropper`: The control that samples a color from the screen.
-   * - `footer`: The row holding the value and the tools.
-   * - `value`: The color as text, which can be typed or pasted.
-   * - `format`: The control that changes the syntax the value is written in.
-   * - `swatches`: The row of presets.
-   * - `swatch`: One preset.
+   * - `channel`: One ramp.
    * - `channel-control`: The range input.
+   * - `channel-feedback`: What is wrong with it.
    * - `channel-field`: The row: the control and its readout.
+   * - `channel-hint`: Help under the track, while nothing is wrong.
+   * - `channel-label`: The question, over the track.
    * - `channel-marker`: One mark.
    * - `channel-marker-label`: The value a mark stands at, when `marker-labels` is set.
    * - `channel-markers`: The row of marks along the track.
    * - `channel-output`: The current value, shown beside it.
+   * - `channels`: The ramps beside it.
+   * - `controls`: The row under the square.
+   * - `eyedropper`: The control that samples a color from the screen.
    * - `eyedropper-button`: The inner control.
+   * - `footer`: The row holding the value and the tools.
+   * - `format`: The control that changes the syntax the value is written in.
    * - `format-button`: The inner control.
-   * - `channel-feedback`: What is wrong with it.
-   * - `channel-hint`: Help under the track, while nothing is wrong.
-   * - `channel-label`: The question, over the track.
+   * - `grid`: The saturation and brightness square.
+   * - `grid-brightness`: The range input for its vertical axis.
+   * - `grid-handle`: The mark showing where in the square the color sits.
+   * - `grid-saturation`: The range input for the square's horizontal axis.
+   * - `icon`: A glyph this component draws.
+   * - `sample`: The chip of the current color, which copies it when pressed.
+   * - `swatch`: One preset.
+   * - `swatches`: The row of presets.
+   * - `value`: The color as text, which can be typed or pasted.
    */
   "helix-headless-color-picker": Partial<
     HelixHeadlessColorPickerProps &
@@ -35365,12 +35881,12 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the chosen option changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
-   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-before-change`: Fired when the chosen option changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the panel opens.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -35378,9 +35894,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, which are `helix-option` elements.
-   * - `start`: Before the text, for an icon.
    * - `end`: After it, for a unit or a clear button.
    * - `indicator`: Replaces the caret saying the field opens.
+   * - `start`: Before the text, for an icon.
    *
    * ## Methods
    *
@@ -35451,14 +35967,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
-   * - `tags`: The row of chosen options, when `multiple` is set.
-   * - `tag`: One chosen option.
-   * - `rest`: The count of choices held beyond `max-tags`.
    * - `create`: The row offering to add what was typed.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box around the text and its marks.
+   * - `hint`: Help under the field, while nothing is wrong.
    * - `indicator`: The caret.
-   * - `surface`: The floating panel.
+   * - `label`: The question, over the field.
    * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
@@ -35467,15 +35982,16 @@ export type CustomElementsSolidJs = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
+   * - `rest`: The count of choices held beyond `max-tags`.
+   * - `surface`: The floating panel.
+   * - `tag`: One chosen option.
    * - `tag-dismiss`: The remove button, when `dismissible`.
    * - `tag-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `tag-prefix`: The category before the label.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `listbox-loading`: Shown while the options are still on their way. from the listbox.
+   * - `tags`: The row of chosen options, when `multiple` is set.
    */
   "helix-headless-combobox": Partial<
     HelixHeadlessComboboxProps &
@@ -35573,9 +36089,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when a command is chosen.
-   * - `helix-before-open`: Fired when the palette opens.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the palette opens.
+   * - `helix-select`: Fired when a command is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -35604,8 +36120,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `dialog`: The overlay's own box, forwarded from the dialog.
-   * - `listbox`: The list inside it.
    * - `footer`: The row under the list.
+   * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
    * - `listbox-filter-icon`: The mark beside that field.
@@ -35613,9 +36129,9 @@ export type CustomElementsSolidJs = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
-   * - `listbox-loading`: Shown while the options are still on their way.
    */
   "helix-headless-command": Partial<
     HelixHeadlessCommandProps &
@@ -35790,8 +36306,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The resting icon. Falls back to a clipboard.
    * - `copied`: What replaces it once the write succeeds. Falls back to a check.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -36004,17 +36520,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
    * - `helix-filter`: Fired when the query changes, and cancelable.
    * - `helix-navigate`: Fired when a reader asks for another page, and cancelable.
+   * - `helix-sort`: Fired when a reader asks for a different order, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The columns, declared as `helix-table-column` children.
-   * - `toolbar`: Above the grid, for a search field or actions.
    * - `footer`: Below the grid, replacing the pagination this would otherwise draw.
+   * - `toolbar`: Above the grid, for a search field or actions.
    *
    * ## Methods
    *
@@ -36040,15 +36556,15 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `table`: The grid.
-   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
-   * - `row`: One row of data.
    * - `cell`: One cell.
-   * - `toolbar`: The region above the grid.
-   * - `footer`: The region below the grid.
-   * - `pagination`: The pagination, where this draws one.
    * - `empty`: Shown when no rows match.
+   * - `footer`: The region below the grid.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `loading`: Shown while the rows are still on their way.
+   * - `pagination`: The pagination, where this draws one.
+   * - `row`: One row of data.
+   * - `table`: The grid.
+   * - `toolbar`: The region above the grid.
    */
   "helix-headless-data-table": Partial<
     HelixHeadlessDataTableProps &
@@ -36274,20 +36790,20 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the date changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the calendar opens.
+   * - `helix-before-change`: Fired when the date changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the calendar opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: The mark on the field saying a calendar opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: The mark on the field saying a calendar opens.
    *
    * ## Methods
    *
@@ -36352,17 +36868,16 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
    * - `date`: One held date, as a tag, in `multiple`.
-   * - `rest`: How many dates are held beyond the ones shown.
-   * - `trigger`: The control that opens the calendar.
-   * - `trigger-icon`: The mark on the button that opens the calendar.
-   * - `surface`: The floating panel.
-   * - `picker`: The date picker inside it.
    * - `date-dismiss`: The remove button, when `dismissible`.
    * - `date-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `date-prefix`: The category before the label.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
+   * - `picker`: The date picker inside it.
    * - `picker-cell`: One column of a row, which is what a range paints.
    * - `picker-day`: The shape inside a cell, which is what a single date paints.
    * - `picker-grid`: The grid of days.
@@ -36376,9 +36891,10 @@ export type CustomElementsSolidJs = {
    * - `picker-previous-mark`: The glyph on the previous month control.
    * - `picker-week`: One row of days.
    * - `picker-weekday`: A column header naming a day of the week.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `rest`: How many dates are held beyond the ones shown.
+   * - `surface`: The floating panel.
+   * - `trigger`: The control that opens the calendar.
+   * - `trigger-icon`: The mark on the button that opens the calendar.
    */
   "helix-headless-date-input": Partial<
     HelixHeadlessDateInputProps &
@@ -36435,7 +36951,9 @@ export type CustomElementsSolidJs = {
    *
    * - `mode`: How many dates can be held at once.
    * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `locale`: Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
    * - `invalid`: Whether the current selection fails validation.
@@ -36566,17 +37084,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired before the dates change, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired before the dates change, and cancelable.
    * - `helix-navigate`: Fired before the month on show changes, and cancelable.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
    * - `next-icon`: The glyph on the control that moves forward a month, usually a caret.
+   * - `previous-icon`: The glyph on the control that moves back a month, usually a caret.
    *
    * ## Methods
    *
@@ -36786,9 +37304,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
-   * - `helix-before-close`: Fired before it closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -36796,9 +37314,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
-   * - `icon`: A single mark above the title, for a dialog that warns.
-   * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
+   * - `header`: The title, and anything beside it.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    *
    * ## Methods
    *
@@ -36900,8 +37418,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `line`: The rule itself, or each half of it where something is set in.
    * - `content`: What is set into it.
+   * - `line`: The rule itself, or each half of it where something is set in.
    */
   "helix-headless-divider": Partial<
     HelixHeadlessDividerProps &
@@ -37067,16 +37585,16 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `center`: The middle of the ring, holding whatever is slotted.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
    * - `tooltip-value`: A column's value inside the tooltip.
-   * - `segment`: One slice.
-   * - `segment-edge`: One slice as a closed shape, for a boundary to trace.
    * - `track`: The ring the slices are drawn on.
    */
   "helix-headless-donut-chart": Partial<
@@ -37214,8 +37732,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `close`: Relayed, because the platform's own does not escape.
+   * - `helix-before-close`: Fired before the panel closes, and cancelable.
    * - `helix-before-open`: Fired when the drawer opens or closes.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -37244,9 +37762,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `panel`: The sliding panel.
-   * - `header`: The header region.
    * - `content`: The scrolling content region.
+   * - `header`: The header region.
+   * - `panel`: The sliding panel.
    */
   "helix-headless-drawer": Partial<
     HelixHeadlessDrawerProps &
@@ -37276,8 +37794,12 @@ export type CustomElementsSolidJs = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `onPage`: Whether the page showing is the one this row is on. Written by the stack. (property only)
-   * - `showingPage`: Whether this row's own page is the one showing. Written by the stack. (property only)
+   * - `onPage`: Whether the page showing is the one this row is on.
+   *
+   * Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing.
+   *
+   * Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
@@ -37325,9 +37847,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this row.
+   * - `end`: After the words, usually a mark or a count.
    * - `page`: The rows of the page this one opens.
    * - `start`: Before the words, usually an icon.
-   * - `end`: After the words, usually a mark or a count.
    *
    * ## Methods
    *
@@ -37439,11 +37961,11 @@ export type CustomElementsSolidJs = {
    *
    * - `back`: The control that returns one page.
    * - `back-mark`: The glyph on the back control.
+   * - `empty`: Shown when there are no entries to show.
    * - `header`: The bar above a page, holding the way back and its name.
+   * - `loading`: Shown while the entries are still on their way.
    * - `page`: The region the rows are in.
    * - `title`: The name of the page showing.
-   * - `empty`: Shown when there are no entries to show.
-   * - `loading`: Shown while the entries are still on their way.
    */
   "helix-headless-drilldown": Partial<
     HelixHeadlessDrilldownProps &
@@ -37504,10 +38026,10 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `icon`: A mark above the heading.
-   * - `heading`: What is missing.
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
+   * - `heading`: What is missing.
+   * - `icon`: A mark above the heading.
    */
   "helix-headless-empty": Partial<
     HelixHeadlessEmptyProps &
@@ -37554,7 +38076,9 @@ export type CustomElementsSolidJs = {
    * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
    * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
-   * - `locale`: Language tag the sizes are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the sizes are written in.
+   *
+   * Absent uses the runtime's own.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -37623,17 +38147,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the chosen files change, with their names.
-   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: What the reader presses to open the picker.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: What the reader presses to open the picker.
    *
    * ## Methods
    *
@@ -37693,27 +38217,27 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
-   * - `icon`: A glyph this component draws.
-   * - `trigger`: The label that opens the picker.
-   * - `list`: The chosen files.
-   * - `file`: One chosen file.
    * - `detail`: Its name and its reading, stacked.
-   * - `name`: Its name.
-   * - `meta`: The row holding its size and kind.
-   * - `size`: How big it is.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box that is pressed and dropped on.
+   * - `file`: One chosen file.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `icon`: A glyph this component draws.
    * - `kind`: What kind of file it is.
-   * - `remove`: The control that takes it back out.
    * - `kind-dismiss`: The remove button, when `dismissible`.
    * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `kind-prefix`: The category before the label.
+   * - `label`: The question, over the field.
+   * - `list`: The chosen files.
+   * - `meta`: The row holding its size and kind.
+   * - `name`: Its name.
+   * - `remove`: The control that takes it back out.
+   * - `size`: How big it is.
    * - `size-dismiss`: The remove button, when `dismissible`.
    * - `size-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    * - `size-prefix`: The category before the label.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `trigger`: The label that opens the picker.
    */
   "helix-headless-file-input": Partial<
     HelixHeadlessFileInputProps &
@@ -37773,11 +38297,15 @@ export type CustomElementsSolidJs = {
    * this is and a stylesheet has a reason to know: a compact reading is a fixed
    * few characters and a date is not.
    * - `hour`: How the hour is written, where a time of day is shown.
-   * - `locale`: Locale for the reading. Empty is the runtime's own.
+   * - `locale`: Locale for the reading.
+   *
+   * Empty is the runtime's own.
    * - `minute`: How the minute is written, where a time of day is shown.
    * - `month`: How the month is written, where a date is shown.
    * - `second`: How the second is written, where a time of day is shown.
-   * - `time-zone`/`timeZone`: The time zone to read the timestamp in. Empty is the runtime's own.
+   * - `time-zone`/`timeZone`: The time zone to read the timestamp in.
+   *
+   * Empty is the runtime's own.
    * - `time-zone-name`/`timeZoneName`: Whether to name the time zone, and how.
    * - `weekday`: How the weekday is written, where one is shown.
    * - `year`: How the year is written, where a date is shown.
@@ -37910,7 +38438,8 @@ export type CustomElementsSolidJs = {
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
-   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a number.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
    * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `for`: The id of the table to read.
    *
@@ -38002,45 +38531,45 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
+   * - `end`: Below the strip, at the trailing edge: usually the newest date.
    * - `start`: Below the strip, at the leading edge: usually the oldest date.
    * - `summary`: Below the strip, in the middle: the reading over the range drawn.
-   * - `end`: Below the strip, at the trailing edge: usually the newest date.
    *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
    *
+   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
+   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
    * - `--heatmap-cell-width`: How wide a cell is. The strip fits as many as the container allows. (default: `undefined`)
-   * - `--heatmap-cell-height`: How tall a cell is. A row of a tall thin cell is what a status page draws. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
-   * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
-   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
-   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
-   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
-   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
-   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
-   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
-   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-3`: The third step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-4`: The fourth step of the magnitude ramp. (default: `undefined`)
    * - `--heatmap-tone-5`: The loudest step of the magnitude ramp. (default: `undefined`)
+   * - `--heatmap-tone-accent`: What `accent` is worth. (default: `undefined`)
+   * - `--heatmap-tone-danger`: What `danger` is worth. (default: `undefined`)
+   * - `--heatmap-tone-info`: What `info` is worth. (default: `undefined`)
+   * - `--heatmap-tone-muted`: What `muted` is worth: the quiet ground, for a bucket that means nothing happened. (default: `undefined`)
+   * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
+   * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
+   * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `strip`: The grid of cells.
    * - `cell`: One reading.
-   * - `footer`: The three-slot row under the strip.
-   * - `start`: The leading slot's box.
-   * - `summary`: The middle slot's box.
-   * - `end`: The trailing slot's box.
    * - `empty`: Shown when the table has no readings in it.
+   * - `end`: The trailing slot's box.
+   * - `footer`: The three-slot row under the strip.
    * - `mark`: The invisible point the tooltip is anchored to.
+   * - `start`: The leading slot's box.
+   * - `strip`: The grid of cells.
+   * - `summary`: The middle slot's box.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
@@ -38207,8 +38736,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The icon.
-   * - `start`: Content before the label, usually an icon.
    * - `end`: Content after the label.
+   * - `start`: Content before the label, usually an icon.
    *
    * ## Methods
    *
@@ -38388,7 +38917,8 @@ export type CustomElementsSolidJs = {
    * right for a picture in a page, and `sync` is what a consumer reaches for
    * when the picture is about to be composited with something else and a tear
    * would show.
-   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas can read it.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
    * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
@@ -38401,7 +38931,12 @@ export type CustomElementsSolidJs = {
    * back declares that a picture has arrived which this element has never
    * fetched. The `data-` name is the library's answer to both, being a
    * different name a re-parse cannot mistake for a declaration, and it is what
-   * `data-open` and `data-checked` already do.
+   * `data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+   * own moved to `:state(scrolled)` for the hydration reason recorded there.
+   * A picture arrives after somebody fetched it, which puts this on the safe
+   * side of hydration: a fact that can be true on the *first* update mirrors to
+   * a custom state instead, which is what `:state(open)` and `:state(checked)`
+   * became on 27 Aug 2026 for exactly that reason.
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence. (property only)
@@ -38438,23 +38973,23 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `load`: Relayed, because the platform's own does not escape.
    * - `error`: Relayed for the same reason.
+   * - `load`: Relayed, because the platform's own does not escape.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `placeholder`: Shown until the picture arrives.
    * - `fallback`: Shown instead of it, if it never does.
+   * - `placeholder`: Shown until the picture arrives.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `fallback`: What stands in when it fails.
    * - `image`: The picture itself.
    * - `placeholder`: What stands in until it arrives.
-   * - `fallback`: What stands in when it fails.
    */
   "helix-headless-image": Partial<
     HelixHeadlessImageProps &
@@ -38514,7 +39049,9 @@ export type CustomElementsSolidJs = {
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
@@ -38543,7 +39080,9 @@ export type CustomElementsSolidJs = {
    * that does nothing visible, and guarding it here rather than asking the
    * consumer not to means the property can be set once on a component that
    * changes type.
-   * - `reveal-label`/`revealLabel`: What the reveal toggle is called. The state is `aria-pressed`, not this.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -38645,16 +39184,16 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the reader has finished.
    * - `helix-before-change`: Fired as the text changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the text, for an icon or a prefix.
    * - `end`: After the text, for an icon or a unit.
+   * - `start`: Before the text, for an icon or a prefix.
    *
    * ## Methods
    *
@@ -38725,14 +39264,14 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding everything.
-   * - `control`: The input itself.
    * - `clear`: The button that empties the field.
-   * - `icon`: A glyph this component draws.
-   * - `reveal`: The button that shows and hides a password.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
+   * - `control`: The input itself.
    * - `feedback`: What is wrong with it.
+   * - `field`: The box holding everything.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `icon`: A glyph this component draws.
+   * - `label`: The question, over the field.
+   * - `reveal`: The button that shows and hides a password.
    */
   "helix-headless-input": Partial<
     HelixHeadlessInputProps &
@@ -39201,10 +39740,10 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Leading content, usually an icon or an avatar.
    * - `(default)`: The label.
-   * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   * - `start`: Leading content, usually an icon or an avatar.
+   * - `supporting`: Secondary text under the label.
    *
    * ## CSS Parts
    *
@@ -39484,18 +40023,18 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the answer changes, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired when the answer changes, and cancelable.
    * - `helix-filter`: Fired before the list narrows, and cancelable.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, and any groups of them.
-   * - `label`: Richer than a string.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string.
    *
    * ## Methods
    *
@@ -39596,9 +40135,9 @@ export type CustomElementsSolidJs = {
    * - `hint`: Help under the list.
    * - `items`: The list itself.
    * - `label`: The question, over the list.
+   * - `loading`: Shown while the options are still on their way.
    * - `search`: The region holding the field that narrows the list.
    * - `search-field`: The field itself.
-   * - `loading`: Shown while the options are still on their way.
    */
   "helix-headless-listbox": Partial<
     HelixHeadlessListboxProps &
@@ -39668,10 +40207,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
    * - `indicator`: The arc that turns.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `svg`: The rotating circle pair.
+   * - `track`: The full circle behind the indicator.
    */
   "helix-headless-loader": Partial<
     HelixHeadlessLoaderProps &
@@ -39820,8 +40359,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -39855,8 +40394,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `trigger`: The default trigger, where none was slotted.
    * - `surface`: The floating panel, which is what opens.
+   * - `trigger`: The default trigger, where none was slotted.
    */
   "helix-headless-megamenu": Partial<
     HelixHeadlessMegamenuProps &
@@ -40013,8 +40552,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row, which is an `<a>` where `href` is set.
+   * - `mark`: The trailing mark: a tick when checked, a caret when it opens. a page. One column, because a row is never both.
    * - `start`: The leading column, which is a slot and is always there.
-   * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-headless-menu-item": Partial<
     HelixHeadlessMenuItemProps &
@@ -40045,7 +40584,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
@@ -40109,8 +40650,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-select`: Fired when an item is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
@@ -40143,11 +40684,11 @@ export type CustomElementsSolidJs = {
    *
    * - `back`: The control that returns from a submenu.
    * - `back-mark`: The glyph on the back control of a submenu.
+   * - `empty`: Shown when there are no items to show.
    * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `loading`: Shown while the items are still on their way.
    * - `surface`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
-   * - `empty`: Shown when there are no items to show.
-   * - `loading`: Shown while the items are still on their way.
    */
   "helix-headless-menu": Partial<
     HelixHeadlessMenuProps &
@@ -40198,9 +40739,15 @@ export type CustomElementsSolidJs = {
    * takes and what a consumer writing `value="72"` means. A range of zero to one
    * is a fraction, and a component that reads `value="72"` as seventy-two times
    * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: Where the reading sits between `min` and `max`. Outside them, it clamps.
-   * - `low`: Top of the low band. Absent leaves the range unbanded.
-   * - `high`: Bottom of the high band. Absent leaves the range unbanded.
+   * - `value`: Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
+   * - `low`: Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   * - `high`: Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
    * - `optimum`: Where in the range it is best to be.
    *
    * Defaults to the middle of whatever bands are declared, which is the
@@ -40292,10 +40839,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The whole range, or the drawing in `ring` and `arc`.
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
+   * - `track`: The whole range, or the drawing in `ring` and `arc`.
    * - `value`: The reading, under `show-value`.
    */
   "helix-headless-meter": Partial<
@@ -40362,8 +40909,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `indicator`: The marker that travels to the current destination.
+   * - `nav`: The navigation landmark.
    */
   "helix-headless-navigation": Partial<
     HelixHeadlessNavigationProps &
@@ -40425,7 +40972,9 @@ export type CustomElementsSolidJs = {
    * one.
    * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
    * - `dismissible`: Whether a reader may remove it.
-   * - `locale`: Locale for the timestamp. Empty is the runtime's own.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
    * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -40456,17 +41005,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
    * - `helix-dismiss`: Fired when a reader asks to remove it, and cancelable.
+   * - `helix-read`: Fired when the item is marked read or unread, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: What happened, in the consumer's own markup.
+   * - `actions`: What a reader can do about it.
    * - `caption`: A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`.
    * - `media`: An avatar or icon identifying who or what it came from.
-   * - `actions`: What a reader can do about it.
    *
    * ## Methods
    *
@@ -40482,16 +41031,16 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The whole notification.
-   * - `media`: The leading slot's box.
-   * - `body`: The label and the caption together.
-   * - `label`: What happened, on the first line.
-   * - `trailing`: The column holding the time and the controls.
-   * - `time`: When it happened, read the way a person reads one.
-   * - `controls`: The actions and the dismiss, which replace the time.
    * - `actions`: The trailing slot's box.
+   * - `body`: The label and the caption together.
+   * - `controls`: The actions and the dismiss, which replace the time.
    * - `dismiss`: The control that removes it.
    * - `dismiss-mark`: The glyph on that control, where none is slotted.
+   * - `item`: The whole notification.
+   * - `label`: What happened, on the first line.
+   * - `media`: The leading slot's box.
+   * - `time`: When it happened, read the way a person reads one.
+   * - `trailing`: The column holding the time and the controls.
    */
   "helix-headless-notification": Partial<
     HelixHeadlessNotificationProps &
@@ -40586,8 +41135,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The notifications, as `helix-notification` children.
-   * - `header`: Above the list, for a title and the mark-all control.
    * - `footer`: Below the list, for a link to everything.
+   * - `header`: Above the list, for a title and the mark-all control.
    *
    * ## Methods
    *
@@ -40604,12 +41153,12 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `empty`: Shown when there is nothing in the feed.
+   * - `footer`: The region below the list.
    * - `header`: The region above the list.
    * - `list`: The list itself.
-   * - `footer`: The region below the list.
-   * - `mark-all`: The control that marks everything read.
-   * - `empty`: Shown when there is nothing in the feed.
    * - `loading`: Shown while the feed is still on its way.
+   * - `mark-all`: The control that marks everything read.
    */
   "helix-headless-notifications": Partial<
     HelixHeadlessNotificationsProps &
@@ -40664,15 +41213,21 @@ export type CustomElementsSolidJs = {
    * lets autofill work at all. This used to be hardcoded `off`, so a reader
    * could never have a birthday or a postal code filled in for them and a
    * consumer had no way to ask for it. See 295.
-   * - `min`: Smallest value the reader may reach. Absent has no floor.
-   * - `max`: Largest value the reader may reach. Absent has no ceiling.
+   * - `min`: Smallest value the reader may reach.
+   *
+   * Absent has no floor.
+   * - `max`: Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
    * - `step`: How far one step moves.
    * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
    *
    * Ten steps, which is the convention every spinner on the platform follows,
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
    *
@@ -40765,16 +41320,16 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the field once the reader has finished.
    * - `helix-before-change`: Fired as the value changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: Before the number, for a unit or an icon.
    * - `end`: After it.
+   * - `start`: Before the number, for a unit or an icon.
    *
    * ## Methods
    *
@@ -40847,12 +41402,12 @@ export type CustomElementsSolidJs = {
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
    * - `decrement-mark`: The glyph on the step down control.
+   * - `feedback`: What is wrong with it.
    * - `field`: The box holding everything.
+   * - `hint`: Help under the field, while nothing is wrong.
    * - `increment`: The control that steps up.
    * - `increment-mark`: The glyph on the step up control.
    * - `label`: The name over the field, which is also the scrub grip.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-number-input": Partial<
     HelixHeadlessNumberInputProps &
@@ -40911,8 +41466,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The heading.
    * - `items`: The run itself.
+   * - `label`: The heading.
    */
   "helix-headless-option-group": Partial<
     HelixHeadlessOptionGroupProps &
@@ -40965,8 +41520,12 @@ export type CustomElementsSolidJs = {
    *
    * It does not reflect, per the rule that payload state stays off the host: a
    * string is not a fact a selector needs.
-   * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
-   * - `selected`: Whether this choice is currently chosen. Written by the listbox.
+   * - `data-active`/`active`: Whether this is the option the keyboard is on.
+   *
+   * Written by the listbox.
+   * - `selected`: Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
    * - `label`: A shorter name for this choice, for where the row does not fit.
    *
    * `<option label>`'s own meaning: the text a chooser shows when it has less
@@ -41070,8 +41629,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this choice.
-   * - `start`: Before the words, for an icon or an avatar.
    * - `end`: After them, for a shortcut or a count.
+   * - `start`: Before the words, for an icon or an avatar.
    *
    * ## Methods
    *
@@ -41083,10 +41642,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The row.
-   * - `text`: The words and the caption under them, as one column.
-   * - `label`: The words.
    * - `description`: The caption under the words, when there is one.
+   * - `item`: The row.
+   * - `label`: The words.
+   * - `text`: The words and the caption under them, as one column.
    */
   "helix-headless-option": Partial<
     HelixHeadlessOptionProps &
@@ -41207,8 +41766,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `nav`: The navigation landmark.
    * - `indicator`: The mark that travels to the section being read.
+   * - `nav`: The navigation landmark.
    */
   "helix-headless-outline": Partial<
     HelixHeadlessOutlineProps &
@@ -41409,9 +41968,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `first-icon`: The glyph on the jump-to-first control, usually a double caret.
-   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
-   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
    * - `last-icon`: The glyph on the jump-to-last control, usually a double caret.
+   * - `next-icon`: The glyph on the forward-one-page control, usually a caret.
+   * - `previous-icon`: The glyph on the back-one-page control, usually a caret.
    *
    * ## CSS Parts
    *
@@ -41490,7 +42049,9 @@ export type CustomElementsSolidJs = {
    * `Pagination.page` and the calendar's `month`.
    * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
-   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `locale`: Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -41594,7 +42155,9 @@ export type CustomElementsSolidJs = {
    * of the element, so calling it `label` put one word on three jobs inside one
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
-   * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   * - `locale`: Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -41771,10 +42334,10 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `change`: Announced with it, a filled code being the commit.
+   * - `change`: Announced with a filled code, and when an edited one loses focus.
    * - `helix-before-change`: Fired as the code changes, and cancelable.
-   * - `input`: Announced once the value has moved.
    * - `helix-complete`: Fired when the last box is filled.
+   * - `input`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -41838,11 +42401,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row of boxes.
    * - `cell`: One box.
-   * - `label`: The question, over the boxes.
-   * - `hint`: Help under the boxes, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The row of boxes.
+   * - `hint`: Help under the boxes, while nothing is wrong.
+   * - `label`: The question, over the boxes.
    */
   "helix-headless-pin-input": Partial<
     HelixHeadlessPinInputProps &
@@ -41879,7 +42442,9 @@ export type CustomElementsSolidJs = {
    *
    * - `label`: Accessible name for the panel.
    * - `offset`: Space between the trigger and the panel, in pixels.
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -41933,16 +42498,16 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: What opens it.
    * - `(default)`: The contents of the panel.
+   * - `trigger`: What opens it.
    *
    * ## Methods
    *
@@ -42089,9 +42654,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The full length the work is measured against.
-   * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
+   * - `indicator`: The part of it that is done.
+   * - `track`: The full length the work is measured against.
    * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-headless-progress": Partial<
@@ -42187,9 +42752,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `code`: The square itself.
-   * - `modules`: Everything but the three corner squares.
    * - `finders`: The three corner squares, which can take their own color.
    * - `logo`: The box holding the center mark.
+   * - `modules`: Everything but the three corner squares.
    */
   "helix-headless-qr-code": Partial<
     HelixHeadlessQrCodeProps &
@@ -42365,17 +42930,17 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the answer changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The radios.
-   * - `label`: Richer than a string, where the question is more than one.
    * - `hint`: Richer than a string.
+   * - `label`: Richer than a string, where the question is more than one.
    *
    * ## Methods
    *
@@ -42437,10 +43002,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the set.
-   * - `items`: The choices, which is what `orientation` lays out.
-   * - `hint`: Help under the set.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the set.
+   * - `items`: The choices, which is what `orientation` lays out.
+   * - `label`: The question, over the set.
    */
   "helix-headless-radio-group": Partial<
     HelixHeadlessRadioGroupProps &
@@ -42470,7 +43035,9 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `disabled`: Whether this choice can be made.
-   * - `selected`: Whether this is the current choice. Written by the group.
+   * - `selected`: Whether this is the current choice.
+   *
+   * Written by the group.
    * - `value`: Identifies this choice to the group, and is what the form submits.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
@@ -42534,10 +43101,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The button, which is the whole row.
    * - `box`: The circle.
-   * - `mark`: The dot inside it.
+   * - `item`: The button, which is the whole row.
    * - `label`: The words beside it.
+   * - `mark`: The dot inside it.
    */
   "helix-headless-radio": Partial<
     HelixHeadlessRadioProps &
@@ -42702,9 +43269,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced with it, the choice being the commit.
    * - `helix-before-change`: Fired before the score changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced with it, the choice being the commit.
    *
    * ## Methods
    *
@@ -42775,15 +43342,15 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marks`: The row of marks.
-   * - `track`: The unfilled marks.
-   * - `fill`: The filled marks, clipped to the score.
-   * - `mark`: One mark, in either layer.
-   * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`.
-   * - `label`: The question, over the marks.
-   * - `hint`: Help under the marks, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `fill`: The filled marks, clipped to the score.
+   * - `hint`: Help under the marks, while nothing is wrong.
+   * - `label`: The question, over the marks.
+   * - `mark`: One mark, in either layer.
+   * - `marks`: The row of marks.
+   * - `option`: One place a reader can press, which is one step.
+   * - `track`: The unfilled marks.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-headless-rating": Partial<
     HelixHeadlessRatingProps &
@@ -42868,8 +43435,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `viewport`: The scrolling box.
    * - `edges`: Where the sideways edge cues are drawn.
+   * - `viewport`: The scrolling box.
    */
   "helix-headless-scroll-area": Partial<
     HelixHeadlessScrollAreaProps &
@@ -43020,11 +43587,11 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Relayed from the listbox when the answer changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Relayed from the listbox when the answer changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -43032,11 +43599,11 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The options, and any groups of them.
-   * - `start`: Before the chosen value, for an icon or a prefix.
    * - `end`: After it, for a count, a unit, or a clear button.
+   * - `hint`: Richer than a string.
    * - `indicator`: The mark on the trigger saying this opens, usually a caret.
    * - `label`: Richer than a string.
-   * - `hint`: Richer than a string.
+   * - `start`: Before the chosen value, for an icon or a prefix.
    *
    * ## Methods
    *
@@ -43107,14 +43674,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the trigger.
-   * - `value`: The chosen option's text inside the trigger.
-   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
-   * - `trigger`: The closed control, which says what is chosen.
-   * - `surface`: The floating panel.
-   * - `listbox`: The list inside it.
-   * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the trigger.
+   * - `indicator`: The caret saying the control opens. Replaced by slotting one.
+   * - `label`: The question, over the trigger.
+   * - `listbox`: The list inside it.
    * - `listbox-empty`: Shown when a filter has hidden everything.
    * - `listbox-feedback`: What is wrong with it.
    * - `listbox-filter-icon`: The mark beside that field.
@@ -43122,9 +43686,12 @@ export type CustomElementsSolidJs = {
    * - `listbox-hint`: Help under the list.
    * - `listbox-items`: The list itself.
    * - `listbox-label`: The question, over the list.
+   * - `listbox-loading`: Shown while the options are still on their way.
    * - `listbox-search`: The region holding the field that narrows the list.
    * - `listbox-search-field`: The field itself.
-   * - `listbox-loading`: Shown while the options are still on their way.
+   * - `surface`: The floating panel.
+   * - `trigger`: The closed control, which says what is chosen.
+   * - `value`: The chosen option's text inside the trigger.
    */
   "helix-headless-select": Partial<
     HelixHeadlessSelectProps &
@@ -43342,9 +43909,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed once the reader has let go.
    * - `helix-before-change`: Fired as the value changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
    *
@@ -43415,15 +43982,15 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row: the control and its readout.
    * - `control`: The range input.
-   * - `markers`: The row of marks along the track.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The row: the control and its readout.
+   * - `hint`: Help under the track, while nothing is wrong.
+   * - `label`: The question, over the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
+   * - `markers`: The row of marks along the track.
    * - `output`: The current value, shown beside it.
-   * - `label`: The question, over the track.
-   * - `hint`: Help under the track, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
    */
   "helix-headless-slider": Partial<
     HelixHeadlessSliderProps &
@@ -43660,8 +44227,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The control.
    * - `icon`: The mark's box.
+   * - `item`: The control.
    * - `label`: The name beside it.
    */
   "helix-headless-speed-dial-item": Partial<
@@ -43757,8 +44324,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `helix-before-close`: Fired before it closes, and cancelable.
+   * - `helix-before-open`: Fired before it opens, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -43786,9 +44353,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `actions`: The region the actions are drawn in.
    * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
-   * - `actions`: The region the actions are drawn in.
    */
   "helix-headless-speed-dial": Partial<
     HelixHeadlessSpeedDialProps &
@@ -44002,15 +44569,15 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
    * - `helix-before-collapse`: Fired before a pane shuts or reopens, and cancelable.
+   * - `helix-before-resize`: Fired before the divider settles, and cancelable.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `start`: The pane before the divider.
    * - `end`: The pane after it.
+   * - `start`: The pane before the divider.
    *
    * ## Methods
    *
@@ -44042,10 +44609,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `start`: The box holding the first pane.
+   * - `corner`: The handle where two dividers cross, added on the client.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client.
+   * - `start`: The box holding the first pane.
    */
   "helix-headless-splitter": Partial<
     HelixHeadlessSplitterProps &
@@ -44254,7 +44821,9 @@ export type CustomElementsSolidJs = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -44405,9 +44974,9 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The step's name.
+   * - `content`: What the stage holds, shown while it is the current one.
    * - `description`: A line under the name, for what the stage is for.
    * - `marker`: Replaces the number, or the check a complete step shows.
-   * - `content`: What the stage holds, shown while it is the current one.
    *
    * ## Methods
    *
@@ -44423,11 +44992,11 @@ export type CustomElementsSolidJs = {
    * - `content`: What the stage holds, while it is open.
    * - `description`: The line under it.
    * - `label`: The step's name, which is a `helix-button`.
+   * - `label-button`: The inner control.
    * - `lead`: The half line arriving from the step before.
    * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
    * - `marker`: The shape carrying the number or the check.
    * - `trail`: The half line running on to the next.
-   * - `label-button`: The inner control.
    */
   "helix-headless-step": Partial<
     HelixHeadlessStepProps &
@@ -44532,9 +45101,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the input once the state has changed.
    * - `helix-before-toggle`: Fired before the state changes, and cancelable.
    * - `input`: Announced once the state has moved.
-   * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
    *
@@ -44608,13 +45177,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The row: the track and its label.
-   * - `track`: The groove the thumb travels in.
    * - `control`: The input.
-   * - `thumb`: The part that moves.
-   * - `label`: The words beside it.
-   * - `hint`: Help under the control, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The row: the track and its label.
+   * - `hint`: Help under the control, while nothing is wrong.
+   * - `label`: The words beside it.
+   * - `thumb`: The part that moves.
+   * - `track`: The groove the thumb travels in.
    */
   "helix-headless-switch": Partial<
     HelixHeadlessSwitchProps &
@@ -44910,10 +45479,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
-   * - `table`: The grid.
    * - `empty`: Shown when there are no rows to show.
+   * - `head`: The row the column headings sit in. `display: contents`, so it takes no space.
    * - `loading`: Shown while the rows are still on their way.
+   * - `table`: The grid.
    */
   "helix-headless-table": Partial<
     HelixHeadlessTableProps &
@@ -45095,7 +45664,9 @@ export type CustomElementsSolidJs = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -45153,8 +45724,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `indicator`: The mark that travels to the selected tab.
-   * - `tabs`: The tab list.
    * - `panels`: The panel container.
+   * - `tabs`: The tab list.
    */
   "helix-headless-tabs": Partial<
     HelixHeadlessTabsProps &
@@ -45291,8 +45862,8 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `prefix`: A category the label belongs to, set before it and weightier.
    * - `(default)`: The tag's label.
+   * - `prefix`: A category the label belongs to, set before it and weightier.
    *
    * ## Methods
    *
@@ -45340,7 +45911,9 @@ export type CustomElementsSolidJs = {
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
@@ -45358,7 +45931,8 @@ export type CustomElementsSolidJs = {
    * no form at all and forwarding the attribute would have looked right and
    * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
    * element sends two entries, and that is what this does.
-   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with it.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -45457,9 +46031,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Relayed from the textarea once the reader has finished.
    * - `helix-before-change`: Fired as the text changes, and cancelable.
    * - `input`: Announced once the value has moved.
-   * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
    *
@@ -45529,11 +46103,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the control.
    * - `control`: The textarea itself.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
    * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the control.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    */
   "helix-headless-textarea": Partial<
     HelixHeadlessTextareaProps &
@@ -45603,7 +46177,9 @@ export type CustomElementsSolidJs = {
    * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
    * swaps to the value while the caret is in it either way, so the rendering is
    * never something this element would refuse to read back.
-   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
    * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
@@ -45725,20 +46301,20 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired when the time changes.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
-   * - `helix-before-open`: Fired when the list opens.
+   * - `helix-before-change`: Fired when the time changes.
    * - `helix-before-close`: Fired when it closes.
+   * - `helix-before-open`: Fired when the list opens.
+   * - `input`: Announced once the value has moved.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `trigger`: The mark on the field saying a list opens.
-   * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the field.
+   * - `trigger`: The mark on the field saying a list opens.
    *
    * ## Methods
    *
@@ -45803,21 +46379,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
-   * - `time`: One held time, as a tag, in `multiple`.
-   * - `rest`: How many times are held beyond the ones shown.
-   * - `trigger`: The control that opens the list.
-   * - `trigger-icon`: The mark on the button that opens the clock.
-   * - `surface`: The floating panel.
+   * - `feedback`: What is wrong with it.
+   * - `field`: The box holding the text and the trigger.
+   * - `hint`: Help under the field, while nothing is wrong.
+   * - `label`: The question, over the field.
    * - `picker`: The list inside it.
    * - `picker-column`: One of them.
-   * - `picker-columns`: The row of columns, in `wheels`.
-   * - `picker-list`: The listbox holding the times, in `list`.
-   * - `picker-option`: One time in it. Carries `data-between` inside a range.
-   * - `time-dismiss`: The remove button, when `dismissible`.
-   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
-   * - `time-prefix`: The category before the label.
    * - `picker-column-empty`: Shown when a filter has hidden everything.
    * - `picker-column-feedback`: What is wrong with it.
    * - `picker-column-filter-icon`: The mark beside that field.
@@ -45825,8 +46393,11 @@ export type CustomElementsSolidJs = {
    * - `picker-column-hint`: Help under the list.
    * - `picker-column-items`: The list itself.
    * - `picker-column-label`: The question, over the list.
+   * - `picker-column-loading`: Shown while the options are still on their way.
    * - `picker-column-search`: The region holding the field that narrows the list.
    * - `picker-column-search-field`: The field itself.
+   * - `picker-columns`: The row of columns, in `wheels`.
+   * - `picker-list`: The listbox holding the times, in `list`.
    * - `picker-list-empty`: Shown when a filter has hidden everything.
    * - `picker-list-feedback`: What is wrong with it.
    * - `picker-list-filter-icon`: The mark beside that field.
@@ -45834,17 +46405,22 @@ export type CustomElementsSolidJs = {
    * - `picker-list-hint`: Help under the list.
    * - `picker-list-items`: The list itself.
    * - `picker-list-label`: The question, over the list.
+   * - `picker-list-loading`: Shown while the options are still on their way.
    * - `picker-list-search`: The region holding the field that narrows the list.
    * - `picker-list-search-field`: The field itself.
+   * - `picker-option`: One time in it. Carries `data-between` inside a range.
    * - `picker-option-description`: The caption under the words, when there is one.
    * - `picker-option-item`: The row.
    * - `picker-option-label`: The words.
    * - `picker-option-text`: The words and the caption, as one column.
-   * - `label`: The question, over the field.
-   * - `hint`: Help under the field, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
-   * - `picker-column-loading`: Shown while the options are still on their way.
-   * - `picker-list-loading`: Shown while the options are still on their way.
+   * - `rest`: How many times are held beyond the ones shown.
+   * - `surface`: The floating panel.
+   * - `time`: One held time, as a tag, in `multiple`.
+   * - `time-dismiss`: The remove button, when `dismissible`.
+   * - `time-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `time-prefix`: The category before the label.
+   * - `trigger`: The control that opens the list.
+   * - `trigger-icon`: The mark on the button that opens the clock.
    */
   "helix-headless-time-input": Partial<
     HelixHeadlessTimeInputProps &
@@ -45902,7 +46478,9 @@ export type CustomElementsSolidJs = {
    * A time not on the step is simply never offered, so it is not an error to
    * name one, and naming every time in the list is how the empty state is
    * reached honestly rather than by handing over an empty range.
-   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.
    *
@@ -46037,9 +46615,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `change`: Announced once the value has moved.
    * - `helix-before-change`: Fired when the time changes.
    * - `input`: Announced once the value has moved.
-   * - `change`: Announced once the value has moved.
    *
    * ## Methods
    *
@@ -46112,10 +46690,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The listbox holding the times, in `list`.
-   * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
-   * - `option`: One time in it. Carries `data-between` inside a range.
    * - `column-empty`: Shown when a filter has hidden everything.
    * - `column-feedback`: What is wrong with it.
    * - `column-filter-icon`: The mark beside that field.
@@ -46123,8 +46698,11 @@ export type CustomElementsSolidJs = {
    * - `column-hint`: Help under the list.
    * - `column-items`: The list itself.
    * - `column-label`: The question, over the list.
+   * - `column-loading`: Shown while the options are still on their way.
    * - `column-search`: The region holding the field that narrows the list.
    * - `column-search-field`: The field itself.
+   * - `columns`: The row of columns, in `wheels`.
+   * - `list`: The listbox holding the times, in `list`.
    * - `list-empty`: Shown when a filter has hidden everything.
    * - `list-feedback`: What is wrong with it.
    * - `list-filter-icon`: The mark beside that field.
@@ -46132,14 +46710,14 @@ export type CustomElementsSolidJs = {
    * - `list-hint`: Help under the list.
    * - `list-items`: The list itself.
    * - `list-label`: The question, over the list.
+   * - `list-loading`: Shown while the options are still on their way.
    * - `list-search`: The region holding the field that narrows the list.
    * - `list-search-field`: The field itself.
+   * - `option`: One time in it. Carries `data-between` inside a range.
    * - `option-description`: The caption under the words, when there is one.
    * - `option-item`: The row.
    * - `option-label`: The words.
    * - `option-text`: The words and the caption, as one column.
-   * - `column-loading`: Shown while the options are still on their way.
-   * - `list-loading`: Shown while the options are still on their way.
    */
   "helix-headless-time-picker": Partial<
     HelixHeadlessTimePickerProps &
@@ -46212,8 +46790,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `connector`: The line arriving at this entry.
-   * - `dot`: The mark drawn where nothing was slotted for one.
    * - `content`: What happened, and the time above it.
+   * - `dot`: The mark drawn where nothing was slotted for one.
    * - `marker`: The mark on the line.
    * - `rail`: The column holding the mark and the line.
    * - `time`: When it happened.
@@ -46410,8 +46988,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The message.
    * - `actions`: What to do about it, usually a button or a link.
-   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    * - `dismiss-icon`: Replaces the glyph inside the dismiss control.
+   * - `icon`: Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for.
    *
    * ## Methods
    *
@@ -46665,10 +47243,10 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
-   * - `input`: Announced once the value has moved.
    * - `change`: Announced once the value has moved.
+   * - `helix-before-change`: Fired before the answer moves, and cancelable. The only way to refuse one.
    * - `helix-select`: Fired when an item is chosen. Dispatched by the item and listened for here.
+   * - `input`: Announced once the value has moved.
    *
    * ## Slots
    *
@@ -46736,13 +47314,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `row`: The line the track sits on, with whatever flanks it.
-   * - `track`: The bar the items sit in.
    * - `divider`: The rule after an inline label, separating it from the items.
+   * - `feedback`: What is wrong with it.
+   * - `hint`: Help under the row, while nothing is wrong.
    * - `indicator`: The moving marker behind the selected item.
    * - `label`: The question, over the row.
-   * - `hint`: Help under the row, while nothing is wrong.
-   * - `feedback`: What is wrong with it.
+   * - `row`: The line the track sits on, with whatever flanks it.
+   * - `track`: The bar the items sit in.
    */
   "helix-headless-toggle-group": Partial<
     HelixHeadlessToggleGroupProps &
@@ -46988,7 +47566,9 @@ export type CustomElementsSolidJs = {
    * through as attributes. Both paths reach the same place through Lit, so
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
-   * - `placement`: Preferred side. It moves if that side does not fit.
+   * - `placement`: Preferred side.
+   *
+   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
@@ -47084,8 +47664,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
    * - `helix-before-close`: Fired before it hides, and cancelable.
+   * - `helix-before-open`: Fired before the bubble shows, and cancelable.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -47230,8 +47810,8 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-before-activate`: Fired when the current stop moves, carrying the new index.
-   * - `helix-complete`: Fired when the last stop is finished.
    * - `helix-before-close`: Fired when the reader leaves early.
+   * - `helix-complete`: Fired when the last stop is finished.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -47358,15 +47938,15 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `bubble`: The panel that points at the target.
-   * - `arrow`: The point, which the floating pass places against the target.
-   * - `content`: The region holding the slotted content.
    * - `actions`: The row the controls sit in.
+   * - `arrow`: The point, which the floating pass places against the target.
    * - `back`: The control that goes to the previous stop.
-   * - `next`: The control that goes on, and finishes on the last stop.
-   * - `skip`: The control that leaves the tour.
    * - `back-button`: The inner control.
+   * - `bubble`: The panel that points at the target.
+   * - `content`: The region holding the slotted content.
+   * - `next`: The control that goes on, and finishes on the last stop.
    * - `next-button`: The inner control.
+   * - `skip`: The control that leaves the tour.
    * - `skip-button`: The inner control.
    */
   "helix-headless-tour-stop": Partial<
@@ -47508,9 +48088,9 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-select`: Fired when the item is chosen.
-   * - `helix-before-open`: Fired before a branch opens, and cancelable.
    * - `helix-before-close`: Fired before a branch closes, and cancelable.
+   * - `helix-before-open`: Fired before a branch opens, and cancelable.
+   * - `helix-select`: Fired when the item is chosen.
    * - `toggle`: Says the state moved, carrying `newState` and `oldState`.
    *
    * ## Slots
@@ -47519,8 +48099,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The item's label.
    * - `children`: Nested items, which make this a branch.
-   * - `start`: Before the label, after the chevron. A mark about the item.
    * - `end`: After the label, at the row's far side. A count, or a state.
+   * - `start`: Before the label, after the chevron. A mark about the item.
    *
    * ## Methods
    *
@@ -47559,11 +48139,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `group`: The container for nested items.
    * - `item`: The node, and the focus target unless `href` moves it to the row.
+   * - `label`: The label text.
    * - `row`: The clickable label row, which is an `<a>` where `href` is set.
    * - `toggle`: The expand and collapse control.
-   * - `label`: The label text.
-   * - `group`: The container for nested items.
    */
   "helix-headless-tree-item": Partial<
     HelixHeadlessTreeItemProps &
@@ -47606,7 +48186,9 @@ export type CustomElementsSolidJs = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -47662,9 +48244,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tree`: The tree container.
    * - `empty`: Shown when there are no rows to show.
    * - `loading`: Shown while the rows are still on their way.
+   * - `tree`: The tree container.
    */
   "helix-headless-tree": Partial<
     HelixHeadlessTreeProps &
@@ -47851,9 +48433,9 @@ export type CustomElementsSolidJs = {
    *
    * - `container`: The `listitem`, which the button sits in.
    * - `item`: The row, which is a button.
+   * - `label`: The name and whatever follows it.
    * - `media`: The leading column.
    * - `thumbnail`: The image `poster` falls back to.
-   * - `label`: The name and whatever follows it.
    */
   "helix-headless-video-playlist-item": Partial<
     HelixHeadlessVideoPlaylistItemProps &
@@ -47949,20 +48531,20 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
-   * - `icon`: The glyph on the trigger.
-   * - `poster`: An entry's still, where it has one.
-   * - `menu`: The menu that holds the entries.
-   * - `trigger`: The button that opens it.
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
    * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
    * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `icon`: The glyph on the trigger.
+   * - `menu`: The menu that holds the entries.
    * - `menu-back`: The control that returns from a submenu.
    * - `menu-back-mark`: The glyph on the back control of a submenu.
-   * - `menu-header`: The bar above a submenu, holding the way back and its name.
-   * - `menu-title`: The name of the submenu that is showing.
-   * - `menu-surface`: The floating panel the menu is drawn on.
    * - `menu-empty`: Shown when there are no items to show.
+   * - `menu-header`: The bar above a submenu, holding the way back and its name.
    * - `menu-loading`: Shown while the items are still on their way.
+   * - `menu-surface`: The floating panel the menu is drawn on.
+   * - `menu-title`: The name of the submenu that is showing.
+   * - `poster`: An entry's still, where it has one.
+   * - `trigger`: The button that opens it.
    */
   "helix-headless-video-playlist-menu": Partial<
     HelixHeadlessVideoPlaylistMenuProps &
@@ -48013,7 +48595,9 @@ export type CustomElementsSolidJs = {
    * real item; writing hands ownership to the consumer, so `<helix-tabs
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
-   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
+   *
+   * Ignored once `active` is written.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -48069,8 +48653,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `player`: The region holding the player.
    * - `items`: The list of entries.
+   * - `player`: The region holding the player.
    */
   "helix-headless-video-playlist": Partial<
     HelixHeadlessVideoPlaylistProps &
@@ -48168,7 +48752,8 @@ export type CustomElementsSolidJs = {
    * the browser's policy and not this element's, and `play()` already swallows
    * the refusal: what follows a refused autoplay is a paused player showing its
    * start control, which is the correct thing to be looking at.
-   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can be read.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
+   * be read.
    * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
    * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
@@ -48310,11 +48895,11 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `ended`: Relayed for the same reason.
    * - `helix-next`: Fired when the reader asks for the next item.
    * - `helix-previous`: Fired when they ask for the previous one.
-   * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason.
+   * - `play`: Relayed, because it does not cross a shadow boundary.
    *
    * ## Slots
    *
@@ -48351,54 +48936,54 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `icon`: A glyph this component draws.
-   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
-   * - `video`: The video itself.
-   * - `poster`: What covers it before it plays.
    * - `back`: The region top left, for a way out of a set.
-   * - `failure`: What is said when the source will not play.
-   * - `loading`: What is said while the picture waits for more of itself.
-   * - `loading-mark`: The part of that which spins.
-   * - `cue`: The caption on screen now, drawn by this element.
-   * - `controls`: The bar along the bottom.
-   * - `play`: Play and pause.
-   * - `scrubber`: Where it is, and where to go.
-   * - `time`: The position and the duration.
-   * - `sound`: The speaker and its level, which are one control.
-   * - `mute`: Sound on and off.
-   * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
    * - `captions-menu`: The language menu, where there is more than one.
-   * - `rewind`: The control that goes back ten seconds.
-   * - `forward`: The control that goes on ten seconds.
-   * - `remote`: Play on another device, where one is available.
-   * - `speed`: Playback speed, where it was asked for.
-   * - `pip`: Picture in picture, where it was asked for and exists.
-   * - `start`: The mark over the picture before anything has played.
-   * - `next`: Asks for the next item, where it was asked for.
-   * - `previous`: Asks for the previous one.
-   * - `download`: Saves the file, where it was asked for.
-   * - `overflow`: The menu holding the controls kept off the bar.
-   * - `more`: The button that opens it.
-   * - `fullscreen`: The whole screen, and back.
    * - `captions-menu-back`: The control that returns from a submenu.
    * - `captions-menu-back-mark`: The glyph on the back control of a submenu.
+   * - `captions-menu-empty`: Shown when there are no items to show.
    * - `captions-menu-header`: The bar above a submenu, holding the way back and its name.
+   * - `captions-menu-loading`: Shown while the items are still on their way.
+   * - `captions-menu-surface`: The floating panel the menu is drawn on.
    * - `captions-menu-title`: The name of the submenu that is showing.
+   * - `controls`: The bar along the bottom.
+   * - `cue`: The caption on screen now, drawn by this element.
+   * - `download`: Saves the file, where it was asked for.
    * - `entry`: One row in a menu this player opens.
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
-   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
+   * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens.
    * - `entry-start`: The leading column, which is a slot and is always there.
+   * - `failure`: What is said when the source will not play.
+   * - `forward`: The control that goes on ten seconds.
+   * - `fullscreen`: The whole screen, and back.
+   * - `icon`: A glyph this component draws.
+   * - `loading`: What is said while the picture waits for more of itself.
+   * - `loading-mark`: The part of that which spins.
+   * - `more`: The button that opens it.
+   * - `mute`: Sound on and off.
+   * - `next`: Asks for the next item, where it was asked for.
+   * - `overflow`: The menu holding the controls kept off the bar.
    * - `overflow-back`: The control that returns from a submenu.
    * - `overflow-back-mark`: The glyph on the back control of a submenu.
-   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
-   * - `overflow-title`: The name of the submenu that is showing.
-   * - `captions-menu-surface`: The floating panel the menu is drawn on.
-   * - `overflow-surface`: The floating panel the menu is drawn on.
-   * - `captions-menu-empty`: Shown when there are no items to show.
-   * - `captions-menu-loading`: Shown while the items are still on their way.
    * - `overflow-empty`: Shown when there are no items to show.
+   * - `overflow-header`: The bar above a submenu, holding the way back and its name.
    * - `overflow-loading`: Shown while the items are still on their way.
+   * - `overflow-surface`: The floating panel the menu is drawn on.
+   * - `overflow-title`: The name of the submenu that is showing.
+   * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `play`: Play and pause.
+   * - `poster`: What covers it before it plays.
+   * - `previous`: Asks for the previous one.
+   * - `remote`: Play on another device, where one is available.
+   * - `rewind`: The control that goes back ten seconds.
+   * - `scrubber`: Where it is, and where to go.
+   * - `sound`: The speaker and its level, which are one control.
+   * - `speed`: Playback speed, where it was asked for.
+   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
+   * - `start`: The mark over the picture before anything has played.
+   * - `time`: The position and the duration.
+   * - `video`: The video itself.
+   * - `volume`: How loud.
    */
   "helix-headless-video": Partial<
     HelixHeadlessVideoProps &
@@ -48514,12 +49099,12 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
-  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
-  "--chart-bar-wash"?: string;
   /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
   /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
+  "--chart-bar-wash"?: string;
   /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** The chosen brightness, 0 to 100, as a percentage. */
@@ -48536,32 +49121,18 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
+  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
+  "--heatmap-cell-height"?: string;
+  /** How far a cell's corners are rounded. */
+  "--heatmap-cell-radius"?: string;
   /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
   /** How wide a cell is. The strip fits as many as the container allows. */
   "--heatmap-cell-width"?: string;
-  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
-  "--heatmap-cell-height"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
-  /** How far a cell's corners are rounded. */
-  "--heatmap-cell-radius"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
-  /** What `success` is worth, as a name or a `data-tone`. */
-  "--heatmap-tone-success"?: string;
-  /** What `warning` is worth. */
-  "--heatmap-tone-warning"?: string;
-  /** What `danger` is worth. */
-  "--heatmap-tone-danger"?: string;
-  /** What `info` is worth. */
-  "--heatmap-tone-info"?: string;
-  /** What `accent` is worth. */
-  "--heatmap-tone-accent"?: string;
-  /** What `primary` is worth. */
-  "--heatmap-tone-primary"?: string;
-  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
-  "--heatmap-tone-muted"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
   "--heatmap-tone-1"?: string;
   /** The second step of the magnitude ramp. */
@@ -48572,6 +49143,20 @@ export type CustomCssProperties = {
   "--heatmap-tone-4"?: string;
   /** The loudest step of the magnitude ramp. */
   "--heatmap-tone-5"?: string;
+  /** What `accent` is worth. */
+  "--heatmap-tone-accent"?: string;
+  /** What `danger` is worth. */
+  "--heatmap-tone-danger"?: string;
+  /** What `info` is worth. */
+  "--heatmap-tone-info"?: string;
+  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
+  "--heatmap-tone-muted"?: string;
+  /** What `primary` is worth. */
+  "--heatmap-tone-primary"?: string;
+  /** What `success` is worth, as a name or a `data-tone`. */
+  "--heatmap-tone-success"?: string;
+  /** What `warning` is worth. */
+  "--heatmap-tone-warning"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Where a bound sits on the arc, as a length along it. */

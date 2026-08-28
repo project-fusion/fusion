@@ -62,11 +62,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The message.
  * @slot actions - What to do about it, usually a button or a link.
+ * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
  * @slot icon - Replaces the tone mark. Matches `Callout`, which is why the
  *   dismiss control's own glyph is `dismiss-icon` rather than this: two slots
  *   cannot share a name, assignment goes to whichever comes first in the tree,
  *   and the tone mark is the one a consumer reaches for.
- * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
+ *
+ * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
  *
  * @csspart actions - The region holding what to do about it.
  * @csspart content - The message.
@@ -76,8 +78,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart icon-mark - The tone glyph, where none is slotted.
  * @csspart item - The message's own surface.
  * @csspart timer - The bar showing how long is left, where a duration was given.
- *
- * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
  */

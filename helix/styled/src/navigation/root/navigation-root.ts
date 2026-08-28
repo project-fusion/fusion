@@ -18,8 +18,8 @@ import { styles } from './navigation-root.css.js'
  * @aliases Nav, NavList, Tabs
  * @documentation https://helix.fusion.dev/components/navigation
  *
- * @cssproperty --navigation-indicator-color - Fill of the traveling marker.
  * @cssproperty --navigation-gap - Space between destinations.
+ * @cssproperty --navigation-indicator-color - Fill of the traveling marker.
  */
 @customElement('helix-navigation')
 export class HelixNavigation extends HelixHeadlessNavigation {

@@ -23,8 +23,8 @@ import { styles } from './button-root.css.js'
  * @documentation https://helix.fusion.dev/components/button
  *
  * @slot - The button's label.
- * @slot start - Content before the label, usually an icon.
  * @slot end - Content after the label.
+ * @slot start - Content before the label, usually an icon.
  *
  * @csspart button - The inner control.
  *
@@ -33,12 +33,13 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-foreground-color - Label and icon color.
  * @cssproperty --button-inline-size - Width taken by `width="standard"`.
  * @cssproperty --button-radii - Corner radius of the control.
- * @cssproperty --button-radii-start - Leading corners, which a group flattens.
  * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
- * @cssproperty --button-radii-start-start - The top leading corner, for a group stacking down.
- * @cssproperty --button-radii-start-end - The top trailing corner, for a group stacking down.
- * @cssproperty --button-radii-end-start - The bottom leading corner, for a group stacking down.
  * @cssproperty --button-radii-end-end - The bottom trailing corner, for a group stacking down.
+ * @cssproperty --button-radii-end-start - The bottom leading corner, for a group stacking down.
+ * @cssproperty --button-radii-start - Leading corners, which a group flattens.
+ * @cssproperty --button-radii-start-end - The top trailing corner, for a group stacking down.
+ * @cssproperty --button-radii-start-start - The top leading corner, for a group stacking down.
+ * @cssproperty --button-size - Height of the control, for a container whose row is not one of the density steps.
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {

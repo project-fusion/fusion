@@ -44,10 +44,10 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter
  *
- * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of it the value fills.
  * @csspart tick - A mark at `low` or at `high`.
+ * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart value - The reading, under `show-value`.
  *
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
@@ -57,11 +57,15 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  */
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
-  /** Accessible name for the reading. */
+  /**
+   * Accessible name for the reading.
+   */
   @property()
   label = 'Meter'
 
-  /** Bottom of the range. */
+  /**
+   * Bottom of the range.
+   */
   @property({ type: Number })
   min = 0
 
@@ -76,15 +80,27 @@ export class HelixHeadlessMeter extends HelixElement {
   @property({ type: Number })
   max = 100
 
-  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
+  /**
+   * Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
+   */
   @property({ type: Number })
   value = 0
 
-  /** Top of the low band. Absent leaves the range unbanded. */
+  /**
+   * Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   */
   @property({ type: Number })
   low?: number
 
-  /** Bottom of the high band. Absent leaves the range unbanded. */
+  /**
+   * Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
+   */
   @property({ type: Number })
   high?: number
 
@@ -150,7 +166,9 @@ export class HelixHeadlessMeter extends HelixElement {
   @property({ reflect: true })
   shape?: 'arc' | 'ring'
 
-  /** Whether the reading is shown beside the bar. */
+  /**
+   * Whether the reading is shown beside the bar.
+   */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
 

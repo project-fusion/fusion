@@ -44,14 +44,14 @@ import { styles } from './meter-root.css.js'
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter
  *
- * @csspart track - The whole range.
  * @csspart indicator - The part of it the value fills.
  * @csspart tick - A mark at `low` or at `high`.
+ * @csspart track - The whole range.
  * @csspart value - The reading, under `show-value`.
  *
+ * @cssproperty --meter-color - The fill, overriding the band's own tone.
  * @cssproperty --meter-ring-size - Edge length of the drawing, in `ring` and `arc`.
  * @cssproperty --meter-ring-width - Thickness of the stroke there.
- * @cssproperty --meter-color - The fill, overriding the band's own tone.
  * @cssproperty --meter-size - How thick the bar is.
  * @cssproperty --meter-tick-color - The mark at a threshold.
  * @cssproperty --meter-track-color - The groove behind the fill.

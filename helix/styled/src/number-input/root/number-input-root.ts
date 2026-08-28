@@ -28,12 +28,12 @@ import { styles } from './number-input-root.css.js'
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://helix.fusion.dev/components/number-input
  *
- * @slot start - Before the number, for a unit or an icon.
  * @slot end - After it.
+ * @slot start - Before the number, for a unit or an icon.
  *
- * @csspart field - The box holding everything.
  * @csspart control - The field itself.
  * @csspart decrement - The control that steps down.
+ * @csspart field - The box holding everything.
  * @csspart increment - The control that steps up.
  */
 @customElement('helix-number-input')

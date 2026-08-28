@@ -97,7 +97,9 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
       this.requestUpdate('open', previous)
     }
 
-    /** Initial open state for uncontrolled use, where nothing declared one. */
+    /**
+     * Initial open state for uncontrolled use, where nothing declared one.
+     */
     @property({ attribute: 'default-open', type: Boolean })
     defaultOpen = false
 

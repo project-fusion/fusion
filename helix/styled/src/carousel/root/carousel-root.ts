@@ -22,11 +22,10 @@ import { styles } from './carousel-root.css.js'
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://helix.fusion.dev/components/carousel
  *
- *
- * @cssproperty --carousel-block-size - Height of a vertical track.
  * @cssproperty --carousel-bleed - Room inside the scroller so a slide's own shadow, border or
  * focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches
  * 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more.
+ * @cssproperty --carousel-block-size - Height of a vertical track.
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')

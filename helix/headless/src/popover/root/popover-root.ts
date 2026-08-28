@@ -42,27 +42,35 @@ import { property } from 'lit/decorators.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover
  *
- * @slot trigger - What opens it.
  * @slot - The contents of the panel.
+ * @slot trigger - What opens it.
+ *
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
- *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  */
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
-  /** Accessible name for the panel. */
+  /**
+   * Accessible name for the panel.
+   */
   @property()
   label = 'Popover'
 
-  /** Space between the trigger and the panel, in pixels. */
+  /**
+   * Space between the trigger and the panel, in pixels.
+   */
   @property({ type: Number })
   offset = 4
 
-  /** Preferred side. It moves if that side does not fit. */
+  /**
+   * Preferred side.
+   *
+   * It moves if that side does not fit.
+   */
   @property()
   placement: Placement = 'bottom-start'
 

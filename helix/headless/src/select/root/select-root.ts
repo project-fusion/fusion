@@ -40,27 +40,24 @@ import '../../listbox/index.js'
  * @documentation https://helix.fusion.dev/components/select
  *
  * @slot - The options, and any groups of them.
- * @slot start - Before the chosen value, for an icon or a prefix.
  * @slot end - After it, for a count, a unit, or a clear button.
+ * @slot hint - Richer than a string.
  * @slot indicator - The mark on the trigger saying this opens, usually a caret.
  * @slot label - Richer than a string.
- * @slot hint - Richer than a string.
+ * @slot start - Before the chosen value, for an icon or a prefix.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the answer changes.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the answer changes.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
- * @csspart label - The question, over the trigger.
- * @csspart value - The chosen option's text inside the trigger.
- * @csspart indicator - The caret saying the control opens. Replaced by slotting one.
- * @csspart trigger - The closed control, which says what is chosen.
- * @csspart surface - The floating panel.
- * @csspart listbox - The list inside it.
- * @csspart hint - Help under the trigger.
  * @csspart feedback - What is wrong with it.
+ * @csspart hint - Help under the trigger.
+ * @csspart indicator - The caret saying the control opens. Replaced by slotting one.
+ * @csspart label - The question, over the trigger.
+ * @csspart listbox - The list inside it.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
  * @csspart listbox-feedback - What is wrong with it.
  * @csspart listbox-filter-icon - The mark beside that field.
@@ -68,9 +65,12 @@ import '../../listbox/index.js'
  * @csspart listbox-hint - Help under the list.
  * @csspart listbox-items - The list itself.
  * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-loading - Shown while the options are still on their way.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
- * @csspart listbox-loading - Shown while the options are still on their way.
+ * @csspart surface - The floating panel.
+ * @csspart trigger - The closed control, which says what is chosen.
+ * @csspart value - The chosen option's text inside the trigger.
  */
 @customElement('helix-headless-select')
 export class HelixHeadlessSelect extends MixinControllerOpen(
@@ -98,19 +98,27 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   @property({ reflect: true, type: Boolean })
   loading = false
 
-  /** What the list says while they are on their way. */
+  /**
+   * What the list says while they are on their way.
+   */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
 
-  /** What it says where there are none. */
+  /**
+   * What it says where there are none.
+   */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
 
-  /** Whether more than one option can be the answer. */
+  /**
+   * Whether more than one option can be the answer.
+   */
   @property({ reflect: true, type: Boolean })
   multiple = false
 
-  /** Shown on the trigger while nothing is chosen. */
+  /**
+   * Shown on the trigger while nothing is chosen.
+   */
   @property()
   placeholder = 'Choose'
 

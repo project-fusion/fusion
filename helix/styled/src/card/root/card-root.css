@@ -10,7 +10,7 @@
      square-ish controls. Matching them makes the card recede, which is what a
      container should do. `--card-radii` is still there for a consumer who
      wants the older, rounder box. */
-  border-radius: var(--card-radii, var(--helix-radii-sm));
+  border-radius: var(--card-radii, var(--helix-radii-lg));
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. `elevated` sets it below, and the
      `data-card` recipe sets it on hover: one property, so a card cannot end up

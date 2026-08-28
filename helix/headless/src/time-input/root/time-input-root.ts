@@ -49,32 +49,24 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @aliases TimeField, InputTime
  * @documentation https://helix.fusion.dev/components/time-input
  *
- * @slot trigger - The mark on the field saying a list opens.
- * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
+ * @slot hint - Help under the field.
+ * @slot trigger - The mark on the field saying a list opens.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the time changes.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the list opens.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
- * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.
- * @csspart time - One held time, as a tag, in `multiple`.
- * @csspart rest - How many times are held beyond the ones shown.
- * @csspart trigger - The control that opens the list.
- * @csspart trigger-icon - The mark on the button that opens the clock.
- * @csspart surface - The floating panel.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The box holding the text and the trigger.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart label - The question, over the field.
  * @csspart picker - The list inside it.
  * @csspart picker-column - One of them.
- * @csspart picker-columns - The row of columns, in `wheels`.
- * @csspart picker-list - The listbox holding the times, in `list`.
- * @csspart picker-option - One time in it. Carries `data-between` inside a range.
- * @csspart time-dismiss - The remove button, when `dismissible`.
- * @csspart time-dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart time-prefix - The category before the label.
  * @csspart picker-column-empty - Shown when a filter has hidden everything.
  * @csspart picker-column-feedback - What is wrong with it.
  * @csspart picker-column-filter-icon - The mark beside that field.
@@ -82,8 +74,11 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-column-hint - Help under the list.
  * @csspart picker-column-items - The list itself.
  * @csspart picker-column-label - The question, over the list.
+ * @csspart picker-column-loading - Shown while the options are still on their way.
  * @csspart picker-column-search - The region holding the field that narrows the list.
  * @csspart picker-column-search-field - The field itself.
+ * @csspart picker-columns - The row of columns, in `wheels`.
+ * @csspart picker-list - The listbox holding the times, in `list`.
  * @csspart picker-list-empty - Shown when a filter has hidden everything.
  * @csspart picker-list-feedback - What is wrong with it.
  * @csspart picker-list-filter-icon - The mark beside that field.
@@ -91,17 +86,22 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-list-hint - Help under the list.
  * @csspart picker-list-items - The list itself.
  * @csspart picker-list-label - The question, over the list.
+ * @csspart picker-list-loading - Shown while the options are still on their way.
  * @csspart picker-list-search - The region holding the field that narrows the list.
  * @csspart picker-list-search-field - The field itself.
+ * @csspart picker-option - One time in it. Carries `data-between` inside a range.
  * @csspart picker-option-description - The caption under the words, when there is one.
  * @csspart picker-option-item - The row.
  * @csspart picker-option-label - The words.
  * @csspart picker-option-text - The words and the caption, as one column.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
- * @csspart picker-column-loading - Shown while the options are still on their way.
- * @csspart picker-list-loading - Shown while the options are still on their way.
+ * @csspart rest - How many times are held beyond the ones shown.
+ * @csspart surface - The floating panel.
+ * @csspart time - One held time, as a tag, in `multiple`.
+ * @csspart time-dismiss - The remove button, when `dismissible`.
+ * @csspart time-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart time-prefix - The category before the label.
+ * @csspart trigger - The control that opens the list.
+ * @csspart trigger-icon - The mark on the button that opens the clock.
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinControllerOpen(
@@ -157,15 +157,21 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   @property({ attribute: 'max-tags', type: Number })
   maxTags = 0
 
-  /** How far apart the offered times are, in minutes. */
+  /**
+   * How far apart the offered times are, in minutes.
+   */
   @property({ type: Number })
   step = 15
 
-  /** Earliest time that can be chosen, as `HH:mm`. */
+  /**
+   * Earliest time that can be chosen, as `HH:mm`.
+   */
   @property()
   min = '00:00'
 
-  /** Latest time that can be chosen, as `HH:mm`. */
+  /**
+   * Latest time that can be chosen, as `HH:mm`.
+   */
   @property()
   max = '23:59'
 
@@ -180,19 +186,29 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   @property({ attribute: 'time-style' })
   timeStyle: 'iso' | 'local' = 'local'
 
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /**
+   * Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** What the field says before a time is in it. */
+  /**
+   * What the field says before a time is in it.
+   */
   @property()
   placeholder = 'HH:mm'
 
-  /** Accessible name for the control that opens the list. */
+  /**
+   * Accessible name for the control that opens the list.
+   */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a time'
 
-  /** Whether the caret is in the field, which is when it holds the value. */
+  /**
+   * Whether the caret is in the field, which is when it holds the value.
+   */
   @state()
   private editing = false
 

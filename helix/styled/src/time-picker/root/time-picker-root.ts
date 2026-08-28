@@ -29,10 +29,10 @@ import { styles } from './time-picker-root.css.js'
  * @documentation https://helix.fusion.dev/components/time-picker
  *
  * @cssproperty --time-picker-list-height - How tall the list is before it scrolls.
- * @cssproperty --time-picker-wheel-height - How tall a wheel is. Five rows by default.
- * @cssproperty --time-picker-row-size - Height and least width of one row in a wheel.
  * @cssproperty --time-picker-range-color - Wash behind the times inside a range.
+ * @cssproperty --time-picker-row-size - Height and least width of one row in a wheel.
  * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.
+ * @cssproperty --time-picker-wheel-height - How tall a wheel is. Five rows by default.
  */
 @customElement('helix-time-picker')
 export class HelixTimePicker extends HelixHeadlessTimePicker {

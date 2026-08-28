@@ -151,61 +151,61 @@ const SKIP_SECONDS = 10
  * @slot controls - Added to the control bar, before fullscreen.
  * @slot poster - Shown over the video until it starts.
  *
- * @csspart icon - A glyph this component draws.
- * @csspart stage - The box holding the picture and its controls, and the focus
- * target the keys are bound to.
- * @csspart video - The video itself.
- * @csspart poster - What covers it before it plays.
- * @csspart back - The region top left, for a way out of a set.
- * @csspart failure - What is said when the source will not play.
- * @csspart loading - What is said while the picture waits for more of itself.
- * @csspart loading-mark - The part of that which spins.
- * @csspart cue - The caption on screen now, drawn by this element.
- * @csspart controls - The bar along the bottom.
- * @csspart play - Play and pause.
- * @csspart scrubber - Where it is, and where to go.
- * @csspart time - The position and the duration.
- * @csspart sound - The speaker and its level, which are one control.
- * @csspart mute - Sound on and off.
- * @csspart volume - How loud.
- * @csspart captions - Subtitles on and off.
- * @csspart captions-menu - The language menu, where there is more than one.
- * @csspart rewind - The control that goes back ten seconds.
- * @csspart forward - The control that goes on ten seconds.
- * @csspart remote - Play on another device, where one is available.
- * @csspart speed - Playback speed, where it was asked for.
- * @csspart pip - Picture in picture, where it was asked for and exists.
- * @csspart start - The mark over the picture before anything has played.
- * @csspart next - Asks for the next item, where it was asked for.
- * @csspart previous - Asks for the previous one.
- * @csspart download - Saves the file, where it was asked for.
- * @csspart overflow - The menu holding the controls kept off the bar.
- * @csspart more - The button that opens it.
- * @csspart fullscreen - The whole screen, and back.
- * @csspart captions-menu-back - The control that returns from a submenu.
- * @csspart captions-menu-back-mark - The glyph on the back control of a submenu.
- * @csspart captions-menu-header - The bar above a submenu, holding the way back and its name.
- * @csspart captions-menu-title - The name of the submenu that is showing.
- * @csspart entry - One row in a menu this player opens.
- * @csspart entry-item - The row, which is an `<a>` where `href` is set.
- * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
- * @csspart entry-start - The leading column, which is a slot and is always there.
- * @csspart overflow-back - The control that returns from a submenu.
- * @csspart overflow-back-mark - The glyph on the back control of a submenu.
- * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
- * @csspart overflow-title - The name of the submenu that is showing.
- * @csspart captions-menu-surface - The floating panel the menu is drawn on.
- * @csspart overflow-surface - The floating panel the menu is drawn on.
- * @csspart captions-menu-empty - Shown when there are no items to show.
- * @csspart captions-menu-loading - Shown while the items are still on their way.
- * @csspart overflow-empty - Shown when there are no items to show.
- * @csspart overflow-loading - Shown while the items are still on their way.
- *
+ * @event {Event} ended - Relayed for the same reason.
  * @event {HelixNextEvent} helix-next - Fired when the reader asks for the next item.
  * @event {HelixPreviousEvent} helix-previous - Fired when they ask for the previous one.
- * @event {Event} play - Relayed, because it does not cross a shadow boundary.
  * @event {Event} pause - Relayed for the same reason.
- * @event {Event} ended - Relayed for the same reason.
+ * @event {Event} play - Relayed, because it does not cross a shadow boundary.
+ *
+ * @csspart back - The region top left, for a way out of a set.
+ * @csspart captions - Subtitles on and off.
+ * @csspart captions-menu - The language menu, where there is more than one.
+ * @csspart captions-menu-back - The control that returns from a submenu.
+ * @csspart captions-menu-back-mark - The glyph on the back control of a submenu.
+ * @csspart captions-menu-empty - Shown when there are no items to show.
+ * @csspart captions-menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart captions-menu-loading - Shown while the items are still on their way.
+ * @csspart captions-menu-surface - The floating panel the menu is drawn on.
+ * @csspart captions-menu-title - The name of the submenu that is showing.
+ * @csspart controls - The bar along the bottom.
+ * @csspart cue - The caption on screen now, drawn by this element.
+ * @csspart download - Saves the file, where it was asked for.
+ * @csspart entry - One row in a menu this player opens.
+ * @csspart entry-item - The row, which is an `<a>` where `href` is set.
+ * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens.
+ * @csspart entry-start - The leading column, which is a slot and is always there.
+ * @csspart failure - What is said when the source will not play.
+ * @csspart forward - The control that goes on ten seconds.
+ * @csspart fullscreen - The whole screen, and back.
+ * @csspart icon - A glyph this component draws.
+ * @csspart loading - What is said while the picture waits for more of itself.
+ * @csspart loading-mark - The part of that which spins.
+ * @csspart more - The button that opens it.
+ * @csspart mute - Sound on and off.
+ * @csspart next - Asks for the next item, where it was asked for.
+ * @csspart overflow - The menu holding the controls kept off the bar.
+ * @csspart overflow-back - The control that returns from a submenu.
+ * @csspart overflow-back-mark - The glyph on the back control of a submenu.
+ * @csspart overflow-empty - Shown when there are no items to show.
+ * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-loading - Shown while the items are still on their way.
+ * @csspart overflow-surface - The floating panel the menu is drawn on.
+ * @csspart overflow-title - The name of the submenu that is showing.
+ * @csspart pip - Picture in picture, where it was asked for and exists.
+ * @csspart play - Play and pause.
+ * @csspart poster - What covers it before it plays.
+ * @csspart previous - Asks for the previous one.
+ * @csspart remote - Play on another device, where one is available.
+ * @csspart rewind - The control that goes back ten seconds.
+ * @csspart scrubber - Where it is, and where to go.
+ * @csspart sound - The speaker and its level, which are one control.
+ * @csspart speed - Playback speed, where it was asked for.
+ * @csspart stage - The box holding the picture and its controls, and the focus
+ * target the keys are bound to.
+ * @csspart start - The mark over the picture before anything has played.
+ * @csspart time - The position and the duration.
+ * @csspart video - The video itself.
+ * @csspart volume - How loud.
  *
  * @cssproperty --video-intrinsic-ratio - The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it.
  * @cssproperty --video-level - The current volume, 0 to 1.
@@ -213,19 +213,27 @@ const SKIP_SECONDS = 10
  */
 @customElement('helix-headless-video')
 export class HelixHeadlessVideo extends HelixElement {
-  /** Where the video is, for the common case of one file. */
+  /**
+   * Where the video is, for the common case of one file.
+   */
   @property()
   src = ''
 
-  /** A still shown before it plays, which the platform draws itself. */
+  /**
+   * A still shown before it plays, which the platform draws itself.
+   */
   @property()
   poster = ''
 
-  /** Accessible name, since a video is not described by its filename. */
+  /**
+   * Accessible name, since a video is not described by its filename.
+   */
   @property()
   label = ''
 
-  /** Whether it starts again at the end. */
+  /**
+   * Whether it starts again at the end.
+   */
   @property({ reflect: true, type: Boolean })
   loop = false
 
@@ -245,7 +253,9 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ attribute: 'muted', reflect: true, type: Boolean })
   defaultMuted = false
 
-  /** Whether it plays where it sits rather than taking over the screen. */
+  /**
+   * Whether it plays where it sits rather than taking over the screen.
+   */
   @property({ attribute: 'plays-inline', converter: onUnlessFalse })
   playsInline = true
 
@@ -258,7 +268,9 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ reflect: true, type: Boolean })
   controls = false
 
-  /** How much to fetch before anything is asked for. */
+  /**
+   * How much to fetch before anything is asked for.
+   */
   @property()
   preload: 'auto' | 'metadata' | 'none' = 'metadata'
 
@@ -273,15 +285,22 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ reflect: true, type: Boolean })
   autoplay = false
 
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /**
+   * How the media is fetched across origins, which decides whether a track can
+   * be read.
+   */
   @property({ attribute: 'crossorigin' })
   crossOrigin: 'anonymous' | 'use-credentials' | null = null
 
-  /** Whether the browser may offer picture in picture. */
+  /**
+   * Whether the browser may offer picture in picture.
+   */
   @property({ attribute: 'disable-picture-in-picture', reflect: true, type: Boolean })
   disablePictureInPicture = false
 
-  /** Whether the browser may offer playback on a remote device. */
+  /**
+   * Whether the browser may offer playback on a remote device.
+   */
   @property({ attribute: 'disable-remote-playback', reflect: true, type: Boolean })
   disableRemotePlayback = false
 
@@ -381,7 +400,9 @@ export class HelixHeadlessVideo extends HelixElement {
     }
   }
 
-  /** The speeds offered, slowest first, as multipliers of normal. */
+  /**
+   * The speeds offered, slowest first, as multipliers of normal.
+   */
   @property({ attribute: 'speeds' })
   speeds = '0.5 1 1.5 2'
 
@@ -399,19 +420,27 @@ export class HelixHeadlessVideo extends HelixElement {
   @property({ attribute: 'idle-delay', type: Number })
   idleDelay = 2500
 
-  /** What the play control is called while it would start the video. */
+  /**
+   * What the play control is called while it would start the video.
+   */
   @property({ attribute: 'play-label' })
   playLabel = 'Play'
 
-  /** And while it would stop it. */
+  /**
+   * And while it would stop it.
+   */
   @property({ attribute: 'pause-label' })
   pauseLabel = 'Pause'
 
-  /** What a reader is told while the picture is waiting for more of itself. */
+  /**
+   * What a reader is told while the picture is waiting for more of itself.
+   */
   @property({ attribute: 'loading-label' })
   loadingLabel = 'Loading'
 
-  /** And what they are told when it will not play at all. */
+  /**
+   * And what they are told when it will not play at all.
+   */
   @property({ attribute: 'error-label' })
   errorLabel = 'This video could not be played'
 
@@ -430,7 +459,10 @@ export class HelixHeadlessVideo extends HelixElement {
   @state()
   private buffering = false
 
-  /** Whether the source failed, which is the other thing a frozen frame can mean. */
+  /**
+   * Whether the source failed, which is the other thing a frozen frame can
+   * mean.
+   */
   @state()
   private failed = false
 
@@ -497,17 +529,23 @@ export class HelixHeadlessVideo extends HelixElement {
   @state()
   private rate = 1
 
-  /** Whether the reader has been still long enough for the bar to go. */
+  /**
+   * Whether the reader has been still long enough for the bar to go.
+   */
   @state()
   private idle = false
 
   private idleTimer?: ReturnType<typeof setTimeout>
 
-  /** Whether anything on the network offers to play this. */
+  /**
+   * Whether anything on the network offers to play this.
+   */
   @state()
   private remoteAvailable = false
 
-  /** Whether it is playing somewhere else right now. */
+  /**
+   * Whether it is playing somewhere else right now.
+   */
   @state()
   private remoteConnected = false
 
@@ -571,7 +609,10 @@ export class HelixHeadlessVideo extends HelixElement {
       .filter((one) => !onBar.has(one) && this.offers(one))
   }
 
-  /** The sources and caption tracks to copy into the video, as the consumer wrote them. */
+  /**
+   * The sources and caption tracks to copy into the video, as the consumer
+   * wrote them.
+   */
   @state()
   private media: { attrs: Record<string, string>; tag: 'source' | 'track' }[] = []
 
@@ -1368,7 +1409,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * React reports a mismatch it will not patch up. Nothing plays until somebody
    * presses play, so this one is written long past hydration and there is
    * nothing for it to disagree with. `data-closed` on `Toast.Item` and
-   * `data-scrolled` on `AppHeader` are the same case; `:state(open)` and
+   * `data-closed` on `Toast.Item` is the same case; `:state(open)` and
    * `:state(checked)` are the other one, and were `data-` attributes until
    * 27 Aug 2026.
    */

@@ -26,10 +26,10 @@ import { styles } from './date-picker-root.css.js'
  *
  * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.
  * @cssproperty --date-picker-day-size - Width and height of a day.
- * @cssproperty --date-picker-track-size - Width of a column, which is what sets the space between days.
+ * @cssproperty --date-picker-range-color - Band behind the days in a range.
  * @cssproperty --date-picker-row-size - Height of a week row.
  * @cssproperty --date-picker-selected-color - Fill behind a selected day.
- * @cssproperty --date-picker-range-color - Band behind the days in a range.
+ * @cssproperty --date-picker-track-size - Width of a column, which is what sets the space between days.
  */
 @customElement('helix-date-picker')
 export class HelixDatePicker extends HelixHeadlessDatePicker {

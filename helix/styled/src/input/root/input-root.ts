@@ -32,8 +32,8 @@ import { styles } from './input-root.css.js'
  * @aliases TextField, Field, TextInput
  * @documentation https://helix.fusion.dev/components/input
  *
- * @cssproperty --input-size - Height of the field.
  * @cssproperty --input-background-color - Fill behind the text.
+ * @cssproperty --input-size - Height of the field.
  */
 @customElement('helix-input')
 export class HelixInput extends HelixHeadlessInput {

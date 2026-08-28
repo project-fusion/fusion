@@ -34,14 +34,16 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - A mark to sit still at the center, usually a logo. Empty by default.
  *
- * @csspart svg - The rotating circle pair.
- * @csspart mark - The region holding what was slotted at the center.
- * @csspart track - The full circle behind the indicator.
  * @csspart indicator - The arc that turns.
+ * @csspart mark - The region holding what was slotted at the center.
+ * @csspart svg - The rotating circle pair.
+ * @csspart track - The full circle behind the indicator.
  */
 @customElement('helix-headless-loader')
 export class HelixHeadlessLoader extends HelixElement {
-  /** Accessible name, announced while the work is outstanding. */
+  /**
+   * Accessible name, announced while the work is outstanding.
+   */
   @property()
   label = 'Loading'
 

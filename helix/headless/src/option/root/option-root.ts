@@ -32,22 +32,21 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/option
  *
  * @slot - The words naming this choice.
- * @slot start - Before the words, for an icon or an avatar.
  * @slot end - After them, for a shortcut or a count.
+ * @slot start - Before the words, for an icon or an avatar.
  *
  * @event {HelixSelectEvent} helix-select - Fired when this choice is made.
  *
- * @csspart item - The row.
- *
- * @csspart text - The words and the caption under them, as one column.
- *
- * @csspart label - The words.
- *
  * @csspart description - The caption under the words, when there is one.
+ * @csspart item - The row.
+ * @csspart label - The words.
+ * @csspart text - The words and the caption under them, as one column.
  */
 @customElement('helix-headless-option')
 export class HelixHeadlessOption extends HelixElement {
-  /** Whether this choice can be made. */
+  /**
+   * Whether this choice can be made.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
@@ -75,7 +74,11 @@ export class HelixHeadlessOption extends HelixElement {
   @property()
   description?: string
 
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /**
+   * Whether this is the option the keyboard is on.
+   *
+   * Written by the listbox.
+   */
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
   active = false
 
@@ -105,7 +108,11 @@ export class HelixHeadlessOption extends HelixElement {
   /** What the markup said, read once at construction for the reason above. */
   private seeded = this.hasAttribute('selected')
 
-  /** Whether this choice is currently chosen. Written by the listbox. */
+  /**
+   * Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
+   */
   @property({ type: Boolean })
   selected = false
 
@@ -120,7 +127,9 @@ export class HelixHeadlessOption extends HelixElement {
   @property()
   label = ''
 
-  /** Identifies this choice, and is what a form submits. */
+  /**
+   * Identifies this choice, and is what a form submits.
+   */
   @property()
   value = ''
 

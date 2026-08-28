@@ -33,9 +33,9 @@ import { styles } from './switch-root.css.js'
  * @documentation https://helix.fusion.dev/components/switch
  *
  * @cssproperty --switch-height - Height of the track. The width follows it.
- * @cssproperty --switch-width - Length of the track, if not the derived one.
  * @cssproperty --switch-on-color - Fill when it is on.
  * @cssproperty --switch-thumb-color - The handle, in both states.
+ * @cssproperty --switch-width - Length of the track, if not the derived one.
  */
 @customElement('helix-switch')
 export class HelixSwitch extends HelixHeadlessSwitch {

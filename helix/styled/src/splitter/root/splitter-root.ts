@@ -41,10 +41,10 @@ import { styles } from './splitter-root.css.js'
  * @aliases SplitPane, Resizable, SplitView
  * @documentation https://helix.fusion.dev/components/splitter
  *
- * @csspart start - The box holding the first pane.
+ * @csspart corner - The handle where a nested splitter's divider crosses this one.
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
- * @csspart corner - The handle where a nested splitter's divider crosses this one.
+ * @csspart start - The box holding the first pane.
  *
  * @cssproperty --splitter-color - The line between the panes.
  * @cssproperty --splitter-corner - How wide the handle at a crossing is.

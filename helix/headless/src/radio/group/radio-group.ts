@@ -41,17 +41,17 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @documentation https://helix.fusion.dev/components/radio-group
  *
  * @slot - The radios.
- * @slot label - Richer than a string, where the question is more than one.
  * @slot hint - Richer than a string.
+ * @slot label - Richer than a string, where the question is more than one.
  *
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
  *
- * @csspart label - The question, over the set.
- * @csspart items - The choices, which is what `orientation` lays out.
- * @csspart hint - Help under the set.
  * @csspart feedback - What is wrong with it.
+ * @csspart hint - Help under the set.
+ * @csspart items - The choices, which is what `orientation` lays out.
+ * @csspart label - The question, over the set.
  */
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {

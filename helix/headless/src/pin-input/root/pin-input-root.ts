@@ -42,16 +42,16 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input
  *
+ * @event {Event} change - Announced with a filled code, and when an edited one loses focus.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the code changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last box is filled.
- * @event {Event} change - Announced with it, a filled code being the commit.
+ * @event {Event} input - Announced once the value has moved.
  *
- * @csspart field - The row of boxes.
  * @csspart cell - One box.
- * @csspart label - The question, over the boxes.
- * @csspart hint - Help under the boxes, while nothing is wrong.
  * @csspart feedback - What is wrong with it.
+ * @csspart field - The row of boxes.
+ * @csspart hint - Help under the boxes, while nothing is wrong.
+ * @csspart label - The question, over the boxes.
  */
 @customElement('helix-headless-pin-input')
 export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -69,7 +69,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   @property()
   autocomplete = 'one-time-code'
 
-  /** How many characters the code has. */
+  /**
+   * How many characters the code has.
+   */
   @property({ type: Number })
   length = 6
 
@@ -99,7 +101,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   @property()
   type: PinType = 'numeric'
 
-  /** Whether the characters are hidden, the way a password is. */
+  /**
+   * Whether the characters are hidden, the way a password is.
+   */
   @property({ reflect: true, type: Boolean })
   mask = false
 
@@ -119,11 +123,15 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   @property()
   placeholder = ''
 
-  /** Whether the boxes refuse input while still submitting their value. */
+  /**
+   * Whether the boxes refuse input while still submitting their value.
+   */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
 
-  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
+  /**
+   * Accessible name for one box, with `{index}` and `{length}` filled in.
+   */
   @property({ attribute: 'cell-label' })
   cellLabel = 'Character {index} of {length}'
 
@@ -201,6 +209,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         /* And a native `change`, because a filled code is this control's
            commit. There is no inner control to relay one from: six boxes each
            fire their own, and none of them means the code is entered. */
+        this.committed = next
         this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
       }
     })
@@ -309,9 +318,63 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     event.preventDefault()
   }
 
+  /**
+   * The code as it stood at the last commit, so a blur that changed nothing
+   * says nothing.
+   *
+   * **The last commit, and not the value the reader arrived on**, which is what
+   * the platform compares against. Taking that reading means recognizing the
+   * arrival, and this component moves focus itself on every character, so the
+   * `focus` it would be reading is mostly one it caused: telling those apart
+   * rests entirely on `relatedTarget`, on an event the element dispatched to
+   * itself. The last commit rests on nothing, and it is the value the event
+   * would carry anyway.
+   *
+   * They agree everywhere a reader is involved, including the case the platform
+   * is careful about: typing a character and deleting it again leaves the code
+   * where it was, so neither reading commits. They part only when a script
+   * assigns while the field is unfocused, where this commits on the way out and
+   * the platform does not, having taken its baseline after the assignment.
+   * Announcing a value a consumer set themselves is the safe half of that trade.
+   *
+   * Seeded in `firstUpdated`, a code in the markup being committed by whoever
+   * wrote it.
+   */
+  private committed = ''
+
   /** Selecting on focus, so typing replaces rather than appending. */
   private readonly handleFocus = (event: FocusEvent): void => {
     ;(event.target as HTMLInputElement).select()
+  }
+
+  /**
+   * Commits when focus leaves the row, which is the moment every other field in
+   * the library has and this one did not.
+   *
+   * `change` is one of the two events `MixinField` reads as "the reader has had
+   * a go at this", so a code that was never completed was never `touched` and
+   * its own `tooShort` message could not show: two boxes of four filled and
+   * tabbed away from was answered with nothing at all. `Input` gets this for
+   * free by relaying its control's own `change`; here the cells each fire one,
+   * none of them means the code is entered, and neither does any single one of
+   * them mean the reader has left.
+   *
+   * **Focus leaving the row, and not a cell.** Every character moves focus to
+   * the next box, so a per-cell blur would commit on every keystroke, which is
+   * the fault this exists to fix pointed the other way.
+   *
+   * `composed: false`, like the completion above and like the native event this
+   * stands in for. It is dispatched on the host, so a consumer hears it.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    if (this.cells.includes(event.relatedTarget as HTMLInputElement)) {
+      return
+    }
+    if (this.value === this.committed) {
+      return
+    }
+    this.committed = this.value
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
   /** Reports the code and a verdict on it. */
@@ -352,6 +415,11 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     })
   }
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.committed = this.value
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.paint()
@@ -367,7 +435,12 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
        pressing it focused nothing and the group had no accessible name at all.
        The set names itself through `hostAria` instead. */
     return html`${this.renderGroupLabel()}
-      <div part="field" role="group" aria-describedby=${this.describedBy ?? nothing}>
+      <div
+        part="field"
+        role="group"
+        aria-describedby=${this.describedBy ?? nothing}
+        @focusout=${this.handleFocusOut}
+      >
         ${characters.map(
           (character, at) => html`<input
             part="cell"

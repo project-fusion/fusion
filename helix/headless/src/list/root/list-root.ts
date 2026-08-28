@@ -20,7 +20,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
-  /** Accessible name for the set. */
+  /**
+   * Accessible name for the set.
+   */
   @property()
   label = ''
 

@@ -46,34 +46,44 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @slot - The items.
  * @slot trigger - What opens it.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart back - The control that returns from a submenu.
  * @csspart back-mark - The glyph on the back control of a submenu.
+ * @csspart empty - Shown when there are no items to show.
  * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart loading - Shown while the items are still on their way.
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
- * @csspart empty - Shown when there are no items to show.
- * @csspart loading - Shown while the items are still on their way.
  */
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
-  /** Preferred side. It moves if that side does not fit. */
+  /**
+   * Preferred side.
+   *
+   * It moves if that side does not fit.
+   */
   @property()
   placement: Placement = 'bottom-start'
 
-  /** Space between the trigger and the surface, in pixels. */
+  /**
+   * Space between the trigger and the surface, in pixels.
+   */
   @property({ type: Number })
   offset = 4
 
-  /** Accessible name for the surface. */
+  /**
+   * Accessible name for the surface.
+   */
   @property()
   label = 'Menu'
 
-  /** What the row returning from a submenu reads. */
+  /**
+   * What the row returning from a submenu reads.
+   */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
 

@@ -22,14 +22,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Chip, Pill, Label
  * @documentation https://helix.fusion.dev/components/tag
  *
- * @slot prefix - A category the label belongs to, set before it and weightier.
  * @slot - The tag's label.
+ * @slot prefix - A category the label belongs to, set before it and weightier.
+ *
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  *
  * @csspart dismiss - The control that asks to remove the tag.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart prefix - The category before the label.
- *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  */
 @customElement('helix-headless-tag')
 export class HelixHeadlessTag extends MixinDismissible(HelixElement) {

@@ -20,16 +20,16 @@ import { styles } from './tree-root.css.js'
  *
  * @slot - The tree's items.
  *
- * @csspart tree - The tree container.
- *
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  *
- * @cssproperty --tree-indent - Indent added per level.
+ * @csspart tree - The tree container.
+ *
+ * @cssproperty --tree-chevron-gap - Set from `chevron-placement`; the space before the chevron.
+ * @cssproperty --tree-chevron-order - Set from `chevron-placement`; read by each item.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
+ * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
- * @cssproperty --tree-chevron-order - Set from `chevron-placement`; read by each item.
- * @cssproperty --tree-chevron-gap - Set from `chevron-placement`; the space before the chevron.
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixHeadlessTree {

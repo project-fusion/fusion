@@ -55,26 +55,25 @@ import { property } from 'lit/decorators.js'
  * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
  * without measuring anything itself.
  *
- *
  * @since 0.1.0
  * @status experimental
  * @category forms
  * @aliases Range, Range input
  * @documentation https://helix.fusion.dev/components/slider
  *
+ * @event {Event} change - Relayed once the reader has let go.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Relayed once the reader has let go.
  *
- * @csspart field - The row: the control and its readout.
  * @csspart control - The range input.
- * @csspart markers - The row of marks along the track.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The row: the control and its readout.
+ * @csspart hint - Help under the track, while nothing is wrong.
+ * @csspart label - The question, over the track.
  * @csspart marker - One mark.
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
+ * @csspart markers - The row of marks along the track.
  * @csspart output - The current value, shown beside it.
- * @csspart label - The question, over the track.
- * @csspart hint - Help under the track, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.
@@ -96,15 +95,21 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ reflect: true, type: Boolean })
   range = false
 
-  /** The largest value the reader can choose. */
+  /**
+   * The largest value the reader can choose.
+   */
   @property({ type: Number })
   max = 100
 
-  /** The smallest value the reader can choose. */
+  /**
+   * The smallest value the reader can choose.
+   */
   @property({ type: Number })
   min = 0
 
-  /** Whether the chosen value is shown beside the track. */
+  /**
+   * Whether the chosen value is shown beside the track.
+   */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
 
@@ -126,7 +131,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ type: Number })
   markers = 0
 
-  /** Whether each mark says which value it stands at. */
+  /**
+   * Whether each mark says which value it stands at.
+   */
   @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
   markerLabels = false
 
@@ -134,13 +141,31 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ type: Number })
   step = 1
 
-  /*
-   * The value each mark stands at, snapped to a step it can be reached on.
+  /**
+   * How many characters the readout has to be able to hold, widest case.
    *
-   * De-duplicated, because snapping can land two marks on one step: five marks
-   * across a range of two steps is three marks, not five with a pair on top of
-   * each other, and two marks in one place read as one drawn badly.
+   * **A number that grows a digit makes the track jump.** The output sizes to
+   * its text, so a range crossing 99 to 100 widens by a character and the row
+   * gives that width back out of the track: the handle moves while the value
+   * has not, which reads as the control drifting under the pointer. `3ch` was
+   * the floor and covers a plain value up to three digits, and a range says
+   * "35 to 100", which is ten.
+   *
+   * Widest rather than current, so the box never changes size at all. Measured
+   * off the bounds because that is what the readout can ever say: the longer of
+   * the two ends, twice, plus the four of " to " when both are shown. Negative
+   * bounds are covered by measuring the rendered string rather than the digits,
+   * since the sign is a character like any other.
+   *
+   * `tabular-nums` is on the part already and is the other half of this: equal
+   * digit widths keep a same-length number from shifting inside the box the
+   * same way a different-length one shifted the box.
    */
+  private get reserve(): number {
+    const widest = Math.max(String(this.min).length, String(this.max).length)
+    return this.range ? widest * 2 + ' to '.length : widest
+  }
+
   /**
    * How many decimals the step is written to, so a label is not float noise.
    *
@@ -152,6 +177,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     return String(this.step).split('.')[1]?.length ?? 0
   }
 
+  /**
+   * How far one press of an arrow key moves it.
+   */
   private get markerValues(): number[] {
     const span = this.max - this.min
     if (this.markers < 2 || span <= 0) {
@@ -458,7 +486,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
          * 10 to 60 heard both twice, fifty times. It repeats what the control
          * already reports, which is the definition of decoration. */
         this.showValue
-          ? html`<output part="output" for="control" aria-hidden="true"
+          ? html`<output
+              part="output"
+              for="control"
+              aria-hidden="true"
+              style=${`--_slider-output-reserve: ${this.reserve}ch`}
               >${this.range ? `${start} to ${end}` : this.value}</output
             >`
           : nothing

@@ -125,25 +125,26 @@ import type {
   HelixBeforeCloseEvent,
   HelixBeforeOpenEvent,
   HelixDismissEvent,
+  HelixScrolledEvent,
   HelixSelectEvent,
   HelixSendEvent,
   HelixBeforePinEvent,
   HelixBeforeChangeEvent,
   HelixBeforeToggleEvent,
+  HelixCopyEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
-  HelixCopyEvent,
   HelixCreateEvent,
-  HelixSortEvent,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixSortEvent,
   HelixResizeEvent,
   HelixShortcutEvent,
   HelixReadEvent,
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
-  HelixBeforeResizeEvent,
   HelixBeforeCollapseEvent,
+  HelixBeforeResizeEvent,
   HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
@@ -344,6 +345,15 @@ export type HelixHeadlessAnnouncementVueEvents = {
   "helix-dismiss": HelixHeadlessAnnouncementHelixDismissElementEvent;
 };
 
+/** `HelixHeadlessAppHeader` component event */
+export type HelixHeadlessAppHeaderElementEvent<E = Event> = TypedEvent<
+  HelixHeadlessAppHeader,
+  E
+>;
+/** `helix-scrolled` event type */
+export type HelixHeadlessAppHeaderHelixScrolledElementEvent =
+  HelixHeadlessAppHeaderElementEvent<HelixScrolledEvent>;
+
 export type HelixHeadlessAppHeaderVueProps = {
   /** Where the middle region sits in the bar.
 
@@ -381,7 +391,10 @@ box would have been setting `nav-align` to do it. The part is called
   contentAlign?: HelixHeadlessAppHeader["contentAlign"];
 };
 
-export type HelixHeadlessAppHeaderVueEvents = {};
+export type HelixHeadlessAppHeaderVueEvents = {
+  /** Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis. */
+  "helix-scrolled": HelixHeadlessAppHeaderHelixScrolledElementEvent;
+};
 
 export type HelixHeadlessAvatarGroupVueProps = {
   /** Accessible name for the set, such as "Reviewers". */
@@ -421,25 +434,35 @@ export type HelixHeadlessAvatarElementEvent<E = Event> = TypedEvent<
 >;
 
 export type HelixHeadlessAvatarVueProps = {
-  /** Image to show. Falls back to the slot, or to initials, if it fails. */
+  /** Image to show.
+
+Falls back to the slot, or to initials, if it fails. */
   src?: HelixHeadlessAvatar["src"];
-  /** Name of the person or entity. Used for the label and the initials. */
+  /** Name of the person or entity.
+
+Used for the label and the initials. */
   name?: HelixHeadlessAvatar["name"];
 };
 
 export type HelixHeadlessAvatarVueEvents = {
-  /** Relayed from the image once it has loaded. */
-  load: HelixHeadlessAvatarElementEvent;
   /** Relayed from the image when it fails. */
   error: HelixHeadlessAvatarElementEvent;
+  /** Relayed from the image once it has loaded. */
+  load: HelixHeadlessAvatarElementEvent;
 };
 
 export type HelixHeadlessBadgeVueProps = {
-  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
+  /** The count or short text to show.
+
+Absent shows a dot, zero shows nothing. */
   value?: HelixHeadlessBadge["value"];
-  /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
+  /** Cap for a numeric value.
+
+Past it the indicator reads `{max}+`. */
   max?: HelixHeadlessBadge["max"];
-  /** Accessible name. Required for a dot, which has no text to read. */
+  /** Accessible name.
+
+Required for a dot, which has no text to read. */
   label?: HelixHeadlessBadge["label"];
 };
 
@@ -550,13 +573,30 @@ export type HelixHeadlessBreadcrumbVueProps = {
   current?: HelixHeadlessBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
 
-Empty rather than optional and unreflected: an `href` written onto every
-host would be a link to the current page on every crumb nobody asked to be
-one, and nothing selects on it. */
+**Optional and reflected, because a stylesheet does select on it.**
+`breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+block padding off a crumb that is not a link, so the attribute is what
+decides how tall a crumb is. Unreflected, an `href` set from script reached
+the property, rendered the anchor, and left the host looking unlinked: the
+crumb drew at 20px where a markup twin drew at 28.
+
+*This said the opposite until 27 Aug 2026*, and named the reason as
+"nothing selects on it", which was not true when it was written. The
+paragraph is worth keeping because the rest of it is right and is what makes
+this optional rather than defaulted: an `href` written onto every host would
+be a link to the current page on every crumb nobody asked to be one. That is
+the general rule as well, that a reflected property takes no default, so the
+two agree.
+
+Found by the picture comparison rather than by reading: React assigns a
+matching property instead of an attribute, so every crumb in the React twin
+of `breadcrumbs/links` lost its padding at once. */
   href?: HelixHeadlessBreadcrumb["href"];
   /** Where the link opens, for the rare crumb that leaves the site. */
   target?: HelixHeadlessBreadcrumb["target"];
-  /** What the link declares about where it goes. The consumer's decision. */
+  /** What the link declares about where it goes.
+
+The consumer's decision. */
   rel?: HelixHeadlessBreadcrumb["rel"];
 };
 
@@ -901,7 +941,9 @@ export type HelixHeadlessChatComposerHelixSendElementEvent =
   HelixHeadlessChatComposerElementEvent<HelixSendEvent>;
 
 export type HelixHeadlessChatComposerVueProps = {
-  /** What the reader has written. Read it, or set it to seed a draft. */
+  /** What the reader has written.
+
+Read it, or set it to seed a draft. */
   value?: HelixHeadlessChatComposer["value"];
   /** Shown in an empty field. */
   placeholder?: HelixHeadlessChatComposer["placeholder"];
@@ -925,7 +967,9 @@ has to mean a new line and nothing else. */
   "send-label"?: HelixHeadlessChatComposer["sendLabel"];
   /** Label for the control that sends. */
   sendLabel?: HelixHeadlessChatComposer["sendLabel"];
-  /** How many rows the field opens at. It grows from there. */
+  /** How many rows the field opens at.
+
+It grows from there. */
   rows?: HelixHeadlessChatComposer["rows"];
 };
 
@@ -955,12 +999,16 @@ anything else is a name the consumer styles. */
   /** What has happened to it.
 
 Reflected, because every one of the four is a visual state and a stylesheet
-has no other way to know. Empty is a settled message with nothing to report,
-which is what most of a transcript is. */
+has no other way to know. Absent is a settled message with nothing to
+report, which is what most of a transcript is, and it is the absence of the
+attribute rather than a value of it: there is no initializer, so nothing is
+reflected until something happens. */
   state?: HelixHeadlessChatMessage["state"];
   /** When it was said, as anything `Date` parses. */
   at?: HelixHeadlessChatMessage["at"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessChatMessage["locale"];
   /** What to call each state, for a reader who cannot see it. */
   "sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
@@ -1090,12 +1138,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessCheckboxGroupVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixHeadlessCheckboxGroupElementEvent;
   /** Fired when any box changes, with the whole set. */
   "helix-before-change": HelixHeadlessCheckboxGroupHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessCheckboxGroupElementEvent;
-  /** Announced once the value has moved. */
-  change: HelixHeadlessCheckboxGroupElementEvent;
 };
 
 /** `HelixHeadlessCheckbox` component event */
@@ -1170,12 +1218,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessCheckboxVueEvents = {
+  /** Relayed from the input once the state has changed. */
+  change: HelixHeadlessCheckboxElementEvent;
   /** Fired before the state changes, and cancelable. */
   "helix-before-toggle": HelixHeadlessCheckboxHelixBeforeToggleElementEvent;
   /** Announced once the state has moved. */
   input: HelixHeadlessCheckboxElementEvent;
-  /** Relayed from the input once the state has changed. */
-  change: HelixHeadlessCheckboxElementEvent;
 };
 
 export type HelixHeadlessCodeBlockVueProps = {
@@ -1188,7 +1236,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   "no-copy"?: HelixHeadlessCodeBlock["noCopy"];
   /** Whether to leave the copy button off.
 
@@ -1197,7 +1257,19 @@ it is *present*, so a `copyable` defaulting to true could never be turned
 off from markup: `copyable="false"` is the string "false", which is
 present, which is true. Measured, and it is why this is named the other way
 round. The platform already writes booleans like this for the same reason,
-`novalidate` and `nomodule` and `noreferrer` among them. */
+`novalidate` and `nomodule` and `noreferrer` among them.
+
+**Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+reserves the copy button's width with `:host(:not([no-copy]))`, so the
+attribute is what decides whether the block pays for a control. Set from
+script the button went away, `render` reading the property, and the 40px it
+stood in stayed reserved: the exact waste that rule was written to stop,
+arrived at from the other side.
+
+A false boolean reflects as the attribute's absence, so this costs no
+`no-copy=""` on hosts that never asked for one, and the rule about a
+reflected property taking no default is satisfied by the default being
+`false`. */
   noCopy?: HelixHeadlessCodeBlock["noCopy"];
 };
 
@@ -1215,12 +1287,12 @@ export type HelixHeadlessColorInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessColorInputHelixBeforeChangeElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
-  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessColorInputHelixBeforeCloseElementEvent =
   HelixHeadlessColorInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessColorInputHelixBeforeOpenElementEvent =
+  HelixHeadlessColorInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessColorInputVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -1357,16 +1429,16 @@ reflected none of them. */
 };
 
 export type HelixHeadlessColorInputVueEvents = {
-  /** Fired when the color changes. */
-  "helix-before-change": HelixHeadlessColorInputHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessColorInputElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessColorInputElementEvent;
-  /** Fired when the panel opens. */
-  "helix-before-open": HelixHeadlessColorInputHelixBeforeOpenElementEvent;
+  /** Fired when the color changes. */
+  "helix-before-change": HelixHeadlessColorInputHelixBeforeChangeElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessColorInputHelixBeforeCloseElementEvent;
+  /** Fired when the panel opens. */
+  "helix-before-open": HelixHeadlessColorInputHelixBeforeOpenElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessColorInputElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessColorInputElementEvent;
 };
@@ -1376,18 +1448,18 @@ export type HelixHeadlessColorPickerElementEvent<E = Event> = TypedEvent<
   HelixHeadlessColorPicker,
   E
 >;
-/** `helix-sample-end` event type */
-export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixSampleEndEvent>;
-/** `helix-sample-start` event type */
-export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
-  HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
 /** `helix-before-change` event type */
 export type HelixHeadlessColorPickerHelixBeforeChangeElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixBeforeChangeEvent>;
 /** `helix-copy` event type */
 export type HelixHeadlessColorPickerHelixCopyElementEvent =
   HelixHeadlessColorPickerElementEvent<HelixCopyEvent>;
+/** `helix-sample-end` event type */
+export type HelixHeadlessColorPickerHelixSampleEndElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleEndEvent>;
+/** `helix-sample-start` event type */
+export type HelixHeadlessColorPickerHelixSampleStartElementEvent =
+  HelixHeadlessColorPickerElementEvent<HelixSampleStartEvent>;
 
 export type HelixHeadlessColorPickerVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -1504,18 +1576,18 @@ reflected none of them. */
 };
 
 export type HelixHeadlessColorPickerVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixHeadlessColorPickerElementEvent;
+  /** Fired when the color changes. */
+  "helix-before-change": HelixHeadlessColorPickerHelixBeforeChangeElementEvent;
+  /** Fired when the color is put on the clipboard. */
+  "helix-copy": HelixHeadlessColorPickerHelixCopyElementEvent;
   /** The eyedropper has closed, whether or not a color was taken. */
   "helix-sample-end": HelixHeadlessColorPickerHelixSampleEndElementEvent;
   /** The eyedropper is opening, so anything covering the page should get out of the way. */
   "helix-sample-start": HelixHeadlessColorPickerHelixSampleStartElementEvent;
-  /** Fired when the color changes. */
-  "helix-before-change": HelixHeadlessColorPickerHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessColorPickerElementEvent;
-  /** Announced once the value has moved. */
-  change: HelixHeadlessColorPickerElementEvent;
-  /** Fired when the color is put on the clipboard. */
-  "helix-copy": HelixHeadlessColorPickerHelixCopyElementEvent;
 };
 
 /** `HelixHeadlessCombobox` component event */
@@ -1526,15 +1598,15 @@ export type HelixHeadlessComboboxElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessComboboxHelixBeforeChangeElementEvent =
   HelixHeadlessComboboxElementEvent<HelixBeforeChangeEvent>;
-/** `helix-create` event type */
-export type HelixHeadlessComboboxHelixCreateElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
-  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessComboboxHelixBeforeCloseElementEvent =
   HelixHeadlessComboboxElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessComboboxHelixBeforeOpenElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixBeforeOpenEvent>;
+/** `helix-create` event type */
+export type HelixHeadlessComboboxHelixCreateElementEvent =
+  HelixHeadlessComboboxElementEvent<HelixCreateEvent>;
 
 export type HelixHeadlessComboboxVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
@@ -1713,18 +1785,18 @@ differently: they are one chooser to a consumer. */
 };
 
 export type HelixHeadlessComboboxVueEvents = {
-  /** Fired when the chosen option changes. */
-  "helix-before-change": HelixHeadlessComboboxHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessComboboxElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessComboboxElementEvent;
-  /** Fired when the reader asks for something the list does not hold, and cancelable. */
-  "helix-create": HelixHeadlessComboboxHelixCreateElementEvent;
-  /** Fired when the panel opens. */
-  "helix-before-open": HelixHeadlessComboboxHelixBeforeOpenElementEvent;
+  /** Fired when the chosen option changes. */
+  "helix-before-change": HelixHeadlessComboboxHelixBeforeChangeElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessComboboxHelixBeforeCloseElementEvent;
+  /** Fired when the panel opens. */
+  "helix-before-open": HelixHeadlessComboboxHelixBeforeOpenElementEvent;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "helix-create": HelixHeadlessComboboxHelixCreateElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessComboboxElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessComboboxElementEvent;
 };
@@ -1734,15 +1806,15 @@ export type HelixHeadlessCommandElementEvent<E = Event> = TypedEvent<
   HelixHeadlessCommand,
   E
 >;
-/** `helix-select` event type */
-export type HelixHeadlessCommandHelixSelectElementEvent =
-  HelixHeadlessCommandElementEvent<HelixSelectEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
-  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessCommandHelixBeforeCloseElementEvent =
   HelixHeadlessCommandElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessCommandHelixBeforeOpenElementEvent =
+  HelixHeadlessCommandElementEvent<HelixBeforeOpenEvent>;
+/** `helix-select` event type */
+export type HelixHeadlessCommandHelixSelectElementEvent =
+  HelixHeadlessCommandElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessCommandVueProps = {
   /** Accessible name for the overlay, which has no visible heading. */
@@ -1790,12 +1862,12 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessCommandVueEvents = {
-  /** Fired when a command is chosen. */
-  "helix-select": HelixHeadlessCommandHelixSelectElementEvent;
-  /** Fired when the palette opens. */
-  "helix-before-open": HelixHeadlessCommandHelixBeforeOpenElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessCommandHelixBeforeCloseElementEvent;
+  /** Fired when the palette opens. */
+  "helix-before-open": HelixHeadlessCommandHelixBeforeOpenElementEvent;
+  /** Fired when a command is chosen. */
+  "helix-select": HelixHeadlessCommandHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessCommandElementEvent;
 };
@@ -1963,15 +2035,15 @@ export type HelixHeadlessDataTableElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDataTable,
   E
 >;
-/** `helix-sort` event type */
-export type HelixHeadlessDataTableHelixSortElementEvent =
-  HelixHeadlessDataTableElementEvent<HelixSortEvent>;
 /** `helix-filter` event type */
 export type HelixHeadlessDataTableHelixFilterElementEvent =
   HelixHeadlessDataTableElementEvent<HelixFilterEvent>;
 /** `helix-navigate` event type */
 export type HelixHeadlessDataTableHelixNavigateElementEvent =
   HelixHeadlessDataTableElementEvent<HelixNavigateEvent>;
+/** `helix-sort` event type */
+export type HelixHeadlessDataTableHelixSortElementEvent =
+  HelixHeadlessDataTableElementEvent<HelixSortEvent>;
 
 export type HelixHeadlessDataTableVueProps = {
   /** The field naming a row's stable identity.
@@ -2085,12 +2157,12 @@ holds and reordering it under them is a mutation they did not ask for. */
 };
 
 export type HelixHeadlessDataTableVueEvents = {
-  /** Fired when a reader asks for a different order, and cancelable. */
-  "helix-sort": HelixHeadlessDataTableHelixSortElementEvent;
   /** Fired when the query changes, and cancelable. */
   "helix-filter": HelixHeadlessDataTableHelixFilterElementEvent;
   /** Fired when a reader asks for another page, and cancelable. */
   "helix-navigate": HelixHeadlessDataTableHelixNavigateElementEvent;
+  /** Fired when a reader asks for a different order, and cancelable. */
+  "helix-sort": HelixHeadlessDataTableHelixSortElementEvent;
 };
 
 /** `HelixHeadlessDateInput` component event */
@@ -2101,12 +2173,12 @@ export type HelixHeadlessDateInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessDateInputHelixBeforeChangeElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
-  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessDateInputHelixBeforeCloseElementEvent =
   HelixHeadlessDateInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDateInputHelixBeforeOpenElementEvent =
+  HelixHeadlessDateInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDateInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -2353,16 +2425,16 @@ reader makes in one of these. */
 };
 
 export type HelixHeadlessDateInputVueEvents = {
-  /** Fired when the date changes. */
-  "helix-before-change": HelixHeadlessDateInputHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessDateInputElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessDateInputElementEvent;
-  /** Fired when the calendar opens. */
-  "helix-before-open": HelixHeadlessDateInputHelixBeforeOpenElementEvent;
+  /** Fired when the date changes. */
+  "helix-before-change": HelixHeadlessDateInputHelixBeforeChangeElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessDateInputHelixBeforeCloseElementEvent;
+  /** Fired when the calendar opens. */
+  "helix-before-open": HelixHeadlessDateInputHelixBeforeOpenElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessDateInputElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessDateInputElementEvent;
 };
@@ -2384,7 +2456,9 @@ export type HelixHeadlessDatePickerVueProps = {
   mode?: HelixHeadlessDatePicker["mode"];
   /** How many months to show, side by side. */
   months?: HelixHeadlessDatePicker["months"];
-  /** Locale for month and day names. Absent uses the runtime's own. */
+  /** Locale for month and day names.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessDatePicker["locale"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
   "disable-dates"?: HelixHeadlessDatePicker["disableDates"];
@@ -2540,14 +2614,14 @@ reader makes in one of these. */
 };
 
 export type HelixHeadlessDatePickerVueEvents = {
-  /** Fired before the dates change, and cancelable. */
-  "helix-before-change": HelixHeadlessDatePickerHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessDatePickerElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessDatePickerElementEvent;
+  /** Fired before the dates change, and cancelable. */
+  "helix-before-change": HelixHeadlessDatePickerHelixBeforeChangeElementEvent;
   /** Fired before the month on show changes, and cancelable. */
   "helix-navigate": HelixHeadlessDatePickerHelixNavigateElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessDatePickerElementEvent;
 };
 
 /** `HelixHeadlessDialog` component event */
@@ -2555,12 +2629,12 @@ export type HelixHeadlessDialogElementEvent<E = Event> = TypedEvent<
   HelixHeadlessDialog,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
-  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessDialogHelixBeforeCloseElementEvent =
   HelixHeadlessDialogElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
+  HelixHeadlessDialogElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessDialogVueProps = {
   /** Accessible name for the dialog. */
@@ -2645,12 +2719,12 @@ survives to it and a consumer reading one back gets what they wrote. */
 };
 
 export type HelixHeadlessDialogVueEvents = {
-  /** Fired before it opens, and cancelable. */
-  "helix-before-open": HelixHeadlessDialogHelixBeforeOpenElementEvent;
-  /** Fired before it closes, and cancelable. */
-  "helix-before-close": HelixHeadlessDialogHelixBeforeCloseElementEvent;
   /** Relayed, because the platform's own does not escape. */
   close: HelixHeadlessDialogElementEvent;
+  /** Fired before it closes, and cancelable. */
+  "helix-before-close": HelixHeadlessDialogHelixBeforeCloseElementEvent;
+  /** Fired before it opens, and cancelable. */
+  "helix-before-open": HelixHeadlessDialogHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessDialogElementEvent;
 };
@@ -2837,10 +2911,10 @@ survives to it and a consumer reading one back gets what they wrote. */
 };
 
 export type HelixHeadlessDrawerVueEvents = {
-  /** Fired before the panel closes, and cancelable. */
-  "helix-before-close": HelixHeadlessDrawerHelixBeforeCloseElementEvent;
   /** Relayed, because the platform's own does not escape. */
   close: HelixHeadlessDrawerElementEvent;
+  /** Fired before the panel closes, and cancelable. */
+  "helix-before-close": HelixHeadlessDrawerHelixBeforeCloseElementEvent;
   /** Fired when the drawer opens or closes. */
   "helix-before-open": HelixHeadlessDrawerHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
@@ -2861,9 +2935,13 @@ export type HelixHeadlessDrilldownItemVueProps = {
   disabled?: HelixHeadlessDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
   value?: HelixHeadlessDrilldownItem["value"];
-  /** Whether the page showing is the one this row is on. Written by the stack. */
+  /** Whether the page showing is the one this row is on.
+
+Written by the stack. */
   onPage?: HelixHeadlessDrilldownItem["onPage"];
-  /** Whether this row's own page is the one showing. Written by the stack. */
+  /** Whether this row's own page is the one showing.
+
+Written by the stack. */
   showingPage?: HelixHeadlessDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
@@ -2958,7 +3036,9 @@ export type HelixHeadlessFileInputVueProps = {
   "trigger-label"?: HelixHeadlessFileInput["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
   triggerLabel?: HelixHeadlessFileInput["triggerLabel"];
-  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  /** Language tag the sizes are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessFileInput["locale"];
   /** What the control removing one file is called, per file. */
   "remove-label"?: HelixHeadlessFileInput["removeLabel"];
@@ -3005,11 +3085,11 @@ reflected none of them. */
 
 export type HelixHeadlessFileInputVueEvents = {
   /** Announced once the value has moved. */
+  input: HelixHeadlessFileInputElementEvent;
+  /** Announced once the value has moved. */
   change: HelixHeadlessFileInputElementEvent;
   /** Fired when the chosen files change, with their names. */
   "helix-before-change": HelixHeadlessFileInputHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessFileInputElementEvent;
 };
 
 export type HelixHeadlessFormatDateVueProps = {
@@ -3038,7 +3118,9 @@ few characters and a date is not. */
   elapsed?: HelixHeadlessFormatDate["elapsed"];
   /** How the hour is written, where a time of day is shown. */
   hour?: HelixHeadlessFormatDate["hour"];
-  /** Locale for the reading. Empty is the runtime's own. */
+  /** Locale for the reading.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessFormatDate["locale"];
   /** How the minute is written, where a time of day is shown. */
   minute?: HelixHeadlessFormatDate["minute"];
@@ -3046,9 +3128,13 @@ few characters and a date is not. */
   month?: HelixHeadlessFormatDate["month"];
   /** How the second is written, where a time of day is shown. */
   second?: HelixHeadlessFormatDate["second"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   "time-zone"?: HelixHeadlessFormatDate["timeZone"];
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /** The time zone to read the timestamp in.
+
+Empty is the runtime's own. */
   timeZone?: HelixHeadlessFormatDate["timeZone"];
   /** Whether to name the time zone, and how. */
   "time-zone-name"?: HelixHeadlessFormatDate["timeZoneName"];
@@ -3137,7 +3223,8 @@ arithmetic should plan around.
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   minCell?: HelixHeadlessHeatmap["minCell"];
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
+number. */
   gap?: HelixHeadlessHeatmap["gap"];
   /** Shown when the table has no readings in it. */
   "empty-text"?: HelixHeadlessHeatmap["emptyText"];
@@ -3363,9 +3450,11 @@ right for a picture in a page, and `sync` is what a consumer reaches for
 when the picture is about to be composited with something else and a tear
 would show. */
   decoding?: HelixHeadlessImage["decoding"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   crossorigin?: HelixHeadlessImage["crossOrigin"];
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
   crossOrigin?: HelixHeadlessImage["crossOrigin"];
   /** How much of the referring URL to send with the request. */
   referrerpolicy?: HelixHeadlessImage["referrerPolicy"];
@@ -3382,7 +3471,12 @@ hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
 back declares that a picture has arrived which this element has never
 fetched. The `data-` name is the library's answer to both, being a
 different name a re-parse cannot mistake for a declaration, and it is what
-`data-open` and `data-checked` already do.
+`data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+own moved to `:state(scrolled)` for the hydration reason recorded there.
+A picture arrives after somebody fetched it, which puts this on the safe
+side of hydration: a fact that can be true on the *first* update mirrors to
+a custom state instead, which is what `:state(open)` and `:state(checked)`
+became on 27 Aug 2026 for exactly that reason.
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
@@ -3390,10 +3484,10 @@ resting state of a mirror is the attribute's absence. */
 };
 
 export type HelixHeadlessImageVueEvents = {
-  /** Relayed, because the platform's own does not escape. */
-  load: HelixHeadlessImageElementEvent;
   /** Relayed for the same reason. */
   error: HelixHeadlessImageElementEvent;
+  /** Relayed, because the platform's own does not escape. */
+  load: HelixHeadlessImageElementEvent;
 };
 
 /** `HelixHeadlessInput` component event */
@@ -3411,7 +3505,9 @@ export type HelixHeadlessInputVueProps = {
 Empty leaves the attribute off, which is the browser's default. Set it to
 a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   autocomplete?: HelixHeadlessInput["autocomplete"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessInput["readOnly"];
@@ -3450,9 +3546,13 @@ that does nothing visible, and guarding it here rather than asking the
 consumer not to means the property can be set once on a component that
 changes type. */
   reveal?: HelixHeadlessInput["reveal"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   "reveal-label"?: HelixHeadlessInput["revealLabel"];
-  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  /** What the reveal toggle is called.
+
+The state is `aria-pressed`, not this. */
   revealLabel?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
@@ -3547,12 +3647,12 @@ be anyway. */
 };
 
 export type HelixHeadlessInputVueEvents = {
+  /** Relayed from the input once the reader has finished. */
+  change: HelixHeadlessInputElementEvent;
   /** Fired as the text changes, and cancelable. */
   "helix-before-change": HelixHeadlessInputHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessInputElementEvent;
-  /** Relayed from the input once the reader has finished. */
-  change: HelixHeadlessInputElementEvent;
 };
 
 /** `HelixHeadlessKbd` component event */
@@ -3902,14 +4002,14 @@ that can. */
 };
 
 export type HelixHeadlessListboxVueEvents = {
-  /** Fired when the answer changes, and cancelable. */
-  "helix-before-change": HelixHeadlessListboxHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessListboxElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessListboxElementEvent;
+  /** Fired when the answer changes, and cancelable. */
+  "helix-before-change": HelixHeadlessListboxHelixBeforeChangeElementEvent;
   /** Fired before the list narrows, and cancelable. */
   "helix-filter": HelixHeadlessListboxHelixFilterElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessListboxElementEvent;
 };
 
 export type HelixHeadlessLoaderVueProps = {
@@ -3924,12 +4024,12 @@ export type HelixHeadlessMegamenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMegamenu,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
-  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessMegamenuHelixBeforeCloseElementEvent =
   HelixHeadlessMegamenuElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMegamenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMegamenuElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessMegamenuVueProps = {
   /** The section's name, which names the default trigger and the panel. */
@@ -4025,10 +4125,10 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessMegamenuVueEvents = {
-  /** Fired before it opens, and cancelable. */
-  "helix-before-open": HelixHeadlessMegamenuHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-before-close": HelixHeadlessMegamenuHelixBeforeCloseElementEvent;
+  /** Fired before it opens, and cancelable. */
+  "helix-before-open": HelixHeadlessMegamenuHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessMegamenuElementEvent;
 };
@@ -4114,18 +4214,20 @@ export type HelixHeadlessMenuElementEvent<E = Event> = TypedEvent<
   HelixHeadlessMenu,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
-  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessMenuHelixBeforeCloseElementEvent =
   HelixHeadlessMenuElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessMenuHelixBeforeOpenElementEvent =
+  HelixHeadlessMenuElementEvent<HelixBeforeOpenEvent>;
 /** `helix-select` event type */
 export type HelixHeadlessMenuHelixSelectElementEvent =
   HelixHeadlessMenuElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessMenuVueProps = {
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessMenu["placement"];
   /** Space between the trigger and the surface, in pixels. */
   offset?: HelixHeadlessMenu["offset"];
@@ -4180,10 +4282,10 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessMenuVueEvents = {
-  /** Fired before it opens, and cancelable. */
-  "helix-before-open": HelixHeadlessMenuHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-before-close": HelixHeadlessMenuHelixBeforeCloseElementEvent;
+  /** Fired before it opens, and cancelable. */
+  "helix-before-open": HelixHeadlessMenuHelixBeforeOpenElementEvent;
   /** Fired when an item is chosen. */
   "helix-select": HelixHeadlessMenuHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
@@ -4202,11 +4304,17 @@ takes and what a consumer writing `value="72"` means. A range of zero to one
 is a fraction, and a component that reads `value="72"` as seventy-two times
 over its maximum is a trap that costs nothing to avoid. */
   max?: HelixHeadlessMeter["max"];
-  /** Where the reading sits between `min` and `max`. Outside them, it clamps. */
+  /** Where the reading sits between `min` and `max`.
+
+Outside them, it clamps. */
   value?: HelixHeadlessMeter["value"];
-  /** Top of the low band. Absent leaves the range unbanded. */
+  /** Top of the low band.
+
+Absent leaves the range unbanded. */
   low?: HelixHeadlessMeter["low"];
-  /** Bottom of the high band. Absent leaves the range unbanded. */
+  /** Bottom of the high band.
+
+Absent leaves the range unbanded. */
   high?: HelixHeadlessMeter["high"];
   /** Where in the range it is best to be.
 
@@ -4290,12 +4398,12 @@ export type HelixHeadlessNotificationElementEvent<E = Event> = TypedEvent<
   HelixHeadlessNotification,
   E
 >;
-/** `helix-read` event type */
-export type HelixHeadlessNotificationHelixReadElementEvent =
-  HelixHeadlessNotificationElementEvent<HelixReadEvent>;
 /** `helix-dismiss` event type */
 export type HelixHeadlessNotificationHelixDismissElementEvent =
   HelixHeadlessNotificationElementEvent<HelixDismissEvent>;
+/** `helix-read` event type */
+export type HelixHeadlessNotificationHelixReadElementEvent =
+  HelixHeadlessNotificationElementEvent<HelixReadEvent>;
 
 export type HelixHeadlessNotificationVueProps = {
   /** When it happened, as anything `Date` parses.
@@ -4328,7 +4436,9 @@ one. */
   defaultRead?: HelixHeadlessNotification["defaultRead"];
   /** Whether a reader may remove it. */
   dismissible?: HelixHeadlessNotification["dismissible"];
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
   locale?: HelixHeadlessNotification["locale"];
   /** Accessible name for the dismiss control. */
   "dismiss-label"?: HelixHeadlessNotification["dismissLabel"];
@@ -4337,10 +4447,10 @@ one. */
 };
 
 export type HelixHeadlessNotificationVueEvents = {
-  /** Fired when the item is marked read or unread, and cancelable. */
-  "helix-read": HelixHeadlessNotificationHelixReadElementEvent;
   /** Fired when a reader asks to remove it, and cancelable. */
   "helix-dismiss": HelixHeadlessNotificationHelixDismissElementEvent;
+  /** Fired when the item is marked read or unread, and cancelable. */
+  "helix-read": HelixHeadlessNotificationHelixReadElementEvent;
 };
 
 /** `HelixHeadlessNotifications` component event */
@@ -4401,9 +4511,13 @@ lets autofill work at all. This used to be hardcoded `off`, so a reader
 could never have a birthday or a postal code filled in for them and a
 consumer had no way to ask for it. See 295. */
   autocomplete?: HelixHeadlessNumberInput["autocomplete"];
-  /** Smallest value the reader may reach. Absent has no floor. */
+  /** Smallest value the reader may reach.
+
+Absent has no floor. */
   min?: HelixHeadlessNumberInput["min"];
-  /** Largest value the reader may reach. Absent has no ceiling. */
+  /** Largest value the reader may reach.
+
+Absent has no ceiling. */
   max?: HelixHeadlessNumberInput["max"];
   /** How far one step moves. */
   step?: HelixHeadlessNumberInput["step"];
@@ -4419,7 +4533,9 @@ Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
   largeStep?: HelixHeadlessNumberInput["largeStep"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessNumberInput["readOnly"];
@@ -4506,12 +4622,12 @@ form would submit it. */
 };
 
 export type HelixHeadlessNumberInputVueEvents = {
+  /** Relayed from the field once the reader has finished. */
+  change: HelixHeadlessNumberInputElementEvent;
   /** Fired as the value changes, and cancelable. */
   "helix-before-change": HelixHeadlessNumberInputHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessNumberInputElementEvent;
-  /** Relayed from the field once the reader has finished. */
-  change: HelixHeadlessNumberInputElementEvent;
 };
 
 export type HelixHeadlessOptionGroupVueProps = {
@@ -4553,11 +4669,17 @@ time, so the component can decline to draw the box at all.
 It does not reflect, per the rule that payload state stays off the host: a
 string is not a fact a selector needs. */
   description?: HelixHeadlessOption["description"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   "data-active"?: HelixHeadlessOption["active"];
-  /** Whether this is the option the keyboard is on. Written by the listbox. */
+  /** Whether this is the option the keyboard is on.
+
+Written by the listbox. */
   active?: HelixHeadlessOption["active"];
-  /** Whether this choice is currently chosen. Written by the listbox. */
+  /** Whether this choice is currently chosen.
+
+Written by the listbox. */
   selected?: HelixHeadlessOption["selected"];
   /** A shorter name for this choice, for where the row does not fit.
 
@@ -4845,7 +4967,9 @@ Reading gives the real one; writing declares it the consumer's, and
   defaultValue?: HelixHeadlessPaginationSize["defaultValue"];
   /** The words beside the control. */
   label?: HelixHeadlessPaginationSize["label"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessPaginationSize["locale"];
 };
 
@@ -4877,7 +5001,9 @@ of the element, so calling it `label` put one word on three jobs inside one
 family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
 which each label something; this labels nothing, it *is* the thing. */
   format?: HelixHeadlessPaginationSummary["format"];
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /** Locale for the numbers.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessPaginationSummary["locale"];
 };
 
@@ -5007,14 +5133,14 @@ reflected none of them. */
 };
 
 export type HelixHeadlessPinInputVueEvents = {
-  /** Announced with it, a filled code being the commit. */
+  /** Announced with a filled code, and when an edited one loses focus. */
   change: HelixHeadlessPinInputElementEvent;
   /** Fired as the code changes, and cancelable. */
   "helix-before-change": HelixHeadlessPinInputHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessPinInputElementEvent;
   /** Fired when the last box is filled. */
   "helix-complete": HelixHeadlessPinInputHelixCompleteElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessPinInputElementEvent;
 };
 
 /** `HelixHeadlessPopover` component event */
@@ -5022,19 +5148,21 @@ export type HelixHeadlessPopoverElementEvent<E = Event> = TypedEvent<
   HelixHeadlessPopover,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
-  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessPopoverHelixBeforeCloseElementEvent =
   HelixHeadlessPopoverElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessPopoverHelixBeforeOpenElementEvent =
+  HelixHeadlessPopoverElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessPopoverVueProps = {
   /** Accessible name for the panel. */
   label?: HelixHeadlessPopover["label"];
   /** Space between the trigger and the panel, in pixels. */
   offset?: HelixHeadlessPopover["offset"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
@@ -5067,10 +5195,10 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessPopoverVueEvents = {
-  /** Fired before it opens, and cancelable. */
-  "helix-before-open": HelixHeadlessPopoverHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-before-close": HelixHeadlessPopoverHelixBeforeCloseElementEvent;
+  /** Fired before it opens, and cancelable. */
+  "helix-before-open": HelixHeadlessPopoverHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessPopoverElementEvent;
 };
@@ -5265,12 +5393,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessRadioGroupVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixHeadlessRadioGroupElementEvent;
   /** Fired when the answer changes, and cancelable. */
   "helix-before-change": HelixHeadlessRadioGroupHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessRadioGroupElementEvent;
-  /** Announced once the value has moved. */
-  change: HelixHeadlessRadioGroupElementEvent;
 };
 
 /** `HelixHeadlessRadio` component event */
@@ -5285,7 +5413,9 @@ export type HelixHeadlessRadioHelixSelectElementEvent =
 export type HelixHeadlessRadioVueProps = {
   /** Whether this choice can be made. */
   disabled?: HelixHeadlessRadio["disabled"];
-  /** Whether this is the current choice. Written by the group. */
+  /** Whether this is the current choice.
+
+Written by the group. */
   selected?: HelixHeadlessRadio["selected"];
   /** Identifies this choice to the group, and is what the form submits. */
   value?: HelixHeadlessRadio["value"];
@@ -5444,12 +5574,12 @@ form would submit it. */
 };
 
 export type HelixHeadlessRatingVueEvents = {
+  /** Announced with it, the choice being the commit. */
+  change: HelixHeadlessRatingElementEvent;
   /** Fired before the score changes, and cancelable. */
   "helix-before-change": HelixHeadlessRatingHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessRatingElementEvent;
-  /** Announced with it, the choice being the commit. */
-  change: HelixHeadlessRatingElementEvent;
 };
 
 export type HelixHeadlessScrollAreaVueProps = {
@@ -5469,12 +5599,12 @@ export type HelixHeadlessSelectElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessSelectHelixBeforeChangeElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
-  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessSelectHelixBeforeCloseElementEvent =
   HelixHeadlessSelectElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSelectHelixBeforeOpenElementEvent =
+  HelixHeadlessSelectElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessSelectVueProps = {
   /** Whether the list can be narrowed by typing.
@@ -5596,16 +5726,16 @@ differently: they are one chooser to a consumer. */
 };
 
 export type HelixHeadlessSelectVueEvents = {
-  /** Relayed from the listbox when the answer changes. */
-  "helix-before-change": HelixHeadlessSelectHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessSelectElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessSelectElementEvent;
-  /** Fired when the list opens. */
-  "helix-before-open": HelixHeadlessSelectHelixBeforeOpenElementEvent;
+  /** Relayed from the listbox when the answer changes. */
+  "helix-before-change": HelixHeadlessSelectHelixBeforeChangeElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessSelectHelixBeforeCloseElementEvent;
+  /** Fired when the list opens. */
+  "helix-before-open": HelixHeadlessSelectHelixBeforeOpenElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessSelectElementEvent;
 };
@@ -5727,12 +5857,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessSliderVueEvents = {
+  /** Relayed once the reader has let go. */
+  change: HelixHeadlessSliderElementEvent;
   /** Fired as the value changes, and cancelable. */
   "helix-before-change": HelixHeadlessSliderHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessSliderElementEvent;
-  /** Relayed once the reader has let go. */
-  change: HelixHeadlessSliderElementEvent;
 };
 
 export type HelixHeadlessSparklineVueProps = {
@@ -5841,12 +5971,12 @@ export type HelixHeadlessSpeedDialElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSpeedDial,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
-  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessSpeedDialHelixBeforeCloseElementEvent =
   HelixHeadlessSpeedDialElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessSpeedDialHelixBeforeOpenElementEvent =
+  HelixHeadlessSpeedDialElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessSpeedDialVueProps = {
   /** Names the trigger and the set of actions it opens. */
@@ -5889,10 +6019,10 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessSpeedDialVueEvents = {
-  /** Fired before it opens, and cancelable. */
-  "helix-before-open": HelixHeadlessSpeedDialHelixBeforeOpenElementEvent;
   /** Fired before it closes, and cancelable. */
   "helix-before-close": HelixHeadlessSpeedDialHelixBeforeCloseElementEvent;
+  /** Fired before it opens, and cancelable. */
+  "helix-before-open": HelixHeadlessSpeedDialHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessSpeedDialElementEvent;
 };
@@ -5902,12 +6032,12 @@ export type HelixHeadlessSplitterElementEvent<E = Event> = TypedEvent<
   HelixHeadlessSplitter,
   E
 >;
-/** `helix-before-resize` event type */
-export type HelixHeadlessSplitterHelixBeforeResizeElementEvent =
-  HelixHeadlessSplitterElementEvent<HelixBeforeResizeEvent>;
 /** `helix-before-collapse` event type */
 export type HelixHeadlessSplitterHelixBeforeCollapseElementEvent =
   HelixHeadlessSplitterElementEvent<HelixBeforeCollapseEvent>;
+/** `helix-before-resize` event type */
+export type HelixHeadlessSplitterHelixBeforeResizeElementEvent =
+  HelixHeadlessSplitterElementEvent<HelixBeforeResizeEvent>;
 
 export type HelixHeadlessSplitterVueProps = {
   /** Which way the panes are laid out.
@@ -6007,10 +6137,10 @@ passes through. */
 };
 
 export type HelixHeadlessSplitterVueEvents = {
-  /** Fired before the divider settles, and cancelable. */
-  "helix-before-resize": HelixHeadlessSplitterHelixBeforeResizeElementEvent;
   /** Fired before a pane shuts or reopens, and cancelable. */
   "helix-before-collapse": HelixHeadlessSplitterHelixBeforeCollapseElementEvent;
+  /** Fired before the divider settles, and cancelable. */
+  "helix-before-resize": HelixHeadlessSplitterHelixBeforeResizeElementEvent;
 };
 
 export type HelixHeadlessStatGroupVueProps = {
@@ -6099,9 +6229,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessSteps["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessSteps["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessSteps["defaultActive"];
 };
 
@@ -6203,12 +6337,12 @@ reflected none of them. */
 };
 
 export type HelixHeadlessSwitchVueEvents = {
+  /** Relayed from the input once the state has changed. */
+  change: HelixHeadlessSwitchElementEvent;
   /** Fired before the state changes, and cancelable. */
   "helix-before-toggle": HelixHeadlessSwitchHelixBeforeToggleElementEvent;
   /** Announced once the state has moved. */
   input: HelixHeadlessSwitchElementEvent;
-  /** Relayed from the input once the state has changed. */
-  change: HelixHeadlessSwitchElementEvent;
 };
 
 export type HelixHeadlessTableCellVueProps = {
@@ -6408,9 +6542,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessTabs["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessTabs["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTabs["defaultActive"];
 };
 
@@ -6496,7 +6634,9 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "auto-grow"?: HelixHeadlessTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   autoGrow?: HelixHeadlessTextarea["autoGrow"];
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
   "read-only"?: HelixHeadlessTextarea["readOnly"];
@@ -6530,7 +6670,8 @@ no form at all and forwarding the attribute would have looked right and
 submitted nothing. `ElementInternals` takes a `FormData`, which is how one
 element sends two entries, and that is what this does. */
   dirName?: HelixHeadlessTextarea["dirName"];
-  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  /** How the browser wraps the text, and whether the breaks are submitted with
+it. */
   wrap?: HelixHeadlessTextarea["wrap"];
   /** Fewest characters the value may have.
 
@@ -6624,12 +6765,12 @@ which is where an empty field's caret would be anyway. */
 };
 
 export type HelixHeadlessTextareaVueEvents = {
+  /** Relayed from the textarea once the reader has finished. */
+  change: HelixHeadlessTextareaElementEvent;
   /** Fired as the text changes, and cancelable. */
   "helix-before-change": HelixHeadlessTextareaHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessTextareaElementEvent;
-  /** Relayed from the textarea once the reader has finished. */
-  change: HelixHeadlessTextareaElementEvent;
 };
 
 /** `HelixHeadlessTimeInput` component event */
@@ -6640,12 +6781,12 @@ export type HelixHeadlessTimeInputElementEvent<E = Event> = TypedEvent<
 /** `helix-before-change` event type */
 export type HelixHeadlessTimeInputHelixBeforeChangeElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeChangeEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
-  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTimeInputHelixBeforeCloseElementEvent =
   HelixHeadlessTimeInputElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTimeInputHelixBeforeOpenElementEvent =
+  HelixHeadlessTimeInputElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessTimeInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
@@ -6708,7 +6849,9 @@ for reading; `iso` is `HH:mm`, which is what it is for typing. The field
 swaps to the value while the caret is in it either way, so the rendering is
 never something this element would refuse to read back. */
   timeStyle?: HelixHeadlessTimeInput["timeStyle"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessTimeInput["locale"];
   /** What the field says before a time is in it. */
   placeholder?: HelixHeadlessTimeInput["placeholder"];
@@ -6836,16 +6979,16 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 };
 
 export type HelixHeadlessTimeInputVueEvents = {
-  /** Fired when the time changes. */
-  "helix-before-change": HelixHeadlessTimeInputHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessTimeInputElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessTimeInputElementEvent;
-  /** Fired when the list opens. */
-  "helix-before-open": HelixHeadlessTimeInputHelixBeforeOpenElementEvent;
+  /** Fired when the time changes. */
+  "helix-before-change": HelixHeadlessTimeInputHelixBeforeChangeElementEvent;
   /** Fired when it closes. */
   "helix-before-close": HelixHeadlessTimeInputHelixBeforeCloseElementEvent;
+  /** Fired when the list opens. */
+  "helix-before-open": HelixHeadlessTimeInputHelixBeforeOpenElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessTimeInputElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTimeInputElementEvent;
 };
@@ -6901,7 +7044,9 @@ A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
   disableTimes?: HelixHeadlessTimePicker["disableTimes"];
-  /** Language tag the times are written in. Absent uses the runtime's own. */
+  /** Language tag the times are written in.
+
+Absent uses the runtime's own. */
   locale?: HelixHeadlessTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   label?: HelixHeadlessTimePicker["label"];
@@ -7034,12 +7179,12 @@ a consumer handing over `new Date()` gets the time of day they expected. */
 };
 
 export type HelixHeadlessTimePickerVueEvents = {
+  /** Announced once the value has moved. */
+  change: HelixHeadlessTimePickerElementEvent;
   /** Fired when the time changes. */
   "helix-before-change": HelixHeadlessTimePickerHelixBeforeChangeElementEvent;
   /** Announced once the value has moved. */
   input: HelixHeadlessTimePickerElementEvent;
-  /** Announced once the value has moved. */
-  change: HelixHeadlessTimePickerElementEvent;
 };
 
 export type HelixHeadlessTimelineItemVueProps = {
@@ -7248,14 +7393,14 @@ reflected none of them. */
 };
 
 export type HelixHeadlessToggleGroupVueEvents = {
-  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
-  "helix-before-change": HelixHeadlessToggleGroupHelixBeforeChangeElementEvent;
-  /** Announced once the value has moved. */
-  input: HelixHeadlessToggleGroupElementEvent;
   /** Announced once the value has moved. */
   change: HelixHeadlessToggleGroupElementEvent;
+  /** Fired before the answer moves, and cancelable. The only way to refuse one. */
+  "helix-before-change": HelixHeadlessToggleGroupHelixBeforeChangeElementEvent;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
   "helix-select": HelixHeadlessToggleGroupHelixSelectElementEvent;
+  /** Announced once the value has moved. */
+  input: HelixHeadlessToggleGroupElementEvent;
 };
 
 /** `HelixHeadlessToggle` component event */
@@ -7317,12 +7462,12 @@ export type HelixHeadlessTooltipElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTooltip,
   E
 >;
-/** `helix-before-open` event type */
-export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
-  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTooltipHelixBeforeCloseElementEvent =
   HelixHeadlessTooltipElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTooltipHelixBeforeOpenElementEvent =
+  HelixHeadlessTooltipElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixHeadlessTooltipVueProps = {
   /** The text shown in the bubble.
@@ -7349,7 +7494,9 @@ through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
   for?: HelixHeadlessTooltip["for"];
-  /** Preferred side. It moves if that side does not fit. */
+  /** Preferred side.
+
+It moves if that side does not fit. */
   placement?: HelixHeadlessTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
@@ -7432,10 +7579,10 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessTooltipVueEvents = {
-  /** Fired before the bubble shows, and cancelable. */
-  "helix-before-open": HelixHeadlessTooltipHelixBeforeOpenElementEvent;
   /** Fired before it hides, and cancelable. */
   "helix-before-close": HelixHeadlessTooltipHelixBeforeCloseElementEvent;
+  /** Fired before the bubble shows, and cancelable. */
+  "helix-before-open": HelixHeadlessTooltipHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTooltipElementEvent;
 };
@@ -7448,12 +7595,12 @@ export type HelixHeadlessTourElementEvent<E = Event> = TypedEvent<
 /** `helix-before-activate` event type */
 export type HelixHeadlessTourHelixBeforeActivateElementEvent =
   HelixHeadlessTourElementEvent<HelixBeforeActivateEvent>;
-/** `helix-complete` event type */
-export type HelixHeadlessTourHelixCompleteElementEvent =
-  HelixHeadlessTourElementEvent<HelixCompleteEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTourHelixBeforeCloseElementEvent =
   HelixHeadlessTourElementEvent<HelixBeforeCloseEvent>;
+/** `helix-complete` event type */
+export type HelixHeadlessTourHelixCompleteElementEvent =
+  HelixHeadlessTourElementEvent<HelixCompleteEvent>;
 
 export type HelixHeadlessTourVueProps = {
   /** Whether the tour is running. */
@@ -7502,10 +7649,10 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 export type HelixHeadlessTourVueEvents = {
   /** Fired when the current stop moves, carrying the new index. */
   "helix-before-activate": HelixHeadlessTourHelixBeforeActivateElementEvent;
-  /** Fired when the last stop is finished. */
-  "helix-complete": HelixHeadlessTourHelixCompleteElementEvent;
   /** Fired when the reader leaves early. */
   "helix-before-close": HelixHeadlessTourHelixBeforeCloseElementEvent;
+  /** Fired when the last stop is finished. */
+  "helix-complete": HelixHeadlessTourHelixCompleteElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTourElementEvent;
 };
@@ -7564,15 +7711,15 @@ export type HelixHeadlessTreeItemElementEvent<E = Event> = TypedEvent<
   HelixHeadlessTreeItem,
   E
 >;
-/** `helix-select` event type */
-export type HelixHeadlessTreeItemHelixSelectElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
-/** `helix-before-open` event type */
-export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
-  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
 /** `helix-before-close` event type */
 export type HelixHeadlessTreeItemHelixBeforeCloseElementEvent =
   HelixHeadlessTreeItemElementEvent<HelixBeforeCloseEvent>;
+/** `helix-before-open` event type */
+export type HelixHeadlessTreeItemHelixBeforeOpenElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixBeforeOpenEvent>;
+/** `helix-select` event type */
+export type HelixHeadlessTreeItemHelixSelectElementEvent =
+  HelixHeadlessTreeItemElementEvent<HelixSelectEvent>;
 
 export type HelixHeadlessTreeItemVueProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
@@ -7645,12 +7792,12 @@ is what the mirror has always been for. */
 };
 
 export type HelixHeadlessTreeItemVueEvents = {
-  /** Fired when the item is chosen. */
-  "helix-select": HelixHeadlessTreeItemHelixSelectElementEvent;
-  /** Fired before a branch opens, and cancelable. */
-  "helix-before-open": HelixHeadlessTreeItemHelixBeforeOpenElementEvent;
   /** Fired before a branch closes, and cancelable. */
   "helix-before-close": HelixHeadlessTreeItemHelixBeforeCloseElementEvent;
+  /** Fired before a branch opens, and cancelable. */
+  "helix-before-open": HelixHeadlessTreeItemHelixBeforeOpenElementEvent;
+  /** Fired when the item is chosen. */
+  "helix-select": HelixHeadlessTreeItemHelixSelectElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessTreeItemElementEvent;
 };
@@ -7698,9 +7845,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessTree["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessTree["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessTree["defaultActive"];
 };
 
@@ -7822,9 +7973,13 @@ real item; writing hands ownership to the consumer, so `<helix-tabs
 active="one">` is a set that stays on that tab and `default-active` is
 how markup says where to start. */
   active?: HelixHeadlessVideoPlaylist["active"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   "default-active"?: HelixHeadlessVideoPlaylist["defaultActive"];
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Initial item for uncontrolled use.
+
+Ignored once `active` is written. */
   defaultActive?: HelixHeadlessVideoPlaylist["defaultActive"];
 };
 
@@ -7896,9 +8051,11 @@ the browser's policy and not this element's, and `play()` already swallows
 the refusal: what follows a refused autoplay is a paused player showing its
 start control, which is the correct thing to be looking at. */
   autoplay?: HelixHeadlessVideo["autoplay"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   crossorigin?: HelixHeadlessVideo["crossOrigin"];
-  /** How the media is fetched across origins, which decides whether a track can be read. */
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
   crossOrigin?: HelixHeadlessVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
   "disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
@@ -8078,16 +8235,16 @@ past the end is the one write the platform answers with an exception. */
 };
 
 export type HelixHeadlessVideoVueEvents = {
+  /** Relayed for the same reason. */
+  ended: HelixHeadlessVideoElementEvent;
   /** Fired when the reader asks for the next item. */
   "helix-next": HelixHeadlessVideoHelixNextElementEvent;
   /** Fired when they ask for the previous one. */
   "helix-previous": HelixHeadlessVideoHelixPreviousElementEvent;
-  /** Relayed, because it does not cross a shadow boundary. */
-  play: HelixHeadlessVideoElementEvent;
   /** Relayed for the same reason. */
   pause: HelixHeadlessVideoElementEvent;
-  /** Relayed for the same reason. */
-  ended: HelixHeadlessVideoElementEvent;
+  /** Relayed, because it does not cross a shadow boundary. */
+  play: HelixHeadlessVideoElementEvent;
 };
 
 export type HelixHeadlessVirtualListVueProps = {
@@ -8102,12 +8259,12 @@ export type HelixHeadlessVirtualListVueProps = {
 export type HelixHeadlessVirtualListVueEvents = {};
 
 export type CustomCssProperties = {
-  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
-  "--chart-bar-wash"?: string;
   /** The color of a single-series axis, taken from that series. */
   "--bar-chart-axis"?: string;
   /** The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. */
   "--bar-chart-secondary"?: string;
+  /** The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. */
+  "--chart-bar-wash"?: string;
   /** The chosen color, to paint over the transparency check. */
   "--color-input-swatch"?: string;
   /** The chosen brightness, 0 to 100, as a percentage. */
@@ -8124,32 +8281,18 @@ export type CustomCssProperties = {
   "--date-picker-column-count"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
+  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
+  "--heatmap-cell-height"?: string;
+  /** How far a cell's corners are rounded. */
+  "--heatmap-cell-radius"?: string;
   /** The size a cell wants on both axes, where neither is given its own. */
   "--heatmap-cell-size"?: string;
   /** How wide a cell is. The strip fits as many as the container allows. */
   "--heatmap-cell-width"?: string;
-  /** How tall a cell is. A row of a tall thin cell is what a status page draws. */
-  "--heatmap-cell-height"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
-  /** How far a cell's corners are rounded. */
-  "--heatmap-cell-radius"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
-  /** What `success` is worth, as a name or a `data-tone`. */
-  "--heatmap-tone-success"?: string;
-  /** What `warning` is worth. */
-  "--heatmap-tone-warning"?: string;
-  /** What `danger` is worth. */
-  "--heatmap-tone-danger"?: string;
-  /** What `info` is worth. */
-  "--heatmap-tone-info"?: string;
-  /** What `accent` is worth. */
-  "--heatmap-tone-accent"?: string;
-  /** What `primary` is worth. */
-  "--heatmap-tone-primary"?: string;
-  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
-  "--heatmap-tone-muted"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */
   "--heatmap-tone-1"?: string;
   /** The second step of the magnitude ramp. */
@@ -8160,6 +8303,20 @@ export type CustomCssProperties = {
   "--heatmap-tone-4"?: string;
   /** The loudest step of the magnitude ramp. */
   "--heatmap-tone-5"?: string;
+  /** What `accent` is worth. */
+  "--heatmap-tone-accent"?: string;
+  /** What `danger` is worth. */
+  "--heatmap-tone-danger"?: string;
+  /** What `info` is worth. */
+  "--heatmap-tone-info"?: string;
+  /** What `muted` is worth: the quiet ground, for a bucket that means nothing happened. */
+  "--heatmap-tone-muted"?: string;
+  /** What `primary` is worth. */
+  "--heatmap-tone-primary"?: string;
+  /** What `success` is worth, as a name or a `data-tone`. */
+  "--heatmap-tone-success"?: string;
+  /** What `warning` is worth. */
+  "--heatmap-tone-warning"?: string;
   /** Where the panel starts, measured from the bar above it. */
   "--megamenu-top"?: string;
   /** Where a bound sits on the arc, as a length along it. */
@@ -8234,7 +8391,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessAnnouncementVueProps,
     HelixHeadlessAnnouncementVueEvents
   >;
-  /** Tracks whether the page has scrolled and reflects it as 'data-scrolled', so the styled tier can lift the bar off the page without a scroll handler of its own. Scroll position is the one piece of state the server genuinely cannot know, so it is read on connect rather than derived: a fresh load starts at the top, which is what the server rendered, and a reload part-way down corrects on hydration.  The listener is passive and reads 'scrollY' only, so it never blocks scrolling.  Three regions, each in its own wrapper, because the row is a grid and a grid needs three items to put the middle one in the middle. A bare slot is 'display: contents', so its assigned elements become grid items themselves: two actions would take two tracks and push the navigation off center. These wrappers earn their boxes, which is the test; they carry no inset or fill of their own, so an empty one still paints nothing.  The host is the banner and spans the viewport; the row inside it is what gets centered. A banner that is itself narrowed leaves its background stopping short of the window edges, which reads as a floating bar rather than as the top of the page. That needs one element and one row, not a wrapper as well: the host carries the material and 'content' carries the measure. */
+  /** Tracks whether the page has scrolled and carries it as the custom state 'scrolled', so the styled tier can lift the bar off the page without a scroll handler of its own. Scroll position is the one piece of state the server genuinely cannot know, so it is read on connect rather than derived: a fresh load starts at the top, which is what the server rendered, and a reload part-way down corrects on hydration.  **A custom state and not 'data-scrolled', which is what this used to be.** The attribute was written onto the host by the element itself, so a server sent the header without it and the element added it on upgrade. A framework hydrating the page then found an attribute it had not rendered and reported the tree as mismatched: intermittently, because it only happens when the reader reloads far enough down the page to pass the threshold. Every server-rendered consumer paid for that, and could only answer it by suppressing hydration warnings on an element they did not write.  'ElementInternals.states' is deliberately not in the DOM, so there is nothing for a hydration pass to disagree with, and ':state(scrolled)' selects it. The base class made the same move for 'data-settled' and its note explains the rest.  The listener is passive and reads 'scrollY' only, so it never blocks scrolling.  Three regions, each in its own wrapper, because the row is a grid and a grid needs three items to put the middle one in the middle. A bare slot is 'display: contents', so its assigned elements become grid items themselves: two actions would take two tracks and push the navigation off center. These wrappers earn their boxes, which is the test; they carry no inset or fill of their own, so an empty one still paints nothing.  The host is the banner and spans the viewport; the row inside it is what gets centered. A banner that is itself narrowed leaves its background stopping short of the window edges, which reads as a floating bar rather than as the top of the page. That needs one element and one row, not a wrapper as well: the host carries the material and 'content' carries the measure. */
   "helix-headless-app-header": DefineCustomElement<
     HelixHeadlessAppHeader,
     HelixHeadlessAppHeaderVueProps,
@@ -8306,7 +8463,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessCardVueProps,
     HelixHeadlessCardVueEvents
   >;
-  /** The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and the browser's own momentum all work without being reimplemented. The controls scroll it; they do not drive a transform.  Slides are the consumer's own elements. Each is given 'aria-roledescription="slide"' and a name reading its position in the set, which is what a screen-reader user needs to know where they are. Where a slide carries its own 'aria-label', that one is left alone.  **Rotation stops on focus and on hover, and once stopped it stays stopped.** The APG is explicit: rotation must not resume unless the reader asks for it, so hovering away does not start it again. The control names the action it performs, and it is first in the tab order. */
+  /** The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and the browser's own momentum all work without being reimplemented. The controls scroll it; they do not drive a transform.  Slides are the consumer's own elements, and nothing is written onto them. The component renders a pane per slide carrying 'role="group"', 'aria-roledescription="slide"' and a name reading its position in the set, and assigns the slide into it: a screen-reader user hears where they are, and a slide that is itself a link is still a link, which it was not while the role was being written on top of it. See 'assign'.  **Rotation stops on focus and on hover, and once stopped it stays stopped.** The APG is explicit: rotation must not resume unless the reader asks for it, so hovering away does not start it again. The control names the action it performs, and it is first in the tab order. */
   "helix-headless-carousel": DefineCustomElement<
     HelixHeadlessCarousel,
     HelixHeadlessCarouselVueProps,

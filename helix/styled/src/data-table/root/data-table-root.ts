@@ -27,19 +27,19 @@ import '../../table/index.js'
  * @documentation https://helix.fusion.dev/components/data-table
  *
  * @slot - The columns, declared as `helix-table-column` children.
- * @slot toolbar - Above the grid, for a search field or actions.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
+ * @slot toolbar - Above the grid, for a search field or actions.
  *
- * @csspart table - The grid.
  * @csspart cell - One cell.
+ * @csspart table - The grid.
  *
- * @cssproperty --data-table-columns - Track list for the columns, which wins over the one the columns worked out.
- * @cssproperty --data-table-rule - The hairline between rows.
  * @cssproperty --data-table-color - Ink in a cell.
+ * @cssproperty --data-table-columns - Track list for the columns, which wins over the one the columns worked out.
  * @cssproperty --data-table-heading-color - Ink in a heading.
- * @cssproperty --data-table-text - Type size, headings and cells alike.
  * @cssproperty --data-table-padding-block - Space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - Space either side of a cell's content.
+ * @cssproperty --data-table-rule - The hairline between rows.
+ * @cssproperty --data-table-text - Type size, headings and cells alike.
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {

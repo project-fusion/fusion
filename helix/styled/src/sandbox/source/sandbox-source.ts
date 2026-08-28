@@ -29,17 +29,19 @@ import { styles } from './sandbox-source.css.js'
  * @aliases Editor, Code pane
  * @documentation https://helix.fusion.dev/sandbox/source
  *
- * @csspart source - The editable region.
- *
- * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired when the source is edited.
+ * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
+ *
+ * @csspart source - The editable region.
  *
  * @cssproperty --sandbox-source-background - Fill behind the source.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
  */
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
-  /** The source being edited. */
+  /**
+   * The source being edited.
+   */
   @property()
   value = ''
 
@@ -54,11 +56,15 @@ export class HelixSandboxSource extends HelixElement {
   @property()
   name = 'html'
 
-  /** Accessible name for the editable region. */
+  /**
+   * Accessible name for the editable region.
+   */
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 
-  /** Whether Tab indents rather than moving focus. */
+  /**
+   * Whether Tab indents rather than moving focus.
+   */
   @property({ attribute: 'tab-indents', converter: onUnlessFalse })
   tabIndents = true
 

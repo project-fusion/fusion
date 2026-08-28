@@ -35,13 +35,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
- * @csspart start - The leading column, which is a slot and is always there.
- * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
+ * @csspart mark - The trailing mark: a tick when checked, a caret when it opens.
  * a page. One column, because a row is never both.
+ * @csspart start - The leading column, which is a slot and is always there.
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
-  /** What this row stands for, carried in the event when it is chosen. */
+  /**
+   * What this row stands for, carried in the event when it is chosen.
+   */
   @property()
   value = ''
 
@@ -59,11 +61,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @property({ reflect: true, type: Boolean })
   checkable = false
 
-  /** Whether the row is ticked. */
+  /**
+   * Whether the row is ticked.
+   */
   @property({ reflect: true, type: Boolean })
   checked = false
 
-  /** Whether the row can be chosen. */
+  /**
+   * Whether the row can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
@@ -90,11 +96,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @property()
   href = ''
 
-  /** Where the link opens, for the rows that should leave the page. */
+  /**
+   * Where the link opens, for the rows that should leave the page.
+   */
   @property()
   target = ''
 
-  /** The relationship, which `target="_blank"` should always set. */
+  /**
+   * The relationship, which `target="_blank"` should always set.
+   */
   @property()
   rel = ''
 

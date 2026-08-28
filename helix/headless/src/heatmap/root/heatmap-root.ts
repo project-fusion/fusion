@@ -67,18 +67,20 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
  * @documentation https://helix.fusion.dev/components/heatmap
  *
+ * @slot end - Below the strip, at the trailing edge: usually the newest date.
  * @slot start - Below the strip, at the leading edge: usually the oldest date.
  * @slot summary - Below the strip, in the middle: the reading over the range drawn.
- * @slot end - Below the strip, at the trailing edge: usually the newest date.
  *
- * @csspart strip - The grid of cells.
+ * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, carrying that number.
+ *
  * @csspart cell - One reading.
- * @csspart footer - The three-slot row under the strip.
- * @csspart start - The leading slot's box.
- * @csspart summary - The middle slot's box.
- * @csspart end - The trailing slot's box.
  * @csspart empty - Shown when the table has no readings in it.
+ * @csspart end - The trailing slot's box.
+ * @csspart footer - The three-slot row under the strip.
  * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart start - The leading slot's box.
+ * @csspart strip - The grid of cells.
+ * @csspart summary - The middle slot's box.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
@@ -86,26 +88,24 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
  * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
- * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
- * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
- * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
- * @cssproperty --heatmap-tone-warning - What `warning` is worth.
- * @cssproperty --heatmap-tone-danger - What `danger` is worth.
- * @cssproperty --heatmap-tone-info - What `info` is worth.
- * @cssproperty --heatmap-tone-accent - What `accent` is worth.
- * @cssproperty --heatmap-tone-primary - What `primary` is worth.
- * @cssproperty --heatmap-tone-muted - What `muted` is worth: the quiet ground, for a bucket that means nothing happened.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
  * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.
  * @cssproperty --heatmap-tone-4 - The fourth step of the magnitude ramp.
  * @cssproperty --heatmap-tone-5 - The loudest step of the magnitude ramp.
- *
- * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, carrying that number.
+ * @cssproperty --heatmap-tone-accent - What `accent` is worth.
+ * @cssproperty --heatmap-tone-danger - What `danger` is worth.
+ * @cssproperty --heatmap-tone-info - What `info` is worth.
+ * @cssproperty --heatmap-tone-muted - What `muted` is worth: the quiet ground, for a bucket that means nothing happened.
+ * @cssproperty --heatmap-tone-primary - What `primary` is worth.
+ * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
+ * @cssproperty --heatmap-tone-warning - What `warning` is worth.
  */
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
@@ -170,11 +170,16 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   @property({ attribute: 'min-cell', type: Number })
   minCell = 8
 
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a number. */
+  /**
+   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
+   */
   @property({ type: Number })
   gap = 2
 
-  /** Shown when the table has no readings in it. */
+  /**
+   * Shown when the table has no readings in it.
+   */
   @property({ attribute: 'empty-text' })
   emptyText = 'No readings'
 
@@ -226,7 +231,10 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   @state()
   private metrics: { cell: number; gap: number } | undefined = undefined
 
-  /** Which drawn cell the pointer is on, as an index into `drawn`, or -1 for none. */
+  /**
+   * Which drawn cell the pointer is on, as an index into `drawn`, or -1 for
+   * none.
+   */
   @state()
   private hovered = -1
 

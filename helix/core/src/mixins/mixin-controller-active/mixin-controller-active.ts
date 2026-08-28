@@ -95,7 +95,11 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
       this.requestUpdate('active', previous)
     }
 
-    /** Initial item for uncontrolled use. Ignored once `active` is written. */
+    /**
+     * Initial item for uncontrolled use.
+     *
+     * Ignored once `active` is written.
+     */
     @property({ attribute: 'default-active' })
     defaultActive = ''
 

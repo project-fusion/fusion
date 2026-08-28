@@ -59,6 +59,44 @@
   opacity: 0.5;
 }
 
+/* **Inline: a control in a row of prose or of tools, rather than a field in a
+   form.** `ghost` is the registry's word for a control with no ground of its
+   own, and it is the same one `Button` and `IconButton` take: no fill, no edge,
+   and a wash of the foreground the moment a pointer is on it.
+
+   Three things go with the box. The host stops filling its column and takes the
+   width of what is in it, because a field is as wide as the form and a control
+   in a sentence is as wide as its answer. The trigger stops spacing its two
+   halves apart, so the mark sits against the value rather than at the far end of
+   a width nothing is using. And the step comes down, because a control drawn
+   without a frame beside 32 pixel neighbours is 40 pixels of empty air.
+
+   The label is unaffected and deliberately so: a field with no visible label
+   sets `aria-label` and gets a clipped one, which is a separate question from
+   where its surface ends. */
+:host([emphasis="ghost"]) {
+  inline-size: fit-content;
+}
+
+:host([emphasis="ghost"]) [part="trigger"] {
+  background-color: transparent;
+  block-size: var(--helix-size-control-sm);
+  border-color: transparent;
+  justify-content: start;
+  padding-inline: var(--helix-space-2xs);
+}
+
+:host([emphasis="ghost"]:not(:disabled)) [part="trigger"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  border-color: transparent;
+}
+
+/* Focus still draws an edge, because a control with no resting frame has nothing
+   else to say where the keyboard is. */
+:host([emphasis="ghost"]) [part="trigger"]:focus-visible {
+  border-color: var(--helix-color-primary);
+}
+
 /* One line, cut rather than wrapped, so a long answer does not make the closed
    control taller than the fields beside it. */
 /* The value takes the room, so the trigger reads the same with a leading icon

@@ -23,12 +23,14 @@ import { property } from 'lit/decorators.js'
  * @slot - The quoted passage.
  * @slot attribution - Who said it, and where.
  *
- * @csspart blockquote - The quotation.
  * @csspart attribution - The footer carrying the source.
+ * @csspart blockquote - The quotation.
  */
 @customElement('helix-headless-blockquote')
 export class HelixHeadlessBlockquote extends HelixElement {
-  /** URL identifying where the passage came from. */
+  /**
+   * URL identifying where the passage came from.
+   */
   @property()
   cite = ''
 

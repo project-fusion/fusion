@@ -66,7 +66,9 @@ export const FOLDS_UP_TO = 12
  */
 @customElement('helix-headless-avatar-group')
 export class HelixHeadlessAvatarGroup extends HelixElement {
-  /** Accessible name for the set, such as "Reviewers". */
+  /**
+   * Accessible name for the set, such as "Reviewers".
+   */
   @property()
   label = ''
 

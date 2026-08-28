@@ -26,9 +26,9 @@ import { styles } from './toast-root.css.js'
  * @aliases Toaster, Snackbar, Notifications
  * @documentation https://helix.fusion.dev/components/toast
  *
- * @cssproperty --toast-inset - Distance from the edges of the window.
  * @cssproperty --toast-gap - Space between one message and the next.
  * @cssproperty --toast-inline-size - Width of a message.
+ * @cssproperty --toast-inset - Distance from the edges of the window.
  */
 @customElement('helix-toast')
 export class HelixToast extends HelixHeadlessToast {

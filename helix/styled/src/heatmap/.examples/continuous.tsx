@@ -4,7 +4,7 @@ export function Example() {
       className="field"
       for="load"
       label="Average load by hour"
-      rows="7"
+      rows={7}
       thresholds="0 1 2 3 4"
       tones="1 2 3 4 5"
     >

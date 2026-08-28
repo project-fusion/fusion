@@ -21,7 +21,7 @@ export function Example() {
      subtree inert, so a panel anywhere else cannot be pressed at all. A tour
      points *into* things, so anything it points into has to stay reachable. As
      a prop rather than an attribute, since `modal` is a boolean attribute
-     defaulting to true and `modal="false"` in markup still reads as true. */
+     defaulting to true and `modal={false}` in markup still reads as true. */
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)
 

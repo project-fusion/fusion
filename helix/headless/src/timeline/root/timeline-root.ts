@@ -41,7 +41,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-timeline')
 export class HelixHeadlessTimeline extends HelixElement {
-  /** Names the record, for a reader arriving at it out of context. */
+  /**
+   * Names the record, for a reader arriving at it out of context.
+   */
   @property()
   label = ''
 

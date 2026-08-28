@@ -39,19 +39,21 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Picture, Img, Figure
  * @documentation https://helix.fusion.dev/components/image
  *
- * @slot placeholder - Shown until the picture arrives.
  * @slot fallback - Shown instead of it, if it never does.
+ * @slot placeholder - Shown until the picture arrives.
  *
- * @event {Event} load - Relayed, because the platform's own does not escape.
  * @event {Event} error - Relayed for the same reason.
+ * @event {Event} load - Relayed, because the platform's own does not escape.
  *
+ * @csspart fallback - What stands in when it fails.
  * @csspart image - The picture itself.
  * @csspart placeholder - What stands in until it arrives.
- * @csspart fallback - What stands in when it fails.
  */
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
-  /** Where the picture is. */
+  /**
+   * Where the picture is.
+   */
   @property()
   src = ''
 
@@ -74,11 +76,15 @@ export class HelixHeadlessImage extends HelixElement {
   @property({ reflect: true })
   loading?: 'eager' | 'lazy'
 
-  /** The candidate widths, passed through to the picture. */
+  /**
+   * The candidate widths, passed through to the picture.
+   */
   @property()
   srcset = ''
 
-  /** How much of the line it will take, passed through to the picture. */
+  /**
+   * How much of the line it will take, passed through to the picture.
+   */
   @property()
   sizes = ''
 
@@ -107,11 +113,16 @@ export class HelixHeadlessImage extends HelixElement {
   @property()
   decoding: 'async' | 'auto' | 'sync' = 'async'
 
-  /** How the picture is fetched across origins, which decides whether a canvas can read it. */
+  /**
+   * How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
+   */
   @property({ attribute: 'crossorigin' })
   crossOrigin: 'anonymous' | 'use-credentials' | null = null
 
-  /** How much of the referring URL to send with the request. */
+  /**
+   * How much of the referring URL to send with the request.
+   */
   @property({ attribute: 'referrerpolicy' })
   referrerPolicy = ''
 
@@ -127,7 +138,8 @@ export class HelixHeadlessImage extends HelixElement {
    * back declares that a picture has arrived which this element has never
    * fetched. The `data-` name is the library's answer to both, being a
    * different name a re-parse cannot mistake for a declaration, and it is what
-   * `data-closed` on `Toast.Item` and `data-scrolled` on `AppHeader` already do.
+   * `data-closed` on `Toast.Item` already does, and `AppHeader` did until its
+   * own moved to `:state(scrolled)` for the hydration reason recorded there.
    * A picture arrives after somebody fetched it, which puts this on the safe
    * side of hydration: a fact that can be true on the *first* update mirrors to
    * a custom state instead, which is what `:state(open)` and `:state(checked)`
@@ -139,7 +151,9 @@ export class HelixHeadlessImage extends HelixElement {
   @property({ attribute: false })
   status: 'error' | 'loaded' | 'loading' = 'loading'
 
-  /** Which `src` the current status belongs to, so a new one starts over. */
+  /**
+   * Which `src` the current status belongs to, so a new one starts over.
+   */
   @state()
   private answered = ''
 

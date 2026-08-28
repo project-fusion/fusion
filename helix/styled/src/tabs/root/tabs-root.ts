@@ -19,8 +19,8 @@ import { styles } from './tabs-root.css.js'
  * @slot - The tabs.
  * @slot panels - The panels.
  *
- * @csspart tabs - The tab list.
  * @csspart panels - The panel container.
+ * @csspart tabs - The tab list.
  */
 @customElement('helix-tabs')
 export class HelixTabs extends HelixHeadlessTabs {

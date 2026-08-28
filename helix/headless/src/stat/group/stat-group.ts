@@ -19,7 +19,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-stat-group')
 export class HelixHeadlessStatGroup extends HelixElement {
-  /** Accessible name for the set. */
+  /**
+   * Accessible name for the set.
+   */
   @property()
   label = ''
 

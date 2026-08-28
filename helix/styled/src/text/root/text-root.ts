@@ -63,11 +63,19 @@ const TAGS: Record<string, StaticValue> = {
  */
 @customElement('helix-text')
 export class HelixText extends HelixElement {
-  /** Which element to render. Decides the outline and the semantics. */
+  /**
+   * Which element to render.
+   *
+   * Decides the outline and the semantics.
+   */
   @property({ reflect: true })
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
 
-  /** Type treatment. Defaults to the one that matches `as`. */
+  /**
+   * Type treatment.
+   *
+   * Defaults to the one that matches `as`.
+   */
   @property({ reflect: true })
   variant?:
     | 'display'

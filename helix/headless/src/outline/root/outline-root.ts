@@ -50,12 +50,12 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/outline
  *
- * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value.
- *
  * @slot - The links, as anchors with fragment hrefs.
  *
- * @csspart nav - The navigation landmark.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value.
+ *
  * @csspart indicator - The mark that travels to the section being read.
+ * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-outline')
 export class HelixHeadlessOutline extends HelixElement {
@@ -67,7 +67,9 @@ export class HelixHeadlessOutline extends HelixElement {
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
   })
 
-  /** Accessible name for the navigation. */
+  /**
+   * Accessible name for the navigation.
+   */
   @property()
   label = 'On this page'
 
@@ -119,7 +121,9 @@ export class HelixHeadlessOutline extends HelixElement {
     return this.reading
   }
 
-  /** What `current` reports, which only `mark` writes. */
+  /**
+   * What `current` reports, which only `mark` writes.
+   */
   @state()
   private reading = ''
 

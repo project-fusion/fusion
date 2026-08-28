@@ -22,11 +22,11 @@ import { styles } from './button-group-root.css.js'
  * @aliases Segmented buttons, Split button
  * @documentation https://helix.fusion.dev/components/button-group
  *
- * @property appearance - Whether the buttons are one bar or a spaced row.
- *
  * @slot - The buttons in the group.
  *
  * @cssproperty --button-group-gap - Space between the buttons, when `spaced`.
+ *
+ * @property appearance - Whether the buttons are one bar or a spaced row.
  */
 @customElement('helix-button-group')
 export class HelixButtonGroup extends HelixHeadlessButtonGroup {

@@ -93,7 +93,9 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
       this.requestUpdate('checked', previous)
     }
 
-    /** Initial checked state for uncontrolled use, where nothing declared one. */
+    /**
+     * Initial checked state for uncontrolled use, where nothing declared one.
+     */
     @property({ attribute: 'default-checked', type: Boolean })
     defaultChecked = false
 

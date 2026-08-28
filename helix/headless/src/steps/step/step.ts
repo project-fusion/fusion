@@ -68,37 +68,45 @@ import '../../button/index.js'
  * @documentation https://helix.fusion.dev/components/steps
  *
  * @slot - The step's name.
+ * @slot content - What the stage holds, shown while it is the current one.
  * @slot description - A line under the name, for what the stage is for.
  * @slot marker - Replaces the number, or the check a complete step shows.
- * @slot content - What the stage holds, shown while it is the current one.
+ *
+ * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
  *
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.
  * @csspart description - The line under it.
  * @csspart label - The step's name, which is a `helix-button`.
+ * @csspart label-button - The inner control.
  * @csspart lead - The half line arriving from the step before.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
  * @csspart trail - The half line running on to the next.
- * @csspart label-button - The inner control.
- *
- * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
-  /** Whether the reader has finished this stage. */
+  /**
+   * Whether the reader has finished this stage.
+   */
   @property({ reflect: true, type: Boolean })
   complete = false
 
-  /** Whether this is the stage the reader is in. */
+  /**
+   * Whether this is the stage the reader is in.
+   */
   @property({ reflect: true, type: Boolean })
   current = false
 
-  /** Whether the reader may go to this stage. */
+  /**
+   * Whether the reader may go to this stage.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** What this stage is called when it announces itself. */
+  /**
+   * What this stage is called when it announces itself.
+   */
   @property()
   value = ''
 

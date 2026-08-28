@@ -61,22 +61,22 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  * @documentation https://helix.fusion.dev/components/chat
  *
  * @slot - The turns, as `helix-chat-message` children.
- * @slot header - Above the transcript: what this conversation is.
  * @slot actions - Beside the header: what can be done to the conversation itself.
  * @slot composer - Below the transcript, where the reader writes.
- * @slot status - Beside the composer: somebody typing, connection lost.
+ * @slot header - Above the transcript: what this conversation is.
  * @slot resume - The way back to the bottom, shown while the reader has scrolled away.
+ * @slot status - Beside the composer: somebody typing, connection lost.
  *
- * @csspart header - The region above the transcript.
+ * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+ *
  * @csspart actions - The controls for the conversation, at the header's trailing edge.
+ * @csspart composer - The region the composer sits in.
+ * @csspart empty - Shown when the conversation has no turns.
+ * @csspart header - The region above the transcript.
+ * @csspart loading - Shown while the history is still on its way.
  * @csspart log - The transcript, which is the thing that scrolls.
  * @csspart resume - The affordance offered while the reader is away from the bottom.
  * @csspart status - The status region, which is not part of the log.
- * @csspart composer - The region the composer sits in.
- * @csspart empty - Shown when the conversation has no turns.
- * @csspart loading - Shown while the history is still on its way.
- *
- * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
@@ -94,7 +94,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
-  /** Accessible name for the conversation. */
+  /**
+   * Accessible name for the conversation.
+   */
   @property()
   label = ''
 
@@ -140,7 +142,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.requestUpdate('pinned', previous)
   }
 
-  /** Whether to open pinned, where nothing declared it. */
+  /**
+   * Whether to open pinned, where nothing declared it.
+   */
   @property({ attribute: 'default-pinned', type: Boolean })
   defaultPinned = true
 

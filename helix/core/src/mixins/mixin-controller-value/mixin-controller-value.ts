@@ -87,7 +87,9 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
   // TypeScript consumers see; this class is what the manifest analyzer reads
   // when resolving inherited members into dependent packages.
   class ValueElement extends Base {
-    /** The value the markup declared, which is where a reset returns to. */
+    /**
+     * The value the markup declared, which is where a reset returns to.
+     */
     @property({ attribute: 'default-value' })
     defaultValue = ''
 

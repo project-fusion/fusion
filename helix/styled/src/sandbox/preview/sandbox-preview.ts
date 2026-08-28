@@ -97,7 +97,6 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | Pre
  * @documentation https://helix.fusion.dev/sandbox/preview
  *
  * @event {HelixConsoleEvent} helix-console - Relayed from the frame, one per console call.
- *
  * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, whenever it changes.
  *
  * @csspart frame - The iframe.
@@ -122,27 +121,39 @@ export class HelixSandboxPreview extends HelixElement {
   @property({ attribute: 'color-mode' })
   colorMode?: 'dark' | 'light'
 
-  /** Document the frame loads, which brings the styles and the elements. */
+  /**
+   * Document the frame loads, which brings the styles and the elements.
+   */
   @property()
   src = ''
 
-  /** Markup to render. */
+  /**
+   * Markup to render.
+   */
   @property()
   source = ''
 
-  /** Stylesheet applied inside the frame, alongside the markup. */
+  /**
+   * Stylesheet applied inside the frame, alongside the markup.
+   */
   @property()
   styles = ''
 
-  /** Accessible name for the frame. */
+  /**
+   * Accessible name for the frame.
+   */
   @property()
   label = 'Preview'
 
-  /** Writing direction inside the frame. */
+  /**
+   * Writing direction inside the frame.
+   */
   @property({ reflect: true })
   direction?: 'rtl'
 
-  /** How the example is placed in the frame. */
+  /**
+   * How the example is placed in the frame.
+   */
   @property({ reflect: true })
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
 

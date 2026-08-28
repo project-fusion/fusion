@@ -24,12 +24,14 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - Content set into the rule, such as the word between two sections.
  *
- * @csspart line - The rule itself, or each half of it where something is set in.
  * @csspart content - What is set into it.
+ * @csspart line - The rule itself, or each half of it where something is set in.
  */
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
-  /** Which way the rule runs. */
+  /**
+   * Which way the rule runs.
+   */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
 

@@ -8,6 +8,7 @@ import { registerElementEvents } from '@helix-io/core'
 registerElementEvents({
   'helix-accordion-item': ['helix-before-close', 'helix-before-open', 'toggle'],
   'helix-announcement': ['helix-dismiss'],
+  'helix-app-header': ['helix-scrolled'],
   'helix-avatar': ['error', 'load'],
   'helix-carousel': ['helix-select'],
   'helix-chat': ['helix-before-pin'],
@@ -77,7 +78,7 @@ registerElementEvents({
   'helix-radio': ['helix-select'],
   'helix-radio-group': ['change', 'helix-before-change', 'input'],
   'helix-rating': ['change', 'helix-before-change', 'input'],
-  'helix-sandbox': ['helix-before-resize'],
+  'helix-sandbox': ['helix-before-panel-resize', 'helix-before-split'],
   'helix-sandbox-preview': ['helix-console', 'helix-resize'],
   'helix-sandbox-source': ['helix-before-edit', 'helix-caret'],
   'helix-select': [

@@ -18,3 +18,34 @@
   --helix-size-icon: var(--helix-size-icon-sm);
   --menu-min-inline-size: 11rem;
 }
+
+/* The picker is a tool on the composer's row, so the glyph beside it comes down
+   with the row's own step. Everything else it needs is `emphasis="ghost"`: no
+   frame, the width of what is in it, and the mark against the value.
+
+   **The label is not hidden from here, and it was.** This carried
+   `::part(label) { display: none }`, which took the label out of the
+   accessibility tree along with the picture. `MixinField` already answers this:
+   a field with an empty `label` and an `aria-label` on the host renders the
+   label *clipped* instead, which is the standard one pixel box, still read and
+   still the target of the `for` that focuses the control. Its own note says the
+   accessibility tree is "the one thing it is here to stay in", and `display:
+   none` was the one thing that took it out. */
+.assistant-model {
+  --helix-size-icon: var(--helix-size-icon-sm);
+}
+
+/* **The ring is the ground, and the group cannot know what that is.** Each
+   avatar is ringed so the one behind it stops at a clean edge, and the ring
+   defaults to the page color, which is right on a page and wrong on this panel:
+   the chat above sets its own surface, so the marks would be ringed in a color
+   nothing around them is wearing. `--avatar-group-ring-color` is the hook for
+   exactly that, and the example that chose the surface is the one that knows it.
+
+   The overlap comes down with the marks. The default is `sm` against a full
+   size avatar; these are the small step in a footnote, and at that width the
+   default hid most of each face. */
+.assistant-sources {
+  --avatar-group-overlap: var(--helix-space-xs);
+  --avatar-group-ring-color: var(--helix-color-surface);
+}

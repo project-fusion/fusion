@@ -33,15 +33,27 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-badge')
 export class HelixHeadlessBadge extends HelixElement {
-  /** The count or short text to show. Absent shows a dot, zero shows nothing. */
+  /**
+   * The count or short text to show.
+   *
+   * Absent shows a dot, zero shows nothing.
+   */
   @property()
   value = ''
 
-  /** Cap for a numeric value. Past it the indicator reads `{max}+`. */
+  /**
+   * Cap for a numeric value.
+   *
+   * Past it the indicator reads `{max}+`.
+   */
   @property({ type: Number })
   max?: number
 
-  /** Accessible name. Required for a dot, which has no text to read. */
+  /**
+   * Accessible name.
+   *
+   * Required for a dot, which has no text to read.
+   */
   @property()
   label = ''
 

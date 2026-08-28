@@ -43,7 +43,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-toast')
 export class HelixHeadlessToast extends HelixElement {
-  /** Accessible name for the region, such as "Notifications". */
+  /**
+   * Accessible name for the region, such as "Notifications".
+   */
   @property()
   label = 'Notifications'
 

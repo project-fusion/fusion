@@ -36,26 +36,26 @@ import { styles } from './notification.css.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
- * @slot media - An avatar or icon identifying who or what it came from.
  * @slot actions - What a reader can do about it.
+ * @slot media - An avatar or icon identifying who or what it came from.
  *
- * @csspart item - The whole notification.
- * @csspart time - When it happened.
- * @csspart trailing - The column holding the time and the controls.
  * @csspart controls - The actions and the dismiss, which replace the time.
  * @csspart dismiss - The control that removes it.
  * @csspart dismiss-mark - The glyph on that control, where none is slotted.
+ * @csspart item - The whole notification.
+ * @csspart time - When it happened.
+ * @csspart trailing - The column holding the time and the controls.
  *
- * @cssproperty --notifications-rule - The hairline between items.
  * @cssproperty --notifications-color - Ink in an item that has been read.
- * @cssproperty --notifications-unread-mark - Color of the edge mark on an unread item.
+ * @cssproperty --notifications-padding-block - Space above and below an item.
+ * @cssproperty --notifications-padding-inline - Space either side of an item.
+ * @cssproperty --notifications-rule - The hairline between items.
  * @cssproperty --notifications-unread-block-size - How long that mark is.
  * @cssproperty --notifications-unread-inline-size - How thick that mark is.
  * @cssproperty --notifications-unread-inset - How far it sits from the row's leading edge.
+ * @cssproperty --notifications-unread-mark - Color of the edge mark on an unread item.
  * @cssproperty --notifications-unread-offset - How far it sits from the row's top.
  * @cssproperty --notifications-unread-radius - Its corner radius, which is what turns it into a dot.
- * @cssproperty --notifications-padding-block - Space above and below an item.
- * @cssproperty --notifications-padding-inline - Space either side of an item.
  */
 @customElement('helix-notification')
 export class HelixNotification extends HelixHeadlessNotification {

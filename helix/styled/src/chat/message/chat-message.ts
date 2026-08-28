@@ -22,14 +22,13 @@ import { styles } from './chat-message.css.js'
  * @documentation https://helix.fusion.dev/components/chat
  *
  * @slot - What was said.
- * @slot avatar - Who said it.
  * @slot actions - What can be done with it.
+ * @slot avatar - Who said it.
  *
  * @csspart content - What was said.
  * @csspart meta - The time and the state together.
  *
  * @cssproperty --chat-message-background - Fill behind a turn.
- * @cssproperty --chat-message-border-width - The edge every turn carries, which only a failed one colors.
  * @cssproperty --chat-message-background-me - Fill behind the reader's own turns.
  * @cssproperty --chat-message-color - Ink in a turn.
  * @cssproperty --chat-message-measure - How wide a turn may get before it wraps.

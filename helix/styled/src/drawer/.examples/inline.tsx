@@ -1,6 +1,6 @@
 export function Example() {
   return (
-    <helix-drawer default-open label="Filters" modal="false">
+    <helix-drawer default-open label="Filters" modal={false}>
       {' '}
       <helix-flex direction="column" gap="sm">
         {' '}

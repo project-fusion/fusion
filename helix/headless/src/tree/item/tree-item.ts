@@ -57,25 +57,27 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
- * @slot start - Before the label, after the chevron. A mark about the item.
  * @slot end - After the label, at the row's far side. A count, or a state.
+ * @slot start - Before the label, after the chevron. A mark about the item.
  *
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target unless `href` moves it to the row.
+ * @csspart label - The label text.
  * @csspart row - The clickable label row, which is an `<a>` where `href` is set.
  * @csspart toggle - The expand and collapse control.
- * @csspart label - The label text.
- * @csspart group - The container for nested items.
- *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
  */
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
-  /** Identifies the item to the consumer, carried in `helix-select`. */
+  /**
+   * Identifies the item to the consumer, carried in `helix-select`.
+   */
   @property()
   value = ''
 
@@ -89,7 +91,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   @property()
   href = ''
 
-  /** Where the link opens, for the rare row that leaves the site. */
+  /**
+   * Where the link opens, for the rare row that leaves the site.
+   */
   @property()
   target = ''
 
@@ -132,11 +136,17 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'level', type: Number })
   level?: number
 
-  /** Whether this item holds the tree's single tab stop. */
+  /**
+   * Whether this item holds the tree's single tab stop.
+   */
   @state()
   focusable = false
 
-  /** Whether anything is slotted into `children`. Read after first render. */
+  /**
+   * Whether anything is slotted into `children`.
+   *
+   * Read after first render.
+   */
   @state()
   private branch = false
 

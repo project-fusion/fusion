@@ -17,14 +17,14 @@ import { styles } from './rating-root.css.js'
  * @aliases Stars, Score, Review score
  * @documentation https://helix.fusion.dev/components/rating
  *
- * @cssproperty --rating-mark - The shape of one mark, as a mask image.
- * @cssproperty --rating-size - How big one mark is.
- * @cssproperty --rating-gap - Space between marks.
- * @cssproperty --rating-color - The color of a filled mark.
- * @cssproperty --rating-empty-color - And of an unfilled one.
- *
  * @slot mark - The shape of a mark, cloned into every position. Left empty, the
  * stylesheet draws its own and `--rating-mark` swaps it.
+ *
+ * @cssproperty --rating-color - The color of a filled mark.
+ * @cssproperty --rating-empty-color - And of an unfilled one.
+ * @cssproperty --rating-gap - Space between marks.
+ * @cssproperty --rating-mark - The shape of one mark, as a mask image.
+ * @cssproperty --rating-size - How big one mark is.
  */
 @customElement('helix-rating')
 export class HelixRating extends HelixHeadlessRating {

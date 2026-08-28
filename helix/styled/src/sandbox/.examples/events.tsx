@@ -6,7 +6,7 @@ type Arrival = { carried: string; name: string }
 const KEEP = 7
 
 const RESTING: Arrival[] = [
-  { carried: 'Type in the source, then drag the divider', name: 'Nothing yet' },
+  { carried: 'Type in the source, then drag either divider', name: 'Nothing yet' },
 ]
 
 export function Example() {

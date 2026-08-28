@@ -24,17 +24,17 @@ import { styles } from './tree-item.css.js'
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
  *
- * @csspart item - The node, and the focus target.
- * @csspart row - The clickable label row.
- * @csspart toggle - The expand and collapse control.
- * @csspart label - The label text.
- * @csspart group - The container for nested items.
- *
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  *
- * @cssproperty --tree-indent - Indent added per level.
+ * @csspart group - The container for nested items.
+ * @csspart item - The node, and the focus target.
+ * @csspart label - The label text.
+ * @csspart row - The clickable label row.
+ * @csspart toggle - The expand and collapse control.
+ *
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
+ * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree-item')

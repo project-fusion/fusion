@@ -31,7 +31,7 @@ export function Example() {
         default-page="4"
         onhelix-before-change={proposed}
         onhelix-navigate={moved}
-        pages="12"
+        pages={12}
       />
 
       <helix-list divided label="What arrived">

@@ -23,7 +23,9 @@ import { styles } from './checkbox-group-root.css.js'
  */
 @customElement('helix-checkbox-group')
 export class HelixCheckboxGroup extends HelixHeadlessCheckboxGroup {
-  /** Which way the boxes run. */
+  /**
+   * Which way the boxes run.
+   */
   @property({ reflect: true })
   orientation?: 'horizontal'
 

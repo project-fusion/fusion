@@ -128,13 +128,15 @@ const pathFor = (
  * @slot logo - A mark for the center, which only reads at a high correction.
  *
  * @csspart code - The square itself.
- * @csspart modules - Everything but the three corner squares.
  * @csspart finders - The three corner squares, which can take their own color.
  * @csspart logo - The box holding the center mark.
+ * @csspart modules - Everything but the three corner squares.
  */
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
-  /** What the code encodes, which is usually a URL. */
+  /**
+   * What the code encodes, which is usually a URL.
+   */
   @property()
   value = ''
 

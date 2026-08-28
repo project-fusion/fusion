@@ -36,21 +36,23 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The words naming what this turns on.
  *
+ * @event {Event} change - Relayed from the input once the state has changed.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
  * @event {Event} input - Announced once the state has moved.
- * @event {Event} change - Relayed from the input once the state has changed.
  *
- * @csspart field - The row: the track and its label.
- * @csspart track - The groove the thumb travels in.
  * @csspart control - The input.
- * @csspart thumb - The part that moves.
- * @csspart label - The words beside it.
- * @csspart hint - Help under the control, while nothing is wrong.
  * @csspart feedback - What is wrong with it.
+ * @csspart field - The row: the track and its label.
+ * @csspart hint - Help under the control, while nothing is wrong.
+ * @csspart label - The words beside it.
+ * @csspart thumb - The part that moves.
+ * @csspart track - The groove the thumb travels in.
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
-  /** Value submitted when the switch is on. */
+  /**
+   * Value submitted when the switch is on.
+   */
   @property()
   value = 'on'
 

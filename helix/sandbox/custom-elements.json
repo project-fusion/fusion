@@ -629,42 +629,42 @@
           "name": "HelixSandboxSpecs",
           "cssProperties": [
             {
-              "description": "Color of a passing test.",
-              "name": "--specs-pass-color"
-            },
-            {
               "description": "Color of a failing one.",
               "name": "--specs-fail-color"
+            },
+            {
+              "description": "Color of a passing test.",
+              "name": "--specs-pass-color"
             }
           ],
           "cssParts": [
             {
-              "description": "The counts, and how long the run took.",
-              "name": "summary"
-            },
-            {
-              "description": "The scrolling list.",
-              "name": "results"
-            },
-            {
-              "description": "A describe block's heading.",
-              "name": "suite"
-            },
-            {
-              "description": "One test.",
-              "name": "result"
-            },
-            {
-              "description": "Whether that test passed.",
-              "name": "status"
+              "description": "Shown when there is nothing to report.",
+              "name": "empty"
             },
             {
               "description": "Why it failed.",
               "name": "error"
             },
             {
-              "description": "Shown when there is nothing to report.",
-              "name": "empty"
+              "description": "One test.",
+              "name": "result"
+            },
+            {
+              "description": "The scrolling list.",
+              "name": "results"
+            },
+            {
+              "description": "Whether that test passed.",
+              "name": "status"
+            },
+            {
+              "description": "A describe block's heading.",
+              "name": "suite"
+            },
+            {
+              "description": "The counts, and how long the run took.",
+              "name": "summary"
             }
           ],
           "members": [
@@ -675,7 +675,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Which family's specs to run. Changing it runs them.",
+              "description": "Which family's specs to run.\n\nChanging it runs them.",
               "attribute": "family"
             },
             {
@@ -685,7 +685,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The document that runs them. Same origin, and it must stay that way.",
+              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
               "attribute": "src"
             },
             {
@@ -1030,7 +1030,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Which family's specs to run. Changing it runs them.",
+              "description": "Which family's specs to run.\n\nChanging it runs them.",
               "fieldName": "family"
             },
             {
@@ -1039,7 +1039,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The document that runs them. Same origin, and it must stay that way.",
+              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
               "fieldName": "src"
             },
             {

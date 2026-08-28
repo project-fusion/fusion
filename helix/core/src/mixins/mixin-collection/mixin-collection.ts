@@ -76,15 +76,21 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ reflect: true, type: Boolean })
     loading = false
 
-    /** What is said while they are on their way. */
+    /**
+     * What is said while they are on their way.
+     */
     @property({ attribute: 'loading-text' })
     loadingText = 'Loading'
 
-    /** What is said where there are none, and none are coming. */
+    /**
+     * What is said where there are none, and none are coming.
+     */
     @property({ attribute: 'empty-text' })
     emptyText = 'Nothing to show'
 
-    /** Whether the rows have been looked at yet. */
+    /**
+     * Whether the rows have been looked at yet.
+     */
     @state()
     private slotCounted = false
 

@@ -5,7 +5,7 @@
    between the two examples changes one attribute and nothing else.
 
    The scroller is the frame's own document, which is the one the component
-   listens to: `data-scrolled` is set from `window.scrollY`, so a bar inside an
+   listens to: the custom state `scrolled` is set from `window.scrollY`, so a bar inside an
    overflowing div would never lift. */
 .page {
   display: flex;

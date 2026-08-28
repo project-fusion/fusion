@@ -23,8 +23,8 @@ import { styles } from './callout-root.css.js'
  * @slot - The callout's content.
  * @slot icon - Replaces the icon chosen by `severity`.
  *
- * @csspart icon - The icon region.
  * @csspart content - The content region.
+ * @csspart icon - The icon region.
  *
  * @cssproperty --callout-background-color - Fill behind the callout.
  * @cssproperty --callout-radii - Corner radius of the callout.

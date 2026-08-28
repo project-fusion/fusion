@@ -32,21 +32,23 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The label.
  *
+ * @event {Event} change - Relayed from the input once the state has changed.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
  * @event {Event} input - Announced once the state has moved.
- * @event {Event} change - Relayed from the input once the state has changed.
  *
- * @csspart field - The row the box and its label share, and the surface the card appearance draws.
  * @csspart box - The frame the input is painted as, and the mark sits over.
  * @csspart control - The input.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The row the box and its label share, and the surface the card appearance draws.
+ * @csspart hint - Help under the control, while nothing is wrong.
  * @csspart label - The label beside it.
  * @csspart mark - The tick, or the dash when the box is indeterminate.
- * @csspart hint - Help under the control, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
-  /** Value submitted when the box is checked. */
+  /**
+   * Value submitted when the box is checked.
+   */
   @property()
   value = 'on'
 

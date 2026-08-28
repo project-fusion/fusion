@@ -79,22 +79,22 @@ const SCRUB_FINE = 16
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://helix.fusion.dev/components/number-input
  *
- * @slot start - Before the number, for a unit or an icon.
  * @slot end - After it.
+ * @slot start - Before the number, for a unit or an icon.
  *
+ * @event {Event} change - Relayed from the field once the reader has finished.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Relayed from the field once the reader has finished.
  *
  * @csspart control - The field itself.
  * @csspart decrement - The control that steps down.
  * @csspart decrement-mark - The glyph on the step down control.
+ * @csspart feedback - What is wrong with it.
  * @csspart field - The box holding everything.
+ * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart increment - The control that steps up.
  * @csspart increment-mark - The glyph on the step up control.
  * @csspart label - The name over the field, which is also the scrub grip.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-headless-number-input')
 export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -112,15 +112,25 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   @property()
   autocomplete = ''
 
-  /** Smallest value the reader may reach. Absent has no floor. */
+  /**
+   * Smallest value the reader may reach.
+   *
+   * Absent has no floor.
+   */
   @property({ type: Number })
   min?: number
 
-  /** Largest value the reader may reach. Absent has no ceiling. */
+  /**
+   * Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
+   */
   @property({ type: Number })
   max?: number
 
-  /** How far one step moves. */
+  /**
+   * How far one step moves.
+   */
   @property({ type: Number })
   step = 1
 
@@ -134,11 +144,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   @property({ attribute: 'large-step', type: Number })
   largeStep?: number
 
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /**
+   * Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
+   */
   @property()
   placeholder = ''
 
-  /** Whether the field refuses input while still submitting its value. */
+  /**
+   * Whether the field refuses input while still submitting its value.
+   */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
 
@@ -155,11 +171,15 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   @property({ reflect: true, type: Boolean })
   scrub = false
 
-  /** Accessible name for the control that steps down. */
+  /**
+   * Accessible name for the control that steps down.
+   */
   @property({ attribute: 'decrement-label' })
   decrementLabel = 'Decrease'
 
-  /** Accessible name for the control that steps up. */
+  /**
+   * Accessible name for the control that steps up.
+   */
   @property({ attribute: 'increment-label' })
   incrementLabel = 'Increase'
 

@@ -32,18 +32,65 @@ describe('app header', () => {
 
   test('starts un-scrolled, matching what the server rendered', async () => {
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
-    expect(header.hasAttribute('data-scrolled')).toBe(false)
+    expect(header.matches(':state(scrolled)')).toBe(false)
+  })
+
+  // The whole reason this is a state and not `data-scrolled`: an attribute the
+  // element writes onto itself is markup the server never sent, and a framework
+  // hydrating the page reports the tree as mismatched.
+  test('writes no attribute a hydrating framework could disagree with', async () => {
+    const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
+    window.dispatchEvent(new Event('scroll'))
+    expect(header.matches(':state(scrolled)')).toBe(true)
+    expect(header.getAttributeNames()).not.toContain('data-scrolled')
+  })
+
+  test('announces the change, since a custom state cannot be observed', async () => {
+    /* Reset before mounting: `scrollY` is stubbed on the shared `window` and
+       survives the test that stubbed it, so a header connecting after one of
+       those reads the page as already scrolled and the first crossing never
+       happens. */
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+    const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    const heard: boolean[] = []
+    header.addEventListener('helix-scrolled', (event) => {
+      heard.push((event as CustomEvent<{ scrolled: boolean }>).detail.scrolled)
+    })
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
+    window.dispatchEvent(new Event('scroll'))
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+    window.dispatchEvent(new Event('scroll'))
+
+    expect(heard).toEqual([true, false])
+  })
+
+  // Only on a crossing. The handler returns early when the threshold has not
+  // moved, so a listener is not woken on every frame of a scroll.
+  test('says nothing while the threshold holds', async () => {
+    const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
+    window.dispatchEvent(new Event('scroll'))
+
+    let after = 0
+    header.addEventListener('helix-scrolled', () => {
+      after += 1
+    })
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 900 })
+    window.dispatchEvent(new Event('scroll'))
+    expect(after).toBe(0)
   })
 
   test('reflects scroll position so styling needs no handler of its own', async () => {
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.hasAttribute('data-scrolled')).toBe(true)
+    expect(header.matches(':state(scrolled)')).toBe(true)
 
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.hasAttribute('data-scrolled')).toBe(false)
+    expect(header.matches(':state(scrolled)')).toBe(false)
   })
 
   test('stops listening once removed', async () => {
@@ -51,6 +98,6 @@ describe('app header', () => {
     header.remove()
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     window.dispatchEvent(new Event('scroll'))
-    expect(header.hasAttribute('data-scrolled')).toBe(false)
+    expect(header.matches(':state(scrolled)')).toBe(false)
   })
 })

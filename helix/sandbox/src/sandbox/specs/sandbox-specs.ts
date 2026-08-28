@@ -60,28 +60,38 @@ interface ResultsMessage {
  * @aliases Tests, Suite
  * @documentation https://helix.fusion.dev/sandbox/specs
  *
- * @csspart summary - The counts, and how long the run took.
- * @csspart results - The scrolling list.
- * @csspart suite - A describe block's heading.
- * @csspart result - One test.
- * @csspart status - Whether that test passed.
- * @csspart error - Why it failed.
  * @csspart empty - Shown when there is nothing to report.
+ * @csspart error - Why it failed.
+ * @csspart result - One test.
+ * @csspart results - The scrolling list.
+ * @csspart status - Whether that test passed.
+ * @csspart suite - A describe block's heading.
+ * @csspart summary - The counts, and how long the run took.
  *
- * @cssproperty --specs-pass-color - Color of a passing test.
  * @cssproperty --specs-fail-color - Color of a failing one.
+ * @cssproperty --specs-pass-color - Color of a passing test.
  */
 @customElement('helix-sandbox-specs')
 export class HelixSandboxSpecs extends HelixElement {
-  /** Which family's specs to run. Changing it runs them. */
+  /**
+   * Which family's specs to run.
+   *
+   * Changing it runs them.
+   */
   @property()
   family = ''
 
-  /** The document that runs them. Same origin, and it must stay that way. */
+  /**
+   * The document that runs them.
+   *
+   * Same origin, and it must stay that way.
+   */
   @property()
   src = ''
 
-  /** Accessible name for the results. */
+  /**
+   * Accessible name for the results.
+   */
   @property()
   label = 'Spec results'
 

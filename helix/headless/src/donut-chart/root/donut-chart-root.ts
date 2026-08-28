@@ -97,20 +97,20 @@ const THICKNESS: Record<string, number> = {
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
+ * @slot - Goes in the middle of the ring. A total, usually.
+ *
  * @csspart center - The middle of the ring, holding whatever is slotted.
+ * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
+ * @csspart segment - One slice.
+ * @csspart segment-edge - One slice as a closed shape, for a boundary to trace.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
- * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The slice's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
- * @csspart segment - One slice.
- * @csspart segment-edge - One slice as a closed shape, for a boundary to trace.
  * @csspart track - The ring the slices are drawn on.
- *
- * @slot - Goes in the middle of the ring. A total, usually.
  *
  * @cssproperty --donut-chart-stroke - How thick the ring is drawn, derived from `hole`.
  */
@@ -222,11 +222,10 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
 
   protected override render(): TemplateResult {
     const shares = this.shares
-    const named = this.named
     /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
-    return html`${this.renderPlot(shares, named)}
+    return html`${this.renderPlot(shares)}
 `
   }
 
@@ -236,10 +235,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `aria-hidden`, because the table it was read from is the readable version
    * and a screen reader hearing both hears the same numbers twice.
    */
-  protected renderPlot(
-    shares: { fraction: number; start: number }[],
-    named: string,
-  ): TemplateResult {
+  protected renderPlot(shares: { fraction: number; start: number }[]): TemplateResult {
     /* The thickness is declared here, on the box that holds both the ring and
        the middle, and not on the slices.
      *
@@ -256,7 +252,6 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       id="helix-chart-plot"
       part="plot"
       style="--donut-chart-stroke: ${this.thickness}"
-      title=${named || nothing}
     >
       <svg viewBox=${this.frame} xmlns="http://www.w3.org/2000/svg">
         <circle

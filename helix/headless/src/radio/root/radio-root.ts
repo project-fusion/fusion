@@ -36,14 +36,16 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when this choice is made.
  *
- * @csspart item - The button, which is the whole row.
  * @csspart box - The circle.
- * @csspart mark - The dot inside it.
+ * @csspart item - The button, which is the whole row.
  * @csspart label - The words beside it.
+ * @csspart mark - The dot inside it.
  */
 @customElement('helix-headless-radio')
 export class HelixHeadlessRadio extends HelixElement {
-  /** Whether this choice can be made. */
+  /**
+   * Whether this choice can be made.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
@@ -73,11 +75,17 @@ export class HelixHeadlessRadio extends HelixElement {
   /** What the markup said, read once at construction for the reason above. */
   private seeded = this.hasAttribute('selected')
 
-  /** Whether this is the current choice. Written by the group. */
+  /**
+   * Whether this is the current choice.
+   *
+   * Written by the group.
+   */
   @property({ type: Boolean })
   selected = false
 
-  /** Identifies this choice to the group, and is what the form submits. */
+  /**
+   * Identifies this choice to the group, and is what the form submits.
+   */
   @property()
   value = ''
 

@@ -21,11 +21,15 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-tab-panel')
 export class HelixHeadlessTabPanel extends HelixElement {
-  /** Pairs the panel with the tab of the same value. */
+  /**
+   * Pairs the panel with the tab of the same value.
+   */
   @property()
   value = ''
 
-  /** Whether this panel is the visible one. */
+  /**
+   * Whether this panel is the visible one.
+   */
   @property({ type: Boolean })
   selected = false
 

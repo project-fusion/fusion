@@ -20,13 +20,15 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The item's label.
  *
- * @csspart item - The radio button.
- *
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
+ *
+ * @csspart item - The radio button.
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends HelixElement {
-  /** Identifies the item to the group. */
+  /**
+   * Identifies the item to the group.
+   */
   @property()
   value = ''
 
@@ -56,11 +58,15 @@ export class HelixHeadlessToggle extends HelixElement {
   /** What the markup said, read once at construction for the reason above. */
   private seeded = this.hasAttribute('selected')
 
-  /** Whether this item is the current one. */
+  /**
+   * Whether this item is the current one.
+   */
   @property({ type: Boolean })
   selected = false
 
-  /** Whether the item can be chosen. */
+  /**
+   * Whether the item can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 

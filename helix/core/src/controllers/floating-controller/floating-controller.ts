@@ -229,8 +229,36 @@ export class FloatingController implements ReactiveController {
         // scaling from 0 flies in from the viewport corner. As `translate` it
         // composes as `translate() scale()`, the offset is applied in the
         // parent's coordinates, and the scale cannot reach it.
+        /* **Written as viewport coordinates, which is what they are.**
+         *
+         * `computePosition` returns a position in the viewport and this element
+         * is `position: fixed`, so the two agree and the translate is the answer
+         * unmodified.
+         *
+         * **A correction used to sit here and it was answering the wrong
+         * question.** A chart's bubble was landing hundreds of pixels from its
+         * anchor, which looked like an ancestor stealing the containing block:
+         * `transform`, `filter` and `backdrop-filter` all do that to a `fixed`
+         * descendant, and the page's cards are glass. Measured, the bubble with
+         * a zeroed translate sat at (799, 439) rather than the origin, which
+         * seemed to confirm it.
+         *
+         * It was not that. 799 is `(1728 - 130) / 2` and 439 is near
+         * `(1003 - 73) / 2`: the bubble was centered in the viewport, which is
+         * what the UA stylesheet does to a `popover` through `inset: 0` and
+         * `margin: auto`. The chart was rendering the *headless* tooltip, which
+         * ships no styles to overrule that; `Tooltip` sets `margin: 0` and the
+         * controller writes the insets, so a styled one was never centered and
+         * never needed correcting. Fixing the tier fixed the position, and the
+         * correction then subtracted a real ancestor's origin from an already
+         * correct number and threw every tooltip on the page off by it.
+         *
+         * Recorded because the evidence for the wrong answer was a measurement,
+         * not a guess, and the number that disproved it was arithmetic on the
+         * viewport. */
         translate: `${Math.round(x)}px ${Math.round(y)}px`,
       })
+
       floating.setAttribute('data-placement', placement)
       /* Placed, and it is a separate fact from shown. `computePosition` is
          async, so between the render that reveals a panel and the microtask

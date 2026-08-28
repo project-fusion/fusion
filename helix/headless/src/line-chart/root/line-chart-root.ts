@@ -247,9 +247,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const slot = WIDTH / readings.length
     const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, WIDTH - slot / 2])
 
-    const named = this.named
-
-    return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}`
+    return html`${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}`
   }
 
   /**
@@ -263,7 +261,6 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     x: (value: number) => number,
     y: (value: number) => number,
     domain: [number, number],
-    named: string,
   ): TemplateResult {
     /* Drawn only where zero is inside the range. A rule at the foot of a chart
        whose lowest reading is 980 is not the zero line, it is the bottom of the
@@ -290,7 +287,6 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       id="helix-chart-plot"
       part="plot"
       style=${holes ? `--_line-chart-holes: ${holes}` : nothing}
-      title=${named || nothing}
     >
       <svg part="svg"
         preserveAspectRatio="none"

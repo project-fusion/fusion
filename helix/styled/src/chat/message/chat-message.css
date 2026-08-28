@@ -61,13 +61,7 @@
   font-size: var(--helix-text-sm);
   grid-column: 1;
   line-height: var(--helix-leading-normal);
-  min-block-size: calc(
-    1lh +
-    var(--helix-space-xs) *
-    2 +
-    var(--chat-message-border-width, var(--helix-border-thin)) *
-    2
-  );
+  min-block-size: calc(1lh + var(--helix-space-xs) * 2);
 }
 
 [part="body"] {
@@ -198,9 +192,19 @@
    control. A consumer who wants otherwise sets it on their own element and wins,
    which is what inherited properties are for.
 
-   The negative gap between slotted avatars is the avatar-group overlap, and it
-   applies only to those: a stack of round marks reads as "these sources" at a
-   glance and the same treatment on text chips would hide the text. */
+   **It does not stack the marks itself, and it briefly tried to.** There was a
+   rule here reading `::slotted(helix-avatar + helix-avatar)`, meant to overlap a
+   run of source avatars the way a facepile does. It was dead twice over.
+   `::slotted()` takes a compound selector and a `+` is a combinator, which
+   `Avatar.Group`'s own stylesheet says out loud where it explains why
+   `:not(:first-child)` is allowed there; and the avatars in that example were
+   inside a consumer's own wrapper, so they were never assigned to this slot to
+   be matched in the first place. Nothing in a shadow root can reach a slotted
+   element's children.
+
+   The library already has the thing: `helix-avatar-group` overlaps its members,
+   rings each one against the ground, folds past `max` and counts the rest. A
+   footnote row that wants a facepile slots one. */
 [part="sources"] {
   --helix-size-avatar: var(--helix-size-avatar-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
@@ -214,10 +218,6 @@
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-2xs);
   line-height: var(--helix-leading-normal);
-}
-
-[part="sources"] slot::slotted(helix-avatar + helix-avatar) {
-  margin-inline-start: calc(var(--helix-size-avatar-sm) / -3);
 }
 
 [part="sources"][hidden] {
@@ -255,19 +255,6 @@
     --chat-message-background,
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
   );
-  /* **Every turn carries the edge, and only a failed one colors it.** The edge
-     is how this library says a thing is wrong: an invalid field turns its own
-     border `danger` rather than relying on the note under it, and a turn that
-     did not send is the same fact about a different box. Held at `transparent`
-     on every other turn so the state costs no layout when it arrives, which is
-     the trick `field` uses on the line that swaps between a hint and a message.
-
-     The width is a hook because `shape-and-borders` asks for one: of 68 border
-     declarations in the library, eight put the color behind a hook and none put
-     the width behind one, so an edge could be recolored and never removed. The
-     *color* is deliberately not hooked. It is the meaning rather than the
-     treatment, and a theme that can recolor a failure can hide one. */
-  border: var(--chat-message-border-width, var(--helix-border-thin)) solid transparent;
   border-radius: var(--helix-radii-md);
   color: var(--chat-message-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
@@ -298,12 +285,9 @@
    and `surface-overlay`, one rung further down. */
 /* **`plain` takes the ground away and leaves the words.** Not the padding: the
    inline padding goes, because there is no box left for it to be inside, and the
-   block padding stays so a run of plain turns keeps the rhythm a bubble gave it.
-   The edge goes with the ground, and with it the failure edge, which is why a
-   plain turn that failed still has the mark and the words on the line below. */
+   block padding stays so a run of plain turns keeps the rhythm a bubble gave it. */
 :host([separation="plain"]) [part="content"] {
   background-color: transparent;
-  border-color: transparent;
   padding-inline: var(--helix-space-none);
 }
 
@@ -434,22 +418,18 @@
    to be found rather than noticed. `sending` is quieter than a settled turn, and
    `streaming` is drawn only while it has nothing to show: once the text is
    arriving the text is the signal, and decorating it competes with it. */
-:host([state="failed"]) [part="content"] {
-  border-color: var(--helix-color-danger);
-}
+/* **The bubble is not marked, and it was.** A failed turn drew a `danger` edge,
+   on the argument that an invalid field turns its own border rather than relying
+   on the note under it. A field is the right analogy for the mechanism and the
+   wrong one for the object: a field is a control the reader is being told to fix
+   and a turn is something they already said, so ringing it in red reads as an
+   accusation about the words rather than a report about the delivery. It also
+   could not survive `separation="plain"`, where there is no box to ring and the
+   rule came out as a hairline tight around bare prose.
 
-/* **A turn with no box has no edge to color, and this rule is what makes that
-   true rather than merely claimed.** The `plain` rule above sets the edge back
-   to transparent and the failure rule sets it to `danger`; both are (0,2,0), so
-   the later one won and a plain turn that failed drew a red hairline tight
-   around bare prose with no padding inside it, reading as a broken input.
-
-   Nothing is lost by dropping it. The mark and the words on the line below are
-   what a failure says, and they are the same thing `field` falls back to on a
-   control whose border a theme has removed. */
-:host([separation="plain"][state="failed"]) [part="content"] {
-  border-color: transparent;
-}
+   The mark and the words on the line below are what a failure says. That is
+   `field`'s own fallback for a control whose border a theme has removed, and it
+   is the whole signal here. */
 
 :host([state="failed"]) [part="meta"] {
   color: var(--helix-color-danger);

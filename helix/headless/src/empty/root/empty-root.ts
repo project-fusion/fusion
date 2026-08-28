@@ -25,10 +25,10 @@ import { property } from 'lit/decorators.js'
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://helix.fusion.dev/components/empty
  *
- * @slot icon - A mark above the heading.
- * @slot heading - What is missing.
  * @slot - Why, and what to do about it.
  * @slot actions - The way out.
+ * @slot heading - What is missing.
+ * @slot icon - A mark above the heading.
  */
 @customElement('helix-headless-empty')
 export class HelixHeadlessEmpty extends HelixElement {

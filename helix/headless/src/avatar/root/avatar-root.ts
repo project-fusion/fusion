@@ -43,23 +43,35 @@ export const initialsOf = (name: string): string => {
  *
  * @slot - Shown when there is no usable image, in place of the initials.
  *
+ * @event {Event} error - Relayed from the image when it fails.
+ * @event {Event} load - Relayed from the image once it has loaded.
+ *
  * @csspart image - The image, when one is loading or loaded.
  * @csspart initials - The initials shown when there is no usable image.
- *
- * @event {Event} load - Relayed from the image once it has loaded.
- * @event {Event} error - Relayed from the image when it fails.
  */
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
-  /** Image to show. Falls back to the slot, or to initials, if it fails. */
+  /**
+   * Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
+   */
   @property()
   src = ''
 
-  /** Name of the person or entity. Used for the label and the initials. */
+  /**
+   * Name of the person or entity.
+   *
+   * Used for the label and the initials.
+   */
   @property()
   name = ''
 
-  /** Whether the image failed. The element's own observation, never set. */
+  /**
+   * Whether the image failed.
+   *
+   * The element's own observation, never set.
+   */
   @state()
   private failed = false
 

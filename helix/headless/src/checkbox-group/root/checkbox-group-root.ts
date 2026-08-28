@@ -41,17 +41,17 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @documentation https://helix.fusion.dev/components/checkbox-group
  *
  * @slot - The checkboxes.
- * @slot label - Richer than a string, where the label is more than one.
  * @slot hint - Richer than a string.
+ * @slot label - Richer than a string, where the label is more than one.
  *
- * @csspart label - The group's name, over the set.
- * @csspart items - The list itself, which is what `orientation` lays out.
- * @csspart hint - Help under the set.
- * @csspart feedback - What is wrong with it.
- *
+ * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when any box changes, with the whole set.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
+ *
+ * @csspart feedback - What is wrong with it.
+ * @csspart hint - Help under the set.
+ * @csspart items - The list itself, which is what `orientation` lays out.
+ * @csspart label - The group's name, over the set.
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
@@ -61,7 +61,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
      the property does not: the group submits nothing under it, and hands it to
      every box that has none. */
 
-  /** The checked values, comma separated. */
+  /**
+   * The checked values, comma separated.
+   */
   @property()
   value = ''
 

@@ -49,14 +49,14 @@ import { property } from 'lit/decorators.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @csspart panel - The sliding panel.
- * @csspart header - The header region.
- * @csspart content - The scrolling content region.
- *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
  * @event {Event} close - Relayed, because the platform's own does not escape.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the drawer opens or closes.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart content - The scrolling content region.
+ * @csspart header - The header region.
+ * @csspart panel - The sliding panel.
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
@@ -83,7 +83,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   @property({ reflect: true })
   placement?: 'start' | 'end' | 'top' | 'bottom'
 
-  /** Accessible name for the panel. */
+  /**
+   * Accessible name for the panel.
+   */
   @property()
   label = ''
 

@@ -116,18 +116,25 @@ const isInsertion = (event: Event): boolean =>
  * @documentation https://helix.fusion.dev/components/combobox
  *
  * @slot - The options, which are `helix-option` elements.
- * @slot start - Before the text, for an icon.
  * @slot end - After it, for a unit or a clear button.
  * @slot indicator - Replaces the caret saying the field opens.
+ * @slot start - Before the text, for an icon.
  *
- * @csspart field - The box around the text and its marks.
+ * @event {Event} change - Announced once the value has moved.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen option changes.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the panel opens.
+ * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
+ * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
  * @csspart control - The text field itself.
- * @csspart tags - The row of chosen options, when `multiple` is set.
- * @csspart tag - One chosen option.
- * @csspart rest - The count of choices held beyond `max-tags`.
  * @csspart create - The row offering to add what was typed.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The box around the text and its marks.
+ * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart indicator - The caret.
- * @csspart surface - The floating panel.
+ * @csspart label - The question, over the field.
  * @csspart listbox - The list inside it.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
  * @csspart listbox-feedback - What is wrong with it.
@@ -136,24 +143,17 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-hint - Help under the list.
  * @csspart listbox-items - The list itself.
  * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-loading - Shown while the options are still on their way.
+ * from the listbox.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
+ * @csspart rest - The count of choices held beyond `max-tags`.
+ * @csspart surface - The floating panel.
+ * @csspart tag - One chosen option.
  * @csspart tag-dismiss - The remove button, when `dismissible`.
  * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart tag-prefix - The category before the label.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
- * @csspart listbox-loading - Shown while the options are still on their way.
- * from the listbox.
- *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the chosen option changes.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the panel opens.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @csspart tags - The row of chosen options, when `multiple` is set.
  */
 @customElement('helix-headless-combobox')
 export class HelixHeadlessCombobox extends MixinControllerOpen(
@@ -170,7 +170,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   @property()
   autocomplete = 'off'
 
-  /** Text shown while nothing has been chosen. */
+  /**
+   * Text shown while nothing has been chosen.
+   */
   @property()
   placeholder = ''
 
@@ -209,11 +211,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   @property({ type: Boolean })
   suggest = false
 
-  /** What the create row says, before the words it would add. */
+  /**
+   * What the create row says, before the words it would add.
+   */
   @property({ attribute: 'create-label' })
   createLabel = 'Add'
 
-  /** What a tag's remove control is called, since the mark has no name. */
+  /**
+   * What a tag's remove control is called, since the mark has no name.
+   */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove'
 
@@ -234,7 +240,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   @property({ attribute: 'max-tags', type: Number })
   maxTags = 0
 
-  /** Accessible name for the list, which has no visible one of its own. */
+  /**
+   * Accessible name for the list, which has no visible one of its own.
+   */
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
 
@@ -247,11 +255,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   @property({ reflect: true, type: Boolean })
   loading = false
 
-  /** What the list says while they are on their way. */
+  /**
+   * What the list says while they are on their way.
+   */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
 
-  /** Words shown where the filter has hidden everything. */
+  /**
+   * Words shown where the filter has hidden everything.
+   */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
 

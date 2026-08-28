@@ -92,41 +92,40 @@ interface EyeDropperConstructor {
  *
  * @slot eyedropper-icon - The glyph on the screen-sampling control, usually a dropper.
  *
+ * @event {Event} change - Announced once the value has moved.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
+ * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
  * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
  * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
- *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the color changes.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
  *
- * @csspart grid - The saturation and brightness square.
- * @csspart grid-handle - The mark showing where in the square the color sits.
- * @csspart grid-saturation - The range input for the square's horizontal axis.
- * @csspart grid-brightness - The range input for its vertical axis.
- * @csspart controls - The row under the square.
- * @csspart icon - A glyph this component draws.
- * @csspart sample - The chip of the current color, which copies it when pressed.
- * @csspart channels - The ramps beside it.
- * @csspart channel - One ramp.
  * @csspart actions - The group holding the eyedropper and the syntax toggle.
- * @csspart eyedropper - The control that samples a color from the screen.
- * @csspart footer - The row holding the value and the tools.
- * @csspart value - The color as text, which can be typed or pasted.
- * @csspart format - The control that changes the syntax the value is written in.
- * @csspart swatches - The row of presets.
- * @csspart swatch - One preset.
+ * @csspart channel - One ramp.
  * @csspart channel-control - The range input.
+ * @csspart channel-feedback - What is wrong with it.
  * @csspart channel-field - The row: the control and its readout.
+ * @csspart channel-hint - Help under the track, while nothing is wrong.
+ * @csspart channel-label - The question, over the track.
  * @csspart channel-marker - One mark.
  * @csspart channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart channel-markers - The row of marks along the track.
  * @csspart channel-output - The current value, shown beside it.
+ * @csspart channels - The ramps beside it.
+ * @csspart controls - The row under the square.
+ * @csspart eyedropper - The control that samples a color from the screen.
  * @csspart eyedropper-button - The inner control.
+ * @csspart footer - The row holding the value and the tools.
+ * @csspart format - The control that changes the syntax the value is written in.
  * @csspart format-button - The inner control.
- * @csspart channel-feedback - What is wrong with it.
- * @csspart channel-hint - Help under the track, while nothing is wrong.
- * @csspart channel-label - The question, over the track.
+ * @csspart grid - The saturation and brightness square.
+ * @csspart grid-brightness - The range input for its vertical axis.
+ * @csspart grid-handle - The mark showing where in the square the color sits.
+ * @csspart grid-saturation - The range input for the square's horizontal axis.
+ * @csspart icon - A glyph this component draws.
+ * @csspart sample - The chip of the current color, which copies it when pressed.
+ * @csspart swatch - One preset.
+ * @csspart swatches - The row of presets.
+ * @csspart value - The color as text, which can be typed or pasted.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
@@ -195,15 +194,21 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   @property({ attribute: 'no-value', type: Boolean })
   noValue = false
 
-  /** Whether the reader may change the format. */
+  /**
+   * Whether the reader may change the format.
+   */
   @property({ attribute: 'no-format', type: Boolean })
   noFormat = false
 
-  /** Whether the eyedropper is offered where the browser has one. */
+  /**
+   * Whether the eyedropper is offered where the browser has one.
+   */
   @property({ attribute: 'no-eyedropper', type: Boolean })
   noEyedropper = false
 
-  /** Colors offered under the picker, as a comma-separated list. */
+  /**
+   * Colors offered under the picker, as a comma-separated list.
+   */
   @property()
   swatches = ''
 

@@ -168,9 +168,24 @@
  * point `for` at, since a reading is a position and not a thing. Placement,
  * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
  * reason a chart no longer draws its own. */
+/* **A pixel rather than nothing, because a rect of no area is not trackable.**
+   This is the point the bubble hangs off, so it was written with no size at
+   all, and that is the one thing an anchor may not be. `Tooltip` names the
+   failure in its own source: an element that draws nothing is what "took the
+   bubble to the corner of the window", and the descent that guards against it
+   runs only on the slotted path. Reached through `for`, as a chart reaches it,
+   the element is taken as given.
+
+   `autoUpdate` tracks a reference by observing it, and the move observer
+   derives its root margin from the reference's own rect. A 0 by 0 rect makes
+   that margin degenerate, so the updates that should follow a scroll or a
+   resize do not necessarily fire, and the bubble keeps whatever position it was
+   last given. One pixel is enough to be observable and is still nothing to
+   look at: no fill, no border, and out of the pointer's way. */
 [part="mark"] {
-  block-size: 0;
-  inline-size: 0;
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -180,28 +195,65 @@
   position: absolute;
 }
 
+/* **The bubble is a `Tooltip` and is set like one.**
+ *
+ * These parts are slotted into `Tooltip`, so what surrounds them is that
+ * component's own surface: `surface-inverse` with `foreground-inverse` on it,
+ * `text-xs`, regular weight, and `2xs xs` of padding. Everything below either
+ * inherits that or says why it differs.
+ *
+ * **Which is why nothing here names a foreground token.** The label reached for
+ * `--helix-color-foreground` and the names for `--helix-color-foreground-muted`,
+ * and both are the *page's* ink: on a light page that is near-black text on the
+ * near-black ground this bubble is made of. The library publishes
+ * `foreground-inverse` and no muted twin of it, so a muted row inside an
+ * inverted surface has no token to ask for. `currentColor` at reduced opacity
+ * does have one, needs no second token, and holds in both schemes because it is
+ * derived from whatever the bubble is already using.
+ *
+ * **And no rule under the label.** A hairline separator, generous block padding
+ * and a semibold title are the vocabulary of a card. They read as one here
+ * because a chart bubble carries more than a sentence, but the thing it is
+ * carrying is still a tooltip, and it sat beside the page's other tips looking
+ * like a different component. Weight and a single `2xs` gap say "this names the
+ * rest" without borrowing a panel's furniture. */
 [part="tooltip-label"] {
-  color: var(--helix-color-foreground-muted);
   display: block;
   font-weight: var(--helix-weight-medium);
+  margin-block-end: var(--helix-space-2xs);
 }
 
-/* Name and value on one line, the value pushed to the end so a column of them
-   lines up whatever the names are. */
+/* **Three columns, where this was a flex row pushed apart.**
+ *
+ * `justify-content: space-between` lines the values up and lets everything else
+ * fall where the text does, which holds while every row has a value and breaks
+ * the moment one does not. A two-series chart is exactly that case: on the
+ * `Material Web` reading the `Helix` series has nothing to report, so its cell
+ * rendered a dot and a name with no value to push against, and the name sat in
+ * the middle of a row whose neighbor started at the dot.
+ *
+ * Stated as a grid, the dot, the name and the number each have a column and
+ * hold it whether or not the row filled all three. */
 [part="tooltip-cell"] {
   align-items: baseline;
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: 0.5em minmax(0, 1fr) auto;
 }
 
+/* Placed rather than flowed, because the dot is drawn only where a series was
+   plotted: an unplotted row keeps the same columns as the rows around it
+   instead of sliding one to the left. */
 [part="tooltip-name"] {
-  color: var(--helix-color-foreground-muted);
+  grid-column: 2;
+  /* Quieter than the number beside it, from the bubble's own ink rather than
+     from the page's. */
+  opacity: 0.72;
 }
 
 [part="tooltip-value"] {
   font-variant-numeric: tabular-nums;
-  font-weight: var(--helix-weight-medium);
+  grid-column: 3;
 }
 
 /* A dot in the series color, so a row of the bubble and a line in the drawing
@@ -210,6 +262,7 @@
   block-size: 0.5em;
   border-radius: var(--helix-radii-full);
   content: "";
+  grid-column: 1;
   inline-size: 0.5em;
 }
 

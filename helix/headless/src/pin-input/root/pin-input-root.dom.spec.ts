@@ -251,6 +251,67 @@ describe('input pin completion', () => {
   })
 })
 
+describe('input pin commit', () => {
+  /** Leaving a box, for wherever focus is going. */
+  const leave = (host: Pin, at: number, to: HTMLElement | null = null): void => {
+    cells(host)[at]?.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: to }))
+  }
+
+  const commits = (host: Pin): string[] => {
+    const seen: string[] = []
+    host.addEventListener('change', () => {
+      seen.push(host.value)
+    })
+    return seen
+  }
+
+  test('an edited code commits when focus leaves the row', async () => {
+    const host = await pin('length="4"')
+    const seen = commits(host)
+    await arrive(host, 0, '12')
+    leave(host, 2)
+    expect(seen).toEqual(['12'])
+  })
+
+  test('and moving from one box to the next is not leaving', async () => {
+    /* Every character moves focus along, so a per-cell blur would commit on
+       every keystroke. */
+    const host = await pin('length="4"')
+    const seen = commits(host)
+    await arrive(host, 0, '12')
+    leave(host, 2, cells(host)[3] as HTMLElement)
+    expect(seen).toEqual([])
+  })
+
+  test('and leaving without having edited says nothing', async () => {
+    const host = await pin('default-value="12" length="4"')
+    const seen = commits(host)
+    leave(host, 0)
+    expect(seen).toEqual([])
+  })
+
+  test('a filled code commits once, and leaving it does not commit again', async () => {
+    const host = await pin('length="4"')
+    const seen = commits(host)
+    await arrive(host, 0, '1234')
+    leave(host, 3)
+    expect(seen).toEqual(['1234'])
+  })
+
+  test('so a half-entered code says what is wrong with it once it is left', async () => {
+    /* The whole point of the commit: `MixinField` shows nothing until the
+       reader has had a go, and completion was the only thing that counted as
+       one. A code abandoned at two of four was answered with silence. */
+    const host = await pin('length="4"')
+    await arrive(host, 0, '12')
+    expect(part(host, 'feedback')).toBeNull()
+    leave(host, 2)
+    await host.updateComplete
+    await host.updateComplete
+    expect(part(host, 'feedback')?.textContent?.trim()).toBe('Please enter all 4 characters.')
+  })
+})
+
 describe('input pin validity', () => {
   const internals = (host: HTMLElement): ElementInternals =>
     (host as unknown as { internals: ElementInternals }).internals

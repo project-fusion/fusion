@@ -37,8 +37,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot time - When it happened, as a reader should see it written.
  *
  * @csspart connector - The line arriving at this entry.
- * @csspart dot - The mark drawn where nothing was slotted for one.
  * @csspart content - What happened, and the time above it.
+ * @csspart dot - The mark drawn where nothing was slotted for one.
  * @csspart marker - The mark on the line.
  * @csspart rail - The column holding the mark and the line.
  * @csspart time - When it happened.
@@ -55,7 +55,9 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   @property()
   datetime = ''
 
-  /** What kind of event it was, which decides the mark's color and nothing else. */
+  /**
+   * What kind of event it was, which decides the mark's color and nothing else.
+   */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 

@@ -33,21 +33,25 @@ import { property } from 'lit/decorators.js'
  * @slot media - A thumbnail. Falls back to an image of `poster`.
  * @slot meta - After the name. A duration, or a date.
  *
+ * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen.
+ *
  * @csspart container - The `listitem`, which the button sits in.
  * @csspart item - The row, which is a button.
+ * @csspart label - The name and whatever follows it.
  * @csspart media - The leading column.
  * @csspart thumbnail - The image `poster` falls back to.
- * @csspart label - The name and whatever follows it.
- *
- * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen.
  */
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
-  /** What identifies the entry, and what `active` is compared against. */
+  /**
+   * What identifies the entry, and what `active` is compared against.
+   */
   @property()
   value = ''
 
-  /** The file this entry plays. */
+  /**
+   * The file this entry plays.
+   */
   @property()
   src = ''
 
@@ -63,7 +67,9 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   @property()
   poster = ''
 
-  /** Whether the entry can be chosen. */
+  /**
+   * Whether the entry can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 

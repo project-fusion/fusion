@@ -29,11 +29,15 @@ import { styles } from './avatar-root.css.js'
  */
 @customElement('helix-avatar')
 export class HelixAvatar extends HelixHeadlessAvatar {
-  /** Whether the avatar is a circle or a rounded square. */
+  /**
+   * Whether the avatar is a circle or a rounded square.
+   */
   @property({ reflect: true })
   shape?: 'circle' | 'square'
 
-  /** Edge length of the avatar. */
+  /**
+   * Edge length of the avatar.
+   */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg'
 

@@ -34,15 +34,15 @@ import { property } from 'lit/decorators.js'
  * @aliases Multiline, TextArea
  * @documentation https://helix.fusion.dev/components/textarea
  *
+ * @event {Event} change - Relayed from the textarea once the reader has finished.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Relayed from the textarea once the reader has finished.
  *
- * @csspart field - The box holding the control.
  * @csspart control - The textarea itself.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart feedback - What is wrong with it.
+ * @csspart field - The box holding the control.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart label - The question, over the field.
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -58,19 +58,29 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   @property()
   autocomplete = ''
 
-  /** Whether the box follows its own content rather than scrolling. */
+  /**
+   * Whether the box follows its own content rather than scrolling.
+   */
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false
 
-  /** Shown while the field is empty. Not a label: it goes when typing starts. */
+  /**
+   * Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
+   */
   @property()
   placeholder = ''
 
-  /** Whether the field refuses input while still submitting its value. */
+  /**
+   * Whether the field refuses input while still submitting its value.
+   */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
 
-  /** How many lines the box is before anything is typed. */
+  /**
+   * How many lines the box is before anything is typed.
+   */
   @property({ type: Number })
   rows = 3
 
@@ -99,7 +109,10 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   @property({ attribute: 'dirname' })
   dirName = ''
 
-  /** How the browser wraps the text, and whether the breaks are submitted with it. */
+  /**
+   * How the browser wraps the text, and whether the breaks are submitted with
+   * it.
+   */
   @property()
   wrap: 'hard' | 'off' | 'soft' = 'soft'
 
@@ -381,7 +394,9 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   @property({ attribute: 'minlength', type: Number })
   minLength?: number
 
-  /** Most characters the value may have. */
+  /**
+   * Most characters the value may have.
+   */
   @property({ attribute: 'maxlength', type: Number })
   maxLength?: number
 

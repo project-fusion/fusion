@@ -58,9 +58,6 @@ const HEIGHT = 100
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The rule the columns stand on.
- * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
- *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
- *   `wash="gradient"` asks for it.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
@@ -79,6 +76,9 @@ const HEIGHT = 100
  *
  * @cssproperty --bar-chart-axis - The color of a single-series axis, taken from that series.
  * @cssproperty --bar-chart-secondary - The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
+ * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
+ *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
+ *   `wash="gradient"` asks for it.
  */
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
@@ -264,8 +264,6 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const other: [number, number] = [Math.min(0, second), Math.max(0, top)]
     const z = scaled.size > 0 ? linear(other, range) : undefined
 
-    const named = this.named
-
     /* Widest number on either scale, in characters, so the axis column is the
        size of its own contents.
      *
@@ -299,7 +297,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
 
     return html`${
       z === undefined ? nothing : this.renderAxis(y, domain, 'primary', sideways, widest)
-    }${this.renderPlot(series, categories, y, domain, floor, named, z)}${
+    }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
     }${this.renderLabels(categories)}`
   }
@@ -316,7 +314,6 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     y: (value: number) => number,
     domain: [number, number],
     floor: number,
-    named: string,
     z?: (value: number) => number,
   ): TemplateResult {
     const sideways = this.direction === 'horizontal'
@@ -407,7 +404,6 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       aria-hidden="true"
       id="helix-chart-plot"
       part="plot"
-      title=${named || nothing}
     >
       <svg part="svg"
         preserveAspectRatio="none"

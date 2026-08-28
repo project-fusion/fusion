@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixHeadlessSelect } from '@helix-io/headless/select'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './select-root.css.js'
@@ -47,6 +48,40 @@ export class HelixSelect extends HelixHeadlessSelect {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+
+  /**
+   * How much ink the trigger claims.
+   *
+   * **The first field in this library to take an axis, and the case that asked
+   * for it is a control in a row rather than a control on a form.** A chat's
+   * composer wants a model picker beside an attachment button and a send button:
+   * at the field's own frame it is 40 pixels of bordered well in a line of 28
+   * pixel glyphs, and it reads as the composer's subject rather than as one of
+   * its tools. The same is true of a select in a toolbar, in a table header, or
+   * inside a sentence.
+   *
+   * - Unset is the frame an `Input` wears, which is what a form wants: a control
+   *   that looks like a button among fields reads as an action rather than an
+   *   answer.
+   * - `ghost` drops the fill and the edge, takes the width of what is in it, and
+   *   puts the mark against the value instead of at the far end of the control.
+   *
+   * **`emphasis` and not `separation`, which the registry decides rather than
+   * taste.** Emphasis is asked of controls, how loud this one is; separation is
+   * asked of containers, where the surface ends. A trigger is a control, and
+   * `check:axes` refuses a family that declares both. Two of the four values are
+   * taken: `solid` and `subtle` are a button's way of being the one thing to
+   * press, which is not a thing an answer should ever be.
+   *
+   * **The other three fields want this too and do not have it yet.** `Input`,
+   * `Textarea` and `Combobox` wear the same frame from the same shared
+   * stylesheet, and an inline one of each is as reasonable as an inline select.
+   * They are left alone rather than swept, because each has a different thing
+   * inside the frame and guessing at three is how an axis ends up meaning four
+   * things, which is the fault `appearance` was retired for.
+   */
+  @property({ reflect: true })
+  emphasis?: 'ghost'
 }
 
 declare global {

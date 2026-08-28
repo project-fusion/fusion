@@ -77,19 +77,29 @@ type Row = Record<string, string>
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
-  /** How tall one row is, in pixels, used to map scroll offset to an index. */
+  /**
+   * How tall one row is, in pixels, used to map scroll offset to an index.
+   */
   @property({ type: Number })
   estimate = 32
 
-  /** Id of the element holding the rows, as JSON in a script. */
+  /**
+   * Id of the element holding the rows, as JSON in a script.
+   */
   @property()
   for = ''
 
-  /** What the list is called, since the rendered rows are only a window on it. */
+  /**
+   * What the list is called, since the rendered rows are only a window on it.
+   */
   @property()
   label = ''
 
-  /** The parsed source. Empty on a server, which has nothing to read. */
+  /**
+   * The parsed source.
+   *
+   * Empty on a server, which has nothing to read.
+   */
   @state()
   private rows: Row[] = []
 

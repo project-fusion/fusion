@@ -26,9 +26,9 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/drilldown
  *
  * @slot - The words naming this row.
+ * @slot end - After the words, usually a mark or a count.
  * @slot page - The rows of the page this one opens.
  * @slot start - Before the words, usually an icon.
- * @slot end - After the words, usually a mark or a count.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
  *
@@ -37,11 +37,15 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-drilldown-item')
 export class HelixHeadlessDrilldownItem extends HelixElement {
-  /** Whether the row can be reached at all. */
+  /**
+   * Whether the row can be reached at all.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
-  /** Identifies the row to whatever is listening. */
+  /**
+   * Identifies the row to whatever is listening.
+   */
   @property()
   value = ''
 
@@ -52,11 +56,19 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    */
   readonly isDrilldownItem = true
 
-  /** Whether the page showing is the one this row is on. Written by the stack. */
+  /**
+   * Whether the page showing is the one this row is on.
+   *
+   * Written by the stack.
+   */
   @property({ attribute: false })
   onPage = true
 
-  /** Whether this row's own page is the one showing. Written by the stack. */
+  /**
+   * Whether this row's own page is the one showing.
+   *
+   * Written by the stack.
+   */
   @property({ attribute: false })
   showingPage = false
 

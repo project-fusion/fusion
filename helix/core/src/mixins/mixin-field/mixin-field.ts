@@ -168,19 +168,27 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
   class FieldElement extends Base {
-    /** Help under the control, shown while there is nothing wrong. */
+    /**
+     * Help under the control, shown while there is nothing wrong.
+     */
     @property()
     hint = ''
 
-    /** What is wrong, in the reader's words rather than the browser's. */
+    /**
+     * What is wrong, in the reader's words rather than the browser's.
+     */
     @property()
     feedback = ''
 
-    /** The accessible name, and the fallback for the `label` slot. */
+    /**
+     * The accessible name, and the fallback for the `label` slot.
+     */
     @property()
     label = ''
 
-    /** Whether the form refuses to submit without it. */
+    /**
+     * Whether the form refuses to submit without it.
+     */
     @property({ reflect: true, type: Boolean })
     required = false
 

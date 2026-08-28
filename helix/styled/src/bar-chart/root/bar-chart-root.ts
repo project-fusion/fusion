@@ -23,17 +23,36 @@ import '../../tooltip/index.js'
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
- * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
- * @cssproperty --bar-chart-line-width - Thickness of a `lines` series.
- * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
  * @cssproperty --bar-chart-bar-stroke - Width of the edge an `outlined` or `subtle`
  *   column is drawn with.
  * @cssproperty --bar-chart-block-size - Height of the drawing.
  * @cssproperty --bar-chart-gap - Space between the drawing and its labels.
+ * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
+ * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
+ * @cssproperty --bar-chart-line-width - Thickness of a `lines` series.
  */
 @customElement('helix-bar-chart')
 export class HelixBarChart extends HelixHeadlessBarChart {
+  /**
+   * **The styled tier, so the tooltip this renders is the styled one.**
+   *
+   * `tag()` builds a child's tag name from this prefix, and the base declares
+   * `helix-headless-`. Every other styled component that renders a child
+   * overrides it; the three charts that draw a tooltip did not, so a
+   * `helix-bar-chart` on a page put a `helix-headless-tooltip` in its shadow
+   * root: the behavior with none of the surface. What showed was the browser's
+   * own popover defaults, a white 1.5px border, square corners, `0.25em` of
+   * padding and the page's font size, which is why the reading bubble looked
+   * like no other tooltip on the site.
+   *
+   * Measured before the fix: the chart's bubble computed
+   * `border: 1.5px solid rgb(255, 255, 255)`, `border-radius: 0px`,
+   * `padding: 3.5px`, `font-size: 14px`. The masthead's, a `helix-tooltip`,
+   * had the component's own `none`, `radii-sm`, `2xs xs` and `text-xs`.
+   */
+  static override tier = 'helix-'
+
   /**
    * What the columns are made of.
    *
@@ -145,7 +164,11 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   @property()
   outlined?: string
 
-  /** Which series are drawn as a wash of their color, by name. Matched as `outlined` is. */
+  /**
+   * Which series are drawn as a wash of their color, by name.
+   *
+   * Matched as `outlined` is.
+   */
   @property()
   subtle?: string
 

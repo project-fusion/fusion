@@ -81,8 +81,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @slot content - The bubble's content, when `content` is not enough. Anything
  * slotted here replaces the property, which is this slot's fallback.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the bubble shows, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it hides, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the bubble shows, and cancelable.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart arrow - The point, resting against the trigger.
@@ -122,7 +122,11 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   @property()
   for = ''
 
-  /** Preferred side. It moves if that side does not fit. */
+  /**
+   * Preferred side.
+   *
+   * It moves if that side does not fit.
+   */
   @property()
   placement: Placement = 'top'
 
@@ -156,7 +160,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   @property()
   within = ''
 
-  /** Whether the tooltip never shows. */
+  /**
+   * Whether the tooltip never shows.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
@@ -190,7 +196,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'delay', type: Number })
   delay = 400
 
-  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  /**
+   * How long the bubble stays after the pointer leaves, in milliseconds.
+   */
   @property({ attribute: 'delay-out', type: Number })
   delayOut = 100
 

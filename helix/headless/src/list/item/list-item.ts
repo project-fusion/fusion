@@ -35,12 +35,12 @@ import { property } from 'lit/decorators.js'
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *
- * @csspart row - The layout, held off the host so the host can carry a marker.
- *
- * @slot start - Leading content, usually an icon or an avatar.
  * @slot - The label.
- * @slot supporting - Secondary text under the label.
  * @slot end - Trailing content.
+ * @slot start - Leading content, usually an icon or an avatar.
+ * @slot supporting - Secondary text under the label.
+ *
+ * @csspart row - The layout, held off the host so the host can carry a marker.
  */
 @customElement('helix-headless-list-item')
 export class HelixHeadlessListItem extends HelixElement {
@@ -54,7 +54,9 @@ export class HelixHeadlessListItem extends HelixElement {
   @property()
   href = ''
 
-  /** Where the link opens, for the rare row that leaves the site. */
+  /**
+   * Where the link opens, for the rare row that leaves the site.
+   */
   @property()
   target = ''
 

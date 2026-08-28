@@ -205,30 +205,6 @@ helix-card > [slot="media"] {
   text-decoration-thickness: 2px;
 }
 
-/* A link opening a new context says so, rather than surprising the reader.
- *
- * **Prose only, and not on a link wearing a button.** The mark is right in a
- * paragraph, where a reader following a link has no other warning and the glyph
- * sits in the same type as the words around it. Inside a control it is wrong on
- * every count: a bare unicode arrow is not from the icon set, it does not follow
- * `--helix-size-icon`, it lands inside the button's padding as a second label,
- * and a control that opens something is already a deliberate act rather than a
- * surprise mid-sentence. `<a data-button>` is the consumer's own element with
- * no slots to fill, so anyone who does want the mark writes a `<helix-icon>` in
- * it and gets one that matches everything else.
- *
- * Buttons only. `data-link="quiet"` was nearly excluded with them and should
- * not be: quiet is for navigation, and a navigation row that opens a new tab is
- * still a link a reader is about to follow.
- *
- * `:not()` inside `:where()`, so the whole thing stays at zero specificity and a
- * consumer's own rule still beats it. */
-:where(a[target="_blank"]:not([data-button]))::after {
-  content: "↗";
-  font-size: 0.85em;
-  margin-inline-start: 0.15em;
-}
-
 /* Link variants, as recipes rather than as a component.
  *
  * The rule above already covers a plain anchor, and these are the departures
@@ -509,7 +485,7 @@ helix-text[tone="danger"] {
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 6%, transparent)
   );
-  block-size: var(--helix-size-control);
+  block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
   border-radius: var(--button-radii, var(--helix-radii-sm));
   color: var(--button-foreground-color, var(--_button-tone));
@@ -593,9 +569,9 @@ helix-text[tone="danger"] {
  * 120px column.
  *
  * A host is reachable from here, which is what makes moving it possible at
- * all. `helix-button[fill="standard"]` is an ordinary type-and-attribute
+ * all. `helix-button[width="standard"]` is an ordinary type-and-attribute
  * selector on a light-DOM element, and the outer tree wins over the inner one,
- * so a rule in this file beats `:host([fill="standard"])` whatever their
+ * so a rule in this file beats `:host([width="standard"])` whatever their
  * specificities. Verified by asking for a width the shadow never declares.
  *
  * On the host rather than on `::part(button)`, because the host is the box a
@@ -610,7 +586,19 @@ helix-text[tone="danger"] {
  * own stylesheet.
  */
 [data-button][data-button-width="standard"] {
-  inline-size: var(--button-inline-size, var(--helix-size-button));
+  /* **A floor, which is what the note below always claimed and the property
+     never was.** `inline-size` is a fixed width: a label wider than the standard
+     one filled the box edge to edge and then ate its own padding, so the axis
+     that exists to stop short buttons looking mean made long ones look broken.
+     `proof-band.tsx` carried a comment declining to use `standard` for exactly
+     this, and shortened its label instead, which is a page working around a
+     component rather than a page making a choice.
+
+     `min-inline-size` keeps every measurement the pairing was built on: a
+     `<Link data-button>` and a `<helix-button>` still agree, because they agree
+     on the floor and on the content above it. What changes is only the case
+     that was wrong, where the content is wider than the floor. */
+  min-inline-size: var(--button-inline-size, var(--helix-size-button));
   /* Never wider than the room it has. A standard width is a floor for tidiness,
      not a promise to overflow a narrow column to keep it. */
   max-inline-size: 100%;

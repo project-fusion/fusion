@@ -37,8 +37,8 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  *
  * @slot - What scrolls.
  *
- * @csspart viewport - The scrolling box.
  * @csspart edges - Where the sideways edge cues are drawn.
+ * @csspart viewport - The scrolling box.
  */
 @customElement('helix-headless-scroll-area')
 export class HelixHeadlessScrollArea extends HelixElement {
@@ -50,11 +50,15 @@ export class HelixHeadlessScrollArea extends HelixElement {
   @property()
   label = ''
 
-  /** Which edges have content past them, measured rather than guessed. */
+  /**
+   * Which edges have content past them, measured rather than guessed.
+   */
   @state()
   private more: string[] = []
 
-  /** Whether there is anything to scroll at all, which decides the tab stop. */
+  /**
+   * Whether there is anything to scroll at all, which decides the tab stop.
+   */
   @state()
   private scrolls = false
 

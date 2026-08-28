@@ -29,8 +29,8 @@ import { styles } from './icon-button-root.css.js'
  * @csspart button - The inner button or anchor.
  *
  * @cssproperty --icon-button-radii - Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`.
- * @cssproperty --icon-button-size - Edge length of the control.
  * @cssproperty --icon-button-shadow - What it casts, where it is raised off the page.
+ * @cssproperty --icon-button-size - Edge length of the control.
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {

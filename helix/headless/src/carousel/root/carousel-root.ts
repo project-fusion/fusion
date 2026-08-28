@@ -18,10 +18,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * and the browser's own momentum all work without being reimplemented. The
  * controls scroll it; they do not drive a transform.
  *
- * Slides are the consumer's own elements. Each is given
+ * Slides are the consumer's own elements, and nothing is written onto them. The
+ * component renders a pane per slide carrying `role="group"`,
  * `aria-roledescription="slide"` and a name reading its position in the set,
- * which is what a screen-reader user needs to know where they are. Where a
- * slide carries its own `aria-label`, that one is left alone.
+ * and assigns the slide into it: a screen-reader user hears where they are, and
+ * a slide that is itself a link is still a link, which it was not while the role
+ * was being written on top of it. See `assign`.
  *
  * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
  * The APG is explicit: rotation must not resume unless the reader asks for it,
@@ -47,11 +49,31 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart previous-mark - The glyph on the previous control.
  * @csspart rotation - The control that stops and starts rotation.
  * @csspart rotation-mark - The glyph on the play and pause control.
+ * @csspart slide - The pane one slide is shown in, and the box the track snaps to.
  * @csspart track - The scroller the slides sit in.
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
-  /** Accessible name for the carousel. */
+  /**
+   * Manual, so each slide can be wrapped without its markup being touched.
+   *
+   * A slide has to be a `group` carrying `aria-roledescription="slide"` and a
+   * position in the run, and those are the component's facts rather than the
+   * consumer's element's. Writing them on is what a React consumer's hydration
+   * reports and does not patch up, and on a slide that is itself a link it also
+   * takes the link's role away. Assigning into a pane the component rendered
+   * says the same thing to a screen reader and leaves the consumer's element
+   * exactly as it was served. `Chat` and `DataTable` wrap their children the
+   * same way and for the first of those two reasons.
+   */
+  static override shadowRootOptions: ShadowRootInit = {
+    ...HelixElement.shadowRootOptions,
+    slotAssignment: 'manual',
+  }
+
+  /**
+   * Accessible name for the carousel.
+   */
   @property()
   label = 'Carousel'
 
@@ -128,26 +150,38 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ reflect: true })
   controls?: 'always' | 'auto' | 'none'
 
-  /** Slide to start on, where nothing declared one. */
+  /**
+   * Slide to start on, where nothing declared one.
+   */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
 
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
 
-  /** Whether moving past either end wraps to the other. */
+  /**
+   * Whether moving past either end wraps to the other.
+   */
   @property({ type: Boolean })
   loop = false
 
-  /** Whether the carousel advances on its own. */
+  /**
+   * Whether the carousel advances on its own.
+   */
   @property({ type: Boolean })
   autoplay = false
 
-  /** How long each slide is held, in milliseconds. */
+  /**
+   * How long each slide is held, in milliseconds.
+   */
   @property({ type: Number })
   interval = 5000
 
-  /** Whether rotation is running. Absent until autoplay starts it. */
+  /**
+   * Whether rotation is running.
+   *
+   * Absent until autoplay starts it.
+   */
   @state()
   private rotating = false
 
@@ -185,6 +219,18 @@ export class HelixHeadlessCarousel extends HelixElement {
   get positions(): number {
     const across = Math.max(1, Math.floor(this.perView ?? 1))
     return Math.max(1, this.slides.length - across + 1)
+  }
+
+  /**
+   * The panes rendered for the slides, in order. Empty until the first render.
+   *
+   * One per slide, and the box the track actually lays out: the slide itself is
+   * assigned into it and takes its size from it, so every offset the scroller
+   * is asked about is a pane's. Read fresh rather than cached, because a slide
+   * arriving or leaving re-renders the run.
+   */
+  private get panes(): HTMLElement[] {
+    return [...(this.renderRoot?.querySelectorAll?.<HTMLElement>('[part="slide"]') ?? [])]
   }
 
   /** The slides, in light-DOM order. Empty on the server, which has no tree. */
@@ -305,7 +351,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   }
 
   private scrollToIndex(): void {
-    const slide = this.slides[this.index]
+    /* The pane, not the slide inside it. The pane is the flex item the track
+       lays out and the box carrying `scroll-snap-align`, so it is what the
+       scroller's offsets are about; the slide is its content and, before the
+       assignment lands, is not in the track's layout at all. */
+    const slide = this.panes[this.index]
     const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
     if (!slide || !track) {
       return
@@ -423,7 +473,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     const bleed = this.bleed(track)
     const at = this.orientation === 'vertical' ? track.scrollTop : track.scrollLeft
-    return this.slides.slice(0, this.positions).reduce(
+    return this.panes.slice(0, this.positions).reduce(
       (best, slide, index) => {
         const distance = Math.abs(this.edgeOf(slide, track, bleed) - at)
         return distance < best.distance ? { distance, index } : best
@@ -538,10 +588,24 @@ export class HelixHeadlessCarousel extends HelixElement {
    */
   private stopped = false
 
+  /**
+   * Watches the light DOM for slides arriving and leaving.
+   *
+   * **A manually assigned slot does not announce them.** `slotchange` fires when
+   * an assignment changes, and under `slotAssignment: 'manual'` the only thing
+   * that changes an assignment is this component calling `assign`, so a slide
+   * appended by a consumer would reach no slot, render nowhere and be counted by
+   * nothing. The default slot used to carry that duty and could, because it took
+   * whatever was there. `Chat` watches for the same reason.
+   */
+  private watcher: MutationObserver | undefined = undefined
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusin', this.pause)
     this.addEventListener('pointerenter', this.pause)
+    this.watcher = new MutationObserver(() => this.requestUpdate())
+    this.watcher.observe(this, { childList: true })
   }
 
   override disconnectedCallback(): void {
@@ -552,6 +616,8 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     this.removeEventListener('focusin', this.pause)
     this.removeEventListener('pointerenter', this.pause)
+    this.watcher?.disconnect()
+    this.watcher = undefined
     clearInterval(this.timer)
     this.timer = undefined
   }
@@ -603,77 +669,52 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (count > 0 && this.index > count - 1) {
       this.goTo(count - 1)
     }
-    /* Held back until the first pass has run, which is a frame after the first
-       update. Everything reaching here afterwards is a slide set that changed
-       under a page long since hydrated, and wants naming immediately. */
-    if (this.named) {
-      this.nameSlides()
+    this.assign()
+  }
+
+  /**
+   * Puts each slide into the pane rendered for it.
+   *
+   * **The panes carry the ARIA and the consumer's element carries none**, which
+   * is the whole reason this is a manual assignment rather than a plain slot.
+   * The APG wants each slide to be a `group` with `aria-roledescription="slide"`
+   * and a name saying where it sits in the run, and this used to be four
+   * `setAttribute` calls onto the elements a consumer wrote. Two things were
+   * wrong with that, and only one of them was about frameworks.
+   *
+   * **A React consumer's slides are nodes React is in the middle of hydrating.**
+   * The attributes landed before React reached them, so React found a DOM it had
+   * not rendered and reported a mismatch it says it will not patch up. It means
+   * it: the ARIA survived and the announcement was correct, so nothing looked
+   * wrong and the console was the only tell. Deferring the write was tried
+   * first, and a frame is a race rather than an ordering: measured in Chromium
+   * on the landing page, a tab opened in the foreground still reported the
+   * mismatch, and a tab opened hidden did not, only because `requestAnimationFrame`
+   * had not run there yet. `Chat` reached this same conclusion for the same
+   * reason and its comment on `shadowRootOptions` says so.
+   *
+   * **And `role="group"` on a consumer's `<a href>` is not additive.** It
+   * replaces the implicit link role, so six insight cards on the landing page
+   * announced as groups and left the links list entirely. Every slide that is
+   * itself a control had this, and no amount of deferring the write would have
+   * helped, because the write was the bug. A pane around the slide is what the
+   * pattern actually asks for: a group holding a link, rather than a link
+   * relabeled as a group.
+   *
+   * So nothing is written onto a consumer's element at all now, and the
+   * mismatch is gone by construction rather than by timing.
+   */
+  private assign(): void {
+    const panes = this.renderRoot?.querySelectorAll?.<HTMLSlotElement>('[part="slide"] slot')
+    if (!panes) {
+      return
     }
-  }
-
-  /**
-   * Whether the first naming pass has run. See `firstUpdated`.
-   */
-  private named = false
-
-  /**
-   * Names the slides a frame late, so React has committed before they change.
-   *
-   * **These are the consumer's own elements, and on a React page they are nodes
-   * React is in the middle of hydrating.** Written from `updated`, the
-   * attributes landed on the anchors before React reached them, so React found
-   * a DOM it had not rendered and reported a mismatch naming `role="group"` and
-   * `aria-roledescription="slide"` on every slide. It says the mismatch "won't
-   * be patched up", and it means it: the ARIA survived and the announcement was
-   * correct, so nothing looked wrong and the console was the only tell.
-   *
-   * **What it costs is the boundary, not the attributes.** React answers a
-   * mismatch by discarding the server's HTML for that subtree and rendering it
-   * again on the client, which re-inserts every node in it. On the landing page
-   * that subtree also holds three `<helix-aura>`, and re-inserting one used to
-   * put it out permanently: see the note in `aura-root.ts` on why a spent canvas
-   * cannot serve a second context. One component's hydration mismatch blinded
-   * another component two sections away, which is the shape this class of bug
-   * takes and the reason it is worth a frame to avoid.
-   *
-   * **A frame, and this is the library's established window**, not a number
-   * picked here: `HelixElement.firstUpdated` waits exactly one for the same
-   * reason, that React has to have committed for there to be anything to read.
-   * A frame callback runs in the rendering step before paint, so the names are
-   * on the slides in the frame the element upgraded in rather than after an
-   * empty one.
-   *
-   * **Deferred for every consumer rather than only where React is detected.**
-   * The bag `reactPropsOf` reads sits on the element React rendered, and these
-   * are its children; asking each slide whether a framework owns it is a
-   * question with no reliable answer, and the honest one costs a frame nobody
-   * can perceive. An HTML page gains a frame of unnamed slides, during which
-   * the carousel is still a labeled region holding six links.
-   */
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    requestAnimationFrame(() => {
-      this.named = true
-      this.nameSlides()
-    })
-  }
-
-  /**
-   * Gives each slide its role, its slide-ness, and a position in the set.
-   *
-   * Named on the slides themselves rather than on wrappers, so each is the
-   * consumer's own element and keeps whatever it already carried. The label is
-   * a fallback for the same reason: a slide that came with a name of its own
-   * keeps it, and `1 of 6` is what a slide with nothing to say gets.
-   */
-  private nameSlides(): void {
-    const slides = this.slides
-    slides.forEach((slide, index) => {
-      slide.setAttribute('role', 'group')
-      slide.setAttribute('aria-roledescription', 'slide')
-      if (!slide.hasAttribute('aria-label')) {
-        slide.setAttribute('aria-label', `${index + 1} of ${slides.length}`)
-      }
+    /* Paired by position, and short-circuited by whichever ran out: a render
+       and a child list can disagree for one update when children arrive after
+       the template was built, and the mutation observer schedules the update
+       that reconciles them. */
+    this.slides.forEach((slide, index) => {
+      panes[index]?.assign?.(slide)
     })
   }
 
@@ -737,7 +778,16 @@ export class HelixHeadlessCarousel extends HelixElement {
         @touchstart=${this.handleTake}
         @wheel=${this.handleTake}
       >
-        <slot @slotchange=${() => this.requestUpdate()}></slot>
+        ${this.slides.map(
+          (_, index) => html`<div
+            part="slide"
+            role="group"
+            aria-roledescription="slide"
+            aria-label=${`${index + 1} of ${this.slides.length}`}
+          >
+            <slot @slotchange=${() => this.requestUpdate()}></slot>
+          </div>`,
+        )}
       </div>
       ${
         this.slides.length > 1

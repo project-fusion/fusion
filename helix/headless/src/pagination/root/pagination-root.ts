@@ -139,9 +139,11 @@ const fill = (
  * @documentation https://helix.fusion.dev/components/pagination
  *
  * @slot first-icon - The glyph on the jump-to-first control, usually a double caret.
- * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
- * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot last-icon - The glyph on the jump-to-last control, usually a double caret.
+ * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
+ * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
+ *
+ * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control standing over pages not shown, which jumps into them.
@@ -154,8 +156,6 @@ const fill = (
  * @csspart page - The control for one page.
  * @csspart previous - The control that moves back one page.
  * @csspart status - The reading of where you are, in `compact`.
- *
- * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {
@@ -242,15 +242,21 @@ export class HelixHeadlessPagination extends HelixElement {
     this.requestUpdate('page', previous)
   }
 
-  /** Page to open on, where nothing declared one. */
+  /**
+   * Page to open on, where nothing declared one.
+   */
   @property({ attribute: 'default-page', type: Number })
   defaultPage = 1
 
-  /** How many pages to show either side of the current one. */
+  /**
+   * How many pages to show either side of the current one.
+   */
   @property({ type: Number })
   siblings = 1
 
-  /** How many pages to show at each end, whatever the current one is. */
+  /**
+   * How many pages to show at each end, whatever the current one is.
+   */
   @property({ type: Number })
   boundaries = 1
 
@@ -278,7 +284,9 @@ export class HelixHeadlessPagination extends HelixElement {
   @property({ type: Boolean })
   compact = false
 
-  /** Accessible name for the navigation landmark. */
+  /**
+   * Accessible name for the navigation landmark.
+   */
   @property()
   label = 'Pagination'
 
@@ -298,7 +306,9 @@ export class HelixHeadlessPagination extends HelixElement {
   @property()
   locale = ''
 
-  /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
+  /**
+   * Accessible name for one page, with `{page}` and `{pages}` filled in.
+   */
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
 
@@ -313,23 +323,33 @@ export class HelixHeadlessPagination extends HelixElement {
   @property({ attribute: 'status-label' })
   statusLabel = '{page} of {pages}'
 
-  /** Accessible name for the control that moves back. */
+  /**
+   * Accessible name for the control that moves back.
+   */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous page'
 
-  /** Accessible name for the control that moves forward. */
+  /**
+   * Accessible name for the control that moves forward.
+   */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
 
-  /** Accessible name for the control that jumps to the first page. */
+  /**
+   * Accessible name for the control that jumps to the first page.
+   */
   @property({ attribute: 'first-label' })
   firstLabel = 'First page'
 
-  /** Accessible name for the control that jumps to the last page. */
+  /**
+   * Accessible name for the control that jumps to the last page.
+   */
   @property({ attribute: 'last-label' })
   lastLabel = 'Last page'
 
-  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  /**
+   * Accessible name for a gap, with `{page}` filled in as where it goes.
+   */
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
 

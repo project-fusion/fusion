@@ -59,19 +59,19 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://helix.fusion.dev/components/rating
  *
+ * @event {Event} change - Announced with it, the choice being the commit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the score changes, and cancelable.
  * @event {Event} input - Announced once the value has moved.
- * @event {Event} change - Announced with it, the choice being the commit.
  *
- * @csspart marks - The row of marks.
- * @csspart track - The unfilled marks.
- * @csspart fill - The filled marks, clipped to the score.
- * @csspart mark - One mark, in either layer.
- * @csspart option - One place a reader can press, which is one step.
- * @csspart value - The score written out, under `show-value`.
- * @csspart label - The question, over the marks.
- * @csspart hint - Help under the marks, while nothing is wrong.
  * @csspart feedback - What is wrong with it.
+ * @csspart fill - The filled marks, clipped to the score.
+ * @csspart hint - Help under the marks, while nothing is wrong.
+ * @csspart label - The question, over the marks.
+ * @csspart mark - One mark, in either layer.
+ * @csspart marks - The row of marks.
+ * @csspart option - One place a reader can press, which is one step.
+ * @csspart track - The unfilled marks.
+ * @csspart value - The score written out, under `show-value`.
  *
  * @cssproperty --rating-full - How many marks are wholly filled.
  * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.
@@ -93,7 +93,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   protected override readonly announcesInput = false
 
-  /** How many marks there are. */
+  /**
+   * How many marks there are.
+   */
   @property({ type: Number })
   max = 5
 
@@ -171,7 +173,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   @state()
   private markSource: Element | undefined = undefined
 
-  /** What the pointer is over, which is shown instead of the score while it is. */
+  /**
+   * What the pointer is over, which is shown instead of the score while it is.
+   */
   @state()
   private previewing: number | undefined = undefined
 

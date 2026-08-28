@@ -35,22 +35,26 @@ const LIMIT = 200
  * @aliases Console, Output
  * @documentation https://helix.fusion.dev/sandbox/terminal
  *
- * @csspart log - The scrolling region.
- * @csspart entry - One line.
- * @csspart level - The level a line came in at.
- * @csspart message - The text of a line.
  * @csspart count - How many times a repeated line arrived.
  * @csspart empty - Shown while nothing has been written.
+ * @csspart entry - One line.
+ * @csspart level - The level a line came in at.
+ * @csspart log - The scrolling region.
+ * @csspart message - The text of a line.
  *
  * @cssproperty --sandbox-terminal-size - Height of the scrolling region.
  */
 @customElement('helix-sandbox-terminal')
 export class HelixSandboxTerminal extends HelixElement {
-  /** What to show before anything has been written. */
+  /**
+   * What to show before anything has been written.
+   */
   @property({ attribute: 'empty-label' })
   emptyLabel = 'Nothing written to the console yet.'
 
-  /** Accessible name for the log. */
+  /**
+   * Accessible name for the log.
+   */
   @property()
   label = 'Console output'
 

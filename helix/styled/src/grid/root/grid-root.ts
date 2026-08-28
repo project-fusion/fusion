@@ -27,7 +27,9 @@ import { styles } from './grid-root.css.js'
  */
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {
-  /** Fixed number of equal columns. */
+  /**
+   * Fixed number of equal columns.
+   */
   @property({ reflect: true, type: Number })
   columns?: number
 
@@ -40,11 +42,15 @@ export class HelixGrid extends HelixElement {
   @property()
   min = ''
 
-  /** Space between cells, named on the space scale. */
+  /**
+   * Space between cells, named on the space scale.
+   */
   @property({ reflect: true })
   gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
-  /** Alignment of each cell within its row. */
+  /**
+   * Alignment of each cell within its row.
+   */
   @property({ reflect: true })
   align?: 'start' | 'center' | 'end' | 'stretch'
 

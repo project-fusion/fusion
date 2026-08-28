@@ -4,20 +4,33 @@
    content, so without it the transcript refuses to shrink and pushes the
    composer off the bottom of the panel. */
 .sidebar {
+  /* **The panel gives up its inset, which is the case the hook was written for.**
+     `--drawer-inset` defaults to `lg` and its own note names the exception: a
+     drawer whose content runs to the edges sets it to zero and puts the inset on
+     that content, "which is what it wants anyway". A conversation pads every
+     region it owns, so the default put 24 pixels around a component that had
+     already spaced itself, and stopped the header's rule short of the panel it
+     was meant to divide.
+
+     The content box keeps its own `--helix-size-focus-reach` padding, which is
+     not decoration: without it a focused control at the panel's edge has the
+     sides of its ring clipped while the top and bottom survive, which reads as a
+     drawing fault rather than as focus. That is four pixels rather than
+     twenty-four, and it is the drawer's rule to keep rather than this example's
+     to remove. */
+  --drawer-inset: var(--helix-space-none);
   --drawer-size: 24rem;
 }
 
-/* The drawer gives up its own padding and its own header. The conversation has
-   a header of its own and pads every region it owns, so a second set of both
-   put the drawer's title at one inset and the transcript at another, with a
-   band of nothing between them. */
+/* The drawer gives up its own header. The conversation has one, so a second put
+   the drawer's title at one inset and the transcript at another, with a band of
+   nothing between them. */
 .sidebar::part(header) {
   display: none;
 }
 
 .sidebar::part(content) {
   display: grid;
-  padding: var(--helix-space-none);
 }
 
 .sidebar-chat {

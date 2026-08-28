@@ -139,13 +139,13 @@ const addMonths = (date: Date, months: number): Date => {
  * @aliases Calendar, Date grid, Month view
  * @documentation https://helix.fusion.dev/components/date-picker
  *
- * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.
  * @slot next-icon - The glyph on the control that moves forward a month, usually a caret.
+ * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
+ * @event {Event} input - Announced once the value has moved.
  *
  * @csspart cell - One column of a row, which is what a range paints.
  * @csspart day - The shape inside a cell, which is what a single date paints.
@@ -165,27 +165,41 @@ const addMonths = (date: Date, months: number): Date => {
  */
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
-  /** How many dates can be held at once. */
+  /**
+   * How many dates can be held at once.
+   */
   @property({ reflect: true })
   mode?: 'range' | 'multiple'
 
-  /** How many months to show, side by side. */
+  /**
+   * How many months to show, side by side.
+   */
   @property({ type: Number })
   months = 1
 
-  /** Locale for month and day names. Absent uses the runtime's own. */
+  /**
+   * Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  /**
+   * Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   */
   @property({ attribute: 'disable-dates' })
   disableDates = ''
 
-  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  /**
+   * Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   */
   @property({ attribute: 'disable-days' })
   disableDays = ''
 
-  /** Whether the current selection fails validation. */
+  /**
+   * Whether the current selection fails validation.
+   */
   @property({ reflect: true, type: Boolean })
   invalid = false
 
@@ -230,18 +244,24 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous month'
 
-  /** Accessible name for the control that pages forward. */
+  /**
+   * Accessible name for the control that pages forward.
+   */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next month'
 
-  /** Month to open on, where nothing declared one. */
+  /**
+   * Month to open on, where nothing declared one.
+   */
   @property({ attribute: 'default-month' })
   defaultMonth = ''
 
   /** The month on show, whoever set it, and `undefined` until somebody has. */
   private monthState: string | undefined = undefined
 
-  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  /**
+   * Earliest selectable date, as `YYYY-MM-DD`.
+   */
   @property()
   min = ''
 
@@ -261,19 +281,29 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   @property({ type: Number })
   step = 1
 
-  /** Latest selectable date, as `YYYY-MM-DD`. */
+  /**
+   * Latest selectable date, as `YYYY-MM-DD`.
+   */
   @property()
   max = ''
 
-  /** Accessible name for the grid. */
+  /**
+   * Accessible name for the grid.
+   */
   @property()
   label = 'Date Picker'
 
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  /**
+   * First column of the week, `0` for Sunday through `6` for Saturday.
+   */
   @property({ attribute: 'first-day-of-week', type: Number })
   firstDayOfWeek = 0
 
-  /** The date the grid's tab stop is on. Absent until the grid is used. */
+  /**
+   * The date the grid's tab stop is on.
+   *
+   * Absent until the grid is used.
+   */
   @state()
   private focused = ''
 
@@ -541,7 +571,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     return super.requestValue(next)
   }
 
-  /** Whether the form refuses to submit while nothing is chosen. */
+  /**
+   * Whether the form refuses to submit while nothing is chosen.
+   */
   @property({ reflect: true, type: Boolean })
   required = false
 

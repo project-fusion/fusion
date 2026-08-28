@@ -80,14 +80,14 @@ const PANEL_MAX = 0.8
  * @aliases Playground, REPL, Editor
  * @documentation https://helix.fusion.dev/sandbox
  *
+ * @slot panel - A panel under both panes, usually a terminal.
+ * @slot preview - The live preview. Second unless `lead` says otherwise.
+ * @slot source - The editable source pane. First unless `lead` says otherwise.
+ * @slot status - A status bar, spanning both panes at the bottom.
+ * @slot toolbar - A bar across the top, spanning both panes.
+ *
  * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired when the panel's divider is let go, with its height in pixels.
  * @event {HelixBeforeSplitEvent} helix-before-split - Fired when the panes' divider is let go, with the lead pane's share.
- *
- * @slot source - The editable source pane. First unless `lead` says otherwise.
- * @slot preview - The live preview. Second unless `lead` says otherwise.
- * @slot toolbar - A bar across the top, spanning both panes.
- * @slot panel - A panel under both panes, usually a terminal.
- * @slot status - A status bar, spanning both panes at the bottom.
  *
  * @csspart body - The splitter holding the panes above the panel.
  * @csspart corner - The handle where the two dividers cross.
@@ -96,13 +96,15 @@ const PANEL_MAX = 0.8
  * @csspart panes - The splitter holding the source and preview panes.
  * @csspart separator - Either divider.
  *
- * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
  * @cssproperty --sandbox-grab - The invisible width of a divider's drag target.
+ * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
  * @cssproperty --sandbox-separator-color - Color of the divider.
  */
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
-  /** Whether the panes sit side by side or stacked. */
+  /**
+   * Whether the panes sit side by side or stacked.
+   */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
 
@@ -126,7 +128,9 @@ export class HelixSandbox extends HelixElement {
   @property()
   lead: 'source' | 'preview' = 'source'
 
-  /** Percentage of the sandbox given to the source pane. */
+  /**
+   * Percentage of the sandbox given to the source pane.
+   */
   @property({ attribute: 'split', type: Number })
   split = DEFAULT_SPLIT
 
@@ -148,11 +152,17 @@ export class HelixSandbox extends HelixElement {
   @property({ attribute: 'default-split', type: Number })
   defaultSplit = DEFAULT_SPLIT
 
-  /** Height of the panel, in pixels. */
+  /**
+   * Height of the panel, in pixels.
+   */
   @property({ attribute: 'panel-size', type: Number })
   panelSize = DEFAULT_PANEL
 
-  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  /**
+   * What a reset makes the panel, in pixels.
+   *
+   * The pair to `panel-size`.
+   */
   @property({ attribute: 'default-panel-size', type: Number })
   defaultPanelSize = DEFAULT_PANEL
 
@@ -166,15 +176,21 @@ export class HelixSandbox extends HelixElement {
   @property({ attribute: 'panel-collapsed-size', type: Number })
   panelCollapsedSize = 0
 
-  /** Accessible name for the panel's divider. */
+  /**
+   * Accessible name for the panel's divider.
+   */
   @property({ attribute: 'panel-label' })
   panelLabel = 'Resize panel'
 
-  /** Accessible name for the divider that moves both at once. */
+  /**
+   * Accessible name for the divider that moves both at once.
+   */
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize panes and panel'
 
-  /** Accessible name for the divider. */
+  /**
+   * Accessible name for the divider.
+   */
   @property({ attribute: 'separator-label' })
   separatorLabel = 'Resize source pane'
 

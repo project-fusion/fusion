@@ -27,19 +27,21 @@ import '../message/chat-message.js'
  * @documentation https://helix.fusion.dev/components/chat
  *
  * @slot - The turns, as `helix-chat-message` children.
- * @slot header - Above the transcript.
  * @slot composer - Below the transcript, where the reader writes.
- * @slot status - Beside the composer: somebody typing, connection lost.
+ * @slot header - Above the transcript.
  * @slot resume - The way back to the bottom.
+ * @slot status - Beside the composer: somebody typing, connection lost.
  *
- * @csspart log - The transcript, which is the thing that scrolls.
  * @csspart composer - The region the composer sits in.
+ * @csspart log - The transcript, which is the thing that scrolls.
  *
- * @cssproperty --chat-max-height - How tall the conversation may get before the transcript scrolls.
  * @cssproperty --chat-gap - Space between turns.
- * @cssproperty --chat-rule - The hairline under the header.
+ * @cssproperty --chat-max-height - How tall the conversation may get before the transcript scrolls.
  * @cssproperty --chat-padding-inline - Space either side of every region.
+ * @cssproperty --chat-resume-border-color - The edge around the way back.
+ * @cssproperty --chat-resume-border-width - How thick that edge is, for a surface over content.
  * @cssproperty --chat-resume-shadow - The lift under the way back, which floats over the transcript.
+ * @cssproperty --chat-rule - The hairline under the header.
  */
 @customElement('helix-chat')
 export class HelixChat extends HelixHeadlessChat {

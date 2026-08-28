@@ -22,12 +22,14 @@ import { property } from 'lit/decorators.js'
  * @slot - The options in this run.
  * @slot label - Richer than a string.
  *
- * @csspart label - The heading.
  * @csspart items - The run itself.
+ * @csspart label - The heading.
  */
 @customElement('helix-headless-option-group')
 export class HelixHeadlessOptionGroup extends HelixElement {
-  /** The heading over the run. */
+  /**
+   * The heading over the run.
+   */
   @property()
   label = ''
 

@@ -1,0 +1,34 @@
+<!-- @summary A crumb that opens a filterable list, for switching what the trail is about. -->
+<!-- @min 320 -->
+<helix-breadcrumbs aria-label="Breadcrumb">
+  <helix-breadcrumb href="/">irontitan76</helix-breadcrumb>
+
+  <helix-breadcrumb current>
+    <helix-popover
+      label="Switch repository"
+      placement="bottom-start"
+    >
+      <helix-button
+        emphasis="ghost"
+        slot="trigger"
+      >
+        docs-site
+        <helix-icon
+          name="caret-down"
+          slot="end"
+        ></helix-icon>
+      </helix-button>
+
+      <helix-listbox
+        filter-label="Search repositories"
+        filterable
+        label="Switch repository"
+        name="repository"
+      >
+        <helix-option value="docs-site">docs-site</helix-option>
+        <helix-option value="billing">billing</helix-option>
+        <helix-option value="marketing-site">marketing-site</helix-option>
+      </helix-listbox>
+    </helix-popover>
+  </helix-breadcrumb>
+</helix-breadcrumbs>

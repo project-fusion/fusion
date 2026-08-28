@@ -10,20 +10,11 @@
   id="assistant"
   label="Assistant"
 >
-  <helix-flex
-    align="center"
-    gap="sm"
+  <helix-text
+    as="strong"
     slot="header"
-  >
-    <helix-text
-      as="strong"
-      variant="body-strong"
-    >Assistant</helix-text>
-    <helix-tag
-      emphasis="subtle"
-      tone="neutral"
-    >opus-5</helix-tag>
-  </helix-flex>
+    variant="body-strong"
+  >Assistant</helix-text>
 
   <!-- Controls for the conversation rather than for any turn in it, which is
        what the header's trailing edge is for. The one that gets used goes on the
@@ -112,17 +103,27 @@
       gap="2xs"
       slot="sources"
     >
-      <helix-avatar
-        name="RM"
-        shape="circle"
-        size="sm"
-      ></helix-avatar>
-      <helix-avatar
-        name="D4"
-        shape="circle"
-        size="sm"
-      ></helix-avatar>
-      <helix-text variant="caption">runbook/migrations.md and deploy #4812</helix-text>
+      <helix-avatar-group
+        class="assistant-sources"
+        label="Three sources"
+      >
+        <helix-avatar
+          name="RM"
+          shape="circle"
+          size="sm"
+        ></helix-avatar>
+        <helix-avatar
+          name="D4"
+          shape="circle"
+          size="sm"
+        ></helix-avatar>
+        <helix-avatar
+          name="PG"
+          shape="circle"
+          size="sm"
+        ></helix-avatar>
+      </helix-avatar-group>
+      <helix-text variant="caption">runbook/migrations.md and two more</helix-text>
     </helix-flex>
 
     <helix-flex
@@ -188,6 +189,21 @@
     >
       <helix-icon name="plus"></helix-icon>
     </helix-icon-button>
+
+    <!-- Which model answers is a choice about the turn being written, so it
+         belongs on the composer's own row rather than as a label in the header.
+         A tag beside the title said what was in use and could not be changed. -->
+    <helix-select
+      aria-label="Model"
+      class="assistant-model"
+      default-value="opus-5"
+      emphasis="ghost"
+      slot="start"
+    >
+      <helix-option value="opus-5">Opus 5</helix-option>
+      <helix-option value="sonnet-5">Sonnet 5</helix-option>
+      <helix-option value="haiku-4-5">Haiku 4.5</helix-option>
+    </helix-select>
     <helix-icon-button
       emphasis="ghost"
       label="Stop answering"

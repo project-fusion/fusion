@@ -27,8 +27,8 @@ import { styles } from './pin-input-root.css.js'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input
  *
- * @csspart field - The row of boxes.
  * @csspart cell - One box.
+ * @csspart field - The row of boxes.
  *
  * @cssproperty --pin-input-gap - Space between one box and the next.
  */

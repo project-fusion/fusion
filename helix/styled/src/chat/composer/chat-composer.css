@@ -100,20 +100,34 @@
 
 /* Square, because it holds a glyph and nothing else.
 
-   **Subtle and monotone, and a notch inside the small control step.** A filled
+   **Ghost and monotone, and a notch inside the small control step.** A filled
    primary square is what a page's one affirmative action looks like, and this is
    not on a page: it is inside the composer, under the words being written, and
    at that strength it was the loudest thing in a component whose whole subject
-   is the text above it. `emphasis="subtle"` is the library's word for the
-   strength, "coloured without reading as the one thing to press", and `Button`'s
-   recipe is the shape of it: a wash of the tone with the tone as the ink, and a
-   stronger wash under the pointer.
+   is the text above it. It came down through solid, then a subtle wash, and
+   stops here: no ground at rest, and a wash of the foreground the moment a
+   pointer is on it.
 
-   The tone is the foreground rather than the brand. Blue put a second color in a
-   composer that already has one on the reader's own turns above it, and pointed
-   at the least surprising control in the component: nobody needs telling which
-   button sends. Monotone leaves it reading as a control, because it has a fill
-   where the tools beside it have none, without reading as an argument.
+   **The recipe is `Button`'s ghost, value for value, and that is the whole
+   reason to take it rather than tune one.** The tools slotted beside this are
+   `helix-icon-button` elements at `emphasis="ghost"`, so the same 8% mix means
+   send and its neighbours light up identically under the pointer instead of
+   nearly so. The tone is the foreground rather than the brand for the same kind
+   of reason the strength came down: blue put a second color in a composer that
+   already has one on the reader's own turns above it, and pointed at the least
+   surprising control in the component. Nobody needs telling which button sends.
+
+   What tells it apart from its neighbours is the glyph and the corner it sits
+   in, which is what tells it apart in every composer anybody has used.
+
+   **The ink follows `IconButton`'s two, and this rule was the only glyph in the
+   component that did not.** That control inks itself `foreground-muted` at rest
+   and `foreground` under the pointer, on the argument that a control which is
+   not the subject should not be drawn at full strength until it is being used.
+   Measured across the whole component: the copy, retry, attach, stop and header
+   glyphs all sat at `oklch(0.71)` and this one at `oklch(1)`, so the send mark
+   was the single brightest thing in a composer built to be quiet, next to a stop
+   control four pixels away drawn a third weaker.
 
    The size is `sm` less the smallest space, which is 28. A control that sits on
    a page takes a step off the control ladder; this one sits inside another
@@ -123,11 +137,11 @@
    32 is the same size as a slotted tool and reads as one. */
 [part="send"] {
   align-items: center;
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  background-color: transparent;
   block-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
   border: 0;
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground);
+  color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   inline-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
@@ -141,7 +155,8 @@
 }
 
 [part="send"]:hover:not(:disabled) {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 20%, transparent);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
 }
 
 [part="send"]:disabled {

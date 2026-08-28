@@ -113,11 +113,19 @@ export class HelixLegend extends HelixHeadlessLegend {
   @property()
   outlined?: string
 
-  /** Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. */
+  /**
+   * Which entries are drawn as a wash of their color, by name.
+   *
+   * Matched as `outlined` is.
+   */
   @property()
   subtle?: string
 
-  /** Which entries are glass rather than solid, by name. Matched as `outlined` is. */
+  /**
+   * Which entries are glass rather than solid, by name.
+   *
+   * Matched as `outlined` is.
+   */
   @property()
   glass?: string
 

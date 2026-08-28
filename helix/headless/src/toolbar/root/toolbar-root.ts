@@ -80,11 +80,15 @@ const claimed = (event: KeyboardEvent): boolean => {
  */
 @customElement('helix-headless-toolbar')
 export class HelixHeadlessToolbar extends HelixElement {
-  /** Accessible name for the toolbar. */
+  /**
+   * Accessible name for the toolbar.
+   */
   @property()
   label = 'Toolbar'
 
-  /** Which way the arrow keys move. */
+  /**
+   * Which way the arrow keys move.
+   */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
 

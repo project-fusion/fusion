@@ -26,19 +26,23 @@ import { property } from 'lit/decorators.js'
  * @slot - The action's name.
  * @slot icon - The mark, which is what a dial is read by.
  *
- * @csspart item - The control.
- * @csspart icon - The mark's box.
- * @csspart label - The name beside it.
- *
  * @event {HelixSelectEvent} helix-select - Fired when the action is chosen.
+ *
+ * @csspart icon - The mark's box.
+ * @csspart item - The control.
+ * @csspart label - The name beside it.
  */
 @customElement('helix-headless-speed-dial-item')
 export class HelixHeadlessSpeedDialItem extends HelixElement {
-  /** What this action stands for, carried in the event when it is chosen. */
+  /**
+   * What this action stands for, carried in the event when it is chosen.
+   */
   @property()
   value = ''
 
-  /** Whether the action can be chosen. */
+  /**
+   * Whether the action can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 

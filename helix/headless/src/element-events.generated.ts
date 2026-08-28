@@ -8,6 +8,7 @@ import { registerElementEvents } from '@helix-io/core'
 registerElementEvents({
   'helix-headless-accordion-item': ['helix-before-close', 'helix-before-open', 'toggle'],
   'helix-headless-announcement': ['helix-dismiss'],
+  'helix-headless-app-header': ['helix-scrolled'],
   'helix-headless-avatar': ['error', 'load'],
   'helix-headless-carousel': ['helix-select'],
   'helix-headless-chat': ['helix-before-pin'],

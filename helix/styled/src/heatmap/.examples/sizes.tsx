@@ -6,7 +6,7 @@ export function Example() {
         className="small"
         for="sizesmall"
         label="Commits, small cells"
-        rows="5"
+        rows={5}
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >
@@ -142,7 +142,7 @@ export function Example() {
         className="medium"
         for="sizemedium"
         label="Commits, medium cells"
-        rows="5"
+        rows={5}
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >
@@ -278,7 +278,7 @@ export function Example() {
         className="large"
         for="sizelarge"
         label="Commits, large cells"
-        rows="5"
+        rows={5}
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >

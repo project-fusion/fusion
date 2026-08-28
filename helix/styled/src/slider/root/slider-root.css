@@ -104,7 +104,10 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-variant-numeric: tabular-nums;
-  min-inline-size: 3ch;
+  /* Reserved from the bounds by the headless tier, which is the only place
+     that knows how long the readout can get. The 3ch stands as the floor for
+     anything rendering the part without it. */
+  min-inline-size: var(--_slider-output-reserve, 3ch);
   text-align: end;
 }
 

@@ -38,8 +38,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/button
  *
  * @slot - The button's label.
- * @slot start - Content before the label, usually an icon.
  * @slot end - Content after the label.
+ * @slot start - Content before the label, usually an icon.
  *
  * @csspart button - The inner control.
  */
@@ -54,7 +54,9 @@ export class HelixHeadlessButton extends HelixFormElement {
     target: () => this.renderRoot?.querySelector<HTMLElement>('[part="button"]') ?? null,
   })
 
-  /** What activating the button does to its form. */
+  /**
+   * What activating the button does to its form.
+   */
   @property()
   type: 'button' | 'submit' | 'reset' = 'button'
 
@@ -95,19 +97,27 @@ export class HelixHeadlessButton extends HelixFormElement {
   @property({ attribute: 'formaction' })
   formAction = ''
 
-  /** How the submission is encoded, overriding the form's own. */
+  /**
+   * How the submission is encoded, overriding the form's own.
+   */
   @property({ attribute: 'formenctype' })
   formEnctype = ''
 
-  /** Which HTTP method the submission uses, overriding the form's own. */
+  /**
+   * Which HTTP method the submission uses, overriding the form's own.
+   */
   @property({ attribute: 'formmethod' })
   formMethod = ''
 
-  /** Whether this submission skips the form's validation. */
+  /**
+   * Whether this submission skips the form's validation.
+   */
   @property({ attribute: 'formnovalidate', type: Boolean })
   formNoValidate = false
 
-  /** Which browsing context the response lands in, overriding the form's own. */
+  /**
+   * Which browsing context the response lands in, overriding the form's own.
+   */
   @property({ attribute: 'formtarget' })
   formTarget = ''
 

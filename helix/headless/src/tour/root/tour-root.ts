@@ -60,18 +60,20 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * @slot - The stops, in the order they should be visited.
  *
- * @csspart spotlight - The box over the current target, which paints the scrim.
- *
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired when the current stop moves,
  * carrying the new index.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired when the reader leaves early.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired when the reader leaves early.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart spotlight - The box over the current target, which paints the scrim.
  */
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends HelixElement {
-  /** Whether the tour is running. */
+  /**
+   * Whether the tour is running.
+   */
   @property({ reflect: true, type: Boolean })
   open = false
 
@@ -102,41 +104,57 @@ export class HelixHeadlessTour extends HelixElement {
     this.requestUpdate('index', previous)
   }
 
-  /** Stop to start on, where nothing declared one. */
+  /**
+   * Stop to start on, where nothing declared one.
+   */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
 
   /** The stop being shown, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
 
-  /** Accessible name for the run, such as "Getting started". */
+  /**
+   * Accessible name for the run, such as "Getting started".
+   */
   @property()
   label = ''
 
-  /** Space left around the target when it is lit, in pixels. */
+  /**
+   * Space left around the target when it is lit, in pixels.
+   */
   @property({ attribute: 'spotlight-padding', type: Number })
   spotlightPadding = 8
 
-  /** Label for the control that goes back, handed to every stop. */
+  /**
+   * Label for the control that goes back, handed to every stop.
+   */
   @property({ attribute: 'back-label' })
   backLabel = ''
 
-  /** Label for the control that goes on. */
+  /**
+   * Label for the control that goes on.
+   */
   @property({ attribute: 'next-label' })
   nextLabel = ''
 
-  /** Label for the control that goes on from the last stop. */
+  /**
+   * Label for the control that goes on from the last stop.
+   */
   @property({ attribute: 'done-label' })
   doneLabel = ''
 
-  /** Label for the control that leaves the tour. */
+  /**
+   * Label for the control that leaves the tour.
+   */
   @property({ attribute: 'skip-label' })
   skipLabel = ''
 
   @queryAssignedElements({ flatten: true })
   private assigned!: HTMLElement[]
 
-  /** Where the light falls, read from the current target. */
+  /**
+   * Where the light falls, read from the current target.
+   */
   @state()
   private spot: { height: number; left: number; top: number; width: number } | undefined
 

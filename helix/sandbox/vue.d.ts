@@ -88,9 +88,13 @@ export type HelixSandboxEditorVueEvents = {
 };
 
 export type HelixSandboxSpecsVueProps = {
-  /** Which family's specs to run. Changing it runs them. */
+  /** Which family's specs to run.
+
+Changing it runs them. */
   family?: HelixSandboxSpecs["family"];
-  /** The document that runs them. Same origin, and it must stay that way. */
+  /** The document that runs them.
+
+Same origin, and it must stay that way. */
   src?: HelixSandboxSpecs["src"];
   /** Accessible name for the results. */
   label?: HelixSandboxSpecs["label"];
@@ -99,10 +103,10 @@ export type HelixSandboxSpecsVueProps = {
 export type HelixSandboxSpecsVueEvents = {};
 
 export type CustomCssProperties = {
-  /** Color of a passing test. */
-  "--specs-pass-color"?: string;
   /** Color of a failing one. */
   "--specs-fail-color"?: string;
+  /** Color of a passing test. */
+  "--specs-pass-color"?: string;
 };
 
 // Vue SFC template type-checking (GlobalComponents) for non-Vue custom elements.

@@ -20,9 +20,9 @@ import { styles } from './tag-root.css.js'
  *
  * @slot - The tag's label.
  *
- * @csspart dismiss - The remove button, when `dismissible`.
- *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
+ *
+ * @csspart dismiss - The remove button, when `dismissible`.
  *
  * @cssproperty --tag-background-color - Fill behind the tag.
  * @cssproperty --tag-border-color - Color of the edge, for a chip that separates by fill alone.

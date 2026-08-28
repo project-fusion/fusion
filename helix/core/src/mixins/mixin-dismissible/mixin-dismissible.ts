@@ -47,7 +47,9 @@ export declare class DismissibleElement {
  */
 export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => {
   class Dismissible extends Base {
-    /** Whether it offers a control to take it away. */
+    /**
+     * Whether it offers a control to take it away.
+     */
     @property({ reflect: true, type: Boolean })
     dismissible = false
 

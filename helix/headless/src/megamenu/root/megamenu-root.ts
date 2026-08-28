@@ -80,18 +80,20 @@ let showing: HelixHeadlessMegamenu | undefined
  * @slot - The panel's contents: the consumer's own lists and headings.
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.
  *
- * @csspart trigger - The default trigger, where none was slotted.
- * @csspart surface - The floating panel, which is what opens.
- *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ *
+ * @csspart surface - The floating panel, which is what opens.
+ * @csspart trigger - The default trigger, where none was slotted.
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
-  /** The section's name, which names the default trigger and the panel. */
+  /**
+   * The section's name, which names the default trigger and the panel.
+   */
   @property()
   label = ''
 

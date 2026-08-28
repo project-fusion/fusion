@@ -23,14 +23,14 @@ import { styles } from './checkbox-root.css.js'
  * @aliases Tickbox, Toggle
  * @documentation https://helix.fusion.dev/components/checkbox
  *
- * @cssproperty --checkbox-size - Width and height of the box.
- * @cssproperty --checkbox-checked-color - Fill of a ticked box.
  * @cssproperty --checkbox-background-color - Fill of an unticked box.
  * @cssproperty --checkbox-border-color - Edge of the box, in every state.
- * @cssproperty --checkbox-mark-color - Ink the tick is drawn in.
- * @cssproperty --checkbox-card-padding - Inset of the card appearance.
  * @cssproperty --checkbox-card-background-color - Fill behind a card-shaped choice.
  * @cssproperty --checkbox-card-border-color - Edge around one.
+ * @cssproperty --checkbox-card-padding - Inset of the card appearance.
+ * @cssproperty --checkbox-checked-color - Fill of a ticked box.
+ * @cssproperty --checkbox-mark-color - Ink the tick is drawn in.
+ * @cssproperty --checkbox-size - Width and height of the box.
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixHeadlessCheckbox {

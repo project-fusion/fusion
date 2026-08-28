@@ -42,16 +42,18 @@ import { property } from 'lit/decorators.js'
  * @aliases Progress bar, Loading bar
  * @documentation https://helix.fusion.dev/components/progress
  *
- * @csspart track - The full length the work is measured against.
- * @csspart indicator - The part of it that is done.
  * @csspart groove - The unfilled circle, under the ring's own sweep.
+ * @csspart indicator - The part of it that is done.
+ * @csspart track - The full length the work is measured against.
  * @csspart value - The reading beside the bar, under `show-value`.
  *
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Absent while indeterminate.
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
-  /** Accessible name for what is in progress. */
+  /**
+   * Accessible name for what is in progress.
+   */
   @property()
   label = 'Progress'
 
@@ -71,7 +73,9 @@ export class HelixHeadlessProgress extends HelixElement {
   @property({ reflect: true, type: Boolean })
   indeterminate = false
 
-  /** The total the work is measured against. */
+  /**
+   * The total the work is measured against.
+   */
   @property({ type: Number })
   max = 100
 

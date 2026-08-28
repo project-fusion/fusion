@@ -33,12 +33,12 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @slot - The tabs.
  * @slot panels - The panels.
  *
- * @csspart indicator - The mark that travels to the selected tab.
- * @csspart tabs - The tab list.
- * @csspart panels - The panel container.
- *
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current tab moves, and cancelable. The only way to refuse one.
  * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds.
+ *
+ * @csspart indicator - The mark that travels to the selected tab.
+ * @csspart panels - The panel container.
+ * @csspart tabs - The tab list.
  */
 @customElement('helix-headless-tabs')
 export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
@@ -91,7 +91,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   @property({ reflect: true })
   variant?: 'segmented' | 'underlined'
 
-  /** Accessible name for the tab list. */
+  /**
+   * Accessible name for the tab list.
+   */
   @property()
   label = 'Tabs'
 

@@ -33,23 +33,23 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://helix.fusion.dev/components/chat
  *
  * @slot - What was said.
+ * @slot actions - What can be done with it: copy, retry, react.
  * @slot avatar - Who said it.
  * @slot sources - What it was said from: citations, documents, a retrieved page.
- * @slot actions - What can be done with it: copy, retry, react.
  *
- * @csspart message - The whole turn.
+ * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again, and cancelable.
+ *
+ * @csspart actions - The controls offered on the turn, beside its time.
  * @csspart avatar - The leading slot's box.
  * @csspart body - What was said, and the line under it.
  * @csspart content - The consumer's own markup.
- * @csspart sources - What the turn was drawn from, under it and outside the bubble.
- * @csspart meta - The line under a turn: its time, its state, and its controls.
- * @csspart time - When it was said.
- * @csspart state - What has happened to it, where that is worth saying.
  * @csspart mark - The status glyph beside a failure.
+ * @csspart message - The whole turn.
+ * @csspart meta - The line under a turn: its time, its state, and its controls.
  * @csspart retry - The control offered on a failed message.
- * @csspart actions - The controls offered on the turn, beside its time.
- *
- * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again, and cancelable.
+ * @csspart sources - What the turn was drawn from, under it and outside the bubble.
+ * @csspart state - What has happened to it, where that is worth saying.
+ * @csspart time - When it was said.
  */
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
@@ -76,32 +76,43 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * What has happened to it.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
-   * has no other way to know. Empty is a settled message with nothing to report,
-   * which is what most of a transcript is.
+   * has no other way to know. Absent is a settled message with nothing to
+   * report, which is what most of a transcript is, and it is the absence of the
+   * attribute rather than a value of it: there is no initializer, so nothing is
+   * reflected until something happens.
    */
-  /* The same, and for the same reason. Empty was "a settled message with
-     nothing to report", which is the resting state and so is the absence of the
-     attribute rather than a value of it. */
   @property({ reflect: true })
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
 
-  /** When it was said, as anything `Date` parses. */
+  /**
+   * When it was said, as anything `Date` parses.
+   */
   @property()
   at = ''
 
-  /** Locale for the timestamp. Empty is the runtime's own. */
+  /**
+   * Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** What to call each state, for a reader who cannot see it. */
+  /**
+   * What to call each state, for a reader who cannot see it.
+   */
   @property({ attribute: 'sending-label' })
   sendingLabel = 'Sending'
 
-  /** @internal */
+  /**
+   * @internal
+   */
   @property({ attribute: 'failed-label' })
   failedLabel = 'Not sent'
 
-  /** Label for the control offered on a failed message. */
+  /**
+   * Label for the control offered on a failed message.
+   */
   @property({ attribute: 'retry-label' })
   retryLabel = 'Try again'
 

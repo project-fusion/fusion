@@ -30,13 +30,12 @@ import type { HelixHeadlessTableColumn } from '../column/table-column.js'
  *
  * @slot - The table's rows.
  *
- * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
- * @csspart table - The grid.
  * @csspart empty - Shown when there are no rows to show.
+ * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart loading - Shown while the rows are still on their way.
+ * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns.
- *
  * @cssproperty --table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set.
  */
 @customElement('helix-headless-table')
@@ -55,7 +54,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @property()
   columns = ''
 
-  /** Accessible name for the table. */
+  /**
+   * Accessible name for the table.
+   */
   @property()
   label = ''
 

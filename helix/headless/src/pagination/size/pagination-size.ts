@@ -61,12 +61,12 @@ import '../../select/index.js'
  * @aliases Page size, Rows per page
  * @documentation https://helix.fusion.dev/components/pagination
  *
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
+ *
  * @csspart control - The select.
  * @csspart label - The words beside the number, forwarded from the select.
  * @csspart trigger - The closed control, forwarded from the select.
  * @csspart value - The chosen size inside the trigger, forwarded from the select.
- *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
  */
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {
@@ -100,15 +100,23 @@ export class HelixHeadlessPaginationSize extends HelixElement {
     this.requestUpdate('value', previous)
   }
 
-  /** Size to start on, where nothing declared one. */
+  /**
+   * Size to start on, where nothing declared one.
+   */
   @property({ attribute: 'default-value', type: Number })
   defaultValue = 0
 
-  /** The words beside the control. */
+  /**
+   * The words beside the control.
+   */
   @property()
   label = 'Per page'
 
-  /** Locale for the numbers. Absent uses the runtime's own. */
+  /**
+   * Locale for the numbers.
+   *
+   * Absent uses the runtime's own.
+   */
   @property()
   locale = ''
 

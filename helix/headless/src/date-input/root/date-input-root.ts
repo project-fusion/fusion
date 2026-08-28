@@ -75,28 +75,27 @@ const dates = (value: string): string[] =>
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://helix.fusion.dev/components/date-input
  *
- * @slot trigger - The mark on the field saying a calendar opens.
- * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
+ * @slot hint - Help under the field.
+ * @slot trigger - The mark on the field saying a calendar opens.
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the date changes.
- * @event {Event} input - Announced once the value has moved.
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the calendar opens.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the date changes.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired when it closes.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the calendar opens.
+ * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
- * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.
- * @csspart rest - How many dates are held beyond the ones shown.
- * @csspart trigger - The control that opens the calendar.
- * @csspart trigger-icon - The mark on the button that opens the calendar.
- * @csspart surface - The floating panel.
- * @csspart picker - The date picker inside it.
  * @csspart date-dismiss - The remove button, when `dismissible`.
  * @csspart date-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart date-prefix - The category before the label.
+ * @csspart feedback - What is wrong with it.
+ * @csspart field - The box holding the text and the trigger.
+ * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart label - The question, over the field.
+ * @csspart picker - The date picker inside it.
  * @csspart picker-cell - One column of a row, which is what a range paints.
  * @csspart picker-day - The shape inside a cell, which is what a single date paints.
  * @csspart picker-grid - The grid of days.
@@ -110,9 +109,10 @@ const dates = (value: string): string[] =>
  * @csspart picker-previous-mark - The glyph on the previous month control.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
- * @csspart label - The question, over the field.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart feedback - What is wrong with it.
+ * @csspart rest - How many dates are held beyond the ones shown.
+ * @csspart surface - The floating panel.
+ * @csspart trigger - The control that opens the calendar.
+ * @csspart trigger-icon - The mark on the button that opens the calendar.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinControllerOpen(
@@ -165,7 +165,9 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   @property({ attribute: 'max-tags', type: Number })
   maxTags = 0
 
-  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
+  /**
+   * Earliest date that can be chosen, as `YYYY-MM-DD`.
+   */
   @property()
   min = ''
 
@@ -180,19 +182,27 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   @property({ type: Number })
   step = 1
 
-  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
+  /**
+   * Latest date that can be chosen, as `YYYY-MM-DD`.
+   */
   @property()
   max = ''
 
-  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  /**
+   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   */
   @property({ attribute: 'disable-dates' })
   disableDates = ''
 
-  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  /**
+   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   */
   @property({ attribute: 'disable-days' })
   disableDays = ''
 
-  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  /**
+   * First column of the week in the calendar, `0` for Sunday through `6`.
+   */
   @property({ attribute: 'first-day-of-week', type: Number })
   firstDayOfWeek = 0
 
@@ -223,15 +233,21 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   @property({ attribute: 'date-style' })
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
-  /** Language tag the calendar names its months and days in. */
+  /**
+   * Language tag the calendar names its months and days in.
+   */
   @property()
   locale = ''
 
-  /** What the field says before a date is in it. */
+  /**
+   * What the field says before a date is in it.
+   */
   @property()
   placeholder = 'YYYY-MM-DD'
 
-  /** Accessible name for the control that opens the calendar. */
+  /**
+   * Accessible name for the control that opens the calendar.
+   */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a date'
 
@@ -336,7 +352,9 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     return this.mode === 'range' ? written.join(' – ') : written.join(', ')
   }
 
-  /** Whether the caret is in the field, which is when it holds the value. */
+  /**
+   * Whether the caret is in the field, which is when it holds the value.
+   */
   @state()
   private editing = false
 

@@ -23,7 +23,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-table-cell')
 export class HelixHeadlessTableCell extends HelixElement {
-  /** Whether the cell heads its column. */
+  /**
+   * Whether the cell heads its column.
+   */
   @property({ reflect: true, type: Boolean })
   header = false
 

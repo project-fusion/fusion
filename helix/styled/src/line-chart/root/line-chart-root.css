@@ -137,9 +137,24 @@
  * point `for` at, since a reading is a position and not a thing. Placement,
  * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
  * reason a chart no longer draws its own. */
+/* **A pixel rather than nothing, because a rect of no area is not trackable.**
+   This is the point the bubble hangs off, so it was written with no size at
+   all, and that is the one thing an anchor may not be. `Tooltip` names the
+   failure in its own source: an element that draws nothing is what "took the
+   bubble to the corner of the window", and the descent that guards against it
+   runs only on the slotted path. Reached through `for`, as a chart reaches it,
+   the element is taken as given.
+
+   `autoUpdate` tracks a reference by observing it, and the move observer
+   derives its root margin from the reference's own rect. A 0 by 0 rect makes
+   that margin degenerate, so the updates that should follow a scroll or a
+   resize do not necessarily fire, and the bubble keeps whatever position it was
+   last given. One pixel is enough to be observable and is still nothing to
+   look at: no fill, no border, and out of the pointer's way. */
 [part="mark"] {
-  block-size: 0;
-  inline-size: 0;
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
   position: absolute;
 }
 

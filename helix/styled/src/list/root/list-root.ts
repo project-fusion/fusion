@@ -26,7 +26,9 @@ import { styles } from './list-root.css.js'
  */
 @customElement('helix-list')
 export class HelixList extends HelixHeadlessList {
-  /** Whether a rule sits between rows. */
+  /**
+   * Whether a rule sits between rows.
+   */
   @property({ reflect: true, type: Boolean })
   divided = false
 

@@ -132,7 +132,21 @@
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 6%, transparent)
   );
-  block-size: var(--helix-size-control);
+  /* A container that has already sized its own row can say so.
+   *
+   * Density is the general answer and stays the default: a region says `sm` and
+   * every control in it agrees. What density cannot express is a row whose
+   * height is not one of the three steps, and `Breadcrumbs` is that row. A crumb
+   * is `1lh` plus `2xs` either side, 28px, which is between `sm` at 32 and
+   * nothing, so a button slotted into one stepped the whole trail: measured 40
+   * at the default and still 32 under `data-density="sm"`, against links of 28.
+   *
+   * `IconButton` had the hook and this did not, so the shipped fold worked with
+   * a `dots-three` trigger and a labelled one did not, which is the difference
+   * between the overflow example and a repository switcher. One hook rather
+   * than a second control size: the container knows the number and no scale
+   * contains it. */
+  block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
   box-sizing: border-box;
   color: var(--button-foreground-color, var(--_button-tone));
@@ -287,7 +301,19 @@
 /* How much of the room available to it the button takes. On the host, since the
    host is the box in the layout. */
 :host([width="standard"]) {
-  inline-size: var(--button-inline-size, var(--helix-size-button));
+  /* **A floor, which is what the note below always claimed and the property
+     never was.** `inline-size` is a fixed width: a label wider than the standard
+     one filled the box edge to edge and then ate its own padding, so the axis
+     that exists to stop short buttons looking mean made long ones look broken.
+     `proof-band.tsx` carried a comment declining to use `standard` for exactly
+     this, and shortened its label instead, which is a page working around a
+     component rather than a page making a choice.
+
+     `min-inline-size` keeps every measurement the pairing was built on: a
+     `<Link data-button>` and a `<helix-button>` still agree, because they agree
+     on the floor and on the content above it. What changes is only the case
+     that was wrong, where the content is wider than the floor. */
+  min-inline-size: var(--button-inline-size, var(--helix-size-button));
   /* Never wider than the room it has. A standard width is a floor for tidiness,
      not a promise to overflow a narrow column to keep it. */
   max-inline-size: 100%;

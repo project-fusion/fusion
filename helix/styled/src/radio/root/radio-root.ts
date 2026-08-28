@@ -23,14 +23,14 @@ import { styles } from './radio-root.css.js'
  * @aliases Option, Choice
  * @documentation https://helix.fusion.dev/components/radio
  *
- * @cssproperty --radio-size - Diameter of the circle.
- * @cssproperty --radio-mark-color - Color of the dot.
  * @cssproperty --radio-background-color - Fill of an unselected circle.
  * @cssproperty --radio-border-color - Edge of the circle, in every state.
- * @cssproperty --radio-card-padding - Inset of the card appearance.
- * @cssproperty --radio-chip-size - Diameter of the chip appearance.
  * @cssproperty --radio-card-background-color - Fill behind a card-shaped choice.
  * @cssproperty --radio-card-border-color - Edge around one.
+ * @cssproperty --radio-card-padding - Inset of the card appearance.
+ * @cssproperty --radio-chip-size - Diameter of the chip appearance.
+ * @cssproperty --radio-mark-color - Color of the dot.
+ * @cssproperty --radio-size - Diameter of the circle.
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixHeadlessRadio {

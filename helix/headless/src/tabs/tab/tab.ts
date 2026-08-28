@@ -20,21 +20,27 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The tab's label.
  *
- * @csspart tab - The tab itself.
- *
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen.
+ *
+ * @csspart tab - The tab itself.
  */
 @customElement('helix-headless-tab')
 export class HelixHeadlessTab extends HelixElement {
-  /** Identifies the tab, and pairs it with the panel of the same value. */
+  /**
+   * Identifies the tab, and pairs it with the panel of the same value.
+   */
   @property()
   value = ''
 
-  /** Whether this tab is the current one. */
+  /**
+   * Whether this tab is the current one.
+   */
   @property({ type: Boolean })
   selected = false
 
-  /** Whether the tab can be chosen. */
+  /**
+   * Whether the tab can be chosen.
+   */
   @property({ reflect: true, type: Boolean })
   disabled = false
 

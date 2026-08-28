@@ -41,16 +41,35 @@
    slides. Two items in one cell overlap by default, which is what
    `justify-self` is for: the dots take the start of the row and the arrows the
    end, and neither is placed relative to the other. */
+/* **The bleed insets the chrome too, because it is what the content column
+   is.** The track takes `--carousel-bleed` as padding, so a slide's leading
+   edge sits that far in from the component's own edge; the dots and arrows
+   share the track's column and were taking none of it, so they sat flush
+   against the component while the slides they belong to started further in.
+
+   At the default bleed that is a `space-md` disagreement nobody reads as a
+   mistake. It stops being invisible the moment a consumer bleeds the carousel
+   to the viewport: the insights carousel on the landing page sets the bleed to
+   the page inset so the track runs edge to edge with its slides still in the
+   text column, and the arrows and dots went to the screen edges on their own.
+
+   Only on the inline axis, and only here. These two rules are the block-start
+   and block-end placements, where the chrome is a row in the track's column and
+   the inset is the same question for both. Placed beside the slides it is a
+   column in a gutter of its own, which is a different question with a different
+   answer, and those rules turn this back off. */
 [part="indicators"] {
   grid-area: 3 / 2;
   justify-self: var(--_carousel-indicators-along);
   padding-block-start: var(--helix-space-sm);
+  padding-inline: var(--_carousel-bleed);
 }
 
 [part="controls"] {
   grid-area: 3 / 2;
   justify-self: var(--_carousel-controls-along);
   padding-block-start: var(--helix-space-sm);
+  padding-inline: var(--_carousel-bleed);
 }
 
 /* ========================================================= along the edge ==
@@ -133,6 +152,7 @@
   flex-direction: column;
   justify-self: center;
   padding-block-start: var(--helix-space-none);
+  padding-inline: var(--helix-space-none);
 }
 
 :host([controls-placement="inline-start"]) [part="controls"],
@@ -141,6 +161,7 @@
   flex-direction: column;
   justify-self: center;
   padding-block-start: var(--helix-space-none);
+  padding-inline: var(--helix-space-none);
 }
 
 /* A column beside the slides has nothing to split the edge with, so both center
@@ -288,8 +309,22 @@
   display: flex;
   gap: var(--_carousel-gap);
   overflow-x: auto;
-  padding: var(--_carousel-bleed);
-  scroll-padding: var(--_carousel-bleed);
+  /* **Inline only, because that is the axis the bleed is about.**
+
+     The bleed gives back the room a negative margin took when the track was
+     pulled out to the viewport's edges, which is a horizontal manoeuvre; it was
+     applied as `padding` on all four sides, so setting it also pushed the
+     slides down off the top of the track and lifted the chrome off their
+     bottom. At the shipped default that is `space-md` and reads as ordinary
+     breathing room. On the landing page, where the bleed is the page inset,
+     it measured 72px of dead space between the cards and the dots under them.
+
+     The block axis keeps `space-md` on its own. It is not zero because the
+     track is a scroll container on one axis and therefore clips on the other,
+     so a card's shadow needs somewhere to land. */
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--_carousel-bleed);
+  scroll-padding-inline: var(--_carousel-bleed);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -319,7 +354,16 @@
   scroll-snap-type: y mandatory;
 }
 
-[part="track"] ::slotted(*) {
+/* The pane, not the slotted slide.
+ *
+ * The component wraps each slide in a `[part="slide"]` and assigns it there, so
+ * the consumer's element carries no attribute of ours: see `assign` in the
+ * headless root. The pane is therefore the flex item and the box that snaps, and
+ * the sizing had to move onto it with the layout. `display: grid` is what passes
+ * the size through, a lone grid item stretching both axes, so a slide still
+ * fills the space it used to occupy directly. */
+[part="slide"] {
+  display: flex;
   flex: 0 0
     calc(
       (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
@@ -328,8 +372,22 @@
   scroll-snap-align: start;
 }
 
+/* The slide fills the pane, which is what the sizing used to do to it directly.
+ *
+ * A `flex-basis` beats a `width` on a flex item, so while the slide was the
+ * flex item its own declared width was overridden by the per-view arithmetic. A
+ * pane that merely contained it would silently hand that width back, and a slide
+ * narrower than its share would sit against one edge with the gap after it. The
+ * same two properties on the same axis keep the same answer. */
+[part="slide"] ::slotted(*) {
+  flex: 1 1 0;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
 /* Sized on the block axis instead, by the same arithmetic. */
-:host([orientation="vertical"]) [part="track"] ::slotted(*) {
+:host([orientation="vertical"]) [part="slide"] {
+  flex-direction: column;
   flex: 0 0
     calc(
       (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /

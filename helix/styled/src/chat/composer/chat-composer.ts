@@ -18,12 +18,12 @@ import { styles } from './chat-composer.css.js'
  * @category forms
  * @documentation https://helix.fusion.dev/components/chat
  *
- * @slot start - Under the field, at the leading edge: attachments, a model picker.
  * @slot end - Under the field, beside the send control.
+ * @slot start - Under the field, at the leading edge: attachments, a model picker.
  *
  * @csspart field - The text field.
- * @csspart tools - The row under the field.
  * @csspart send - The control that offers the turn.
+ * @csspart tools - The row under the field.
  *
  * @cssproperty --chat-composer-background - Fill behind the composer.
  * @cssproperty --chat-composer-border-width - The composer's edge, so a theme can remove it.

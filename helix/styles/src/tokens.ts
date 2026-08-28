@@ -280,7 +280,38 @@ export const TOKENS: Token[] = [
      translucent pane rather than an opaque surface, so it is a `color-mix` with
      alpha rather than a flat neutral, and no amount of collapsing makes those
      the same value. */
-  ['color-border', 'light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))'],
+  /* **Softened between the steps, and deliberately not by one.**
+
+     A rule wants to be the quietest thing that is still a rule, and flat 300 and
+     700 read as a drawn line rather than an edge. One ramp step in each
+     direction is the obvious move and the one thing this cannot do: light lands
+     on `neutral-200`, which is `surface-sunken`, and dark on `neutral-800`,
+     which is `surface-raised`. That is the fault the note above already records,
+     a track drawn in the same neutral as its own border.
+
+     So it lands between the steps, where no surface sits and nothing can
+     collide.
+
+     **The two arms are matched on the result, not on the recipe.** Both were
+     written as sixty percent of the old value first, and in dark that changed
+     almost nothing: the ramp is tighter at that end, 700 to 800 spanning 0.04
+     against 300 to 200's 0.05, and the dark line started much further from its
+     surface to begin with, 0.12 of lightness against light's 0.075. The same
+     nudge was a quarter of the gap in one mode and an eighth in the other, and
+     dark stayed close to twice as loud as light.
+
+     So dark is measured from the other side: mixed down from 800 rather than
+     across from 700, landing at 0.266 against a 0.21 surface. That is 0.055 of
+     separation, which is what light has. The two modes now read as the same
+     line rather than as the same arithmetic.
+
+     Still flat and still opaque, which is what keeps it distinct from
+     `--helix-material-border`: that one is alpha because it is drawn over
+     translucent panes, and this one is not. */
+  [
+    'color-border',
+    'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-800) 70%, var(--_helix-neutral-900)))',
+  ],
   /* Interaction. */
   ['color-primary', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
   ['color-primary-hover', 'light-dark(var(--_helix-brand-600), var(--_helix-brand-300))'],
@@ -795,7 +826,11 @@ export const TOKENS: Token[] = [
      follows this; `megamenu` keeps its own `none`, because a band that sits on
      the page rather than over it is a per-instance choice and turning glass on
      for every one of them would be a visual change nobody asked for. */
-  ['material-backdrop', 'blur(var(--helix-material-blur-md))', 'The wash behind a modal.'],
+  [
+    'material-backdrop',
+    'blur(var(--helix-material-blur-md)) saturate(1.5)',
+    'The wash behind a modal.',
+  ],
   /* **The scalar the policy moves, where the others are values it sets.** A
      line chart's area wash, a bar chart's faded group and a header's backdrop
      are the same decision at three scales, and each of them held its own number
@@ -847,7 +882,7 @@ export const TOKENS: Token[] = [
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 60%, transparent )',
+    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 30%, transparent )',
 
     'The translucent ground, for a surface that admits what is behind it.',
   ],

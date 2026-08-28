@@ -57,25 +57,25 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @aliases Episode Menu, Queue Menu, Up Next
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
- * @csspart entry - One entry in the menu.
- * @csspart icon - The glyph on the trigger.
- * @csspart poster - An entry's still, where it has one.
- * @csspart menu - The menu that holds the entries.
- * @csspart trigger - The button that opens it.
- * @csspart entry-item - The row, which is an `<a>` where `href` is set.
- * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
- * @csspart entry-start - The leading column, which is a slot and is always there.
- * @csspart menu-back - The control that returns from a submenu.
- * @csspart menu-back-mark - The glyph on the back control of a submenu.
- * @csspart menu-header - The bar above a submenu, holding the way back and its name.
- * @csspart menu-title - The name of the submenu that is showing.
- * @csspart menu-surface - The floating panel the menu is drawn on.
- * @csspart menu-empty - Shown when there are no items to show.
- * @csspart menu-loading - Shown while the items are still on their way.
- *
  * @slot trigger - Replaces the button that opens the menu.
  *
  * @event {HelixSelectEvent} helix-select - Fired with the chosen entry's value. The playlist listens for it.
+ *
+ * @csspart entry - One entry in the menu.
+ * @csspart entry-item - The row, which is an `<a>` where `href` is set.
+ * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
+ * @csspart entry-start - The leading column, which is a slot and is always there.
+ * @csspart icon - The glyph on the trigger.
+ * @csspart menu - The menu that holds the entries.
+ * @csspart menu-back - The control that returns from a submenu.
+ * @csspart menu-back-mark - The glyph on the back control of a submenu.
+ * @csspart menu-empty - Shown when there are no items to show.
+ * @csspart menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart menu-loading - Shown while the items are still on their way.
+ * @csspart menu-surface - The floating panel the menu is drawn on.
+ * @csspart menu-title - The name of the submenu that is showing.
+ * @csspart poster - An entry's still, where it has one.
+ * @csspart trigger - The button that opens it.
  */
 @customElement('helix-headless-video-playlist-menu')
 export class HelixHeadlessVideoPlaylistMenu extends HelixElement {

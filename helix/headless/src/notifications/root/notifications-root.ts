@@ -42,17 +42,17 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - The notifications, as `helix-notification` children.
- * @slot header - Above the list, for a title and the mark-all control.
  * @slot footer - Below the list, for a link to everything.
- *
- * @csspart header - The region above the list.
- * @csspart list - The list itself.
- * @csspart footer - The region below the list.
- * @csspart mark-all - The control that marks everything read.
- * @csspart empty - Shown when there is nothing in the feed.
- * @csspart loading - Shown while the feed is still on its way.
+ * @slot header - Above the list, for a title and the mark-all control.
  *
  * @event {HelixReadEvent} helix-read - Fired by an item, and by this element when everything is marked read. Cancelable.
+ *
+ * @csspart empty - Shown when there is nothing in the feed.
+ * @csspart footer - The region below the list.
+ * @csspart header - The region above the list.
+ * @csspart list - The list itself.
+ * @csspart loading - Shown while the feed is still on its way.
+ * @csspart mark-all - The control that marks everything read.
  */
 @customElement('helix-headless-notifications')
 export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
@@ -70,15 +70,21 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
-  /** Accessible name for the feed. */
+  /**
+   * Accessible name for the feed.
+   */
   @property()
   label = ''
 
-  /** Whether to draw a control that marks everything read. */
+  /**
+   * Whether to draw a control that marks everything read.
+   */
   @property({ attribute: 'mark-all', type: Boolean })
   markAll = false
 
-  /** Label for that control. */
+  /**
+   * Label for that control.
+   */
   @property({ attribute: 'mark-all-label' })
   markAllLabel = 'Mark all as read'
 

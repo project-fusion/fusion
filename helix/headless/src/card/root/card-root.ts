@@ -26,10 +26,10 @@ import { property } from 'lit/decorators.js'
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
- * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
- * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
+ * @slot header - Title and any actions for the whole card.
+ * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  */
 @customElement('helix-headless-card')
 export class HelixHeadlessCard extends HelixElement {

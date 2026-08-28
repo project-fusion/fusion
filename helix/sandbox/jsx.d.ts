@@ -280,18 +280,26 @@ cursor in it to read a long line. What it stops is the typing. */
 };
 
 export type HelixSandboxSpecsProps = {
-  /** Which family's specs to run. Changing it runs them. */
+  /** Which family's specs to run.
+
+Changing it runs them. */
   family?: HelixSandboxSpecs["family"];
-  /** The document that runs them. Same origin, and it must stay that way. */
+  /** The document that runs them.
+
+Same origin, and it must stay that way. */
   src?: HelixSandboxSpecs["src"];
   /** Accessible name for the results. */
   label?: HelixSandboxSpecs["label"];
 };
 
 export type HelixSandboxSpecsSolidJsProps = {
-  /** Which family's specs to run. Changing it runs them. */
+  /** Which family's specs to run.
+
+Changing it runs them. */
   "prop:family"?: HelixSandboxSpecs["family"];
-  /** The document that runs them. Same origin, and it must stay that way. */
+  /** The document that runs them.
+
+Same origin, and it must stay that way. */
   "prop:src"?: HelixSandboxSpecs["src"];
   /** Accessible name for the results. */
   "prop:label"?: HelixSandboxSpecs["label"];
@@ -415,8 +423,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `family`: Which family's specs to run. Changing it runs them.
-   * - `src`: The document that runs them. Same origin, and it must stay that way.
+   * - `family`: Which family's specs to run.
+   *
+   * Changing it runs them.
+   * - `src`: The document that runs them.
+   *
+   * Same origin, and it must stay that way.
    * - `label`: Accessible name for the results.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -453,20 +465,20 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
    * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
+   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `summary`: The counts, and how long the run took.
-   * - `results`: The scrolling list.
-   * - `suite`: A describe block's heading.
-   * - `result`: One test.
-   * - `status`: Whether that test passed.
-   * - `error`: Why it failed.
    * - `empty`: Shown when there is nothing to report.
+   * - `error`: Why it failed.
+   * - `result`: One test.
+   * - `results`: The scrolling list.
+   * - `status`: Whether that test passed.
+   * - `suite`: A describe block's heading.
+   * - `summary`: The counts, and how long the run took.
    */
   "helix-sandbox-specs": Partial<
     HelixSandboxSpecsProps & BaseProps<HelixSandboxSpecs> & BaseEvents<HelixSandboxSpecs>
@@ -589,8 +601,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `family`: Which family's specs to run. Changing it runs them.
-   * - `src`: The document that runs them. Same origin, and it must stay that way.
+   * - `family`: Which family's specs to run.
+   *
+   * Changing it runs them.
+   * - `src`: The document that runs them.
+   *
+   * Same origin, and it must stay that way.
    * - `label`: Accessible name for the results.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -627,20 +643,20 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
    * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
+   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `summary`: The counts, and how long the run took.
-   * - `results`: The scrolling list.
-   * - `suite`: A describe block's heading.
-   * - `result`: One test.
-   * - `status`: Whether that test passed.
-   * - `error`: Why it failed.
    * - `empty`: Shown when there is nothing to report.
+   * - `error`: Why it failed.
+   * - `result`: One test.
+   * - `results`: The scrolling list.
+   * - `status`: Whether that test passed.
+   * - `suite`: A describe block's heading.
+   * - `summary`: The counts, and how long the run took.
    */
   "helix-sandbox-specs": Partial<
     HelixSandboxSpecsProps &
@@ -651,10 +667,10 @@ export type CustomElementsSolidJs = {
 };
 
 export type CustomCssProperties = {
-  /** Color of a passing test. */
-  "--specs-pass-color"?: string;
   /** Color of a failing one. */
   "--specs-fail-color"?: string;
+  /** Color of a passing test. */
+  "--specs-pass-color"?: string;
 };
 
 declare module "react" {

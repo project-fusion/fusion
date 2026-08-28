@@ -73,7 +73,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
   @property()
   date = ''
 
-  /** How the day of the month is written, where a date is shown. */
+  /**
+   * How the day of the month is written, where a date is shown.
+   */
   @property()
   day?: 'numeric' | '2-digit'
 
@@ -87,39 +89,61 @@ export class HelixHeadlessFormatDate extends HelixElement {
   @property({ reflect: true, type: Boolean })
   elapsed = false
 
-  /** How the hour is written, where a time of day is shown. */
+  /**
+   * How the hour is written, where a time of day is shown.
+   */
   @property()
   hour?: 'numeric' | '2-digit'
 
-  /** Locale for the reading. Empty is the runtime's own. */
+  /**
+   * Locale for the reading.
+   *
+   * Empty is the runtime's own.
+   */
   @property()
   locale = ''
 
-  /** How the minute is written, where a time of day is shown. */
+  /**
+   * How the minute is written, where a time of day is shown.
+   */
   @property()
   minute?: 'numeric' | '2-digit'
 
-  /** How the month is written, where a date is shown. */
+  /**
+   * How the month is written, where a date is shown.
+   */
   @property()
   month?: 'numeric' | '2-digit' | 'long' | 'short' | 'narrow'
 
-  /** How the second is written, where a time of day is shown. */
+  /**
+   * How the second is written, where a time of day is shown.
+   */
   @property()
   second?: 'numeric' | '2-digit'
 
-  /** The time zone to read the timestamp in. Empty is the runtime's own. */
+  /**
+   * The time zone to read the timestamp in.
+   *
+   * Empty is the runtime's own.
+   */
   @property({ attribute: 'time-zone' })
   timeZone?: string
 
-  /** Whether to name the time zone, and how. */
+  /**
+   * Whether to name the time zone, and how.
+   */
   @property({ attribute: 'time-zone-name' })
   timeZoneName?: 'long' | 'short'
 
-  /** How the weekday is written, where one is shown. */
+  /**
+   * How the weekday is written, where one is shown.
+   */
   @property()
   weekday?: 'long' | 'short' | 'narrow'
 
-  /** How the year is written, where a date is shown. */
+  /**
+   * How the year is written, where a date is shown.
+   */
   @property()
   year?: 'numeric' | '2-digit'
 
@@ -133,7 +157,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
   @state()
   private clock: number | undefined = undefined
 
-  /** The date read out of the light DOM, where no attribute carried one. */
+  /**
+   * The date read out of the light DOM, where no attribute carried one.
+   */
   @state()
   private written = ''
 

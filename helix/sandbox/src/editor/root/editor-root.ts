@@ -61,19 +61,27 @@ export type EditorLanguage = keyof typeof LANGUAGES
  */
 @customElement('helix-sandbox-editor')
 export class HelixSandboxEditor extends HelixElement {
-  /** The source being edited. */
+  /**
+   * The source being edited.
+   */
   @property()
   value = ''
 
-  /** Which source this pane holds, echoed in every change. */
+  /**
+   * Which source this pane holds, echoed in every change.
+   */
   @property()
   name = 'html'
 
-  /** How to highlight it. */
+  /**
+   * How to highlight it.
+   */
   @property()
   language: EditorLanguage = 'html'
 
-  /** Accessible name for the editable region. */
+  /**
+   * Accessible name for the editable region.
+   */
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 

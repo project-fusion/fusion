@@ -21,11 +21,11 @@ import { styles } from './drawer-root.css.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @csspart panel - The sliding panel.
- * @csspart header - The header region.
- * @csspart content - The scrolling content region.
- *
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired when the drawer opens or closes.
+ *
+ * @csspart content - The scrolling content region.
+ * @csspart header - The header region.
+ * @csspart panel - The sliding panel.
  *
  * @cssproperty --drawer-backdrop - Filter applied behind a `material="glass"` drawer.
  *   Follows the theme's material policy; set it to override the strength on one drawer.

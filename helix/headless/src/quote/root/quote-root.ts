@@ -26,7 +26,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-quote')
 export class HelixHeadlessQuote extends HelixElement {
-  /** URL identifying where the quotation came from. */
+  /**
+   * URL identifying where the quotation came from.
+   */
   @property()
   cite = ''
 
