@@ -57,16 +57,16 @@ them. The order was carried in a conversation until it was got wrong twice in on
 night; it is a script now.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
-push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`
-jobs, on a clean checkout, and it is better at every part of that than a laptop
-is. Running it locally before pushing duplicates a ten minute gate that already
-exists.
+push, sharded across `plan`, `warm`, `checks`, `lint`, `types`, `tests` and six
+`browser` jobs, on a clean checkout, and it is better at every part of that than
+a laptop is. Running it locally before pushing duplicates a four minute gate that
+already exists.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `docs/token-reference.md is behind helix/styles/tokens.json` is a red
 build that stays red until somebody runs `bun run tokens` and pushes again, so
 `.githooks/pre-push` runs `biome ci` and the seven staleness checks and nothing
-else: 8 seconds against ten minutes. It judges and never writes, because a hook
+else: 8 seconds against four minutes. It judges and never writes, because a hook
 that edits the tree during `git push` produces a push that does not contain the
 edits. `git push --no-verify` skips it.
 
