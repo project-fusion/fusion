@@ -10,8 +10,17 @@
    *
    * Here and not on the control, because `::slotted()` reaches one level and
    * the trigger is inside whatever was slotted. A custom property inherits the
-   * rest of the way, and one nothing reads costs nothing. */
-  --icon-button-size: var(--breadcrumbs-control-size, calc(1lh + var(--helix-space-2xs) * 2));
+   * rest of the way, and one nothing reads costs nothing.
+   *
+   * **The arithmetic is `text * leading`, and it was `1lh` until it had a second
+   * reader.** A custom property is substituted unresolved, so `lh` resolves
+   * against whoever *consumes* it rather than against the crumb that wrote it.
+   * `IconButton` sets no line-height and inherits the crumb's, so the two agreed
+   * and the unit looked portable; `Button` sets `leading-tight`, so the same
+   * expression measured 23.59 against links of 27.5, four pixels short and in
+   * the same row. The token pair is absolute at both ends, and it is the shape
+   * `Checkbox` already computes its box from. */
+  --icon-button-size: var(--breadcrumbs-control-size, calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2));
 
   /* And the same for a labelled one, which the rule above cannot reach.
    *
@@ -21,7 +30,7 @@
    * icon button did. Two hooks because they are two components; one number,
    * because the crumb's height is the only thing either of them is agreeing
    * with. */
-  --button-size: var(--breadcrumbs-control-size, calc(1lh + var(--helix-space-2xs) * 2));
+  --button-size: var(--breadcrumbs-control-size, calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2));
 
   align-items: center;
   display: inline-flex;

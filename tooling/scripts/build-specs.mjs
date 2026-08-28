@@ -75,6 +75,25 @@ const out = join(root, 'site/ui/public/specs')
  * One entry per specifier rather than one file re-exporting all of them,
  * because `lit` and `lit/static-html.js` both export `html` and they are not
  * the same binding. A single flat module would have to drop one of them.
+ *
+ * **`@helix-io/core` is deliberately not here**, and it is the obvious entry to
+ * add: every family extends `HelixElement`, so with splitting off it is inlined
+ * ninety-three times and it is most of what a bundle weighs. Measured 27 Aug
+ * 2026, naming it took the family bundles from 9,143 KB to 3,017 KB.
+ *
+ * It also broke the sandbox family with `ReferenceError: <minified> is not
+ * defined` at import, and cost 52 tests that stopped running behind it. The
+ * runtime build below is `splitting: true`, so core does not arrive as one file:
+ * it came out as ten `helix-core-*.js` chunks with circular initialization
+ * between them, which is the cycle the family build's own `splitting: false`
+ * comment describes, reached through a different door. The minified name moved
+ * between builds, which is what says it is evaluation order rather than a bug in
+ * the code.
+ *
+ * What makes it not worth retrying at the ratio it looks like it pays at: the
+ * build succeeds, so there is no signal until a family fails at runtime, and
+ * ninety-two of ninety-three passing is not a property that holds. These bundles
+ * are gitignored artifacts, so the whole prize is a faster local spec run.
  */
 const RUNTIME = {
   '@helix-io/icons': 'helix-icons',

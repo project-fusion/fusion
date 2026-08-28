@@ -996,12 +996,58 @@ turns out to be, the way `check:axes` names work rather than blocking on it.
 ## JSDoc contract
 
 Every component's class JSDoc carries `@summary`, `@description`, `@since`,
-`@status`, `@documentation`, plus `@alias` where a component is known by other
-names. `helix-convention-lint` requires the first five and **fails the build**.
+`@status`, `@category`, `@documentation`, plus `@aliases` where a component is
+known by other names. `helix-convention-lint` **fails the build** without
+`@since`, `@status`, `@documentation`, or a description, which `@summary` alone
+satisfies.
+
+**`@category` is asked of a family root and not of its parts**, which is the one
+exception and is a rule about the question rather than about the tag. It answers
+what a component is for, and `Tabs.Tab` has no answer to that separate from
+`Tabs`: giving it one puts a part in the gallery beside its own root.
+
+*Corrected 27 Aug 2026, and the tag name was the half that mattered.* This said
+`@alias`, which the metadata plugin does not read, and omitted `@category`,
+which fails the build. The plugin's own header carried the same wrong name two
+lines above the right one. Nothing shipped wrong because the corpus was written
+against the code rather than against this file, which is luck: 216 blocks say
+`@aliases` and the two documents that name the tag both said `@alias`.
 
 Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
 badge a docs page or warn a consumer.
+
+**The tags come in one order, and the lists inside them sort by name.**
+
+```
+@summary  @description  @since  @status  @category  @groups  @aliases
+@documentation  @slot  @event  @csspart  @cssproperty
+```
+
+One blank line between groups and none between the metadata tags, which is what
+makes those six read as a block rather than six statements. `@slot`, `@event`,
+`@csspart` and `@cssproperty` sort by name within their own group, and the
+default slot, written with no name at all, sorts first: it is the slot a
+component has before it has any other.
+
+Most of that is the corpus stating a rule rather than a decision taken. Measured
+across all 246 blocks on 27 Aug 2026, the metadata prefix was unanimous, `@slot`
+preceded `@csspart` 115 times against 3, and `@cssproperty` came last 17 against
+2. **`@event` against `@csspart` split 38 to 36, and was decided rather than
+derived**: slots and events are what a consumer writes markup against, parts and
+custom properties are what they write CSS against, and the two pairs are worth
+not interleaving.
+
+**Sorting is not tidiness, because the reference page is generated from this
+order.** `bun run reference` writes the tags out as it finds them, so an
+unsorted block is a published API table with a part missing from where a reader
+looks. `Video` declares 48 parts and had its `captions-menu-*` family in three
+separate runs with the whole `overflow-*` set between them. No line of it was
+wrong, and no reader who did not already know the answer could have found one.
+
+`bun run tag-order` rewrites, `check:tag-order` judges, and `verify` runs it.
+Only blocks carrying `@summary` are touched: a member's JSDoc uses `@internal`,
+`@param` and `@reference`, whose order is the order of the thing they describe.
 
 Events are declared, never inferred, and **names are `helix-{verb}`, lowercase
 and prefixed**:

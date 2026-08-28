@@ -450,6 +450,8 @@ const dearest = styled.rows.reduce((high, row) => (row.alone.gzip > high.alone.g
 const wholeStyled = packages.find((one) => one.entry === '@helix-io/styled')
 const wholeHeadless = packages.find((one) => one.entry === '@helix-io/headless')
 
+const kb = (bytes) => `${(bytes / 1000).toFixed(1)} kB`
+
 const percent = (part, whole) => Math.round((part / whole) * 100)
 const sharedShare = percent(median(styledGzip) - median(styledAdded), median(styledGzip))
 const addedShare = percent(median(styledAdded), median(styledGzip))
@@ -746,7 +748,85 @@ const written = `${lines
   .trimEnd()}\n`
 const output = join(ROOT, OUTPUT)
 
+/**
+ * The four claims the landing page prints, emitted rather than copied.
+ *
+ * **The page says "every number here was produced, not written" and one of them
+ * was written.** `proof.ts` carried them by hand and said so in its own header,
+ * predicting the exact failure that arrived: the component count sat at 92
+ * while the build measured 93, directly under that heading. A number a
+ * generator could produce and a human retypes is a number that goes stale on a
+ * day nobody is looking.
+ *
+ * Emitted from this script rather than a generator of its own because every
+ * value is already computed for the MDX above, and measuring them twice is how
+ * two documents come to disagree about one run.
+ */
+const CLAIMS_OUT = 'site/ui/content/landing/claims.generated.ts'
+
+const claims = [
+  {
+    label: 'Components',
+    note: 'Two tiers. Headless behavior and a styled layer over it, both shipped.',
+    value: String(styled.rows.length),
+  },
+  {
+    label: 'The token layer, compressed',
+    note: `${TOKEN_COUNT} semantic tokens. Nothing on a Helix page paints without this file.`,
+    value: kb(stylesheets.find((sheet) => sheet.path.endsWith('dist/tokens.css')).brotli),
+  },
+  {
+    label: 'The derivation engine',
+    note: 'Build time for most consumers, runtime for a theme switcher.',
+    value: kb(packages.find((one) => one.entry === '@helix-io/theme').brotli),
+  },
+  {
+    label: 'Shared across the first component',
+    note: 'Ten components are one runtime plus nine additions, not ten of the first number.',
+    value: `${sharedShare}%`,
+  },
+]
+
+const claimsSource = [
+  '/* Generated from the built packages by `bun run metrics`. Do not edit. */',
+  '',
+  'export interface Claim {',
+  '  /** What was measured, in the fewest words that stay true. */',
+  '  label: string',
+  '  /** Why the number is the one worth printing. Never an adjective. */',
+  '  note: string',
+  '  /** Rendered large. A string because the unit belongs to the figure. */',
+  '  value: string',
+  '}',
+  '',
+  'export const CLAIMS: readonly Claim[] = [',
+  ...claims.flatMap((claim) => [
+    '  {',
+    `    label: '${claim.label}',`,
+    `    note: '${claim.note.replace(/'/g, "\\'")}',`,
+    `    value: '${claim.value}',`,
+    '  },',
+  ]),
+  ']',
+  '',
+].join('\n')
+
+const claimsPath = join(ROOT, CLAIMS_OUT)
+
 if (check) {
+  let claimsExisting = ''
+  try {
+    claimsExisting = readFileSync(claimsPath, 'utf8')
+  } catch {
+    claimsExisting = ''
+  }
+  if (claimsExisting !== claimsSource) {
+    console.error(
+      `${CLAIMS_OUT} is behind the packages it measures. Run \`bun run metrics\` and commit the result.`,
+    )
+    process.exit(1)
+  }
+
   const existing = existsSync(output) ? readFileSync(output, 'utf8') : ''
   if (existing !== written) {
     /* **Which lines, not just that some line.** Reporting only staleness costs a
@@ -779,6 +859,7 @@ if (check) {
   )
 } else {
   writeFileSync(output, written)
+  writeFileSync(claimsPath, claimsSource)
   console.log(
     `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families written to ${OUTPUT}`,
   )
