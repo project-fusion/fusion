@@ -46,8 +46,8 @@ on purpose and are not softened as the company matures.
 
 The strategy is not in this repository. The numbered plan (thesis, planning documents) lives in the internal repository, because this one is public.
 
-What is here is the writing meant to be read: `docs/insights/` is the published
-essays, `docs/19-queue.md` is the work queue, and the two generated references
+What is here is the writing meant to be read: `fusion/docs/insights/` is the published
+essays, `fusion/docs/19-queue.md` is the work queue, and the two generated references
 beside them are `component-reference.md` and `token-reference.md`.
 
 ## Packages
@@ -73,5 +73,5 @@ bun install && bun run verify
 ## Conventions
 
 - `.local/` is gitignored and per-machine. Scratch, artifacts, screenshots.
-- `docs/` is tracked. Strategy lives with the code.
+- `fusion/docs/` is tracked. Strategy lives with the code.
 - **No em dashes** in code, docs, or copy.

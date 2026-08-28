@@ -220,7 +220,7 @@ for (const page of docPages) {
  * stale parallel site the whole arrangement exists to prevent. */
 const { routes } = await import('../../site/ui/content/routes/routes.ts')
 const { renderCopy, copyFor } = await import('../../site/ui/utils/copy-markdown/copy-markdown.ts')
-const { findSitePage, sitePageSources } = await import('../../docs/insights/src/index.ts')
+const { findSitePage, sitePageSources } = await import('../../fusion/docs/insights/src/index.ts')
 const { SERVICES } = await import('../../site/ui/content/services/services.ts')
 let prose = 0
 

@@ -1,7 +1,7 @@
 body:
   - attributes:
       value:
-        A proposal usually belongs in `docs/19-queue.md` rather than here, since
+        A proposal usually belongs in `fusion/docs/19-queue.md` rather than here, since
         that is where the reasoning survives next to the code. Open this if you
         would rather discuss it before writing a row.
     type: markdown

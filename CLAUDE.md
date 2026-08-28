@@ -1,12 +1,13 @@
 # Working in this repo
 
-Fusion Development Group. **The strategy folder is not in this repository.**
-`docs/plan/` was removed when the history was rewritten for the public repository,
-and it lives in the archive alongside the rest of what was taken out. Comments
+Fusion Development Group. **The strategy folder is not in this repository.** It
+was removed when the history was rewritten for the public repository, and it
+lives in the archive alongside the rest of what was taken out. Comments
 here still cite it by name, `plan/00-thesis.md` and `plan/23-helix-docs.md` among
 them, because the reasoning they carry is still why the code is shaped as it is;
-the documents themselves are elsewhere. What remains in [`docs/`](docs/) is the
-queue, the published writing, and two generated references.
+the documents themselves are elsewhere. What remains in
+[`fusion/docs/`](fusion/docs/) is the queue, the published writing, and two
+generated references.
 
 Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 `.claude/rules/cortex.md` for `cortex/**`. To add a component, use the
@@ -103,11 +104,11 @@ is. Running it locally before pushing duplicates a ten minute gate that already
 exists.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
-a push. `docs/token-reference.md is behind helix/styles/tokens.json` is a red
-build that stays red until somebody runs `bun run gen:tokens-reference` and
-pushes again, so `.githooks/pre-push` runs `biome ci`, `check:css:reachable` and
-the twelve
-generated-file checks and nothing else: 9 seconds against ten minutes. It judges
+a push. `fusion/docs/token-reference.md is behind helix/styles/tokens.json` is
+a red build that stays red until somebody runs `bun run gen:tokens-reference`
+and pushes again, so `.githooks/pre-push` runs `biome ci`, `check:css:reachable`
+and the twelve generated-file checks and nothing else: 9 seconds against ten
+minutes. It judges
 and never writes, because a hook that edits the tree during `git push` produces
 a push that does not contain the edits. `git push --no-verify` skips it.
 
@@ -162,11 +163,10 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs gallery sandbox
            testing cli
 cortex/    core trace engram docs
-site/      ui, the Next application that renders everything above and below
-docs/      plan/ is the numbered strategy, insights/ is the published writing;
-           the queue and two generated references sit above both, being
-           infrastructure rather than either
-tooling/   CI and build scripts
+fusion/    docs today, cli and site to follow: what belongs to the company
+           rather than to a product. `insights` is the published writing, and
+           the queue and two generated references sit above it
+tooling/   CI and build scripts, and shrinking
 .local/    per-machine scratch, gitignored
 ```
 
@@ -212,16 +212,29 @@ tooling/   CI and build scripts
   names recur across domains.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
   typed registry. The site that renders it is separate and depends on it.
-- **`docs/` is the repository's own writing, grouped by what a file is**, and it
-  is the one folder that is not a product domain. `plan/` is strategy, `insights/`
-  is what gets published, and a package inside it is scoped `@fusion.dev/*`
-  because the writing belongs to the company rather than to any product.
+- **`fusion/` is the company tier, and it is a domain like the other two.** It
+  holds what belongs to Fusion rather than to Helix or Cortex: the CLI, the
+  writing, and the site that renders everything above it. `fusion/docs/insights`
+  is what gets published, and the queue and the two generated references are
+  infrastructure sitting above it.
 
-  *Amended 24 Aug 2026, when `site/content` became `docs/insights`.* This said
-  "domain folders at root" without qualification, so a package under `docs/` was
-  a contradiction and the move was held on it for a day. The rule was right about
-  what it was protecting, which is products scattering, and too broad about how
-  it said so: `docs/` holds no product and never did.
+  **The scope already said this.** `@fusion.dev/helix-*` and
+  `@fusion.dev/cortex-*` name their domain; `@fusion.dev/*` bare names the company, which is why
+  `@fusion.dev/insights` and `@fusion.dev/cli` carry no domain prefix while
+  `@fusion.dev/helix-core` does. The folder now matches the scope it was always
+  published under.
+
+  *Amended 24 Aug 2026, when `site/content` became `docs/insights`.* The rule
+  then read "domain folders at root" without qualification, so a package under
+  `docs/` was a contradiction and the move was held on it for a day. It was
+  right about what it was protecting, which is products scattering, and too
+  broad about how it said so.
+
+  *Amended again 28 Aug 2026, and this is the reason the first amendment was
+  needed.* `docs/` and `site/` were company-tier folders that had no company
+  tier to sit in, so each had to be argued for as an exception. Folding them
+  into `fusion/` makes them ordinary, and the exception disappears rather than
+  gaining a third clause. Three domains, each a folder, each a version line.
 
   **What settled it was this file's own next bullet.** A `<domain>/docs` is a
   content package and *the site that renders it is separate*, which is exactly

@@ -8,7 +8,7 @@ import { DocumentPage } from '../document-page'
  * Privacy, rendered from `@fusion.dev/insights`.
  *
  * **The writing belongs to the company rather than to the site**, which is why
- * the source is an MDX file in `docs/insights` beside the thesis and the trust
+ * the source is an MDX file in `fusion/docs/insights` beside the thesis and the trust
  * bar rather than markup in this file. Replacing the renderer would otherwise
  * take the legal text with it.
  *

@@ -40,7 +40,7 @@
  *
  * **What is still owed is the restore, and it is a sweep rather than an edit.**
  * Measured 25 Aug 2026 with the real British forms put back: **75 occurrences
- * across 23 files**, 39 of them in `docs/19-queue.md`, led by `color` at 19,
+ * across 23 files**, 39 of them in `fusion/docs/19-queue.md`, led by `color` at 19,
  * `behavior` at 6 and `centered`, `judgment` and `license` at 6 each. Restoring
  * the list without rewriting those turns `verify` red, so the two belong in one
  * change and that change is not this one. The pairs below are the ones this
@@ -70,7 +70,7 @@ import { join } from 'node:path'
  * **`center` renames a public part**, `donut-chart`'s, and that is deliberate
  * rather than collateral. There is no `helix-v` tag, so `::part(center)` has no
  * consumer to break, and this is free today and a deprecation after the first
- * release. The same timing argument as [#215](../../docs/19-queue.md).
+ * release. The same timing argument as [#215](../../fusion/docs/19-queue.md).
  */
 const PAIRS = [
   ['acknowledgement', 'acknowledgment'],
@@ -158,7 +158,7 @@ const PAIRS = [
    literally, and it sat outside this list while holding nine British spellings,
    which is the failure this check exists to prevent, in the one directory
    written to be copied from. */
-const ROOTS = ['cortex', 'docs', 'helix', 'site', 'tooling', '.claude', '.github']
+const ROOTS = ['cortex', 'fusion', 'helix', 'site', 'tooling', '.claude', '.github']
 
 /* Root files are named rather than globbed, so one that is not named is not
    swept: `Cargo.toml` carried a British spelling in a comment for as long as it
@@ -335,7 +335,7 @@ for (const path of [...ROOTS.flatMap((root) => files(root)), ...FILES]) {
          reporter said otherwise until 25 Aug 2026. It named every pair whose
          left side appeared on the line, which was harmless only while every
          pair had the same word on both sides: the first live pair turned one
-         British word in `docs/19-queue.md` into 169 complaints, most of them
+         British word in `fusion/docs/19-queue.md` into 169 complaints, most of them
          "`color` is British. Write `color`." The line above decides what gets
          written; this decides what gets said, and the two have to agree. */
       if (found && like(found[0], american) !== found[0]) {

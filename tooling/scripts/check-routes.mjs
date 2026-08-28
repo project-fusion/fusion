@@ -151,7 +151,7 @@ for (const route of components) {
  * post edits frontmatter and the address does not move. What can still move it
  * is a `git mv`, which is a deliberate act and is exactly what this checks.
  *
- * The record is `docs/insights/published.json`, written by this check the first
+ * The record is `fusion/docs/insights/published.json`, written by this check the first
  * time it runs and appended to as pages appear. It is not a source of identity
  * (the file name is) and nothing reads it at runtime: it is a memory of what
  * has been published, which is the one thing a filesystem cannot tell you,
@@ -161,7 +161,7 @@ for (const route of components) {
  * carries the machinery, permanent and wildcarded, from when `/design` became
  * `/helix`. A rename without a redirect is a link that was published and now
  * 404s, and `llms.txt` means a machine may hold it too. */
-const PUBLISHED = join(ROOT, 'docs/insights/published.json')
+const PUBLISHED = join(ROOT, 'fusion/docs/insights/published.json')
 const CONFIG = join(ROOT, 'site/ui/next.config.ts')
 
 const published = existsSync(PUBLISHED)
@@ -208,7 +208,13 @@ if (problems.length > 0) {
 const untracked = new Set(
   spawnSync(
     'git',
-    ['ls-files', '--others', '--exclude-standard', 'helix/docs/content', 'docs/insights/content'],
+    [
+      'ls-files',
+      '--others',
+      '--exclude-standard',
+      'helix/docs/content',
+      'fusion/docs/insights/content',
+    ],
     {
       cwd: ROOT,
       encoding: 'utf8',
@@ -243,7 +249,7 @@ if (problems.length === 0) {
          is the shape of a check that cannot fail. Found by reverting the file
          and watching this branch report clean. */
       console.error(
-        'routes: docs/insights/published.json is behind the routes that exist. Run ' +
+        'routes: fusion/docs/insights/published.json is behind the routes that exist. Run ' +
           '`bun run gen:routes` and commit the result.\n',
       )
       for (const path of merged.filter((one) => !published.paths.includes(one))) {

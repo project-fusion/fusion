@@ -18,7 +18,7 @@
  * because a false positive is worse than a miss here:
  *
  * - A backticked path rooted at the repository, with a known extension:
- *   `docs/19-queue.md`, `helix/styles/src/tokens.css`. A path that starts
+ *   `fusion/docs/19-queue.md`, `helix/styles/src/tokens.css`. A path that starts
  *   somewhere else is illustrative rather than a claim and is left alone.
  * - A backticked `bun run <script>`, against the nearest `package.json` and
  *   every one above it, since a package names its own scripts.
@@ -49,7 +49,7 @@ import { dirname, join } from 'node:path'
    thing here pointing at a file that does not exist, and this check could not see
    it: every path it scanned was inside a package. A root file is where a reader
    starts, which makes it the worst place to be unchecked. */
-const ROOTS = ['helix', 'cortex', 'tooling', 'docs', 'site/ui']
+const ROOTS = ['helix', 'cortex', 'tooling', 'fusion', 'site/ui']
 
 /* The repository's own top-level files, checked without descending.
    `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left

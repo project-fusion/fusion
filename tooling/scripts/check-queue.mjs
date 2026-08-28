@@ -1,5 +1,5 @@
 /**
- * Holds `docs/19-queue.md` to one number per row.
+ * Holds `fusion/docs/19-queue.md` to one number per row.
  *
  * Written after the same collision happened twice in one evening, the second
  * time to the person who had just written a note in that file telling everyone
@@ -21,7 +21,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const FILE = 'docs/19-queue.md'
+const FILE = 'fusion/docs/19-queue.md'
 const text = readFileSync(join(ROOT, FILE), 'utf8')
 const lines = text.split('\n')
 

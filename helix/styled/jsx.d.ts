@@ -8539,7 +8539,7 @@ anybody who has written HTML types, it parsed to no property at all, and
 the field stayed editable with no error anywhere. Measured before the
 rename: `readOnly` came back `false`.
 
-Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
 today and a deprecation after the first release. */
@@ -8561,7 +8561,7 @@ anybody who has written HTML types, it parsed to no property at all, and
 the field stayed editable with no error anywhere. Measured before the
 rename: `readOnly` came back `false`.
 
-Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
 today and a deprecation after the first release. */
@@ -8735,7 +8735,7 @@ anybody who has written HTML types, it parsed to no property at all, and
 the field stayed editable with no error anywhere. Measured before the
 rename: `readOnly` came back `false`.
 
-Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
 today and a deprecation after the first release. */
@@ -8757,7 +8757,7 @@ anybody who has written HTML types, it parsed to no property at all, and
 the field stayed editable with no error anywhere. Measured before the
 rename: `readOnly` came back `false`.
 
-Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
 about the part it renamed for the same kind of reason: there is no
 `helix-v` tag, so no consumer is holding the old spelling, and this is free
 today and a deprecation after the first release. */
@@ -26185,7 +26185,7 @@ export type CustomElements = {
    * the field stayed editable with no error anywhere. Measured before the
    * rename: `readOnly` came back `false`.
    *
-   * Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+   * Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
    * about the part it renamed for the same kind of reason: there is no
    * `helix-v` tag, so no consumer is holding the old spelling, and this is free
    * today and a deprecation after the first release.
@@ -43415,7 +43415,7 @@ export type CustomElementsSolidJs = {
    * the field stayed editable with no error anywhere. Measured before the
    * rename: `readOnly` came back `false`.
    *
-   * Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+   * Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
    * about the part it renamed for the same kind of reason: there is no
    * `helix-v` tag, so no consumer is holding the old spelling, and this is free
    * today and a deprecation after the first release.

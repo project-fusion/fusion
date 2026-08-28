@@ -27,7 +27,7 @@ a finding rather than allowing it, and comment any allow at its site.
 
 ## What the queue is
 
-[`docs/19-queue.md`](docs/19-queue.md) is the issue tracker, in the repository,
+[`fusion/docs/19-queue.md`](fusion/docs/19-queue.md) is the issue tracker, in the repository,
 under review, and versioned with the code it describes. Numbers are stable: a
 finished item keeps its number, so a commit naming #49 still means something a
 year from now. `bun run check:prose:queue` prints the next free number and holds the

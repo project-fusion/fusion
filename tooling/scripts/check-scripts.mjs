@@ -2,15 +2,15 @@
 /**
  * Every `bun run` inside a manifest names a script that manifest can reach.
  *
- * **A manifest reaches its own scripts and no others.** `bun run catalog` inside
- * `site/ui` runs that package's `catalog`, and a root script of the same name is
- * not a fallback: measured from `helix/core`, `bun run fix:order` answers
+ * **A manifest reaches its own scripts and no others.** A `catalog` call inside
+ * `site/ui` runs the `catalog` that package declares, and a root script of the
+ * same name is not a fallback: measured from `helix/core`, `bun run fix:order` answers
  * `Script not found` while the root declares it. So the same words mean
  * different things in different manifests and neither one can borrow from the
  * other, which is exactly the ambiguity a rename walks into.
  *
  * **The second is what happened, on 28 Aug 2026.** Renaming the root writers to
- * `gen:*` rewrote `bun run catalog` to `bun run gen:catalog` inside
+ * `gen:*` rewrote every `catalog` call to `gen:catalog` inside
  * `site/ui/package.json`, where `catalog`, `frame`, `specs` and `wasm` are that
  * package's own scripts and the turbo tasks behind `turbo watch`. Ten call
  * sites across `build`, `dev` and `typecheck`. The tree stayed green through a

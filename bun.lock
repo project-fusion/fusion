@@ -26,7 +26,7 @@
       "name": "@fusion.dev/cortex-docs",
       "version": "0.0.0-dev",
     },
-    "docs/insights": {
+    "fusion/docs/insights": {
       "name": "@fusion.dev/insights",
       "version": "0.0.0-dev",
     },
@@ -192,7 +192,7 @@
         "@fusion.dev/helix-sandbox": "helix/sandbox",
         "@fusion.dev/helix-styles": "helix/styles",
         "@fusion.dev/helix-theme": "helix/theme",
-        "@fusion.dev/insights": "docs/insights",
+        "@fusion.dev/insights": "fusion/docs/insights",
         "next": "^16.3.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -291,9 +291,9 @@
 
     "@fusion.dev/helix-theme": ["@fusion.dev/helix-theme@workspace:helix/theme", {}],
 
-    "@fusion.dev/insights": ["@fusion.dev/insights@workspace:docs/insights", {}],
+    "@fusion.dev/insights": ["@fusion.dev/insights@workspace:fusion/docs/insights", {}],
 
-    "@fusion.dev/site-ui": ["@fusion.dev/site-ui@workspace:site/ui", { "dependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-docs": "helix/docs", "@fusion.dev/helix-gallery": "helix/gallery", "@fusion.dev/helix-sandbox": "helix/sandbox", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/insights": "docs/insights", "next": "^16.3.1", "react": "^19.0.0", "react-dom": "^19.0.0" }, "devDependencies": { "@mdx-js/mdx": "^3.1.1", "@types/react": "^19.0.0", "@types/react-dom": "^19.0.0", "remark-frontmatter": "^5.0.0", "remark-gfm": "^4.0.1" } }],
+    "@fusion.dev/site-ui": ["@fusion.dev/site-ui@workspace:site/ui", { "dependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-docs": "helix/docs", "@fusion.dev/helix-gallery": "helix/gallery", "@fusion.dev/helix-sandbox": "helix/sandbox", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/insights": "fusion/docs/insights", "next": "^16.3.1", "react": "^19.0.0", "react-dom": "^19.0.0" }, "devDependencies": { "@mdx-js/mdx": "^3.1.1", "@types/react": "^19.0.0", "@types/react-dom": "^19.0.0", "remark-frontmatter": "^5.0.0", "remark-gfm": "^4.0.1" } }],
 
     "@github/catalyst": ["@github/catalyst@1.8.1", "", {}, "sha512-dnN4WWpbeuQvA17LvsGdlXEueJdBk9y+I+WO5pdNpoHNOXPsFcz3hJrq1iRmdsNgQOf4S8e83axtwIxvG62eWA=="],
 

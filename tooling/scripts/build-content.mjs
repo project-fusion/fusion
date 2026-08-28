@@ -20,9 +20,9 @@ import { fileURLToPath } from 'node:url'
 import { formatted } from './lib/formatted.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const CONTENT = join(ROOT, 'docs/insights/content')
-const OUT = join(ROOT, 'docs/insights/src/sources.generated.ts')
-const PAGES = join(ROOT, 'docs/insights/src/pages.generated.ts')
+const CONTENT = join(ROOT, 'fusion/docs/insights/content')
+const OUT = join(ROOT, 'fusion/docs/insights/src/sources.generated.ts')
+const PAGES = join(ROOT, 'fusion/docs/insights/src/pages.generated.ts')
 
 /**
  * The frontmatter of one file, as strings.

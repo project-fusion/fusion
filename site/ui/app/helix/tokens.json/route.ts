@@ -7,7 +7,7 @@ import tokens from '@fusion.dev/helix-styles/tokens.json'
  * exports `tokens.json` and always has, so a consumer with a `node_modules` can
  * read all 177 with their values and categories. An agent that arrived through
  * `llms.txt` could not: the tokens page is prose about the system and names
- * seven, and `docs/token-reference.md` is repository-internal by design, since a
+ * seven, and `fusion/docs/token-reference.md` is repository-internal by design, since a
  * reader count is a fact about this repository rather than about Helix.
  *
  * So the one published list of what a token *is* was reachable from an install

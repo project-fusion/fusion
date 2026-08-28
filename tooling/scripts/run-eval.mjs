@@ -2,7 +2,7 @@
 /**
  * Scores a responder against the agent evaluation corpus.
  *
- * **This is the gate [#205](../../docs/19-queue.md) put in front of shipping
+ * **This is the gate [#205](../../fusion/docs/19-queue.md) put in front of shipping
  * anything agent-facing**, and the useful thing to understand about it is which
  * half runs in CI and why.
  *

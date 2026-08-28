@@ -1,7 +1,7 @@
 body:
   - attributes:
       value:
-        Before filing, check `docs/19-queue.md`. It is the outstanding work,
+        Before filing, check `fusion/docs/19-queue.md`. It is the outstanding work,
         with the reasoning, and it is a file rather than an issue list.
     type: markdown
   - attributes:

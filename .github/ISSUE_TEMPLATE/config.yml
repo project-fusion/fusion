@@ -5,7 +5,7 @@ contact_links:
       it before filing, since the thing you are about to report may already be
       there with the reasoning attached.
     name: The queue
-    url: https://github.com/project-fusion/fusion/blob/main/docs/19-queue.md
+    url: https://github.com/project-fusion/fusion/blob/main/fusion/docs/19-queue.md
   - about:
       Do not open an issue for a vulnerability. An issue is world readable the
       moment it is filed.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Writes `docs/component-reference.md` from the manifest.
+ * Writes `fusion/docs/component-reference.md` from the manifest.
  *
  * **Unnumbered, and that is the point of the name.** It sat at
  * `11-component-reference.md`, taking a slot in the 00 to 99 strategy sequence
@@ -43,7 +43,7 @@ import { reference, referenceFamilies } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const MANIFEST = 'helix/styled/custom-elements.json'
-const OUTPUT = 'docs/component-reference.md'
+const OUTPUT = 'fusion/docs/component-reference.md'
 
 const manifest = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))
 

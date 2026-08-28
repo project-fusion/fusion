@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 /**
- * Writes `docs/token-reference.md` from the token registry.
+ * Writes `fusion/docs/token-reference.md` from the token registry.
  *
  * It read `tokens.css` and matched declarations out of it with a regular
  * expression, which worked and was the only reader that source had. The tokens
@@ -35,7 +35,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const SOURCE = 'helix/styles/tokens.json'
-const OUTPUT = 'docs/token-reference.md'
+const OUTPUT = 'fusion/docs/token-reference.md'
 const ROOTS = ['helix', 'site']
 
 /** The fifteen, in the order the stylesheet declares them. */
@@ -198,7 +198,7 @@ const unread = declared.filter(([name]) => !reads.has(name))
 const lines = [
   '# Token reference',
   '',
-  '*Generated from [`helix/styles/src/tokens.ts`](../helix/styles/src/tokens.ts) by',
+  '*Generated from [`helix/styles/src/tokens.ts`](../../helix/styles/src/tokens.ts) by',
   '`bun run gen:tokens-reference`. Do not edit.*',
   '',
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,
