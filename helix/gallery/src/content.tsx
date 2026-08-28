@@ -355,7 +355,6 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** Two axes, and every cell the same as every other. */
   /**
    * Three instants read in a column, and the last one is a date.
    *
@@ -422,6 +421,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /** Two axes, and every cell the same as every other. */
   grid: (
     <g className="artSunken">
       {[28, 80, 132].map((y) =>
