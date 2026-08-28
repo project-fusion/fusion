@@ -213,41 +213,30 @@ helix-megamenu::part(surface) {
 [data-megamenu-heading] > helix-icon {
   --icon-size: var(--helix-size-icon-md);
 
-  /* The mark as a near-black tile with the letter cut out of it in near-white,
-   * rather than the brand's own mid blue running to its active one.
+  /* The letterform alone, with no tile under it.
    *
    * Nothing about the drawing changes to do this. Both marks declare their tile
    * as a gradient between `--logo-color-from` and `--logo-color-to`, and the
-   * letter as `--logo-color-knockout`, each falling back to what the wordmark
-   * uses; `chrome.module.css` already sets the same three for the wordmark, so
-   * this is the second consumer of a hook that was built for exactly this.
+   * letter as `--logo-color-knockout`; a transparent gradient leaves the letter
+   * standing on the panel and `currentColor` hands it the heading's own ink. The
+   * hooks were built for the tile and turn out to be what takes it away.
    *
-   * **Neutral rather than brand, and the panel is why.** A blue tile beside a
-   * blue wordmark, above rows whose only accent is where the reader currently
-   * is, spends the one color a navigation has on saying which column a name
-   * belongs to. Near-black says the same thing and spends nothing.
+   * **A tile is a logo and these are list items.** The panel is a column of
+   * product names, each a link to somewhere; a filled rounded square beside the
+   * name reads as a brand lockup, which is the treatment the masthead already
+   * gives the company one row above. Two lockups in one panel is two claims
+   * about what the reader is looking at. The letter alone still tells Helix from
+   * Cortex at a glance, which is the whole job here.
    *
-   * **It turns over with the mode, and it has to.** `surface-media` was the
-   * first reach, being the one pair that does not turn over, on the reasoning
-   * that carried the brand version: a fill holding a light letter has to be
-   * dark in both. That reasoning was about a *blue* fill, which is visible on
-   * either ground. A near-black one is not: measured on the dark panel it came
-   * out at 1.00 against the ground behind it, so the tile disappeared and left
-   * a bare white letter, and the mark changed silhouette between the modes
-   * rather than changing color. `surface-inverse` is the opposite of the page
-   * by construction, with `foreground-inverse` as its ink, so the tile is
-   * near-black on a light panel, near-white on a dark one, and a tile in both.
-   * Both stops take the same value, a monotone tile being the ask and a
-   * two-rung ramp across neutrals having nothing to show.
-   *
-   * **The brand version left one finding worth keeping.** `primary-subtle` is
-   * the obvious reach for a light letter and is `light-dark(brand-50,
-   * brand-900)`, so in dark mode it becomes a *dark* blue on a tile that did
-   * not move: measured at 2.28 against the tile and 1.85 against its far stop,
-   * which is a letter nobody can read. */
-  --logo-color-from: var(--helix-color-surface-inverse);
-  --logo-color-knockout: var(--helix-color-foreground-inverse);
-  --logo-color-to: var(--helix-color-surface-inverse);
+   * **And it turns over for free.** The tile version had to be reasoned into
+   * `surface-inverse` so a light letter always had a dark ground: `surface-media`
+   * measured 1.00 against the dark panel and the tile vanished, leaving a bare
+   * letter and a mark that changed silhouette between modes. With no tile there
+   * is no pairing to hold, `currentColor` is the heading's color in both modes,
+   * and the contrast is whatever the heading already passes. */
+  --logo-color-from: transparent;
+  --logo-color-knockout: currentColor;
+  --logo-color-to: transparent;
 }
 
 /* **One inset for the site's chrome, because a reader sees it as one edge.**
@@ -435,6 +424,74 @@ helix-drawer {
  * down a page compete and four rules read as one thing. These sit side by side in
  * a grid, two or three or four across, where the box is what says where one ends
  * and the next begins. */
+/* **What breaks glass, and what does not.** Read this before putting a mask, a
+ * fade or a transition on anything that contains a glass surface.
+ *
+ * `backdrop-filter` samples the *backdrop root*: the nearest ancestor that has
+ * been flattened into its own group. Inside one, an element can only sample what
+ * is painted within that group, so a card that blurs a page-length aura from
+ * inside a flattened ancestor blurs nothing and goes flat. Its computed
+ * `backdrop-filter` still reads `blur(40px)` the whole time, which is why this
+ * keeps being rediscovered rather than noticed.
+ *
+ * Measured with a stripe test, a hard black and white grating behind a blurring
+ * box, rather than reasoned from the spec, because the spec's list and this
+ * engine's behavior are not the same list:
+ *
+ *   BREAKS IT   `opacity` below 1, including 0.99
+ *               `mask-image`, even a mask with nothing to mask
+ *               `filter`
+ *               an `animation` or `transition` that lands on any of those, for
+ *               as long as it stays attached to the element
+ *
+ *   SAFE        `overflow: hidden`, and clipping with a radius
+ *               `isolation: isolate`
+ *               `transform`
+ *               `contain: paint`
+ *
+ * Three separate bugs have come from the left column. The reveal animated
+ * `opacity` and flattened every card on the landing page while the sections were
+ * fading; see the note in `reveal-on-scroll.tsx`, which is why that reveal is a
+ * `transform` and nothing else. The aura carries `opacity: 0.5` and is only safe
+ * because nothing inside it blurs. And an edge fade on the insights carousel was
+ * designed and dropped: the mask that dissolves a card at the boundary is an
+ * ancestor of that card, so it would have flattened the six it was framing.
+ *
+ * The practical consequence worth stating once: **a soft fade is not available
+ * over glass.** If a boundary is wanted, clip it. If a section must fade, the
+ * things inside it cannot be glass. */
+/**
+ * An icon-sized link, for the places a control would be a lie.
+ *
+ * **`IconButton` is a `button` and takes no `href`.** The routing page states
+ * the rule this follows: a component that navigates renders its own anchor, and
+ * wrapping a button in a link to borrow its shape is the third option that page
+ * rules out. So the header's repository mark and the footer's social row are
+ * anchors, and this is the recipe that makes them the same size and weight as
+ * the icon buttons beside them.
+ *
+ * A recipe rather than two classes, because there are two readers: `data-button`
+ * and `data-link` are keyed the same way one layer down, for the same reason.
+ *
+ * Ghost at rest. Both places it appears are chrome, and a ground under every
+ * mark would make the quietest part of the page the busiest.
+ */
+[data-icon-link] {
+  align-items: center;
+  block-size: var(--helix-size-control-sm);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  inline-size: var(--helix-size-control-sm);
+  justify-content: center;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[data-icon-link]:hover,
+[data-icon-link]:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
 [data-substrate] {
   border-radius: var(--helix-radii-md);
   padding: var(--helix-space-lg);
@@ -636,36 +693,77 @@ helix-drawer helix-tree {
 /* ============================================================ motion ===== */
 
 /* Sections arrive as they are scrolled to, once, and never on the way back up.
-   Driven by a view timeline rather than an observer, so it costs no JavaScript
-   and cannot fight the browser's own scheduling.
+ *
+ * **Driven from `reveal-on-scroll.tsx` rather than from a view timeline**, and
+ * that component's own note carries the argument: a scroll-driven animation with
+ * `fill: both` never detaches from its element, which makes the section a
+ * permanent backdrop root and takes the `backdrop-filter` off every card inside
+ * it. A transition ends, and when it does the section is at exactly `opacity: 1`
+ * with nothing bound to it.
+ *
+ * **Nothing here hides anything on its own.** The armed state is written by
+ * script, so a page whose JavaScript never ran has no rule that can hide a
+ * section. That is deliberate: CSS cannot promise to un-hide what it hid if the
+ * thing that would have is the script that failed.
+ *
+ * The motion query still guards it, and the script checks the same thing, so
+ * reduced motion is answered twice and neither answer depends on the other. */
+/* **A rise and no fade, because a fade breaks the glass on the way in.**
+ *
+ * This animated `opacity` from 0 to 1, and an element at less than full opacity
+ * is a backdrop root: every card inside the section stopped being able to sample
+ * the field behind it and rendered as a flat 30 percent tint. The blur returned
+ * the instant the value reached exactly 1, which put a visible snap from *more
+ * transparent* to *less* at the end of every reveal, at the moment the card is
+ * fully opaque and being looked at. Reported off a screen recording, and the
+ * note in `reveal-on-scroll.tsx` had claimed this was the one moment nobody
+ * could see. It is the moment everybody sees.
+ *
+ * `transform` does not form a backdrop root. Measured against hard stripes: a
+ * `translateZ(0)` ancestor passed the backdrop through and only `opacity: .99`
+ * blocked it. So a section rises into place with its cards lit the whole way
+ * and there is nothing left to snap.
+ *
+ * **Bigger, slower and sprung, because a rise has to earn its own visibility.**
+ *
+ * A fade does this work for free and is the one thing this cannot use. What is
+ * left is distance, time and shape, and the first two passes under-spent all
+ * three. 24px in 320ms fired as the section's top crossed the bottom edge of the
+ * window, so the whole animation played while the section was a sliver at the
+ * foot of the screen: reported as no motion at all, which was fair. Then 64px in
+ * 640ms, which was visible and still read as nothing much, because a decelerate
+ * into a stop is the least noticeable shape a movement can have.
+ *
+ * 96px, three times `slow`, and `easing-spring`: a `linear()` curve that carries
+ * past its target to 1.043 and settles back. The overshoot is what makes it
+ * read. An element that arrives, passes the mark and comes back has moved; one
+ * that eases to a halt has merely stopped.
+ *
+ * **And a scale, which is the second thing a transform can say.** A rise alone
+ * is one axis of one property, and at a glance it is hard to separate from the
+ * scroll carrying the section up anyway. Three percent of growth is not, because
+ * nothing else on the page is changing size: the section reads as arriving under
+ * its own power rather than being pushed. It composes into the same `transform`,
+ * so it stays off the backdrop-root path that the fade fell into and the cards
+ * keep their blur the whole way.
+ *
+ * Settling on `transform: none` rather than an explicit identity, which
+ * interpolates the same and says the resting state is *nothing applied*. */
+[data-reveal="armed"] {
+  transform: translateY(calc(var(--helix-space-3xl) * 1.5)) scale(0.97);
+}
 
-   Behind `@supports` because a browser without scroll-driven animations must
-   show the content rather than an element stuck at `opacity: 0`, and behind the
-   motion query because this is decoration. */
-@keyframes site-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(var(--helix-space-lg));
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="armed"],
+  [data-reveal="shown"] {
+    transition: transform calc(var(--helix-duration-slow) * 3) var(--helix-easing-spring);
   }
 }
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    [data-reveal] {
-      animation: site-reveal linear both;
-      /* Both ends in `entry`, so the reveal completes as the section finishes
-         entering the viewport. Ending on `cover` made the range a fraction of
-         the element's whole pass across the screen, which on a tall window
-         left a section fully visible and still half faded. */
-      animation-range: entry 10% entry 90%;
-      animation-timeline: view();
-    }
-  }
+/* Stated rather than left to the base style, so the transition has two ends to
+   run between and the element lands on a value it was given. */
+[data-reveal="shown"] {
+  transform: none;
 }
 
 /* Cross-route transitions. The header and its indicator persist while the

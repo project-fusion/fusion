@@ -11,8 +11,8 @@ import {
   useState,
 } from 'react'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
-import { INITIAL } from '../../(tool)/helix/theme/defaults'
-import styles from './preview.module.css'
+import { INITIAL } from '../(tool)/helix/theme/defaults'
+import styles from './landing-c.module.css'
 
 /** What the last derivation produced, for anything that wants to show it. */
 export interface Derived {
@@ -70,9 +70,8 @@ const SHOWN = [
   'color-danger',
 ]
 
-const paint = (
+const derive = (
   engine: ThemeEngine,
-  node: HTMLElement,
   settings: Omit<Controls, `set${string}` | 'derived'>,
 ): Derived => {
   /**
@@ -106,22 +105,6 @@ const paint = (
     },
     status: { allowance: INITIAL.allowance, harmony: INITIAL.harmony / 100 },
   })
-
-  /* Set before the values, because a `var()` inside a custom property is
-     substituted on the element the property is declared on: a seed written on a
-     plain element is read by nothing until this attribute re-runs those
-     declarations. Learned by `showcase.tsx` the hard way. */
-  node.dataset.helixTheme = ''
-  /* Not `--helix-*`: that prefix belongs to the design system, and squatting
-     on it made `check:tokens` read this as one of its tokens, renamed or
-     mistyped. It is a page-local flag and now says so. */
-  node.style.setProperty('--preview-color-scheme', settings.scheme)
-  for (const token of theme.tokens) {
-    node.style.setProperty(`--helix-${token.name}`, token.hex)
-  }
-  for (const [name, value] of Object.entries(theme.seeds)) {
-    node.style.setProperty(`--helix-${name}`, value)
-  }
 
   /* **Returned rather than thrown away.** The engine measures every pair it
      derives and reports what it could not clear, and until now the page set the
@@ -206,6 +189,43 @@ const readSiteScheme = (): 'dark' | 'light' => {
  */
 const OWNED = '--helix-'
 
+/**
+ * Writes an already-derived theme onto the scope.
+ *
+ * **Separate from deriving it, and that separation is the bug it fixes.** The
+ * two were one function behind one gate: nothing derived until a reader moved a
+ * control, because deriving on arrival opened the page in a palette measurably
+ * unlike the rest of the site. The gate was right about painting and wrong
+ * about the report, and the sliders paid for it. Their track gradients are
+ * built from the derived primary, so with nothing derived they had no ramp to
+ * show and the first interaction was what made one appear.
+ *
+ * Deriving is unconditional now and painting is still gated, so the controls
+ * can describe a palette the page has not adopted. Still one derivation per
+ * change, which is what the note in the effect was protecting.
+ */
+const applyScope = (
+  node: HTMLElement,
+  theme: Derived['theme'],
+  scheme: Controls['scheme'],
+): void => {
+  /* Set before the values, because a `var()` inside a custom property is
+     substituted on the element the property is declared on: a seed written on a
+     plain element is read by nothing until this attribute re-runs those
+     declarations. Learned by `showcase.tsx` the hard way. */
+  node.dataset.helixTheme = ''
+  /* Not `--helix-*`: that prefix belongs to the design system, and squatting on
+     it made `check:tokens` read this as one of its tokens, renamed or mistyped.
+     It is a page-local flag and now says so. */
+  node.style.setProperty('--preview-color-scheme', scheme)
+  for (const token of theme.tokens) {
+    node.style.setProperty(`--helix-${token.name}`, token.hex)
+  }
+  for (const [name, value] of Object.entries(theme.seeds)) {
+    node.style.setProperty(`--helix-${name}`, value)
+  }
+}
+
 const paintRoot = (
   theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] },
   scheme: 'dark' | 'light',
@@ -230,7 +250,24 @@ const clearRoot = (): void => {
     }
   }
   delete root.dataset.helixTheme
-  root.removeAttribute('data-color-mode')
+  /* **`data-color-mode` is not ours to remove**, and taking it off here was a
+     visible bug.
+     `paintRoot` writes it as a nudge, to make the token controller notice a
+     palette it has already been handed. The attribute itself belongs to the
+     reader: `preferences.tsx` persists it and a script in `head` restores it
+     before the first paint so the page never renders in the wrong scheme.
+     Deleting it on teardown threw that away.
+     It showed as a hard flash of light-mode blue on every reload. This effect
+     is registered as a cleanup, and React runs effects mount, cleanup, mount in
+     StrictMode, which `next.config.ts` turns on: so on load the attribute was
+     set by the script, stripped here, and set again. In the frame between,
+     `light-dark()` fell back to `prefers-color-scheme`, `--helix-color-background`
+     resolved light, and the aura reads that value once to decide which half of
+     its palette to draw. A full-viewport field at light-mode brightness under
+     chrome that was already dark, for one frame, three times in a row on the
+     recording that reported it.
+     What this owns is the palette it painted: the `--helix-*` properties above
+     and the `data-helix-theme` flag. It removes those and stops. */
 }
 
 /**
@@ -306,6 +343,32 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
    */
   const [touched, setTouched] = useState(false)
 
+  /**
+   * Two sources, and only one of them stops being listened to.
+   *
+   * **`chosen` used to tear down both and that broke the sync.** It latches
+   * when somebody picks a scheme here, so the page stops moving under them when
+   * the operating system changes its mind. Fair. But the same effect also
+   * carried the observer for `data-color-mode`, and that attribute is how the
+   * masthead's preferences panel states a choice: pick a scheme in this bar,
+   * then pick the other one in preferences, and this control never heard about
+   * it. One deliberate choice was silencing another.
+   *
+   * The system query is what `chosen` should gate, because a system preference
+   * is an ambient default and a latched choice outranks it. The attribute is
+   * somebody pressing a control, which outranks everything here, so it is
+   * followed for as long as this scope exists.
+   */
+  useEffect(() => {
+    const follow = () => setScheme(readSiteScheme())
+    const modes = new MutationObserver(follow)
+    modes.observe(document.documentElement, {
+      attributeFilter: ['data-color-mode'],
+      attributes: true,
+    })
+    return () => modes.disconnect()
+  }, [])
+
   useEffect(() => {
     if (chosen) {
       return
@@ -314,27 +377,23 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
     const follow = () => setScheme(readSiteScheme())
     follow()
     query.addEventListener('change', follow)
-    const modes = new MutationObserver(follow)
-    modes.observe(document.documentElement, {
-      attributeFilter: ['data-color-mode'],
-      attributes: true,
-    })
-    return () => {
-      query.removeEventListener('change', follow)
-      modes.disconnect()
-    }
+    return () => query.removeEventListener('change', follow)
   }, [chosen])
 
   useEffect(() => {
     const node = scope.current
-    if (!touched) {
+    if (!engine || !node) {
       return
     }
-    if (engine && node) {
-      /* One derivation, two destinations. Deriving twice would run the search
-         twice for one keystroke and risk the two drifting apart. */
-      const report = paint(engine, node, { accentHue, brand, chromaScale, density, radius, scheme })
-      setDerived(report)
+    /* One derivation, two destinations. Deriving twice would run the search
+       twice for one keystroke and risk the two drifting apart. */
+    const report = derive(engine, { accentHue, brand, chromaScale, density, radius, scheme })
+    setDerived(report)
+    /* The report is for the controls and can exist from the first frame. The
+       page itself still waits, so it opens in exactly what the stylesheet
+       ships. */
+    if (touched) {
+      applyScope(node, report.theme, scheme)
       paintRoot(report.theme, scheme)
     }
   }, [accentHue, brand, chromaScale, density, engine, radius, scheme, touched])

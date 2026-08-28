@@ -1,55 +1,33 @@
 /**
  * The measured claims, for the front of the site.
  *
- * **These numbers are copied and that is a defect, not a shortcut.** Every one
- * of them is produced by `bun run metrics` from the built packages and written
- * into `helix/docs/content/metrics.mdx`, which says at the top that an edited
- * number is a number nothing produced. Copying them here creates exactly the
- * staleness the generator exists to prevent: `tokens.css` grows by one token
- * and the docs move while the landing page keeps yesterday's figure.
- *
- * Before this ships, `tooling/scripts/build-metrics.mjs` should emit this module
- * alongside the MDX, and `check:metrics` should judge it the way the other
- * eleven generators are judged. It is written by hand here because the shape has
- * to be decided before a generator can be taught to produce it.
+ * **The claims are generated now; the comparison below is still by hand.**
+ * `CLAIMS` came from this file until the copy drifted, and is emitted by
+ * `bun run metrics` into `claims.generated.ts`. `BUTTON` has not moved yet: it
+ * needs the peer numbers, which come from `bun run metrics:peers` and a set of
+ * libraries installed into `.local`, so it is the same defect one step further
+ * from the generator that could fix it.
  *
  * Brotli throughout. Gzip is the honest floor and brotli is what a CDN actually
  * serves, and quoting the larger of the two to look conservative would be
  * quoting a number no reader receives.
  */
 
-/** One number a reader can hold, with the sentence that makes it mean something. */
-export interface Claim {
-  /** What was measured, in the fewest words that stay true. */
-  label: string
-  /** Why the number is the one worth printing. Never an adjective. */
-  note: string
-  /** Rendered large. A string because the unit belongs to the figure. */
-  value: string
-}
-
-export const CLAIMS: readonly Claim[] = [
-  {
-    label: 'Components',
-    note: 'Two tiers. Headless behavior and a styled layer over it, both shipped.',
-    value: '92',
-  },
-  {
-    label: 'The token layer, compressed',
-    note: '179 semantic tokens. Nothing on a Helix page paints without this file.',
-    value: '1.9 kB',
-  },
-  {
-    label: 'The derivation engine',
-    note: 'Build time for most consumers, runtime for a theme switcher.',
-    value: '1.4 kB',
-  },
-  {
-    label: 'Shared across the first component',
-    note: 'Ten components are one runtime plus nine additions, not ten of the first number.',
-    value: '66%',
-  },
-]
+/**
+ * The measured claims, re-exported from what the build wrote.
+ *
+ * **They were copied by hand and the copy went stale, exactly as the note here
+ * predicted.** The component count read 92 while the build measured 93, printed
+ * under a heading that says every number on the page was produced rather than
+ * written, and the token layer had moved from 1.9 kB to 2.0. Both were found by
+ * comparing the page against `bun run metrics` rather than by anybody noticing.
+ *
+ * `build-metrics.mjs` emits `claims.generated.ts` beside the MDX now and
+ * `check:metrics` judges it, so the front of the site quotes the same run as
+ * the docs. Re-exported rather than imported at each call site, so nothing
+ * downstream had to change.
+ */
+export { CLAIMS, type Claim } from './claims.generated'
 
 /**
  * The same button, built five ways.
@@ -70,8 +48,8 @@ export interface Rival {
 }
 
 export const BUTTON: readonly Rival[] = [
+  { brotli: 9977, name: 'Helix', ours: true },
   { brotli: 12591, name: 'Material Web' },
-  { brotli: 13049, name: 'Helix', ours: true },
   { brotli: 15805, name: 'Shoelace' },
   { brotli: 17685, name: 'Carbon' },
   { brotli: 18674, name: 'Spectrum' },

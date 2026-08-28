@@ -1,10 +1,3 @@
-/* The card, beside the component that renders it.
- *
- * `.insightPhoto` comes with it even though the element is created in
- * `lib/insight-art.tsx`, because that component only ever appears inside this
- * one: the picture is part of the card rather than a thing of its own.
- */
-
 /* The same pair the gallery's cards need, for the same reason.
  *
  * The anchor stretches because `helix-grid` stretches its items, and the card
@@ -34,37 +27,125 @@
   --card-align: space-between;
 }
 
-/* A photograph, treated so that any two of them read as one set.
- *
- * **The treatment is the design here, and the vendor is only supply.** Six
- * pictures chosen well are still six pictures until something ties them
- * together, and a stock library's abstract-technology shelf is the most reused
- * imagery on the web, so untreated it reads as the default anyone would have
- * reached for. Desaturated, they read as ours.
- *
- * `grayscale` and not a duotone, for now. A duotone needs a tint strength tuned
- * against real photographs and there are none in the repository yet, so a
- * two-element blend stack would be a guess wearing more markup. The filter is
- * behind a hook: point `--insight-photo-filter` at a `sepia`/`hue-rotate` pair
- * or at `none` once there is something to look at.
- *
- * The ratio is the gallery's rather than the file's, so a grid where some posts
- * have pictures and some have none keeps one card shape, and two photographs of
- * different proportions crop to the same box instead of stepping the row.
- * Stated through the component's own hooks, both of them.
- *
- * `--card-media-block-size: auto` hands the height back to the element, which
- * is what `Card`'s default was written for: it sets a height because a chart
- * has no intrinsic shape, and a box carrying a ratio has one. On the card
- * rather than on the picture, because it is the card's hook and it has to be
- * set whether or not this particular post brought a file. */
-.insightPhoto {
-  --image-aspect: 16 / 10;
-  --image-placeholder-color: var(--helix-color-surface-sunken);
-
-  filter: var(--insight-photo-filter, grayscale(1));
-}
-
 .insightCard helix-card {
   --card-media-block-size: auto;
+}
+
+/* The surface, stated here so a card is the same object wherever it appears.
+ *
+ * **Two of the three facts were already shared and the last two were not.** The
+ * ground, the corner and the missing stroke reached the gallery on their own,
+ * through `material="glass"` and the site's own defaults; the blur and the
+ * shadow did not, because those were written on the landing page as part of a
+ * draft-wide recipe scoped to `.noRules`. Measured side by side: the gallery
+ * blurred at 16px against the carousel's 18, and carried `separation`'s stock
+ * `0 4px 12px` where the carousel had a deep, soft drop and a hairline of light
+ * along the top edge. Same component, same markup, two objects.
+ *
+ * It belongs to the card rather than to either page. A page can say where its
+ * cards sit and how many are in a row; what a card is made of is the card's own
+ * business, and the alternative was for the gallery to import the landing
+ * page's stylesheet to borrow a class named after a decision that page made.
+ *
+ * The values are the carousel's, because that is the one that was asked to be
+ * matched and the richer of the two.
+ */
+/* **The blur is the card's, the shadow is `separation`'s.** These were written
+   together to match a carousel that no longer exists, and the drop was a
+   hand-rolled `0 18px 40px -24px` beside an inset highlight: a second elevation
+   language on a component that ships one. `separation="elevated"` is what these
+   cards already ask for, so the override was answering a question the card had
+   answered. The blur stays, because that is a material and the card takes it
+   from the page. */
+.insightCard helix-card {
+  /* **Through the component's hook, not past it.** `backdrop-filter` written
+     here is a document rule on a shadow host, which wins whatever the
+     specificity and whatever the layer, so the card's own `material` handling
+     stops meaning anything and `check:overruled` says so. `--card-backdrop` is
+     the hook `Card` publishes for this, and setting it leaves the component in
+     charge of when the blur applies. */
+  --card-backdrop: blur(40px) saturate(1.5);
+}
+
+/* The summary, held to two lines.
+ *
+ * **A card shows a preview and the page shows the description.** `summary` is
+ * the essay's own `description`, which is also its meta description and its
+ * line in `llms.txt`, so it is written to be a complete sentence about the post
+ * rather than to fit a box. Lengths run from one sentence to four, and in a
+ * grid the longest one in a row sets the height of every card beside it.
+ *
+ * Clamped rather than shortened at the source, because the full sentence is
+ * doing a job everywhere else it appears. Two lines is the count that leaves
+ * the title and the footer as the things a reader scans, and it is what lets
+ * the gallery run five across instead of four.
+ *
+ * `-webkit-` prefixed and unprefixed together: the box-orient pair is still the
+ * only combination every engine implements, and `line-clamp` is the standard
+ * that replaces it. Both, so this keeps working when the prefixed one goes.
+ */
+.insightSummary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* The generated plate, at the ratio the card's media region expects.
+ *
+ * Moved here from the landing page's stylesheet with the component that draws
+ * it. It was the draft's own class while the plate was the draft's own card;
+ * now that every insight card falls back to a cover, the drawing belongs beside
+ * the card rather than beside the page that first used it. */
+.cover {
+  aspect-ratio: 16 / 7;
+  display: block;
+  inline-size: 100%;
+}
+
+/* The affordances the carousel's card had and the shared one did not.
+ *
+ * **Inherited from `InsightPlate` when it was retired.** That card was written
+ * locally for the landing page and grew a hover lift and a focus ring there;
+ * the shared card had neither, so the gallery's six were a grid of links that
+ * answered a pointer with nothing and a keyboard with the browser's default.
+ * Retiring the plate would have taken both away from the carousel rather than
+ * bringing them to the gallery, so they moved here.
+ *
+ * Three pixels, which is enough to read as the card coming forward and not
+ * enough to disturb the row. `translate` rather than `transform`, so it composes
+ * with anything the card is already transformed by instead of replacing it. */
+.insightCard {
+  transition: translate var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.insightCard:hover {
+  translate: 0 -3px;
+}
+
+/* **The anchor takes the card's corner, or the ring is a rectangle around a
+   rounded thing.** An `outline` follows the border box of the element it is on,
+   and the element it is on is the `Link`: a box with no radius wrapped around a
+   `helix-card` that has one. The ring traced the anchor and the card sat inside
+   it visibly out of register, which is what reads as the border being off
+   kilter. Nothing else about the anchor changes, since it draws no background
+   and no border of its own. */
+.insightCard {
+  border-radius: var(--helix-radii-lg);
+}
+
+.insightCard:focus-visible {
+  outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightCard {
+    transition: none;
+  }
+
+  .insightCard:hover {
+    translate: none;
+  }
 }

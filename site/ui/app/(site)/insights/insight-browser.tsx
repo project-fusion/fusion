@@ -199,7 +199,6 @@ export function InsightBrowser({
         ></helix-aura>
         <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
-            <helix-tag>Fusion Development Group</helix-tag>
             <helix-text as="h1">Insights</helix-text>
             <helix-text as="p" className={browser.pageHeroLede}>
               The arguments behind what we build, written where they can be checked.

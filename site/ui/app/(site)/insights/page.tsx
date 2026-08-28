@@ -63,7 +63,7 @@ export default async function Page({
       order={order}
       sorts={Object.keys(SORTS)}
     >
-      <helix-grid className={styles.insightGrid} columns={4} gap="xl">
+      <helix-grid className={styles.insightGrid} columns={5} gap="xl">
         {insights.map((insight) => (
           <InsightCard insight={insight} key={insight.slug} slug />
         ))}

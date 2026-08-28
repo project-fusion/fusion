@@ -137,10 +137,87 @@
   justify-content: space-between;
 }
 
+/**
+ * The lockup: a mark in its own column, and both lines of type in the other.
+ *
+ * **Two left edges was the fault.** As a row with a line beneath it, the mark
+ * and the tagline both started at the block's edge while the name began past
+ * the mark, so a three-line lockup had a step in it and read as two things
+ * stacked rather than one object.
+ *
+ * A grid puts the mark in a column of its own and gives the name and the
+ * tagline a shared edge, which is what a mark beside stacked type is: a marker
+ * for a block, not the first word of one line.
+ *
+ * **The indent is derived, not measured.** It is whatever the mark's column
+ * turns out to be plus the column gap, so a mark that changes size takes the
+ * tagline with it. A `padding-inline-start` on the tagline would be the same
+ * number written a second time, and wrong the day the first one moved.
+ *
+ * `start` rather than `center` down the block: the mark aligns to the cap of
+ * the name beside it rather than to the middle of a two-line stack it is not
+ * part of.
+ */
 .footerBrand {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
+  align-items: start;
+  /* **Rows sized to their content, not to the space around them.** This is a
+     stretched item of the footer's own flex row, so it inherits the height of
+     the tallest column beside it, and a grid hands that surplus to its rows: two
+     lines of type came out 66px apart. The flex column this replaced left the
+     slack below its children instead, which is the behavior to keep. */
+  align-content: start;
+  column-gap: var(--helix-space-xs);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: var(--helix-space-2xs);
+}
+
+/* The tagline is the third child and belongs under the second, not beside the
+   mark. Named by position because there are exactly three and their order is
+   the lockup. */
+/* **Everything after the mark, not only the last thing.** This was
+   `> :last-child`, which held while the brand was a mark, a name and a tagline:
+   the tagline was last and the rule put it under the name. Adding the social row
+   made *it* last, so the tagline fell back to auto-placement and landed in the
+   mark's column. Stated as "every child after the first" it does not depend on
+   how many there are. */
+.footerBrand > * + * {
+  grid-column: 2;
+}
+
+/**
+ * The mark set to its glyph rather than to its box.
+ *
+ * **An icon is padded and a logo in a lockup is not.** `fusion.svg` draws into
+ * a 256 viewBox with the artwork spanning 42.5 to 213.9, which is 16.6 percent
+ * of clear space on each side. That is correct for an icon, where the padding
+ * is what makes a row of different drawings look like one row. It is wrong
+ * here, where the mark is the first character of a line and the line under it
+ * starts at the container's edge.
+ *
+ * Measured in the footer at a 1.25rem mark: the glyph began 3.3px right of
+ * "Developing" below it, and the 8px between mark and name read as 11.3. Small
+ * numbers, and between two lines that are supposed to start together they are
+ * the whole of what looks wrong.
+ *
+ * Negative on both sides, so one declaration does both halves: the start pulls
+ * the glyph out to the text's edge, and the end takes the same slack out from
+ * between the mark and the name so `gap` means what it says.
+ *
+ * No fallback on `--icon-size`. The footer sets it on the element, and a length
+ * written here to cover the case where it does not would be a raw space value
+ * that `check:tokens` is right to refuse. Without one an unset size makes the
+ * `calc` invalid and the margin drops, which is the correct failure: the mark
+ * sits where an unadjusted mark sits.
+ *
+ * Here rather than in the icon, because the padding is a fact about the drawing
+ * and every other use of it wants that padding. A lockup is the exception and
+ * is the thing that should carry the correction. Tightening the viewBox instead
+ * would have fixed the alignment and made the mark non-square, which every
+ * consumer sizing it as an icon assumes it is.
+ */
+.footerBrand helix-icon {
+  margin-inline: calc(var(--icon-size) * -0.166);
 }
 
 .footerNav {
@@ -149,10 +226,46 @@
   gap: var(--helix-space-2xl);
 }
 
+/**
+ * A column of links, floored so three of them read as a directory.
+ *
+ * **Flex items size to their content, and these three have nothing in common
+ * to size to.** Products holds two short names, Company five medium ones and
+ * Legal one long one, so the columns came out at three different widths with an
+ * identical gap between them: the eye reads the gap as the thing that varies
+ * and the block looks misaligned rather than ragged-by-design.
+ *
+ * A floor rather than equal thirds. `1fr` columns would divide the footer's
+ * whole remaining width and push Legal out to the far edge, which is a table of
+ * contents rather than a footer; a minimum makes the three regular while each
+ * still ends where its longest link does. `12ch` is measured on the widest of
+ * them, "Acceptable use", so the floor clears the content it has to hold.
+ *
+ * `min-inline-size` and not `inline-size`, so a group that outgrows the floor
+ * still grows, and the wrapping the parent relies on at narrow widths is
+ * untouched.
+ */
 .footerGroup {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
+  min-inline-size: 12ch;
+}
+
+/* **The heading is a heading, and the gap is what says so.** One `2xs` between
+   every line put `Products` the same distance from `Helix` as `Helix` is from
+   `Cortex`, so the column read as four peers of which the first happened to be
+   bold. A step more under the heading separates the name of the group from its
+   contents, which is the only distinction the column is making. */
+.footerGroup > :first-child {
+  padding-block-end: var(--helix-space-2xs);
+}
+
+/* Clear of the tagline by more than the brand's own row gap: the marks are a
+   different kind of thing from the two lines above them, and at the row gap they
+   read as a third line of the lockup. */
+.footerSocials {
+  padding-block-start: var(--helix-space-xs);
 }
 
 /* **Narrow: tighten the gaps so the three groups stay one row.** Measured at
@@ -305,6 +418,27 @@
  * can take one at all. */
 .siteCommand {
   --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
+}
+
+/**
+ * The panel and the bar are one sheet, so the panel stops drawing its own.
+ *
+ * **`.navGlass` already grows to the panel's bottom**, measured by the nav and
+ * set as a block size, so a single blurred surface covers the bar and whatever
+ * it opened. The panel kept its own edge inside that: a top border, two top
+ * corners, and a `0 4px 12px` shadow whose blur reaches back up over the bar.
+ * Three ways of drawing a line where the two meet, on a join that is supposed
+ * to have no line at all.
+ *
+ * The bottom corners and a downward shadow stay. That edge is real: it is where
+ * the sheet ends and the page it opened over begins.
+ */
+.navPanel::part(surface) {
+  border-block-start: 0;
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
+  /* Offset past its own blur, so nothing reaches back over the bar. */
+  box-shadow: 0 14px 28px -10px color-mix(in oklab, var(--helix-color-background) 70%, transparent);
 }
 
 .siteCommand::part(dialog) {

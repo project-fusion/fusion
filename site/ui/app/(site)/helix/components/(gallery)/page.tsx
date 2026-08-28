@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { type Family, getFamilies } from '../../../../content/catalog/catalog'
+import { type Family, getFamilies } from '../../../../../content/catalog/catalog'
 import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
 

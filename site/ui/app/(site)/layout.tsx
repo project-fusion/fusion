@@ -4,6 +4,7 @@ import { SiteNav } from '@/components/site-nav/site-nav'
 import { PRODUCTS } from '@/content/products/products'
 import styles from '../../components/chrome.module.css'
 import { type RouteKind, routes } from '../../content/routes/routes'
+import { RevealOnScroll } from './reveal-on-scroll'
 
 /**
  * What the footer links, in three groups.
@@ -18,6 +19,7 @@ import { type RouteKind, routes } from '../../content/routes/routes'
  * are what a reader scans a footer for, and burying them beside a slogan is how
  * a site technically links them without anybody finding them.
  */
+
 const FOOTER_GROUPS = [
   {
     heading: 'Products',
@@ -42,6 +44,25 @@ const FOOTER_GROUPS = [
     ],
   },
 ]
+
+/**
+ * Where to find us, under the mark.
+ *
+ * **An empty `href` renders nothing**, which is how this shipped while only the
+ * repository was known: a guessed `linkedin.com/company/...` is a link to
+ * whoever does own that slug, so the entry sat here rendering nothing until
+ * there was a real address for it. All three have one now, and the guard stays
+ * for the next account that is named before it exists.
+ */
+const SOCIALS = [
+  { href: 'https://github.com/project-fusion', icon: 'github-logo', label: 'Fusion on GitHub' },
+  {
+    href: 'https://www.linkedin.com/company/project-fusion',
+    icon: 'linkedin-logo',
+    label: 'Fusion on LinkedIn',
+  },
+  { href: 'https://x.com/fusiondotdev', icon: 'x-logo', label: 'Fusion on X' },
+] as const
 
 /** The registry's routes of one kind, as palette items. */
 const findable = (kind: RouteKind) =>
@@ -97,6 +118,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         ]}
       />
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
+      <RevealOnScroll />
 
       <footer className={styles.siteFooter} data-site-footer>
         {/* `data-site-footer` stays whatever else changes here: the Aura page
@@ -104,21 +126,50 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
             and a CSS module rewrites class names, so the mark is the only thing
             that selector can reach. */}
         <div className={styles.footerInner} data-shell>
+          {/* Three children of one grid rather than a row with a line under it:
+              the mark takes a column, and the two lines of type share the other
+              one. See `footerBrand` for why the indent is derived rather than
+              measured. */}
           <div className={styles.footerBrand}>
-            <helix-flex align="center" gap="xs">
-              <helix-icon
-                className={styles.fusionLogo}
-                label="Fusion"
-                name="fusion"
-                style={{ '--icon-size': '1.25rem' }}
-              />
-              <helix-text tone="muted" variant="caption">
-                Fusion Development Group
-              </helix-text>
-            </helix-flex>
-            <helix-text tone="subtle" variant="label">
+            <helix-icon
+              className={styles.fusionLogo}
+              label="Fusion"
+              name="fusion"
+              style={{ '--icon-size': '1.25rem' }}
+            />
+            {/* **The name leads and the line under it recedes**, which is the
+                opposite of what these two were doing. The name was `caption`
+                at regular weight and the tagline `label`, and `label` is the
+                small-and-firm variant meant for a field's name: 500 against
+                the name's 400, one pixel smaller, and a step quieter in tone.
+                So the company read as the caption of its own slogan. */}
+            <helix-text variant="body-strong">Fusion Development Group</helix-text>
+            <helix-text tone="subtle" variant="caption">
               Developing for humanity.
             </helix-text>
+
+            {/* **Anchors, not `helix-icon-button`.** That component is a
+                `button` and takes no `href`, which is the rule its own docs
+                state: a component that navigates renders its own anchor, and
+                this one does not navigate. Wrapping a button in a link to get
+                one is the third option the same page rules out. So these are
+                links wearing `data-icon-link`, the site recipe that gives them
+                the size and weight of the icon buttons they sit beside, and
+                `aria-label` does the naming the glyph cannot. */}
+            <helix-flex class={styles.footerSocials} gap="2xs">
+              {SOCIALS.filter((one) => one.href).map((one) => (
+                <a
+                  aria-label={one.label}
+                  data-icon-link
+                  href={one.href}
+                  key={one.icon}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <helix-icon name={one.icon}></helix-icon>
+                </a>
+              ))}
+            </helix-flex>
           </div>
 
           <nav aria-label="Footer" className={styles.footerNav}>

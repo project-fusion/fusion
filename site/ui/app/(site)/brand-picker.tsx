@@ -2,7 +2,7 @@
 
 import type { HelixColorPicker } from '@helix-io/styled'
 import { useEffect, useRef } from 'react'
-import styles from './preview.module.css'
+import styles from './landing-c.module.css'
 import { useThemeControls } from './theme-context'
 
 /**

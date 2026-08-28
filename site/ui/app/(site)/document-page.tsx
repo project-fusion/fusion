@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { PageOutline } from '@/components/page-outline/page-outline'
+import type { OutlineEntry } from '@/utils/outline/outline'
 import styles from './document-page.module.css'
 
 /**
@@ -24,6 +26,7 @@ export function DocumentPage({
   body,
   footer,
   kicker,
+  outline,
   lede,
   meta,
   title,
@@ -35,6 +38,17 @@ export function DocumentPage({
   footer?: ReactNode
   /** The small line above the title, where the page has one. */
   kicker?: string
+  /**
+   * The document's own sections, shown between the head and the body.
+   *
+   * **Inline rather than a rail, because this page is a column.** The docs and
+   * the reference put their outline in a third grid track beside the prose;
+   * this shell is capped at a reading measure and centered, so there is nothing
+   * either side of it to put a rail in without dismantling the one thing the
+   * layout is for. A contents block under the title is how a policy presents
+   * the same list anyway.
+   */
+  outline?: readonly OutlineEntry[]
   /** The paragraph under the title, where the page shows one before its body. */
   lede?: string
   /** Facts about this document, where it has any worth stating. */
@@ -69,6 +83,16 @@ export function DocumentPage({
         </helix-flex>
         {meta}
       </helix-flex>
+
+      {outline && outline.length > 0 && (
+        <nav className={styles.documentContents}>
+          <PageOutline
+            className={styles.documentContentsTitle}
+            entries={outline}
+            label="Contents"
+          />
+        </nav>
+      )}
 
       <article className={styles.documentBody} data-prose>
         {body}

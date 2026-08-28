@@ -1,7 +1,9 @@
 import { docSources, findPage, navigation, pages } from '@helix-io/docs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { PageOutline } from '@/components/page-outline/page-outline'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { outlineOf } from '@/utils/outline/outline'
 import { renderMdx } from '../../../../../utils/mdx/mdx'
 import styles from '../../components/(reference)/docs.module.css'
 import prose from '../docs-prose.module.css'
@@ -54,9 +56,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     notFound()
   }
 
+  /* From the source rather than the registry: see the note on `outlineOf`. The
+     docs shell already lays out three columns and this page filled two, so the
+     rail lands in a track that was standing empty beside every prose page while
+     the reference next door had one. */
+  const outline = outlineOf(source)
+
   return (
-    <main className={styles.docsMain}>
-      {/* The section, and then the document.
+    <>
+      <main className={styles.docsMain}>
+        {/* The section, and then the document.
           
           **The page does not render the title, because the document already
           does.** Every one of these files opens with its own `# Heading`, which
@@ -68,13 +77,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           `description` is not shown either. It is a one-line summary for the
           sidebar, the metadata and `llms.txt`, and every page's own first
           paragraph is the sentence a reader wants under the title. */}
-      <helix-text tone="subtle" variant="label">
-        {sectionOf(slug)}
-      </helix-text>
+        <helix-text tone="subtle" variant="label">
+          {sectionOf(slug)}
+        </helix-text>
 
-      <div className={prose.prose} data-prose>
-        {await renderMdx(source)}
-      </div>
-    </main>
+        <div className={prose.prose} data-prose>
+          {await renderMdx(source)}
+        </div>
+      </main>
+
+      <aside className={styles.docsRail}>
+        <PageOutline className={styles.docsRailTitle} entries={outline} />
+      </aside>
+    </>
   )
 }

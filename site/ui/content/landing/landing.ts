@@ -1,4 +1,5 @@
 import type { PageCopy } from '@/content/copy/copy'
+import { ENGAGEMENT, ENGAGEMENT_COPY } from '@/content/landing/helix-landing'
 
 /**
  * Everything the landing page says, as data.
@@ -40,27 +41,13 @@ export const LANDING: PageCopy = {
       title: 'Drawn by the thing it documents',
     },
     {
-      /* What only this section can say is what the engagement is actually like,
-         which is what its four cards answer. */
-      items: [
-        {
-          body: 'A token layer, two tiers, generated framework wrappers, a sandbox and the checks that keep it honest. We are not learning this on your project.',
-          name: 'The system already exists',
-        },
-        {
-          body: 'Four weeks, two days a week, because the hard part is behind us. Starting from nothing, the same deliverable is quoted in months.',
-          name: 'It is faster because of that',
-        },
-        {
-          body: 'Your repository, your license. Handover is a condition of the work rather than a phase at the end, and no engagement should leave you needing us on a retainer.',
-          name: 'You keep all of it',
-        },
-        {
-          body: 'Active ships with users. Building is real work with nothing shipped. Declared is a direction. Nothing here is described as further along than it is.',
-          name: 'We tell you what is not done',
-        },
-      ],
-      title: 'How the work goes',
+      /* The cards live in `helix-landing.ts` now, because the page renders them
+         too. They were only here, which made this document describe a band the
+         page did not have. */
+      body: [ENGAGEMENT_COPY.lede],
+      items: ENGAGEMENT,
+      kicker: 'The engagement',
+      title: ENGAGEMENT_COPY.title,
     },
     {
       from: 'insights',
@@ -68,14 +55,29 @@ export const LANDING: PageCopy = {
       title: 'The arguments, written down',
     },
     {
-      body: [
-        'Tell us what you need built. We will say plainly whether we are the right people for it.',
-      ],
+      body: ['Tell us what you need built. We will say plainly if we are not the right people.'],
       title: 'Take on the work',
     },
   ],
+  /**
+   * Both halves of the offer in one line: the system is takeable and the
+   * engineering is hireable. It is the route registry's description of `/` and
+   * the frontmatter of `/index.md`.
+   */
   lede: 'Take Helix and go, or hire us to build with it.',
-  title: 'The interface layer, already built',
+  /**
+   * **The hero's headline, because this document is that page.**
+   *
+   * This read "The interface layer, already built" while the page it mirrors
+   * said something else entirely, so `/index.md` opened on a headline no reader
+   * of the page had seen. The note in `routes.ts` calls this module the source
+   * for the title and warns that a second wording is the drift it exists to
+   * remove; the second wording had grown here instead of there.
+   *
+   * The site's own name stays the *route* title, which is what a sitemap and a
+   * search result want. This is the `h1`, and the `h1` is the heading.
+   */
+  title: 'An intelligent design system, and the engineers behind it',
 }
 
 /** The one line the hero asks a reader to run rather than to read. */

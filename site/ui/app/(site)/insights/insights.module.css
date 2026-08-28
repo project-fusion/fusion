@@ -1,7 +1,7 @@
 /* Insights: the gallery's own hero and grid, and everything a post is made of.
  *
  * Scoped to the two routes that read it. What stayed global is the card itself,
- * `.insightCard` and `.insightPhoto`, because a card is rendered on the landing
+ * `.insightCard`, because a card is rendered on the landing
  * page as well and its picture is painted by a component in `lib/`: a name two
  * routes and a shared component all apply is a shared name, whatever directory
  * it happens to be styled from.
@@ -57,19 +57,31 @@
 
 /* ======================================================== insights ======= */
 
-/* Three across, stepping down as the window narrows.
+/* Five across, stepping down as the window narrows.
  *
- * Three rather than the gallery's five, because these cards carry a title and
- * two sentences instead of a drawing and a name: a text card at a fifth of a
- * wide window is a column of broken lines. The steps below fall where a
- * sentence stops fitting rather than at a list of device widths. */
+ * **Five is what the summary being two lines pays for.** The note here used to
+ * argue against it, that a card carrying a title and two sentences is a column
+ * of broken lines at a fifth of a wide window, and that was true while the
+ * summary ran to whatever length the essay's own description happened to be:
+ * four and five sentences in places, so the tallest card in a row set the
+ * height of all of them. Clamped at two lines the card has a bounded shape, and
+ * a bounded shape is what makes the narrower column work.
+ *
+ * The steps fall where a sentence stops fitting rather than at a list of device
+ * widths. */
 .insightGrid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-/* Three steps down rather than two, because four across needs one more.
-   Straight from four to two would double the card width in a single breakpoint,
-   which is the jump the intermediate step exists to avoid. */
+/* Four steps down rather than three, because five across needs one more. Each
+   step widens the card by about a quarter; skipping one doubles it in a single
+   breakpoint, which is the jump these exist to avoid. */
+@media (width < 100rem) {
+  .insightGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (width < 88rem) {
   .insightGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

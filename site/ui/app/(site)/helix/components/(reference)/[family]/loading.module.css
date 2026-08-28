@@ -1,0 +1,96 @@
+/* A place to put `inert`, and not a box: the article and the rail have to stay
+   direct children of the shell that lays them out side by side. */
+.standIn {
+  display: contents;
+}
+
+/* The article's own rhythm, which is `gap="3xl"` between sections in the page
+   this stands in for. Stated rather than borrowed, because the page says it with
+   a `helix-flex` attribute and there is no flex here to give it to. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-3xl);
+}
+
+.head,
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+}
+
+/* Each box is the height of what it replaces, so nothing moves when the real
+   thing lands. `data-skeleton` in `site.css` paints them: a recipe rather than
+   `helix-skeleton`, because a loading state may not depend on the JavaScript it
+   is waiting for and every Helix tag is hidden until it upgrades. */
+.title {
+  block-size: var(--helix-text-3xl);
+  inline-size: min(16rem, 55%);
+}
+
+.description {
+  block-size: var(--helix-text-md);
+  inline-size: min(38rem, 90%);
+}
+
+.tags {
+  display: flex;
+  gap: var(--helix-space-xs);
+}
+
+.tag {
+  block-size: var(--helix-size-control-sm);
+  inline-size: 5rem;
+}
+
+.heading {
+  block-size: var(--helix-text-xl);
+  inline-size: min(11rem, 40%);
+}
+
+.code {
+  block-size: var(--helix-size-control-lg);
+}
+
+/* The sandbox, which is the tallest thing on the page. Reserving its room is
+   most of what stops the article jumping when the manifest arrives. */
+.preview {
+  block-size: 20rem;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+.row {
+  block-size: var(--helix-size-control);
+}
+
+.railHead {
+  block-size: var(--helix-text-sm);
+  inline-size: 7rem;
+  margin-block-end: var(--helix-space-sm);
+}
+
+.railRow {
+  block-size: var(--helix-text-sm);
+  inline-size: 9rem;
+}
+
+.railRow + .railRow {
+  margin-block-start: var(--helix-space-xs);
+}
+
+/* Said to a screen reader and drawn nowhere: the visual half is the boxes above
+   and repeating it in the page would be saying it twice. */
+.announcement {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

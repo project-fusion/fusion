@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Switcher check</title>
+    <link rel="stylesheet" href="./frame.css" />
+    <style>
+      body { padding: 2rem; }
+      .row { display: flex; align-items: center; gap: 1rem; margin-block-end: 2rem; }
+    </style>
+  </head>
+  <body>
+    <div id="preview-root" data-layout="padded">
+      <h3>switcher (new example)</h3>
+      <helix-breadcrumbs aria-label="Breadcrumb">
+        <helix-breadcrumb href="/">irontitan76</helix-breadcrumb>
+        <helix-breadcrumb current>
+          <helix-popover label="Switch repository" placement="bottom-start">
+            <helix-button emphasis="ghost" slot="trigger">
+              docs-site
+              <helix-icon name="caret-down" slot="end"></helix-icon>
+            </helix-button>
+            <helix-listbox filter-label="Search repositories" filterable label="Switch repository" name="repository">
+              <helix-option value="docs-site">docs-site</helix-option>
+              <helix-option value="billing">billing</helix-option>
+              <helix-option value="marketing-site">marketing-site</helix-option>
+            </helix-listbox>
+          </helix-popover>
+        </helix-breadcrumb>
+      </helix-breadcrumbs>
+
+      <h3>overflow (shipped example, for the height comparison)</h3>
+      <helix-breadcrumbs aria-label="Breadcrumb">
+        <helix-breadcrumb href="/">Home</helix-breadcrumb>
+        <helix-breadcrumb>
+          <helix-menu label="Hidden steps">
+            <helix-icon-button emphasis="ghost" label="Show hidden steps" slot="trigger">
+              <helix-icon name="dots-three"></helix-icon>
+            </helix-icon-button>
+            <helix-menu-item href="/design">Design</helix-menu-item>
+          </helix-menu>
+        </helix-breadcrumb>
+        <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
+      </helix-breadcrumbs>
+    </div>
+    <script src="./frame.js" defer></script>
+  </body>
+</html>

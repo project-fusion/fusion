@@ -231,9 +231,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      computed again.
    *
    * `AppHeader` already decides this, with a band around the threshold so a
-   * page that rubber-bands does not flicker, and it reflects the answer as
-   * `data-scrolled`. A second scroll listener here would be a second opinion on
-   * the same question and would eventually disagree with the first. */
+   * page that rubber-bands does not flicker, and it carries the answer as the
+   * custom state `scrolled`, announcing each crossing. A second scroll listener
+   * here would be a second opinion on the same question and would eventually
+   * disagree with the first. */
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -241,11 +242,21 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
     if (!header) {
       return
     }
-    const sync = () => setScrolled(header.hasAttribute('data-scrolled'))
-    sync()
-    const watch = new MutationObserver(sync)
-    watch.observe(header, { attributeFilter: ['data-scrolled'] })
-    return () => watch.disconnect()
+    /* **The header says so, rather than being watched.** It carried the
+       threshold as `data-scrolled` and this read it with a `MutationObserver`,
+       which worked and cost every server-rendered consumer a hydration error:
+       an attribute the element writes onto itself is markup the server never
+       sent. It is a custom state now, which is not in the DOM and so cannot be
+       observed, and the header announces crossings instead.
+
+       `matches` for the state it is already in, since a listener only hears the
+       next change and a reload part-way down the page has already crossed. */
+    setScrolled(header.matches(':state(scrolled)'))
+    const hear = (event: Event) => {
+      setScrolled((event as CustomEvent<{ scrolled: boolean }>).detail.scrolled)
+    }
+    header.addEventListener('helix-scrolled', hear)
+    return () => header.removeEventListener('helix-scrolled', hear)
   }, [])
 
   /* How far down the sheet reaches. The bar's own height at rest, and the
@@ -344,6 +355,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 never produced. The server cannot know the width, so this is
                 expected rather than a symptom. */}
           <helix-megamenu
+            class={styles.navPanel}
             label="Products"
             onhelix-before-close={() => setPanelDown(false)}
             /* Both fire before the panel moves and both are cancelable, so
@@ -468,6 +480,24 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         <div className={styles.wideOnly} slot="end">
           <SiteFind findable={findable} />
         </div>
+
+        {/* **Between the search and the preferences, and an anchor.** The two
+            controls either side are `helix-icon-button`, which is a `button`
+            and takes no `href`; `data-icon-link` is the recipe that gives a
+            real link the same size and weight. Not hidden on a narrow screen
+            the way the search is: the search needs a keyboard and this needs a
+            tap. */}
+        <helix-tooltip content="Source on GitHub" placement="bottom" slot="end">
+          <a
+            aria-label="Fusion source on GitHub"
+            data-icon-link
+            href="https://github.com/project-fusion"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <helix-icon name="github-logo"></helix-icon>
+          </a>
+        </helix-tooltip>
 
         <helix-tooltip content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>

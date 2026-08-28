@@ -296,14 +296,6 @@
   vertical-align: middle;
 }
 
-/* No arrow. The base layer marks any `a[target="_blank"]` with one, which is
-   right for a link inside a sentence and wrong here: the mark is already an
-   icon saying the row has a reference, and a second glyph beside it says the
-   same thing twice in two visual languages. */
-.apiReference::after {
-  content: none;
-}
-
 .apiReference:hover,
 .apiReference:focus-visible {
   color: var(--helix-color-foreground);

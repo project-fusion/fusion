@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import styles from '../preview.module.css'
+import styles from './landing-c.module.css'
 
 /**
  * The news pill above the headline.

@@ -190,6 +190,36 @@
   min-inline-size: 52rem;
 }
 
+/**
+ * Which of the two figures is showing, decided by width alone.
+ *
+ * The wide one scrolls below its 52rem floor rather than shrinking, which keeps
+ * the type legible and costs a horizontal drag twice the width of a phone. The
+ * stacked one needs no floor: it was drawn for 340 units and reads at any width
+ * a phone has. So the breakpoint is simply where the wide figure stops fitting.
+ *
+ * `display` rather than mounting one or the other, so both are server-rendered
+ * and the choice never depends on a measurement taken on the client.
+ */
+.diagramStacked {
+  display: none;
+}
+
+.diagramStackedSvg {
+  block-size: auto;
+  inline-size: 100%;
+}
+
+@media (max-width: 40rem) {
+  .diagram {
+    display: none;
+  }
+
+  .diagramStacked {
+    display: block;
+  }
+}
+
 /* Type inside the drawing. `text` inherits nothing useful from the page, so the
    three roles are stated rather than assumed, and all three take tokens so they
    move with the theme like every stroke around them. */
@@ -237,6 +267,26 @@
 }
 
 /**
+ * The fan composites as one shape, not as four strokes.
+ *
+ * The paths inside take no alpha of their own; the group carries it, so where
+ * the four flatten onto their shared tangent an overlap is the same value as a
+ * single line instead of stacking to nearly twice it.
+ *
+ * **Declared after `.diagramBase path` rather than outranking it.** Both are
+ * (0,1,1), so the tie goes to source order. Scoping this through the parent to
+ * win on weight instead put a (0,2,1) selector above a (0,1,1) one, which is
+ * the descending specificity `lint` refuses and the harder thing to read.
+ */
+.diagramFan {
+  opacity: 0.45;
+}
+
+.diagramFan path {
+  stroke-opacity: 1;
+}
+
+/**
  * One pulse per path, and it never seams.
  *
  * `--len` is the path's own length, emitted with the geometry that produced it.
@@ -254,7 +304,12 @@
   /* Lifted above the brand so the traveling head reads against a field that is
      itself brand-coloured. At the token value it disappeared into the aura. */
   stroke-opacity: 0.92;
-  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--helix-color-primary) 45%, transparent));
+  /* Wider and weaker than the old 3px at 45 percent: a tight bright halo on a
+     short fast dash reads as a hard object with an outline, and what a light
+     moving along a wire does is bleed. Two shadows so the falloff is not a
+     single hard ring. */
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
 }
 
 /**
@@ -290,40 +345,6 @@
  * which gives a real sweep and keeps the per-path length that makes the loop
  * seamless.
  */
-@property --shift {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-
-@keyframes preview-junction {
-  0%,
-  100% {
-    opacity: 0.45;
-    scale: 1;
-  }
-
-  50% {
-    opacity: 1;
-    scale: 1.4;
-  }
-}
-
-.diagramJunction {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .diagramJunction {
-    animation: preview-junction 3.2s var(--helix-easing-standard) infinite;
-  }
-
-  .diagramJunction:last-of-type {
-    animation-delay: -1.6s;
-  }
-}
-
 /* With no motion the highlight would sit frozen mid-path, which reads as a
    defect rather than as a still. The base carries the drawing on its own. */
 @media (prefers-reduced-motion: reduce) {
@@ -407,6 +428,30 @@
 
 /* ── Theme this page ───────────────────────────────────────────────── */
 
+/* Gone by the time the footer is here. The rail is what moves rather than the
+   pill, so the pill's own arrival animation and its open/close width are left
+   alone: two things animating one element is how a control ends up half open
+   and half retired.
+
+   Down and out rather than a fade alone, so it reads as leaving the screen it
+   was floating over. `visibility` on the same timing with `allow-discrete`, so
+   a retired control is not a transparent thing still taking clicks. */
+.fabRail[data-retired] {
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 calc(var(--helix-space-3xl) * 1.5);
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fabRail {
+    transition:
+      opacity var(--helix-duration-slow) var(--helix-easing-standard),
+      translate var(--helix-duration-slow) var(--helix-easing-standard),
+      visibility var(--helix-duration-slow) allow-discrete;
+  }
+}
+
 .fabRail {
   display: flex;
   inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
@@ -434,9 +479,13 @@
 .fab {
   backdrop-filter: blur(24px) saturate(1.8);
   background: color-mix(in oklab, var(--helix-color-surface-overlay) 42%, transparent);
-  border: var(--helix-border-thin) solid
-    color-mix(in oklab, var(--helix-color-border) 55%, transparent);
-  border-radius: var(--helix-radii-full);
+  /* **No stroke.** The pill is the only floating thing on the page and it was
+     the only one wearing an outline: the shadow already separates it from
+     whatever it is over, and a line around a translucent object reads as the
+     edge of a sheet rather than the shape of a control. The cards behind it
+     dropped their borders for the same reason and kept their shadows. */
+  border: 0;
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   /**
    * **One height for both states, stated rather than inherited.**
@@ -446,14 +495,32 @@
    * the bar it became: the thing grew in two directions at once and the morph
    * read as two elements swapping rather than one changing shape. Only the width
    * should move.
+   *
+   * **One control tall, down from 3.25rem.** The pill reads as a control rather
+   * than a piece of furniture at that height, and `--helix-size-control-md` is
+   * 2.5rem, so this is not a number that happens to look right: it is the same
+   * height the system gives every other medium control, and the `sm` icon
+   * button inside it is 2rem by the same scale. Stating it as the token is what
+   * makes the contents proportional rather than separately tuned, and a theme
+   * that moves the density seed moves the bar and its controls together.
+   *
+   * The two sizes that could not be derived came down by the same ratio: the
+   * face's dot and the derived swatches.
    */
-  block-size: 3.25rem;
+  block-size: var(--helix-size-control-md);
   display: grid;
   grid-template-areas: "stack";
   inline-size: 13rem;
   overflow: hidden;
   padding-inline: var(--helix-space-2xs);
-  place-items: center;
+  /* **Centered down the block, stretched across the inline.** `center` on both
+     axes shrink-wrapped each face to its own content, so the collapsed pill was
+     13rem of glass with a hit area only as wide as "Make it yours" and the band
+     either side of it did nothing on click. Stretching the inline axis makes
+     each face fill the shape it is drawn as, which is also what lets the open
+     bar's sliders take their `flex` share of the width instead of sitting at
+     their minimum. */
+  place-items: center stretch;
   pointer-events: auto;
   transition:
     inline-size var(--helix-duration-slow) var(--helix-easing-spring),
@@ -481,24 +548,59 @@
   cursor: pointer;
   display: flex;
   font: inherit;
+  /* Semibold at 14px, because the pill is a label rather than a line of prose:
+     at regular weight it read as a caption that happened to be on glass. */
+  font-weight: var(--helix-weight-semibold);
   gap: var(--helix-space-sm);
   justify-content: center;
-  padding-inline: var(--helix-space-md);
+  /* `sm` rather than `md`. The face is centered in a pill whose width is set
+     elsewhere, so its inline padding was buying nothing but distance between
+     the dot and the words. */
+  padding-inline: var(--helix-space-sm);
   transition: opacity var(--helix-duration-fast) var(--helix-easing-accelerate);
   white-space: nowrap;
 }
 
+/* The swatch on the collapsed pill: the brand, and nothing drawn around it.
+ *
+ * **The ring is gone.** It was a hairline of `border` at 70 percent, put there
+ * to keep a pale brand from disappearing into the glass, and what it actually
+ * did was outline the one element on the pill whose whole job is to be a
+ * color. A swatch with a stroke reads as a control; without one it reads as
+ * paint, which is what it is.
+ *
+ * **And the corner is the theme's, not `full`.** This sat at `radii-full`
+ * while the pill it lives on and every card behind it answer to the radius
+ * slider two controls away, so moving that slider squared off the entire page
+ * around one dot that stayed a circle. `radii-sm` is the step a box this size
+ * takes, and at the shipped seed it is 4px against a 10.4px swatch: still
+ * visibly round, and now round by the same rule as everything else. */
 .fabDot {
   background: var(--swatch);
-  block-size: 0.85rem;
-  border-radius: var(--helix-radii-full);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--helix-color-border) 70%, transparent);
+  block-size: 0.65rem;
+  border-radius: var(--helix-radii-sm);
   flex: none;
-  inline-size: 0.85rem;
+  inline-size: 0.65rem;
 }
 
 /* Held back until the pill has most of its width, so the controls arrive into
    room that already exists rather than being squeezed out of a closing gap. */
+/* **The row fills the pill, which is what puts the close control at its end.**
+ *
+ * `fabTools` is a flex container holding one `helix-flex`, and that child had no
+ * `flex` of its own, so it sized to its content: on a pill opened to 54rem the
+ * controls sat against the left and the rest was dead glass. The close button is
+ * the last thing in the row, so it stopped wherever the content did rather than
+ * at the edge a reader looks for it, which reads as the control not being there
+ * at all.
+ *
+ * Filling the row is also what the sliders were already asking for. Each channel
+ * is `flex: 1 1 0`, which distributes free space and had none to distribute. */
+.fabTools > * {
+  flex: 1;
+  min-inline-size: 0;
+}
+
 .fabTools {
   align-items: center;
   block-size: 100%;
@@ -523,6 +625,112 @@
 .fabChannel {
   flex: 1 1 0;
   min-inline-size: 4rem;
+}
+
+/**
+ * A bar on a pointer, a sheet on a finger.
+ *
+ * **The labels are the reason, not the layout.** Every control in here is named
+ * by a `helix-tooltip` and an `aria-label`. A touch screen has no hover, so the
+ * tooltip never opens, and `aria-label` is for a screen reader rather than for
+ * looking at: on a phone the open bar was three unlabelled sliders, a picker and
+ * a row of colored dots, with nothing on screen saying which slider was
+ * saturation. Making it a sheet is what buys the room to say so.
+ *
+ * `display: contents` above the breakpoint, so the wrapper each row is built
+ * from does not exist as far as the bar's flex layout is concerned. The desktop
+ * arrangement is unchanged rather than reconstructed.
+ */
+.fabRow {
+  display: contents;
+}
+
+.fabRowLabel {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  /* The rail stops centering a pill and starts holding a sheet against the
+     bottom edge. The closed pill keeps its own gap, so only the open state is
+     flush. */
+  .fabRail {
+    inset-block-end: 0;
+    padding-inline: 0;
+  }
+
+  .fab:not([data-open]) {
+    margin-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /**
+   * **Tall enough for its contents and no taller.** A sheet that takes the
+   * screen is a page, and this is a set of controls for the page behind it:
+   * covering that page hides the thing every one of these sliders is changing.
+   * `block-size: auto` lets the six rows decide, and the cap is only there so a
+   * future seventh cannot push it over the fold.
+   */
+  .fab[data-open] {
+    block-size: auto;
+    border-end-end-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: var(--helix-radii-lg);
+    border-start-start-radius: var(--helix-radii-lg);
+    inline-size: 100%;
+    max-block-size: 80dvh;
+    overflow-y: auto;
+    padding: var(--helix-space-md);
+    padding-block-end: calc(var(--helix-space-md) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* The two faces share one grid cell so the pill can morph into the bar. A
+     sheet sizes to its contents, so the collapsed face has to stop contributing
+     a height once it is not the thing being shown. */
+  .fab[data-open] .fabFace {
+    display: none;
+  }
+
+  /* Stated on the element rather than passed as `direction`, because the row is
+     right on a pointer and this is the same markup. A document rule outranks the
+     component's own `:host`, which is what makes one attribute serve both. */
+  .fabStack {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--helix-space-md);
+  }
+
+  .fabRow {
+    display: grid;
+    gap: var(--helix-space-2xs);
+  }
+
+  .fabRowLabel {
+    color: var(--helix-color-foreground-muted);
+    display: block;
+    font-size: var(--helix-text-xs);
+  }
+
+  /* Full width, which is the whole point of the sheet: a slider is a target
+     before it is a readout, and 4rem of track is a poor one for a thumb. */
+  .fabChannel {
+    inline-size: 100%;
+  }
+
+  /* A rule between columns says nothing once they are rows; the gap does. */
+  .fabDivider {
+    display: none;
+  }
+
+  /* First and hard against the trailing edge, so the sheet opens with its exit
+     where a sheet's exit is, rather than below six controls.
+
+     `align-self` and not `justify-self`: the stack is a flex column, where the
+     cross axis is the inline one and `justify-self` is ignored outright. Written
+     the other way it sat at the leading edge, which is where a flex item goes
+     when you have told it nothing. */
+  .fabClose {
+    align-self: flex-end;
+    order: -1;
+  }
 }
 
 /* The morph is the decoration; the two states are not. A reader who asked for
@@ -569,7 +777,13 @@
  * number, so it stays correct if either changes.
  */
 .fabClearance {
-  padding-block-end: calc(var(--helix-space-lg) * 2 + 3.5rem + env(safe-area-inset-bottom, 0px));
+  padding-block-end: calc(
+    var(--helix-space-lg) *
+    2 +
+    var(--helix-size-control-md) +
+    var(--helix-space-2xs) +
+    env(safe-area-inset-bottom, 0px)
+  );
 }
 
 /* ── Draft C's type scale ──────────────────────────────────────────── */
@@ -605,6 +819,28 @@
  * variant and set in the body face, which is right for a document; a landing
  * page is six statements and the face earns its keep on all of them.
  */
+/* The half of the heading the brand paints.
+ *
+ * **A span rather than a gradient across the whole line.** A duotone made by
+ * running a gradient over the entire heading colors words that are not the
+ * claim, and on a two-line heading it puts the darkest part of the ramp on
+ * whichever words happen to wrap last. Painting one phrase says which phrase.
+ *
+ * `primary` rather than a mix, because this is the one place on the page where
+ * the brand is the subject rather than an accent on something else: it is the
+ * color the whole system is derived from, sitting in the sentence that says the
+ * system derives things. */
+.tDisplayAccent {
+  color: var(--helix-color-primary);
+  /* **Its own line, so the color break and the line break are the same break.**
+     `text-wrap: balance` on the heading optimises for even line lengths and
+     knows nothing about the two tones: it stranded "and" at the end of the first
+     line, which put the change of color mid-sentence on a conjunction. A painted
+     phrase that starts with the last word of the line above it is not a phrase
+     any more. Block, so the accent always begins a line, at every width. */
+  display: block;
+}
+
 .tDisplay {
   font-family: var(--helix-font-display);
   /* Fluid between two rungs of the ramp rather than between two numbers
@@ -702,7 +938,12 @@
 .kicker {
   align-items: center;
   background: color-mix(in oklab, var(--helix-color-primary) 12%, transparent);
-  border-radius: var(--helix-radii-full);
+  /* **The theme's corner, not a pill.** This and the chip inside it were both
+     `radii-full` while every card, button and control on the page answers to the
+     radius slider, so squaring the page off left two capsules floating in it.
+     `md` on the banner and `sm` on the chip keeps the size relationship they had
+     without either of them opting out of the theme. */
+  border-radius: var(--helix-radii-md);
   color: var(--helix-color-foreground);
   display: inline-flex;
   font-size: var(--helix-text-md);
@@ -719,7 +960,7 @@
 
 .kickerBadge {
   background: var(--helix-color-primary);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-on-accent);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
@@ -752,89 +993,35 @@
  * edge off where it lands and lets the fill and the shadow carry the grouping.
  */
 .noRules :global([data-substrate]),
-.noRules :global(helix-card) {
+.noRules :global(helix-card),
+.noRules :global([data-closing]) {
   border-color: transparent;
   box-shadow:
     0 1px 0 0 color-mix(in oklab, var(--helix-color-foreground) 6%, transparent) inset,
     0 18px 40px -24px rgb(0 0 0 / 0.55);
 }
 
-/* ── The construction field ────────────────────────────────────────── */
-
-.blueprint {
-  block-size: 100%;
-  inline-size: 100%;
-  inset: 0;
-  /* Faded at both ends, so the drawing continues past the band rather than
-     stopping at it. */
-  mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
-  pointer-events: none;
-  position: absolute;
-  z-index: 0;
-}
-
 /**
- * **Fainter than it wants to be.**
+ * One corner for the close, which is the only thing here that needs telling.
  *
- * At 0.18 the rectangles read as boxes drawn on the page and collided visibly
- * with the eyebrow row. Construction lines are supposed to be noticed second, on
- * the way back out of a section, not competing with the first thing read. The
- * reference keeps them near the threshold of visible and so does this.
- */
-.blueprintInk {
-  opacity: 0.11;
-}
-
-@keyframes preview-ink {
-  from {
-    stroke-dashoffset: 1400;
-  }
-
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    /**
-     * Each rectangle inks itself in on its own `view()` timeline, so the ones
-     * lower in a tall band arrive later because they *are* later. A shared
-     * timeline with per-child delays would fake the same order and get it wrong
-     * the moment the band's height changes.
-     */
-    .blueprintInk rect {
-      animation: preview-ink linear both;
-      animation-range: entry 0% entry 60%;
-      animation-timeline: view();
-      stroke-dasharray: 1400;
-    }
-  }
-}
-
-/* ── The drawing's own furniture ───────────────────────────────────── */
-
-/**
- * The starfield. Deliberately near the threshold of visible.
+ * **`helix-card` was in this rule and did not need to be.** The note that put it
+ * here said the component ships `sm` and the draft wants `lg`; the component
+ * resolves `var(--card-radii, var(--helix-radii-lg))` and always has, so the
+ * line restated the default and the premise was simply wrong. What was actually
+ * on the wrong corner was `helix-code-block`, which is not reached by this
+ * selector and is now fixed where it lives.
  *
- * It is doing one job: putting the figure in space rather than on paper, which
- * is what stops a circle with lines into it from reading as a flowchart. If it
- * is noticed as dots, it is too strong.
+ * `[data-closing]` is a section rather than a component and does need it.
  */
-.diagramStars {
-  opacity: 0.55;
+.noRules :global([data-closing]) {
+  border-radius: var(--helix-radii-lg);
 }
 
-/**
- * The sheet the figure is a detail of.
- *
- * A dashed rectangle alone reads as a dotted border. What makes it a drawing
- * frame is the corner ticks drawn over it, which is the trick the reference
- * uses: the corners are solid and the sides are not, so the eye reads a
- * registration mark rather than an outline.
- */
-.diagramFrame {
-  opacity: 0.5;
+/* The registration marks, themed with everything else. See the note in
+   `derivation-diagram.tsx` for why this is a masked rect rather than four
+   paths. */
+.diagramCorners {
+  rx: var(--helix-radii-lg);
 }
 
 @keyframes preview-twinkle {
@@ -870,6 +1057,18 @@
   gap: var(--helix-space-sm);
 }
 
+/* **Written here rather than up in the sheet's own block, and the reason is the
+   cascade.** As `.fabReadoutRow .fabReadout` it was two selectors beating one
+   and worked, which `noDescendingSpecificity` flags because it only works by
+   outweighing a rule that comes later. At equal weight the order decides, so the
+   override belongs after the thing it overrides. Same trap as the `.bandSplit`
+   reset and the closing card's radius, caught this time by the linter. */
+@media (max-width: 40rem) {
+  .fabReadout {
+    justify-content: space-between;
+  }
+}
+
 .fabSwatches {
   display: flex;
   /* Overlapped, so eight roles read as one palette rather than as eight chips. */
@@ -878,10 +1077,10 @@
 
 .fabSwatch {
   background: var(--swatch);
-  block-size: 1.1rem;
+  block-size: 0.85rem;
   border-radius: var(--helix-radii-full);
   box-shadow: 0 0 0 2px var(--helix-color-surface-overlay);
-  inline-size: 1.1rem;
+  inline-size: 0.85rem;
   margin-inline-start: calc(var(--helix-space-2xs) * -1);
 }
 
@@ -937,13 +1136,6 @@
  * band that merely dims it still has a moving gradient behind a panel of live
  * controls. `isolation` so anything inside keeps its own stacking context.
  */
-.solidBand {
-  background: var(--helix-color-background);
-  isolation: isolate;
-  position: relative;
-  z-index: 1;
-}
-
 /**
  * The field's drift.
  *
@@ -1005,6 +1197,29 @@
  * the thresholds a build passes or fails on, and only AA gets a word, because
  * it is the only one that decides anything.
  */
+.diagramGlass {
+  backdrop-filter: blur(28px) saturate(1.7);
+  /* **Whiter in light, and the dark value untouched.**
+     `surface` is `oklch(0.985)` in light and at 24 percent it is barely there:
+     what showed through was the field behind it, so the disc read as a pale
+     blue lens rather than as the white instrument face it is meant to be. Dark
+     has the opposite problem and does not share it, a 24 percent light-on-dark
+     wash being plenty to separate the hub from its ground.
+
+     `surface-overlay` rather than `surface` on the light side, because it is
+     `lab(100 0 0)` there against `surface`'s 0.985: the point is white, so the
+     white token is the one to mix from. Held to 52 percent rather than taken
+     to opaque, because the blur behind it is the reason the hub reads as glass
+     and a solid disc would be a hole cut in the drawing. */
+  background: light-dark(
+    color-mix(in oklab, var(--helix-color-surface-overlay) 52%, transparent),
+    color-mix(in oklab, var(--helix-color-surface) 24%, transparent)
+  );
+  block-size: 100%;
+  border-radius: var(--helix-radii-full);
+  inline-size: 100%;
+}
+
 .diagramGaugeTrack {
   stroke: var(--helix-color-foreground-muted);
   stroke-opacity: 0.2;
@@ -1039,14 +1254,31 @@
   background: color-mix(in oklab, var(--helix-color-surface-overlay) 26%, transparent);
 }
 
-/* The shared components carry their own fills, and those are opaque tokens
-   rather than mixes, so they need the same treatment where a draft uses them. */
-.noRules :global([data-substrate]),
-.noRules :global(helix-card) {
-  --card-background-color: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+/**
+ * The shared components carry their own fills, and those are opaque tokens
+ * rather than mixes, so they need the same treatment where a draft uses them.
+ *
+ * **Except a card that was already given a fill on purpose.** The showcase's
+ * anchor is a brand surface that supplies its own `foreground-on-accent` text,
+ * so replacing its ground with 30 percent glass left white type on a
+ * near-transparent panel: measured on the draft as `oklab(0.21 0 0 / 0.3)`
+ * under `lab(100 0 0)`, which is the card the page uses to advertise that it
+ * measures contrast. A card that brought its own ground keeps it.
+ */
+/* Named once, because the animated edge further down has to paint this same
+   ground itself: a two-layer background clips the fill to the padding box and
+   the gradient to the border box, so the fill has to be a layer rather than a
+   color. Two literals would drift the first time one of them moved. */
+.noRules {
+  --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+}
 
-  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
-  backdrop-filter: blur(18px) saturate(1.5);
+.noRules :global([data-substrate]),
+.noRules :global(helix-card:not([data-filled])) {
+  --card-background-color: var(--site-glass);
+
+  background: var(--site-glass);
+  backdrop-filter: blur(40px) saturate(1.5);
 }
 
 /* ── The field takes the brand too ─────────────────────────────────── */
@@ -1074,86 +1306,9 @@
  * Measured identical across dark, light and the no-attribute case.
  */
 .noRules :global([data-closing][data-closing][data-closing]) {
-  backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(40px) saturate(1.5);
   background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
   border-color: transparent;
-}
-
-/**
- * The header sits above `main`, outside anything a page can scope to, so this is
- * global. It is loaded only on the preview routes, which is what keeps it from
- * reaching the rest of the site.
- */
-:global(helix-app-header) {
-  --app-header-background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
-  --app-header-backdrop: blur(18px) saturate(1.5);
-}
-
-/* ── Insight plates ────────────────────────────────────────────────── */
-
-.plate {
-  backdrop-filter: blur(18px) saturate(1.5);
-  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
-  border-radius: var(--helix-radii-lg);
-  color: inherit;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
-  text-decoration: none;
-  transition: translate var(--helix-duration-normal) var(--helix-easing-standard);
-}
-
-/* Lifts rather than brightens. A card that changes color on hover is a second
-   surface; one that rises is the same card, closer. */
-.plate:hover {
-  translate: 0 -3px;
-}
-
-.plate:focus-visible {
-  outline: 2px solid var(--helix-color-focus-ring);
-  outline-offset: 3px;
-}
-
-/* The plate is a band across the top, not a square: a cover that takes half the
-   card leaves the title fighting for the rest. */
-.cover {
-  aspect-ratio: 16 / 7;
-  display: block;
-  inline-size: 100%;
-}
-
-.plateBody {
-  display: grid;
-  gap: var(--helix-space-sm);
-  padding: var(--helix-space-lg);
-}
-
-.plateTitle {
-  font-family: var(--helix-font-display);
-  font-size: var(--helix-text-lg);
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: -0.012em;
-  line-height: 1.25;
-  text-wrap: balance;
-}
-
-/**
- * Clamped, because the reel shows four across and an unclamped paragraph at a
- * quarter of the shell is a column rather than a teaser.
- */
-.plateSummary {
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  color: var(--helix-color-foreground-muted);
-  display: -webkit-box;
-  font-size: var(--helix-text-md);
-  line-height: 1.5;
-  overflow: hidden;
-}
-
-.plateDate {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-sm);
 }
 
 /**
@@ -1210,6 +1365,10 @@
 
 /* The hovered route lifts out of the base's usual near-invisibility, so the
    path from one input to the hub reads as a single continuous thing. */
+.diagramSvg:has([data-ch]:hover) .diagramFan {
+  opacity: 1;
+}
+
 .diagramSvg:has([data-ch="brand"]:hover) .diagramBase [data-ch="brand"],
 .diagramSvg:has([data-ch="saturation"]:hover) .diagramBase [data-ch="saturation"],
 .diagramSvg:has([data-ch="density"]:hover) .diagramBase [data-ch="density"],
@@ -1226,5 +1385,416 @@
 @media (prefers-reduced-motion: reduce) {
   .diagramSvg [data-ch] {
     transition-duration: var(--helix-duration-instant);
+  }
+}
+
+/**
+ * A band as one card rather than a row of them.
+ *
+ * **Six panels was six edges.** A banner, four figures and a chart each on
+ * their own glass read as six unrelated claims that happened to be stacked,
+ * and every one of them had a corner that appeared over the aura and vanished
+ * over the page, because a translucent fill has an edge only where there is
+ * something behind it to differ from. One ground has one edge, and the parts
+ * are told apart by a rule between them instead.
+ *
+ * The rule is `material-border`, which is the token for a line drawn on a
+ * translucent pane: it carries its own alpha, so it reads against whatever the
+ * aura is doing behind it rather than against an assumed ground.
+ */
+.bandCard {
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  overflow: hidden;
+}
+
+.bandSection {
+  padding: var(--helix-space-xl);
+}
+
+.bandSection + .bandSection,
+.bandRow + .bandSection {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+/**
+ * Stacked below the wrap and in a row above it, and the divider turns with it.
+ *
+ * `auto-fit` was the obvious way to write this and the wrong one: a sibling
+ * rule cannot know a wrap happened, so the first item of every wrapped row wore
+ * a divider on the side facing nothing. Stating both layouts states where the
+ * line goes in each.
+ */
+.bandRow {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+/**
+ * Two unequal halves of one card, and no rule between them.
+ *
+ * `.bandRow` gives every cell the same width, which is right for figures and
+ * wrong here: the prose wants a measure and the showcase wants the rest.
+ *
+ * **The divider is gone, unlike every other band's.** This one had a line
+ * between the halves and another above the showcase, and the showcase is not a
+ * list of peer cells: it is a panel of live components that already draw their
+ * own edges, so a rule beside them was a border against a wall of borders. The
+ * dividers elsewhere separate prose from prose and still earn their keep.
+ */
+.bandSplit {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+/**
+ * **Stated, because `.bandSection + .bandSection` would otherwise draw one.**
+ * Both halves of a split are sections, so the second matches that rule and wore
+ * a line across the top of the showcase. The rule is right where it was written,
+ * for sections stacked down a card; a split lays them side by side, where the
+ * same border is a lid rather than a divider.
+ *
+ * **Two classes deep, because the rule it answers is.** The reset this replaces
+ * was written `.bandSplit > * + *`, which is one class against
+ * `.bandSection + .bandSection`'s two: it lost the cascade and never did
+ * anything, so the lid was on the showcase the whole time it was supposedly
+ * canceled. Matching the compound is what makes it win.
+ */
+.bandSplit > .bandSection + .bandSection {
+  border-block-start: 0;
+}
+
+@media (min-width: 60rem) {
+  .bandSplit {
+    grid-template-columns: minmax(20rem, 30rem) minmax(0, 1fr);
+  }
+}
+
+.bandCell {
+  padding: var(--helix-space-xl);
+}
+
+/**
+ * The divider between cells, stated for both layouts like `.bandRow` above.
+ *
+ * **Adjacent, not every cell.** A botched replace had left this as a bare
+ * `.bandCell`, which draws the line on the first one too: doubled against the
+ * row's own top border when stacked, and drawn against nothing at the start of
+ * the row when in columns. That is the exact failure the note on `.bandRow`
+ * describes, reintroduced one rule below it.
+ */
+.bandCell + .bandCell {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+@media (min-width: 60rem) {
+  .bandRow {
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+  }
+
+  .bandCell + .bandCell {
+    border-block-start: 0;
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+}
+
+/**
+ * Four essays in one card, and the row answers the pointer.
+ *
+ * **The cell is the link.** A title that is the only target makes three
+ * quarters of a cell dead to the pointer, and the cell is what a reader is
+ * aiming at; the chips and the summary belong to the same choice.
+ *
+ * **The hover is on the row, not only the cell.** A cell that lifts on its own
+ * says "this one is a target" and nothing about the other three; receding the
+ * siblings at the same time says "this one, out of four", which is the sentence
+ * a set of peers wants. The two halves are one gesture and share a duration.
+ *
+ * **`opacity` is safe here and would not be one level up**, which is worth
+ * saying beside the declaration rather than trusting to memory. It flattens the
+ * `backdrop-filter` of anything beneath it, and beneath this there is none:
+ * these cells are text, and the only glass in the band is the card above them,
+ * whose filter a descendant's opacity has never had anything to do with. Had
+ * the four stayed cards, this rule would have flattened all of them. See the
+ * note above `[data-substrate]` in `site.css`.
+ *
+ * Reduced motion keeps the change and drops the travel: the dimming carries the
+ * meaning and the rise only carries the motion.
+ */
+.insightCell {
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+  text-decoration: none;
+  transition:
+    opacity 180ms ease,
+    translate 180ms ease;
+}
+
+.insightRow:hover .insightCell {
+  opacity: 0.5;
+}
+
+.insightRow .insightCell:hover {
+  opacity: 1;
+  translate: 0 -1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightCell {
+    transition: opacity 180ms ease;
+  }
+
+  .insightRow .insightCell:hover {
+    translate: none;
+  }
+}
+
+/**
+ * Edge to edge on a narrow screen, and no corner where there is no gap.
+ *
+ * **The inset is a proportion of the page and stops being one at the bottom.**
+ * `--site-inset` clamps to `1.5rem`, so a 390px phone spends 48px, an eighth of
+ * its width, holding the cards away from an edge they are not competing with.
+ * The card is the page there: it is the full width of the content, there is
+ * nothing beside it, and the margin is only making the measure narrower.
+ *
+ * The radius goes with it. A rounded corner says where a surface ends against
+ * something else, and flush against the viewport there is nothing on the other
+ * side of it; kept, it reads as a card that has been cropped rather than one
+ * that fills the screen. The vertical rhythm is untouched, so the bands still
+ * separate the way they do everywhere else.
+ *
+ * Only the field bands, which are the ones that are a card in a section. The
+ * header, the footer and every other page keep their inset, because a shell is
+ * a page-wide convention and this is one page's cards.
+ */
+@media (max-width: 40rem) {
+  .fieldBand :global([data-shell]) {
+    padding-inline: 0;
+  }
+
+  .bandCard {
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  /* **One inset, and it is the hero's.**
+   *
+   * The card's inset was the sum of two paddings written for a card floating on
+   * a field: `space-lg` on the substrate and `space-xl` on the section, 56px
+   * together. Against a hero whose text starts at `--site-inset`, 24px, that put
+   * the body copy a full 32px inside the line the page opens on, so the
+   * measure stepped in at the first band and stayed there.
+   *
+   * The card carries the whole inset now and the section adds none, which keeps
+   * one number in one place rather than two that have to sum to the right
+   * answer. Block padding is untouched: the vertical rhythm was never the
+   * problem. */
+  .fieldBand :global([data-substrate]) {
+    padding-inline: var(--site-inset);
+  }
+
+  .bandSection,
+  .bandCell {
+    padding-inline: 0;
+  }
+
+  /* **Written here, at the weight the rule it answers carries.** The close is
+     reached by `.noRules [data-closing]` above, which is two selectors; the same
+     declaration in `landing.module.css` is one and lost, so the card went full
+     width with its corners still rounded against the viewport edge. Same trap as
+     the `.bandSplit` reset: a rule that reads correctly and never applies. */
+  .noRules :global([data-closing]) {
+    border-radius: 0;
+    max-inline-size: 100%;
+  }
+}
+
+/**
+ * The carousel runs to the page edges; the first card does not move.
+ *
+ * **Two halves, and the component already owns the harder one.** A negative
+ * margin takes the track out of the shell's inset and out to the viewport
+ * edges. Setting `--carousel-bleed` to that same inset gives the track back the
+ * room it just escaped, and because the component applies the bleed as
+ * `scroll-padding` as well as padding, the snapport is inset by it too: the
+ * leading slide rests where the shell's content starts rather than against the
+ * clip edge. Padding alone would have put the card in the right place and let
+ * the first snap pull it straight back out.
+ */
+.reelBleed {
+  --carousel-bleed: var(--site-inset);
+
+  margin-inline: calc(var(--site-inset) * -1);
+}
+
+/* **The code block on the same material as everything around it.**
+ *
+ * It sits in the showcase among cards that all take the page's glass, and it
+ * was the one object still on its own surface: an opaque `surface-raised` bar
+ * over a block of flat page background, which beside a row of translucent cards
+ * reads as a screenshot of a different site. `CodeBlock` published only
+ * `--code-block-background` until now, so there was no way to say this without
+ * reaching past it; it publishes the backdrop, the border and the header ground
+ * as well, and this is written entirely in those.
+ *
+ * The same 30 percent and the same `blur(40px) saturate(1.5)` the cards use, so
+ * the two are the same material rather than two attempts at one. The header
+ * takes a lighter mix than the body, which is the one difference kept: it is
+ * what makes the bar a bar rather than the block growing a title. */
+.noRules :global(helix-code-block) {
+  --code-block-backdrop: blur(40px) saturate(1.5);
+  --code-block-background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  --code-block-border-color: transparent;
+  --code-block-header-background: color-mix(in oklab, var(--helix-color-surface) 46%, transparent);
+}
+
+/**
+ * The theme pill, arriving after everything else has settled.
+ *
+ * **Last, and from nothing.** It is the one control on the page that is an
+ * invitation rather than part of the argument, so it should not compete with
+ * the hero for the first look: it grows in once the column above it has
+ * finished arriving. `scale(0)` to full is the shape that reads as *appearing*
+ * rather than as sliding in from somewhere off screen, which is what a pill
+ * pinned to the bottom of the viewport has no room to do.
+ *
+ * `easing-spring` for the same reason the scroll reveal uses it: an overshoot
+ * is what separates a thing that arrived from a thing that was always there.
+ * On a scale it is the difference between a pop and a fade-up.
+ *
+ * `backwards` so the pill is held at `scale(0)` through the delay rather than
+ * sitting at full size and then jumping to nothing when the animation starts.
+ *
+ * **Width alone, and it opens rather than grows.** This was a `scale`, which
+ * takes the height with it and squashes everything inside: the label arrives
+ * compressed and stretches out, which reads as the pill being pulled into shape
+ * rather than opening. Animating `inline-size` against the `overflow: hidden`
+ * this already has makes the pill a shutter instead. The face keeps its own
+ * size and is revealed, never distorted, which is exactly the morph the control
+ * already performs when it opens into the toolbar.
+ *
+ * **No `to` block, deliberately.** The resting width is `13rem` and it is
+ * declared once, on the rule above. A keyframe naming it again is a second copy
+ * that goes stale the day the pill is resized; with only a `from`, the end of
+ * the animation is whatever the element's own style says.
+ *
+ * **Opacity as well, which the width alone did not cover.** At a true zero there
+ * is nothing to see, so this is not about the held state: it is about the first
+ * frames after it. A shutter opening from nothing puts a hard vertical edge on
+ * screen and drags it outward, and the eye reads that edge before it reads the
+ * pill. Fading across the same interval softens the leading edge without
+ * touching what is actually animating, which is still the width.
+ *
+ * **Three properties to reach an actual zero, not one.** `inline-size: 0` on its
+ * own does not make the pill disappear: the used width cannot fall below the
+ * element's own `padding-inline`, so a sliver of glass sat on screen through the
+ * whole delay, and `shadow-floating` drew around that sliver whether or not
+ * there was anything inside it to cast from. All three collapse together, so
+ * what is held through the delay is a box with no width, no inset and nothing
+ * drawn outside it.
+ */
+@keyframes site-fab-arrive {
+  from {
+    box-shadow: none;
+    inline-size: 0;
+    opacity: 0;
+    padding-inline: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fab {
+    animation: site-fab-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-spring)
+      calc(var(--helix-duration-slow) * 5) backwards;
+  }
+}
+
+/**
+ * A light that travels the edge of every band card.
+ *
+ * **A masked ring, because clipping the fill does not mask a translucent one.**
+ * The first version painted the gradient into the border box and the card's own
+ * ground into the padding box, which is the standard gradient-border trick and
+ * depends on that ground being opaque. This one is 30 percent glass, so the
+ * conic gradient read straight through the middle of every card.
+ *
+ * `border-image` is the other obvious answer and is worse: it ignores
+ * `border-radius`, so a 12px card gets a square ring around it.
+ *
+ * So the ring is its own box. A pseudo-element covers the card, paints the
+ * gradient across all of it, and masks out everything inside its own padding:
+ * two full-size mask layers, one clipped to the content box, composited with
+ * `exclude`, which leaves exactly the padding ring. `border-radius: inherit`
+ * means it follows whatever corner the theme is on, which is the thing
+ * `border-image` could not do.
+ *
+ * **It renders on a shadow host, which was worth checking rather than assuming.**
+ * `helix-card` has a shadow root, and light-DOM children of a shadow host do not
+ * render unless slotted. A generated `::before` is not slotted content and does
+ * render: confirmed by painting one magenta on the insights gallery and looking
+ * at it.
+ *
+ * **No filter, opacity or transform on the card**, which is what keeps this off
+ * the backdrop-root path the glass cannot survive. The mask is on the pseudo
+ * element, so it makes a backdrop root of a box that has no descendants.
+ *
+ * `@property` is what makes the angle animatable at all: a bare custom property
+ * is a string to the interpolator, and a registered `<angle>` is a number.
+ *
+ * Slow on purpose. At eight seconds the light is a thing you notice having
+ * moved rather than a thing that is moving, which is the difference between a
+ * card that is alive and a card that is loading.
+ */
+@property --card-edge-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
+@keyframes site-card-edge {
+  to {
+    --card-edge-angle: 360deg;
+  }
+}
+
+/* The ring is positioned against the card, and these are static by default. */
+.noRules :global([data-substrate]),
+.noRules :global(helix-card:not([data-filled])),
+.noRules :global([data-closing]) {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .noRules :global([data-substrate])::before,
+  .noRules :global(helix-card:not([data-filled]))::before,
+  .noRules :global([data-closing])::before {
+    animation: site-card-edge 8s linear infinite;
+    background: conic-gradient(
+      from var(--card-edge-angle),
+      transparent 0%,
+      color-mix(in oklab, var(--helix-color-primary) 55%, transparent) 8%,
+      transparent 22%,
+      transparent 58%,
+      color-mix(in oklab, var(--helix-color-primary) 28%, transparent) 66%,
+      transparent 82%
+    );
+    border-radius: inherit;
+    content: "";
+    inset: 0;
+    /* The ring's own thickness: the mask keeps this band and drops the rest. */
+    padding: var(--helix-border-thin);
+    pointer-events: none;
+    position: absolute;
+    mask:
+      linear-gradient(black 0 0) content-box,
+      linear-gradient(black 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
   }
 }

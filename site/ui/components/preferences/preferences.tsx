@@ -2,9 +2,15 @@
 import { useEffect, useState } from 'react'
 import type { ApiTier } from '@/hooks/use-api-tier/use-api-tier'
 
-type ColorMode = 'system' | 'light' | 'dark'
+/* Re-exported, because the preview's theme toolbar writes the same preference
+   and two components holding the same string is how they drift. The value
+   itself lives in a plain module now: the root layout needs it on the server to
+   build its pre-paint script, and a `'use client'` file cannot hand a server
+   component a string. */
+export { COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 
-const STORAGE_KEY = 'fusion-color-mode'
+import { type ColorMode, COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
+
 const TIER_KEY = 'fusion-api-tier'
 
 /**
@@ -87,6 +93,32 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         applyTier(storedTier)
       }
     }
+  }, [])
+
+  /**
+   * Follows the attribute, because this panel is not the only thing that sets it.
+   *
+   * **It read `localStorage` once at mount and never again**, so a scheme
+   * chosen anywhere else left this showing the old answer: change it in the
+   * landing page's theme bar, open preferences, and the radio still pointed at
+   * what you had before. The panel was not wrong about what it had been told,
+   * it had just stopped listening.
+   *
+   * `data-color-mode` is the one thing every control agrees on, so watching it
+   * needs no coordination between them. Its absence is the system default,
+   * which is what `system` means here.
+   */
+  useEffect(() => {
+    const follow = () => {
+      const attr = document.documentElement.dataset.colorMode
+      setMode(attr === 'dark' || attr === 'light' ? attr : 'system')
+    }
+    const modes = new MutationObserver(follow)
+    modes.observe(document.documentElement, {
+      attributeFilter: ['data-color-mode'],
+      attributes: true,
+    })
+    return () => modes.disconnect()
   }, [])
 
   const choose = (next: ColorMode) => {

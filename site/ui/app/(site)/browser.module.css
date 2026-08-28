@@ -393,3 +393,22 @@
 .gridBand {
   padding-block: var(--helix-space-2xl);
 }
+
+/* The shortcut chip on the hero's search field, which is glass.
+ *
+ * **`Kbd` ships an opaque key and the hero has nothing opaque on it.** Its
+ * ground is `surface-sunken` and its edge is a full-strength `border`, which is
+ * right on a page: a key is a physical thing and reads as one against paper.
+ * Dropped onto a translucent field floating over the aura it is the only solid
+ * object in the composition, so it reads as a hole punched in the glass rather
+ * than as a key resting on it.
+ *
+ * Both hooks the component publishes, and both mixed rather than replaced: the
+ * fill is the foreground at 8 percent so it tints whatever is behind it instead
+ * of covering it, and the edge is the border token at 45 so it stays a line
+ * without becoming the brightest thing on the field. Off `foreground` and
+ * `border` rather than off literal colors, so this holds in both schemes. */
+.pageHeroInner helix-kbd {
+  --kbd-background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  --kbd-border-color: color-mix(in oklab, var(--helix-color-border) 45%, transparent);
+}

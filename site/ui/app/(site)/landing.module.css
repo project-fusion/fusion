@@ -149,116 +149,76 @@
  * `interactive`, so it asks for no hit test of its own, but it does cover the
  * whole hero including both calls to action, and a layer over those is one
  * refactor away from swallowing the press that pays for the site. */
-/* The aura, fixed behind the whole page.
+/**
+ * One field, over the whole reel.
  *
- * **Fixed rather than sitting in the hero.** The light runs the length of the
- * page now, so it cannot belong to one band: parked in the hero it scrolled
- * away after a screen, which is a hero decoration with extra steps.
+ * **Six of these were a seam generator.** Every band carried its own 200svh
+ * aura anchored to its own top, so where one band ended and the next began the
+ * two boxes cut against each other and drew a hard horizontal line across the
+ * page. Matching their settings could not fix that: the line is the boundary
+ * between two canvases, not a difference between them.
  *
- * **No `z-index`, and none needed.** This is positioned, the sections after it
- * are positioned, and positioned boxes with no layer of their own paint in tree
- * order. The markup already says what the order is, so a number here would be a
- * second statement of the same thing, and the layer scale has no negative step
- * to spend on it anyway. */
+ * Stretched to the reel instead, which is the lit region by definition and
+ * already clips where the footer starts. No boundary inside it, so nothing to
+ * see at a band edge, and six fewer WebGL contexts for the compositor to carry.
+ *
+ * **No `z-index`, and one is actively wrong here.** This is positioned, the
+ * sections after it are positioned, and positioned boxes with no layer of their
+ * own paint in tree order, so the markup already says what the order is.
+ *
+ * `--helix-layer-beneath` is -1, and `.reel` establishes no stacking context:
+ * no `isolation`, no `contain`, no transform, and `overflow: clip` does not
+ * make one. A negative layer therefore does not settle behind the sections, it
+ * escapes to the nearest ancestor that does form a context and paints behind
+ * *that* element's background, which is opaque. The field disappears entirely.
+ * Tried on 27 Aug 2026 as belt-and-braces next to `.reel > section`, which is
+ * the belt and is sufficient on its own.
+ */
 .reelAura {
-  /* Absolute against the reel, not fixed against the window.
-   *
-   * Fixed was the wrong reading of "down the whole page": it pins the light to
-   * the viewport, so nine screens of content slide over a field that never
-   * moves, which is a wallpaper rather than a page. What was actually wrong was
-   * that the aura stopped at the hero's bottom edge, cut off exactly where the
-   * first band ended.
-   *
-   * So it starts at the top and runs past that edge, and the shape fades itself
-   * out at the bottom of its own box: every shape here ends with a vertical
-   * envelope, so a taller box means a longer fade rather than a hard stop.
-   *
-   * Two screens rather than all nine, because the field is aspect-corrected
-   * against its own box: stretched over the full reel it would be nine times
-   * taller than wide, and the braid would come out a thread. */
-  block-size: 200svh;
-  inset-block-start: 0;
-  inset-inline: 0;
-  /* Faded out at the bottom, because the shape does not reliably do it.
-   *
-   * Each shape ends with a vertical envelope, but those are written against an
-   * unscaled box: `scale` multiplies the sampled coordinates after the
-   * rotation, so at 1.7 the lit region reaches past the edge and the light was
-   * simply stopping where the canvas did. Seen by shortening the box until its
-   * own bottom was on screen: a bright braid and then a horizontal line.
-   *
-   * A mask rather than more envelope, because it holds for every shape, every
-   * tilt and every scale, including the ones nobody has tried. The last third,
-   * which at two screens is most of the band the aura shares with the page. */
-  mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
-  pointer-events: none;
-  position: absolute;
-}
+  /* Absolute against the reel, not fixed against the window. Fixed pins the
+     light to the viewport, so the content slides over a field that never moves,
+     which is a wallpaper rather than a page. */
+  block-size: auto;
+  inset: 0;
+  /* Half strength. The field is the page's ground rather than its subject, and
+     `gain` would have been the other lever: that one changes what the shader
+     draws, brightening the lit parts and leaving the dark ones, which flattens
+     the braid. Opacity takes the whole field down evenly and keeps its shape.
 
-/* **A second field, because the aspect correction is per box.**
- *
- * 225 tried making the first one taller and measured why that fails: stretched
- * over the 4690 reel the box goes from 1.41 to 3.66, and at `scale` 1.7 the
- * braid does not thin out, it disappears, photographing as plain white. Raising
- * `scale` to 4.41 in proportion brings light back and it is a diffuse wash
- * rather than a braid. So the field is not one thing made longer, it is two
- * things the same size.
- *
- * **Same box, so the tuning transfers exactly.** `terminus={0.5625}` is derived
- * against a reel twice the viewport's height and reads 26.0 degrees at 1280,
- * 23.1 at 1512 and 28.5 from 1920 up. A second box of the same `200svh` has the
- * same aspect at every width, so it draws the same angle without a number being
- * re-derived. That is the whole reason to repeat the size rather than fit the
- * light to the gap.
- *
- * **Anchored to the band rather than to a pixel.** It sits inside the section
- * that opens the second transparent run, so it moves when the copy above it
- * does; `.reel > section` is already positioned, which makes that section the
- * containing block. The two opaque bands are what bound it in practice: 225
- * measured that only the showcase and the closing band paint a background, and
- * they hide the light rather than being lit by it.
- *
- * **The mask fades in as well as out**, which the first one does not need. That
- * one starts at the top of the page where there is nothing above it; this one
- * starts at a band edge with an opaque band over it, so without the top stop the
- * light would appear at a hard horizontal line. */
-.reelAuraLate {
-  /* **Behind the band's own words, which the first field gets for free.** That
-     one is a sibling *before* every section, and the sections are positioned, so
-     they stack over it in tree order. This one is a child of the band it lights,
-     where an absolutely positioned element paints above static flow content: the
-     first attempt washed out the two headings it was meant to sit behind.
-     `data-reveal` animates opacity, so the section is already a stacking
-     context, which is what keeps this negative index inside the band rather than
-     sending it behind the page. */
-  z-index: var(--helix-layer-beneath);
-  block-size: 200svh;
-  inset-block-start: 0;
-  inset-inline: 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 62%, transparent 100%);
-  pointer-events: none;
-  position: absolute;
-}
+     Safe on this element specifically. An opacity below 1 makes a backdrop root
+     of its own descendants, and this has none: the cards that blur it are
+     siblings further down the page, and what they sample is the field as
+     painted, at whatever strength it was painted. */
+  opacity: 0.5;
+  /* **Faded out at the bottom, because the shape does not reliably do it.**
+     Each shape ends with a vertical envelope, but those are written against an
+     unscaled box: `scale` multiplies the sampled coordinates after the rotation,
+     so the lit region can reach past the edge and the light simply stops where
+     the canvas does. A mask rather than more envelope, because it holds for
+     every shape, every tilt and every scale, including the ones nobody has
+     tried.
 
-.reelScrimLate {
-  /* **Behind the band's own words, which the first field gets for free.** That
-     one is a sibling *before* every section, and the sections are positioned, so
-     they stack over it in tree order. This one is a child of the band it lights,
-     where an absolutely positioned element paints above static flow content: the
-     first attempt washed out the two headings it was meant to sit behind.
-     `data-reveal` animates opacity, so the section is already a stacking
-     context, which is what keeps this negative index inside the band rather than
-     sending it behind the page. */
-  z-index: var(--helix-layer-beneath);
-  background: radial-gradient(
-    ellipse 62% 26% at 50% 32%,
-    color-mix(in srgb, var(--helix-color-background) 70%, transparent) 0%,
-    color-mix(in srgb, var(--helix-color-background) 34%, transparent) 55%,
-    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
-  );
-  block-size: 200svh;
-  inset-block-start: 0;
-  inset-inline: 0;
+     Later than the 62% this held at two screens. That number was the last third
+     of a box the height of two viewports; over the whole reel the same fraction
+     would start fading around the third band and leave half the page dark.
+
+     Later again, from 86 to 96, and the reel grew a bottom margin to put it in.
+     Measured at 1100 wide: the reel ran to 6907 and the closing call to action
+     sat at 6470 to 6825, so a fade beginning at 86 percent started 530px above
+     that section and took it from 45 percent opacity down to 8. The light was
+     not stopping short of the bottom of the page, it was being masked off
+     across the last thing on it. The reel's own end padding is what makes room
+     for the fade to happen below the content instead of over it.
+
+     One band, which is where it started, and the mark at 98 rather than 86.
+     Four bands put 331px of unlit reel under the closing section and two put
+     180, both of which read as the page trailing off rather than arriving at
+     the footer. The room was never the point: the fade only has to begin below
+     the last thing a reader looks at, and a section's own end padding is
+     already empty. Measured at 1200 wide: the reel ends at 6632, the 98 percent
+     mark falls at 6499, and the closing call to action's content stops around
+     6452, so the fade starts in the padding under it and has 133px to run. */
+  mask-image: linear-gradient(to bottom, black 0%, black 98%, transparent 100%);
   pointer-events: none;
   position: absolute;
 }
@@ -269,74 +229,16 @@
   position: relative;
 }
 
-/* Ground under the words, thinning to nothing where they end.
+/* The install line: a command and the one thing you do with it.
  *
- * The claim is white and holds its own, but the lede under it is muted, and a
- * braid drifts: text that is legible in one frame is not text that is legible.
- * It covers the same box the aura does, and scrolls with it, so the two stay
- * registered to each other wherever the reader is on the page.
+ * `surface` with a hairline rather than the code block's own treatment, because
+ * this is one line in a hero rather than a listing in a document, and at hero
+ * scale a filled block reads as a third button.
  *
- * The right stays clear on purpose. A scrim across the whole hero would be a
- * dimmer switch on the thing it was added to show. */
-/* **A wash behind the words, not a curtain across one side.**
- *
- * This ran `to right`: the page's own color at full strength on the left edge,
- * still 72% of it at 46%, and gone by 78%. That was correct for a hero whose
- * words sat on the left, where the job is to keep type legible over moving
- * light. It is wrong for a centered one twice over. It washes out the left three
- * quarters of the field, which is why the light read as living in the top right
- * corner, and in light mode the wash is white at full strength over a pale
- * field, which is why there was almost nothing left to see.
- *
- * Centered on the words instead, measured rather than guessed: the hero column
- * sits at 0.5 across and 0.25 down the two-screen box, spanning 0.125 to 0.375
- * vertically, so the ellipse is placed there and sized to cover that band.
- *
- * Weaker, too. 70% behind the type is enough to hold it off a field that is
- * itself only a wash, where 100% was protecting against a brightness the aura
- * does not reach. What the field loses at the center it gains everywhere else,
- * and the everywhere else is now symmetric. */
-.reelScrim {
-  background: radial-gradient(
-    ellipse 62% 26% at 50% 25%,
-    color-mix(in srgb, var(--helix-color-background) 70%, transparent) 0%,
-    color-mix(in srgb, var(--helix-color-background) 34%, transparent) 55%,
-    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
-  );
-  block-size: 200svh;
-  inset-block-start: 0;
-  inset-inline: 0;
-  pointer-events: none;
-  position: absolute;
-}
-
-/* **A percentage ellipse over a phone covers everything there is to see.**
- *
- * The scrim is 62% of the width, which on a desktop leaves the outer thirds of
- * the field lit and reads as light around a claim. At 375 those thirds are
- * 71px each, so the core and its falloff take the whole visible width and what
- * is left of the aura is the strip behind the masthead. Reported as the aura
- * barely showing on a phone, and it is the scrim rather than the light: hiding
- * this element alone brings the field back at the same width.
- *
- * **The core was also narrower than the line it protects.** 62% of 375 is 232px
- * against a 327px measure, so the ends of every heading sat outside the darkest
- * part while the middle of the field paid for it. Wider and weaker is the trade
- * that answers both: the whole line gets the same ground, and less of it. */
-@media (width < 48rem) {
-  .reelScrim {
-    background: radial-gradient(
-      ellipse 92% 24% at 50% 27%,
-      color-mix(in srgb, var(--helix-color-background) 46%, transparent) 0%,
-      color-mix(in srgb, var(--helix-color-background) 24%, transparent) 58%,
-      color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
-    );
-  }
-}
-
-/* Above the light. Positioned, and that is the whole of the stacking:
-   positioned elements with no `z-index` stack in tree order, and the order in
-   the markup is already aura, scrim, words. */
+ * The button pulls back by its own padding so the *line* is what the box is
+ * sized to. Left alone, a 40 control inside a chip built for 13px type sets the
+ * height of the whole thing and the command ends up floating in a control's
+ * worth of air. */
 /* **Centered, so the light has something to be behind.**
  *
  * The column was left-aligned, which is right for a page of prose and wrong for
@@ -353,16 +255,6 @@
   text-align: center;
 }
 
-/* The install line: a command and the one thing you do with it.
- *
- * `surface` with a hairline rather than the code block's own treatment, because
- * this is one line in a hero rather than a listing in a document, and at hero
- * scale a filled block reads as a third button.
- *
- * The button pulls back by its own padding so the *line* is what the box is
- * sized to. Left alone, a 40 control inside a chip built for 13px type sets the
- * height of the whole thing and the command ends up floating in a control's
- * worth of air. */
 /* **`max-content` around `stretch`, so the buttons name the width.**
  *
  * The install pill sized itself to its own text, 214 around 164 of code, under
@@ -584,6 +476,19 @@
      card's padding is and is why the text reads narrower than the text above it
      without the edges disagreeing. */
   margin-inline: auto;
+  /* **The one band whose spacing came out half.**
+   *
+   * Every other band is a card inside a section, so the section's
+   * `padding-block` sits outside the card and two neighbors put a full
+   * `--site-band` each between them: 216px measured. This card *is* its section,
+   * so that same padding lands inside the card as its own generous inset, and
+   * the gap above it was one band's worth rather than two. Nothing looked wrong
+   * about the card; it sat closer to the essays than any other pair on the page
+   * sat to each other.
+   *
+   * A margin rather than moving the padding out, because the inset is doing real
+   * work: it is what makes the close read as airy instead of cramped. */
+  margin-block-start: var(--site-band);
   max-inline-size: calc(100% - 2 * var(--site-inset));
 }
 
@@ -599,7 +504,28 @@
 
 .showcaseBand {
   align-content: stretch;
-  block-size: calc(100svh - var(--helix-size-header));
+  /* **A floor rather than a fixed height, because the content does not fit at
+     every window.**
+
+     One screen minus the header is the right ambition for a stage: the showcase
+     is the page's demonstration and it should own the view when it can. Written
+     as `block-size` it was a promise the content could not keep. Measured at
+     1280 by 900: the band resolved to 844px and the card inside it came out
+     979, so the card ran 232px past the section's own bottom edge and overlapped
+     the next band's card by 136. Every other band on the page ends exactly 96px
+     above its section's bottom, which is the section's end padding, and this one
+     ended below it.
+
+     That is what reads as inconsistent spacing between sections. The gap between
+     two cards is 192 everywhere the sections size to their content, and here it
+     collapsed to a negative number and the following card painted over the
+     overflow.
+
+     `min-block-size` keeps the ambition and drops the promise: the band is a
+     screen tall wherever the content fits in one, and taller where it does not.
+     The stage inside still clips and fades, since that is its own `overflow`
+     and mask rather than anything this height was providing. */
+  min-block-size: calc(100svh - var(--helix-size-header));
 }
 
 /* Prose, rule, stage. The prose column is clamped rather than fractional: a
@@ -911,4 +837,78 @@
   --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
 
   margin-inline-end: calc(var(--helix-space-2xs) * -1);
+}
+
+/* The compatibility line under the hero's actions.
+ *
+ * Quiet on purpose. It is a fact a reader needs before they can want anything
+ * else on the page, and it is not a claim worth the size of one: `subtle` and a
+ * step down from the lede, so it reads as a specification rather than a pitch. */
+.heroWorks {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  max-inline-size: 46ch;
+  text-wrap: pretty;
+}
+
+/**
+ * The hero on load: a blur that clears while the column rises.
+ *
+ * **A keyframe animation rather than the scroll reveal's transition**, because
+ * this fires once on load with nothing to observe. It is the same argument the
+ * reveal makes in reverse: that one needs an end state a transition can be
+ * driven to, and this one needs a start state that exists before any script has
+ * run. An animation carries both in the stylesheet, so the hero arrives even if
+ * the page never hydrates.
+ *
+ * **`filter` is safe here and would not be inside a band.** A filter makes an
+ * element a backdrop root, which is the fault that took the fade off the scroll
+ * reveal. Nothing in the hero carries a `backdrop-filter`: the kicker is a flat
+ * tint, the buttons are solid, and the install line is its own surface. The
+ * cards that care live further down the page and are never inside this element.
+ *
+ * Staggered by depth rather than by counting children, so adding a control to
+ * the hero does not mean renumbering anything.
+ */
+@keyframes site-hero-arrive {
+  from {
+    filter: blur(12px);
+    opacity: 0;
+    transform: translateY(var(--helix-space-2xl));
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .heroShell > * {
+    animation: site-hero-arrive calc(var(--helix-duration-slow) * 3) var(--helix-easing-decelerate)
+      backwards;
+  }
+
+  /* Each element waits a beat longer than the one above it. `fast` is the step
+     rather than a round number, so the cadence moves with the motion scale. */
+  .heroShell > :nth-child(1) {
+    animation-delay: var(--helix-duration-fast);
+  }
+
+  .heroShell > :nth-child(2) {
+    animation-delay: calc(var(--helix-duration-fast) * 2);
+  }
+
+  .heroShell > :nth-child(3) {
+    animation-delay: calc(var(--helix-duration-fast) * 3);
+  }
+
+  .heroShell > :nth-child(4) {
+    animation-delay: calc(var(--helix-duration-fast) * 4);
+  }
+
+  .heroShell > :nth-child(5) {
+    animation-delay: calc(var(--helix-duration-fast) * 5);
+  }
 }

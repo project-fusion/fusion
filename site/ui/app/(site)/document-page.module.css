@@ -68,18 +68,19 @@
  *
  * `variant="label"` sets the kicker at `text-xs` with `tracking-wide`, which is
  * right for a form label and too quiet for the line above a document's title: it
- * read as a stray word rather than as the class of thing the page is. Capitals
- * and `tracking-wider` are what make it an eyebrow, and the two go together, in
- * that capitals at the narrower tracking look cramped rather than deliberate.
+ * read as a stray word rather than as the class of thing the page is.
  *
- * Taken from the legacy marketing site's about page, which is where the
- * treatment on this site started. Its 0.18em is looser than this: at four words
- * a kicker set that wide starts to come apart, and `Acceptable use` is four
- * words.
+ * **Sentence case, where this was capitals and wider tracking.** The two went
+ * together and they come off together: the note that put them here said capitals
+ * at the narrower tracking look cramped, which is true and is an argument about
+ * how to set capitals rather than for setting them. An eyebrow reading
+ * `ACCEPTABLE USE` is shouting a filing label at somebody who came to read a
+ * policy, and it is the only place on the site that shouts. The size and the
+ * subdued tone are what make it an eyebrow; the capitals were only making it
+ * loud.
  */
 .documentKicker {
-  letter-spacing: var(--helix-tracking-wider);
-  text-transform: uppercase;
+  letter-spacing: var(--helix-tracking-wide);
 }
 
 /* **Left, with the prose under it.**
@@ -185,4 +186,29 @@
    at the same distance as the next sentence. */
 .documentBody > * + :where(h2, h3) {
   margin-block-start: var(--helix-space-2xl);
+}
+
+/**
+ * The contents block, between a document's head and its body.
+ *
+ * **A box, because there is no rail to put this in.** On the docs and the
+ * reference the same list is a sticky column beside the prose, held apart from
+ * it by two rem of grid gap. Here it sits in the reading column itself, so
+ * without an edge of its own it reads as the document's first section rather
+ * than as navigation over it.
+ *
+ * Bounded by the measure like everything else in this shell: a contents list
+ * running wider than the prose it indexes would be the one element on the page
+ * setting its own column.
+ */
+.documentContents {
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-md);
+  max-inline-size: var(--document-measure);
+  padding: var(--helix-space-md);
+}
+
+.documentContentsTitle {
+  display: block;
+  padding-block-end: var(--helix-space-xs);
 }

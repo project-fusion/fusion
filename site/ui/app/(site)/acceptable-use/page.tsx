@@ -1,6 +1,7 @@
 import { findSitePage, sitePageSources } from '@fusion-io/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderDocument } from '../../../utils/mdx/mdx'
+import { outlineOf } from '../../../utils/outline/outline'
 import { DocumentPage } from '../document-page'
 
 /**
@@ -30,6 +31,7 @@ export default async function Page() {
       body={source ? await renderDocument(source) : null}
       kicker={page.kicker}
       lede={page.lede}
+      outline={source ? outlineOf(source) : undefined}
       title={page.title}
     />
   )

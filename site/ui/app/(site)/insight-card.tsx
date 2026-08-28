@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { InsightArt } from '../../components/insight-art/insight-art'
 import { formatDate, type Insight } from '../../content/insights'
 import styles from './insight-card.module.css'
 
@@ -43,8 +42,6 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
           `check:overruled` exists to catch. The recipe is for elements that are
           not components. */}
       <helix-card material="glass" separation="elevated">
-        <InsightArt image={insight.image} slot="media" />
-
         {/* Both facts as tags, and toned the way the post's own page tones them:
             the subject carries the brand and the kind of writing stays neutral
             beside it. */}
@@ -57,7 +54,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
           <helix-text as="h3" variant="title">
             {insight.title}
           </helix-text>
-          <helix-text tone="muted" variant="caption">
+          <helix-text class={styles.insightSummary} tone="muted" variant="caption">
             {insight.summary}
           </helix-text>
         </helix-flex>

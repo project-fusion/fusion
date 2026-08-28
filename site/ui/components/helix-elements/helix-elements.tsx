@@ -3,6 +3,30 @@
 import { useEffect, useState } from 'react'
 
 /**
+ * The one route that must not have the library, and why it cannot say so itself.
+ *
+ * The spec runner imports a bundle per family from `public/specs`, and each of
+ * those carries the family it tests: it has to, because
+ * `run-browser-specs.mjs` runs the same bundles against a blank page in CI,
+ * where nothing else registers anything. In the sandbox's iframe that is a
+ * second registration of tags this component has already made, and the library
+ * warns about it by name, once per tag, saying the page holds two copies of
+ * Helix. It does, and this is the copy that should not be there:
+ * `spec-frame.tsx` says in as many words that it imports no components, "because
+ * loading every component would be loading 92 families to test one". A root
+ * layout is above that intent and overrides it, since a child route cannot
+ * un-render a parent's component.
+ *
+ * **A path test, which is a sniff, and the structural fix is a root layout of
+ * its own.** Next supports one per top-level route group, and that is the
+ * version with no condition in it. It moves every route in the app into a
+ * group, so it is not a change to make while another branch is holding thirty
+ * files open in the same directory. `check:specs-isolated` fails if the specs
+ * document ever registers the library again, whichever way it is kept out.
+ */
+const SPECS = '/helix/sandbox/specs'
+
+/**
  * Registers every Helix element the site uses, after React has hydrated.
  *
  * A custom element registers as a side effect of importing its module, and a
@@ -42,6 +66,9 @@ export function HelixElements(): null {
   const [, setRegistered] = useState(false)
 
   useEffect(() => {
+    if (window.location.pathname === SPECS) {
+      return
+    }
     let live = true
     void Promise.all([import('@helix-io/styled'), import('@helix-io/sandbox/specs')]).then(() => {
       if (live) {

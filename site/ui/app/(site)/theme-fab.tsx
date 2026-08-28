@@ -2,13 +2,21 @@
 
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { BOUNDS } from '../../(tool)/helix/theme/defaults'
+import { STORAGE_KEY } from '@/components/preferences/preferences'
+import { BOUNDS } from '../(tool)/helix/theme/defaults'
 import { BrandPicker } from './brand-picker'
-import styles from './preview.module.css'
+import styles from './landing-c.module.css'
 import { useThemeControls } from './theme-context'
 
 /**
- * A pill that says "Theme this page", and becomes the toolbar that does it.
+ * A pill that says "Make it yours", and becomes the toolbar that does it.
+ *
+ * **The label is an invitation rather than an instruction.** "Theme this page"
+ * named a feature and read like a settings row: correct, and nobody wants to
+ * theme a page. What the control actually offers is the hero's own promise, one
+ * color in and the whole page follows, so it borrows the hero's last three
+ * words. Three words is also the most a pill can hold before it stops being a
+ * dot with a label and starts being a button.
  *
  * **One element that changes size, not two that swap.** Both faces live in the
  * same grid cell and cross-fade while the container's width animates, so the
@@ -29,7 +37,45 @@ import { useThemeControls } from './theme-context'
 export const ThemeFab = () => {
   const c = useThemeControls()
   const [open, setOpen] = useState(false)
+  const [nearFooter, setNearFooter] = useState(false)
   const shell = useRef<HTMLDivElement | null>(null)
+
+  /* **Retires as the footer arrives, rather than sitting over it.**
+   *
+   * The pill is fixed to the bottom of the viewport, so at the end of the page
+   * it comes to rest on top of the footer: a floating control over a region
+   * that is not a page any more, covering links it has nothing to do with.
+   *
+   * Watched rather than measured against a scroll offset, because the offset
+   * that matters is "the footer is here" and only the footer knows where that
+   * is. A number would be a second answer to that question and would be wrong
+   * the first time the footer's height changed.
+   *
+   * `rootMargin` lifts the trigger a little above the fold so the pill is gone
+   * before the two would touch rather than as they meet. It closes on the way
+   * out too: an open toolbar fading is a set of controls a reader can no longer
+   * reach but can still see.
+   */
+  useEffect(() => {
+    const footer = document.querySelector('[data-site-footer]')
+    if (!footer) {
+      return
+    }
+    const watch = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) {
+          return
+        }
+        setNearFooter(entry.isIntersecting)
+        if (entry.isIntersecting) {
+          setOpen(false)
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px' },
+    )
+    watch.observe(footer)
+    return () => watch.disconnect()
+  }, [])
 
   /* Escape closes it, and a press anywhere outside does too. A floating control
      with no way out but its own small button is a trap on a touch screen. */
@@ -56,7 +102,7 @@ export const ThemeFab = () => {
   }, [open])
 
   return (
-    <div className={styles.fabRail}>
+    <div className={styles.fabRail} data-retired={nearFooter ? '' : undefined}>
       <div
         className={`${styles.fab} ${open ? styles.fabOpen : ''}`}
         data-open={open || undefined}
@@ -72,75 +118,118 @@ export const ThemeFab = () => {
           type="button"
         >
           <span className={styles.fabDot} style={{ '--swatch': c.brand } as CSSProperties} />
-          Theme this page
+          Make it yours
         </button>
 
         <div className={styles.fabTools} inert={!open || undefined}>
-          <helix-flex align="center" data-density="sm" gap="md" wrap={false}>
-            <BrandPicker />
+          {/* **Rows, not a bar, once the pointer is a finger.** Every control
+              here is named by a `helix-tooltip` and an `aria-label`, and a touch
+              screen has neither a hover nor a screen reader in play: on a phone
+              this was three unlabelled sliders and a row of dots. The labels
+              below are the same words the tooltips carry, shown rather than
+              hovered. Each row is `display: contents` above the breakpoint, so
+              the bar it started as is unchanged. */}
+          <helix-flex
+            align="center"
+            class={styles.fabStack}
+            data-density="sm"
+            gap="md"
+            wrap={false}
+          >
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Brand color</span>
+              <BrandPicker />
+            </div>
 
-            <helix-tooltip
-              class={styles.fabTip}
-              content={`Saturation · ${c.chromaScale}`}
-              placement="top"
-            >
-              <helix-slider
-                {...BOUNDS.chromaScale}
-                aria-label="Saturation"
-                class={styles.fabChannel}
-                name="chroma"
-                onInput={(event) => c.setChromaScale(Number(event.currentTarget.value))}
-                style={{ '--slider-track-image': c.derived?.ramps.saturation ?? '' }}
-                value={String(c.chromaScale)}
-              ></helix-slider>
-            </helix-tooltip>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Saturation</span>
+              <helix-tooltip
+                class={styles.fabTip}
+                content={`Saturation · ${c.chromaScale}`}
+                placement="top"
+              >
+                <helix-slider
+                  {...BOUNDS.chromaScale}
+                  aria-label="Saturation"
+                  class={styles.fabChannel}
+                  name="chroma"
+                  onInput={(event) => c.setChromaScale(Number(event.currentTarget.value))}
+                  style={{ '--slider-track-image': c.derived?.ramps.saturation ?? '' }}
+                  value={String(c.chromaScale)}
+                ></helix-slider>
+              </helix-tooltip>
+            </div>
 
-            <helix-tooltip
-              class={styles.fabTip}
-              content={`Accent angle · ${c.accentHue}`}
-              placement="top"
-            >
-              <helix-slider
-                {...BOUNDS.accentHue}
-                aria-label="Accent angle"
-                class={styles.fabChannel}
-                name="accent"
-                onInput={(event) => c.setAccentHue(Number(event.currentTarget.value))}
-                style={{ '--slider-track-image': c.derived?.ramps.accent ?? '' }}
-                value={String(c.accentHue)}
-              ></helix-slider>
-            </helix-tooltip>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Accent angle</span>
+              <helix-tooltip
+                class={styles.fabTip}
+                content={`Accent angle · ${c.accentHue}`}
+                placement="top"
+              >
+                <helix-slider
+                  {...BOUNDS.accentHue}
+                  aria-label="Accent angle"
+                  class={styles.fabChannel}
+                  name="accent"
+                  onInput={(event) => c.setAccentHue(Number(event.currentTarget.value))}
+                  style={{ '--slider-track-image': c.derived?.ramps.accent ?? '' }}
+                  value={String(c.accentHue)}
+                ></helix-slider>
+              </helix-tooltip>
+            </div>
 
-            <helix-tooltip
-              class={styles.fabTip}
-              content={`Corner radius · ${c.radius}`}
-              placement="top"
-            >
-              <helix-slider
-                {...BOUNDS.radius}
-                aria-label="Corner radius"
-                class={styles.fabChannel}
-                name="radius"
-                onInput={(event) => c.setRadius(Number(event.currentTarget.value))}
-                value={String(c.radius)}
-              ></helix-slider>
-            </helix-tooltip>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Corner radius</span>
+              <helix-tooltip
+                class={styles.fabTip}
+                content={`Corner radius · ${c.radius}`}
+                placement="top"
+              >
+                <helix-slider
+                  {...BOUNDS.radius}
+                  aria-label="Corner radius"
+                  class={styles.fabChannel}
+                  name="radius"
+                  onInput={(event) => c.setRadius(Number(event.currentTarget.value))}
+                  value={String(c.radius)}
+                ></helix-slider>
+              </helix-tooltip>
+            </div>
 
-            <helix-toggle-group
-              aria-label="Color scheme"
-              onChange={(event) => {
-                c.setScheme(
-                  (event.currentTarget as HTMLElement & { value: string }).value as
-                    | 'dark'
-                    | 'light',
-                )
-              }}
-              separation="outlined"
-              value={c.scheme}
-            >
-              <helix-toggle value="light">Light</helix-toggle>
-              <helix-toggle value="dark">Dark</helix-toggle>
-            </helix-toggle-group>
+            {/* **One button showing where it goes, not two showing where you
+                are.** A two-option toggle group spends the width of both words
+                on a choice with two states, in a bar that also has to hold
+                three sliders and a picker. The icon is the mode it switches to
+                and the tooltip says so, which is the pair that leaves no doubt
+                about which way the control reads.
+
+                **It writes the site preference, not just the scope.** The
+                masthead's preferences panel and this bar were setting the same
+                thing two ways: this one painted the scope and the attribute,
+                that one also persisted. Changing the scheme here then opening
+                preferences showed the old answer, and a reload took the page
+                back to it. Both now go through `STORAGE_KEY`. */}
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Color scheme</span>
+              <helix-tooltip
+                content={c.scheme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+                placement="top"
+              >
+                <helix-icon-button
+                  emphasis="ghost"
+                  label={c.scheme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+                  onClick={() => {
+                    const next = c.scheme === 'dark' ? 'light' : 'dark'
+                    c.setScheme(next)
+                    document.documentElement.dataset.colorMode = next
+                    window.localStorage.setItem(STORAGE_KEY, next)
+                  }}
+                >
+                  <helix-icon name={c.scheme === 'dark' ? 'sun' : 'moon'}></helix-icon>
+                </helix-icon-button>
+              </helix-tooltip>
+            </div>
 
             <div className={styles.fabDivider} />
 
@@ -149,47 +238,95 @@ export const ThemeFab = () => {
                 and the claim that every pair is measured is a sentence somewhere
                 else on the page. The swatches are derived roles rather than the
                 brand repeated, and the verdict is the engine's own count. */}
-            <div className={styles.fabReadout}>
-              <div className={styles.fabSwatches}>
-                {(c.derived?.swatches ?? []).map((one) => (
+            {/* **The readout says what the engine found and not what it is**, so
+                both halves carry a tooltip that does.
+
+                The swatches are the semantic roles derived from the brand, not
+                a status indicator, which is the reading a row of colored dots
+                invites. The verdict has three findings behind it and they are
+                different measurements: `violations` is a foreground against the
+                ground it is painted on, and `collisions` is two roles against
+                each other, close enough that a reader cannot tell them apart.
+                Neither substitutes for the other, and "roles too close" is the
+                second one with no way to know that from the words.
+
+                `helix-tooltip` rather than the native `title` these swatches
+                carried. A `title` is the browser's own delayed box, which is
+                the same thing that was just taken off the charts: it cannot be
+                styled, it cannot be reached by touch, and it arrives late. */}
+            <div className={`${styles.fabRow} ${styles.fabReadoutRow}`}>
+              <span className={styles.fabRowLabel}>What the engine derived</span>
+              <div className={styles.fabReadout}>
+                <helix-tooltip
+                  content="The roles the engine derived from your brand color."
+                  placement="top"
+                >
+                  <div className={styles.fabSwatches}>
+                    {(c.derived?.swatches ?? []).map((one) => (
+                      <span
+                        className={styles.fabSwatch}
+                        key={one.name}
+                        style={{ '--swatch': one.hex } as React.CSSProperties}
+                      />
+                    ))}
+                  </div>
+                </helix-tooltip>
+                <helix-tooltip
+                  content={
+                    c.derived
+                      ? c.derived.violations.length > 0
+                        ? 'Pairs whose contrast falls short of the target for their size.'
+                        : c.derived.collisions.length > 0
+                          ? 'Two roles landed close enough that they cannot be told apart. Measured as perceptual distance, not contrast.'
+                          : 'Every foreground clears the contrast target for the ground it sits on.'
+                      : 'Nothing derived yet. The page is wearing the palette the stylesheet ships.'
+                  }
+                  placement="top"
+                >
                   <span
-                    className={styles.fabSwatch}
-                    key={one.name}
-                    style={{ '--swatch': one.hex } as React.CSSProperties}
-                    title={one.name}
-                  />
-                ))}
-              </div>
-              <span
-                className={styles.fabVerdict}
-                data-failing={c.derived && c.derived.violations.length > 0 ? '' : undefined}
-              >
-                {/* **A count is not asserted here, and that was a real bug.**
+                    className={styles.fabVerdict}
+                    data-failing={c.derived && c.derived.violations.length > 0 ? '' : undefined}
+                  >
+                    {/* **A count is not asserted here, and that was a real bug.**
                     The first version printed "13 pairs pass", taken from how many
                     derived roles happened to carry a contrast reading. The
                     metrics page says 67. Two different numbers for one claim on
                     one site, and the smaller was invented by this component.
                     What the engine reports per derivation is its failures, so
                     that is what this shows. */}
-                {/* Before the first touch nothing has been derived, and the
+                    {/* Before the first touch nothing has been derived, and the
                     page is wearing the palette the stylesheet ships. Saying
                     "deriving" there would be a spinner for work that is not
                     happening and never will until somebody moves something. */}
-                {c.derived
-                  ? c.derived.violations.length > 0
-                    ? `${c.derived.violations.length} pair${c.derived.violations.length === 1 ? '' : 's'} fail`
-                    : c.derived.collisions.length > 0
-                      ? 'roles too close'
-                      : 'every pair clears'
-                  : 'as shipped'}
-              </span>
+                    {c.derived
+                      ? c.derived.violations.length > 0
+                        ? `${c.derived.violations.length} pair${c.derived.violations.length === 1 ? '' : 's'} fail`
+                        : c.derived.collisions.length > 0
+                          ? 'roles too close'
+                          : 'every pair clears'
+                      : 'as shipped'}
+                  </span>
+                </helix-tooltip>
+              </div>
             </div>
 
+            {/* **The glyph is a child, not an attribute.** `name` on
+                `IconButton` is the form field name it inherits from `button`,
+                beside `type`, `value` and the `form*` pair. It is not the icon,
+                and setting it to `x-mark` gave the control a form name and no
+                content: an empty button the width of an icon, which is why the
+                close never appeared. The scheme toggle three elements up had it
+                right the whole time.
+
+                `x` rather than `x-mark`, which is not in the set either. */}
             <helix-icon-button
+              class={styles.fabClose}
+              emphasis="ghost"
               label="Close the theme controls"
-              name="x-mark"
               onClick={() => setOpen(false)}
-            ></helix-icon-button>
+            >
+              <helix-icon name="x"></helix-icon>
+            </helix-icon-button>
           </helix-flex>
         </div>
       </div>

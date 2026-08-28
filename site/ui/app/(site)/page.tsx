@@ -1,542 +1,436 @@
-/**
- * The Fusion landing page.
- *
- * Copy comes from the strategy docs rather than being written fresh, so the
- * site and the plan cannot drift: the thesis is `plan/00-thesis.md` and the
- * constraint is the one in `CLAUDE.md`.
- *
- * One idea per band, each given a screen's worth of room. The page is a
- * sequence of single statements rather than a wall of sections, so what carries
- * the hierarchy is type and emptiness rather than rules and boxes.
- *
- * A server component with no client boundary of its own. Elements upgrade from
- * the single registration in the root layout.
- */
 import Link from 'next/link'
-import { INSTALL, LANDING } from '@/content/landing/landing'
-import { PRODUCTS } from '@/content/products/products'
+import { INSIGHTS } from '@/content/insights'
+import {
+  DELIVERY,
+  ENGAGEMENT,
+  ENGAGEMENT_COPY,
+  HERO,
+  MECHANISMS,
+  PROBLEM,
+} from '@/content/landing/helix-landing'
 import { SERVICES } from '@/content/services/services'
-import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { INSIGHTS } from '../../content/insights'
-import { HeroCopy } from './hero-copy'
-import { InsightCard } from './insight-card'
-import { InsightReel } from './insight-reel'
-import styles from './landing.module.css'
+import { DerivationDiagram, DerivationDiagramStacked } from './derivation-diagram'
+import landing from './landing.module.css'
+import styles from './landing-c.module.css'
+import { NewsKicker } from './news-kicker'
+import { ProofBand } from './proof-band'
 import { Showcase } from './showcase'
+import { ThemeScope } from './theme-context'
+import { ThemeFab } from './theme-fab'
 
-/* The landing page states its own, where it used to inherit the root layout's.
-   Inheriting gave it a title and a description and no canonical, which is the
-   one tag that has to name a page rather than a site. */
 export const metadata = pageMetadata({
-  description: LANDING.lede,
+  description: HERO.description,
   path: '/',
   title: 'Fusion Development Group',
 })
 
+/**
+ * Draft C: the design system is the product, and the engagements are how it
+ * arrives.
+ *
+ * **The reordering is the change.** Earlier drafts opened with the company and
+ * put two substrates and three offers on the page as peers, which asks a reader
+ * to care about Fusion before being told what Fusion has. This one states a
+ * problem, answers it with three mechanisms, shows the mechanism working, proves
+ * it with measurements, and only then says what it costs to have someone bring
+ * it to you.
+ *
+ * **Cortex is not on this page and that is deliberate.** It is real and it is
+ * Building, and it is also a second thing to understand at the moment a reader
+ * is deciding about the first. It keeps its own page.
+ *
+ * The type scale is C's own rather than the token ramp: see `.tDisplay` and its
+ * siblings for why a landing page wants a different curve from a document.
+ */
 export default function Home() {
   return (
-    <div className={styles.reel}>
-      {/* Starting at the top of the page and running past the hero.
-
-          **`terminus`, tuned so the angle reads about 23 degrees on a large
-          screen.** 23 is the derived number: against a field 1280 by 1600 it
-          lands the axis at 979, the midpoint between the navigation's right edge
-          and the actions.
-
-          It is not set as `tilt`, and `tilt` would not take if it were: the
-          component resolves `terminus` first and only falls back to an angle
-          when there is no exit point to honor. The two are asking different
-          questions. An angle says where the braid leaves the top edge for one
-          shape of box only, and this reel is two screens tall, so its aspect
-          moves with the window rather than with the width alone.
-
-          So the exit point is what is declared and 23 is what it draws where it
-          matters. Measured across the widths a desktop actually is, at a reel
-          twice the viewport's height: 26.0 degrees at 1280, 23.1 at 1512, and
-          28.5 from 1920 up, where the reel stops growing with the width. The
-          previous 0.76 drew 28.0, 31.3 and 34.0 at those same three.
-          
-          It used to be inside the hero, so it stopped dead at the end of the
-          first band. It scrolls with the page rather than being pinned to the
-          window: a field that never moves is a wallpaper. No `interactive`, so
-          it never asks for the hit test and every control keeps its presses. It
-          stops itself in a background tab, and where WebGL is refused it draws
-          nothing and the page is the type it always was. */}
-      <helix-aura
-        class={styles.reelAura}
-        gain={0.85}
-        scale={1.7}
-        speed={1}
-        terminus={0.5625}
-        variant="flow"
-      ></helix-aura>
-      <div className={styles.reelScrim} />
-
-      <section className={styles.hero}>
-        <helix-flex align="center" class={styles.heroShell} data-shell direction="column" gap="lg">
-          {/* A tag rather than a line of label text. The name is a thing, not a
-              sentence about one, and a tag is what this library uses for a
-              thing with a name. The line beside it says what we are made of,
-              which is the one fact the title does not carry. */}
-          <helix-flex align="center" data-density="sm" gap="sm" wrap>
-            <helix-tag>Fusion Development Group</helix-tag>
-          </helix-flex>
-          <HeroCopy lede={LANDING.lede} title={LANDING.title} />
-          {/* **The buttons and the install line are one block, and the block is
-              what makes them the same width.**
-
-              The pill used to size itself to its own text: 214 around 164 of
-              code, under a button pair measuring 412, so the hero column ended
-              in an element hugging itself under a row twice its width. Padding
-              was the first lever and it does not reach: `md` is 222 and `lg` is
-              238 against 412.
-
-              A width on the pill would be the number 412 written down, and it
-              would be wrong the day either button's label changes. This wrapper
-              is `max-content` around `align-items: stretch`, so the row sets the
-              width by being the wider child and the pill takes it, whatever the
-              copy turns out to say. */}
-          <helix-flex class={styles.heroActions} direction="column" gap="md">
-            <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
-              <Link
-                data-button="solid"
-                data-button-tone="primary"
-                data-button-width="standard"
-                href="/services"
-              >
-                See what we do
-              </Link>
-              <Link data-button data-button-width="standard" href="/helix">
-                Open Helix
-              </Link>
-            </helix-flex>
-
-            {/* The shortest true path into the thing the page is about.
-              
-              Two buttons ask a reader to go somewhere and read; this asks them
-              to type one line and have the library. It is the only element in
-              the hero that is not a claim, which is why it is last and quiet:
-              a reader who is convinced does not need the buttons, and a reader
-              who is not will not start with a package name.
-
-              `CopyButton` rather than a code block with a button beside it,
-              because the whole line is the payload and the copy is the only
-              interaction it has. */}
-            <helix-flex align="center" class={styles.heroInstall} gap="2xs" justify="between">
-              <code>{INSTALL}</code>
-              <helix-copy-button
-                copied-label="Copied"
-                label="Copy the install command"
-                value={INSTALL}
-              ></helix-copy-button>
-            </helix-flex>
-          </helix-flex>
-        </helix-flex>
-      </section>
-
-      <section data-band data-reveal>
-        <helix-flex data-shell direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            {/* **No kicker and no title.** Two named cards and a services block
-                below them are already legible as a choice; a heading above
-                saying some version of "here are the things" is a row of chrome
-                that names what the reader can see. The label and the h2 that
-                stood here answered the same question the section answers, in
-                the same words, one line earlier. */}
-            {/* **What they are, not what they promise.** This paragraph led
-                with the sovereignty constraint, that nothing here needs us to
-                keep running. True, and a claim about the future rather than a
-                description of the present, which is the line this page now
-                holds: what exists here, what is coming on `/thesis`. What a
-                reader wants at this point is what the two things *are* and how
-                they arrive, which is also the half that is checkable today.
-
-                The license stays out of it for the reason it was taken out
-                before: whether a package is MIT matters to about one reader in
-                fifty and to none of them first. */}
-            <helix-text as="p" data-measure tone="muted">
-              {LANDING.blocks[0]?.body?.[0]}
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="xl" min="22rem">
-            {PRODUCTS.map((product) => (
-              <helix-flex
-                data-material="glass"
-                data-substrate
-                direction="column"
-                gap="sm"
-                key={product.name}
-              >
-                <helix-flex align="center" data-density="sm" gap="sm">
-                  <helix-text tone="subtle" variant="label">
-                    {product.role}
-                  </helix-text>
-                  <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
-                </helix-flex>
-                <helix-text as="h3" data-substrate-name>
-                  {product.name}
-                </helix-text>
-                <helix-text as="p" tone="muted">
-                  {product.body}
-                </helix-text>
-
-                {/* **The command is not repeated here.** The hero carries it
-                    already, in a pill built for one line, and the same string
-                    twice on one page is a second copy to keep current and a
-                    reader wondering which one is. This panel's job is to say what
-                    the product is and open the door.
-
-                    What is left is the honest sentence where there is nothing to
-                    install: a `Building` product with an install line would be
-                    the stage label saying one thing and the page another.
-                    `install` stays on the product type, since it is what tells
-                    these two panels apart.
-
-                    No license line either. It is a fact for whoever is about to
-                    install, and the install page is one click away; on a landing
-                    panel it takes the same weight as the button beside it and
-                    answers a question almost nobody has asked yet. */}
-                {product.install ? (
-                  <helix-flex data-substrate-action direction="column" gap="sm">
-                    {/* **Standard width and the large control height**, the
-                        same pair the hero uses. `sm` here made the one action on
-                        a panel the smallest control on the page, which is the
-                        opposite of what it is: the panel exists to send a reader
-                        somewhere and this is the door. */}
-                    <helix-flex align="center" data-density="lg" gap="sm" wrap>
-                      <a data-button="subtle" data-button-width="standard" href={product.href}>
-                        Explore components
-                      </a>
-                    </helix-flex>
-                  </helix-flex>
-                ) : (
-                  <helix-flex data-substrate-action direction="column" gap="sm">
-                    <helix-text tone="subtle" variant="caption">
-                      Nothing to install yet. The shape is written down and the crates are in the
-                      open.
-                    </helix-text>
-                    <helix-flex data-density="lg">
-                      {/* Paired with `Explore components` as verb and noun, and
-                          naming what is actually behind the link. The sentence
-                          above says the shape is written down, so the offer is
-                          to read it: `Read the shape` said the same thing in
-                          words that only make sense having just read that
-                          sentence. */}
-                      <a data-button="subtle" data-button-width="standard" href={product.href}>
-                        Read the design
-                      </a>
-                    </helix-flex>
-                  </helix-flex>
-                )}
-              </helix-flex>
-            ))}
-          </helix-grid>
-        </helix-flex>
-      </section>
-
-      {/* Why us, where the mechanism and the constraint used to be.
-          
-          Both were arguments a reader had to accept before they reached
-          anything they could buy, and both have pages of their own now. What a
-          first visit needs here is the reason to choose this over an agency
-          starting from a blank file. */}
-      {/* Services sits with the substrates, not after the argument for us.
-          What we currently offer is three things, and a reader deciding whether
-          to care should meet all three together: two they can take and one they
-          can hire. `Why us` is a reason to prefer the third and belongs after
-          it, not between them. */}
-      <section data-band data-reveal>
-        {/* **The middle field, and it lives here rather than in the band it
-            lights.** The showcase runs 2202 to 3046 and the two other fields run
-            0 to 1800 and 3046 to 4846, so it sat exactly in the gap with nothing
-            behind it, which is what 222 measured and what made its glass
-            decoration rather than material.
-
-            It cannot be a child of the showcase itself. An absolutely positioned
-            child at a negative index paints behind that band's *content* and in
-            front of its *background*, so a field placed there would sit on top of
-            the glass instead of behind it, which is the opposite of the point.
-            Anchored to the services band above, which is transparent, it reaches
-            down under the showcase, and the showcase paints over it in tree
-            order: exactly the relationship the first field has with every band.
-
-            Same `200svh` box as the other two, so `terminus` needs no
-            re-deriving. See 251 for why the size repeats rather than being fitted
-            to the gap, and 252 for the frame-rate cost of a third context. */}
-        <helix-aura
-          class={styles.reelAuraLate}
-          gain={0.85}
-          scale={1.7}
-          speed={1}
-          terminus={0.5625}
-          variant="flow"
-        ></helix-aura>
-        <div className={styles.reelScrimLate} />
-        <helix-flex data-shell direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text tone="subtle" variant="label">
-              {LANDING.blocks[1]?.kicker}
-            </helix-text>
-            <helix-text as="h2" data-measure data-section-title>
-              {LANDING.blocks[1]?.title}
-            </helix-text>
-            <helix-text as="p" data-measure tone="muted">
-              {LANDING.blocks[1]?.body?.[0]}
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="xl" min="18rem">
-            {SERVICES.map((service) => (
-              <helix-flex
-                data-material="glass"
-                data-substrate
-                direction="column"
-                gap="sm"
-                key={service.name}
-              >
-                {/* **No icon.** Three line glyphs sat over three headings and
-                    carried nothing the heading did not: a magnifier over "AI
-                    capability audit", a cube over "Design system sprint", a pair
-                    of figures over "Conversational build". None of them is the
-                    idea, and a metaphor a reader has to decode before the words
-                    beneath it is a cost with no return. The names are short and
-                    concrete and do the work. */}
-                <helix-text as="h3" data-substrate-name>
-                  {service.name}
-                </helix-text>
-                {/* No number here, and the prices page is one line below.
-                    
-                    Three offers in a row with three five-figure sums beside
-                    them is a price list, and a landing band is not one: a
-                    reader meets the cost before they have been told what any of
-                    it is, which is the anchoring problem `docs/17` names for the
-                    sprint in particular. The figures are stated in full on
-                    `/services`, where the sentence explaining each one arrives
-                    first. */}
-                <helix-text as="p" tone="muted">
-                  {service.summary}
-                </helix-text>
-              </helix-flex>
-            ))}
-          </helix-grid>
-
-          <helix-flex data-density="lg">
-            <Link data-button href="/services">
-              See what each one costs
-            </Link>
-          </helix-flex>
-        </helix-flex>
-      </section>
-
-      {/* *The verticals band is gone.* It explained the stage vocabulary and
-          then listed five rows to apply it to, which is a glossary followed by
-          its own index: two of the five are Declared, so the row a reader was
-          most likely to press was the one with the least behind it. The labels
-          themselves stay wherever a stage is actually claimed, and the thesis
-          page is where the argument for them belongs. */}
-      {/* **The showcase is the components, not a picture of them.**
-    
-          A design system on a landing page is usually a screenshot, which
-          proves nothing: the one claim worth making here is that these are real
-          custom elements that upgrade in your browser on the page you are
-          already on. So they are rendered, live, with nothing between the
-          reader and the thing. Everything below is the library drawing itself.
-    
-          Kept to controls that need no state to make sense. A form with real
-          validation on a landing page is a demo somebody has to finish; a row
-          of components at rest is what the library looks like. */}
-      {/* **The one band after the hero that takes a whole screen, and it earns
-          it by being a different kind of thing.** The rest are prose with a
-          figure under them and are as tall as what is in them. This is a
-          window: an argument on the left and the library running on the right,
-          held apart by a rule, and a window wants a frame rather than a height
-          that ends wherever the last card did.
-    
-          The stage is sunken, which is the one surface token that reads as
-          *behind* the page rather than on it, so the cards sit in a recess and
-          the whole panel reads as a thing being looked into. What overflows is
-          masked rather than cut: a hard edge says the layout ran out, a fade
-          says there is more, which there is. */}
-      {/* **No ground and no glass on this one.** The band carried
-          `data-material="glass"` and the full-bleed corrections that go with a
-          full-bleed surface, which was the right answer while the stage inside it
-          was paper: two grounds wanted the outer one to admit some light. With
-          the paper gone the components sit on the field directly, and a
-          translucent band over them would be a third layer doing nothing but
-          dimming the thing it is there to reveal.
-
-          The closing call to action keeps its glass and is a card now rather
-          than a band, so its border has four sides to draw. See 222 for the
-          measurement that put a field behind this band in the first place. */}
-      <section className={styles.showcaseBand} data-band data-reveal>
-        {/* **No rule between them, and more room instead.** A line is one way
-            to say two things are separate and whitespace is the other, and
-            whitespace does not have to be looked past. The splitter that was
-            here made where the line falls a judgment a reader could take, and
-            it was still a line down the middle of a section whose two halves
-            already read as two halves.
-    
-            The gap does the work at `3xl`, the widest the scale goes, which is wider than anything else on
-            the page joins with, because the two sides are not a pair of columns
-            in a layout: they are an argument and the thing it is about. */}
-        <div className={styles.showcaseSplit} data-shell>
-          <helix-flex class={styles.showcaseProse} direction="column" gap="sm">
-            <helix-text tone="subtle" variant="label">
-              {LANDING.blocks[2]?.kicker}
-            </helix-text>
-            <helix-text as="h2" data-section-title>
-              {LANDING.blocks[2]?.title}
-            </helix-text>
-            <helix-text as="p" tone="muted">
-              {LANDING.blocks[2]?.body?.[0]}
-            </helix-text>
-            <helix-flex data-density="lg">
-              <Link data-button href="/helix">
-                Open the component index
-              </Link>
-            </helix-flex>
-          </helix-flex>
-
-          <Showcase />
-        </div>
-      </section>
-
-      <section data-band data-reveal>
-        {/* The second field. Same shape, same tuning, its own box: see
-            `.reelAuraLate`, and 225 for the measurement that says one taller box
-            draws a wash rather than a braid. */}
-        <helix-aura
-          class={styles.reelAuraLate}
-          gain={0.85}
-          scale={1.7}
-          speed={1}
-          terminus={0.5625}
-          variant="flow"
-        ></helix-aura>
-        <div className={styles.reelScrimLate} />
-        <helix-flex data-shell direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text tone="subtle" variant="label">
-              Why us
-            </helix-text>
-            {/* **"You are hiring the people who built the tools" was the hero's
-                fork said a second time**, and by this point a reader has met it
-                twice already. What only this section can say is what the
-                engagement is actually like, which is what its four cards
-                answer: the system exists, that makes it faster, you keep it,
-                and we say what is not done. */}
-            <helix-text as="h2" data-measure data-section-title>
-              {LANDING.blocks[3]?.title}
-            </helix-text>
-          </helix-flex>
-
-          {/* Two columns, because there are four reasons.
-              At `18rem` this fitted three at desktop width and left the fourth
-              alone on a row with two empty columns beside it, which reads as a
-              missing item rather than as a list of four. The same floor the
-              contact page's four take, and it still collapses to one column
-              when there is no room for two. */}
-          <helix-grid gap="xl" min="26rem">
-            {(LANDING.blocks[3]?.items ?? []).map((reason) => (
-              <helix-flex
-                data-material="glass"
-                data-substrate
-                direction="column"
-                gap="sm"
-                key={reason.name}
-              >
-                <helix-text as="h3" data-substrate-name>
-                  {reason.name}
-                </helix-text>
-                <helix-text as="p" tone="muted">
-                  {reason.body}
-                </helix-text>
-              </helix-flex>
-            ))}
-          </helix-grid>
-        </helix-flex>
-      </section>
-
-      <section data-band data-reveal>
-        <helix-flex data-shell direction="column" gap="xl">
-          <helix-flex align="center" gap="md" justify="between" wrap>
-            <helix-flex direction="column" gap="sm">
-              <helix-text tone="subtle" variant="label">
-                {LANDING.blocks[4]?.kicker}
-              </helix-text>
-              <helix-text as="h2" data-measure data-section-title>
-                {LANDING.blocks[4]?.title}
-              </helix-text>
-            </helix-flex>
-            <Link data-button href="/insights">
-              Read all
-            </Link>
-          </helix-flex>
-
-          {/* **A carousel, and this is the section that earns one.**
-              The registry is already newest-first, so this is an order rather
-              than a ranking, and a carousel is what shows a set of peers whose
-              order carries no weight past the first. It used to be a grid of
-              the newest three with a link out for the rest, which meant the
-              page held eight arguments and showed three of them.
-
-              Not the hero, where a reader who arrived for one sentence should
-              not be handed a thing that moves. Not the showcase, which is
-              already a panel that cycles and would then be a carousel inside
-              a carousel. Not Services or Questions, whose items are a set to
-              be read whole rather than one at a time.
-
-              No `autoplay`. Everything here is prose a reader chooses to
-              start, and copy that slides away mid-sentence is the reason
-              carousels have the reputation they do. `loop` because the set is
-              small and reaching the end of eight is not a wall worth hitting.
-
-              Four across, so the row reads as a shelf of arguments rather than
-              one card with space either side of it. The card narrows to about a
-              quarter of the shell, which is why its summary is clamped: a
-              three-line teaser under a title is a card, and an unclamped
-              paragraph at that width is a column. */}
-          <InsightReel>
-            {INSIGHTS.map((insight) => (
-              <InsightCard insight={insight} key={insight.slug} />
-            ))}
-          </InsightReel>
-        </helix-flex>
-      </section>
-
-      {/* The story, last and short. It is why the work compounds rather than
-          why anyone should buy it, and a reader who wants it can follow it. */}
-      <section
-        className={styles.closingCard}
-        data-band
-        data-closing
-        data-material="glass"
-        data-reveal
+    <ThemeScope>
+      <div
+        className={`${landing.reel} ${styles.oneBrand} ${styles.fabClearance} ${styles.noRules}`}
       >
-        <helix-flex align="center" data-shell direction="column" gap="lg">
-          <helix-text as="h2" data-section-title>
-            {LANDING.blocks[5]?.title}
-          </helix-text>
-          <helix-text as="p" data-measure tone="muted">
-            {LANDING.blocks[5]?.body?.[0]}
-          </helix-text>
-          {/* `/contact` rather than the mail client. The address is still the
-              action and is on that page; what a `mailto:` cannot carry is what
-              to put in the message and what happens after it, which is the part
-              a reader is actually uncertain about. */}
-          <a
-            data-button="solid"
-            data-button-tone="primary"
-            data-button-width="standard"
-            data-density="lg"
-            href="/contact"
+        {/* **The field, and nothing tempering it.** A scrim used to sit over
+          this, a vertical gradient of the page background holding the aura back
+          everywhere at once. It was written when the light was the only thing
+          between the reader and the text; every claim on the page now sits on
+          glass, so the ground behind the type is the card rather than the
+          field, and a sheet dimming the whole reel was paying for a problem
+          that had been solved somewhere else. */}
+        {/* **Coarser features, because the box grew and the field does not
+            repeat to fill it.**
+
+            `p.y` spans -1 to 1 over the box whatever the box is, so `scale` sets
+            how much field fits top to bottom and the height only sets how many
+            pixels that is: one shape-unit is `H / 2 / scale` of them. Six
+            band-sized boxes became one the length of the page, and at 1.7 the
+            same braid was drawn across three times the pixels, coming out as a
+            smooth gradient with no variation inside any one screen.
+
+            A card on glass reads by contrast against what is behind it rather
+            than by how bright that is, so an even field gives it nothing to
+            separate from and it goes flat however correct its blur is. That is
+            what "the cards regressed" was, and raising `gain` to 1 made it
+            worse by evening the field further.
+
+            Multiplied rather than divided, which is the correction: at 3.2 a
+            shape-unit is about 730px again, near the ~1000 the two-screen box
+            drew at 1.7. The cost is the ends, since `flow` closes on
+            `exp(-0.55 * scale)` of its center brightness at the box edge: 39%
+            at 1.7, 17% here. Hero and footer sit dimmer than the middle bands
+            do, which is a page-length gradient rather than a seam, and is the
+            price of one canvas over nine screens instead of two over four. */}
+        <helix-aura
+          class={landing.reelAura}
+          data-layer
+          gain={1.05}
+          scale={3.5}
+          speed={1}
+          terminus={0.5625}
+          variant="caustics"
+        ></helix-aura>
+
+        <section className={landing.hero}>
+          <helix-flex
+            align="center"
+            class={landing.heroShell}
+            data-shell
+            direction="column"
+            gap="lg"
           >
-            Start a conversation
-          </a>
-        </helix-flex>
-      </section>
-    </div>
+            {/* The latest thing published, which is what a chip pointing at the
+                writing should say. It read "the theme engine now measures every
+                pair it derives", a release note for one part of one product,
+                sitting directly under a heading about the company. */}
+            <NewsKicker href="/insights" label="News" text="Helix ships as one open tier" />
+
+            <h1 className={styles.tDisplay}>
+              {HERO.title} <span className={styles.tDisplayAccent}>{HERO.accent}</span>
+            </h1>
+
+            <p className={styles.tLede}>{HERO.lede}</p>
+
+            <helix-flex class={landing.heroActions} direction="column" gap="md">
+              <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
+                <Link
+                  data-button="solid"
+                  data-button-tone="primary"
+                  data-button-width="standard"
+                  href="/helix"
+                >
+                  Open Helix
+                </Link>
+                <Link data-button="subtle" data-button-width="standard" href="/services">
+                  Work with us
+                </Link>
+              </helix-flex>
+              <helix-flex align="center" class={landing.heroInstall} gap="2xs" justify="between">
+                <code>{HERO.install}</code>
+                <helix-copy-button
+                  copied-label="Copied"
+                  label="Copy the install command"
+                  value={HERO.install}
+                ></helix-copy-button>
+              </helix-flex>
+            </helix-flex>
+
+            {/* Below the actions rather than beside the kicker: a reader looks
+              at the buttons, asks "can I use this", and the answer is the next
+              thing down. */}
+            <p className={landing.heroWorks}>{HERO.works}</p>
+          </helix-flex>
+        </section>
+
+        {/* The problem, before the answer. A reader who recognizes themselves in
+          this reads the next band; one who does not was never the buyer. */}
+        <section className={styles.fieldBand} data-band>
+          <helix-flex data-shell direction="column">
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={styles.bandSection} direction="column" gap="md">
+                <h2 className={styles.tTitle}>{PROBLEM.title}</h2>
+                <p className={styles.tLede}>{PROBLEM.lede}</p>
+              </helix-flex>
+
+              <div className={`${styles.bandRow} ${styles.stagger}`}>
+                {MECHANISMS.map((one) => (
+                  <helix-flex class={styles.bandCell} direction="column" gap="md" key={one.name}>
+                    <p className={styles.tLabel}>{one.name}</p>
+                    <p className={styles.tClaim}>{one.claim}</p>
+                    <ul className={styles.proofList}>
+                      {one.bullets.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </helix-flex>
+                ))}
+              </div>
+            </div>
+          </helix-flex>
+        </section>
+
+        <section className={styles.fieldBand} data-band id="mechanism">
+          <helix-flex data-shell direction="column">
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              {/* **Labeled as the first of the three, because that is what it
+                  is.** The band above ends on three claims and this draws one of
+                  them out; labeled "The derivation" it read as the page
+                  narrowing back to the theme engine one section after widening
+                  to the interface. The label now names the card it belongs to
+                  and the lede says which of the three costs is being answered,
+                  so a reader arrives knowing this is depth rather than a change
+                  of subject. */}
+              <helix-flex class={styles.bandSection} direction="column" gap="md">
+                <p className={styles.tLabel}>Derived, not picked</p>
+                <h2 className={styles.tTitle}>What happens between the color and the page</h2>
+                <p className={styles.tLede}>
+                  The first of those three, drawn out. One value goes in, the whole token layer
+                  comes out, and every pair it produces is measured against the ground it lands on
+                  before any of it reaches a page.
+                </p>
+              </helix-flex>
+              <div className={styles.bandSection}>
+                <DerivationDiagram />
+                <DerivationDiagramStacked />
+              </div>
+            </div>
+          </helix-flex>
+        </section>
+
+        {/* **The one band with no field behind it.** The showcase is already a
+          panel full of live components with their own surfaces, and a moving
+          light under that is two things competing for the same attention. It
+          paints its own ground rather than merely lacking an aura, because the
+          field above it runs `200svh` and would otherwise reach down into it. */}
+        {/* **The band no longer paints its own ground.** It carried `solidBand`, an
+          opaque fill that cut the field out of this one band deliberately. With
+          the showcase in a card of the same glass as the others, the card is the
+          surface and the field can run behind it like everywhere else. */}
+        <section className={`${landing.showcaseBand} ${styles.fieldBand}`} data-band>
+          <div data-shell>
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              <div className={styles.bandSplit}>
+                <helix-flex class={styles.bandSection} direction="column" gap="md">
+                  {/* The card this band draws out, named after it. The other
+                    two mechanisms are labeled this way already: "Derived, not
+                    picked" above and "Measured, not claimed" below. This said
+                    "The library", which named the subject rather than the
+                    argument and left the pattern two-thirds visible. */}
+                  <p className={styles.tLabel}>Standards, not bindings</p>
+                  <h2 className={styles.tTitle}>Every control here is the real one</h2>
+                  <p className={styles.tLede}>
+                    Not a screenshot and not a video. These are custom elements from the package,
+                    upgrading in your browser on the page you are already reading.
+                  </p>
+                  <helix-flex data-density="lg" direction="column" gap="md">
+                    <Link data-button="subtle" data-button-width="standard" href="/helix">
+                      Explore components
+                    </Link>
+
+                    {/* **The two tools, under the reference rather than beside
+                        it.** Both are the same claim as the panel above carried
+                        one step further: the controls are real, and these are
+                        where you get to change them. They are quiet links
+                        because the reference is the thing a reader came for and
+                        three buttons of equal weight is a menu rather than an
+                        invitation.
+
+                        The theme pill at the foot of this page is the builder
+                        in miniature, which is the reason to name the full one
+                        here: a reader who has moved a slider and liked it has
+                        nowhere to go with that. */}
+                    <helix-flex data-density="sm" gap="lg" wrap>
+                      <Link data-link="quiet" href="/helix/sandbox">
+                        Open the sandbox
+                      </Link>
+                      <Link data-link="quiet" href="/helix/theme">
+                        Build a theme
+                      </Link>
+                    </helix-flex>
+                  </helix-flex>
+                </helix-flex>
+
+                <div className={styles.bandSection}>
+                  <Showcase />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* **The field picks up again here and runs to the end.** One `200svh`
+          box anchored to this band reaches down through Services and the close,
+          which is the same trick the live page uses for its own late field: an
+          absolutely positioned child does not take part in flow, so it lights
+          the three bands below it without lengthening any of them.
+
+          It is anchored here rather than on Services because this is the first
+          band after the showcase, and the showcase is the one place the field is
+          deliberately absent. */}
+        <section className={styles.fieldBand} data-band>
+          <ProofBand />
+        </section>
+
+        {/* Delivery, last, because it is what a convinced reader wants and a
+          reason to leave for anyone who is not there yet.
+
+          **The second field, anchored here so it reaches the closing card.**
+          The live page runs its late aura the same way, from the band above the
+          one it is really lighting: an absolutely positioned child at 200svh
+          starts at this band's top and carries down through the close, so the
+          page ends in light rather than trailing off into flat ground. */}
+        <section className={styles.fieldBand} data-band>
+          <helix-flex data-shell direction="column">
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={styles.bandSection} direction="column" gap="md">
+                <p className={styles.tLabel}>How it arrives</p>
+                <h2 className={styles.tTitle}>{DELIVERY.title}</h2>
+                <p className={styles.tLede}>{DELIVERY.lede}</p>
+              </helix-flex>
+
+              <div className={`${styles.bandRow} ${styles.stagger}`}>
+                {SERVICES.map((service) => (
+                  <helix-flex
+                    class={styles.bandCell}
+                    direction="column"
+                    gap="sm"
+                    key={service.name}
+                  >
+                    <p className={styles.tClaim}>{service.name}</p>
+                    <helix-text as="p" tone="muted">
+                      {service.summary}
+                    </helix-text>
+                  </helix-flex>
+                ))}
+              </div>
+
+              <helix-flex class={styles.bandSection} data-density="lg">
+                <Link data-button="subtle" data-button-width="standard" href="/services">
+                  See what each costs
+                </Link>
+              </helix-flex>
+            </div>
+          </helix-flex>
+        </section>
+
+        {/* **What the work is, after what it costs.** The band above is three
+          ways to buy and a link to the prices; this is the half of the heading
+          those cannot answer. A reader deciding whether to hire engineers wants
+          to know what having them in the repository is like, and the honest
+          answers are that the system is already built, that this is why it is
+          quick, that they keep it, and that we say what is unfinished. */}
+        <section className={styles.fieldBand} data-band>
+          <helix-flex data-shell direction="column">
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={styles.bandSection} direction="column" gap="md">
+                <p className={styles.tLabel}>The engagement</p>
+                <h2 className={styles.tTitle}>{ENGAGEMENT_COPY.title}</h2>
+                <p className={styles.tLede}>{ENGAGEMENT_COPY.lede}</p>
+              </helix-flex>
+
+              <div className={`${styles.bandRow} ${styles.stagger}`}>
+                {ENGAGEMENT.map((one) => (
+                  <helix-flex class={styles.bandCell} direction="column" gap="sm" key={one.name}>
+                    <p className={styles.tClaim}>{one.name}</p>
+                    <helix-text as="p" tone="muted">
+                      {one.body}
+                    </helix-text>
+                  </helix-flex>
+                ))}
+              </div>
+            </div>
+          </helix-flex>
+        </section>
+
+        {/* **The arguments, before the ask.** The essays are the one thing on this
+          page that is neither a product claim nor a price, so they sit between
+          the offer and the close: a reader who is not ready to talk has
+          somewhere to go that is not away.
+
+          **A card of four, where this was a carousel of six.** Two things were
+          wrong with the reel and only one of them was visible. It was the single
+          band with no glass behind its heading, so it read as unfinished beside
+          seven that had one. And the fix that would have finished it, dissolving
+          each card as it reached the boundary, is not available: an edge fade is
+          a mask, a mask flattens every `backdrop-filter` beneath it, and the
+          six cards it was framing are the things that would have gone flat. The
+          note above `[data-substrate]` in `site.css` has the measurements.
+
+          So the band is a card like every other, the four newest essays are
+          cells inside it, and each one drops its own glass rather than nesting
+          it. Four because that is a row, and because a set that fits on one
+          screen does not need controls, an indicator or a scroll position to be
+          restored. `Read all` was always where the sixth essay was going. */}
+        <section className={styles.fieldBand} data-band>
+          <helix-flex data-shell direction="column">
+            <div className={styles.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={styles.bandSection} direction="column" gap="md">
+                <helix-flex align="center" gap="md" justify="between" wrap>
+                  <helix-flex direction="column" gap="sm">
+                    <p className={styles.tLabel}>Insights</p>
+                    <h2 className={styles.tTitle}>The arguments, written down</h2>
+                  </helix-flex>
+                  <Link data-button="subtle" data-button-width="standard" href="/insights">
+                    Read all
+                  </Link>
+                </helix-flex>
+                {/* Below the row rather than inside it, so `Read all` stays on the
+                    heading's line and the sentence runs the full measure. */}
+                <p className={styles.tLede}>
+                  Design, engineering and business decisions, with the reasoning kept in.
+                </p>
+              </helix-flex>
+
+              {/* **No card and no art, because the band is the card.** The four
+                  were `InsightCard` at first, which meant a card inside a card:
+                  two edges, and a `backdrop-filter` sampling a surface that was
+                  already frosted. Dropping to the three things a reader chooses
+                  from, what it is about, what it is called and what it argues,
+                  removes the nesting rather than exempting it, and the cell is
+                  the link so the whole of it is the target. The full card, with
+                  its art and its glass, is what `/insights` shows. */}
+              <div className={`${styles.bandRow} ${styles.insightRow}`}>
+                {INSIGHTS.slice(0, 4).map((insight) => (
+                  <Link
+                    className={`${styles.bandCell} ${styles.insightCell}`}
+                    href={`/insights/${insight.slug}`}
+                    key={insight.slug}
+                  >
+                    <helix-flex align="center" data-density="sm" gap="sm" wrap>
+                      <helix-tag tone="primary">{insight.topic}</helix-tag>
+                      <helix-tag>{insight.kind}</helix-tag>
+                    </helix-flex>
+                    <helix-text as="h3" variant="title">
+                      {insight.title}
+                    </helix-text>
+                    <helix-text tone="muted" variant="caption">
+                      {insight.summary}
+                    </helix-text>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </helix-flex>
+        </section>
+
+        <section className={landing.closingCard} data-band data-closing data-material="glass">
+          <helix-flex align="center" data-shell direction="column" gap="lg">
+            <h2 className={styles.tTitle}>Take on the work</h2>
+            <p className={styles.tLede}>
+              Tell us what you need built. We will say plainly if we are not the right people.
+            </p>
+            <a
+              data-button="solid"
+              data-button-tone="primary"
+              data-button-width="standard"
+              data-density="lg"
+              href="/contact"
+            >
+              Start a conversation
+            </a>
+          </helix-flex>
+        </section>
+
+        <ThemeFab />
+      </div>
+    </ThemeScope>
   )
 }

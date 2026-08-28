@@ -1,4 +1,5 @@
-import styles from './preview.module.css'
+import styles from './landing-c.module.css'
+import { StillWhenUnseen } from './still-when-unseen'
 
 /**
  * The derivation, drawn as a routing diagram.
@@ -30,7 +31,7 @@ import styles from './preview.module.css'
  * asymmetry was worth trying and is not worth its cost.
  */
 export const DerivationDiagram = () => (
-  <figure className={styles.diagram}>
+  <StillWhenUnseen className={styles.diagram}>
     <svg
       aria-labelledby="derivation-title derivation-desc"
       className={styles.diagramSvg}
@@ -75,6 +76,16 @@ export const DerivationDiagram = () => (
           <stop offset="0.6" stopColor="var(--helix-color-primary)" stopOpacity="0.05" />
           <stop offset="1" stopColor="var(--helix-color-primary)" stopOpacity="0" />
         </radialGradient>
+        {/* Four squares at the frame's corners. Unpainted area in a mask is
+            black and therefore hidden, so the squares are the whole of it. 24
+            units holds the largest corner the theme can ask for and still
+            leaves an arm either side of it. */}
+        <mask id="derivation-corners">
+          <rect fill="white" height="24" width="24" x="44" y="84" />
+          <rect fill="white" height="24" width="24" x="1132" y="84" />
+          <rect fill="white" height="24" width="24" x="1132" y="372" />
+          <rect fill="white" height="24" width="24" x="44" y="372" />
+        </mask>
       </defs>
 
       <g mask="url(#derivation-mask)">
@@ -141,7 +152,7 @@ export const DerivationDiagram = () => (
         <circle cx="1144" cy="330" opacity="0.13" r="1.0" />
         <circle cx="558" cy="120" opacity="0.22" r="0.9" />
         <circle cx="575" cy="197" opacity="0.30" r="1.1" />
-        <circle cx="939" cy="262" opacity="0.34" r="0.8" />
+        <circle cx="954" cy="262" opacity="0.34" r="0.8" />
       </g>
 
       {/* The sheet this is a detail of. */}
@@ -155,20 +166,36 @@ export const DerivationDiagram = () => (
         x="44"
         y="84"
       />
-      <g
+      {/* **The registration marks, as one rounded rect seen through its own
+          corners.**
+
+          They were four `path` elements with a square turn in each, which no
+          amount of theming could round: path data is a string and CSS cannot
+          reach inside it. Every card on the page answers to the radius slider,
+          so moving it left the drawing frame at right angles around content
+          that had gone soft.
+
+          A `rect` can be themed, because `rx` is an SVG 2 geometry property as
+          well as an attribute and CSS may set it. Drawing the whole rectangle
+          and masking it back to four 24-unit squares gives the same four marks,
+          now with whatever corner the theme is using: the mask shows the turn
+          and the first dozen units of each arm, and hides the long sides that
+          the dashed frame underneath is already drawing. */}
+      <rect
+        className={styles.diagramCorners}
         fill="none"
+        height="312"
+        mask="url(#derivation-corners)"
         stroke="var(--helix-color-foreground-muted)"
         strokeOpacity="0.55"
         strokeWidth="1.2"
-      >
-        <path d="M44 98V84H58" />
-        <path d="M1142 84H1156V98" />
-        <path d="M1156 382V396H1142" />
-        <path d="M58 396H44V382" />
-      </g>
+        width="1112"
+        x="44"
+        y="84"
+      />
       <g stroke="var(--helix-color-border)" strokeDasharray="2 7" strokeWidth="1">
         <line x1="400" x2="400" y1="84" y2="396" />
-        <line x1="760" x2="760" y1="84" y2="396" />
+        <line x1="800" x2="800" y1="84" y2="396" />
       </g>
 
       {/* ── What you choose ─────────────────────────────────────── */}
@@ -188,224 +215,188 @@ export const DerivationDiagram = () => (
           240, but the block including the labels centered on 227, so the whole
           drawing read as riding high in its own frame. Lifted out, the frame
           holds only the rows, and the rows are already centered. */}
-      <text className={styles.diagramLabel} fontSize="15" x="72" y="72">
+      <text className={styles.diagramLabel} fontSize="13" x="72" y="72">
         What you choose
       </text>
 
+      {/* **A hit area, because a stroke is not a target.** The channel a
+          pointer is over decides what the whole figure emphasizes, and until
+          now only the painted pixels answered: `brand` and `saturation` are
+          filled rects and worked, `density` is three 1.6-unit lines and
+          `radius` is a `fill="none"` path, so both wanted the pointer on a
+          hairline. The gap between a glyph and its word answered to nothing at
+          all, which is most of the row.
+
+          `fill="transparent"` rather than `fill="none"`: none is not painted
+          and not hit-tested, transparent is hit-tested and invisible. The band
+          stops at 264, short of the routing at 280, so a row claims its own
+          words and none of the wire. */}
+      {/* **The inputs are right-aligned, and the outputs are left-aligned.**
+          Both columns put their clean vertical against the routing and their
+          ragged edge against the outer air, which is the only arrangement that
+          reads as symmetric: a column aligned the other way leaves a void
+          between the words and the wire whose width is whatever the longest
+          label happened to be.
+
+          Measured before this, the outputs sat a flat 34 from the junction and
+          the inputs ranged from 91 (`saturation`) to 121 (`brand`), so the left
+          half of the figure had three times the gap of the right and no two
+          rows agreed. Text now ends at 246, which is 280 minus that same 34.
+
+          **Each icon is placed from its label's width** rather than sharing one
+          column, so the 16 between a glyph and its word is the same on every
+          row. That is the relationship the eye checks; a shared icon column
+          would hold a different line straight and let this one drift to 45.
+          It does mean these four x values assume `Fusion Sans` at 15: a fallback
+          face with wider metrics moves the words, not the icons, and the gap
+          closes. The rows are hit-tested by the bands below, which are generous
+          enough that none of this affects what is clickable. */}
       <g data-ch="brand">
-        <rect fill="var(--helix-color-primary)" height="32" rx="9" width="32" x="72" y="104" />
-        <text className={styles.diagramMeta} fontSize="19" x="120" y="126">
+        <rect fill="transparent" height="64" width="200" x="64" y="88" />
+        <rect fill="var(--helix-color-primary)" height="32" rx="9" width="32" x="158.5" y="104" />
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="126">
           brand
         </text>
       </g>
 
       <g data-ch="saturation">
-        <rect fill="url(#derivation-chroma)" height="14" rx="7" width="32" x="72" y="193" />
-        <text className={styles.diagramMeta} fontSize="19" x="120" y="206">
+        <rect fill="transparent" height="64" width="200" x="64" y="168" />
+        <rect fill="url(#derivation-chroma)" height="14" rx="7" width="32" x="129.3" y="193" />
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="206">
           saturation
         </text>
       </g>
 
       <g data-ch="density">
+        <rect fill="transparent" height="64" width="200" x="64" y="248" />
         <g stroke="var(--helix-color-foreground-muted)" strokeLinecap="round" strokeWidth="1.6">
-          <line x1="72" x2="104" y1="272" y2="272" />
-          <line x1="72" x2="104" y1="280" y2="280" />
-          <line x1="72" x2="104" y1="288" y2="288" />
+          <line x1="147.9" x2="179.9" y1="272" y2="272" />
+          <line x1="147.9" x2="179.9" y1="280" y2="280" />
+          <line x1="147.9" x2="179.9" y1="288" y2="288" />
         </g>
-        <text className={styles.diagramMeta} fontSize="19" x="120" y="286">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="286">
           density
         </text>
       </g>
 
       <g data-ch="radius">
+        <rect fill="transparent" height="64" width="200" x="64" y="328" />
         <path
-          d="M72 372v-12a12 12 0 0 1 12-12h20"
+          d="M156.5 372v-12a12 12 0 0 1 12-12h20"
           fill="none"
           stroke="var(--helix-color-foreground-muted)"
           strokeWidth="1.6"
         />
-        <text className={styles.diagramMeta} fontSize="19" x="120" y="366">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="366">
           radius
         </text>
       </g>
 
       {/* ── The routing ─────────────────────────────────────────── */}
-      <g className={styles.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.4">
-        <path d="M280 120H390A10 10 0 0 1 400 130" data-ch="brand" />
-        <path d="M280 200H390A10 10 0 0 1 400 210" data-ch="saturation" />
-        <path d="M280 280H390A10 10 0 0 0 400 270" data-ch="density" />
-        <path d="M280 360H390A10 10 0 0 0 400 350" data-ch="radius" />
-        <path d="M400 130V240" />
-        <path d="M400 350V240" />
-        <path d="M400 240H488" />
-        <path d="M712 240H800" />
-        <path d="M800 240V170" />
-        <path d="M800 240V310" />
-        <path d="M800 170A10 10 0 0 1 810 160H920" />
-        <path d="M800 240H920" />
-        <path d="M800 310A10 10 0 0 0 810 320H920" />
+      <g className={styles.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.8">
+        {/* **Each run is one path, and each side is one group.** Two reasons,
+            and the second is the one that shows. Four strokes flattening onto a
+            shared tangent stack unless they composite together, which is what
+            the group is for. And a path that stopped at the junction while
+            another began there put five round caps on one point and handed the
+            pulse off: one light arriving and ending, a different one starting.
+            A flow drawn as a relay is not a flow. */}
+        <g className={styles.diagramFan}>
+          <path d="M280 120C340 120,340 240,400 240H488" data-ch="brand" />
+          <path d="M280 200C340 200,340 240,400 240H488" data-ch="saturation" />
+          <path d="M280 280C340 280,340 240,400 240H488" data-ch="density" />
+          <path d="M280 360C340 360,340 240,400 240H488" data-ch="radius" />
+        </g>
+        <g className={styles.diagramFan}>
+          <path d="M712 240H800C860 240,860 160,920 160" />
+          <path d="M712 240H920" />
+          <path d="M712 240H800C860 240,860 320,920 320" />
+        </g>
       </g>
-      {/* **SMIL, not CSS, and it took three attempts to get here.**
-          `stroke-dashoffset` will not interpolate to a `calc()` endpoint in
-          WebKit: sampled across a second it returned only the two keyframe
-          values and nothing between, so the pulse teleported rather than
-          traveled. Registering the custom property did not help. Moving the
-          animation onto the registered number instead produced no `CSSAnimation`
-          at all, because keyframes holding only a custom property are dropped
-          there.
-
-          `<animate>` takes the numbers directly. Each path carries its own
-          length as a literal, which is what keeps the loop seamless, and its own
-          `begin`, which is what makes the flow read left to right. Nothing to
-          interpolate through, and it is the mechanism SVG has always had for
-          this. */}
       <g className={styles.diagramPulse} fill="none" strokeLinecap="round" strokeWidth="1.6">
-        <path d="M280 120H390A10 10 0 0 1 400 130" data-ch="brand" strokeDasharray="27.7 98.1">
+        <path d="M280 120C340 120,340 240,400 240H488" data-ch="brand" strokeDasharray="16.0 251.4">
           <animate
             attributeName="stroke-dashoffset"
             begin="-0.000s"
-            dur="2.028s"
+            dur="2.786s"
             from="0"
             repeatCount="indefinite"
-            to="-125.7"
+            to="-267.4"
           />
         </path>
-        <path d="M280 200H390A10 10 0 0 1 400 210" data-ch="saturation" strokeDasharray="27.7 98.1">
+        <path
+          d="M280 200C340 200,340 240,400 240H488"
+          data-ch="saturation"
+          strokeDasharray="16.0 200.9"
+        >
           <animate
             attributeName="stroke-dashoffset"
-            begin="-0.507s"
-            dur="2.028s"
+            begin="-0.560s"
+            dur="2.259s"
             from="0"
             repeatCount="indefinite"
-            to="-125.7"
+            to="-216.9"
           />
         </path>
-        <path d="M280 280H390A10 10 0 0 0 400 270" data-ch="density" strokeDasharray="27.7 98.1">
+        <path
+          d="M280 280C340 280,340 240,400 240H488"
+          data-ch="density"
+          strokeDasharray="16.0 200.9"
+        >
           <animate
             attributeName="stroke-dashoffset"
-            begin="-1.014s"
-            dur="2.028s"
+            begin="-1.120s"
+            dur="2.259s"
             from="0"
             repeatCount="indefinite"
-            to="-125.7"
+            to="-216.9"
           />
         </path>
-        <path d="M280 360H390A10 10 0 0 0 400 350" data-ch="radius" strokeDasharray="27.7 98.1">
+        <path
+          d="M280 360C340 360,340 240,400 240H488"
+          data-ch="radius"
+          strokeDasharray="16.0 251.4"
+        >
           <animate
             attributeName="stroke-dashoffset"
-            begin="-1.520s"
-            dur="2.028s"
+            begin="-1.680s"
+            dur="2.786s"
             from="0"
             repeatCount="indefinite"
-            to="-125.7"
+            to="-267.4"
           />
         </path>
-        <path d="M400 130V240" strokeDasharray="24.2 85.8">
+        <path d="M712 240H800C860 240,860 160,920 160" strokeDasharray="16.0 222.8">
           <animate
             attributeName="stroke-dashoffset"
-            begin="-0.250s"
-            dur="1.774s"
+            begin="-0.640s"
+            dur="2.487s"
             from="0"
             repeatCount="indefinite"
-            to="-110.0"
+            to="-238.8"
           />
         </path>
-        <path d="M400 350V240" strokeDasharray="24.2 85.8">
+        <path d="M712 240H920" strokeDasharray="16.0 192.0">
           <animate
             attributeName="stroke-dashoffset"
-            begin="-0.760s"
-            dur="1.774s"
+            begin="-1.020s"
+            dur="2.167s"
             from="0"
             repeatCount="indefinite"
-            to="-110.0"
+            to="-208.0"
           />
         </path>
-        <path d="M400 240H488" strokeDasharray="19.4 68.6">
+        <path d="M712 240H800C860 240,860 320,920 320" strokeDasharray="16.0 222.8">
           <animate
             attributeName="stroke-dashoffset"
-            begin="-0.400s"
-            dur="1.419s"
+            begin="-1.400s"
+            dur="2.487s"
             from="0"
             repeatCount="indefinite"
-            to="-88.0"
-          />
-        </path>
-        <path d="M712 240H800" strokeDasharray="19.4 68.6">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-0.150s"
-            dur="1.419s"
-            from="0"
-            repeatCount="indefinite"
-            to="-88.0"
-          />
-        </path>
-        <path d="M800 240V170" strokeDasharray="15.4 54.6">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-0.600s"
-            dur="1.129s"
-            from="0"
-            repeatCount="indefinite"
-            to="-70.0"
-          />
-        </path>
-        <path d="M800 240V310" strokeDasharray="15.4 54.6">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-1.050s"
-            dur="1.129s"
-            from="0"
-            repeatCount="indefinite"
-            to="-70.0"
-          />
-        </path>
-        <path d="M800 170A10 10 0 0 1 810 160H920" strokeDasharray="27.7 98.1">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-0.350s"
-            dur="2.028s"
-            from="0"
-            repeatCount="indefinite"
-            to="-125.7"
-          />
-        </path>
-        <path d="M800 240H920" strokeDasharray="26.4 93.6">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-0.850s"
-            dur="1.935s"
-            from="0"
-            repeatCount="indefinite"
-            to="-120.0"
-          />
-        </path>
-        <path d="M800 310A10 10 0 0 0 810 320H920" strokeDasharray="27.7 98.1">
-          <animate
-            attributeName="stroke-dashoffset"
-            begin="-1.450s"
-            dur="2.028s"
-            from="0"
-            repeatCount="indefinite"
-            to="-125.7"
+            to="-238.8"
           />
         </path>
       </g>
-
-      <circle
-        className={styles.diagramJunction}
-        cx="400"
-        cy="240"
-        fill="var(--helix-color-primary)"
-        r="4"
-      />
-      <circle
-        className={styles.diagramJunction}
-        cx="800"
-        cy="240"
-        fill="var(--helix-color-primary)"
-        r="4"
-      />
 
       {/* ── The engine ──────────────────────────────────────────── */}
       <circle cx="600" cy="240" fill="url(#derivation-bloom)" r="180" />
@@ -419,11 +410,24 @@ export const DerivationDiagram = () => (
         strokeDasharray="1.5 9"
         strokeWidth="1.1"
       />
+      {/* **Real glass, which needs a `foreignObject` to exist at all.**
+          `backdrop-filter` on an SVG shape does nothing: tested against sharp
+          stripes, a `<circle>` carrying it left them sharp and only an HTML
+          element inside a `foreignObject` blurred them. So the disc was a flat
+          fill of the page background at 82 percent pretending to be a surface,
+          while every card around it was blurring what it sat on.
+
+          Blurred harder than the cards, because this one is the subject rather
+          than a container: the field and the aura behind it go soft enough that
+          the reading in front reads as instrumentation rather than as type on a
+          busy ground. */}
+      <foreignObject height="224" width="224" x="488" y="128">
+        <div className={styles.diagramGlass} />
+      </foreignObject>
       <circle
         cx="600"
         cy="240"
-        fill="var(--helix-color-background)"
-        fillOpacity="0.82"
+        fill="none"
         r="112"
         stroke="var(--helix-color-foreground-muted)"
         strokeOpacity="0.18"
@@ -500,36 +504,192 @@ export const DerivationDiagram = () => (
       </text>
 
       {/* ── What comes out ──────────────────────────────────────── */}
-      <text className={styles.diagramLabel} fontSize="15" x="1015" y="72">
+      <text className={styles.diagramLabel} fontSize="13" x="1030" y="72">
         What comes out
       </text>
-      <text className={styles.diagramFigure} fontSize="34" x="939" y="164">
+      <text className={styles.diagramFigure} fontSize="34" x="954" y="164">
         179
       </text>
-      <text className={styles.diagramMeta} fontSize="15" x="939" y="185">
+      <text className={styles.diagramMeta} fontSize="15" x="954" y="185">
         semantic tokens
       </text>
 
-      <rect fill="var(--helix-color-foreground)" height="26" rx="8" width="26" x="939" y="227" />
+      <rect fill="var(--helix-color-foreground)" height="26" rx="8" width="26" x="954" y="227" />
       <rect
         fill="var(--helix-color-background)"
         height="26"
         rx="8"
         stroke="var(--helix-color-foreground-muted)"
         width="26"
-        x="973"
+        x="988"
         y="227"
       />
-      <text className={styles.diagramMeta} fontSize="15" x="1015" y="246">
+      <text className={styles.diagramMeta} fontSize="15" x="1030" y="246">
         both schemes
       </text>
 
-      <text className={styles.diagramFigure} fontSize="34" x="939" y="324">
+      <text className={styles.diagramFigure} fontSize="34" x="954" y="324">
         67
       </text>
-      <text className={styles.diagramMeta} fontSize="15" x="939" y="345">
+      <text className={styles.diagramMeta} fontSize="15" x="954" y="345">
         pairs measured
       </text>
     </svg>
-  </figure>
+  </StillWhenUnseen>
+)
+
+/**
+ * The same derivation, turned ninety degrees for a phone.
+ *
+ * **A second drawing rather than a responsive one.** The wide figure is 1200
+ * units across because that is what four labeled inputs, a hub and three
+ * labeled outputs need when they run left to right. Nothing about that reflows:
+ * the path data is the layout, so a narrow screen could only scale it down, and
+ * at 342px the type came out near four pixels. It scrolls today, which is honest
+ * and still means dragging a box twice the width of the screen to read the
+ * page's central explanation.
+ *
+ * So the flow runs top to bottom here: four inputs across, converging to the
+ * hub, fanning out to three outputs across. Same three beats, same tokens, same
+ * words. Only the axis changed.
+ *
+ * **Leaner on purpose.** The starfield, the corner registration marks and the
+ * traveling pulses are all in the wide one and none of them are here. They are
+ * atmosphere for a figure with room to breathe, and this is a phone: what
+ * survives is the part that carries the argument.
+ *
+ * Both are in the DOM and CSS shows one, because the choice is a width and a
+ * width is the stylesheet's to know. Picking in JavaScript would mean measuring
+ * on the client and rendering neither on the server. `aria-hidden` on this one,
+ * so the pair reads once: the wide figure carries the `title` and `desc` for
+ * both.
+ */
+export const DerivationDiagramStacked = () => (
+  <div className={styles.diagramStacked}>
+    {/* Hidden on the element rather than only on the wrapper: the pair must read
+        once, the wide figure carries the `title` and `desc` for both, and the
+        a11y lint asks the question of the `svg` itself. */}
+    <svg
+      aria-hidden="true"
+      className={styles.diagramStackedSvg}
+      role="presentation"
+      viewBox="0 0 340 374"
+    >
+      <defs>
+        <linearGradient id="derivation-chroma-stacked" x1="0" x2="1">
+          <stop offset="0" stopColor="var(--helix-color-foreground-subtle)" />
+          <stop offset="1" stopColor="var(--helix-color-primary)" />
+        </linearGradient>
+      </defs>
+
+      <text className={styles.diagramLabel} fontSize="11" x="8" y="14">
+        What you choose
+      </text>
+
+      {/* Four across, each icon over its word. The columns are 85 apart, which
+          is what `saturation` needs at 11 and the widest of the four. */}
+      <g>
+        <rect fill="var(--helix-color-primary)" height="24" rx="7" width="24" x="30" y="34" />
+        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="42" y="76">
+          brand
+        </text>
+      </g>
+
+      <g>
+        <rect
+          fill="url(#derivation-chroma-stacked)"
+          height="11"
+          rx="5.5"
+          width="24"
+          x="115"
+          y="40"
+        />
+        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="127" y="76">
+          saturation
+        </text>
+      </g>
+
+      <g stroke="var(--helix-color-foreground-muted)" strokeLinecap="round" strokeWidth="1.6">
+        <line x1="200" x2="224" y1="40" y2="40" />
+        <line x1="200" x2="224" y1="46" y2="46" />
+        <line x1="200" x2="224" y1="52" y2="52" />
+      </g>
+      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="212" y="76">
+        density
+      </text>
+
+      <path
+        d="M285 58v-9a9 9 0 0 1 9-9h15"
+        fill="none"
+        stroke="var(--helix-color-foreground-muted)"
+        strokeWidth="1.6"
+      />
+      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="297" y="76">
+        radius
+      </text>
+
+      {/* In to the hub, out to the readings. One group so the four strokes
+          composite together rather than stacking where they meet, which is the
+          same reason the wide figure groups its runs. */}
+      <g className={styles.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.6">
+        <g className={styles.diagramFan}>
+          <path d="M42 88C42 132,170 128,170 168" />
+          <path d="M127 88C127 132,170 134,170 168" />
+          <path d="M212 88C212 132,170 134,170 168" />
+          <path d="M297 88C297 132,170 128,170 168" />
+        </g>
+        <g className={styles.diagramFan}>
+          <path d="M170 168C170 208,57 206,57 248" />
+          <path d="M170 168V248" />
+          <path d="M170 168C170 208,283 206,283 248" />
+        </g>
+      </g>
+
+      <circle cx="170" cy="168" fill="var(--helix-color-primary)" r="3.5" />
+
+      {/* Three across, each number over its two words. Split onto two lines
+          rather than shrunk: 113 units a column will not hold `semantic tokens`
+          on one line at a size anybody reads. */}
+      <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="57" y="288">
+        179
+      </text>
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="308">
+        semantic
+      </text>
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="322">
+        tokens
+      </text>
+
+      <rect fill="var(--helix-color-foreground)" height="20" rx="6" width="20" x="149" y="264" />
+      <rect
+        fill="var(--helix-color-background)"
+        height="20"
+        rx="6"
+        stroke="var(--helix-color-border)"
+        width="20"
+        x="173"
+        y="264"
+      />
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="308">
+        both
+      </text>
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="322">
+        schemes
+      </text>
+
+      <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="283" y="288">
+        67
+      </text>
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="308">
+        pairs
+      </text>
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="322">
+        measured
+      </text>
+
+      <text className={styles.diagramLabel} fontSize="11" textAnchor="end" x="332" y="360">
+        What comes out
+      </text>
+    </svg>
+  </div>
 )

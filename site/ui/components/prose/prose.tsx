@@ -335,12 +335,21 @@ const Unwrap = ({ children }: { children?: ReactNode }) => children
  * breaks when it is renamed, which is the honest pair: a renamed section is a
  * different section, and a link to the old name should fail rather than land on
  * whatever now sits in that position.
+ *
+ * **Exported, because a second reader of it exists now.** The page outline lists
+ * a document's own sections and has to link to them, which means deriving the
+ * same anchors from the same headings without a rendered DOM to read them from.
+ * Two implementations of this would be two implementations of a link target,
+ * and the failure is silent: every entry in the rail scrolls nowhere and the
+ * page looks fine.
  */
-const slugOf = (node: ReactNode): string =>
-  textOf(node)
+export const slugify = (text: string): string =>
+  text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
+
+const slugOf = (node: ReactNode): string => slugify(textOf(node))
 
 /**
  * A heading, at the level markdown asked for, with a link to itself.

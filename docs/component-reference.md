@@ -86,18 +86,18 @@ Usable on its own as a disclosure, with no accordion around it.
 
 | Slot | Description |
 | --- | --- |
-| `summary` | The always-visible trigger content. |
 | *(default)* | The content revealed when open. |
+| `summary` | The always-visible trigger content. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `container` | The outer wrapper. |
-| `trigger` | The clickable summary row. |
 | `chevron` | The open and close indicator. |
+| `container` | The outer wrapper. |
 | `content` | The revealed region. |
 | `content-inner` | Padding wrapper inside the animated region. |
+| `trigger` | The clickable summary row. |
 
 #### Custom properties
 
@@ -187,31 +187,37 @@ no shadow: the rule is the whole of it.
 | `material` | `material` | `'frosted' \| 'glass' \| 'transparent' \| undefined` | - | - | What the banner is made of, which is how much of what is behind it shows through. |
 | `sticky` | `sticky` | `boolean` | `false` | - | Whether the banner sticks to the top of the viewport. |
 
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-scrolled` | `HelixScrolledEvent` | Fired when the page crosses the threshold, with the new state. A custom state cannot be observed the way an attribute could, so the header says when it changes rather than leaving consumers to run a second scroll listener and disagree about the hysteresis. |
+
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `brand` | Wordmark or logo, at the inline start. |
 | *(default)* | Primary navigation. |
 | `actions` | Trailing actions, such as a call to action. |
-| `start` | Leading content, usually a wordmark. |
+| `brand` | Wordmark or logo, at the inline start. |
 | `end` | Trailing content. |
+| `start` | Leading content, usually a wordmark. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `content` | The centered row inside the banner. |
+| `end` | The trailing region. |
 | `row` | The centered row inside the banner. |
 | `start` | The leading region. |
-| `end` | The trailing region. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--app-header-background` | Fill behind the banner. |
 | `--app-header-backdrop` | The filter behind it. `none` to pair it with a panel. |
+| `--app-header-background` | Fill behind the banner. |
 | `--app-header-border-color` | The line under the bar. None by default. |
 | `--app-header-height` | Height of the banner. |
 | `--app-header-inset` | Inline padding of the banner. |
@@ -314,17 +320,17 @@ every size, including one a consumer sets themselves through
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `name` | `name` | `string` | `''` | `HelixHeadlessAvatar` | Name of the person or entity. Used for the label and the initials. |
+| `name` | `name` | `string` | `''` | `HelixHeadlessAvatar` | Name of the person or entity. |
 | `shape` | `shape` | `'circle' \| 'square' \| undefined` | - | - | Whether the avatar is a circle or a rounded square. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Edge length of the avatar. |
-| `src` | `src` | `string` | `''` | `HelixHeadlessAvatar` | Image to show. Falls back to the slot, or to initials, if it fails. |
+| `src` | `src` | `string` | `''` | `HelixHeadlessAvatar` | Image to show. |
 
 #### Events
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `load` | `Event` | Relayed from the image once it has loaded. |
 | `error` | `Event` | Relayed from the image when it fails. |
+| `load` | `Event` | Relayed from the image once it has loaded. |
 
 #### Slots
 
@@ -408,10 +414,10 @@ on a dark icon reads as a bite taken out of the icon.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `''` | `HelixHeadlessBadge` | Accessible name. Required for a dot, which has no text to read. |
-| `max` | `max` | `number \| undefined` | - | `HelixHeadlessBadge` | Cap for a numeric value. Past it the indicator reads `{max}+`. |
+| `label` | `label` | `string` | `''` | `HelixHeadlessBadge` | Accessible name. |
+| `max` | `max` | `number \| undefined` | - | `HelixHeadlessBadge` | Cap for a numeric value. |
 | `tone` | `tone` | `'danger' \| 'neutral' \| undefined` | - | - | What the mark means. |
-| `value` | `value` | `string` | `''` | `HelixHeadlessBadge` | The count or short text to show. Absent shows a dot, zero shows nothing. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessBadge` | The count or short text to show. |
 
 #### Slots
 
@@ -465,7 +471,7 @@ it is measured against.
 | `secondary` | `secondary` | `string \| undefined` | - | `HelixHeadlessBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `sourceRows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
-| `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their color, by name. Matched as `outlined` is. |
+| `subtle` | `subtle` | `string \| undefined` | - | - | Which series are drawn as a wash of their color, by name. |
 | `wash` | `wash` | `'gradient' \| undefined` | - | - | How a column's fill is distributed across it. |
 
 #### Parts
@@ -499,16 +505,16 @@ it is measured against.
 | Property | Description |
 | --- | --- |
 | `--bar-chart-band-color` | The slot the pointer is resting in. |
-| `--bar-chart-line-color` | A `lines` series, overriding its series color. |
-| `--bar-chart-line-width` | Thickness of a `lines` series. |
-| `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-bar-stroke` | Width of the edge an `outlined` or `subtle` column is drawn with. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
-| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
+| `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
+| `--bar-chart-line-color` | A `lines` series, overriding its series color. |
+| `--bar-chart-line-width` | Thickness of a `lines` series. |
 | `--bar-chart-axis` | The color of a single-series axis, taken from that series. |
 | `--bar-chart-secondary` | The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
+| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `wash="gradient"` asks for it. |
 
 ## Blockquote
 
@@ -540,8 +546,8 @@ top of that are the same thing said twice.
 
 | Part | Description |
 | --- | --- |
-| `blockquote` | The quotation. |
 | `attribution` | The footer carrying the source. |
+| `blockquote` | The quotation. |
 
 #### Custom properties
 
@@ -598,8 +604,8 @@ and leaves box and background to `::slotted`.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `current` | `current` | `boolean` | `false` | `HelixHeadlessBreadcrumb` | Whether this item is the page the reader is on. |
-| `href` | `href` | `string` | `''` | `HelixHeadlessBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
-| `rel` | `rel` | `string` | `''` | `HelixHeadlessBreadcrumb` | What the link declares about where it goes. The consumer's decision. |
+| `href` | `href` | `string \| undefined` | - | `HelixHeadlessBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
+| `rel` | `rel` | `string` | `''` | `HelixHeadlessBreadcrumb` | What the link declares about where it goes. |
 | `target` | `target` | `string` | `''` | `HelixHeadlessBreadcrumb` | Where the link opens, for the rare crumb that leaves the site. |
 
 #### Slots
@@ -608,8 +614,8 @@ and leaves box and background to `::slotted`.
 | --- | --- |
 | *(default)* | The step: a link, or the text of the current page. |
 | `separator` | Replaces the chevron shown before this item. |
-| `start` | Before the label, for an icon. |
 | `end` | After it, for a count or a mark. |
+| `start` | Before the label, for an icon. |
 
 #### Parts
 
@@ -623,9 +629,9 @@ and leaves box and background to `::slotted`.
 
 | Property | Description |
 | --- | --- |
-| `--breadcrumbs-separator-color` | Color of the chevron. |
-| `--breadcrumbs-hover-color` | Fill behind a step under the pointer. |
 | `--breadcrumbs-control-size` | How tall a control slotted into a crumb is. |
+| `--breadcrumbs-hover-color` | Fill behind a step under the pointer. |
+| `--breadcrumbs-separator-color` | Color of the chevron. |
 
 ## Button
 
@@ -680,8 +686,8 @@ ring is declared here rather than inherited, because the base layer's
 | Slot | Description |
 | --- | --- |
 | *(default)* | The button's label. |
-| `start` | Content before the label, usually an icon. |
 | `end` | Content after the label. |
+| `start` | Content before the label, usually an icon. |
 
 #### Parts
 
@@ -698,12 +704,13 @@ ring is declared here rather than inherited, because the base layer's
 | `--button-foreground-color` | Label and icon color. |
 | `--button-inline-size` | Width taken by `width="standard"`. |
 | `--button-radii` | Corner radius of the control. |
-| `--button-radii-start` | Leading corners, which a group flattens. |
 | `--button-radii-end` | Trailing corners, which a group flattens. |
-| `--button-radii-start-start` | The top leading corner, for a group stacking down. |
-| `--button-radii-start-end` | The top trailing corner, for a group stacking down. |
-| `--button-radii-end-start` | The bottom leading corner, for a group stacking down. |
 | `--button-radii-end-end` | The bottom trailing corner, for a group stacking down. |
+| `--button-radii-end-start` | The bottom leading corner, for a group stacking down. |
+| `--button-radii-start` | Leading corners, which a group flattens. |
+| `--button-radii-start-end` | The top trailing corner, for a group stacking down. |
+| `--button-radii-start-start` | The top leading corner, for a group stacking down. |
+| `--button-size` | Height of the control, for a container whose row is not one of the density steps. |
 
 ## Button Group
 
@@ -775,8 +782,8 @@ headless tier; this tier only decides what that meaning looks like.
 
 | Part | Description |
 | --- | --- |
-| `icon` | The icon region. |
 | `content` | The content region. |
+| `icon` | The icon region. |
 | `icon-mark` | The tone glyph, where none is slotted. |
 
 #### Custom properties
@@ -822,10 +829,10 @@ element you slotted, not a wrapper around it.
 
 | Slot | Description |
 | --- | --- |
-| `media` | Image, video, or chart that runs edge to edge, outside the inset. |
-| `header` | Title and any actions for the whole card. |
 | *(default)* | The card's main content. |
 | `footer` | Actions that conclude the card. |
+| `header` | Title and any actions for the whole card. |
+| `media` | Image, video, or chart that runs edge to edge, outside the inset. |
 
 #### Custom properties
 
@@ -876,6 +883,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixHeadlessCarousel` | Which way the track runs. |
 | `perView` | `per-view` | `number \| undefined` | - | `HelixHeadlessCarousel` | How many slides are shown across the track at once. Absent shows one. |
 | `positions` | - | `number` | - | `HelixHeadlessCarousel` | How many distinct views the track holds, which is what the indicators count. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixHeadlessCarousel` | Manual, so each slide can be wrapped without its markup being touched. |
 | `slides` | - | `HTMLElement[]` | - | `HelixHeadlessCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
 
 #### Methods
@@ -909,14 +917,15 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `previous-mark` | The glyph on the previous control. |
 | `rotation` | The control that stops and starts rotation. |
 | `rotation-mark` | The glyph on the play and pause control. |
+| `slide` | The pane one slide is shown in, and the box the track snaps to. |
 | `track` | The scroller the slides sit in. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--carousel-block-size` | Height of a vertical track. |
 | `--carousel-bleed` | Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. |
+| `--carousel-block-size` | Height of a vertical track. |
 | `--carousel-gap` | Space between slides. |
 
 ## Chat
@@ -970,34 +979,36 @@ offering it.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The turns, as `helix-chat-message` children. |
-| `header` | Above the transcript. |
 | `composer` | Below the transcript, where the reader writes. |
-| `status` | Beside the composer: somebody typing, connection lost. |
+| `header` | Above the transcript. |
 | `resume` | The way back to the bottom. |
+| `status` | Beside the composer: somebody typing, connection lost. |
 | `actions` | Beside the header: what can be done to the conversation itself. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `log` | The transcript, which is the thing that scrolls. |
 | `composer` | The region the composer sits in. |
-| `header` | The region above the transcript. |
+| `log` | The transcript, which is the thing that scrolls. |
 | `actions` | The controls for the conversation, at the header's trailing edge. |
+| `empty` | Shown when the conversation has no turns. |
+| `header` | The region above the transcript. |
+| `loading` | Shown while the history is still on its way. |
 | `resume` | The affordance offered while the reader is away from the bottom. |
 | `status` | The status region, which is not part of the log. |
-| `empty` | Shown when the conversation has no turns. |
-| `loading` | Shown while the history is still on its way. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--chat-max-height` | How tall the conversation may get before the transcript scrolls. |
 | `--chat-gap` | Space between turns. |
-| `--chat-rule` | The hairline under the header. |
+| `--chat-max-height` | How tall the conversation may get before the transcript scrolls. |
 | `--chat-padding-inline` | Space either side of every region. |
+| `--chat-resume-border-color` | The edge around the way back. |
+| `--chat-resume-border-width` | How thick that edge is, for a surface over content. |
 | `--chat-resume-shadow` | The lift under the way back, which floats over the transcript. |
+| `--chat-rule` | The hairline under the header. |
 
 ### Composer (`helix-chat-composer`)
 
@@ -1018,10 +1029,10 @@ a ceiling eats the transcript it belongs to.
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessChatComposer` | Whether the composer refuses input, while a turn is in flight say. |
 | `label` | `label` | `string` | `'Message'` | `HelixHeadlessChatComposer` | Accessible name for the field. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessChatComposer` | Shown in an empty field. |
-| `rows` | `rows` | `number` | `1` | `HelixHeadlessChatComposer` | How many rows the field opens at. It grows from there. |
+| `rows` | `rows` | `number` | `1` | `HelixHeadlessChatComposer` | How many rows the field opens at. |
 | `sendLabel` | `send-label` | `string` | `'Send'` | `HelixHeadlessChatComposer` | Label for the control that sends. |
 | `submitOn` | `submit-on` | `'button' \| 'enter'` | `'enter'` | `HelixHeadlessChatComposer` | What sends: pressing Enter, or only the control. |
-| `value` | `value` | `string` | `''` | `HelixHeadlessChatComposer` | What the reader has written. Read it, or set it to seed a draft. |
+| `value` | `value` | `string` | `''` | `HelixHeadlessChatComposer` | What the reader has written. |
 
 #### Methods
 
@@ -1039,20 +1050,20 @@ a ceiling eats the transcript it belongs to.
 
 | Slot | Description |
 | --- | --- |
-| `start` | Under the field, at the leading edge: attachments, a model picker. |
 | `end` | Under the field, beside the send control. |
+| `start` | Under the field, at the leading edge: attachments, a model picker. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `field` | The text field. |
-| `tools` | The row under the field. |
 | `send` | The control that offers the turn. |
+| `tools` | The row under the field. |
 | `composer` | The whole composer. |
-| `start` | The leading slot's box. |
 | `end` | The trailing slot's box. |
 | `mark` | The glyph inside the send control. |
+| `start` | The leading slot's box. |
 
 #### Custom properties
 
@@ -1082,7 +1093,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | --- | --- | --- | --- | --- | --- |
 | `at` | `at` | `string` | `''` | `HelixHeadlessChatMessage` | When it was said, as anything `Date` parses. |
 | `author` | `author` | `string \| undefined` | - | `HelixHeadlessChatMessage` | Who said it. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. Empty is the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. |
 | `retryLabel` | `retry-label` | `string` | `'Try again'` | `HelixHeadlessChatMessage` | Label for the control offered on a failed message. |
 | `sendingLabel` | `sending-label` | `string` | `'Sending'` | `HelixHeadlessChatMessage` | What to call each state, for a reader who cannot see it. |
 | `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Where the turn's surface ends. |
@@ -1099,8 +1110,8 @@ is the signal, and decorating it competes with the thing it is decorating.
 | Slot | Description |
 | --- | --- |
 | *(default)* | What was said. |
-| `avatar` | Who said it. |
 | `actions` | What can be done with it. |
+| `avatar` | Who said it. |
 | `sources` | What it was said from: citations, documents, a retrieved page. |
 
 #### Parts
@@ -1109,22 +1120,21 @@ is the signal, and decorating it competes with the thing it is decorating.
 | --- | --- |
 | `content` | What was said. |
 | `meta` | The time and the state together. |
-| `message` | The whole turn. |
+| `actions` | The controls offered on the turn, beside its time. |
 | `avatar` | The leading slot's box. |
 | `body` | What was said, and the line under it. |
-| `sources` | What the turn was drawn from, under it and outside the bubble. |
-| `time` | When it was said. |
-| `state` | What has happened to it, where that is worth saying. |
 | `mark` | The status glyph beside a failure. |
+| `message` | The whole turn. |
 | `retry` | The control offered on a failed message. |
-| `actions` | The controls offered on the turn, beside its time. |
+| `sources` | What the turn was drawn from, under it and outside the bubble. |
+| `state` | What has happened to it, where that is worth saying. |
+| `time` | When it was said. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--chat-message-background` | Fill behind a turn. |
-| `--chat-message-border-width` | The edge every turn carries, which only a failed one colors. |
 | `--chat-message-background-me` | Fill behind the reader's own turns. |
 | `--chat-message-color` | Ink in a turn. |
 | `--chat-message-measure` | How wide a turn may get before it wraps. |
@@ -1180,8 +1190,8 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | Event | Type | Description |
 | --- | --- | --- |
 | `input` | `Event` | Announced once the state has moved. |
-| `helix-before-toggle` | `HelixBeforeToggleEvent` | Fired before the state changes, and cancelable. |
 | `change` | `Event` | Relayed from the input once the state has changed. |
+| `helix-before-toggle` | `HelixBeforeToggleEvent` | Fired before the state changes, and cancelable. |
 
 #### Slots
 
@@ -1193,26 +1203,26 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Part | Description |
 | --- | --- |
-| `field` | The row the box and its label share, and the surface the card appearance draws. |
 | `box` | The frame the input is painted as, and the mark sits over. |
 | `control` | The input. |
+| `feedback` | What is wrong with it. |
+| `field` | The row the box and its label share, and the surface the card appearance draws. |
+| `hint` | Help under the control, while nothing is wrong. |
 | `label` | The label beside it. |
 | `mark` | The tick, or the dash when the box is indeterminate. |
-| `hint` | Help under the control, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--checkbox-size` | Width and height of the box. |
-| `--checkbox-checked-color` | Fill of a ticked box. |
 | `--checkbox-background-color` | Fill of an unticked box. |
 | `--checkbox-border-color` | Edge of the box, in every state. |
-| `--checkbox-mark-color` | Ink the tick is drawn in. |
-| `--checkbox-card-padding` | Inset of the card appearance. |
 | `--checkbox-card-background-color` | Fill behind a card-shaped choice. |
 | `--checkbox-card-border-color` | Edge around one. |
+| `--checkbox-card-padding` | Inset of the card appearance. |
+| `--checkbox-checked-color` | Fill of a ticked box. |
+| `--checkbox-mark-color` | Ink the tick is drawn in. |
+| `--checkbox-size` | Width and height of the box. |
 
 ## Checkbox Group
 
@@ -1252,26 +1262,26 @@ line per answer rather than hunting along a row.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when any box changes, with the whole set. |
 | `input` | `Event` | Announced once the value has moved. |
-| `change` | `Event` | Announced once the value has moved. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
 | *(default)* | The checkboxes. |
-| `label` | Richer than a string, where the label is more than one. |
 | `hint` | Richer than a string. |
+| `label` | Richer than a string, where the label is more than one. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `label` | The group's name, over the set. |
-| `items` | The list itself, which is what `orientation` lays out. |
-| `hint` | Help under the set. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the set. |
+| `items` | The list itself, which is what `orientation` lays out. |
+| `label` | The group's name, over the set. |
 
 #### Custom properties
 
@@ -1306,8 +1316,8 @@ around it at the same nominal size. `--code-size` overrides it.
 
 | Property | Description |
 | --- | --- |
-| `--code-size` | The fragment's size. Defaults to `text-sm`. |
 | `--code-padding` | Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. |
+| `--code-size` | The fragment's size. Defaults to `text-sm`. |
 
 ## Code Block
 
@@ -1340,20 +1350,24 @@ of a snippet a reader is most likely to be reading.
 | --- | --- |
 | `block` | The scrolling `<pre>`. |
 | `code` | The `<code>` inside it. |
-| `frame` | The code and the copy button beside it. |
-| `header` | The bar carrying the name, where there is one. |
 | `copy` | The copy button. |
-| `label` | The file name or language, where one is given. |
 | `copy-button` | The inner button. |
 | `copy-mark` | The clipboard glyph, and the confirmation that replaces it. |
 | `copy-tooltip` | The bubble, forwarded from the tooltip inside. |
 | `copy-tooltip-arrow` | The point, resting against the trigger. |
+| `frame` | The code and the copy button beside it. |
+| `header` | The bar carrying the name, where there is one. |
+| `label` | The file name or language, where one is given. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--code-block-backdrop` | A filter over what shows through the block and its header, for a translucent ground. |
 | `--code-block-background` | The ground behind the code, for a block that is not on the page. |
+| `--code-block-border-color` | The line around the block and its header. |
+| `--code-block-header-background` | The ground behind the name, where it should not be `surface-raised`. |
+| `--code-block-radii` | The corner on the header's top and the block's bottom, which are one shape. |
 
 ## Color Input
 
@@ -1424,37 +1438,48 @@ pads its own lower rows.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `start` | Content at the leading end of the field, inside its border. |
 | `end` | Content at the trailing end, before the trigger. |
-| `trigger` | The mark on the field saying a panel opens. |
-| `hint` | Help under the field. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the field. |
+| `start` | Content at the leading end of the field, inside its border. |
+| `trigger` | The mark on the field saying a panel opens. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding the text and the trigger. |
 | `control` | The text input carrying the value. Absent in `swatch`. |
-| `trigger` | The control that opens the panel. |
-| `preview` | The chip showing the color, inside the trigger. |
-| `surface` | The floating panel. |
+| `feedback` | What is wrong with it. |
+| `field` | The box holding the text and the trigger. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `label` | The question, over the field. |
 | `picker` | The color picker inside it. |
 | `picker-actions` | The group holding the eyedropper and the syntax toggle. |
 | `picker-channel` | One ramp. |
+| `picker-channel-control` | The range input. |
+| `picker-channel-feedback` | What is wrong with it. |
+| `picker-channel-field` | The row: the control and its readout. |
+| `picker-channel-hint` | Help under the track, while nothing is wrong. |
+| `picker-channel-label` | The question, over the track. |
+| `picker-channel-marker` | One mark. |
+| `picker-channel-marker-label` | The value a mark stands at, when `marker-labels` is set. |
+| `picker-channel-markers` | The row of marks along the track. |
+| `picker-channel-output` | The current value, shown beside it. |
 | `picker-channels` | The ramps beside it. |
 | `picker-controls` | The row under the square. |
 | `picker-eyedropper` | The control that samples a color from the screen. |
+| `picker-eyedropper-button` | The inner control. |
 | `picker-footer` | The row holding the value and the tools. |
 | `picker-format` | The control that changes the syntax the value is written in. |
+| `picker-format-button` | The inner control. |
 | `picker-grid` | The saturation and brightness square. |
 | `picker-grid-brightness` | The range input for its vertical axis. |
 | `picker-grid-handle` | The mark showing where in the square the color sits. |
@@ -1464,20 +1489,9 @@ pads its own lower rows.
 | `picker-swatch` | One preset. |
 | `picker-swatches` | The row of presets. |
 | `picker-value` | The color as text, which can be typed or pasted. |
-| `picker-channel-control` | The range input. |
-| `picker-channel-field` | The row: the control and its readout. |
-| `picker-channel-marker` | One mark. |
-| `picker-channel-marker-label` | The value a mark stands at, when `marker-labels` is set. |
-| `picker-channel-markers` | The row of marks along the track. |
-| `picker-channel-output` | The current value, shown beside it. |
-| `picker-eyedropper-button` | The inner control. |
-| `picker-format-button` | The inner control. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
-| `picker-channel-feedback` | What is wrong with it. |
-| `picker-channel-hint` | Help under the track, while nothing is wrong. |
-| `picker-channel-label` | The question, over the track. |
+| `preview` | The chip showing the color, inside the trigger. |
+| `surface` | The floating panel. |
+| `trigger` | The control that opens the panel. |
 
 #### Custom properties
 
@@ -1559,10 +1573,10 @@ brought its own card would be a card inside a card there.
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
-| `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a color was taken. |
-| `helix-sample-start` | `HelixSampleStartEvent` | The eyedropper is opening, so anything covering the page should get out of the way. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the color changes. |
 | `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
+| `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a color was taken. |
+| `helix-sample-start` | `HelixSampleStartEvent` | The eyedropper is opening, so anything covering the page should get out of the way. |
 
 #### Slots
 
@@ -1574,43 +1588,43 @@ brought its own card would be a card inside a card there.
 
 | Part | Description |
 | --- | --- |
-| `grid` | The saturation and brightness square. |
-| `grid-handle` | The mark showing where in the square the color sits. |
-| `grid-saturation` | The range input for the square's horizontal axis. |
-| `grid-brightness` | The range input for its vertical axis. |
-| `controls` | The row under the square. |
-| `icon` | A glyph this component draws. |
-| `sample` | The chip of the current color, which copies it when pressed. |
-| `channels` | The ramps beside it. |
-| `channel` | One ramp. |
 | `actions` | The group holding the eyedropper and the syntax toggle. |
-| `eyedropper` | The control that samples a color from the screen. |
-| `footer` | The row holding the value and the tools. |
-| `value` | The color as text, which can be typed or pasted. |
-| `format` | The control that changes the syntax the value is written in. |
-| `swatches` | The row of presets. |
-| `swatch` | One preset. |
+| `channel` | One ramp. |
 | `channel-control` | The range input. |
+| `channel-feedback` | What is wrong with it. |
 | `channel-field` | The row: the control and its readout. |
+| `channel-hint` | Help under the track, while nothing is wrong. |
+| `channel-label` | The question, over the track. |
 | `channel-marker` | One mark. |
 | `channel-marker-label` | The value a mark stands at, when `marker-labels` is set. |
 | `channel-markers` | The row of marks along the track. |
 | `channel-output` | The current value, shown beside it. |
+| `channels` | The ramps beside it. |
+| `controls` | The row under the square. |
+| `eyedropper` | The control that samples a color from the screen. |
 | `eyedropper-button` | The inner control. |
+| `footer` | The row holding the value and the tools. |
+| `format` | The control that changes the syntax the value is written in. |
 | `format-button` | The inner control. |
-| `channel-feedback` | What is wrong with it. |
-| `channel-hint` | Help under the track, while nothing is wrong. |
-| `channel-label` | The question, over the track. |
+| `grid` | The saturation and brightness square. |
+| `grid-brightness` | The range input for its vertical axis. |
+| `grid-handle` | The mark showing where in the square the color sits. |
+| `grid-saturation` | The range input for the square's horizontal axis. |
+| `icon` | A glyph this component draws. |
+| `sample` | The chip of the current color, which copies it when pressed. |
+| `swatch` | One preset. |
+| `swatches` | The row of presets. |
+| `value` | The color as text, which can be typed or pasted. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--color-picker-grid-radii` | Corner radius of the square. |
+| `--color-picker-grid-ratio` | Aspect ratio of the square. |
 | `--color-picker-inset` | Inset of the rows under the square, and the bottom. |
 | `--color-picker-sample-size` | Edge length of the chip that copies the value. |
 | `--color-picker-swatch-size` | Edge length of one preset. |
-| `--color-picker-grid-ratio` | Aspect ratio of the square. |
-| `--color-picker-grid-radii` | Corner radius of the square. |
 | `--color-picker-brightness` | The chosen brightness, 0 to 100, as a percentage. |
 | `--color-picker-hue` | The chosen hue, 0 to 360, unitless. |
 | `--color-picker-saturation` | The chosen saturation, 0 to 100, as a percentage. |
@@ -1678,9 +1692,9 @@ Input, Color Input and Date Input all take.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the chosen option changes. |
-| `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the panel opens. |
+| `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -1688,22 +1702,21 @@ Input, Color Input and Date Input all take.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The options, which are `helix-option` elements. |
-| `start` | Before the text, for an icon. |
 | `end` | After it, for a unit or a clear button. |
 | `indicator` | Replaces the caret saying the field opens. |
+| `start` | Before the text, for an icon. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box around the text and its marks. |
 | `control` | The text field itself. |
-| `tags` | The row of chosen options, when `multiple` is set. |
-| `tag` | One chosen option. |
-| `rest` | The count of choices held beyond `max-tags`. |
 | `create` | The row offering to add what was typed. |
+| `feedback` | What is wrong with it. |
+| `field` | The box around the text and its marks. |
+| `hint` | Help under the field, while nothing is wrong. |
 | `indicator` | The caret. |
-| `surface` | The floating panel. |
+| `label` | The question, over the field. |
 | `listbox` | The list inside it. |
 | `listbox-empty` | Shown when a filter has hidden everything. |
 | `listbox-feedback` | What is wrong with it. |
@@ -1712,15 +1725,16 @@ Input, Color Input and Date Input all take.
 | `listbox-hint` | Help under the list. |
 | `listbox-items` | The list itself. |
 | `listbox-label` | The question, over the list. |
+| `listbox-loading` | Shown while the options are still on their way. from the listbox. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
+| `rest` | The count of choices held beyond `max-tags`. |
+| `surface` | The floating panel. |
+| `tag` | One chosen option. |
 | `tag-dismiss` | The remove button, when `dismissible`. |
 | `tag-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
 | `tag-prefix` | The category before the label. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
-| `listbox-loading` | Shown while the options are still on their way. from the listbox. |
+| `tags` | The row of chosen options, when `multiple` is set. |
 
 #### Custom properties
 
@@ -1769,9 +1783,9 @@ otherwise walk up and down the screen under the words being typed.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the palette opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the palette opens. |
+| `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -1786,8 +1800,8 @@ otherwise walk up and down the screen under the words being typed.
 | Part | Description |
 | --- | --- |
 | `dialog` | The overlay's own box, forwarded from the dialog. |
-| `listbox` | The list inside it. |
 | `footer` | The row under the list. |
+| `listbox` | The list inside it. |
 | `listbox-empty` | Shown when a filter has hidden everything. |
 | `listbox-feedback` | What is wrong with it. |
 | `listbox-filter-icon` | The mark beside that field. |
@@ -1795,16 +1809,16 @@ otherwise walk up and down the screen under the words being typed.
 | `listbox-hint` | Help under the list. |
 | `listbox-items` | The list itself. |
 | `listbox-label` | The question, over the list. |
+| `listbox-loading` | Shown while the options are still on their way. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
-| `listbox-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--command-size` | How wide the palette is. Defaults to `40rem`. |
 | `--command-list-size` | How tall the list grows before it scrolls. |
+| `--command-size` | How wide the palette is. Defaults to `40rem`. |
 
 ## Copy Button
 
@@ -1863,8 +1877,8 @@ it for reassurance reads as a second, accidental press.
 | --- | --- |
 | *(default)* | The resting icon. Falls back to a clipboard. |
 | `copied` | What replaces it once the write succeeds. Falls back to a check. |
-| `start` | Content before the label, usually an icon. |
 | `end` | Content after the label. |
+| `start` | Content before the label, usually an icon. |
 
 #### Parts
 
@@ -1930,43 +1944,43 @@ limitation and worth repeating where a consumer chooses between the two: use
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-sort` | `HelixSortEvent` | Fired when a reader asks for a different order, and cancelable. |
 | `helix-filter` | `HelixFilterEvent` | Fired when the query changes, and cancelable. |
 | `helix-navigate` | `HelixNavigateEvent` | Fired when a reader asks for another page, and cancelable. |
+| `helix-sort` | `HelixSortEvent` | Fired when a reader asks for a different order, and cancelable. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
 | *(default)* | The columns, declared as `helix-table-column` children. |
-| `toolbar` | Above the grid, for a search field or actions. |
 | `footer` | Below the grid, replacing the pagination this would otherwise draw. |
+| `toolbar` | Above the grid, for a search field or actions. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `table` | The grid. |
 | `cell` | One cell. |
+| `table` | The grid. |
+| `empty` | Shown when no rows match. |
+| `footer` | The region below the grid. |
 | `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
+| `loading` | Shown while the rows are still on their way. |
+| `pagination` | The pagination, where this draws one. |
 | `row` | One row of data. |
 | `toolbar` | The region above the grid. |
-| `footer` | The region below the grid. |
-| `pagination` | The pagination, where this draws one. |
-| `empty` | Shown when no rows match. |
-| `loading` | Shown while the rows are still on their way. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--data-table-columns` | Track list for the columns, which wins over the one the columns worked out. |
-| `--data-table-rule` | The hairline between rows. |
 | `--data-table-color` | Ink in a cell. |
+| `--data-table-columns` | Track list for the columns, which wins over the one the columns worked out. |
 | `--data-table-heading-color` | Ink in a heading. |
-| `--data-table-text` | Type size, headings and cells alike. |
 | `--data-table-padding-block` | Space above and below a cell's content. |
 | `--data-table-padding-inline` | Space either side of a cell's content. |
+| `--data-table-rule` | The hairline between rows. |
+| `--data-table-text` | Type size, headings and cells alike. |
 | `--data-table-template` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. |
 
 ## Date Input
@@ -2044,33 +2058,32 @@ whatever holds it.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the date changes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the calendar opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the calendar opens. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `trigger` | The mark on the field saying a calendar opens. |
-| `hint` | Help under the field. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the field. |
+| `trigger` | The mark on the field saying a calendar opens. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding the text and the trigger. |
 | `control` | The text input. |
 | `date` | One held date, as a tag, in `multiple`. |
-| `rest` | How many dates are held beyond the ones shown. |
-| `trigger` | The control that opens the calendar. |
-| `trigger-icon` | The mark on the button that opens the calendar. |
-| `surface` | The floating panel. |
-| `picker` | The date picker inside it. |
 | `date-dismiss` | The remove button, when `dismissible`. |
 | `date-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
 | `date-prefix` | The category before the label. |
+| `feedback` | What is wrong with it. |
+| `field` | The box holding the text and the trigger. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `label` | The question, over the field. |
+| `picker` | The date picker inside it. |
 | `picker-cell` | One column of a row, which is what a range paints. |
 | `picker-day` | The shape inside a cell, which is what a single date paints. |
 | `picker-grid` | The grid of days. |
@@ -2084,9 +2097,10 @@ whatever holds it.
 | `picker-previous-mark` | The glyph on the previous month control. |
 | `picker-week` | One row of days. |
 | `picker-weekday` | A column header naming a day of the week. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
+| `rest` | How many dates are held beyond the ones shown. |
+| `surface` | The floating panel. |
+| `trigger` | The control that opens the calendar. |
+| `trigger-icon` | The mark on the button that opens the calendar. |
 
 #### Custom properties
 
@@ -2131,7 +2145,7 @@ grid reads as a continuous run of dates.
 | `invalid` | `invalid` | `boolean` | `false` | `HelixHeadlessDatePicker` | Whether the current selection fails validation. |
 | `label` | `label` | `string` | `'Date Picker'` | `HelixHeadlessDatePicker` | Accessible name for the grid. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessDatePicker` | Locale for month and day names. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessDatePicker` | Locale for month and day names. |
 | `max` | `max` | `string` | `''` | `HelixHeadlessDatePicker` | Latest selectable date, as `YYYY-MM-DD`. |
 | `min` | `min` | `string` | `''` | `HelixHeadlessDatePicker` | Earliest selectable date, as `YYYY-MM-DD`. |
 | `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixHeadlessDatePicker` | How many dates can be held at once. |
@@ -2169,8 +2183,8 @@ grid reads as a continuous run of dates.
 
 | Slot | Description |
 | --- | --- |
-| `previous-icon` | The glyph on the control that moves back a month, usually a caret. |
 | `next-icon` | The glyph on the control that moves forward a month, usually a caret. |
+| `previous-icon` | The glyph on the control that moves back a month, usually a caret. |
 
 #### Parts
 
@@ -2196,10 +2210,10 @@ grid reads as a continuous run of dates.
 | --- | --- |
 | `--date-picker-columns` | Months per row. Two unless there is only one. |
 | `--date-picker-day-size` | Width and height of a day. |
-| `--date-picker-track-size` | Width of a column, which is what sets the space between days. |
+| `--date-picker-range-color` | Band behind the days in a range. |
 | `--date-picker-row-size` | Height of a week row. |
 | `--date-picker-selected-color` | Fill behind a selected day. |
-| `--date-picker-range-color` | Band behind the days in a range. |
+| `--date-picker-track-size` | Width of a column, which is what sets the space between days. |
 | `--date-picker-column-count` | How many month columns are drawn, capped at two. `--date-picker-columns` overrides it. |
 
 ## Dialog
@@ -2241,9 +2255,9 @@ dialog rather than being a div somebody positioned.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
 | `close` | `Event` | Relayed, because the platform's own does not escape. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -2251,9 +2265,9 @@ dialog rather than being a div somebody positioned.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The dialog's content. |
-| `icon` | A single mark above the title, for a dialog that warns. |
-| `header` | The title, and anything beside it. |
 | `footer` | The actions. |
+| `header` | The title, and anything beside it. |
+| `icon` | A single mark above the title, for a dialog that warns. |
 
 #### Parts
 
@@ -2265,12 +2279,12 @@ dialog rather than being a div somebody positioned.
 
 | Property | Description |
 | --- | --- |
-| `--dialog-rise` | How far the panel rises as it opens. Follows `--helix-space-lg`. |
 | `--dialog-border-color` | Color of the panel's edge. |
 | `--dialog-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--dialog-icon-size` | How big the mark above the title is. |
 | `--dialog-inline-size` | Width of the panel. |
 | `--dialog-inset` | Padding inside the panel. |
+| `--dialog-rise` | How far the panel rises as it opens. Follows `--helix-space-lg`. |
 | `--dialog-scrim` | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
 | `--dialog-shadow` | Lift under the panel. Follows `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it keeps a lift by default. |
 
@@ -2371,16 +2385,16 @@ larger than the default.
 | Part | Description |
 | --- | --- |
 | `center` | The middle of the ring, holding whatever is slotted. |
+| `mark` | The invisible point the tooltip is anchored to. |
 | `plot` | The drawing. |
+| `segment` | One slice. |
+| `segment-edge` | One slice as a closed shape, for a boundary to trace. |
 | `tooltip` | The bubble, forwarded from `Tooltip`. |
 | `tooltip-anchor` | The `Tooltip` element itself. |
-| `mark` | The invisible point the tooltip is anchored to. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The slice's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
 | `tooltip-value` | A column's value inside the tooltip. |
-| `segment` | One slice. |
-| `segment-edge` | One slice as a closed shape, for a boundary to trace. |
 | `track` | The ring the slices are drawn on. |
 
 #### Custom properties
@@ -2429,8 +2443,8 @@ rest is flat and the movement is what says something happened.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the drawer opens or closes. |
-| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the panel closes, and cancelable. |
 | `close` | `Event` | Relayed, because the platform's own does not escape. |
+| `helix-before-close` | `HelixBeforeCloseEvent` | Fired before the panel closes, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -2444,9 +2458,9 @@ rest is flat and the movement is what says something happened.
 
 | Part | Description |
 | --- | --- |
-| `panel` | The sliding panel. |
-| `header` | The header region. |
 | `content` | The scrolling content region. |
+| `header` | The header region. |
+| `panel` | The sliding panel. |
 
 #### Custom properties
 
@@ -2515,11 +2529,11 @@ from: the page arriving was not in the DOM a frame ago. Under
 | --- | --- |
 | `back` | The control that returns one page. |
 | `back-mark` | The glyph on the back control. |
+| `empty` | Shown when there are no entries to show. |
 | `header` | The bar above a page, holding the way back and its name. |
+| `loading` | Shown while the entries are still on their way. |
 | `page` | The region the rows are in. |
 | `title` | The name of the page showing. |
-| `empty` | Shown when there are no entries to show. |
-| `loading` | Shown while the entries are still on their way. |
 
 #### Custom properties
 
@@ -2544,8 +2558,8 @@ lines up with the edge the eye is already following down the list.
 | --- | --- | --- | --- | --- | --- |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether the row can be reached at all. |
 | `focusable` | - | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether this row holds the region's tab stop. Written by the stack. |
-| `onPage` | - | `boolean` | `true` | `HelixHeadlessDrilldownItem` | Whether the page showing is the one this row is on. Written by the stack. |
-| `showingPage` | - | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether this row's own page is the one showing. Written by the stack. |
+| `onPage` | - | `boolean` | `true` | `HelixHeadlessDrilldownItem` | Whether the page showing is the one this row is on. |
+| `showingPage` | - | `boolean` | `false` | `HelixHeadlessDrilldownItem` | Whether this row's own page is the one showing. |
 | `value` | `value` | `string` | `''` | `HelixHeadlessDrilldownItem` | Identifies the row to whatever is listening. |
 
 #### Methods
@@ -2566,9 +2580,9 @@ lines up with the edge the eye is already following down the list.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The words naming this row. |
+| `end` | After the words, usually a mark or a count. |
 | `page` | The rows of the page this one opens. |
 | `start` | Before the words, usually an icon. |
-| `end` | After the words, usually a mark or a count. |
 
 #### Parts
 
@@ -2605,10 +2619,10 @@ empty.
 
 | Slot | Description |
 | --- | --- |
-| `icon` | A mark above the heading. |
-| `heading` | What is missing. |
 | *(default)* | Why, and what to do about it. |
 | `actions` | The way out. |
+| `heading` | What is missing. |
+| `icon` | A mark above the heading. |
 
 #### Custom properties
 
@@ -2652,7 +2666,7 @@ invisible.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessFileInput` | Language tag the sizes are written in. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessFileInput` | Language tag the sizes are written in. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixHeadlessFileInput` | Whether more than one file can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixHeadlessFileInput` | What the control removing one file is called, per file. |
@@ -2673,43 +2687,43 @@ invisible.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the chosen files change, with their names. |
-| `input` | `Event` | Announced once the value has moved. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `trigger` | What the reader presses to open the picker. |
-| `hint` | Help under the field. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the field. |
+| `trigger` | What the reader presses to open the picker. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box that is pressed and dropped on. |
 | `control` | The file input itself, which carries the label and validity. |
-| `icon` | A glyph this component draws. |
-| `trigger` | The label that opens the picker. |
-| `list` | The chosen files. |
-| `file` | One chosen file. |
 | `detail` | Its name and its reading, stacked. |
-| `name` | Its name. |
-| `meta` | The row holding its size and kind. |
-| `size` | How big it is. |
+| `feedback` | What is wrong with it. |
+| `field` | The box that is pressed and dropped on. |
+| `file` | One chosen file. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `icon` | A glyph this component draws. |
 | `kind` | What kind of file it is. |
-| `remove` | The control that takes it back out. |
 | `kind-dismiss` | The remove button, when `dismissible`. |
 | `kind-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
 | `kind-prefix` | The category before the label. |
+| `label` | The question, over the field. |
+| `list` | The chosen files. |
+| `meta` | The row holding its size and kind. |
+| `name` | Its name. |
+| `remove` | The control that takes it back out. |
+| `size` | How big it is. |
 | `size-dismiss` | The remove button, when `dismissible`. |
 | `size-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
 | `size-prefix` | The category before the label. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
+| `trigger` | The label that opens the picker. |
 
 #### Custom properties
 
@@ -2781,11 +2795,11 @@ date is written once and should sit in the text like the text.
 | `day` | `day` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the day of the month is written, where a date is shown. |
 | `elapsed` | `elapsed` | `boolean` | `false` | `HelixHeadlessFormatDate` | Show how long ago it was, compactly, instead of the date. |
 | `hour` | `hour` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the hour is written, where a time of day is shown. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessFormatDate` | Locale for the reading. Empty is the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessFormatDate` | Locale for the reading. |
 | `minute` | `minute` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the minute is written, where a time of day is shown. |
 | `month` | `month` | `'numeric' \| '2-digit' \| 'long' \| 'short' \| 'narrow' \| undefined` | - | `HelixHeadlessFormatDate` | How the month is written, where a date is shown. |
 | `second` | `second` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the second is written, where a time of day is shown. |
-| `timeZone` | `time-zone` | `string \| undefined` | - | `HelixHeadlessFormatDate` | The time zone to read the timestamp in. Empty is the runtime's own. |
+| `timeZone` | `time-zone` | `string \| undefined` | - | `HelixHeadlessFormatDate` | The time zone to read the timestamp in. |
 | `timeZoneName` | `time-zone-name` | `'long' \| 'short' \| undefined` | - | `HelixHeadlessFormatDate` | Whether to name the time zone, and how. |
 | `weekday` | `weekday` | `'long' \| 'short' \| 'narrow' \| undefined` | - | `HelixHeadlessFormatDate` | How the weekday is written, where one is shown. |
 | `year` | `year` | `'numeric' \| '2-digit' \| undefined` | - | `HelixHeadlessFormatDate` | How the year is written, where a date is shown. |
@@ -2884,50 +2898,50 @@ compare two cells by. Both are hooks, so a page may answer differently.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The `<table>` this draws, where it is not named by `for`. |
+| `end` | Below the strip, at the trailing edge. |
 | `start` | Below the strip, at the leading edge. |
 | `summary` | Below the strip, in the middle. |
-| `end` | Below the strip, at the trailing edge. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `strip` | The grid of cells. |
 | `cell` | One reading. |
 | `footer` | The three-slot row under the strip. |
 | `mark` | The invisible point the tooltip is anchored to. |
+| `strip` | The grid of cells. |
 | `tooltip` | The bubble, forwarded from `Tooltip`. |
 | `tooltip-anchor` | The `Tooltip` element itself. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The reading's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
 | `tooltip-value` | A column's value inside the tooltip. |
+| `empty` | Shown when the table has no readings in it. |
+| `end` | The trailing slot's box. |
 | `start` | The leading slot's box. |
 | `summary` | The middle slot's box. |
-| `end` | The trailing slot's box. |
-| `empty` | Shown when the table has no readings in it. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--heatmap-cell-height` | How tall a cell is. A row of a tall thin cell is what a status page draws. |
+| `--heatmap-cell-radius` | How far a cell's corners are rounded. |
 | `--heatmap-cell-size` | The size a cell wants on both axes, where neither is given its own. |
 | `--heatmap-cell-width` | How wide a cell is. The strip fits as many as the container allows. |
-| `--heatmap-cell-height` | How tall a cell is. A row of a tall thin cell is what a status page draws. |
 | `--heatmap-gap` | Space between cells. Zero is a continuous field rather than a grid of tiles. |
-| `--heatmap-cell-radius` | How far a cell's corners are rounded. |
-| `--heatmap-tone-success` | What `success` is worth, as a name or a `data-tone`. |
-| `--heatmap-tone-warning` | What `warning` is worth. |
-| `--heatmap-tone-danger` | What `danger` is worth. |
-| `--heatmap-tone-info` | What `info` is worth. |
-| `--heatmap-tone-accent` | What `accent` is worth. |
-| `--heatmap-tone-primary` | What `primary` is worth. |
-| `--heatmap-tone-muted` | What `muted` is worth: the quiet ground, for a bucket that means nothing happened. |
 | `--heatmap-tone-1` | The quietest step of the magnitude ramp, reached by `tones="1 …"`. |
 | `--heatmap-tone-2` | The second step of the magnitude ramp. |
 | `--heatmap-tone-3` | The third step of the magnitude ramp. |
 | `--heatmap-tone-4` | The fourth step of the magnitude ramp. |
 | `--heatmap-tone-5` | The loudest step of the magnitude ramp. |
+| `--heatmap-tone-accent` | What `accent` is worth. |
+| `--heatmap-tone-danger` | What `danger` is worth. |
+| `--heatmap-tone-info` | What `info` is worth. |
+| `--heatmap-tone-muted` | What `muted` is worth: the quiet ground, for a bucket that means nothing happened. |
+| `--heatmap-tone-primary` | What `primary` is worth. |
+| `--heatmap-tone-success` | What `success` is worth, as a name or a `data-tone`. |
+| `--heatmap-tone-warning` | What `warning` is worth. |
 | `--heatmap-tone` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
 
 ## Icon
@@ -3017,8 +3031,8 @@ common way a toolbar becomes unusable without sight.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The icon. |
-| `start` | Content before the label, usually an icon. |
 | `end` | Content after the label. |
+| `start` | Content before the label, usually an icon. |
 
 #### Parts
 
@@ -3031,8 +3045,8 @@ common way a toolbar becomes unusable without sight.
 | Property | Description |
 | --- | --- |
 | `--icon-button-radii` | Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`. |
-| `--icon-button-size` | Edge length of the control. |
 | `--icon-button-shadow` | What it casts, where it is raised off the page. |
+| `--icon-button-size` | Edge length of the control. |
 
 ## Image
 
@@ -3070,23 +3084,23 @@ base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `load` | `Event` | Relayed, because the platform's own does not escape. |
 | `error` | `Event` | Relayed for the same reason. |
+| `load` | `Event` | Relayed, because the platform's own does not escape. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `placeholder` | Shown until the picture arrives. |
 | `fallback` | Shown instead of it, if it never does. |
+| `placeholder` | Shown until the picture arrives. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
+| `fallback` | What stands in when it fails. |
 | `image` | The picture itself. |
 | `placeholder` | What stands in until it arrives. |
-| `fallback` | What stands in when it fails. |
 
 #### Custom properties
 
@@ -3094,9 +3108,9 @@ base class.
 | --- | --- |
 | `--image-aspect` | The ratio of the box, as `16 / 9`. |
 | `--image-fit` | How the picture fills it. |
+| `--image-placeholder-color` | The resting surface behind both stand-ins. |
 | `--image-position` | Which part survives a crop. |
 | `--image-radius` | Corner radius, under `rounded`. |
-| `--image-placeholder-color` | The resting surface behind both stand-ins. |
 
 ## Input
 
@@ -3137,11 +3151,11 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `minLength` | `minlength` | `number \| undefined` | - | `HelixHeadlessInput` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `pattern` | `pattern` | `string` | `''` | `HelixHeadlessInput` | A regular expression the value has to match, as the platform reads it. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessInput` | Shown while the field is empty. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `reveal` | `reveal` | `boolean` | `false` | `HelixHeadlessInput` | Whether a password field offers a toggle that shows what was typed. |
-| `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixHeadlessInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
+| `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixHeadlessInput` | What the reveal toggle is called. |
 | `selectionDirection` | - | `SelectionDirection` | - | `HelixHeadlessInput` | The caret and the selection, under the platform's own names. |
 | `selectionEnd` | - | `number` | - | `HelixHeadlessInput` | Where the selection ends, as an offset into the value. |
 | `selectionStart` | - | `number` | - | `HelixHeadlessInput` | Where the selection starts, as an offset into the value. |
@@ -3173,28 +3187,28 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 | Slot | Description |
 | --- | --- |
-| `start` | Before the text, for an icon or a prefix. |
 | `end` | After the text, for an icon or a unit. |
+| `start` | Before the text, for an icon or a prefix. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding everything. |
-| `control` | The input itself. |
 | `clear` | The button that empties the field. |
-| `icon` | A glyph this component draws. |
-| `reveal` | The button that shows and hides a password. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
+| `control` | The input itself. |
 | `feedback` | What is wrong with it. |
+| `field` | The box holding everything. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `icon` | A glyph this component draws. |
+| `label` | The question, over the field. |
+| `reveal` | The button that shows and hides a password. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
+| `--input-size` | Height of the field. |
 
 ## Kbd
 
@@ -3267,11 +3281,11 @@ custom property set inline would be the headless tier naming a color.
 | `emphasis` | `emphasis` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much ink the swatches claim. |
 | `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixHeadlessLegend` | Which way to read the table. |
 | `for` | `for` | `string` | `''` | `HelixHeadlessLegend` | The id of the table to take the names from. |
-| `glass` | `glass` | `string \| undefined` | - | - | Which entries are glass rather than solid, by name. Matched as `outlined` is. |
+| `glass` | `glass` | `string \| undefined` | - | - | Which entries are glass rather than solid, by name. |
 | `material` | `material` | `'frosted' \| 'glass' \| undefined` | - | - | What the swatches are made of. |
 | `outlined` | `outlined` | `string \| undefined` | - | - | Which entries are drawn as an outline rather than a fill, by name. |
 | `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
-| `subtle` | `subtle` | `string \| undefined` | - | - | Which entries are drawn as a wash of their color, by name. Matched as `outlined` is. |
+| `subtle` | `subtle` | `string \| undefined` | - | - | Which entries are drawn as a wash of their color, by name. |
 
 #### Parts
 
@@ -3357,11 +3371,11 @@ answers for a shape.
 
 | Property | Description |
 | --- | --- |
-| `--line-chart-band-color` | The slot the pointer is resting in. |
-| `--line-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--line-chart-area-opacity` | How much of a line's color its wash takes. |
+| `--line-chart-band-color` | The slot the pointer is resting in. |
 | `--line-chart-block-size` | Height of the drawing. |
 | `--line-chart-gap` | Space between the drawing and its labels. |
+| `--line-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--line-chart-width` | Thickness of a line. |
 
 ## List
@@ -3424,10 +3438,10 @@ hold their own width and the middle takes the rest.
 
 | Slot | Description |
 | --- | --- |
-| `start` | Leading content, usually an icon or an avatar. |
 | *(default)* | The label. |
-| `supporting` | Secondary text under the label. |
 | `end` | Trailing content. |
+| `start` | Leading content, usually an icon or an avatar. |
+| `supporting` | Secondary text under the label. |
 
 #### Parts
 
@@ -3517,8 +3531,8 @@ list moves under the reader rather than the reader moving to find it.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The options, and any groups of them. |
-| `label` | Richer than a string. |
 | `hint` | Richer than a string. |
+| `label` | Richer than a string. |
 
 #### Parts
 
@@ -3531,9 +3545,9 @@ list moves under the reader rather than the reader moving to find it.
 | `hint` | Help under the list. |
 | `items` | The list itself. |
 | `label` | The question, over the list. |
+| `loading` | Shown while the options are still on their way. |
 | `search` | The region holding the field that narrows the list. |
 | `search-field` | The field itself. |
-| `loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
@@ -3572,17 +3586,17 @@ to say so.
 
 | Part | Description |
 | --- | --- |
-| `svg` | The rotating circle pair. |
-| `mark` | The region holding what was slotted at the center. |
-| `track` | The full circle behind the indicator. |
 | `indicator` | The arc that turns. |
+| `mark` | The region holding what was slotted at the center. |
+| `svg` | The rotating circle pair. |
+| `track` | The full circle behind the indicator. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--loader-size` | Diameter. Defaults to 1.5em. |
 | `--loader-color` | Color of the moving arc. |
+| `--loader-size` | Diameter. Defaults to 1.5em. |
 | `--loader-track-color` | Color of the circle behind it. |
 
 ## Megamenu
@@ -3618,8 +3632,8 @@ Everything about what opens it and what closes it is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -3633,8 +3647,8 @@ Everything about what opens it and what closes it is the base class.
 
 | Part | Description |
 | --- | --- |
-| `trigger` | The default trigger, where none was slotted. |
 | `surface` | The floating panel, which is what opens. |
+| `trigger` | The default trigger, where none was slotted. |
 
 #### Custom properties
 
@@ -3675,7 +3689,7 @@ one panel and reads the same on a phone as on a desk.
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 | `offset` | `offset` | `number` | `4` | `HelixHeadlessMenu` | Space between the trigger and the surface, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessMenu` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessMenu` | Preferred side. |
 
 #### Methods
 
@@ -3690,8 +3704,8 @@ one panel and reads the same on a phone as on a desk.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-select` | `HelixSelectEvent` | Fired when an item is chosen. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
@@ -3708,11 +3722,11 @@ one panel and reads the same on a phone as on a desk.
 | --- | --- |
 | `back` | The control that returns from a submenu. |
 | `back-mark` | The glyph on the back control of a submenu. |
+| `empty` | Shown when there are no items to show. |
 | `header` | The bar above a submenu, holding the way back and its name. |
+| `loading` | Shown while the items are still on their way. |
 | `surface` | The floating panel the menu is drawn on. |
 | `title` | The name of the submenu that is showing. |
-| `empty` | Shown when there are no items to show. |
-| `loading` | Shown while the items are still on their way. |
 
 #### Custom properties
 
@@ -3779,15 +3793,15 @@ than as a ragged list.
 | Part | Description |
 | --- | --- |
 | `item` | The row, which is an `<a>` where `href` is set. |
+| `mark` | The trailing mark: a tick when checked, a caret when it opens. a page. One column, because a row is never both. |
 | `start` | The leading column, which is a slot and is always there. |
-| `mark` | The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--menu-item-start` | Width of the leading column, for a row carrying more than a mark. |
 | `--menu-item-hover-color` | Fill under the pointer. |
+| `--menu-item-start` | Width of the leading column, for a row carrying more than a mark. |
 
 ## Meter
 
@@ -3832,24 +3846,24 @@ reading are what say how far past.
 | --- | --- | --- | --- | --- | --- |
 | `band` | `band` | `MeterBand \| undefined` | - | `HelixHeadlessMeter` | The band, said outright, where the three thresholds cannot say it. |
 | `emphasis` | `emphasis` | `'subtle' \| undefined` | - | - | How much ink the reading claims. |
-| `high` | `high` | `number \| undefined` | - | `HelixHeadlessMeter` | Bottom of the high band. Absent leaves the range unbanded. |
+| `high` | `high` | `number \| undefined` | - | `HelixHeadlessMeter` | Bottom of the high band. |
 | `label` | `label` | `string` | `'Meter'` | `HelixHeadlessMeter` | Accessible name for the reading. |
-| `low` | `low` | `number \| undefined` | - | `HelixHeadlessMeter` | Top of the low band. Absent leaves the range unbanded. |
+| `low` | `low` | `number \| undefined` | - | `HelixHeadlessMeter` | Top of the low band. |
 | `max` | `max` | `number` | `100` | `HelixHeadlessMeter` | Top of the range. |
 | `min` | `min` | `number` | `0` | `HelixHeadlessMeter` | Bottom of the range. |
 | `optimum` | `optimum` | `number \| undefined` | - | `HelixHeadlessMeter` | Where in the range it is best to be. |
 | `shape` | `shape` | `'arc' \| 'ring' \| undefined` | - | `HelixHeadlessMeter` | Whether the reading is drawn as a bar, a ring or an arc. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixHeadlessMeter` | Whether the reading is shown beside the bar. |
-| `value` | `value` | `number` | `0` | `HelixHeadlessMeter` | Where the reading sits between `min` and `max`. Outside them, it clamps. |
+| `value` | `value` | `number` | `0` | `HelixHeadlessMeter` | Where the reading sits between `min` and `max`. |
 | `valueText` | `value-text` | `string` | `''` | `HelixHeadlessMeter` | What the reading says, where a number is not the whole story. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `track` | The whole range. |
 | `indicator` | The part of it the value fills. |
 | `tick` | A mark at `low` or at `high`. |
+| `track` | The whole range. |
 | `value` | The reading, under `show-value`. |
 | `groove` | The unfilled circle, in `ring` and `arc`. |
 
@@ -3857,9 +3871,9 @@ reading are what say how far past.
 
 | Property | Description |
 | --- | --- |
+| `--meter-color` | The fill, overriding the band's own tone. |
 | `--meter-ring-size` | Edge length of the drawing, in `ring` and `arc`. |
 | `--meter-ring-width` | Thickness of the stroke there. |
-| `--meter-color` | The fill, overriding the band's own tone. |
 | `--meter-size` | How thick the bar is. |
 | `--meter-tick-color` | The mark at a threshold. |
 | `--meter-track-color` | The groove behind the fill. |
@@ -3897,15 +3911,15 @@ says where the current page was as well as where it is.
 
 | Part | Description |
 | --- | --- |
-| `nav` | The navigation landmark. |
 | `indicator` | The marker that travels to the current destination. |
+| `nav` | The navigation landmark. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--navigation-indicator-color` | Fill of the traveling marker. |
 | `--navigation-gap` | Space between destinations. |
+| `--navigation-indicator-color` | Fill of the traveling marker. |
 
 ## Notifications
 
@@ -3956,8 +3970,8 @@ holds thousands wants `helix-data-table` with a custom cell.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The notifications, as `helix-notification` children. |
-| `header` | Above the list, for a title and the mark-all control. |
 | `footer` | Below the list, for a link to everything. |
+| `header` | Above the list, for a title and the mark-all control. |
 
 #### Parts
 
@@ -3965,9 +3979,9 @@ holds thousands wants `helix-data-table` with a custom cell.
 | --- | --- |
 | `list` | The list itself. |
 | `mark-all` | The control that marks everything read. |
-| `header` | The region above the list. |
-| `footer` | The region below the list. |
 | `empty` | Shown when there is nothing in the feed. |
+| `footer` | The region below the list. |
+| `header` | The region above the list. |
 | `loading` | Shown while the feed is still on its way. |
 
 #### Custom properties
@@ -3976,8 +3990,8 @@ holds thousands wants `helix-data-table` with a custom cell.
 | --- | --- |
 | `--notifications-max-height` | How tall the feed may get before the list scrolls. |
 | `--notifications-media-column` | The gutter every item holds open where something in the feed has media. |
-| `--notifications-rule` | The hairline between items and around the regions. |
 | `--notifications-padding-inline` | Space either side of the header and footer. |
+| `--notifications-rule` | The hairline between items and around the regions. |
 
 ### Notification (`helix-notification`)
 
@@ -4015,7 +4029,7 @@ viewport rule would hand it the wide branch.
 | `defaultRead` | `default-read` | `boolean` | `false` | `HelixHeadlessNotification` | State to open with, where nothing declared one. |
 | `dismissible` | `dismissible` | `boolean` | `false` | `HelixHeadlessNotification` | Whether a reader may remove it. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `HelixHeadlessNotification` | Accessible name for the dismiss control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessNotification` | Locale for the timestamp. Empty is the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessNotification` | Locale for the timestamp. |
 | `read` | `read` | `boolean` | - | `HelixHeadlessNotification` | Whether the reader has seen it. |
 
 #### Methods
@@ -4028,47 +4042,47 @@ viewport rule would hand it the wide branch.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-read` | `HelixReadEvent` | Fired when the item is marked read or unread, and cancelable. |
 | `helix-dismiss` | `HelixDismissEvent` | Fired when a reader asks to remove it, and cancelable. |
+| `helix-read` | `HelixReadEvent` | Fired when the item is marked read or unread, and cancelable. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
 | *(default)* | What happened, in the consumer's own markup. |
-| `media` | An avatar or icon identifying who or what it came from. |
 | `actions` | What a reader can do about it. |
+| `media` | An avatar or icon identifying who or what it came from. |
 | `caption` | A second line qualifying it, quieter than the first. A bare slot rather than a box, so an item without one pays nothing for it; style it through `::slotted()`. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `item` | The whole notification. |
-| `time` | When it happened. |
-| `trailing` | The column holding the time and the controls. |
 | `controls` | The actions and the dismiss, which replace the time. |
 | `dismiss` | The control that removes it. |
 | `dismiss-mark` | The glyph on that control, where none is slotted. |
-| `media` | The leading slot's box. |
+| `item` | The whole notification. |
+| `time` | When it happened. |
+| `trailing` | The column holding the time and the controls. |
+| `actions` | The trailing slot's box. |
 | `body` | The label and the caption together. |
 | `label` | What happened, on the first line. |
-| `actions` | The trailing slot's box. |
+| `media` | The leading slot's box. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--notifications-rule` | The hairline between items. |
 | `--notifications-color` | Ink in an item that has been read. |
-| `--notifications-unread-mark` | Color of the edge mark on an unread item. |
+| `--notifications-padding-block` | Space above and below an item. |
+| `--notifications-padding-inline` | Space either side of an item. |
+| `--notifications-rule` | The hairline between items. |
 | `--notifications-unread-block-size` | How long that mark is. |
 | `--notifications-unread-inline-size` | How thick that mark is. |
 | `--notifications-unread-inset` | How far it sits from the row's leading edge. |
+| `--notifications-unread-mark` | Color of the edge mark on an unread item. |
 | `--notifications-unread-offset` | How far it sits from the row's top. |
 | `--notifications-unread-radius` | Its corner radius, which is what turns it into a dot. |
-| `--notifications-padding-block` | Space above and below an item. |
-| `--notifications-padding-inline` | Space either side of an item. |
 
 ## Number Input
 
@@ -4107,10 +4121,10 @@ three times as long to cross.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `largeStep` | `large-step` | `number \| undefined` | - | `HelixHeadlessNumberInput` | How far `PageUp` and `PageDown` move. |
-| `max` | `max` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Largest value the reader may reach. Absent has no ceiling. |
-| `min` | `min` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Smallest value the reader may reach. Absent has no floor. |
+| `max` | `max` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Largest value the reader may reach. |
+| `min` | `min` | `number \| undefined` | - | `HelixHeadlessNumberInput` | Smallest value the reader may reach. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessNumberInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessNumberInput` | Shown while the field is empty. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `scrub` | `scrub` | `boolean` | `false` | `HelixHeadlessNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
@@ -4144,22 +4158,22 @@ three times as long to cross.
 
 | Slot | Description |
 | --- | --- |
-| `start` | Before the number, for a unit or an icon. |
 | `end` | After it. |
+| `start` | Before the number, for a unit or an icon. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding everything. |
 | `control` | The field itself. |
 | `decrement` | The control that steps down. |
+| `field` | The box holding everything. |
 | `increment` | The control that steps up. |
 | `decrement-mark` | The glyph on the step down control. |
+| `feedback` | What is wrong with it. |
+| `hint` | Help under the field, while nothing is wrong. |
 | `increment-mark` | The glyph on the step up control. |
 | `label` | The name over the field, which is also the scrub grip. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
 
 ## Option
 
@@ -4178,14 +4192,14 @@ picked from what they are looking at.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `active` | `data-active` | `boolean` | `false` | `HelixHeadlessOption` | Whether this is the option the keyboard is on. Written by the listbox. |
+| `active` | `data-active` | `boolean` | `false` | `HelixHeadlessOption` | Whether this is the option the keyboard is on. |
 | `alternate` | `alternate` | `string` | `''` | `HelixHeadlessOption` | A second destination for this row, taken with the modifier held. |
 | `alternateLabel` | `alternate-label` | `string` | `''` | `HelixHeadlessOption` | What the second destination is, for a reader who cannot see the footer. |
 | `defaultSelected` | - | `boolean` | - | `HelixHeadlessOption` | Whether the markup declared this one chosen, which is what a reset returns to. |
 | `description` | `description` | `string \| undefined` | - | `HelixHeadlessOption` | A second line under the words, for what the choice actually is. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice can be made. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessOption` | A shorter name for this choice, for where the row does not fit. |
-| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice is currently chosen. Written by the listbox. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessOption` | Whether this choice is currently chosen. |
 | `text` | - | `string` | - | `HelixHeadlessOption` | The words, for a listbox that has to match text against them. |
 | `value` | `value` | `string` | `''` | `HelixHeadlessOption` | Identifies this choice, and is what a form submits. |
 
@@ -4206,25 +4220,25 @@ picked from what they are looking at.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The words naming this choice. |
-| `start` | Before the words, for an icon or an avatar. |
 | `end` | After them, for a shortcut or a count. |
+| `start` | Before the words, for an icon or an avatar. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `item` | The row. |
-| `text` | The words and the caption under them, as one column. |
-| `label` | The words. |
 | `description` | The caption under the words, when there is one. |
+| `item` | The row. |
+| `label` | The words. |
+| `text` | The words and the caption under them, as one column. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--option-inset` | Space before the label, shared with a group heading. |
-| `--option-block-inset` | Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. |
 | `--option-active-color` | Wash behind the option the keyboard is on. |
+| `--option-block-inset` | Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. |
+| `--option-inset` | Space before the label, shared with a group heading. |
 | `--option-radii` | Corner radius of the row. A listbox and a select flatten it. |
 
 ### Group (`helix-option-group`)
@@ -4254,8 +4268,8 @@ tells you which list, not something to read on its own.
 
 | Part | Description |
 | --- | --- |
-| `label` | The heading. |
 | `items` | The run itself. |
+| `label` | The heading. |
 
 ## Outline
 
@@ -4298,15 +4312,15 @@ document is not always where the headings are.
 
 | Part | Description |
 | --- | --- |
-| `nav` | The navigation landmark. |
 | `indicator` | The mark that travels to the section being read. |
+| `nav` | The navigation landmark. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--outline-rail` | Width of the gutter the rule and the traveling mark share. |
 | `--outline-indent` | How far each level is inset from the one above. |
+| `--outline-rail` | Width of the gutter the rule and the traveling mark share. |
 
 ## Pagination
 
@@ -4375,22 +4389,22 @@ is a way through rather than a destination, so it does not compete.
 | Slot | Description |
 | --- | --- |
 | `first-icon` | The glyph on the jump-to-first control, usually a double caret. |
-| `previous-icon` | The glyph on the back-one-page control, usually a caret. |
-| `next-icon` | The glyph on the forward-one-page control, usually a caret. |
 | `last-icon` | The glyph on the jump-to-last control, usually a double caret. |
+| `next-icon` | The glyph on the forward-one-page control, usually a caret. |
+| `previous-icon` | The glyph on the back-one-page control, usually a caret. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `list` | The run of pages. |
-| `item` | One slot in the run, holding a page or a gap. |
-| `page` | The control for one page. |
-| `gap` | The control standing over pages not shown, which jumps into them. |
-| `previous` | The control that moves back one page. |
-| `next` | The control that moves forward one page. |
 | `first` | The control that jumps to the first page, under `ends`. |
+| `gap` | The control standing over pages not shown, which jumps into them. |
+| `item` | One slot in the run, holding a page or a gap. |
 | `last` | The control that jumps to the last page, under `ends`. |
+| `list` | The run of pages. |
+| `next` | The control that moves forward one page. |
+| `page` | The control for one page. |
+| `previous` | The control that moves back one page. |
 | `status` | The reading of where you are, in `compact`. |
 | `live` | The region that says the page changed. Clipped, not hidden. |
 | `mark` | The glyph on a first, previous, next or last control, where none is slotted. |
@@ -4423,7 +4437,7 @@ reach through both boundaries and a consumer styles it as the select it is.
 | --- | --- | --- | --- | --- | --- |
 | `defaultValue` | `default-value` | `number` | `0` | `HelixHeadlessPaginationSize` | Size to start on, where nothing declared one. |
 | `label` | `label` | `string` | `'Per page'` | `HelixHeadlessPaginationSize` | The words beside the control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSize` | Locale for the numbers. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSize` | Locale for the numbers. |
 | `sizes` | `sizes` | `string` | `'10,25,50,100'` | `HelixHeadlessPaginationSize` | The sizes offered, comma separated. |
 | `value` | `value` | `number` | - | `HelixHeadlessPaginationSize` | The size in force. |
 
@@ -4457,7 +4471,7 @@ a way to move through it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `format` | `format` | `string` | `'{from}-{to} of {total}'` | `HelixHeadlessPaginationSummary` | The reading, with `{from}`, `{to}` and `{total}` filled in. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSummary` | Locale for the numbers. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessPaginationSummary` | Locale for the numbers. |
 | `page` | `page` | `number` | `1` | `HelixHeadlessPaginationSummary` | The page on show, one-based. |
 | `pageSize` | `page-size` | `number` | `0` | `HelixHeadlessPaginationSummary` | How many items are on a page. |
 | `total` | `total` | `number` | `0` | `HelixHeadlessPaginationSummary` | How many items there are across every page. |
@@ -4522,7 +4536,7 @@ breathe as a code is typed into it.
 | Event | Type | Description |
 | --- | --- | --- |
 | `input` | `Event` | Announced once the value has moved. |
-| `change` | `Event` | Announced with it, a filled code being the commit. |
+| `change` | `Event` | Announced with a filled code, and when an edited one loses focus. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired as the code changes, and cancelable. |
 | `helix-complete` | `HelixCompleteEvent` | Fired when the last box is filled. |
 
@@ -4530,11 +4544,11 @@ breathe as a code is typed into it.
 
 | Part | Description |
 | --- | --- |
-| `field` | The row of boxes. |
 | `cell` | One box. |
-| `label` | The question, over the boxes. |
-| `hint` | Help under the boxes, while nothing is wrong. |
+| `field` | The row of boxes. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the boxes, while nothing is wrong. |
+| `label` | The question, over the boxes. |
 
 #### Custom properties
 
@@ -4568,7 +4582,7 @@ time.
 | `label` | `label` | `string` | `'Popover'` | `HelixHeadlessPopover` | Accessible name for the panel. |
 | `offset` | `offset` | `number` | `4` | `HelixHeadlessPopover` | Space between the trigger and the panel, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessPopover` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'bottom-start'` | `HelixHeadlessPopover` | Preferred side. |
 | `separation` | `separation` | `'plain' \| undefined` | - | - | How the panel separates itself from what it floats over. |
 
 #### Methods
@@ -4584,16 +4598,16 @@ time.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `trigger` | What opens it. |
 | *(default)* | The contents of the panel. |
+| `trigger` | What opens it. |
 
 #### Parts
 
@@ -4649,18 +4663,16 @@ thing advancing.
 
 | Part | Description |
 | --- | --- |
-| `track` | The full length the work is measured against. |
-| `indicator` | The part of it that is done. |
 | `groove` | The unfilled circle, under the ring's own sweep. |
+| `indicator` | The part of it that is done. |
+| `track` | The full length the work is measured against. |
 | `value` | The reading beside the bar, under `show-value`. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--progress-size` | Thickness of the bar. |
 | `--progress-color` | Fill of the part that is done. |
-| `--progress-track-color` | Fill of the part that is not. |
 | `--progress-ring-size` | Diameter of the ring appearance. |
 | `--progress-ring-width` | Thickness of its stroke. |
 | `--progress-fraction` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
@@ -4702,20 +4714,20 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | Part | Description |
 | --- | --- |
 | `code` | The square itself. |
-| `modules` | Everything but the three corner squares. |
 | `finders` | The three corner squares, which can take their own color. |
 | `logo` | The box holding the center mark. |
+| `modules` | Everything but the three corner squares. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
+| `--qr-code-background-color` | Behind them, including the quiet zone. |
 | `--qr-code-color` | The dark modules. Defaults to the page's ink. |
 | `--qr-code-finder-color` | The three corner squares. Defaults to the same ink as the modules. |
-| `--qr-code-background-color` | Behind them, including the quiet zone. |
-| `--qr-code-logo-size` | How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. |
 | `--qr-code-logo-inset` | The quiet zone around that mark. |
+| `--qr-code-logo-size` | How much of the middle a mark may cover. Defaults to `27%`, which `H` correction carries: it can lose thirty percent. |
+| `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
 
 ## Quote
 
@@ -4776,7 +4788,7 @@ and being chosen is an answer rather than a state.
 | `defaultSelected` | - | `boolean` | - | `HelixHeadlessRadio` | Whether the markup declared this one chosen, which is what a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this choice can be made. |
 | `hideControl` | `hide-control` | `boolean` | `false` | - | Takes the circle away, leaving the card as the whole control. |
-| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this is the current choice. Written by the group. |
+| `selected` | `selected` | `boolean` | `false` | `HelixHeadlessRadio` | Whether this is the current choice. |
 | `value` | `value` | `string` | `''` | `HelixHeadlessRadio` | Identifies this choice to the group, and is what the form submits. |
 | `variant` | `variant` | `'chip' \| 'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 
@@ -4804,23 +4816,23 @@ and being chosen is an answer rather than a state.
 
 | Part | Description |
 | --- | --- |
-| `item` | The button, which is the whole row. |
 | `box` | The circle. |
-| `mark` | The dot inside it. |
+| `item` | The button, which is the whole row. |
 | `label` | The words beside it. |
+| `mark` | The dot inside it. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--radio-size` | Diameter of the circle. |
-| `--radio-mark-color` | Color of the dot. |
 | `--radio-background-color` | Fill of an unselected circle. |
 | `--radio-border-color` | Edge of the circle, in every state. |
-| `--radio-card-padding` | Inset of the card appearance. |
-| `--radio-chip-size` | Diameter of the chip appearance. |
 | `--radio-card-background-color` | Fill behind a card-shaped choice. |
 | `--radio-card-border-color` | Edge around one. |
+| `--radio-card-padding` | Inset of the card appearance. |
+| `--radio-chip-size` | Diameter of the chip appearance. |
+| `--radio-mark-color` | Color of the dot. |
+| `--radio-size` | Diameter of the circle. |
 
 ### Group (`helix-radio-group`)
 
@@ -4873,17 +4885,17 @@ group keeps its question above the row rather than beside the first choice.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The radios. |
-| `label` | Richer than a string, where the question is more than one. |
 | `hint` | Richer than a string. |
+| `label` | Richer than a string, where the question is more than one. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `label` | The question, over the set. |
-| `items` | The choices, which is what `orientation` lays out. |
-| `hint` | Help under the set. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the set. |
+| `items` | The choices, which is what `orientation` lays out. |
+| `label` | The question, over the set. |
 
 #### Custom properties
 
@@ -4954,25 +4966,25 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Part | Description |
 | --- | --- |
-| `marks` | The row of marks. |
-| `track` | The unfilled marks. |
-| `fill` | The filled marks, clipped to the score. |
-| `mark` | One mark, in either layer. |
-| `option` | One place a reader can press, which is one step. |
-| `value` | The score written out, under `show-value`. |
-| `label` | The question, over the marks. |
-| `hint` | Help under the marks, while nothing is wrong. |
 | `feedback` | What is wrong with it. |
+| `fill` | The filled marks, clipped to the score. |
+| `hint` | Help under the marks, while nothing is wrong. |
+| `label` | The question, over the marks. |
+| `mark` | One mark, in either layer. |
+| `marks` | The row of marks. |
+| `option` | One place a reader can press, which is one step. |
+| `track` | The unfilled marks. |
+| `value` | The score written out, under `show-value`. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--rating-mark` | The shape of one mark, as a mask image. |
-| `--rating-size` | How big one mark is. |
-| `--rating-gap` | Space between marks. |
 | `--rating-color` | The color of a filled mark. |
 | `--rating-empty-color` | And of an unfilled one. |
+| `--rating-gap` | Space between marks. |
+| `--rating-mark` | The shape of one mark, as a mask image. |
+| `--rating-size` | How big one mark is. |
 | `--rating-full` | How many marks are wholly filled. |
 | `--rating-part` | How much of the next mark is filled, 0 to 1. |
 | `--rating-step` | The width of one step, as a fraction of a mark. |
@@ -5030,7 +5042,7 @@ what it meant when it was written.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `cornerLabel` | `corner-label` | `string` | `'Resize panes and panel'` | - | Accessible name for the divider that moves both at once. |
-| `defaultPanelSize` | `default-panel-size` | `number` | `160` | - | What a reset makes the panel, in pixels. The pair to `panel-size`. |
+| `defaultPanelSize` | `default-panel-size` | `number` | `160` | - | What a reset makes the panel, in pixels. |
 | `defaultSplit` | `default-split` | `number` | `50` | - | Where a reset puts the divider, where nothing declared it. |
 | `lead` | `lead` | `'source' \| 'preview'` | `'source'` | - | Which pane comes first, before the divider. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | - | Whether the panes sit side by side or stacked. |
@@ -5044,17 +5056,18 @@ what it meant when it was written.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-resize` | `HelixBeforeResizeEvent` | Fired when a divider is let go, with the new arrangement. |
+| `helix-before-panel-resize` | `HelixBeforePanelResizeEvent` | Fired when the panel's divider is let go, with its height in pixels. |
+| `helix-before-split` | `HelixBeforeSplitEvent` | Fired when the panes' divider is let go, with the lead pane's share. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `source` | The editable source pane. First unless `lead` says otherwise. |
-| `preview` | The live preview. Second unless `lead` says otherwise. |
-| `toolbar` | A bar across the top, spanning both panes. |
 | `panel` | A panel under both panes, usually a terminal. |
+| `preview` | The live preview. Second unless `lead` says otherwise. |
+| `source` | The editable source pane. First unless `lead` says otherwise. |
 | `status` | A status bar, spanning both panes at the bottom. |
+| `toolbar` | A bar across the top, spanning both panes. |
 
 #### Parts
 
@@ -5071,8 +5084,8 @@ what it meant when it was written.
 
 | Property | Description |
 | --- | --- |
-| `--sandbox-min-block-size` | Minimum height of the sandbox. |
 | `--sandbox-grab` | The invisible width of a divider's drag target. |
+| `--sandbox-min-block-size` | Minimum height of the sandbox. |
 | `--sandbox-separator-color` | Color of the divider. |
 
 ### Preview (`helix-sandbox-preview`)
@@ -5182,8 +5195,8 @@ is the documented escape hatch for exactly this trade.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-caret` | `HelixCaretEvent` | Fired when the cursor moves. |
 | `helix-before-edit` | `HelixBeforeEditEvent` | Fired when the source is edited. |
+| `helix-caret` | `HelixCaretEvent` | Fired when the cursor moves. |
 
 #### Parts
 
@@ -5221,9 +5234,9 @@ empty, or the bar keeps a gap where a value is not.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `column` | `column` | `number \| undefined` | - | - | One-based column of the cursor. Absent shows no readout. |
+| `column` | `column` | `number \| undefined` | - | - | One-based column of the cursor. |
 | `language` | `language` | `string \| undefined` | - | - | The language being edited, as a name or one the editor knows. |
-| `line` | `line` | `number \| undefined` | - | - | One-based line of the cursor. Absent shows no readout. |
+| `line` | `line` | `number \| undefined` | - | - | One-based line of the cursor. |
 
 #### Slots
 
@@ -5282,12 +5295,12 @@ the whole panel being re-announced each time.
 
 | Part | Description |
 | --- | --- |
-| `log` | The scrolling region. |
-| `entry` | One line. |
-| `level` | The level a line came in at. |
-| `message` | The text of a line. |
 | `count` | How many times a repeated line arrived. |
 | `empty` | Shown while nothing has been written. |
+| `entry` | One line. |
+| `level` | The level a line came in at. |
+| `log` | The scrolling region. |
+| `message` | The text of a line. |
 
 #### Custom properties
 
@@ -5355,19 +5368,19 @@ have content past them is measured by the base class.
 
 | Part | Description |
 | --- | --- |
-| `viewport` | The scrolling box. |
 | `edges` | Where the sideways edge cues are drawn. |
+| `viewport` | The scrolling box. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--scroll-area-fade` | How deep the fades are, at both edges. |
-| `--scroll-area-fade-block-start` | How deep the top one is, or `0` to drop it. |
 | `--scroll-area-fade-block-end` | And the bottom one. |
-| `--scroll-area-fade-inline-start` | How deep the leading sideways one is, or `0` to drop it. |
-| `--scroll-area-fade-inline-end` | And the trailing one. |
+| `--scroll-area-fade-block-start` | How deep the top one is, or `0` to drop it. |
 | `--scroll-area-fade-color` | What they fade to, which is the ground behind. |
+| `--scroll-area-fade-inline-end` | And the trailing one. |
+| `--scroll-area-fade-inline-start` | How deep the leading sideways one is, or `0` to drop it. |
 | `--scroll-area-scrollbar` | The scrollbar width keyword. |
 | `--scroll-area-thumb-color` | The scrollbar's handle. |
 | `--scroll-area-track-color` | And its track. |
@@ -5395,6 +5408,7 @@ from the field it came out of.
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emphasis` | `emphasis` | `'ghost' \| undefined` | - | - | How much ink the trigger claims. |
 | `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixHeadlessSelect` | What it says where there are none. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `filterable` | `filterable` | `boolean` | `false` | `HelixHeadlessSelect` | Whether the list can be narrowed by typing. |
@@ -5432,8 +5446,8 @@ from the field it came out of.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Relayed from the listbox when the answer changes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -5441,24 +5455,21 @@ from the field it came out of.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The options, and any groups of them. |
-| `start` | Before the chosen value, for an icon or a prefix. |
 | `end` | After it, for a count, a unit, or a clear button. |
+| `hint` | Richer than a string. |
 | `indicator` | The mark on the trigger saying this opens, usually a caret. |
 | `label` | Richer than a string. |
-| `hint` | Richer than a string. |
+| `start` | Before the chosen value, for an icon or a prefix. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `label` | The question, over the trigger. |
-| `value` | The chosen option's text inside the trigger. |
-| `indicator` | The caret saying the control opens. Replaced by slotting one. |
-| `trigger` | The closed control, which says what is chosen. |
-| `surface` | The floating panel. |
-| `listbox` | The list inside it. |
-| `hint` | Help under the trigger. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the trigger. |
+| `indicator` | The caret saying the control opens. Replaced by slotting one. |
+| `label` | The question, over the trigger. |
+| `listbox` | The list inside it. |
 | `listbox-empty` | Shown when a filter has hidden everything. |
 | `listbox-feedback` | What is wrong with it. |
 | `listbox-filter-icon` | The mark beside that field. |
@@ -5466,9 +5477,12 @@ from the field it came out of.
 | `listbox-hint` | Help under the list. |
 | `listbox-items` | The list itself. |
 | `listbox-label` | The question, over the list. |
+| `listbox-loading` | Shown while the options are still on their way. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
-| `listbox-loading` | Shown while the options are still on their way. |
+| `surface` | The floating panel. |
+| `trigger` | The closed control, which says what is chosen. |
+| `value` | The chosen option's text inside the trigger. |
 
 #### Custom properties
 
@@ -5574,31 +5588,31 @@ the thumb being dragged.
 
 | Part | Description |
 | --- | --- |
-| `field` | The row: the control and its readout. |
 | `control` | The range input. |
-| `markers` | The row of marks along the track. |
+| `feedback` | What is wrong with it. |
+| `field` | The row: the control and its readout. |
+| `hint` | Help under the track, while nothing is wrong. |
+| `label` | The question, over the track. |
 | `marker` | One mark. |
 | `marker-label` | The value a mark stands at, when `marker-labels` is set. |
+| `markers` | The row of marks along the track. |
 | `output` | The current value, shown beside it. |
-| `label` | The question, over the track. |
-| `hint` | Help under the track, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--slider-thumb-color` | The handle. |
-| `--slider-thumb-ring-color` | The fence separating the handle from the track, for a slider that is not on the page. |
-| `--slider-track-color` | The part not yet chosen. |
 | `--slider-fill-color` | The part behind the thumb. |
+| `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
 | `--slider-marker-color` | The ticks along the track. |
-| `--slider-track-image` | The whole track, for a slider whose color is the value. |
-| `--slider-track-size` | How thick the track is. The progress bar's own size by default, the two being the same object. |
-| `--slider-thumb-size` | The handle across the track. Square with the length by default, which is what makes it round. |
+| `--slider-thumb-color` | The handle. |
 | `--slider-thumb-length` | The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval. |
 | `--slider-thumb-radii` | The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise. |
-| `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
+| `--slider-thumb-ring-color` | The fence separating the handle from the track, for a slider that is not on the page. |
+| `--slider-thumb-size` | The handle across the track. Square with the length by default, which is what makes it round. |
+| `--slider-track-color` | The part not yet chosen. |
+| `--slider-track-image` | The whole track, for a slider whose color is the value. |
+| `--slider-track-size` | How thick the track is. The progress bar's own size by default, the two being the same object. |
 | `--slider-fraction` | The value as a fraction of the range, 0 to 1. |
 | `--slider-from` | Where the filled span starts, as a percentage of the track. |
 | `--slider-marker-at` | Where one marker sits, as a percentage of the track. |
@@ -5705,8 +5719,8 @@ moves through it is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before it opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -5720,9 +5734,9 @@ moves through it is the base class.
 
 | Part | Description |
 | --- | --- |
+| `actions` | The region the actions are drawn in. |
 | `icon` | A glyph this component draws. |
 | `trigger` | The default trigger, where none was slotted. |
-| `actions` | The region the actions are drawn in. |
 
 #### Custom properties
 
@@ -5773,8 +5787,8 @@ over. Everything about choosing it is the base class.
 
 | Part | Description |
 | --- | --- |
-| `item` | The control. |
 | `icon` | The mark's box. |
+| `item` | The control. |
 | `label` | The name beside it. |
 
 #### Custom properties
@@ -5848,24 +5862,24 @@ gesture.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-resize` | `HelixBeforeResizeEvent` | Fired before the divider settles, and cancelable. |
 | `helix-before-collapse` | `HelixBeforeCollapseEvent` | Fired before a pane shuts or reopens, and cancelable. |
+| `helix-before-resize` | `HelixBeforeResizeEvent` | Fired before the divider settles, and cancelable. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `start` | The pane before the divider. |
 | `end` | The pane after it. |
+| `start` | The pane before the divider. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `start` | The box holding the first pane. |
+| `corner` | The handle where a nested splitter's divider crosses this one. |
 | `end` | The box holding the second. |
 | `separator` | The divider itself. |
-| `corner` | The handle where a nested splitter's divider crosses this one. |
+| `start` | The box holding the first pane. |
 
 #### Custom properties
 
@@ -5966,7 +5980,7 @@ second name for it here would be a second thing to keep in step.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. |
 | `label` | `label` | `string` | `'Steps'` | `HelixHeadlessSteps` | Accessible name for the sequence. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixHeadlessSteps` | Which way the steps run. |
 | `variant` | `variant` | `'numeric' \| undefined` | - | `HelixHeadlessSteps` | What each step is marked with. |
@@ -5993,12 +6007,12 @@ second name for it here would be a second thing to keep in step.
 
 | Property | Description |
 | --- | --- |
-| `--steps-gap` | Space between one step and the next. |
-| `--steps-connector-inset` | Air either side of a mark, before the rail. |
-| `--steps-marker-size` | Size of the mark, glyph or digit. |
-| `--steps-connector-color` | The rule running through the steps. |
 | `--steps-complete-color` | The mark on a finished step. |
+| `--steps-connector-color` | The rule running through the steps. |
+| `--steps-connector-inset` | Air either side of a mark, before the rail. |
 | `--steps-current-color` | The mark on the current step. |
+| `--steps-gap` | Space between one step and the next. |
+| `--steps-marker-size` | Size of the mark, glyph or digit. |
 
 ### Step (`helix-step`)
 
@@ -6032,9 +6046,9 @@ Extends `HelixHeadlessStep`.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The step's name. |
+| `content` | What the stage holds, shown while it is the current one. |
 | `description` | A line under the name, for what the stage is for. |
 | `marker` | Replaces the number, or the check a complete step shows. |
-| `content` | What the stage holds, shown while it is the current one. |
 
 #### Parts
 
@@ -6044,11 +6058,11 @@ Extends `HelixHeadlessStep`.
 | `content` | What the stage holds, while it is open. |
 | `description` | The line under it. |
 | `label` | The step's name, which is a `helix-button`. |
+| `label-button` | The inner control. |
 | `lead` | The half line arriving from the step before. |
 | `mark` | The glyph inside the marker: a tick, a dot, or an empty ring. |
 | `marker` | The shape carrying the number or the check. |
 | `trail` | The half line running on to the next. |
-| `label-button` | The inner control. |
 
 ## Switch
 
@@ -6108,8 +6122,8 @@ consumer has to keep.
 | Event | Type | Description |
 | --- | --- | --- |
 | `input` | `Event` | Announced once the state has moved. |
-| `helix-before-toggle` | `HelixBeforeToggleEvent` | Fired before the state changes, and cancelable. |
 | `change` | `Event` | Relayed from the input once the state has changed. |
+| `helix-before-toggle` | `HelixBeforeToggleEvent` | Fired before the state changes, and cancelable. |
 
 #### Slots
 
@@ -6121,22 +6135,22 @@ consumer has to keep.
 
 | Part | Description |
 | --- | --- |
-| `field` | The row: the track and its label. |
-| `track` | The groove the thumb travels in. |
 | `control` | The input. |
-| `thumb` | The part that moves. |
-| `label` | The words beside it. |
-| `hint` | Help under the control, while nothing is wrong. |
 | `feedback` | What is wrong with it. |
+| `field` | The row: the track and its label. |
+| `hint` | Help under the control, while nothing is wrong. |
+| `label` | The words beside it. |
+| `thumb` | The part that moves. |
+| `track` | The groove the thumb travels in. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--switch-height` | Height of the track. The width follows it. |
-| `--switch-width` | Length of the track, if not the derived one. |
 | `--switch-on-color` | Fill when it is on. |
 | `--switch-thumb-color` | The handle, in both states. |
+| `--switch-width` | Length of the track, if not the derived one. |
 
 ## Table
 
@@ -6173,8 +6187,8 @@ decorating none of it.
 | Part | Description |
 | --- | --- |
 | `table` | The grid. |
-| `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
 | `empty` | Shown when there are no rows to show. |
+| `head` | The row the column headings sit in. `display: contents`, so it takes no space. |
 | `loading` | Shown while the rows are still on their way. |
 
 #### Custom properties
@@ -6281,7 +6295,7 @@ a movement instead of two separate fills.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. |
 | `label` | `label` | `string` | `'Tabs'` | `HelixHeadlessTabs` | Accessible name for the tab list. |
 | `manual` | `manual` | `boolean` | `false` | `HelixHeadlessTabs` | Whether arrowing to a tab also selects it. |
 | `variant` | `variant` | `'segmented' \| 'underlined' \| undefined` | - | `HelixHeadlessTabs` | How the row reads. |
@@ -6310,8 +6324,8 @@ a movement instead of two separate fills.
 
 | Part | Description |
 | --- | --- |
-| `tabs` | The tab list. |
 | `panels` | The panel container. |
+| `tabs` | The tab list. |
 | `indicator` | The mark that travels to the selected tab. |
 
 ### Panel (`helix-tab-panel`)
@@ -6483,7 +6497,7 @@ cross product, which is the explosion a named ramp exists to prevent.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. Decides the outline and the semantics. |
+| `as` | `as` | `'span' \| 'p' \| 'h1' \| 'h2' \| 'h3' \| 'h4' \| 'h5' \| 'h6' \| 'strong' \| 'em' \| 'code' \| 'label' \| undefined` | - | - | Which element to render. |
 | `tone` | `tone` | `'muted' \| 'subtle' \| 'primary' \| 'danger' \| undefined` | - | - | Color role. A separate axis from the type ramp, because color carries state: folding it in would mean `caption-danger` and the rest of the cross product. |
 | `variant` | `variant` | `\| 'display'
     \| 'heading'
@@ -6493,7 +6507,7 @@ cross product, which is the explosion a named ramp exists to prevent.
     \| 'body-strong'
     \| 'caption'
     \| 'label'
-    \| 'code' \| undefined` | - | - | Type treatment. Defaults to the one that matches `as`. |
+    \| 'code' \| undefined` | - | - | Type treatment. |
 
 #### Slots
 
@@ -6539,7 +6553,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 | `maxLength` | `maxlength` | `number \| undefined` | - | `HelixHeadlessTextarea` | Most characters the value may have. |
 | `minLength` | `minlength` | `number \| undefined` | - | `HelixHeadlessTextarea` | Fewest characters the value may have. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessTextarea` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixHeadlessTextarea` | Shown while the field is empty. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixHeadlessTextarea` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `rows` | `rows` | `number` | `3` | `HelixHeadlessTextarea` | How many lines the box is before anything is typed. |
@@ -6575,11 +6589,11 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding the control. |
 | `control` | The textarea itself. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
 | `feedback` | What is wrong with it. |
+| `field` | The box holding the control. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `label` | The question, over the field. |
 
 #### Custom properties
 
@@ -6619,7 +6633,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimeInput` | Language tag the times are written in. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimeInput` | Language tag the times are written in. |
 | `max` | `max` | `string` | `'23:59'` | `HelixHeadlessTimeInput` | Latest time that can be chosen, as `HH:mm`. |
 | `maxTags` | `max-tags` | `number` | `0` | `HelixHeadlessTimeInput` | How many times are shown as tags before the rest are counted, in `multiple`. |
 | `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimeInput` | Earliest time that can be chosen, as `HH:mm`. |
@@ -6656,37 +6670,29 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `input` | `Event` | Announced once the value has moved. |
 | `change` | `Event` | Announced once the value has moved. |
 | `helix-before-change` | `HelixBeforeChangeEvent` | Fired when the time changes. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when it closes. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired when the list opens. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `trigger` | The mark on the field saying a list opens. |
-| `hint` | Help under the field. |
 | `feedback` | What is wrong with it. |
+| `hint` | Help under the field. |
+| `trigger` | The mark on the field saying a list opens. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `field` | The box holding the text and the trigger. |
 | `control` | The text input. |
-| `time` | One held time, as a tag, in `multiple`. |
-| `rest` | How many times are held beyond the ones shown. |
-| `trigger` | The control that opens the list. |
-| `trigger-icon` | The mark on the button that opens the clock. |
-| `surface` | The floating panel. |
+| `feedback` | What is wrong with it. |
+| `field` | The box holding the text and the trigger. |
+| `hint` | Help under the field, while nothing is wrong. |
+| `label` | The question, over the field. |
 | `picker` | The list inside it. |
 | `picker-column` | One of them. |
-| `picker-columns` | The row of columns, in `wheels`. |
-| `picker-list` | The listbox holding the times, in `list`. |
-| `picker-option` | One time in it. Carries `data-between` inside a range. |
-| `time-dismiss` | The remove button, when `dismissible`. |
-| `time-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
-| `time-prefix` | The category before the label. |
 | `picker-column-empty` | Shown when a filter has hidden everything. |
 | `picker-column-feedback` | What is wrong with it. |
 | `picker-column-filter-icon` | The mark beside that field. |
@@ -6694,8 +6700,11 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `picker-column-hint` | Help under the list. |
 | `picker-column-items` | The list itself. |
 | `picker-column-label` | The question, over the list. |
+| `picker-column-loading` | Shown while the options are still on their way. |
 | `picker-column-search` | The region holding the field that narrows the list. |
 | `picker-column-search-field` | The field itself. |
+| `picker-columns` | The row of columns, in `wheels`. |
+| `picker-list` | The listbox holding the times, in `list`. |
 | `picker-list-empty` | Shown when a filter has hidden everything. |
 | `picker-list-feedback` | What is wrong with it. |
 | `picker-list-filter-icon` | The mark beside that field. |
@@ -6703,17 +6712,22 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `picker-list-hint` | Help under the list. |
 | `picker-list-items` | The list itself. |
 | `picker-list-label` | The question, over the list. |
+| `picker-list-loading` | Shown while the options are still on their way. |
 | `picker-list-search` | The region holding the field that narrows the list. |
 | `picker-list-search-field` | The field itself. |
+| `picker-option` | One time in it. Carries `data-between` inside a range. |
 | `picker-option-description` | The caption under the words, when there is one. |
 | `picker-option-item` | The row. |
 | `picker-option-label` | The words. |
 | `picker-option-text` | The words and the caption, as one column. |
-| `label` | The question, over the field. |
-| `hint` | Help under the field, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
-| `picker-column-loading` | Shown while the options are still on their way. |
-| `picker-list-loading` | Shown while the options are still on their way. |
+| `rest` | How many times are held beyond the ones shown. |
+| `surface` | The floating panel. |
+| `time` | One held time, as a tag, in `multiple`. |
+| `time-dismiss` | The remove button, when `dismissible`. |
+| `time-dismiss-mark` | The glyph on the dismiss control, where none is slotted. |
+| `time-prefix` | The category before the label. |
+| `trigger` | The control that opens the list. |
+| `trigger-icon` | The mark on the button that opens the clock. |
 
 #### Custom properties
 
@@ -6753,7 +6767,7 @@ card would be a card inside a card there.
 | `invalid` | `invalid` | `boolean` | `false` | `HelixHeadlessTimePicker` | Whether the current selection fails validation. |
 | `label` | `label` | `string` | `'Time'` | `HelixHeadlessTimePicker` | Accessible name for the list, which has no visible one of its own. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimePicker` | Language tag the times are written in. Absent uses the runtime's own. |
+| `locale` | `locale` | `string` | `''` | `HelixHeadlessTimePicker` | Language tag the times are written in. |
 | `max` | `max` | `string` | `'23:59'` | `HelixHeadlessTimePicker` | Latest time offered, as `HH:mm`. |
 | `min` | `min` | `string` | `'00:00'` | `HelixHeadlessTimePicker` | Earliest time offered, as `HH:mm`. |
 | `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixHeadlessTimePicker` | How many times can be held at once. |
@@ -6789,10 +6803,7 @@ card would be a card inside a card there.
 
 | Part | Description |
 | --- | --- |
-| `list` | The listbox holding the times, in `list`. |
-| `columns` | The row of columns, in `wheels`. |
 | `column` | One of them. |
-| `option` | One time in it. Carries `data-between` inside a range. |
 | `column-empty` | Shown when a filter has hidden everything. |
 | `column-feedback` | What is wrong with it. |
 | `column-filter-icon` | The mark beside that field. |
@@ -6800,8 +6811,11 @@ card would be a card inside a card there.
 | `column-hint` | Help under the list. |
 | `column-items` | The list itself. |
 | `column-label` | The question, over the list. |
+| `column-loading` | Shown while the options are still on their way. |
 | `column-search` | The region holding the field that narrows the list. |
 | `column-search-field` | The field itself. |
+| `columns` | The row of columns, in `wheels`. |
+| `list` | The listbox holding the times, in `list`. |
 | `list-empty` | Shown when a filter has hidden everything. |
 | `list-feedback` | What is wrong with it. |
 | `list-filter-icon` | The mark beside that field. |
@@ -6809,24 +6823,24 @@ card would be a card inside a card there.
 | `list-hint` | Help under the list. |
 | `list-items` | The list itself. |
 | `list-label` | The question, over the list. |
+| `list-loading` | Shown while the options are still on their way. |
 | `list-search` | The region holding the field that narrows the list. |
 | `list-search-field` | The field itself. |
+| `option` | One time in it. Carries `data-between` inside a range. |
 | `option-description` | The caption under the words, when there is one. |
 | `option-item` | The row. |
 | `option-label` | The words. |
 | `option-text` | The words and the caption, as one column. |
-| `column-loading` | Shown while the options are still on their way. |
-| `list-loading` | Shown while the options are still on their way. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--time-picker-list-height` | How tall the list is before it scrolls. |
-| `--time-picker-wheel-height` | How tall a wheel is. Five rows by default. |
-| `--time-picker-row-size` | Height and least width of one row in a wheel. |
 | `--time-picker-range-color` | Wash behind the times inside a range. |
+| `--time-picker-row-size` | Height and least width of one row in a wheel. |
 | `--time-picker-selected-color` | Fill on the chosen row of a wheel. |
+| `--time-picker-wheel-height` | How tall a wheel is. Five rows by default. |
 
 ## Timeline
 
@@ -6886,8 +6900,8 @@ arrives at this entry from the one before.
 | Part | Description |
 | --- | --- |
 | `connector` | The line arriving at this entry. |
-| `dot` | The mark drawn where nothing was slotted for one. |
 | `content` | What happened, and the time above it. |
+| `dot` | The mark drawn where nothing was slotted for one. |
 | `marker` | The mark on the line. |
 | `rail` | The column holding the mark and the line. |
 | `time` | When it happened. |
@@ -6949,9 +6963,9 @@ into the top layer.
 
 | Property | Description |
 | --- | --- |
-| `--toast-inset` | Distance from the edges of the window. |
 | `--toast-gap` | Space between one message and the next. |
 | `--toast-inline-size` | Width of a message. |
+| `--toast-inset` | Distance from the edges of the window. |
 
 ### Item (`helix-toast-item`)
 
@@ -6994,8 +7008,8 @@ costs contrast for something the mark already says.
 | --- | --- |
 | *(default)* | The message. |
 | `actions` | What to do about it, usually a button or a link. |
-| `icon` | Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for. |
 | `dismiss-icon` | Replaces the glyph inside the dismiss control. |
+| `icon` | Replaces the tone mark. Matches `Callout`, which is why the dismiss control's own glyph is `dismiss-icon` rather than this: two slots cannot share a name, assignment goes to whichever comes first in the tree, and the tone mark is the one a consumer reaches for. |
 
 #### Parts
 
@@ -7130,12 +7144,12 @@ corner radius, which is worse than the exception.
 | Part | Description |
 | --- | --- |
 | `indicator` | The moving marker behind the selected item. |
+| `divider` | The rule after an inline label, separating it from the items. |
+| `feedback` | What is wrong with it. |
+| `hint` | Help under the row, while nothing is wrong. |
+| `label` | The question, over the row. |
 | `row` | The line the track sits on, with whatever flanks it. |
 | `track` | The bar the items sit in. |
-| `divider` | The rule after an inline label, separating it from the items. |
-| `label` | The question, over the row. |
-| `hint` | Help under the row, while nothing is wrong. |
-| `feedback` | What is wrong with it. |
 
 #### Custom properties
 
@@ -7207,7 +7221,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `offset` | `offset` | `number` | `8` | `HelixHeadlessTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `persist` | `persist` | `boolean` | `false` | `HelixHeadlessTooltip` | Whether the bubble survives the trigger being used. |
-| `placement` | `placement` | `Placement` | `'top'` | `HelixHeadlessTooltip` | Preferred side. It moves if that side does not fit. |
+| `placement` | `placement` | `Placement` | `'top'` | `HelixHeadlessTooltip` | Preferred side. |
 | `within` | `within` | `string` | `''` | `HelixHeadlessTooltip` | The id of a box to keep the bubble inside, instead of the viewport. |
 
 #### Methods
@@ -7224,8 +7238,8 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the bubble shows, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before it hides, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before the bubble shows, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -7290,8 +7304,8 @@ The styled tier of `BaseTour`. It draws the light and nothing else.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-before-activate` | `HelixBeforeActivateEvent` | Fired when the current stop moves, carrying the new index. |
-| `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired when the reader leaves early. |
+| `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -7354,15 +7368,15 @@ name, on purpose.
 
 | Part | Description |
 | --- | --- |
-| `bubble` | The panel that points at the target. |
-| `arrow` | The point, which the floating pass places against the target. |
-| `content` | The region holding the slotted content. |
 | `actions` | The row the controls sit in. |
+| `arrow` | The point, which the floating pass places against the target. |
 | `back` | The control that goes to the previous stop. |
-| `next` | The control that goes on, and finishes on the last stop. |
-| `skip` | The control that leaves the tour. |
 | `back-button` | The inner control. |
+| `bubble` | The panel that points at the target. |
+| `content` | The region holding the slotted content. |
+| `next` | The control that goes on, and finishes on the last stop. |
 | `next-button` | The inner control. |
+| `skip` | The control that leaves the tour. |
 | `skip-button` | The inner control. |
 
 #### Custom properties
@@ -7394,7 +7408,7 @@ to it is one more thing between the reader and the label.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `chevronPlacement` | `chevron-placement` | `'start' \| 'end' \| undefined` | - | - | Which end of the row the branch chevron sits at. |
-| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. |
 | `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `label` | `label` | `string` | `'Tree'` | `HelixHeadlessTree` | Accessible name for the tree. |
 | `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
@@ -7431,12 +7445,12 @@ to it is one more thing between the reader and the label.
 
 | Property | Description |
 | --- | --- |
-| `--tree-indent` | Indent added per level. |
+| `--tree-chevron-gap` | Set from `chevron-placement`; the space before the chevron. |
+| `--tree-chevron-order` | Set from `chevron-placement`; read by each item. |
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 | `--tree-gap` | Space between rows. |
+| `--tree-indent` | Indent added per level. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
-| `--tree-chevron-order` | Set from `chevron-placement`; read by each item. |
-| `--tree-chevron-gap` | Set from `chevron-placement`; the space before the chevron. |
 
 ### Item (`helix-tree-item`)
 
@@ -7482,8 +7496,8 @@ the row itself stays flat.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
-| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before a branch opens, and cancelable. |
 | `helix-before-close` | `HelixBeforeCloseEvent` | Fired before a branch closes, and cancelable. |
+| `helix-before-open` | `HelixBeforeOpenEvent` | Fired before a branch opens, and cancelable. |
 | `toggle` | `Event` | Says the state moved, carrying `newState` and `oldState`. |
 
 #### Slots
@@ -7492,26 +7506,26 @@ the row itself stays flat.
 | --- | --- |
 | *(default)* | The item's label. |
 | `children` | Nested items, which make this a branch. |
-| `start` | Before the label, after the chevron. A mark about the item. |
 | `end` | After the label, at the row's far side. A count, or a state. |
+| `start` | Before the label, after the chevron. A mark about the item. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
+| `group` | The container for nested items. |
 | `item` | The node, and the focus target. |
+| `label` | The label text. |
 | `row` | The clickable label row. |
 | `toggle` | The expand and collapse control. |
-| `label` | The label text. |
-| `group` | The container for nested items. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--tree-indent` | Indent added per level. |
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 | `--tree-gap` | Space between rows. |
+| `--tree-indent` | Indent added per level. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
 | `--tree-level` | How deep this row sits, counting from zero, for the indent. |
 
@@ -7651,11 +7665,11 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `ended` | `Event` | Relayed for the same reason. |
 | `helix-next` | `HelixNextEvent` | Fired when the reader asks for the next item. |
 | `helix-previous` | `HelixPreviousEvent` | Fired when they ask for the previous one. |
-| `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
 | `pause` | `Event` | Relayed for the same reason. |
-| `ended` | `Event` | Relayed for the same reason. |
+| `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
 
 #### Slots
 
@@ -7670,66 +7684,66 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Part | Description |
 | --- | --- |
-| `icon` | A glyph this component draws. |
-| `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
-| `video` | The video itself. |
-| `poster` | What covers it before it plays. |
 | `back` | The region top left, for a way out of a set. |
-| `failure` | What is said when the source will not play. |
-| `loading` | What is said while the picture waits for more of itself. |
-| `loading-mark` | The part of that which spins. |
-| `cue` | The caption on screen now, drawn by this element. |
-| `controls` | The bar along the bottom. |
-| `play` | Play and pause. |
-| `scrubber` | Where it is, and where to go. |
-| `time` | The position and the duration. |
-| `sound` | The speaker and its level, which are one control. |
-| `mute` | Sound on and off. |
-| `volume` | How loud. |
 | `captions` | Subtitles on and off. |
 | `captions-menu` | The language menu, where there is more than one. |
-| `rewind` | The control that goes back ten seconds. |
-| `forward` | The control that goes on ten seconds. |
-| `remote` | Play on another device, where one is available. |
-| `speed` | Playback speed, where it was asked for. |
-| `pip` | Picture in picture, where it was asked for and exists. |
-| `start` | The mark over the picture before anything has played. |
-| `next` | Asks for the next item, where it was asked for. |
-| `previous` | Asks for the previous one. |
-| `download` | Saves the file, where it was asked for. |
-| `overflow` | The menu holding the controls kept off the bar. |
-| `more` | The button that opens it. |
-| `fullscreen` | The whole screen, and back. |
 | `captions-menu-back` | The control that returns from a submenu. |
 | `captions-menu-back-mark` | The glyph on the back control of a submenu. |
+| `captions-menu-empty` | Shown when there are no items to show. |
 | `captions-menu-header` | The bar above a submenu, holding the way back and its name. |
+| `captions-menu-loading` | Shown while the items are still on their way. |
+| `captions-menu-surface` | The floating panel the menu is drawn on. |
 | `captions-menu-title` | The name of the submenu that is showing. |
+| `controls` | The bar along the bottom. |
+| `cue` | The caption on screen now, drawn by this element. |
+| `download` | Saves the file, where it was asked for. |
 | `entry` | One row in a menu this player opens. |
 | `entry-item` | The row, which is an `<a>` where `href` is set. |
-| `entry-mark` | The trailing mark: a tick when checked, a caret when it opens |
+| `entry-mark` | The trailing mark: a tick when checked, a caret when it opens. |
 | `entry-start` | The leading column, which is a slot and is always there. |
+| `failure` | What is said when the source will not play. |
+| `forward` | The control that goes on ten seconds. |
+| `fullscreen` | The whole screen, and back. |
+| `icon` | A glyph this component draws. |
+| `loading` | What is said while the picture waits for more of itself. |
+| `loading-mark` | The part of that which spins. |
+| `more` | The button that opens it. |
+| `mute` | Sound on and off. |
+| `next` | Asks for the next item, where it was asked for. |
+| `overflow` | The menu holding the controls kept off the bar. |
 | `overflow-back` | The control that returns from a submenu. |
 | `overflow-back-mark` | The glyph on the back control of a submenu. |
-| `overflow-header` | The bar above a submenu, holding the way back and its name. |
-| `overflow-title` | The name of the submenu that is showing. |
-| `captions-menu-surface` | The floating panel the menu is drawn on. |
-| `overflow-surface` | The floating panel the menu is drawn on. |
-| `captions-menu-empty` | Shown when there are no items to show. |
-| `captions-menu-loading` | Shown while the items are still on their way. |
 | `overflow-empty` | Shown when there are no items to show. |
+| `overflow-header` | The bar above a submenu, holding the way back and its name. |
 | `overflow-loading` | Shown while the items are still on their way. |
+| `overflow-surface` | The floating panel the menu is drawn on. |
+| `overflow-title` | The name of the submenu that is showing. |
+| `pip` | Picture in picture, where it was asked for and exists. |
+| `play` | Play and pause. |
+| `poster` | What covers it before it plays. |
+| `previous` | Asks for the previous one. |
+| `remote` | Play on another device, where one is available. |
+| `rewind` | The control that goes back ten seconds. |
+| `scrubber` | Where it is, and where to go. |
+| `sound` | The speaker and its level, which are one control. |
+| `speed` | Playback speed, where it was asked for. |
+| `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
+| `start` | The mark over the picture before anything has played. |
+| `time` | The position and the duration. |
+| `video` | The video itself. |
+| `volume` | How loud. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--video-aspect-ratio` | The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. |
-| `--video-well-color` | Behind the picture, and in the letterbox bars. |
-| `--video-speed-size` | How wide the playback speed control is held, so the row does not move when the number changes. |
-| `--video-radius` | The corner it is cut to. |
-| `--video-controls-color` | The ink on the bar. |
 | `--video-accent-color` | The played part of the scrubber. |
+| `--video-aspect-ratio` | The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. |
+| `--video-controls-color` | The ink on the bar. |
+| `--video-radius` | The corner it is cut to. |
+| `--video-speed-size` | How wide the playback speed control is held, so the row does not move when the number changes. |
 | `--video-start-size` | Width of the mark that starts it. |
+| `--video-well-color` | Behind the picture, and in the letterbox bars. |
 | `--video-intrinsic-ratio` | The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it. |
 | `--video-level` | The current volume, 0 to 1. |
 | `--video-progress` | How far playback has reached, as a fraction of the duration. |
@@ -7750,7 +7764,7 @@ entries sit in. Everything about which clip is current is the base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. |
 | `label` | `label` | `string` | `'Playlist'` | `HelixHeadlessVideoPlaylist` | Accessible name for the list, which usually has no visible heading. |
 
 #### Methods
@@ -7776,8 +7790,8 @@ entries sit in. Everything about which clip is current is the base class.
 
 | Part | Description |
 | --- | --- |
-| `player` | The region holding the player. |
 | `items` | The list of entries. |
+| `player` | The region holding the player. |
 
 #### Custom properties
 
@@ -7826,9 +7840,9 @@ playing. The base class holds what the entry is and what it announces.
 | --- | --- |
 | `container` | The `listitem`, which the button sits in. |
 | `item` | The row, which is a button. |
+| `label` | The name and whatever follows it. |
 | `media` | The leading column. |
 | `thumbnail` | The image `poster` falls back to. |
-| `label` | The name and whatever follows it. |
 
 #### Custom properties
 
@@ -7883,20 +7897,20 @@ not.
 | Part | Description |
 | --- | --- |
 | `entry` | One entry in the menu. |
-| `icon` | The glyph on the trigger. |
-| `poster` | An entry's still, where it has one. |
-| `menu` | The menu that holds the entries. |
-| `trigger` | The button that opens it. |
 | `entry-item` | The row, which is an `<a>` where `href` is set. |
 | `entry-mark` | The trailing mark: a tick when checked, a caret when it opens |
 | `entry-start` | The leading column, which is a slot and is always there. |
+| `icon` | The glyph on the trigger. |
+| `menu` | The menu that holds the entries. |
 | `menu-back` | The control that returns from a submenu. |
 | `menu-back-mark` | The glyph on the back control of a submenu. |
-| `menu-header` | The bar above a submenu, holding the way back and its name. |
-| `menu-title` | The name of the submenu that is showing. |
-| `menu-surface` | The floating panel the menu is drawn on. |
 | `menu-empty` | Shown when there are no items to show. |
+| `menu-header` | The bar above a submenu, holding the way back and its name. |
 | `menu-loading` | Shown while the items are still on their way. |
+| `menu-surface` | The floating panel the menu is drawn on. |
+| `menu-title` | The name of the submenu that is showing. |
+| `poster` | An entry's still, where it has one. |
+| `trigger` | The button that opens it. |
 
 #### Custom properties
 

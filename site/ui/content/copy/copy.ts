@@ -47,8 +47,14 @@ export interface CopyBlock {
    * it; this only says which list.
    */
   from?: 'families' | 'guides' | 'insights' | 'products' | 'services' | 'verticals'
-  /** Cards written here, for a block whose items belong to it alone. */
-  items?: CopyItem[]
+  /**
+   * Cards written here, for a block whose items belong to it alone.
+   *
+   * `readonly`, because a block may also point at a list the page renders: the
+   * engagement cards are one array read by this document and by `page.tsx`, and
+   * a shared list should not be handed out as something either could mutate.
+   */
+  items?: readonly CopyItem[]
   /** The small line above the heading. */
   kicker?: string
   /** The heading. Absent where the section reads without one. */

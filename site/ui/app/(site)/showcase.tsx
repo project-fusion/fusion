@@ -288,7 +288,7 @@ export function Showcase(): React.ReactElement {
 
   return (
     <div className={styles.showcaseStage} ref={stage}>
-      <helix-card class={styles.showcaseAnchor}>
+      <helix-card class={styles.showcaseAnchor} data-filled>
         <helix-flex direction="column" gap="md">
           <helix-text variant="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
