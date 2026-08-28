@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { execFileSync } from 'node:child_process'
 /**
  * Renders every example twice, from its HTML and from its TSX, and compares.
  *
@@ -72,9 +73,149 @@ const BUILT = join(root, '.local/parity')
 const WIDTH = 640
 
 const args = process.argv.slice(2)
-const only = args.find((one) => !one.startsWith('--'))
+const dryRun = args.includes('--dry-run')
+const changedAt = args.indexOf('--changed')
+const changedFrom = changedAt === -1 ? undefined : args[changedAt + 1]
+/* **The value of `--changed` is not a family name, and the positional search
+   will take it for one.** The comment above `--throttle` names this trap and it
+   caught this flag too: `--changed HEAD~1` read `HEAD~1` as the family to
+   filter to, matched nothing, and reported a clean scoped run over an empty
+   corpus. Excluding the slot after the flag is what keeps the positional
+   argument positional. */
+const only = args.find((one, at) => !one.startsWith('--') && at !== changedAt + 1)
 
-const absent = [FRAME, SHEET].filter((one) => !existsSync(one))
+/**
+ * Paths that can move any picture in the corpus, so a change to one runs all of it.
+ *
+ * **Scoping by family is only safe because this list is not.** An example's
+ * render is a function of far more than its own two files: the tokens it
+ * resolves, the base element that upgrades it, the sheets under `shared/` that
+ * seventeen families import, the icons it draws and the bundle both sides render
+ * from. None of those live under a family, so none would be caught by a family
+ * filter, and each of them changes every picture at once.
+ *
+ * `shared/` is checked before the family pattern deliberately: it sits at
+ * `helix/styled/src/shared` and matches the shape of a family folder without
+ * being one, which is the exception the repository's own layout rule names.
+ */
+const GLOBAL = [
+  'helix/styles/',
+  'helix/core/',
+  'helix/styled/src/shared/',
+  'helix/headless/src/shared/',
+  'helix/icons/',
+  'helix/theme/',
+  'helix/testing/',
+  'tooling/scripts/check-visual-parity.mjs',
+  'tooling/scripts/build-frame.mjs',
+]
+
+const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
+
+/**
+ * The families a change reaches, or `null` for all of them.
+ *
+ * **Reverse composition, because the arrow points the wrong way for us.**
+ * Fifteen families render another inside their own shadow root, named through
+ * `this.tag()`, which `check:seams` already reads. If `listbox` changes, the
+ * picture that moves is `select`'s, so the set has to grow from the changed
+ * family outward to everything that composes it, and keep growing: a family
+ * composing a family that composes the change is just as affected.
+ *
+ * **Over-inclusion is the safe direction and is chosen on purpose.** The scan
+ * does not strip comments the way `check:seams` does, so a `this.tag()` inside
+ * a comment pulls a family in that did not need to be there. That costs seconds
+ * of comparison. The opposite mistake costs a picture nobody looked at, which is
+ * the whole failure this check exists to prevent.
+ */
+const scopeFor = (ref) => {
+  let changed
+  try {
+    changed = execFileSync('git', ['diff', '--name-only', `${ref}...HEAD`], {
+      cwd: root,
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter(Boolean)
+  } catch {
+    /* A shallow clone, an unknown ref, a first commit: any of them means the
+       range cannot be resolved, and the honest answer to "what changed" is then
+       "assume everything". Silently comparing a subset off a broken range is
+       the one outcome worth refusing. */
+    console.log(`parity: cannot resolve ${ref}, comparing the whole corpus.`)
+    return null
+  }
+
+  const global = changed.find((one) => GLOBAL.some((prefix) => one.startsWith(prefix)))
+  if (global !== undefined) {
+    console.log(`parity: ${global} is read by every example, comparing the whole corpus.`)
+    return null
+  }
+
+  const seed = new Set()
+  for (const one of changed) {
+    const found = FAMILY_PATH.exec(one)
+    if (found !== null) {
+      seed.add(found[1])
+    }
+  }
+
+  /* Grow the set through whoever composes what is in it, until it stops
+     growing. `composes` is family -> the families it renders. */
+  const composes = new Map()
+  for (const tier of TIERS) {
+    for (const entry of readdirSync(tier.source, { withFileTypes: true })) {
+      if (!entry.isDirectory()) {
+        continue
+      }
+      /* Merged across tiers rather than replaced, which is the bug this line
+         is the fix for. A family is one name with a folder in each tier, and
+         `composes.set` per tier meant the styled pass overwrote the headless
+         one: every composition declared only in the headless tier was dropped,
+         so a change to `button` did not reach `color-picker`, `steps` or
+         `tour`. Caught by comparing the graph this builds against the same
+         scan run over both tiers at once. */
+      const names = composes.get(entry.name) ?? new Set()
+      for (const file of readdirSync(join(tier.source, entry.name), { recursive: true })) {
+        if (typeof file !== 'string' || !file.endsWith('.ts')) {
+          continue
+        }
+        const source = readFileSync(join(tier.source, entry.name, file), 'utf8')
+        for (const [, name] of source.matchAll(/this\.tag\(\s*'([a-z-]+)'/g)) {
+          names.add(name)
+        }
+      }
+      composes.set(entry.name, names)
+    }
+  }
+
+  const reached = new Set(seed)
+  for (let grew = true; grew; ) {
+    grew = false
+    for (const [family, names] of composes) {
+      if (reached.has(family)) {
+        continue
+      }
+      if ([...names].some((name) => reached.has(name))) {
+        reached.add(family)
+        grew = true
+      }
+    }
+  }
+
+  const added = [...reached].filter((one) => !seed.has(one))
+  if (added.length > 0) {
+    console.log(`parity: ${added.sort().join(', ')} compose something that changed.`)
+  }
+  return reached
+}
+
+/* Gated on the same reasoning as the staleness check below: a dry run answers
+   which families would be compared, which is a question about git and the source
+   tree, and neither half of the bundle is consulted to answer it. In a shared
+   checkout the bundle is also the thing most likely to be missing, because
+   somebody else is part way through rebuilding it. */
+const absent = dryRun ? [] : [FRAME, SHEET].filter((one) => !existsSync(one))
 if (absent.length > 0) {
   console.error(
     `parity: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run ` +
@@ -103,8 +244,12 @@ const newest = (dir) => {
   return latest
 }
 
-const bundled = statSync(FRAME).mtimeMs
-const sources = Math.max(...TIERS.map((tier) => newest(tier.source)))
+/* Not asked of a dry run, which renders nothing: the bundle's age cannot make
+   the answer to "which families would be compared" wrong, and requiring a fresh
+   one would make the cheap question unanswerable in exactly the tree where it is
+   most worth asking, which is one with uncommitted component edits in it. */
+const bundled = dryRun ? 0 : statSync(FRAME).mtimeMs
+const sources = dryRun ? 0 : Math.max(...TIERS.map((tier) => newest(tier.source)))
 if (sources > bundled) {
   console.error(
     'parity: `frame.js` is older than the components it bundles, so both sides would render the\n' +
@@ -166,8 +311,12 @@ const UNCOMPARED = new Map([
   ],
 ])
 
+/* `null` means everything, which is what a run with no `--changed` asks for. */
+const scope = changedFrom === undefined ? null : scopeFor(changedFrom)
+
 /** Every example that is authored in both syntaxes, which is what can be paired. */
 const corpus = []
+const skipped = new Set()
 for (const tier of TIERS) {
   for (const entry of readdirSync(tier.source, { withFileTypes: true })) {
     const dir = join(tier.source, entry.name, '.examples')
@@ -175,6 +324,10 @@ for (const tier of TIERS) {
       continue
     }
     if (only !== undefined && entry.name !== only) {
+      continue
+    }
+    if (scope !== null && !scope.has(entry.name)) {
+      skipped.add(entry.name)
       continue
     }
     for (const file of readdirSync(dir)
@@ -187,6 +340,34 @@ for (const tier of TIERS) {
       corpus.push({ dir, family: entry.name, slug, tier })
     }
   }
+}
+
+/* **What the scope came to, without paying for the pictures.** A run that
+   compares a subset should be able to say which subset before it spends twelve
+   minutes proving it, both for a contributor checking the flag does what they
+   meant and for CI, where this line is the record of what a green tick actually
+   covered. */
+if (dryRun) {
+  const families = [...new Set(corpus.map((one) => one.family))].sort()
+  console.log(
+    `parity: would compare ${corpus.length} examples across ${families.length} ` +
+      `${families.length === 1 ? 'family' : 'families'}` +
+      (skipped.size > 0 ? `, skipping ${skipped.size}` : '') +
+      (families.length > 0 ? `: ${families.join(', ')}` : ''),
+  )
+  process.exit(0)
+}
+
+/* **A scoped run that reaches nothing is a pass, and every other empty run is
+   not.** `--changed` against a commit that touched only the site or the docs
+   legitimately has no example to compare, and failing there would make the
+   check impossible to keep green. An unscoped run finding no corpus means the
+   corpus is missing, which is a real fault. */
+if (corpus.length === 0 && scope !== null) {
+  console.log(
+    `parity: nothing changed that any example renders, ${skipped.size} families not compared.`,
+  )
+  process.exit(0)
 }
 
 if (corpus.length === 0) {
@@ -466,7 +647,7 @@ const picture = async (url) => {
     /* **Every Helix element's own settle signal, which is the one the library
        publishes for exactly this.** `HelixElement` resolves `whenSettled` from
        the frame after `firstUpdated`, once its first style resolution is done
-       and the transition suppression lifts; `@helix-io/testing` already waits on
+       and the transition suppression lifts; `@fusion.dev/helix-testing` already waits on
        it for the same reason. Without it the comparison reads a stopwatch:
        `pagination/footer` reported 419 pixels on one run and 842 on the next
        from the same two files.
@@ -661,6 +842,10 @@ if (findings.length > 0) {
 
 console.log(
   `parity: ${compared} examples render identically from their HTML and their TSX` +
+    /* **A scoped run says so in the same line as its verdict.** A number on its
+       own reads as the whole corpus, which is how a check that stopped covering
+       things goes on looking like one that passes. See `check:floors`. */
+    (skipped.size > 0 ? `, with ${skipped.size} families not compared this run` : '') +
     /* Named every run, because an exception nobody is reminded of is an
        exception that becomes permanent. */
     (UNCOMPARED.size > 0

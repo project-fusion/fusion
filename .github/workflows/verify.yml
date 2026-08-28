@@ -143,7 +143,7 @@ jobs:
       - run: bun run typecheck
 
   # **One job for all three, because `bun run test` is partly Rust.**
-  # `@helix-io/theme`'s `test` script is `cargo test -p fusion-helix-theme`, so
+  # `@fusion.dev/helix-theme`'s `test` script is `cargo test -p fusion-helix-theme`, so
   # `turbo run test` needs a toolchain: split out on its own it failed with
   # cargo's exit 101. Run beside `rs:check` and `rs:test` they share one cargo
   # cache and one compile, where two jobs would each pay for their own.
@@ -207,7 +207,16 @@ jobs:
   # matrix.
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Forty-five because `parity` needs it and the others are billed for what
+    # they use rather than for the ceiling. Measured 28 Aug 2026: the check
+    # compares 610 examples in 701 seconds on an M-series Mac, and the 20 it
+    # used to share left it about ten after checkout, install, build and
+    # `playwright install`. It never once finished: three runs, three
+    # `cancelled` conclusions, which report as neither pass nor fail and read
+    # in the summary as a job that simply did not object. That is the fault
+    # `check:floors` exists to catch, one level up, in the workflow rather than
+    # in the script.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -252,8 +261,19 @@ jobs:
           # which platform it runs on: it compares two renders taken seconds
           # apart in one browser.
           - task: parity
-            run: bun run check:visual-parity
-          # The collector in `@helix-io/diagnostics`, against real components.
+            # Scoped to what the push or the pull request actually changed, and
+            # to whatever composes it. A change under `helix/styles`, `core`,
+            # `icons`, `theme` or either `shared/` is read by every example, so
+            # the script recognizes those and compares the whole corpus anyway.
+            # The run says which families it skipped, in the same line as its
+            # verdict: a subset that reports like a full pass is the failure
+            # this whole check exists to prevent.
+            run: >-
+              bun run check:visual-parity --changed
+              "${{ github.event_name == 'pull_request'
+              && github.event.pull_request.base.sha
+              || github.event.before }}"
+          # The collector in `@fusion.dev/helix-diagnostics`, against real components.
           # Here and not in `verify` because the DOM `verify` runs under drops a
           # `::part()` rule on the floor: happy-dom parses
           # `helix-button::part(button) { }` to zero rules, so every spec for the
@@ -263,7 +283,16 @@ jobs:
           - task: diagnostics
             run: bun run check:diagnostics
     steps:
+      # **Full history, because `parity` scopes itself by diffing against the
+      # base and a depth-1 checkout has nothing to diff against.** The script
+      # treats an unresolvable range as "assume everything", which is the right
+      # default and would also have made the scoping silently never happen: it
+      # would have compared all 610 examples on every run while reporting that
+      # it had scoped. The other tasks in this matrix do not read history and
+      # are not harmed by having it.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v2
         with:
