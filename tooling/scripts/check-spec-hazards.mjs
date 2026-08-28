@@ -31,7 +31,7 @@
  * `while ((await host.updateComplete) === false) {}` is the right idea and had
  * no ceiling in ten files. A component that asks for another update every time
  * turns it into an infinite await: it blocks nothing, allocates nothing, prints
- * nothing, and never returns. `settle` in `@helix-io/testing/dom` is the same
+ * nothing, and never returns. `settle` in `@fusion.dev/helix-testing/dom` is the same
  * loop with a bound, and it names the element when it gives up.
  *
  * Run with `bun run check:spec-hazards` (also part of `bun run verify`).
@@ -142,7 +142,7 @@ for (const { name, root } of PACKAGES) {
         problems.push(
           `${path}:${index + 1}: settles in an unbounded loop. A component that never settles ` +
             'hangs the whole run with no output and no failing test. Use `settle` from ' +
-            '`@helix-io/testing/dom`, which is the same loop with a ceiling that names the element.',
+            '`@fusion.dev/helix-testing/dom`, which is the same loop with a ceiling that names the element.',
         )
       }
     })

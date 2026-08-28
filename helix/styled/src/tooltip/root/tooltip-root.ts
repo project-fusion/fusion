@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTooltip } from '@helix-io/headless/tooltip'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTooltip } from '@fusion.dev/helix-headless/tooltip'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './tooltip-root.css.js'

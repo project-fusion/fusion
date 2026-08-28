@@ -1,4 +1,4 @@
-import { navigation } from '@helix-io/docs'
+import { navigation } from '@fusion.dev/helix-docs'
 import { getFamilies } from '../catalog/catalog'
 
 /*
@@ -18,7 +18,7 @@ import { getFamilies } from '../catalog/catalog'
  * masthead had been compensating by hoisting Components to a product-level
  * destination beside Guides, which said the two were different kinds of thing.
  *
- * **The join is here rather than in `@helix-io/docs`, and that is deliberate.**
+ * **The join is here rather than in `@fusion.dev/helix-docs`, and that is deliberate.**
  * A section of prose comes from the frontmatter of an MDX file in that package.
  * A component comes from `custom-elements.json`, which the docs package does not
  * read and must not: it documents Helix, it is not a consumer of Helix's build

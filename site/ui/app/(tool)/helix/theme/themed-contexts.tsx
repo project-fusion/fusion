@@ -96,7 +96,7 @@ export interface Context {
     status: { caption: string; state: State; words: string }
     trail: { caption: string; value: string }
   }
-  /** The three cards. Icons are names in `@helix-io/icons`. */
+  /** The three cards. Icons are names in `@fusion.dev/helix-icons`. */
   features: readonly { body: string; icon: string; title: string }[]
   /** The recessed band of numbers. */
   figures: readonly { figure: string; label: string }[]

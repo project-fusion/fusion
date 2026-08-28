@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { styles } from './sandbox-toolbar.css.js'

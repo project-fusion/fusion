@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessListItem } from '@helix-io/headless/list'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessListItem } from '@fusion.dev/helix-headless/list'
 import { type CSSResultGroup, html, type TemplateResult } from 'lit'
 import { styles } from './list-item.css.js'
 

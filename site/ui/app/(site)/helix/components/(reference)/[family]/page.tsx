@@ -2,8 +2,8 @@
    and a tree walk, so it runs during the build and the page ships coloured
    markup with no client JavaScript spent on it. `helix/styled` never sees it. */
 
-import { startCase } from '@helix-io/docs'
-import { highlight } from '@helix-io/sandbox/highlight'
+import { startCase } from '@fusion.dev/helix-docs'
+import { highlight } from '@fusion.dev/helix-sandbox/highlight'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -691,7 +691,7 @@ export default async function FamilyDocs({
                 <span
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
                   dangerouslySetInnerHTML={{
-                    __html: highlight(`import '@helix-io/styled/${family.slug}'`, 'js'),
+                    __html: highlight(`import '@fusion.dev/helix/${family.slug}'`, 'js'),
                   }}
                 />
               </helix-code-block>
@@ -701,7 +701,7 @@ export default async function FamilyDocs({
                 <span
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
                   dangerouslySetInnerHTML={{
-                    __html: highlight(`import '@helix-io/headless/${family.slug}'`, 'js'),
+                    __html: highlight(`import '@fusion.dev/helix-headless/${family.slug}'`, 'js'),
                   }}
                 />
               </helix-code-block>

@@ -6,7 +6,7 @@ import {
   HelixBeforeResizeEvent,
   HelixElement,
   requestChange,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -812,7 +812,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    *
    * **By identity rather than by tag, which `closestInstance` exists for and
    * counts this file in its own documentation.** It matched
-   * `'helix-splitter, helix-headless-splitter'`, and only `@helix-io/styled` registers
+   * `'helix-splitter, helix-headless-splitter'`, and only `@fusion.dev/helix` registers
    * the first of those: a headless package naming a styled one by string. Under
    * any third tag, which is exactly what subclassing a headless element is for and
    * what `helix/styled` itself does, the lookup returned null and a nested

@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   drawIcon,
   HelixFormElement,
@@ -6,8 +7,8 @@ import {
   MixinControllerValue,
   MixinField,
   restoreValue,
-} from '@helix-io/core'
-import { eye, eyeSlash, x } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { eye, eyeSlash, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* Side-effect import, because both buttons render a `helix-icon` and a custom
@@ -86,6 +87,15 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+  })
+
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -108,8 +118,29 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
 
   /**
    * Whether the field refuses input while still submitting its value.
+   *
+   * **`readonly`, which is the platform's spelling, and it was `read-only`
+   * until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+   * and the library had been answering that question two ways: thirteen
+   * attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+   * `formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+   * platform writes as one. `readonly` was the only one on both lists, this
+   * spelling on `Rating` and `read-only` on the eight other fields, so one
+   * library shipped both and each was inert on the other's families.
+   *
+   * The cost of the dash-cased form is the one this repository keeps writing
+   * down about attributes: nothing warns. `<helix-input readonly>` is what
+   * anybody who has written HTML types, it parsed to no property at all, and
+   * the field stayed editable with no error anywhere. Measured before the
+   * rename: `readOnly` came back `false`.
+   *
+   * Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+   * about the part it renamed for the same kind of reason: there is no
+   * `helix-v` tag, so no consumer is holding the old spelling, and this is free
+   * today and a deprecation after the first release.
+   * `check:attribute-names` holds it from here.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /**

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTour } from '@helix-io/headless/tour'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTour } from '@fusion.dev/helix-headless/tour'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tour-root.css.js'
 

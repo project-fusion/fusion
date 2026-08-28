@@ -7,7 +7,7 @@
 //! on passing.
 //!
 //! Hand-written rather than derived, and that is deliberate. These keys are the
-//! published interface of `@helix-io/theme` and the Rust field names are not:
+//! published interface of `@fusion.dev/helix-theme` and the Rust field names are not:
 //! `chroma_reduced` is `chromaReduced` on the wire, `seeds` is an object where
 //! the crate holds ordered pairs, and `Outcome` renders as the three strings the
 //! TypeScript union had. A `rename_all` derive would produce most of that and

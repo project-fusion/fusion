@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'

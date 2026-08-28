@@ -5,7 +5,7 @@ import {
   HelixNextEvent,
   HelixPreviousEvent,
   onUnlessFalse,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import {
   airplay,
   arrowClockwise,
@@ -23,7 +23,7 @@ import {
   skipForward,
   speakerHigh,
   speakerX,
-} from '@helix-io/icons'
+} from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
@@ -256,7 +256,7 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * Whether it plays where it sits rather than taking over the screen.
    */
-  @property({ attribute: 'plays-inline', converter: onUnlessFalse })
+  @property({ attribute: 'playsinline', converter: onUnlessFalse })
   playsInline = true
 
   /**
@@ -295,13 +295,13 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * Whether the browser may offer picture in picture.
    */
-  @property({ attribute: 'disable-picture-in-picture', reflect: true, type: Boolean })
+  @property({ attribute: 'disablepictureinpicture', reflect: true, type: Boolean })
   disablePictureInPicture = false
 
   /**
    * Whether the browser may offer playback on a remote device.
    */
-  @property({ attribute: 'disable-remote-playback', reflect: true, type: Boolean })
+  @property({ attribute: 'disableremoteplayback', reflect: true, type: Boolean })
   disableRemotePlayback = false
 
   /**

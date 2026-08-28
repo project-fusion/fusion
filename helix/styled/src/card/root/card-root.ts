@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCard } from '@helix-io/headless/card'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCard } from '@fusion.dev/helix-headless/card'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './card-root.css.js'

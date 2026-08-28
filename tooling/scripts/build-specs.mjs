@@ -3,7 +3,7 @@
  *
  * The sandbox runs a component's own specs against the real platform, so the
  * same files that run in CI are the ones that run there. `bun:test` and
- * `@helix-io/testing/dom` are resolved to the browser harness instead, which
+ * `@fusion.dev/helix-testing/dom` are resolved to the browser harness instead, which
  * is the whole of the difference: no rewriting, no second suite to keep in
  * step, and a spec that is deleted stops being reported the same day.
  *
@@ -76,7 +76,7 @@ const out = join(root, 'site/ui/public/specs')
  * because `lit` and `lit/static-html.js` both export `html` and they are not
  * the same binding. A single flat module would have to drop one of them.
  *
- * **`@helix-io/core` is deliberately not here**, and it is the obvious entry to
+ * **`@fusion.dev/helix-core` is deliberately not here**, and it is the obvious entry to
  * add: every family extends `HelixElement`, so with splitting off it is inlined
  * ninety-three times and it is most of what a bundle weighs. Measured 27 Aug
  * 2026, naming it took the family bundles from 9,143 KB to 3,017 KB.
@@ -96,7 +96,7 @@ const out = join(root, 'site/ui/public/specs')
  * are gitignored artifacts, so the whole prize is a faster local spec run.
  */
 const RUNTIME = {
-  '@helix-io/icons': 'helix-icons',
+  '@fusion.dev/helix-icons': 'helix-icons',
   lit: 'lit',
   'lit/decorators.js': 'lit-decorators',
   'lit/directives/repeat.js': 'lit-repeat',
@@ -144,7 +144,7 @@ const families = async () => {
 const shareRuntime = {
   name: 'shared-runtime',
   setup(build) {
-    build.onResolve({ filter: /^(@helix-io\/icons|lit(\/.*)?)$/ }, ({ path }) => {
+    build.onResolve({ filter: /^(@fusion\.dev\/helix-icons|lit(\/.*)?)$/ }, ({ path }) => {
       const name = RUNTIME[path]
       if (!name) {
         throw new Error(
@@ -161,7 +161,7 @@ const shareRuntime = {
 const useBrowserHarness = {
   name: 'browser-spec-harness',
   setup(build) {
-    build.onResolve({ filter: /^(bun:test|@helix-io\/testing\/dom)$/ }, () => ({
+    build.onResolve({ filter: /^(bun:test|@fusion\.dev\/helix-testing\/dom)$/ }, () => ({
       path: harness,
     }))
   },

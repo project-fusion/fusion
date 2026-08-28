@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSteps } from '@helix-io/headless/steps'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSteps } from '@fusion.dev/helix-headless/steps'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './steps-root.css.js'
 

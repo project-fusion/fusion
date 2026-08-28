@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessVirtualList } from '@helix-io/headless/virtual-list'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessVirtualList } from '@fusion.dev/helix-headless/virtual-list'
 import type { CSSResultGroup } from 'lit'
 
 import { styles } from './virtual-list-root.css.js'
@@ -17,7 +17,7 @@ import { styles } from './virtual-list-root.css.js'
  * @category layout
  * @since 0.1.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/virtual-list
+ * @documentation https://helix.fusion.dev/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.
  * @csspart before - The space standing in for rows above the window.

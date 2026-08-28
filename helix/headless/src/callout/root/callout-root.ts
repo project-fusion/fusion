@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria, TONE_MARKS, toneMark } from '@helix-io/core'
+import { customElement, HelixElement, hostAria, TONE_MARKS, toneMark } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

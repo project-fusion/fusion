@@ -1,5 +1,5 @@
-import { customElement, HelixElement, MixinDismissible } from '@helix-io/core'
-import { x } from '@helix-io/icons'
+import { customElement, HelixElement, MixinDismissible } from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 

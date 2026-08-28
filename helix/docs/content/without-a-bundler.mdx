@@ -29,7 +29,7 @@ no build step at all. Two ways, and they suit different things.
 </div>
 ```
 
-`@helix-io/styles` has no dependencies and no JavaScript. It carries the token
+`@fusion.dev/helix-styles` has no dependencies and no JavaScript. It carries the token
 layer, the element reset, the type scale on bare headings, and recipes for
 markup this library does not render, so a page can look like Helix without a
 single custom element on it.
@@ -43,15 +43,15 @@ what some pages need. See [Recipes](./recipes) for what the base layer provides.
 <script type="importmap">
   {
     "imports": {
-      "@helix-io/styled": "/vendor/helix/styled/dist/index.js",
-      "@helix-io/core": "/vendor/helix/core/dist/index.js",
-      "@helix-io/icons": "/vendor/helix/icons/dist/index.js",
+      "@fusion.dev/helix": "/vendor/helix/styled/dist/index.js",
+      "@fusion.dev/helix-core": "/vendor/helix/core/dist/index.js",
+      "@fusion.dev/helix-icons": "/vendor/helix/icons/dist/index.js",
       "lit": "/vendor/lit/index.js"
     }
   }
 </script>
 <script type="module">
-  import '@helix-io/styled'
+  import '@fusion.dev/helix'
 </script>
 ```
 
@@ -62,7 +62,7 @@ imports are bare specifiers, and a browser needs to be told where each one is.
 **Copy the files, do not point at a CDN.** An import map pointing at someone
 else's server makes your page stop working when theirs does, which is the
 dependency the Sovereignty Constraint exists to refuse. `bun add` and then copy
-`node_modules/@helix-io/*/dist` into whatever you serve.
+`node_modules/@fusion.dev/helix-*/dist` into whatever you serve.
 
 ## What this costs
 
@@ -74,8 +74,8 @@ landing page.
 You can narrow it by importing subpaths instead:
 
 ```js
-import '@helix-io/styled/button'
-import '@helix-io/styled/dialog'
+import '@fusion.dev/helix/button'
+import '@fusion.dev/helix/dialog'
 ```
 
 Each still pulls its own dependencies, so this is a reduction rather than a
@@ -113,7 +113,7 @@ nothing, so a reader who followed this got all 178 semantic tokens declared and
 every one resolving to `rgba(0, 0, 0, 0)`. Linking `all.css` is the fix that
 cannot be got wrong again.*
 
-`elements.css` stays its own link, being `@helix-io/styled`'s rather than this
+`elements.css` stays its own link, being `@fusion.dev/helix`'s rather than this
 package's, and it matters more here than anywhere: with no bundler the module
 graph arrives over the network, so the interval where the markup exists and the
 definitions do not is longer than it is in a built app.

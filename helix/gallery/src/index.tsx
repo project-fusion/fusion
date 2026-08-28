@@ -19,11 +19,11 @@ import { toolingArt } from './tooling'
  *
  * **Ninety-four, not the ninety-three folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
- * `@helix-io/sandbox`. Counting directories is how five families were missed on
+ * `@fusion.dev/helix-sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.
  *
- * **This is `@helix-io/gallery`, and the move is why.** Art is versioned content
- * about components rendered by a site, which is exactly what `@helix-io/docs`
+ * **This is `@fusion.dev/helix-gallery`, and the move is why.** Art is versioned content
+ * about components rendered by a site, which is exactly what `@fusion.dev/helix-docs`
  * already is, so it belongs beside it rather than inside the app that renders
  * it: lockstep-versioned so a consumer's cards match their Helix version,
  * private, and TSX with its stylesheet kept together in `gallery.css`.

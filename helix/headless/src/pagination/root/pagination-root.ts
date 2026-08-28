@@ -5,14 +5,14 @@ import {
   HelixNavigateEvent,
   hostAria,
   requestChange,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import {
   caretDoubleLeft,
   caretDoubleRight,
   caretLeft,
   caretRight,
   type HelixIcon,
-} from '@helix-io/icons'
+} from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

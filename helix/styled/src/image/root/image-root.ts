@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessImage } from '@helix-io/headless/image'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessImage } from '@fusion.dev/helix-headless/image'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './image-root.css.js'

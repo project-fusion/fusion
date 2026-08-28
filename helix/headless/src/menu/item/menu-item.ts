@@ -1,5 +1,5 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@helix-io/core'
-import { caretRight, check } from '@helix-io/icons'
+import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import { caretRight, check } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

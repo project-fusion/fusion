@@ -125,7 +125,7 @@
  * `--helix-layer-*` for "behind", correctly, because nothing should need one. */
 [part="stage"]::before {
   background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
-  block-size: calc(var(--helix-size-icon-lg) + var(--helix-space-2xl));
+  block-size: calc(var(--helix-size-icon-loose) + var(--helix-space-2xl));
   content: "";
   inset-block-end: 0;
   inset-inline: 0;
@@ -195,7 +195,7 @@
  * `<input>` and are deliberately not caught: a slider is not this shape. */
 [part="controls"] :where(a, button) {
   all: unset;
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-tight);
 
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -205,8 +205,8 @@
   display: flex;
   flex: 0 0 auto;
   justify-content: center;
-  min-block-size: var(--helix-size-icon-lg);
-  min-inline-size: var(--helix-size-icon-lg);
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
 }
 
 [part="controls"] :where(a, button):focus-visible,
@@ -376,7 +376,7 @@
   block-size: var(--_video-level-gap);
   bottom: 100%;
   content: "";
-  inline-size: var(--helix-size-icon-lg);
+  inline-size: var(--helix-size-icon-loose);
   left: 50%;
   position: absolute;
   translate: -50% 0;
@@ -398,7 +398,7 @@
   /* One pad lower than the track, which is what centres a ground that is one
      pad taller at each end. */
   bottom: calc(var(--_video-level-lift) - var(--helix-space-xs));
-  inline-size: var(--helix-size-icon-lg);
+  inline-size: var(--helix-size-icon-loose);
   left: 50%;
   position: absolute;
   translate: -50% 0;
@@ -498,7 +498,7 @@
      borrowed for that reason. */
   inline-size: var(
     --video-start-size,
-    clamp(var(--helix-size-control-md), 15%, calc(var(--helix-size-control-lg) * 1.5))
+    clamp(var(--helix-size-control), 15%, calc(var(--helix-size-control-loose) * 1.5))
   );
   inset-block-start: 50%;
   inset-inline-start: 50%;
@@ -541,7 +541,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   inline-size: max-content;
-  inset-block-end: calc(var(--helix-size-icon-lg) + var(--helix-space-lg));
+  inset-block-end: calc(var(--helix-size-icon-loose) + var(--helix-space-lg));
   inset-inline-start: 50%;
   margin: var(--helix-space-none);
   max-inline-size: min(80%, 36rem);
@@ -649,13 +649,13 @@
 [part="loading-mark"] {
   /* The same 0.8s `Loader` turns at, so two spinners on one page agree. */
   animation: video-spin 0.8s linear infinite;
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   border: var(--helix-border-thick) solid
     color-mix(in oklab, var(--helix-color-foreground-media) 30%, transparent);
   border-block-start-color: var(--helix-color-foreground-media);
   border-radius: var(--helix-radii-full);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 @keyframes video-spin {

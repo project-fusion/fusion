@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTimeInput } from '@helix-io/headless/time-input'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTimeInput } from '@fusion.dev/helix-headless/time-input'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, because the tier below renders both of these and a custom
    element registers on import. Inherited from the base along with the template,

@@ -16,7 +16,7 @@
  * sliders start where the stylesheet already is, so moving one is a departure a
  * reader can see rather than a jump.
  */
-import type { ThemeIntent } from '@helix-io/theme'
+import type { ThemeIntent } from '@fusion.dev/helix-theme'
 
 /**
  * The selector the emitted block is written for.

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount as mountMarkup, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount as mountMarkup, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* The data table after hydration.
  *

@@ -1,6 +1,6 @@
 'use client'
 
-import { initTheme, type ThemeEngine } from '@helix-io/theme'
+import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import {
   createContext,
   type ReactNode,

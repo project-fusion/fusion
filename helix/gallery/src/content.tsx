@@ -443,7 +443,7 @@ export const contentArt: Record<string, ReactNode> = {
    *
    * Now: one 20 unit box each, one 2 unit weight each, one alpha, and every one
    * of them an outline rather than a solid, because that is what the icons in
-   * `@helix-io/icons` are. The disc is a ring for the same reason, and the ring
+   * `@fusion.dev/helix-icons` are. The disc is a ring for the same reason, and the ring
    * is `artPage` through the middle rather than a lighter ink, so it is a hole
    * and not a paler circle.
    */

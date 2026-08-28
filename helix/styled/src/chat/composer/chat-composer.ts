@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessChatComposer } from '@helix-io/headless/chat'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './chat-composer.css.js'
 

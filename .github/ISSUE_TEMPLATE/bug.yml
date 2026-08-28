@@ -24,7 +24,7 @@ body:
       required: true
   - attributes:
       description: Which packages, and at what versions. `bun pm ls` prints them.
-      placeholder: "@helix-io/styled 1.4.0, bun 1.1.43, Chrome 141"
+      placeholder: "@fusion.dev/helix 1.4.0, bun 1.1.43, Chrome 141"
       label: Versions
     id: versions
     type: textarea

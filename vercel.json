@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bunx turbo run build --filter=@fusion-io/site-ui...",
+  "buildCommand": "bunx turbo run build --filter=@fusion.dev/site-ui...",
   "framework": "nextjs",
   "installCommand": "bun install",
   "outputDirectory": "site/ui/.next"

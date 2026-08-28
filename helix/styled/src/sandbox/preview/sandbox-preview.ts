@@ -1,4 +1,9 @@
-import { customElement, HelixConsoleEvent, HelixElement, HelixResizeEvent } from '@helix-io/core'
+import {
+  customElement,
+  HelixConsoleEvent,
+  HelixElement,
+  HelixResizeEvent,
+} from '@fusion.dev/helix-core'
 
 /**
  * How long the source has to stop changing before the frame is asked to render,

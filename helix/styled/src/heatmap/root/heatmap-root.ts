@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessHeatmap } from '@helix-io/headless/heatmap'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessHeatmap } from '@fusion.dev/helix-headless/heatmap'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './heatmap-root.css.js'
 

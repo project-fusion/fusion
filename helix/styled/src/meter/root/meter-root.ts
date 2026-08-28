@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessMeter } from '@helix-io/headless/meter'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessMeter } from '@fusion.dev/helix-headless/meter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './meter-root.css.js'

@@ -27,15 +27,15 @@ analysis time rather than left to review.
 ## Install
 
 ```sh
-bun add @helix-io/styled @helix-io/styles
+bun add @fusion.dev/helix @fusion.dev/helix-styles
 ```
 
 Three imports at your app root, in this order, then the elements are usable
 anywhere:
 
 ```ts
-import '@helix-io/styled/helix.css'
-import '@helix-io/styled'
+import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix'
 ```
 
 ```html
@@ -54,16 +54,16 @@ page for each framework.
 
 | Package | Use when |
 | --- | --- |
-| `@helix-io/styles` | Always. Tokens and the base layer |
-| `@helix-io/styled` | You want Helix components as-is |
-| `@helix-io/headless` | You want the behavior and none of the styling |
-| `@helix-io/theme` | You are generating or validating a theme |
-| `@helix-io/icons` | You are drawing an icon outside a component |
-| `@helix-io/core` | You are building a new Helix component |
+| `@fusion.dev/helix-styles` | Always. Tokens and the base layer |
+| `@fusion.dev/helix` | You want Helix components as-is |
+| `@fusion.dev/helix-headless` | You want the behavior and none of the styling |
+| `@fusion.dev/helix-theme` | You are generating or validating a theme |
+| `@fusion.dev/helix-icons` | You are drawing an icon outside a component |
+| `@fusion.dev/helix-core` | You are building a new Helix component |
 
 **There is no React package.** The elements are custom elements and React
 renders them directly; what ships for React is a `jsx.d.ts` that types every tag
-and a runtime bridge in `@helix-io/core` that repairs React's hydration of
+and a runtime bridge in `@fusion.dev/helix-core` that repairs React's hydration of
 custom events. [React](./react) has both.
 
 See [Tiers](./tiers) for how the packages relate and which one to reach for.

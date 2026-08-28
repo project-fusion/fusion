@@ -43,7 +43,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "CodeMirror, not a `<textarea>`. The textarea it replaces was the right call\nwhile a sandbox only had to hold text: undo, selection, spellcheck\nsuppression, mobile keyboards, and screen-reader support all came from the\nplatform. What it could not do is highlight what it holds, number its lines,\nor say where the cursor is, and a status bar reading line and column has to\nask something.\n\n**On its own path.** This is `@helix-io/sandbox/editor` rather than part of\nthe barrel, because CodeMirror is around 110 KB over the wire where the rest\nof this package is a few. A sandbox with no editable pane should not pay for\none, and neither should a site that registers its elements once.\n\nThe view is built once and reconfigured, not rebuilt. Replacing it on every\nchange would throw away the undo history, the scroll position, and the\nselection, which is most of what an editor is.",
+          "description": "CodeMirror, not a `<textarea>`. The textarea it replaces was the right call\nwhile a sandbox only had to hold text: undo, selection, spellcheck\nsuppression, mobile keyboards, and screen-reader support all came from the\nplatform. What it could not do is highlight what it holds, number its lines,\nor say where the cursor is, and a status bar reading line and column has to\nask something.\n\n**On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of\nthe barrel, because CodeMirror is around 110 KB over the wire where the rest\nof this package is a few. A sandbox with no editable pane should not pay for\none, and neither should a site that registers its elements once.\n\nThe view is built once and reconfigured, not rebuilt. Replacing it on every\nchange would throw away the undo history, the scroll position, and the\nselection, which is most of what an editor is.",
           "name": "HelixSandboxEditor",
           "cssParts": [
             {
@@ -100,7 +100,7 @@
               },
               "default": "false",
               "description": "Whether the text can be changed.\n\n`EditorState.readOnly` rather than removing the editor's focus or its\nkeymap: a reader still needs to select the text, scroll it, and put a\ncursor in it to read a long line. What it stops is the typing.",
-              "attribute": "read-only",
+              "attribute": "readonly",
               "reflects": true
             },
             {
@@ -254,7 +254,7 @@
                 "text": "Promise<void>"
               },
               "readonly": true,
-              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@fusion.dev/helix-testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
               "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
               "inheritedFrom": {
                 "name": "HelixElement",
@@ -397,7 +397,7 @@
               "fieldName": "fieldLabel"
             },
             {
-              "name": "read-only",
+              "name": "readonly",
               "type": {
                 "text": "boolean"
               },
@@ -408,7 +408,7 @@
           ],
           "superclass": {
             "name": "HelixElement",
-            "package": "@helix-io/core"
+            "package": "@fusion.dev/helix-core"
           },
           "summary": "An editable pane of source, with highlighting and line numbers.",
           "helix": {
@@ -936,7 +936,7 @@
                 "text": "Promise<void>"
               },
               "readonly": true,
-              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@fusion.dev/helix-testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
               "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
               "inheritedFrom": {
                 "name": "HelixElement",
@@ -1054,7 +1054,7 @@
           ],
           "superclass": {
             "name": "HelixElement",
-            "package": "@helix-io/core"
+            "package": "@fusion.dev/helix-core"
           },
           "summary": "Runs a component's own specs and shows how they came out.",
           "helix": {

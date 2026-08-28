@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessFormatDate } from '@helix-io/headless/format-date'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessFormatDate } from '@fusion.dev/helix-headless/format-date'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './format-date-root.css.js'
 

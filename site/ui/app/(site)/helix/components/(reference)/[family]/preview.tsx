@@ -5,7 +5,7 @@ import type {
   HelixResizeEvent,
   HelixSandbox,
   HelixSandboxPreview,
-} from '@helix-io/styled'
+} from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
 import docs from '../docs.module.css'
@@ -128,7 +128,7 @@ export function ComponentPreview({
      two decisions rather than one. The subpath because it carries CodeMirror
      and a page showing a sandbox without an editable pane should not pay for
      one; this page has one, so it pays. The effect because a module-scope
-     `import '@helix-io/sandbox/editor'` registers the definitions during the
+     `import '@fusion.dev/helix-sandbox/editor'` registers the definitions during the
      client bundle's evaluation, so the elements upgrade and write their own
      bookkeeping before React hydrates, and React then reads a DOM that has
      gained attributes since the server wrote it.

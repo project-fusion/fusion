@@ -39,6 +39,14 @@
               "privacy": "private"
             },
             {
+              "kind": "field",
+              "name": "forwarded",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Set<string>()",
+              "description": "Which state attributes this controller wrote, so only those are removed."
+            },
+            {
               "kind": "method",
               "name": "forward",
               "return": {
@@ -857,6 +865,16 @@
                 "text": "(() => void) | undefined"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "run",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "Which run of placements the results coming back belong to.\n\n`computePosition` is async, so a measurement started before `stop()` still\nresolves after it and wrote its result onto a surface that had just been\ntaken down: the inline `position` and `translate` went back on, and so did\n`data-placed`, which is the attribute five families gate visibility on.\nOpening and closing inside one task is all it takes, since the write lands\na microtask later.\n\nA counter rather than an `AbortController`, because there is nothing to\nabort: the work is already done by the time the answer arrives and the only\nquestion is whether anybody still wants it."
             },
             {
               "kind": "field",
@@ -2854,7 +2872,7 @@
                 "text": "Promise<void>"
               },
               "readonly": true,
-              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@fusion.dev/helix-testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
               "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })"
             },
             {
@@ -3138,7 +3156,7 @@
                 "text": "Promise<void>"
               },
               "readonly": true,
-              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@helix-io/testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
+              "description": "Resolves a frame after the first update, when transitions are switched on.\n\n**Named `whenSettled` because `settled` was taken four times over.** Image\nand Splitter each have a private `settle`, and both color controls carry a\n`settled` of their own, all of them older than this and none of them about\ntransitions. A base class takes the name every subclass then cannot use, so\nit takes the one nobody wanted.\n\n**The state it reports cannot be watched, which is why this exists.** A\n`MutationObserver` could see `[data-settled]` arrive and there is no\nequivalent for `ElementInternals.states`: a custom state is deliberately not\nin the DOM, which is the whole reason it replaced the attribute. Anything\nthat used to wait on the attribute waits on this instead, and gets a better\nsignal for it, an awaited promise being what the callers wanted rather than\na mutation they had to interpret.\n\nSeparate from `updateComplete`, which resolves in the microtask checkpoint\nthe suppression is still active in. That is the distinction `readyToMove`\nin `@fusion.dev/helix-testing` was written around and the reason two checkbox specs\nwere misread as a token fault for days.\n\nIt never resolves where `requestAnimationFrame` never fires, which is a\nserver, a hidden tab, and happy-dom. Callers that must not hang race it\nagainst a timeout; `readyToMove` does exactly that.",
               "default": "new Promise<void>((resolve) => { this.resolveSettled = resolve })",
               "inheritedFrom": {
                 "name": "HelixElement",
@@ -4481,6 +4499,14 @@
           "declaration": {
             "name": "slotFilled",
             "module": "./utils/slot-filled/slot-filled.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "tellDisclosure",
+          "declaration": {
+            "name": "tellDisclosure",
+            "module": "./utils/tell-disclosure/tell-disclosure.js"
           }
         },
         {
@@ -6670,7 +6696,7 @@
               }
             }
           ],
-          "description": "The nearest ancestor that is an instance of a class, crossing shadow roots.\n\n**Identity rather than tag name, and the rule already existed.** `Accordion`'s\nroot states it two files from a violation of it: \"Items are matched with\n`instanceof`, never by tag name. Matching `helix-accordion-item` would tie\nthis tier to the styled one.\" Nine headless families resolve their\nrelationships that way; two did it by tag, and both named `helix-*` tags that\nonly `@helix-io/styled` registers, which is a headless package depending on a\nstyled one by string.\n\nThe consequence is silent rather than loud. Subclassing a headless element under\na different tag is exactly what the headless tier exists to allow, and it is\nwhat `helix/styled` itself does. Under a third tag the lookup returned `null`,\nso an accordion's `mode` was ignored and every section behaved as `multiple`\nwith no error anywhere.\n\n**`closest()` alone is not enough**, which is why this walks rather than\ndelegating. `closest()` stops at a shadow boundary: a component slotted into\nanother component's shadow root has a `parentNode` chain that ends at a\n`ShadowRoot`, and `closest` will not step across it. Following `host` is what\nmakes a nested arrangement resolve, and nesting through a slot is the\nordinary case for anything composable."
+          "description": "The nearest ancestor that is an instance of a class, crossing shadow roots.\n\n**Identity rather than tag name, and the rule already existed.** `Accordion`'s\nroot states it two files from a violation of it: \"Items are matched with\n`instanceof`, never by tag name. Matching `helix-accordion-item` would tie\nthis tier to the styled one.\" Nine headless families resolve their\nrelationships that way; two did it by tag, and both named `helix-*` tags that\nonly `@fusion.dev/helix` registers, which is a headless package depending on a\nstyled one by string.\n\nThe consequence is silent rather than loud. Subclassing a headless element under\na different tag is exactly what the headless tier exists to allow, and it is\nwhat `helix/styled` itself does. Under a third tag the lookup returned `null`,\nso an accordion's `mode` was ignored and every section behaved as `multiple`\nwith no error anywhere.\n\n**`closest()` alone is not enough**, which is why this walks rather than\ndelegating. `closest()` stops at a shadow boundary: a component slotted into\nanother component's shadow root has a `parentNode` chain that ends at a\n`ShadowRoot`, and `closest` will not step across it. Following `host` is what\nmakes a nested arrangement resolve, and nesting through a slot is the\nordinary case for anything composable."
         }
       ],
       "exports": [
@@ -7612,6 +7638,46 @@
           "declaration": {
             "name": "slotFilled",
             "module": "src/utils/slot-filled/slot-filled.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/tell-disclosure/tell-disclosure.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "tellDisclosure",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "trigger",
+              "type": {
+                "text": "Element | null | undefined"
+              }
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              }
+            }
+          ],
+          "description": "Tells a slotted trigger that it opens something, and whether it is open.\n\n**Two components answered this by writing `aria-expanded` onto the consumer's\nelement, and that is a hydration mismatch.** `Megamenu` and `SpeedDial` both\ndid, each with a note saying why: a consumer who has to mirror `open` back\nonto their own trigger is a consumer who will forget, and the failure is\nsilent to everyone who can see the screen. Both notes are right about the\ngap. `Popover` refused to write anything, from the day it was written, on the\ngrounds that a component decorating a consumer's markup after upgrading is\none whose output a React consumer's hydration disagrees with.\n\n**Popover was right, measured 28 Aug 2026 against React 19.2.8.** Four\nfamilies were server-rendered as React emits them and hydrated with the\nelement definitions loaded either side of `hydrateRoot`:\n\n```\ncase        writes to trigger   hydration mismatch\nmegamenu    aria-expanded       yes, both load orders\nspeed dial  aria-expanded       yes, both load orders\npopover     nothing             no\nmenu        nothing             no\n```\n\nReact reports \"some attributes of the server rendered HTML didn't match the\nclient properties. This won't be patched up\", and the cost is not the console\nline: it answers a mismatch by discarding the server's HTML for that subtree\nand rebuilding it, which is what the carousel's own note records blinding an\n`<helix-aura>` two sections away.\n\n**A property crosses the gap that an attribute cannot, and this library\nalready knew it.** `Menu` tells its items by property \"rather than an\nattribute for that reason\", in those words. React diffs the attributes it\nrendered and never looks at a property, so the state reaches the trigger,\nlands as `aria-expanded` inside *that element's* shadow root, and the\nconsumer's markup is exactly what they served. Both positions get what they\nwere protecting: nothing is written onto the consumer's element, and the\nreader is still told what the control does.\n\n**Set before upgrade is safe**, which is what lets this run without waiting\nfor a definition: `ReactiveElement` captures an instance property assigned\nbefore it upgrades and re-applies it, so a trigger whose module has not\nloaded yet still ends up with the value.\n\n**A plain element is warned about rather than written to.** A\n`<button slot=\"trigger\">` has no shadow root to keep the state out of the\nmarkup and no property to take it, and a consumer cannot mirror it themselves\nbecause the open state belongs to the component. Saying so once is the same\nanswer `Tooltip` gives about the link it will not write for them. See #322."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "tellDisclosure",
+          "declaration": {
+            "name": "tellDisclosure",
+            "module": "src/utils/tell-disclosure/tell-disclosure.ts"
           }
         }
       ]

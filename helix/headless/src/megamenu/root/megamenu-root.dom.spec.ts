@@ -1,9 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  // A Helix trigger, which is the only kind that can hold the disclosure state
+  // without it reaching the consumer's markup. See `tellDisclosure`.
+  await import('../../button/index.js')
 })
 
 type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
@@ -331,6 +334,15 @@ describe('a megamenu whose trigger the consumer slotted', () => {
 
   const own = (host: Section) => host.querySelector('button[slot="trigger"]') as HTMLButtonElement
 
+  /** The arrangement the docs recommend: a Helix element in the trigger slot. */
+  const slottedHelixTrigger = async (): Promise<Section> => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Products"><helix-headless-button slot="trigger">Products</helix-headless-button><a href="/one">One</a></helix-headless-megamenu>`,
+    )) as Section
+    await host.updateComplete
+    return host
+  }
+
   /* The reason the slot exists at all in this codebase: no declarative shadow
      DOM ships, so the default trigger's label lives only in the shadow root and
      a server-rendered page has no word in the bar until the element upgrades.
@@ -355,21 +367,62 @@ describe('a megamenu whose trigger the consumer slotted', () => {
     expect(own(host).isConnected).toBe(true)
   })
 
-  test('the disclosure state reaches it, which is the whole contract', async () => {
+  test('the disclosure state reaches it, by property rather than by attribute', async () => {
     /* `render` writes `aria-expanded` onto the button it renders itself, and a
        slotted trigger replaces that button. Without this the panel opened and
        closed and nothing announced it: a reader was told the control was a
-       plain button forever, and the failure was audible only. */
-    const host = await slotted()
-    expect(own(host).getAttribute('aria-controls')).toBe('panel')
-    expect(own(host).getAttribute('aria-expanded')).toBe('false')
+       plain button forever, and the failure was audible only.
+
+       **The attribute is what this asserted until 28 Aug 2026**, and writing it
+       onto the consumer's element is a hydration mismatch React reports and does
+       not patch up: measured against 19.2.8, this family and `SpeedDial` both
+       produced one in either load order while `Popover` and `Menu`, which wrote
+       nothing, were clean. The property never reaches the markup, so there is
+       nothing for React to compare, and a Helix trigger renders the attribute
+       inside its own shadow root. See `tellDisclosure` and #322. */
+    const host = await slottedHelixTrigger()
+    const trigger = host.querySelector('helix-headless-button') as HTMLElement & {
+      expanded?: boolean
+      updateComplete: Promise<boolean>
+    }
+    await trigger.updateComplete
+    expect(trigger.expanded).toBe(false)
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
 
     host.open = true
     await host.updateComplete
-    expect(own(host).getAttribute('aria-expanded')).toBe('true')
+    await trigger.updateComplete
+    expect(trigger.expanded).toBe(true)
+    expect(part(trigger, 'button')?.getAttribute('aria-expanded')).toBe('true')
+    // Still nothing on the consumer's own element, which is the whole point.
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
 
     host.open = false
     await host.updateComplete
-    expect(own(host).getAttribute('aria-expanded')).toBe('false')
+    await trigger.updateComplete
+    expect(trigger.expanded).toBe(false)
+  })
+
+  test('a trigger that cannot hold the state is left alone rather than written to', async () => {
+    /* A plain `<button slot="trigger">` has no shadow root to keep the state out
+       of the markup and no property to take it, so nothing is written and
+       `tellDisclosure` says so once. The reader loses the announcement, which is
+       the cost this records rather than hides. */
+    const host = await slotted()
+    expect(own(host).hasAttribute('aria-expanded')).toBe(false)
+    host.open = true
+    await host.updateComplete
+    expect(own(host).hasAttribute('aria-expanded')).toBe(false)
+  })
+
+  test('and it is not given an `aria-controls` that could never resolve', async () => {
+    /* It was, until 28 Aug 2026: `aria-controls="panel"` naming an id inside
+       this component's own shadow root, written onto an element in the light
+       DOM. An IDREF resolves only within the tree that holds it, so the
+       reference was to nothing at all, and an inert one is worse than none
+       because an audit reports it as satisfied. Asserted here rather than left
+       to a reader noticing, since nothing about the markup looks wrong. */
+    const host = await slotted()
+    expect(own(host).hasAttribute('aria-controls')).toBe(false)
   })
 })

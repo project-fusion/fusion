@@ -1,8 +1,8 @@
 'use client'
 
-import '@helix-io/styles/tokens.css'
-import '@helix-io/styles/primitives.css'
-import '@helix-io/styles/base.css'
+import '@fusion.dev/helix-styles/tokens.css'
+import '@fusion.dev/helix-styles/primitives.css'
+import '@fusion.dev/helix-styles/base.css'
 import { useEffect } from 'react'
 
 interface RunMessage {
@@ -18,7 +18,7 @@ interface RunMessage {
  * every test, so specs sharing the preview's document would tear down the
  * example a reader is looking at, several dozen times a second.
  *
- * No `@helix-io/styled` import here. Each spec bundle brings the family it tests,
+ * No `@fusion.dev/helix` import here. Each spec bundle brings the family it tests,
  * because that is what the spec file itself imports, so loading every component
  * up front would only mean the definitions race: whichever registered first
  * wins, and `customElements.define` throws on the second.

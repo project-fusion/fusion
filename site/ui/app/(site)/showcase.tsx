@@ -1,6 +1,6 @@
 'use client'
 
-import { initTheme, type ThemeEngine, type ThemeIntent } from '@helix-io/theme'
+import { initTheme, type ThemeEngine, type ThemeIntent } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
 import { THEME_ENGINE } from '../../utils/theme-engine/theme-engine'
 import styles from './landing.module.css'
@@ -671,7 +671,7 @@ export function Showcase(): React.ReactElement {
           </helix-callout>
 
           <helix-code-block label="Install Helix">
-            {"bun add @helix-io/styled\nimport '@helix-io/styled/card'"}
+            {"bun add @fusion.dev/helix\nimport '@fusion.dev/helix/card'"}
           </helix-code-block>
 
           <helix-card class="showcaseCard" separation="outlined">

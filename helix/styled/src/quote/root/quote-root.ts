@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessQuote } from '@helix-io/headless/quote'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessQuote } from '@fusion.dev/helix-headless/quote'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './quote-root.css.js'
 

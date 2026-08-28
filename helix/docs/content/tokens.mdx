@@ -11,7 +11,7 @@ Two layers. You see the second.
 
 | Layer | Shape | Who may use it |
 |---|---|---|
-| Primitive | `--_helix-neutral-500` | `@helix-io/styles` only |
+| Primitive | `--_helix-neutral-500` | `@fusion.dev/helix-styles` only |
 | Semantic | `--helix-color-primary` | everything, including you |
 
 Every semantic token answers *what is this for*, never *what value is it*. There
@@ -64,7 +64,7 @@ them to nudge one component; use the semantic tokens to move everything.
 Four things fail the build:
 
 1. **A raw value where a token exists.** `#e5e5e5` when a neutral is right there.
-2. **A primitive referenced from outside `@helix-io/styles`.**
+2. **A primitive referenced from outside `@fusion.dev/helix-styles`.**
 3. **A reference to a token that does not exist.**
 4. **A component hook nothing reads**, and a primitive nothing resolves into.
 

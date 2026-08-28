@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSwitch } from '@helix-io/headless/switch'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSwitch } from '@fusion.dev/helix-headless/switch'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldInlineStyles } from '../../shared/field/field-inline.css.js'

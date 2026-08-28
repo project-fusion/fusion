@@ -9,10 +9,10 @@ title: React
 
 There is no React package. The elements are custom elements and React renders
 them directly. What ships for React is a `jsx.d.ts` that types every tag and a
-runtime bridge in `@helix-io/core` that repairs two React behaviors.
+runtime bridge in `@fusion.dev/helix-core` that repairs two React behaviors.
 
 ```ts
-import '@helix-io/styled/jsx'
+import '@fusion.dev/helix/jsx'
 ```
 
 A types-only import, once, anywhere TypeScript will see it. After that
@@ -67,7 +67,7 @@ this one. Reading a cell needs the columns, and the columns are markup children
 the server render does not hand the table, so the first paint is a labeled shell
 either way. Use `helix-table` where the content has to be in the served HTML.
 
-That is runtime code you already have, in `@helix-io/core`, and nothing to
+That is runtime code you already have, in `@fusion.dev/helix-core`, and nothing to
 configure. One thing to know about it: it reads a React
 internal, the per-page key React stores props under. If a React release renames
 that key the bridge stops repairing and your handlers go back to needing a
@@ -123,7 +123,7 @@ See [State and control](./state-and-control) for the whole of it.
 
 ```tsx
 'use client'
-import '@helix-io/styled'
+import '@fusion.dev/helix'
 
 export const HelixElements = () => null
 ```

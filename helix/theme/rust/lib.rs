@@ -1,6 +1,6 @@
 //! Helix theme derivation.
 //!
-//! **The crate is the implementation and `@helix-io/theme` becomes a wrapper
+//! **The crate is the implementation and `@fusion.dev/helix-theme` becomes a wrapper
 //! over it**, which is what 142 decided and why this is a move rather than a
 //! second engine. A Rust derivation *beside* the TypeScript one is wrong on day
 //! one rather than eventually: both searches here are bisections, so iteration

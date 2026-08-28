@@ -4,7 +4,7 @@
  * **It was in the package barrel, which made two pure functions side-effectful
  * to import.** `index.ts` exported the JSX helpers and this element together,
  * and `@customElement` registers at load, so
- * `import { htmlToJsx } from '@helix-io/sandbox'` for a string transform also
+ * `import { htmlToJsx } from '@fusion.dev/helix-sandbox'` for a string transform also
  * defined `helix-sandbox-specs`. In the workbench that import is at module
  * scope, so the definition landed before React hydrated and the element wrote
  * `data-settled` onto itself in the frame before hydration reached it, which is

@@ -1,5 +1,5 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
-import { caretRight } from '@helix-io/icons'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

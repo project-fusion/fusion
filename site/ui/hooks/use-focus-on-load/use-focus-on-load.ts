@@ -11,7 +11,7 @@ interface Focusable {
  *
  * **A plain effect focuses nothing on a first load, and looks correct on every
  * other one.** Elements register as a side effect of importing
- * `@helix-io/styled`, and `HelixElements` does that import inside an effect of
+ * `@fusion.dev/helix`, and `HelixElements` does that import inside an effect of
  * its own, deliberately, so definitions land after React has hydrated rather
  * than before. That import is a promise. A page's own effect runs while it is
  * still in flight, so the ref holds an `<helix-input>` that has not upgraded: a

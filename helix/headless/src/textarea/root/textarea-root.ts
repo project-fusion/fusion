@@ -1,11 +1,12 @@
 import {
+  AriaForwardController,
   customElement,
   HelixFormElement,
   holdCaret,
   MixinControllerValue,
   MixinField,
   restoreValue,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -46,6 +47,15 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+  })
+
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
@@ -75,7 +85,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /**
    * Whether the field refuses input while still submitting its value.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /**

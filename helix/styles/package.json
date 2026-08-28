@@ -1,5 +1,5 @@
 {
-  "name": "@helix-io/styles",
+  "name": "@fusion.dev/helix-styles",
   "description": "Design tokens and base layer. Pure CSS, no JavaScript.",
   "version": "0.0.0-dev",
   "license": "MIT",

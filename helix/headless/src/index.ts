@@ -10,7 +10,7 @@ import './element-events.generated.js'
  * nothing to keep in step.
  */
 
-export * from '@helix-io/core'
+export * from '@fusion.dev/helix-core'
 export * from './accordion/index.js'
 export * from './announcement/index.js'
 export * from './app-header/index.js'

@@ -33,7 +33,7 @@ const reported = new Set<string>()
  * fires at the moment of the second registration, which is the best possible
  * position and better than anything a later pass can do, and it goes to a
  * console: a CI job cannot see it, and a developer whose console already has
- * forty lines in it will not. `@helix-io/diagnostics` reads this instead, so the
+ * forty lines in it will not. `@fusion.dev/helix-diagnostics` reads this instead, so the
  * same fault reaches a structured report without a second detector guessing at
  * it from the outside. Detect once, at the source; surface twice.
  */

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, settle } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()

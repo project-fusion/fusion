@@ -1,1 +1,1 @@
-import '@helix-io/styled/button'
+import '@fusion.dev/helix/button'

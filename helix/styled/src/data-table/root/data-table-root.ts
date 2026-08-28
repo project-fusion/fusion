@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessDataTable } from '@helix-io/headless/data-table'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './data-table-root.css.js'
 import '../../pagination/index.js'

@@ -4,21 +4,21 @@
  *
  * **A package of custom elements is side-effectful by definition and honestly
  * so.** A module that calls `customElements.define` at load has done something
- * by being loaded, `@helix-io/headless` says so in its `sideEffects` field, and
+ * by being loaded, `@fusion.dev/helix-headless` says so in its `sideEffects` field, and
  * that field is correct. What follows from it is that a bundler may drop
  * nothing out of its barrel: `import { HelixHeadlessButton } from
- * '@helix-io/headless'` retains all 83 families whether or not one of them is
+ * '@fusion.dev/helix-headless'` retains all 83 families whether or not one of them is
  * reachable.
  *
  * Measured before this check existed, by `bun run metrics`: 82 of the 88 styled
- * families imported the headless barrel, and `@helix-io/styled/button` came to
+ * families imported the headless barrel, and `@fusion.dev/helix/button` came to
  * 449,026 raw bytes, 115,590 gzipped, against 41,587 and 14,149 after the same
  * import went deep. The whole styled tier is 1.4MB, so one button was 29
  * percent of the library.
  *
  * **The rule reads `sideEffects`, and does not name a package.** A dependency
  * declaring `sideEffects: false` tree-shakes and its barrel is free, which is
- * why `@helix-io/core` is not a finding and why nothing here has to be updated
+ * why `@fusion.dev/helix-core` is not a finding and why nothing here has to be updated
  * the day that changes. A dependency that does not, and that publishes a
  * subpath pattern, has to be imported through the subpath.
  *

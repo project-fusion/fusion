@@ -1,5 +1,5 @@
-import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
-import { check, circle, record } from '@helix-io/icons'
+import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@fusion.dev/helix-core'
+import { check, circle, record } from '@fusion.dev/helix-icons'
 import type { PropertyValues, TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

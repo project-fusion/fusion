@@ -1,4 +1,4 @@
-import { docSources, findPage, navigation, pages } from '@helix-io/docs'
+import { docSources, findPage, navigation, pages } from '@fusion.dev/helix-docs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageOutline } from '@/components/page-outline/page-outline'

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, VirtualizeController } from '@helix-io/core'
+import { customElement, HelixElement, VirtualizeController } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -69,7 +69,7 @@ type Row = Record<string, string>
  * @category layout
  * @since 0.1.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/virtual-list
+ * @documentation https://helix.fusion.dev/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.
  * @csspart before - The space standing in for rows above the window.

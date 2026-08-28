@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   type HelixBeforeChangeEvent,
   HelixFormElement,
@@ -6,7 +7,7 @@ import {
   MixinControllerValue,
   MixinField,
   PopoverController,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
@@ -108,6 +109,15 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
 export class HelixHeadlessColorInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+  })
+
   /**
    * What the browser may autofill in the text field, as a platform token.
    *
@@ -354,11 +364,17 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('value')) {
-      this.sync()
-      if (parseColor(this.value)) {
-        this.settled = this.value
-      }
+    /* Every update, not only the ones that name `value`.
+       `value` is an accessor over `valueState ?? defaultValue`, so a consumer
+       moving `default-value` on an untouched control moves what the form
+       submits without ever putting `value` in the changed map, and the reported
+       entry went stale. Native `<input>` updates in exactly that case, which is
+       the behavior the mixin's own notes take as the reference. Fifteen of the
+       twenty controls here already reported unconditionally; this is one of the
+       five that did not. */
+    this.sync()
+    if (changed.has('value') && parseColor(this.value)) {
+      this.settled = this.value
     }
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The

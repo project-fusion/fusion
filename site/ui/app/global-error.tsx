@@ -8,7 +8,7 @@ import { useEffect } from 'react'
  * **This file replaces the root layout, so it renders its own document.** That
  * is the documented contract and it has consequences worth stating, because
  * every one of them looks like a mistake in review. There is no
- * `@helix-io/styled` here, so no `helix-*` element would upgrade and none is
+ * `@fusion.dev/helix` here, so no `helix-*` element would upgrade and none is
  * used. There is no `helix.css`, so no token resolves and every value below is
  * literal. There is no `metadata` export, because a boundary is a client
  * component and metadata is not supported in one, so the title is React's

@@ -4,7 +4,7 @@ import {
   infoFill,
   warningFill,
   xCircleFill,
-} from '@helix-io/icons'
+} from '@fusion.dev/helix-icons'
 
 /**
  * The four status tones, as a type anything branching on them can take.

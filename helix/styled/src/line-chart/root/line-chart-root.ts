@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessLineChart } from '@helix-io/headless/line-chart'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessLineChart } from '@fusion.dev/helix-headless/line-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'

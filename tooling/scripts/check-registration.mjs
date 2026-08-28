@@ -27,7 +27,7 @@
  * family or a new subpath is covered on the day it lands. A subpath registers
  * when its directory under `helix/<package>/src` contains a `@customElement`;
  * a bare barrel registers when the package has one anywhere, which is true of
- * the two tiers and false of `@helix-io/sandbox`, whose index forwards the JSX
+ * the two tiers and false of `@fusion.dev/helix-sandbox`, whose index forwards the JSX
  * helpers alone.
  *
  * Run with `bun run check:registration` (also part of `bun run verify`).
@@ -38,10 +38,10 @@ import { join, relative } from 'node:path'
 
 const ROOT = join(import.meta.dirname, '../..')
 const PACKAGES = {
-  '@helix-io/core': 'core',
-  '@helix-io/headless': 'headless',
-  '@helix-io/sandbox': 'sandbox',
-  '@helix-io/styled': 'styled',
+  '@fusion.dev/helix': 'styled',
+  '@fusion.dev/helix-core': 'core',
+  '@fusion.dev/helix-headless': 'headless',
+  '@fusion.dev/helix-sandbox': 'sandbox',
 }
 
 /* The frame is its own document, served at `/sandbox/frame.html`, with no React

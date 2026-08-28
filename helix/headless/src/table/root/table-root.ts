@@ -1,4 +1,4 @@
-import { customElement, HelixElement, MixinCollection } from '@helix-io/core'
+import { customElement, HelixElement, MixinCollection } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessTableColumn } from '../column/table-column.js'

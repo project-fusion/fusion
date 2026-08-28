@@ -12,7 +12,7 @@ A design system that ships two hundred hand-picked hex values can only offer
 override. You change one, break contrast somewhere three components away, and
 never find out. That is a config file, not a theming system.
 
-`@helix-io/theme` computes a complete token set from a handful of intent
+`@fusion.dev/helix-theme` computes a complete token set from a handful of intent
 inputs, and every foreground and background pair meets its contrast target **by
 construction** rather than by audit.
 
@@ -47,7 +47,7 @@ ships and approximate for any other.
 emits, and hands back an artifact:
 
 ```ts
-import { deriveTheme, toCss } from '@helix-io/theme'
+import { deriveTheme, toCss } from '@fusion.dev/helix-theme'
 
 const theme = deriveTheme({
   brand: '#0b3d91',

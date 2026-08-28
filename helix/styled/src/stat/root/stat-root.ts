@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessStat } from '@helix-io/headless/stat'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessStat } from '@fusion.dev/helix-headless/stat'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './stat-root.css.js'
 

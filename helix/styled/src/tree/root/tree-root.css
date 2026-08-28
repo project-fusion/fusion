@@ -14,7 +14,7 @@
 
    Whether, not how much. This said how much, as
    `calc(var(--helix-size-icon) + var(--helix-space-2xs))`, and the item draws
-   its chevron at `--helix-size-icon-sm`: two declarations naming one
+   its chevron at `--helix-size-icon-tight`: two declarations naming one
    measurement, four pixels apart, so every leaf sat four pixels right of every
    branch at the same depth. The width belongs to whoever draws the thing, and
    that is the item. All the tree decides is the policy. */

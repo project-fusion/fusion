@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { FocusTrapController } from './focus-trap-controller.js'
 
 /**

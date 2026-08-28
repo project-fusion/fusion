@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTimePicker } from '@helix-io/headless/time-picker'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTimePicker } from '@fusion.dev/helix-headless/time-picker'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports, because the tier below renders both of these and a custom
    element registers on import. Inherited from the base along with the template,

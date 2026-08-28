@@ -88,7 +88,7 @@
 :host([orientation="vertical"]) {
   flex-direction: column;
 
-  --_steps-mark-box: var(--helix-size-control-sm);
+  --_steps-mark-box: var(--helix-size-control-tight);
   --_steps-columns: auto minmax(0, 1fr);
   --_steps-marker-justify: start;
   --_steps-body-column: 2;

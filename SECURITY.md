@@ -17,7 +17,7 @@ the answer is that it is not one, we say why rather than closing quietly.
 
 ## What is in scope
 
-The eight published packages, `@helix-io/*` and `@cortex-io/*`, and the code in
+The eight published packages, `@fusion.dev/helix-*` and `@fusion.dev/cortex-*`, and the code in
 this repository that produces them.
 
 **`/helix/sandbox` executes whatever you type into it, and that is the design

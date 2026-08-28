@@ -15,7 +15,7 @@
  *
  * Colors are authored in OKLCH: equal numeric steps in sRGB are not equal
  * perceptual steps, which makes both ramp generation and contrast math
- * unreliable. See `@helix-io/theme`.
+ * unreliable. See `@fusion.dev/helix-theme`.
  */
 
 /* **`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to
@@ -34,7 +34,7 @@
 :root,
 [data-helix-theme] {
   /* ------------------------------------------------------- seed -------- */
-  /* The intent inputs. `@helix-io/theme` derives everything below from
+  /* The intent inputs. `@fusion.dev/helix-theme` derives everything below from
      these, guaranteeing contrast by construction rather than by audit.
    *
    * **The public names are the ones without the underscore, and that is not
@@ -144,7 +144,7 @@
    * **They were private with no public name at all**, which is the half of #110
    * that was never looked at, and the engine had been emitting into the gap.
    * `toCss` wrote `--helix-seed-density` and `--helix-seed-radius`, so a theme
-   * derived by `@helix-io/theme` and applied to a page moved its colours and
+   * derived by `@fusion.dev/helix-theme` and applied to a page moved its colours and
    * left its density and its corners exactly where they were: two of the five
    * `ThemeIntent` knobs inert, with a spec asserting one of the dead names.
    *
@@ -456,7 +456,7 @@
      It asked for chroma 0.165 at lightness 0.52 on hue 75 and the browser
      painted 0.110, so the file said one thing and the screen showed another
      with nothing anywhere saying so. The same fault the series ramp records
-     hitting, found from the other side: `@helix-io/theme` solves this hue for
+     hitting, found from the other side: `@fusion.dev/helix-theme` solves this hue for
      itself, reports `chromaReduced`, and came out *more* saturated than the
      token it was being compared against.
      

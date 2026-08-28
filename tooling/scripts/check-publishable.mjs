@@ -2,12 +2,12 @@
 /**
  * What may leave the repository, and what a package must be to do it.
  *
- * **Two questions, two answers.** The scope says which domain a package belongs
- * to; `private` says whether it ships. `@helix-io/cem` is Helix's analyzer
+ * **Two questions, two answers.** The name says which domain a package belongs
+ * to; `private` says whether it ships. `@fusion.dev/helix-cem` is Helix's analyzer
  * configuration, so it is Helix, and it is also a build tool of no use to
  * anyone outside this repository. Both of those are true at once, and a rule
- * that read publication off the scope could only express one of them: it would
- * have forced a rename to `@fusion-io/cem`, filing Helix-specific tooling
+ * that read publication off the name could only express one of them: it would
+ * have forced a rename to `@fusion.dev/cem`, filing Helix-specific tooling
  * beside the repository root and the site, and claiming it is general Fusion
  * tooling, which is exactly what it is not.
  *
@@ -15,8 +15,16 @@
  * it describes, which anyone changing that package already has open, rather
  * than in a central list nothing makes you read.
  *
- * `@fusion-io/*` is company-internal and is always private. That much the scope
- * does decide, because there is no reading under which it ships.
+ * **A package belonging to no domain is always private**, and that is the whole
+ * of what the name decides. `insights`, `site-ui` and `source` name no product,
+ * so there is no reading under which they ship.
+ *
+ * *Rewritten 28 Aug 2026, when three scopes became one.* This read "the scope
+ * says which domain a package belongs to", and named `@fusion-io/*` as the
+ * company-internal scope that is always private. Both were facts about scopes
+ * that no longer exist. The argument survives the move unchanged, because it was
+ * never really about the scope: publication and ownership are two questions, and
+ * one string cannot answer both. What moved is which string answers the first.
  *
  * **A published package may not depend on an unpublished one.** This is the
  * failure this file exists for. Inside the workspace every dependency resolves,
@@ -27,7 +35,7 @@
  * visible from inside any single package, which is why it is worth a script.
  *
  * `devDependencies` are exempt, because a consumer never installs them.
- * `@helix-io/testing` is a devDependency of three published packages and that
+ * `@fusion.dev/helix-testing` is a devDependency of three published packages and that
  * is correct.
  *
  * **`types` before `default`.** Conditions match top to bottom, so a `types`
@@ -43,8 +51,8 @@
  * without it.
  *
  * **One version per domain.** Lockstep is the versioning policy, and the
- * property it exists to hold is that `@helix-io/headless@x` works with
- * `@helix-io/styled@x`. A manifest carrying a different string from its neighbours
+ * property it exists to hold is that `@fusion.dev/helix-headless@x` works with
+ * `@fusion.dev/helix@x`. A manifest carrying a different string from its neighbours
  * is that promise already broken, and the release stamps whatever it finds.
  *
  * Run with `bun run check:publishable` (also part of `bun run verify`).
@@ -52,7 +60,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { DOMAINS, domainOf, INTERNAL, manifests, publishes, root } from './workspace.mjs'
+import { DOMAINS, domainOf, manifests, publishes, root, SCOPE } from './workspace.mjs'
 
 /** Every `types`/`default` pair in an exports tree, in the order written. */
 function conditions(node, trail = []) {
@@ -86,19 +94,20 @@ for (const [name, { directory, manifest }] of manifests()) {
   const domain = domainOf(name)
 
   if (domain === undefined) {
-    if (!name.startsWith(INTERNAL)) {
+    if (!name.startsWith(SCOPE)) {
       problems.push(
-        `${directory}: \`${name}\` is in no known scope. A package is published or it is not, ` +
-          `and the scope is what says which: ${Object.values(DOMAINS).join(' and ')} leave the ` +
-          `repo, ${INTERNAL} does not.`,
+        `${directory}: \`${name}\` is outside \`${SCOPE}\`. Every package in this repository ` +
+          'is in the one company scope, and the name after it says which product owns it: ' +
+          `${Object.values(DOMAINS).join(' and ')}, or neither.`,
       )
       continue
     }
     internal += 1
     if (manifest.private !== true) {
       problems.push(
-        `${directory}: \`${name}\` is internal by its scope but is not \`private\`. ` +
-          'One publish away from being public under a name chosen on the assumption ' +
+        `${directory}: \`${name}\` belongs to no domain but is not \`private\`. The scope no ` +
+          'longer says what ships, so `private` is the only thing that does, and this is one ' +
+          'publish away from being public under a name chosen on the assumption ' +
           'that it never would be.',
       )
     }
@@ -172,7 +181,7 @@ for (const [name, { directory, manifest }] of manifests()) {
 
 /* One visibility for everything, because a release is all of it or none. A
    domain half public and half restricted installs for nobody: a consumer who
-   can reach `@helix-io/styled` gets a 404 on the `@helix-io/core` it depends on,
+   can reach `@fusion.dev/helix` gets a 404 on the `@fusion.dev/helix-core` it depends on,
    and the failure names the dependency rather than the setting that caused it.
    npm also decides visibility at first publish, so a package that goes out
    wrong is not corrected by editing this field afterwards. */
@@ -195,7 +204,7 @@ for (const domain of Object.keys(DOMAINS)) {
   if (distinct.size > 1) {
     problems.push(
       `${domain}: versions disagree across the domain (${[...distinct].sort().join(', ')}). ` +
-        'Lockstep is what makes `@helix-io/headless@x` work with `@helix-io/styled@x`, and the ' +
+        'Lockstep is what makes `@fusion.dev/helix-headless@x` work with `@fusion.dev/helix@x`, and the ' +
         'release stamps whatever it finds: ' +
         inDomain.map((entry) => `${entry.directory} is ${entry.version}`).join(', '),
     )
@@ -203,7 +212,7 @@ for (const domain of Object.keys(DOMAINS)) {
 }
 
 /* The Rust half, which fails in the one direction nothing else watches.
-   `cortex` spans two package managers: `@cortex-io/docs` on npm and the crates
+   `cortex` spans two package managers: `@fusion.dev/cortex-docs` on npm and the crates
    on Cargo, each carrying its own version (see below). The release
    stamps that version and pushes a `cortex-v*` tag whether or not a crate ever
    leaves, so the day someone turns `publish` on is the day the tag starts

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessToggleGroup } from '@helix-io/headless/toggle'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessToggleGroup } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'

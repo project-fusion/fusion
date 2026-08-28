@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixAppHeader, HelixMegamenu } from '@helix-io/styled'
+import type { HelixAppHeader, HelixMegamenu } from '@fusion.dev/helix'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'

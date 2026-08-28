@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessAccordionItem } from '@helix-io/headless/accordion'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessAccordionItem } from '@fusion.dev/helix-headless/accordion'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './accordion-item.css.js'
 

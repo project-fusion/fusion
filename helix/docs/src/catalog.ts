@@ -14,7 +14,7 @@
  * files hold the markup. Nothing about a component is written down here, which
  * is what keeps a site from drifting away from the library it documents.
  */
-import type { HelixDeclaration, HelixManifest, HelixMember } from '@helix-io/cem'
+import type { HelixDeclaration, HelixManifest, HelixMember } from '@fusion.dev/helix-cem'
 import { displayName, startCase, tierOf } from './naming.js'
 import { place } from './reference.js'
 

@@ -3,10 +3,10 @@
  * Where the packages are. A module, not a script: nothing here runs alone.
  *
  * **Scope says which domain, `private` says whether it ships.** These are two
- * questions and were briefly answered by one field. `@helix-io/cem` is Helix's
+ * questions and were briefly answered by one field. `@fusion.dev/helix-cem` is Helix's
  * analyzer configuration: it hardcodes Helix conventions, it belongs to Helix,
  * and it is of no use to anyone outside this repository. Renaming it to
- * `@fusion-io/cem` to express "does not publish" would file it beside the
+ * `@fusion.dev/cem` to express "does not publish" would file it beside the
  * company-wide test helpers and claim it is general Fusion tooling, which is
  * the one thing it is not.
  *
@@ -25,9 +25,14 @@ import { join, resolve } from 'node:path'
 
 export const root = resolve(import.meta.dirname, '../..')
 
-/** The scopes that leave this repository, by domain, and the one that does not. */
-export const DOMAINS = { cortex: '@cortex-io/', helix: '@helix-io/' }
-export const INTERNAL = '@fusion-io/'
+/**
+ * The one scope, and the domains inside it. The scope used to name the domain,
+ * so `domainOf` could read it off the prefix; a single company scope cannot say
+ * that and the name is where it moved. `@fusion.dev/helix` is the styled tier
+ * itself, so a domain matches its own bare name as well as its prefix.
+ */
+export const SCOPE = '@fusion.dev/'
+export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
 
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {
@@ -73,9 +78,21 @@ export function manifests() {
   return found
 }
 
-/** The domain a package name belongs to, or undefined for internal packages. */
-export const domainOf = (name) =>
-  Object.keys(DOMAINS).find((domain) => name.startsWith(DOMAINS[domain]))
+/**
+ * The domain a package name belongs to, or undefined for one that belongs to no
+ * product. `@fusion.dev/helix` and `@fusion.dev/helix-core` both answer helix;
+ * `@fusion.dev/site-ui` answers nothing, and `check:publishable` is what then
+ * requires it to be private.
+ */
+export const domainOf = (name) => {
+  if (!name.startsWith(SCOPE)) {
+    return undefined
+  }
+  const bare = name.slice(SCOPE.length)
+  return Object.keys(DOMAINS).find(
+    (domain) => bare === DOMAINS[domain] || bare.startsWith(`${DOMAINS[domain]}-`),
+  )
+}
 
 /**
  * Whether a package leaves the repository. `private` is the declaration, and a

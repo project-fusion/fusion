@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@helix-io/testing/dom'
+import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -47,11 +47,11 @@ describe('copy button', () => {
   test('writes its value and confirms', async () => {
     const written = clipboard('accept')
     const el = await mount(
-      '<helix-headless-copy-button value="bun add @helix-io/styled"></helix-headless-copy-button>',
+      '<helix-headless-copy-button value="bun add @fusion.dev/helix"></helix-headless-copy-button>',
     )
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
     await press(el)
-    expect(written).toEqual(['bun add @helix-io/styled'])
+    expect(written).toEqual(['bun add @fusion.dev/helix'])
     expect(button.hasAttribute('data-copied')).toBe(true)
   })
 

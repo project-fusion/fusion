@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The controlled and uncontrolled contract, asked of the mixin rather than of a

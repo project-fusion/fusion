@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   customElement,
   HelixFormElement,
   hostAria,
@@ -6,8 +7,8 @@ import {
   MixinControllerValue,
   MixinField,
   PopoverController,
-} from '@helix-io/core'
-import { caretDown } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -76,6 +77,15 @@ import '../../listbox/index.js'
 export class HelixHeadlessSelect extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]') ?? null,
+  })
+
   /**
    * Whether the list can be narrowed by typing.
    *

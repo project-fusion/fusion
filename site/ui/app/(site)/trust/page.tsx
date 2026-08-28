@@ -1,10 +1,10 @@
-import { findSitePage, sitePageSources } from '@fusion-io/insights'
+import { findSitePage, sitePageSources } from '@fusion.dev/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderDocument } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**
- * The trust bar, rendered from `@fusion-io/insights`.
+ * The trust bar, rendered from `@fusion.dev/insights`.
  *
  * **The point is that it is finite.** `the internal plan` names the risk
  * this page exists to answer: a trust bar that is never defined can never be

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessToast } from '@helix-io/headless/toast'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessToast } from '@fusion.dev/helix-headless/toast'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './toast-root.css.js'
 

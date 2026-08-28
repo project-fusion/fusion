@@ -11,7 +11,7 @@ import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-ma
  * The theme builder.
  *
  * **The engine's first real consumer**, which is most of why it exists here
- * rather than as a demo somewhere. `@helix-io/theme` had no consumer in this
+ * rather than as a demo somewhere. `@fusion.dev/helix-theme` had no consumer in this
  * repository at all: `toCss` was called by nothing, and the one page that
  * themed anything wrote a private primitive by hand to do it. An API nobody has
  * used is an API nobody has tested, and the Rust port in #142 would have frozen

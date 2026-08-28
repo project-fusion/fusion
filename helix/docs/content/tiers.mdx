@@ -12,16 +12,16 @@ direction never reverses.
 
 | Package | Owns | Depends on |
 | --- | --- | --- |
-| `@helix-io/styles` | Tokens and the base layer. Pure CSS | nothing |
-| `@helix-io/core` | Element base class, mixins, decorators | Lit |
-| `@helix-io/headless` | Structure, accessibility, state, form participation | `core` |
-| `@helix-io/styled` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
+| `@fusion.dev/helix-styles` | Tokens and the base layer. Pure CSS | nothing |
+| `@fusion.dev/helix-core` | Element base class, mixins, decorators | Lit |
+| `@fusion.dev/helix-headless` | Structure, accessibility, state, form participation | `core` |
+| `@fusion.dev/helix` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
 
-`@helix-io/theme` and `@helix-io/icons` ship beside the stack rather than in it:
+`@fusion.dev/helix-theme` and `@fusion.dev/helix-icons` ship beside the stack rather than in it:
 neither is a tier, and neither is needed to render a component. **There is no
-React package.** The framework typings are generated into `@helix-io/styled`, and
+React package.** The framework typings are generated into `@fusion.dev/helix`, and
 the bridge that repairs React's hydration of custom events is in
-`@helix-io/core`. See [React](./react).
+`@fusion.dev/helix-core`. See [React](./react).
 
 ## Why the split
 
@@ -106,7 +106,7 @@ run of unstyled text and then snaps into a card. The window is short and it is
 most visible on a server-rendered page, where the markup is there long before
 the JavaScript is.
 
-`@helix-io/styled` closes it with `elements.css`, which hides every one of its
+`@fusion.dev/helix` closes it with `elements.css`, which hides every one of its
 tags until the definition lands:
 
 ```css
@@ -151,7 +151,7 @@ made for you.
 
 ## Mixins and tooling
 
-`open` and `defaultOpen` come from `MixinControllerOpen` in `@helix-io/core`.
+`open` and `defaultOpen` come from `MixinControllerOpen` in `@fusion.dev/helix-core`.
 The manifest analyzer cannot follow a mixin into another package, so any
 mixin-provided API a component exposes has to be documented on the component
 itself with `@event`, `@property`, or similar. Undocumented mixin API is

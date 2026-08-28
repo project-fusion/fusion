@@ -48,11 +48,11 @@ slot[hidden] {
  * nothing. Fallback content belongs to this shadow tree and is styled from
  * inside it, which is what these two rules are.
  *
- * `--helix-size-icon-sm`, the same token the slotted path resolves to, so an
+ * `--helix-size-icon-tight`, the same token the slotted path resolves to, so an
  * icon a consumer passes and one the component supplies are the same size. */
 slot > svg {
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* Not printed, being a control.

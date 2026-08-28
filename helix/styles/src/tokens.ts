@@ -14,7 +14,7 @@
  * split, since `derive()` emits `--helix-seed-*` that appear in no stylesheet,
  * which is what `check:seeds` exists to police.
  *
- * **`@helix-io/styles` still ships pure CSS with no JavaScript.** The generated
+ * **`@fusion.dev/helix-styles` still ships pure CSS with no JavaScript.** The generated
  * stylesheet is committed, exactly as `elements.css` and every
  * `pages.generated.ts` in this repository already are, so a consumer installs a
  * folder of `.css` files and nothing here reaches them.
@@ -359,7 +359,7 @@ export const TOKENS: Token[] = [
 
      **It coincides with `primary` for the seed that ships and diverges under
      derivation**, which is the whole reason it is a token rather than a reuse:
-     `@helix-io/theme` solves this one against 3 and `primary` against the
+     `@fusion.dev/helix-theme` solves this one against 3 and `primary` against the
      theme's own target, so a brand that has to travel a long way to be readable
      as text travels much less here. A reader who picks a bright yellow and sees
      olive buttons can still find their own color on the page. */

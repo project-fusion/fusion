@@ -24,7 +24,7 @@
  * Measured on 20 Aug 2026 against npm 11.18.0: every registration returned
  * `403 Forbidden` on `POST /-/package/<pkg>/trust`, and `npm trust list` on the
  * same package returned 403 for a plain GET, which needs no permission at all.
- * `npm view @helix-io/styled` returned 404. The packages did not exist, and that
+ * `npm view @fusion.dev/helix` returned 404. The packages did not exist, and that
  * is the whole cause; auth was fine, and the 2FA line in that output is an
  * unrelated deprecation notice. npm/cli#8544, which asks for exactly this, is
  * still open.

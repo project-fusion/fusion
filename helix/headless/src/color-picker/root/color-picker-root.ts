@@ -7,8 +7,8 @@ import {
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   MixinControllerValue,
-} from '@helix-io/core'
-import { eyedropper } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'

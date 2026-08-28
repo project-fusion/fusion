@@ -29,7 +29,7 @@
 /* Round, raised and the size of a small control: the same shape as the button
    that opened it, one step down, which is what says these belong to it. */
 [part="icon"] {
-  --icon-size: var(--helix-size-icon-md);
+  --icon-size: var(--helix-size-icon);
 
   align-items: center;
   aspect-ratio: 1;
@@ -38,7 +38,7 @@
   box-shadow: var(--helix-shadow-md);
   color: var(--helix-color-foreground);
   display: inline-flex;
-  inline-size: var(--speed-dial-item-size, var(--helix-size-control-sm));
+  inline-size: var(--speed-dial-item-size, var(--helix-size-control-tight));
   justify-content: center;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),

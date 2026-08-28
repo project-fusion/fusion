@@ -3,7 +3,7 @@
  * Inlines the site's MDX into a module, and derives the registries from its
  * frontmatter.
  *
- * `@fusion-io/insights` is a folder of `.mdx` files and a typed registry,
+ * `@fusion.dev/insights` is a folder of `.mdx` files and a typed registry,
  * shaped like the two documentation packages. The site compiles those files to
  * React and serves the same bytes as `/thesis.md`, and it must do both without
  * touching the filesystem: a path this app cannot statically scope traces the

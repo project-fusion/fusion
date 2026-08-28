@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTreeItem } from '@helix-io/headless/tree'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTreeItem } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tree-item.css.js'
 

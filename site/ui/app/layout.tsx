@@ -1,5 +1,5 @@
-import '@helix-io/styled/helix.css'
-import '@helix-io/gallery/gallery.css'
+import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-gallery/gallery.css'
 import './fonts.css'
 import './site.css'
 import type { Metadata } from 'next'

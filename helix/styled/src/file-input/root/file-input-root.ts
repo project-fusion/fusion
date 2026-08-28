@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessFileInput } from '@helix-io/headless/file-input'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessFileInput } from '@fusion.dev/helix-headless/file-input'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the tier below renders `<helix-icon>` for each
    file's remove control and a custom element registers on import. Inherited from

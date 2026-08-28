@@ -1,4 +1,4 @@
-import manifest from '@helix-io/styled/custom-elements.json'
+import manifest from '@fusion.dev/helix/custom-elements.json'
 
 /**
  * The custom elements manifest, at a URL.
@@ -6,7 +6,7 @@ import manifest from '@helix-io/styled/custom-elements.json'
  * **It was only ever a package path before, on a page that says an agent has
  * this site and no checkout.** `coding-agents.mdx` names the manifest as the
  * first of three machine-readable surfaces and gives its location as
- * `@helix-io/styled/custom-elements.json`, which is a specifier: reachable from a
+ * `@fusion.dev/helix/custom-elements.json`, which is a specifier: reachable from a
  * `node_modules` and from nowhere else. An agent that found this site through
  * `llms.txt` had the two surfaces that are documents and not the one that is the
  * vocabulary.

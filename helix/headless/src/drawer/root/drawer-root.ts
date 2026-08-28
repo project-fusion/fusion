@@ -4,7 +4,7 @@ import {
   HelixElement,
   MixinControllerOpen,
   onUnlessFalse,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

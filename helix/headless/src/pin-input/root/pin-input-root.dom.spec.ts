@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@helix-io/testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -221,7 +221,7 @@ describe('input pin keyboard', () => {
   })
 
   test('a read-only field refuses to move', async () => {
-    const host = await pin('default-value="123" length="4" read-only')
+    const host = await pin('default-value="123" length="4" readonly')
     await press(host, 3, 'Backspace')
     expect(host.value).toBe('123')
   })

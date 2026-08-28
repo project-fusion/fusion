@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 
 /**
- * Gallery art for the families that come from `@helix-io/sandbox`.
+ * Gallery art for the families that come from `@fusion.dev/helix-sandbox`.
  *
  * Their own file because the package is their own: the sandbox is deliberately
  * not the component library, and a reader who notices that `editor` and

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTag } from '@helix-io/headless/tag'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTag } from '@fusion.dev/helix-headless/tag'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './tag-root.css.js'

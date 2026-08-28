@@ -3,7 +3,7 @@
  *
  * The specs are written against `bun:test` and happy-dom, and neither exists in
  * a page. Rather than write a second suite, the same spec files are bundled for
- * the browser with `bun:test` and `@helix-io/testing/dom` pointed here, so what
+ * the browser with `bun:test` and `@fusion.dev/helix-testing/dom` pointed here, so what
  * runs in the sandbox is the file that runs in CI, not a copy of it.
  *
  * **This is not a weaker environment than happy-dom. It is a stronger one.**

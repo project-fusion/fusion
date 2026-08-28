@@ -4,8 +4,8 @@ import {
   HelixSelectEvent,
   hostAria,
   requestChange,
-} from '@helix-io/core'
-import { caretLeft, caretRight, play, stop } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

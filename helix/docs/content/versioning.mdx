@@ -7,13 +7,13 @@ title: Versioning
 
 # Versioning
 
-**Every Helix package shares one version.** `@helix-io/styled@1.4.0` works with
-`@helix-io/headless@1.4.0` and with `@helix-io/styles@1.4.0`, and that is a
+**Every Helix package shares one version.** `@fusion.dev/helix@1.4.0` works with
+`@fusion.dev/helix-headless@1.4.0` and with `@fusion.dev/helix-styles@1.4.0`, and that is a
 guarantee rather than a coincidence: they are released together, always, from
 one tag.
 
 ```sh
-bun add @helix-io/styled@1.4.0 @helix-io/styles@1.4.0
+bun add @fusion.dev/helix@1.4.0 @fusion.dev/helix-styles@1.4.0
 ```
 
 Pin them to the same number or pin none of them. A range that lets one drift
@@ -23,7 +23,7 @@ ahead of another is the one configuration this scheme does not defend against.
 
 Cortex moves independently. Full-repo lockstep would be wrong here because the
 documentation packages carry the version of what they document: publishing a
-Cortex fix would bump `@helix-io/docs` to a version in which nothing about Helix
+Cortex fix would bump `@fusion.dev/helix-docs` to a version in which nothing about Helix
 changed.
 
 Per-domain lockstep keeps the property that matters, which is that two Helix
@@ -51,7 +51,7 @@ poisoning the next one. If you see 1.4.0 skipped, that is what happened.
 
 ## Documentation is versioned with the code
 
-`@helix-io/docs@1.4.0` documents Helix 1.4.0. There is no version axis inside
+`@fusion.dev/helix-docs@1.4.0` documents Helix 1.4.0. There is no version axis inside
 the package and no version switcher in it: the package version *is* the version,
 because every package in the domain moves together.
 

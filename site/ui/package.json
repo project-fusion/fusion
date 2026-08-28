@@ -1,5 +1,5 @@
 {
-  "name": "@fusion-io/site-ui",
+  "name": "@fusion.dev/site-ui",
   "description": "fusion.dev: the landing page, the verticals, and the tools under them.",
   "version": "0.0.0-dev",
   "private": true,
@@ -16,13 +16,13 @@
     "wasm": "node ../../tooling/scripts/build-wasm.mjs"
   },
   "dependencies": {
-    "@fusion-io/insights": "workspace:*",
-    "@helix-io/docs": "workspace:*",
-    "@helix-io/gallery": "workspace:*",
-    "@helix-io/sandbox": "workspace:*",
-    "@helix-io/styles": "workspace:*",
-    "@helix-io/theme": "workspace:*",
-    "@helix-io/styled": "workspace:*",
+    "@fusion.dev/insights": "workspace:*",
+    "@fusion.dev/helix-docs": "workspace:*",
+    "@fusion.dev/helix-gallery": "workspace:*",
+    "@fusion.dev/helix-sandbox": "workspace:*",
+    "@fusion.dev/helix-styles": "workspace:*",
+    "@fusion.dev/helix-theme": "workspace:*",
+    "@fusion.dev/helix": "workspace:*",
     "next": "^16.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessQrCode } from '@helix-io/headless/qr-code'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessQrCode } from '@fusion.dev/helix-headless/qr-code'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './qr-code-root.css.js'
 

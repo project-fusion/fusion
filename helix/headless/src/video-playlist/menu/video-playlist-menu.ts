@@ -4,8 +4,8 @@ import {
   drawIcon,
   HelixElement,
   HelixSelectEvent,
-} from '@helix-io/core'
-import { list } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { list } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'

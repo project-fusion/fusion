@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@helix-io/core'
-import { icons } from '@helix-io/icons'
+import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { icons } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

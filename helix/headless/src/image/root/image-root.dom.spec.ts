@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -127,7 +127,7 @@ describe('an image', () => {
   test('asks for the picture urgently only when told to', async () => {
     expect(img(await image('src="/a.jpg"')).getAttribute('fetchpriority')).toBe('auto')
     expect(
-      img(await image('src="/a.jpg" fetch-priority="high"')).getAttribute('fetchpriority'),
+      img(await image('src="/a.jpg" fetchpriority="high"')).getAttribute('fetchpriority'),
     ).toBe('high')
   })
 

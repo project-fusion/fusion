@@ -53,7 +53,7 @@ export function Example() {
       </Owned>
 
       <Owned at={at}>
-        A new version of <strong>@helix-io/styled</strong> is available.
+        A new version of <strong>@fusion.dev/helix</strong> is available.
       </Owned>
     </helix-notifications>
   )

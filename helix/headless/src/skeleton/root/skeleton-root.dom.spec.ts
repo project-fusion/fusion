@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -21,7 +21,7 @@ describe('skeleton', () => {
   test("the shape is the styled tier's, not the headless tier's", async () => {
     // An appearance property on the headless tier is the one thing that tier
     // exists for not having.
-    /* From `src`, not from the package name. `@helix-io/headless` resolves
+    /* From `src`, not from the package name. `@fusion.dev/helix-headless` resolves
        through `exports` to `dist`, which puts a second copy of every element
        class in the run: `customElement` declines a taken tag quietly, so the
        winner is decided by file order and never announced, and after any edit

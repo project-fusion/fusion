@@ -20,7 +20,7 @@
 [part="trigger"] {
   all: unset;
 
-  --icon-size: var(--video-playlist-menu-size, var(--helix-size-icon-sm));
+  --icon-size: var(--video-playlist-menu-size, var(--helix-size-icon-tight));
 
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -30,8 +30,8 @@
   display: flex;
   flex: 0 0 auto;
   justify-content: center;
-  min-block-size: var(--helix-size-icon-lg);
-  min-inline-size: var(--helix-size-icon-lg);
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
 }
 
 [part="trigger"]:focus-visible {
@@ -50,7 +50,7 @@
  * properties inherit through a shadow boundary, so one declaration here reaches
  * both the track and the box. */
 [part="entry"] {
-  --menu-item-start: var(--video-playlist-menu-poster, calc(var(--helix-size-icon-lg) * 2));
+  --menu-item-start: var(--video-playlist-menu-poster, calc(var(--helix-size-icon-loose) * 2));
 }
 
 /* And the row given room to hold one.

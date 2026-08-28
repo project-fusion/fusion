@@ -167,6 +167,11 @@
      a row of their own, and at the full small step they were still the tallest
      thing on the line. Derived from the step rather than written as a number, so
      a consumer at another density gets the same relationship. */
+  /* The fixed step, not the relative one, and it has to be: this declares
+     `--helix-size-control` itself, and `-tight` is defined in terms of that
+     property, so the relative form would be a circular reference and the
+     whole declaration guaranteed-invalid. A container saying what step it is
+     names a step. */
   --helix-size-control: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
   --helix-size-icon: var(--helix-size-icon-sm);
 
@@ -450,9 +455,9 @@
    the same set: it is drawn on a 256 box at width 16, and a value tuned for a 24
    box would come out hairline. */
 [part="mark"] {
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 :host([state="sending"]) [part="content"] {
@@ -483,7 +488,7 @@
   cursor: pointer;
   font: inherit;
   font-weight: var(--helix-weight-medium);
-  min-block-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  min-block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);
   text-decoration: underline;

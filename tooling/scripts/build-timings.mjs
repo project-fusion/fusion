@@ -78,7 +78,7 @@ mkdirSync(SCRATCH, { recursive: true })
 console.log('timing: bundling')
 for (const family of FAMILIES) {
   const entry = join(SCRATCH, `${family}.entry.js`)
-  writeFileSync(entry, `import '@helix-io/styled/${family}'\n`)
+  writeFileSync(entry, `import '@fusion.dev/helix/${family}'\n`)
   execFileSync(
     'bun',
     ['build', entry, '--outfile', join(SCRATCH, `${family}.js`), '--minify', '--target', 'browser'],
@@ -91,7 +91,7 @@ for (const family of FAMILIES) {
   const hydrateEntry = join(SCRATCH, `${family}.hydrate.entry.js`)
   writeFileSync(
     hydrateEntry,
-    `import '@lit-labs/ssr-client/lit-element-hydrate-support.js'\nimport '@helix-io/styled/${family}'\n`,
+    `import '@lit-labs/ssr-client/lit-element-hydrate-support.js'\nimport '@fusion.dev/helix/${family}'\n`,
   )
   execFileSync(
     'bun',
@@ -120,13 +120,13 @@ const bundles = new Map(
  * Rendered here, in Node, by the same helper the SSR specs assert against, so
  * the markup under test is the markup those specs describe rather than a second
  * approximation of it. */
-const { ssr } = await import('@helix-io/testing/ssr')
+const { ssr } = await import('@fusion.dev/helix-testing/ssr')
 const { html: staticHtml, unsafeStatic } = await import('lit/static-html.js')
 const documents = new Map()
 for (const family of FAMILIES) {
   /* Imported for its side effect: `ssr` renders a tag it can resolve, so the
      definition has to be registered in this process first. */
-  await import(`@helix-io/styled/${family}`)
+  await import(`@fusion.dev/helix/${family}`)
   /* `static-html` because the tag is a variable. A tag name is not a binding
      position in an ordinary Lit template, so the plain `html` tag cannot take
      one and fails at render rather than at type-check. */

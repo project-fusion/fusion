@@ -1,4 +1,9 @@
-import { customElement, HelixElement, hostAria, MixinControllerActive } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  MixinControllerActive,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessStep } from '../step/step.js'

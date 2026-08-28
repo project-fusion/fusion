@@ -1,12 +1,13 @@
 import {
+  AriaForwardController,
   customElement,
   drawIcon,
   HelixBeforeChangeEvent,
   HelixFormElement,
   MixinField,
   restoreValue,
-} from '@helix-io/core'
-import { trash } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
@@ -130,6 +131,15 @@ const kind = (file: File): string => {
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+  })
+
   /**
    * Which files the picker offers, as a native `accept` list.
    */
@@ -286,6 +296,20 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
         data.append(this.name, file)
       }
     }
+    /* **An empty one contributes no entry, and the native control contributes an
+       empty file.** Measured, one form holding both: `<input type="file"
+       name="nf">` with nothing chosen submits `nf=` carrying a `File` of zero
+       bytes and no name, and this submits nothing at all.
+
+       Kept, as a decision rather than an omission. A phantom entry naming a file
+       that does not exist is a thing every server reading this form has to know
+       to discard, and the reason the platform sends one is compatibility with
+       form encodings that predate `FormData` rather than anything a reader wants.
+       `check:platform-fidelity` excuses `value` on this family already, for the
+       neighbouring reason that the native one is `C:\fakepath\name`; this is
+       the same component declining to reproduce a lie, one level down. Recorded
+       here because a divergence nobody wrote down is indistinguishable from one
+       nobody noticed. */
     this.internals.setFormValue(data)
     const control = this.control
     if (!control) {

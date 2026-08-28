@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessToggle } from '@helix-io/headless/toggle'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessToggle } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './toggle-root.css.js'
 

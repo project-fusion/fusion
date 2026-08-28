@@ -1,5 +1,5 @@
 {
-  "name": "@helix-io/core",
+  "name": "@fusion.dev/helix-core",
   "description": "Helix element primitives: base classes, mixins, decorators, utilities.",
   "version": "0.0.0-dev",
   "license": "MIT",
@@ -33,12 +33,12 @@
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
-    "@helix-io/icons": "workspace:*"
+    "@fusion.dev/helix-icons": "workspace:*"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
-    "@helix-io/cem": "workspace:*",
-    "@helix-io/testing": "workspace:*",
+    "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
     "lit": "^3.2.1"
   },
   "homepage": "https://fusion.dev",

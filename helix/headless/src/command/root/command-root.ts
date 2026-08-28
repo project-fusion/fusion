@@ -4,7 +4,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   MixinControllerOpen,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import type { PropertyValues, TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'

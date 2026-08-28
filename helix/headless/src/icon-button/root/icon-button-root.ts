@@ -1,4 +1,4 @@
-import { customElement } from '@helix-io/core'
+import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessButton } from '../../button/root/button-root.js'
 
 /**

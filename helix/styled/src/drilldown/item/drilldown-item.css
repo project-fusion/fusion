@@ -17,7 +17,7 @@
 [part="item"] {
   all: unset;
   align-items: center;
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   box-sizing: border-box;
   inline-size: 100%;
   color: var(--helix-color-foreground);

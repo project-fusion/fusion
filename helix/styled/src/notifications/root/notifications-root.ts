@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessNotifications } from '@helix-io/headless/notifications'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessNotifications } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './notifications-root.css.js'
 import '../notification/notification.js'

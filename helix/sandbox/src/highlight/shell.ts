@@ -8,7 +8,7 @@ import { tags } from '@lezer/highlight'
  *
  * **The stock mode colours nothing in the commands this documentation actually
  * contains.** It knows sh: builtins, keywords, redirects, quoting, comments.
- * Every shell fence here is `bun add @helix-io/styled`, and to that mode `bun` is
+ * Every shell fence here is `bun add @fusion.dev/helix`, and to that mode `bun` is
  * an ordinary word, so all three blocks came out entirely gray. A highlighter
  * that returns the input unchanged is not highlighting.
  *

@@ -138,20 +138,20 @@
 [part="send"] {
   align-items: center;
   background-color: transparent;
-  block-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
   border: 0;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
-  inline-size: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  inline-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
   justify-content: center;
   padding: var(--helix-space-none);
 }
 
 [part="mark"] {
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 [part="send"]:hover:not(:disabled) {

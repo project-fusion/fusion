@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessDialog } from '@helix-io/headless/dialog'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessDialog } from '@fusion.dev/helix-headless/dialog'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './dialog-root.css.js'

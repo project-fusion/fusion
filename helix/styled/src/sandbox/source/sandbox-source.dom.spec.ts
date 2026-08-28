@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -109,8 +109,8 @@ describe('the source pane', () => {
  *
  * Worth its own block because this pane is the half of the readout that *ships*.
  * The root's listener and the status bar's `caret` part are both in
- * `@helix-io/styled`, and the only pane that reported a position was the editor in
- * the private `@helix-io/sandbox`, so a consumer with the published shell had a
+ * `@fusion.dev/helix`, and the only pane that reported a position was the editor in
+ * the private `@fusion.dev/helix-sandbox`, so a consumer with the published shell had a
  * status bar that could never fill.
  */
 describe('the source pane reporting its cursor', () => {

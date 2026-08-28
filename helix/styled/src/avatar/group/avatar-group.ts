@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessAvatarGroup } from '@helix-io/headless/avatar'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessAvatarGroup } from '@fusion.dev/helix-headless/avatar'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './avatar-group.css.js'
 

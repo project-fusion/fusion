@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -16,16 +16,59 @@ const kbd = async (attrs = '', inner = ''): Promise<Kbd> => {
 
 const label = (host: Kbd): string => (part(host, 'kbd') as HTMLElement).textContent?.trim() ?? ''
 
+const APPLE_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+const OTHER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+
+/**
+ * Runs a mount against a stated platform rather than the one running the suite.
+ *
+ * **The element reads `navigator.userAgent` at render, and this file is run
+ * twice on two different ones.** `.dom.spec.ts` is compiled into a browser spec
+ * as well as run under happy-dom, so the same assertion was answered by
+ * happy-dom's non-Apple agent in `bun test` and by the host's real one in
+ * Chromium. On Linux both agreed and the suite was green; on a contributor's
+ * Mac the browser half rendered `⌘K` against an expectation of `Ctrl+K` and
+ * `⇧↵` against `Shift+Enter`, so the library was correct and the suite said
+ * otherwise.
+ *
+ * Stubbing it also fixes the half nobody noticed: whichever platform ran the
+ * tests, only one of the two maps was ever exercised, and `mod` existing at all
+ * is a claim about both.
+ *
+ * An own property shadows the prototype getter and `delete` uncovers it again,
+ * which is the restore for a real browser. happy-dom defines it on the instance
+ * instead, so the descriptor it had is put back when there was one.
+ */
+const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> => {
+  const original = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
+  Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent })
+  try {
+    return await run()
+  } finally {
+    if (original === undefined) {
+      delete (navigator as { userAgent?: string }).userAgent
+    } else {
+      Object.defineProperty(navigator, 'userAgent', original)
+    }
+  }
+}
+
 /**
  * What the element draws, which was being typed by hand and was wrong.
  *
- * happy-dom reports a non-Apple user agent, so these assert the form a reader
- * on Windows or Linux gets. That is the half that was broken: a literal `⌘K` in
- * a template tells them to press a key their keyboard does not have.
+ * Both platforms are stated rather than inherited from whoever is running the
+ * suite, which is what `onPlatform` is for. The half that was broken is the
+ * non-Apple one: a literal `⌘K` in a template tells a reader on Windows to
+ * press a key their keyboard does not have.
  */
 describe('a key drawn from a chord', () => {
   test('mod is the platform modifier, which is the whole reason to write a chord', async () => {
-    expect(label(await kbd('keys="mod+k"'))).toBe('Ctrl+K')
+    expect(await onPlatform(OTHER_AGENT, async () => label(await kbd('keys="mod+k"')))).toBe(
+      'Ctrl+K',
+    )
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd('keys="mod+k"')))).toBe('⌘K')
   })
 
   test('a lone key needs no separator and is upper cased', async () => {
@@ -33,7 +76,12 @@ describe('a key drawn from a chord', () => {
   })
 
   test('named keys are spelled, so a chord reads as something to press', async () => {
-    expect(label(await kbd('keys="shift+enter"'))).toBe('Shift+Enter')
+    expect(await onPlatform(OTHER_AGENT, async () => label(await kbd('keys="shift+enter"')))).toBe(
+      'Shift+Enter',
+    )
+    expect(await onPlatform(APPLE_AGENT, async () => label(await kbd('keys="shift+enter"')))).toBe(
+      '⇧↵',
+    )
   })
 
   test('without keys it slots what it was given, which is every use before this', async () => {

@@ -54,8 +54,8 @@ beside them are `component-reference.md` and `token-reference.md`.
 
 | Domain | Packages |
 |---|---|
-| **Helix** (`@helix-io/*`) | `styles` `core` `headless` `web` `react` `icons` `theme` `cem` `docs` |
-| **Cortex** (crates, `@cortex-io/*`) | `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram` `docs` |
+| **Helix** (`@fusion.dev/helix-*`) | `styles` `core` `headless` `web` `react` `icons` `theme` `cem` `docs` |
+| **Cortex** (crates, `@fusion.dev/cortex-*`) | `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram` `docs` |
 
 Versions are **lockstep within a domain**, independent across domains. See
 [`CLAUDE.md`](CLAUDE.md).

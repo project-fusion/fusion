@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessLegend } from '@helix-io/headless/legend'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessLegend } from '@fusion.dev/helix-headless/legend'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessRating } from '@helix-io/headless/rating'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessRating } from '@fusion.dev/helix-headless/rating'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './rating-root.css.js'

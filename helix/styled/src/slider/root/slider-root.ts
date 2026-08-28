@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSlider } from '@helix-io/headless/slider'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSlider } from '@fusion.dev/helix-headless/slider'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'

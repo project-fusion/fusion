@@ -1,5 +1,5 @@
 {
-  "name": "@cortex-io/docs",
+  "name": "@fusion.dev/cortex-docs",
   "description": "Versioned documentation content and registry for Cortex.",
   "version": "0.0.0-dev",
   "license": "MIT",

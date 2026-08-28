@@ -1,4 +1,4 @@
-# @helix-io/sandbox
+# @fusion.dev/helix-sandbox
 
 Sandbox elements: an editable source pane beside a live preview.
 

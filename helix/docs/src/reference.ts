@@ -2,7 +2,7 @@
  * The component reference, rendered from a manifest to markdown.
  *
  * **Pure, and it lives here rather than in a site.** A manifest-to-markdown
- * renderer is documentation for Helix: a consumer installing `@helix-io/docs`
+ * renderer is documentation for Helix: a consumer installing `@fusion.dev/helix-docs`
  * should get the component reference along with the prose, and a site should be
  * one of its readers rather than its owner. It also has to be pure, because a
  * content package that touched the filesystem would trace itself into every
@@ -21,7 +21,12 @@
  * prose under a heading, and truncating that threw away everything `Date
  * Picker` says about its three modes.
  */
-import type { Documented, HelixDeclaration, HelixManifest, HelixMember } from '@helix-io/cem'
+import type {
+  Documented,
+  HelixDeclaration,
+  HelixManifest,
+  HelixMember,
+} from '@fusion.dev/helix-cem'
 import { startCase } from './naming.js'
 
 /**

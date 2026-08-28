@@ -1,5 +1,5 @@
-import { findSitePage } from '@fusion-io/insights'
-import { pages as docPages, navigation } from '@helix-io/docs'
+import { pages as docPages, navigation } from '@fusion.dev/helix-docs'
+import { findSitePage } from '@fusion.dev/insights'
 import { LANDING } from '@/content/landing/landing'
 import { getFamilies } from '../catalog/catalog'
 import { INSIGHTS } from '../insights'
@@ -15,7 +15,7 @@ import { INSIGHTS } from '../insights'
  *
  * **A route says how to get its document rather than holding one.** The three
  * kinds of page here have three different sources: a component page comes from
- * the manifest, a docs page from MDX in `@helix-io/docs`, and a prose page from
+ * the manifest, a docs page from MDX in `@fusion.dev/helix-docs`, and a prose page from
  * a module in this app. Holding the text here would be a fourth copy of all
  * three and the one that goes stale.
  */
@@ -191,7 +191,7 @@ const components = (): Route[] =>
     title: family.label,
   }))
 
-/** Every documentation page, from `@helix-io/docs`. */
+/** Every documentation page, from `@fusion.dev/helix-docs`. */
 const docs = (): Route[] => {
   const order = new Map(
     navigation().flatMap((section, index) =>
@@ -236,7 +236,7 @@ const insights = (): Route[] => [
  *
  * Computed rather than a constant, because two thirds of it comes from
  * generated sources: a family added to the library and a page added to
- * `@helix-io/docs` both appear here without anyone editing this file, which is
+ * `@fusion.dev/helix-docs` both appear here without anyone editing this file, which is
  * the only arrangement under which the two can not drift apart.
  */
 export const routes = (): Route[] => [...PROSE, ...docs(), ...components(), ...insights()]

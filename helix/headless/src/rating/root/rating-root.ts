@@ -7,7 +7,7 @@ import {
   MixinControllerValue,
   MixinField,
   type NavigableItem,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -348,10 +348,29 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.previewing = undefined
   }
 
-  /** Reports the value. */
+  /**
+   * Reports the value, and whether the form may go without one.
+   *
+   * **`required` was on the API page and did nothing.** The mixin brings it,
+   * so it printed on the reference page and read as supported, and nothing here
+   * ever called `setValidity`: a form holding an unrated required rating
+   * submitted, measured, with `:valid` true and the entry present but empty.
+   * This is the case `min` argues for in its own note, that "no rating" and
+   * "the worst rating" are different answers and a survey that requires one
+   * says so with `required`.
+   *
+   * **Empty is `value === ''` rather than a score of zero**, because zero is a
+   * rating a reader can deliberately give when `min` allows it, and refusing to
+   * submit it would be the control disagreeing with the property that permits
+   * it. What `required` asks is whether they answered at all.
+   *
+   * `Slider` is deliberately not given the same treatment: a native
+   * `<input type="range" required>` is always valid, because a range always
+   * holds a number, and matching the platform there is the point.
+   */
   private sync(): void {
     this.internals.setFormValue(this.value)
-    this.refreshFeedback()
+    this.reportRequired(this.value === '', 'Choose a rating to continue.', 'marks')
   }
 
   private readonly handleOptionClick = (event: MouseEvent): void => {
@@ -383,9 +402,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
-    if (changed.has('value')) {
-      this.sync()
-    }
+    // Every update, not only the ones that name `value`: see the note on
+    // `ColorInput.updated`, and the fifteen controls that already did this.
+    this.sync()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

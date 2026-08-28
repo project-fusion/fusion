@@ -5,7 +5,7 @@
      rules. `icon-sm` because a chevron is a marker rather than content: at the
      current step it read as the loudest thing in a row whose text is 14px, and
      a tree is a list of names with a hint of structure beside them. */
-  --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-sm));
+  --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-tight));
   display: block;
 }
 
@@ -60,10 +60,10 @@
      than `min-block-size` alone, because a minimum only holds a row up: it is
      what let the docs link push one past every other. */
   block-size: max(
-    var(--tree-row-size, var(--helix-size-control-sm)),
+    var(--tree-row-size, var(--helix-size-control-tight)),
     calc(1lh + var(--helix-space-xs) * 2)
   );
-  min-block-size: var(--tree-row-size, var(--helix-size-control-sm));
+  min-block-size: var(--tree-row-size, var(--helix-size-control-tight));
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-xs);
   /* One step per level, and the step is the gutter a chevron sits in.

@@ -1,4 +1,4 @@
-import type { HelixIcon } from '@helix-io/icons'
+import type { HelixIcon } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 

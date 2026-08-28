@@ -6,8 +6,8 @@ import {
   hostAria,
   requestChange,
   slotFilled,
-} from '@helix-io/core'
-import { x } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

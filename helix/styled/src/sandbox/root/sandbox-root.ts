@@ -7,7 +7,7 @@ import {
   type HelixCaretEvent,
   type HelixConsoleEvent,
   HelixElement,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
@@ -283,7 +283,7 @@ export class HelixSandbox extends HelixElement {
    *
    * Structural rather than a type check. It was `instanceof
    * HelixSandboxSource`, which was right until there was a second kind of
-   * pane: the editor is `@helix-io/sandbox/editor`, on its own path because it
+   * pane: the editor is `@fusion.dev/helix-sandbox/editor`, on its own path because it
    * carries CodeMirror, and naming its class here would pull that back into
    * this module for every consumer. Where the event came from is a question
    * about the tree, and the tree can answer it.

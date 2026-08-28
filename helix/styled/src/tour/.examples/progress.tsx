@@ -1,6 +1,6 @@
 import './progress.css'
 
-import type { HelixTour } from '@helix-io/styled/tour'
+import type { HelixTour } from '@fusion.dev/helix/tour'
 import { useRef, useState } from 'react'
 
 const STOPS = 3

@@ -6,7 +6,7 @@ import { helixEventNames } from '../events/events.js'
 /**
  * Applied to every Helix component's shadow root so component CSS can rely on
  * border-box on both sides of the shadow boundary. The light DOM gets the same
- * rule from `@helix-io/styles/base.css`.
+ * rule from `@fusion.dev/helix-styles/base.css`.
  */
 const BOX_SIZING = css`
   *,
@@ -78,7 +78,7 @@ const HIDDEN = css`
  * platform acts on it, and the way the headless tier makes the platform act is a
  * CSS rule shipped from here. "The headless tier has no CSS" has never meant
  * `core` has none; it means `helix/headless` must not depend on
- * `@helix-io/styles`, and a rule with no token in it does not.
+ * `@fusion.dev/helix-styles`, and a rule with no token in it does not.
  *
  * **And a rule rather than an inline style, which was the first idea and is
  * wrong.** An inline `style` on a rendered part outranks every author rule
@@ -194,6 +194,26 @@ const REACT_PROPS = '__reactProps$'
  * Cached because `helix-caret` fires on every keystroke and a scan per dispatch
  * would be a scan per keystroke. Re-scanned whenever the cached key comes back
  * empty, so a second React root with a suffix of its own still resolves.
+ *
+ * **A miss must not erase it, and it did.** The re-scan wrote its own result
+ * back unconditionally, so any dispatch from a node React does not own found
+ * nothing and set the key to `undefined`, and the next React-owned node paid
+ * for a full scan again. Most elements in this library are rendered by Lit
+ * inside a shadow root and are exactly that kind of node, so on a real page the
+ * cache was being cleared constantly by the components least able to benefit
+ * from it. Measured, 20,000 dispatches: 5.3ms with a warm cache against 20.3ms
+ * alternating one owned node with one that is not, which is roughly twice the
+ * per-dispatch cost for the half that should have been free.
+ *
+ * So a miss now leaves the cache alone and only a *different* key replaces it,
+ * which keeps the second-React-root case the note above is about.
+ *
+ * **What is left is a scan per dispatch on a page with no React at all**, since
+ * there is no key to find and no honest way to conclude one will never appear:
+ * a root can mount at any time, and memoizing "this node is not React's" would
+ * silently disable the binding for any element that dispatches before React
+ * commits, which is the exact failure this whole mechanism exists to repair.
+ * It is around half a microsecond and it is filed rather than hidden. See #320.
  */
 let reactPropsKey: string | undefined
 
@@ -203,8 +223,12 @@ const reactPropsOf = (node: EventTarget): Record<string, unknown> | undefined =>
   if (reactPropsKey !== undefined && stash[reactPropsKey] !== undefined) {
     return stash[reactPropsKey] as Record<string, unknown>
   }
-  reactPropsKey = Object.keys(stash).find((key) => key.startsWith(REACT_PROPS))
-  return reactPropsKey === undefined ? undefined : (stash[reactPropsKey] as Record<string, unknown>)
+  const found = Object.keys(stash).find((key) => key.startsWith(REACT_PROPS))
+  if (found === undefined) {
+    return undefined
+  }
+  reactPropsKey = found
+  return stash[found] as Record<string, unknown>
 }
 
 /** Elements whose handler props have been read once. */
@@ -587,7 +611,7 @@ export class HelixElement extends LitElement {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a

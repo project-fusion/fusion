@@ -166,10 +166,10 @@ for (const entry of all) {
    yes to everything scores full marks on a corpus of real names, and the failure
    this is written for is a confident invention. */
 for (const name of real) {
-  ask('token', `Is \`${name}\` a token that @helix-io/styles declares?`, 'yes')
+  ask('token', `Is \`${name}\` a token that @fusion.dev/helix-styles declares?`, 'yes')
   const wrong = plausible(name, real)
   if (wrong) {
-    ask('token', `Is \`${wrong}\` a token that @helix-io/styles declares?`, 'no')
+    ask('token', `Is \`${wrong}\` a token that @fusion.dev/helix-styles declares?`, 'no')
   }
 }
 

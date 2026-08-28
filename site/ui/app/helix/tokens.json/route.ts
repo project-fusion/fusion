@@ -1,9 +1,9 @@
-import tokens from '@helix-io/styles/tokens.json'
+import tokens from '@fusion.dev/helix-styles/tokens.json'
 
 /**
  * The semantic token set, at a URL.
  *
- * **The same gap the manifest had, found the same way.** `@helix-io/styles`
+ * **The same gap the manifest had, found the same way.** `@fusion.dev/helix-styles`
  * exports `tokens.json` and always has, so a consumer with a `node_modules` can
  * read all 177 with their values and categories. An agent that arrived through
  * `llms.txt` could not: the tokens page is prose about the system and names

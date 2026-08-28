@@ -10,8 +10,8 @@
  *
  * The stamping has to happen either way. `bun pm pack` rewrites a
  * `workspace:*` dependency to the version in the depended-on package's own
- * manifest, so `@helix-io/styled` ships a hard requirement on whatever
- * `@helix-io/core` said at pack time. Every manifest in the domain is therefore
+ * manifest, so `@fusion.dev/helix` ships a hard requirement on whatever
+ * `@fusion.dev/helix-core` said at pack time. Every manifest in the domain is therefore
  * written before anything is packed, and the only question was ever whether
  * that edit is also committed. It buys nothing, so it is not.
  *
@@ -34,7 +34,7 @@
  * separate tags and a release of one leaves the other alone. `check:publishable`
  * holds the manifests to a single string; this writes it.
  *
- * **`cortex` spans two package managers.** `@cortex-io/docs` is npm and the
+ * **`cortex` spans two package managers.** `@fusion.dev/cortex-docs` is npm and the
  * crates are Cargo, and the version they share lives in `[workspace.package]`.
  * Stamping writes both. Note that this leaves `Cargo.lock` naming the old
  * version of the workspace crates, so anything running afterwards must let

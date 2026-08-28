@@ -101,7 +101,7 @@
      pixels of slack under it for a control sitting beside it. */
   padding-inline-end: calc(
     var(--helix-space-sm) +
-    var(--helix-size-control-sm) +
+    var(--helix-size-control-tight) +
     var(--helix-space-2xs)
   );
   /* Both needed for `0fr` to bite: a grid item refuses to go below its own
@@ -221,17 +221,17 @@ slot[name="icon"]::slotted(*) {
   position: absolute;
   inset-block-start: calc(
     var(--toast-item-inset, var(--helix-space-sm)) +
-    (var(--_toast-line) - var(--helix-size-control-sm)) /
+    (var(--_toast-line) - var(--helix-size-control-tight)) /
     2
   );
   inset-inline-end: var(--helix-space-sm);
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--helix-size-control-sm);
+  inline-size: var(--helix-size-control-tight);
   place-content: center;
   place-items: center;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);

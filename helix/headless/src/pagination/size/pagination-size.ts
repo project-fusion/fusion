@@ -4,7 +4,7 @@ import {
   HelixBeforeChangeEvent,
   HelixElement,
   requestChange,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'

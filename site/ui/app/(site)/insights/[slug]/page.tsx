@@ -1,4 +1,4 @@
-import { sitePageSources } from '@fusion-io/insights'
+import { sitePageSources } from '@fusion.dev/insights'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'

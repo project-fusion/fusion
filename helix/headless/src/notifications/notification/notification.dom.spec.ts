@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One notification.
  *

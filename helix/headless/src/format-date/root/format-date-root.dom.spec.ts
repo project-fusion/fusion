@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The reading, after hydration. What is asserted here is what the element
    decides: which of the two modes it is in, where it takes its value from, and
@@ -34,10 +34,18 @@ describe('the reading', () => {
     expect(part(element, 'time')?.textContent).toBe('42m')
   })
 
+  /* **`time-zone` is stated, because the instant is midnight UTC and the reading
+     is not.** Without it `Intl.DateTimeFormat` answers in whatever zone is
+     running the suite, so this rendered `Jan 1, 2020` on a UTC runner and
+     `Dec 31, 2019` on any machine west of it: the element was correct in both
+     places and the suite was only true in one. CI is UTC, so the failure
+     belonged entirely to contributors. The attribute is the element's own
+     published option rather than a harness trick, which is also the honest way
+     to assert a calendar date. */
   test('without it, the options a consumer set decide', async () => {
     const element = await stamp(
       `<helix-headless-format-date locale="en-US" month="short" day="numeric" year="numeric"
-        date="2020-01-01T00:00:00.000Z"></helix-headless-format-date>`,
+        time-zone="UTC" date="2020-01-01T00:00:00.000Z"></helix-headless-format-date>`,
     )
     expect(part(element, 'time')?.textContent).toBe('Jan 1, 2020')
   })

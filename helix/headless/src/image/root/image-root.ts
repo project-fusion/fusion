@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -97,7 +97,7 @@ export class HelixHeadlessImage extends HelixElement {
    * found first. Left alone the browser decides, which is right for the other
    * ninety-nine pictures.
    */
-  @property({ attribute: 'fetch-priority' })
+  @property({ attribute: 'fetchpriority' })
   fetchPriority: 'auto' | 'high' | 'low' = 'auto'
 
   /**

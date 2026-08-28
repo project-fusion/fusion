@@ -23,7 +23,7 @@
 
      Both are pinned to a step rather than reading the current one, so the gap
      between them holds whatever density the panel is dropped into. */
-  block-size: var(--helix-size-control-md);
+  block-size: var(--helix-size-control);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
   gap: var(--helix-space-2xs);
@@ -33,19 +33,19 @@
 [part="back"] {
   all: unset;
   align-items: center;
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
-  inline-size: var(--helix-size-control-sm);
+  inline-size: var(--helix-size-control-tight);
   justify-content: center;
 }
 
 [part="back"] svg {
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 [part="back"]:hover {

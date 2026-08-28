@@ -66,11 +66,11 @@
 /* Where the color is. Positioned from the two channels, which is the same pair
    of numbers the two ranges hold: nothing here measures anything. */
 [part="grid-handle"] {
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   border: var(--helix-border-thick) solid var(--helix-color-surface);
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
   inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
   inset-inline-start: var(--color-picker-saturation, 100%);
   pointer-events: none;
@@ -384,9 +384,9 @@
    pressed, and twenty pixels is under every pointer guideline there is. A hook,
    since a row of sixteen wants smaller ones than a row of six. */
 [part="swatch"] {
-  block-size: var(--color-picker-swatch-size, var(--helix-size-icon-lg));
+  block-size: var(--color-picker-swatch-size, var(--helix-size-icon-loose));
   cursor: pointer;
-  inline-size: var(--color-picker-swatch-size, var(--helix-size-icon-lg));
+  inline-size: var(--color-picker-swatch-size, var(--helix-size-icon-loose));
   padding: var(--helix-space-none);
 }
 

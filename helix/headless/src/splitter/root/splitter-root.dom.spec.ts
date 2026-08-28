@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, slotted } from '@helix-io/testing/dom'
+import { mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -720,7 +720,7 @@ describe('a press that moves nothing', () => {
  *
  * **This is the case a tag match cannot answer, and it was the fault.**
  * `findOuter` matched `'helix-splitter, helix-headless-splitter'`, and only
- * `@helix-io/styled` registers the first: a headless package naming a styled one
+ * `@fusion.dev/helix` registers the first: a headless package naming a styled one
  * by string. Subclassing a headless element under a third tag is exactly what this
  * tier exists to allow and exactly what `helix/styled` itself does, and under one
  * the lookup returned null, so a nested splitter simply had no corner and

@@ -1,5 +1,5 @@
 {
-  "name": "@helix-io/docs",
+  "name": "@fusion.dev/helix-docs",
   "description": "Versioned documentation content and registry for Helix.",
   "version": "0.0.0-dev",
   "license": "MIT",
@@ -31,7 +31,7 @@
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
-    "@helix-io/cem": "workspace:*"
+    "@fusion.dev/helix-cem": "workspace:*"
   },
   "homepage": "https://fusion.dev",
   "keywords": [

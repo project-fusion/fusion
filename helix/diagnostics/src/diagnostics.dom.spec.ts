@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The collector, against the faults it exists to find.
@@ -49,7 +49,7 @@ const tiers = [
         },
       ],
     },
-    name: '@helix-io/styled',
+    name: '@fusion.dev/helix',
   },
   {
     manifest: {
@@ -59,7 +59,7 @@ const tiers = [
         },
       ],
     },
-    name: '@helix-io/headless',
+    name: '@fusion.dev/helix-headless',
   },
 ]
 

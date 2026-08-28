@@ -1,5 +1,5 @@
 {
-  "name": "@helix-io/cem",
+  "name": "@fusion.dev/helix-cem",
   "description": "Shared custom-elements-manifest analyzer configuration and Helix plugins.",
   "version": "0.0.0-dev",
   "private": true,

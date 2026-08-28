@@ -5,8 +5,8 @@ import {
   requestChange,
   type ToneMark,
   toneMark,
-} from '@helix-io/core'
-import { x } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

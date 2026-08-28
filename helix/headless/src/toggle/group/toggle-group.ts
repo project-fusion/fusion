@@ -7,7 +7,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessToggle } from '../root/toggle-root.js'
@@ -197,8 +197,11 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    // Every update, not only the ones that name `value`: see the note on
+    // `ColorInput.updated`. The placement stays gated, because the indicator
+    // controller already places on every update of its own host.
+    this.sync()
     if (changed.has('value')) {
-      this.sync()
       this.indicator.place()
     }
     this.validate()

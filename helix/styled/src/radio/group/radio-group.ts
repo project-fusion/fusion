@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessRadioGroup } from '@helix-io/headless/radio'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessRadioGroup } from '@fusion.dev/helix-headless/radio'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'

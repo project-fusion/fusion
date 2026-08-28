@@ -1,12 +1,12 @@
-import type { Family } from '@helix-io/docs'
-import { findInCatalog } from '@helix-io/docs'
+import type { Family } from '@fusion.dev/helix-docs'
+import { findInCatalog } from '@fusion.dev/helix-docs'
 import generated from './catalog.generated.json'
 
 /**
  * The component catalog, imported rather than read.
  *
  * **Nothing about a component is written down in this app.** The shaping lives
- * in `@helix-io/docs`, the sources are the manifests and the `.examples/*.html`
+ * in `@fusion.dev/helix-docs`, the sources are the manifests and the `.examples/*.html`
  * files beside each component, and `bun run catalog` joins the two into the
  * file imported above. `site/ui` runs it before `next build` and `next dev`,
  * the same way it already builds the frame and the specs.
@@ -24,7 +24,7 @@ export type {
   Example,
   Family,
   PropertyDoc,
-} from '@helix-io/docs'
+} from '@fusion.dev/helix-docs'
 
 /** Every family, alphabetical, each with its elements and examples. */
 export const getFamilies = (): Family[] => generated as Family[]

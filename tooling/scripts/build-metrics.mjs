@@ -66,7 +66,7 @@ const TIMINGS = 'helix/docs/timings.json'
  * Where the entry modules go while they are being measured.
  *
  * Inside the repository rather than in the system temp directory, because an
- * entry says `import '@helix-io/styled/button'` and package resolution walks up
+ * entry says `import '@fusion.dev/helix/button'` and package resolution walks up
  * from the file: a module outside the workspace resolves nothing. `.local/` is
  * the declared per-machine scratch and is gitignored.
  */
@@ -107,55 +107,58 @@ const lastInSection = () => {
 /**
  * The runtime floor, and the definition of the second column.
  *
- * Lit and `@helix-io/core`: the two things every Helix element needs and
+ * Lit and `@fusion.dev/helix-core`: the two things every Helix element needs and
  * neither of which belongs to any one of them. A page that has one component
  * has already paid this, so what a second component adds is measured against
  * it.
  *
- * `@helix-io/headless` is deliberately not in here. It is a tier rather than a
+ * `@fusion.dev/helix-headless` is deliberately not in here. It is a tier rather than a
  * runtime: a page with one styled component has some of it and never all of
  * it, so a floor containing it would credit every family with code no page
  * loads. `check:barrels` is what keeps that true.
  *
  * **`export *`, not a bare import, and the difference is the whole floor.**
- * `@helix-io/core` is `sideEffects: false`, so `import '@helix-io/core'` for
+ * `@fusion.dev/helix-core` is `sideEffects: false`, so `import '@fusion.dev/helix-core'` for
  * effect compiles to nothing and the first run of this script reported the
  * runtime at 0 raw bytes and the whole icon set at 0 beside it. Re-exporting
  * pins the complete public API in place, which is what a floor has to be for
  * the second column to mean the same thing for every family: a tree-shaken
  * floor would be a different size under each one.
  */
-const RUNTIME = ["export * from 'lit'", "export * from '@helix-io/core'", ''].join('\n')
+const RUNTIME = ["export * from 'lit'", "export * from '@fusion.dev/helix-core'", ''].join('\n')
 
 /** The two tiers with per-family entry points, in dependency order. */
 const TIERS = [
   {
     dir: 'helix/headless',
     heading: 'Headless tier',
-    name: '@helix-io/headless',
+    name: '@fusion.dev/helix-headless',
     note: 'Structure, accessibility, state and form participation. No presentation, and no stylesheet to load beside it.',
   },
   {
     dir: 'helix/styled',
     heading: 'Styled tier',
-    name: '@helix-io/styled',
-    note: 'The headless tier plus presentation. This is what `bun add @helix-io/styled` gives you.',
+    name: '@fusion.dev/helix',
+    note: 'The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gives you.',
   },
 ]
 
 /** Every package with a JavaScript entry a page can import, and what it is for. */
 const PACKAGES = [
   {
-    entry: '@helix-io/core',
+    entry: '@fusion.dev/helix-core',
     note: 'Element base class, mixins, decorators, floating positioning.',
   },
-  { entry: '@helix-io/headless', note: 'Every headless family, which is what the barrel means.' },
-  { entry: '@helix-io/icons', note: 'The whole glyph set.' },
   {
-    entry: '@helix-io/theme',
+    entry: '@fusion.dev/helix-headless',
+    note: 'Every headless family, which is what the barrel means.',
+  },
+  { entry: '@fusion.dev/helix-icons', note: 'The whole glyph set.' },
+  {
+    entry: '@fusion.dev/helix-theme',
     note: 'The derivation engine. Build time for most consumers, runtime for a theme switcher.',
   },
-  { entry: '@helix-io/styled', note: 'Every styled family.' },
+  { entry: '@fusion.dev/helix', note: 'Every styled family.' },
   { entry: 'lit', note: 'Not ours. Here so it can be subtracted from every row above it.' },
 ]
 
@@ -174,7 +177,7 @@ const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'token
  * The stylesheets a consumer links, which no bundler is involved in.
  *
  * **`dist` rather than `src`, for the reason this whole page gives about
- * JavaScript: what is measured is what npm ships.** `@helix-io/styles` exported
+ * JavaScript: what is measured is what npm ships.** `@fusion.dev/helix-styles` exported
  * its authoring copies until 24 Aug 2026, so these rows counted the reasoning
  * as payload: `tokens.css` was 71 percent comment, `primitives.css` 82 and
  * `base.css` 75, and the three together were 60,944 bytes gzipped against 8,219
@@ -330,7 +333,7 @@ const footprint = (dir) => {
          trailing `sourceMappingURL` comment with it, so `dist` on disk is not
          what lands in a consumer's `node_modules`. Measuring the directory and
          reporting the total overstated every row by its own map column: 272,406
-         bytes on `@helix-io/styled` alone.
+         bytes on `@fusion.dev/helix` alone.
 
          Still counted rather than skipped, so the row can say how much was
          removed. A number that used to be part of the total and is now
@@ -396,7 +399,7 @@ const sources = (dir, found = []) => {
 
 const barrelled = new Set()
 for (const path of sources(join(ROOT, 'helix/styled/src'))) {
-  if (readFileSync(path, 'utf8').includes("from '@helix-io/headless'")) {
+  if (readFileSync(path, 'utf8').includes("from '@fusion.dev/helix-headless'")) {
     barrelled.add(path.slice(join(ROOT, 'helix/styled/src').length + 1).split('/')[0])
   }
 }
@@ -440,15 +443,15 @@ const median = (values) => {
     : sorted[middle]
 }
 
-const styled = measured.find((tier) => tier.name === '@helix-io/styled')
-const headless = measured.find((tier) => tier.name === '@helix-io/headless')
+const styled = measured.find((tier) => tier.name === '@fusion.dev/helix')
+const headless = measured.find((tier) => tier.name === '@fusion.dev/helix-headless')
 const styledGzip = styled.rows.map((row) => row.alone.gzip)
 const styledAdded = styled.rows.map((row) => row.added.gzip)
 const headlessGzip = headless.rows.map((row) => row.alone.gzip)
 const cheapest = styled.rows.reduce((low, row) => (row.alone.gzip < low.alone.gzip ? row : low))
 const dearest = styled.rows.reduce((high, row) => (row.alone.gzip > high.alone.gzip ? row : high))
-const wholeStyled = packages.find((one) => one.entry === '@helix-io/styled')
-const wholeHeadless = packages.find((one) => one.entry === '@helix-io/headless')
+const wholeStyled = packages.find((one) => one.entry === '@fusion.dev/helix')
+const wholeHeadless = packages.find((one) => one.entry === '@fusion.dev/helix-headless')
 
 const kb = (bytes) => `${(bytes / 1000).toFixed(1)} kB`
 
@@ -470,7 +473,7 @@ const footprints = [
  * The comparison, or an honest absence of one.
  *
  * **Helix's rows are the same `alone` numbers as the table below**, not a
- * second measurement of the same thing: `alone` is `import '@helix-io/styled/x'`,
+ * second measurement of the same thing: `alone` is `import '@fusion.dev/helix/x'`,
  * and every peer row is `import` of that system's own subpath for the same
  * component. One convention, or the table would compare conventions.
  *
@@ -636,23 +639,23 @@ const lines = [
   '',
   '## The floor',
   '',
-  'Lit and `@helix-io/core`, which is what every element needs and no element',
+  'Lit and `@fusion.dev/helix-core`, which is what every element needs and no element',
   'owns. **Added** is measured against this.',
   '',
   '**It is larger than most single components below, and that is not a mistake.**',
-  'The floor re-exports the whole of `@helix-io/core` so that it is the same size',
+  'The floor re-exports the whole of `@fusion.dev/helix-core` so that it is the same size',
   'under every family. A family that reaches only part of core shakes the rest',
   'out and comes in smaller than the floor, which is the tree-shaking working:',
   'nobody ever downloads this floor on its own.',
   '',
   '| | Raw | Gzip | Brotli |',
   '|---|---|---|---|',
-  row('Lit and `@helix-io/core`', floor),
+  row('Lit and `@fusion.dev/helix-core`', floor),
   '',
   '## Whole packages',
   '',
   'Everything a package exports, retained. This is the ceiling rather than a',
-  'typical page: `@helix-io/styled` and `@helix-io/headless` are side-effectful, so',
+  'typical page: `@fusion.dev/helix` and `@fusion.dev/helix-headless` are side-effectful, so',
   'a barrel import of either really does cost the whole row, and nothing in this',
   'repository does that. The per-component tables are what a page pays.',
   '',
@@ -666,7 +669,7 @@ const lines = [
   '## The stylesheets',
   '',
   'Linked rather than bundled, so these are the files exactly as a browser',
-  'receives them. `@helix-io/styles` ships its stylesheets with the comments',
+  'receives them. `@fusion.dev/helix-styles` ships its stylesheets with the comments',
   'removed and keeps the reasoning in the repository, which is why these numbers',
   'are a quarter of what the sources weigh. It has no JavaScript at all, so this',
   'is the whole cost of adopting the base layer on its own.',
@@ -684,9 +687,9 @@ const lines = [
   '',
   `Across the tier: the cheapest is \`${cheapest.family}\` at ${grouped(cheapest.alone.gzip)} gzipped alone, the dearest \`${dearest.family}\` at ${grouped(dearest.alone.gzip)}, over ${styled.rows.length} components. Every family at once is ${grouped(wholeStyled.gzip)}.`,
   '',
-  `**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@helix-io/headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@helix-io/headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
+  `**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
   '',
-  `The headless tier never had the problem, and it is the control: \`@helix-io/core\` is \`sideEffects: false\`, and a headless family is a median of ${grouped(median(headlessGzip))} bytes gzipped alone.`,
+  `The headless tier never had the problem, and it is the control: \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and a headless family is a median of ${grouped(median(headlessGzip))} bytes gzipped alone.`,
   '',
   ...comparison(),
   ...timing(),
@@ -778,7 +781,7 @@ const claims = [
   {
     label: 'The derivation engine',
     note: 'Build time for most consumers, runtime for a theme switcher.',
-    value: kb(packages.find((one) => one.entry === '@helix-io/theme').brotli),
+    value: kb(packages.find((one) => one.entry === '@fusion.dev/helix-theme').brotli),
   },
   {
     label: 'Shared across the first component',

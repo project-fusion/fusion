@@ -14,10 +14,10 @@
  * of those checks. This is what they get instead.
  *
  * ```ts
- * import { diagnose, report } from '@helix-io/diagnostics'
- * import styled from '@helix-io/styled/custom-elements.json'
+ * import { diagnose, report } from '@fusion.dev/helix-diagnostics'
+ * import styled from '@fusion.dev/helix/custom-elements.json'
  *
- * report(diagnose({ tiers: [{ manifest: styled, name: '@helix-io/styled' }] }))
+ * report(diagnose({ tiers: [{ manifest: styled, name: '@fusion.dev/helix' }] }))
  * ```
  *
  * **Zero network calls, at this layer, ever.** The privacy policy this project
@@ -43,7 +43,7 @@ import type { Report } from './report.js'
 /** What to look at, and what to compare it against. */
 export interface Options {
   /**
-   * `duplicateRegistrations` from `@helix-io/core`, when it is installed.
+   * `duplicateRegistrations` from `@fusion.dev/helix-core`, when it is installed.
    *
    * **Passed in rather than imported**, so this package does not depend on the
    * library it diagnoses. A diagnostics release would otherwise have to follow
@@ -63,8 +63,8 @@ export interface Options {
   /**
    * The manifests to check against, one per installed tier.
    *
-   * **Pass both tiers when both are installed.** A part `@helix-io/headless`
-   * publishes and `@helix-io/styled` never forwarded is a real fault and is
+   * **Pass both tiers when both are installed.** A part `@fusion.dev/helix-headless`
+   * publishes and `@fusion.dev/helix` never forwarded is a real fault and is
    * invisible to either manifest alone.
    */
   tiers: Tier[]

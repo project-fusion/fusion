@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessScrollArea } from '@helix-io/headless/scroll-area'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessScrollArea } from '@fusion.dev/helix-headless/scroll-area'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './scroll-area-root.css.js'
 

@@ -17,7 +17,7 @@
  */
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { initTheme, type ThemeEngine } from '@helix-io/theme'
+import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 
 /**
  * Loaded once per server process.

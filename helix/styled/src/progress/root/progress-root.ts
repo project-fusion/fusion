@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessProgress } from '@helix-io/headless/progress'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessProgress } from '@fusion.dev/helix-headless/progress'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './progress-root.css.js'

@@ -41,7 +41,7 @@ const PUBLIC = join(ROOT, 'site/ui/public')
  * The manifests the reference is built from: the two published packages.
  *
  * **`helix/sandbox` is not among them, and the omission is the point.**
- * `@helix-io/sandbox` is `private: true`, the editor and spec runner that build
+ * `@fusion.dev/helix-sandbox` is `private: true`, the editor and spec runner that build
  * this repository. Reading its manifest put `helix-sandbox-editor` in the
  * reference as a family of its own, called Editor, with no examples and a nav
  * entry pointing at a component nobody can install, and slipped

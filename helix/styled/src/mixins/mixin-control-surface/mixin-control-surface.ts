@@ -1,4 +1,4 @@
-import type { HelixElement } from '@helix-io/core'
+import type { HelixElement } from '@fusion.dev/helix-core'
 import { property } from 'lit/decorators.js'
 
 /* Declared here rather than imported, which is what every mixin in `core` does:

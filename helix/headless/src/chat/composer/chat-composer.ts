@@ -1,5 +1,11 @@
-import { customElement, HelixElement, HelixSendEvent, hostAria, slotFilled } from '@helix-io/core'
-import { arrowElbowDownLeft } from '@helix-io/icons'
+import {
+  customElement,
+  HelixElement,
+  HelixSendEvent,
+  hostAria,
+  slotFilled,
+} from '@fusion.dev/helix-core'
+import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

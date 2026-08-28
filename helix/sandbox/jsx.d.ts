@@ -3,7 +3,7 @@ import type {
   HelixCaretEvent,
   HelixSandboxEditor,
   HelixSandboxSpecs,
-} from '@helix-io/sandbox';
+} from '@fusion.dev/helix-sandbox';
 
 /**
  * This type can be used to create scoped tags for your components.
@@ -227,7 +227,7 @@ export type HelixSandboxEditorProps = {
 `EditorState.readOnly` rather than removing the editor's focus or its
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
-  "read-only"?: HelixSandboxEditor["readOnly"];
+  readonly?: HelixSandboxEditor["readOnly"];
   /** Whether the text can be changed.
 
 `EditorState.readOnly` rather than removing the editor's focus or its
@@ -259,7 +259,7 @@ export type HelixSandboxEditorSolidJsProps = {
 `EditorState.readOnly` rather than removing the editor's focus or its
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
-  "bool:read-only"?: HelixSandboxEditor["readOnly"];
+  "bool:readonly"?: HelixSandboxEditor["readOnly"];
   /** Whether the text can be changed.
 
 `EditorState.readOnly` rather than removing the editor's focus or its
@@ -319,7 +319,7 @@ export type CustomElements = {
    * or say where the cursor is, and a status bar reading line and column has to
    * ask something.
    *
-   * **On its own path.** This is `@helix-io/sandbox/editor` rather than part of
+   * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
    * the barrel, because CodeMirror is around 110 KB over the wire where the rest
    * of this package is a few. A sandbox with no editable pane should not pay for
    * one, and neither should a site that registers its elements once.
@@ -336,7 +336,7 @@ export type CustomElements = {
    * - `name`: Which source this pane holds, echoed in every change.
    * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
-   * - `read-only`/`readOnly`: Whether the text can be changed.
+   * - `readonly`/`readOnly`: Whether the text can be changed.
    *
    * `EditorState.readOnly` rather than removing the editor's focus or its
    * keymap: a reader still needs to select the text, scroll it, and put a
@@ -360,7 +360,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -448,7 +448,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -494,7 +494,7 @@ export type CustomElementsSolidJs = {
    * or say where the cursor is, and a status bar reading line and column has to
    * ask something.
    *
-   * **On its own path.** This is `@helix-io/sandbox/editor` rather than part of
+   * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
    * the barrel, because CodeMirror is around 110 KB over the wire where the rest
    * of this package is a few. A sandbox with no editable pane should not pay for
    * one, and neither should a site that registers its elements once.
@@ -511,7 +511,7 @@ export type CustomElementsSolidJs = {
    * - `name`: Which source this pane holds, echoed in every change.
    * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
-   * - `read-only`/`readOnly`: Whether the text can be changed.
+   * - `readonly`/`readOnly`: Whether the text can be changed.
    *
    * `EditorState.readOnly` rather than removing the editor's focus or its
    * keymap: a reader still needs to select the text, scroll it, and put a
@@ -535,7 +535,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -626,7 +626,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a

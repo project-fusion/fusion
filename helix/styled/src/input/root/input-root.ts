@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessInput } from '@helix-io/headless/input'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessInput } from '@fusion.dev/helix-headless/input'
 import type { CSSResultGroup } from 'lit'
 /* The clear and reveal buttons render one, and a custom element registers on
    import: a consumer importing this family alone would otherwise get an inert

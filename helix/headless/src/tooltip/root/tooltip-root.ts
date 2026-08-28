@@ -6,7 +6,7 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

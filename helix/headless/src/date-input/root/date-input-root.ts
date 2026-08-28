@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   valueAsDate as asDate,
   customElement,
   dateAsValue as fromDate,
@@ -8,8 +9,8 @@ import {
   MixinControllerValue,
   MixinField,
   PopoverController,
-} from '@helix-io/core'
-import { calendarBlank } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { calendarBlank } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -118,6 +119,15 @@ const dates = (value: string): string[] =>
 export class HelixHeadlessDateInput extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /* A consumer's `aria-describedby` names ids in their own tree and the control
+     is in this shadow root, so the reference has to be carried down as an
+     element rather than copied as an id. See `AriaForwardController`: measured
+     in Chrome's own tree, the host held the description and the control the
+     reader is actually on was exposed without it. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+  })
+
   /**
    * What the browser may autofill here, as one of the platform's own tokens.
    *
@@ -524,7 +534,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /** Refuses every change while read-only. See `readOnly`. */
@@ -543,9 +553,9 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('value')) {
-      this.sync()
-    }
+    // Every update, not only the ones that name `value`: see the note on
+    // `ColorInput.updated`, and the fifteen controls that already did this.
+    this.sync()
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The
        controller is idempotent, so arriving twice for the same open costs

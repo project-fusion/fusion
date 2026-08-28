@@ -14,7 +14,7 @@ import type { NextConfig } from 'next'
  *
  * Consumers are on the App Router, so Helix has to work there without asking
  * them to adopt an experimental patch to React. Elements now upgrade on the
- * client like any other custom element, and `@helix-io/styled/elements.css` covers
+ * client like any other custom element, and `@fusion.dev/helix/elements.css` covers
  * the window before they do.
  */
 
@@ -113,7 +113,7 @@ const config: NextConfig = {
       },
 
       /* Editor was never a component a reader could install. It is
-         `helix-sandbox-editor`, from `@helix-io/sandbox`, which is
+         `helix-sandbox-editor`, from `@fusion.dev/helix-sandbox`, which is
          `private: true` build tooling for this repository, and it reached the
          reference only because the catalog was reading that package's manifest
          alongside the two that publish. The page it should have been all along
@@ -131,10 +131,10 @@ const config: NextConfig = {
   // than treat it as prebuilt CommonJS. Production resolves `dist` through
   // package `exports`, which is what a consumer installs.
   transpilePackages: [
-    '@helix-io/core',
-    '@helix-io/headless',
-    '@helix-io/sandbox',
-    '@helix-io/styled',
+    '@fusion.dev/helix-core',
+    '@fusion.dev/helix-headless',
+    '@fusion.dev/helix-sandbox',
+    '@fusion.dev/helix',
   ],
 
   /**

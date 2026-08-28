@@ -41,7 +41,7 @@ export async function GET() {
      rather than crawling: the useful order is the cheapest answer first.
 
      The manifest had no URL at all until this was written. It was documented as
-     `@helix-io/styled/custom-elements.json`, which is a specifier reachable from a
+     `@fusion.dev/helix/custom-elements.json`, which is a specifier reachable from a
      `node_modules`, on a page whose own argument is that an agent has this site
      and no checkout. */
   lines.push(

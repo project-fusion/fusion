@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The boolean controller mixins, asked the same questions in the same order.

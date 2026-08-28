@@ -1,7 +1,7 @@
 /**
  * The sandbox: a preview that runs what it is given, and the panes around it.
  *
- * The editor is deliberately absent and lives on in `@helix-io/editor`, because
+ * The editor is deliberately absent and lives on in `@fusion.dev/helix-editor`, because
  * it carries CodeMirror. That is roughly 4 MB installed against a design system
  * of about the same size, and a `dependencies` entry is paid at install time by
  * every consumer whether or not they import it, which is the one cost a subpath

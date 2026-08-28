@@ -377,7 +377,7 @@
 
      **It coincides with `primary` for the seed that ships and diverges under
      derivation**, which is the whole reason it is a token rather than a reuse:
-     `@helix-io/theme` solves this one against 3 and `primary` against the
+     `@fusion.dev/helix-theme` solves this one against 3 and `primary` against the
      theme's own target, so a brand that has to travel a long way to be readable
      as text travels much less here. A reader who picks a bright yellow and sees
      olive buttons can still find their own color on the page. */
@@ -1209,6 +1209,38 @@
      already follow the region they are in. Measured before changing anything,
      to be sure of which of the two was actually missing. */
   --helix-size-icon: var(--helix-size-icon-md);
+  /* **A step either side of whatever step is current, for a thing that is a
+     control and is deliberately not the same size as its neighbours.**
+   *
+   * The named steps are the scale and never move; the unsuffixed one is the
+   * step a region is currently at. What the set had no word for is *relative*:
+   * a row in a floating panel, a caret inside a trigger, the arrows on a
+   * carousel are all controls that should be a notch smaller than the field
+   * beside them and should still follow the region. Thirty-five stylesheets
+   * expressed that by naming `-sm` or `-lg` outright, which reads correctly and
+   * silently opts the component out of density: measured across the three
+   * regions, an option row was 32px in all of them while the trigger above it
+   * went 32, 40, 48.
+   *
+   * **The multipliers are the ramps' own, not a taste.** `control`, `icon` and
+   * `checkbox` each step by exactly a fifth: `sm` is `md` times 0.8 and `lg` is
+   * `md` times 1.2, in all three. So at the resting density these resolve to
+   * precisely the tokens they replace, and a sweep off the fixed steps changes
+   * nothing at `md` and gains `sm` and `lg`. Verified by measurement rather than
+   * by arithmetic alone.
+   *
+   * `switch`, `tag`, `avatar` and `loader` do *not* step uniformly (0.833,
+   * 0.857, 0.75 and 0.667), so they get no relative pair: a component wanting a
+   * relative size on one of those has to say what it means, and inventing a
+   * multiplier that is right for none of them would be worse than the absence.
+   * See #321. */
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+
   --helix-size-icon-lg: calc(1.5rem * var(--_helix-seed-density));
   --helix-size-icon-md: calc(1.25rem * var(--_helix-seed-density));
   --helix-size-icon-sm: calc(1rem * var(--_helix-seed-density));

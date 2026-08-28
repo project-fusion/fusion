@@ -47,5 +47,5 @@
    a footer it stands beside controls a step smaller, so it takes their height
    and only as much width as the widest number in it needs. */
 [part="control"]::part(trigger) {
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
 }

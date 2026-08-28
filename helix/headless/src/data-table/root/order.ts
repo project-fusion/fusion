@@ -19,7 +19,7 @@
 /**
  * A row, which is whatever the consumer's data is.
  *
- * Not `DataRow`: `@helix-io/core` already exports one, for a cell read out of a
+ * Not `DataRow`: `@fusion.dev/helix-core` already exports one, for a cell read out of a
  * chart series, and the headless barrel re-exports both. Two different `DataRow`s
  * reaching a consumer through one package is the kind of ambiguity TypeScript
  * refuses outright, which is how this was caught.

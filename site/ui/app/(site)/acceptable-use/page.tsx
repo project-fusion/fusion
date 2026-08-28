@@ -1,11 +1,11 @@
-import { findSitePage, sitePageSources } from '@fusion-io/insights'
+import { findSitePage, sitePageSources } from '@fusion.dev/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderDocument } from '../../../utils/mdx/mdx'
 import { outlineOf } from '../../../utils/outline/outline'
 import { DocumentPage } from '../document-page'
 
 /**
- * Acceptable use, rendered from `@fusion-io/insights`.
+ * Acceptable use, rendered from `@fusion.dev/insights`.
  *
  * Sits beside the terms rather than inside them, because it answers a different
  * question: the terms say what the arrangement is, this says what the two pages

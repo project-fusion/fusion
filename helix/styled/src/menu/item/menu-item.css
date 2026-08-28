@@ -43,7 +43,7 @@
     var(--menu-item-start, var(--helix-size-icon))
     minmax(0, 1fr)
     var(--helix-size-icon);
-  min-block-size: var(--helix-size-control-sm);
+  min-block-size: var(--helix-size-control-tight);
   /* The inset is padding on the row and nothing else. A margin here would put
      the same gap back that taking the surface's padding away removed: the row
      would stop short of both edges and hover would light a stripe with unlit
@@ -77,7 +77,7 @@
 /* The leading column, holding whatever the consumer put in it at the size every
    other mark on the row is drawn. */
 [part="start"] {
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-tight);
 
   align-items: center;
   color: var(--helix-color-foreground-subtle);

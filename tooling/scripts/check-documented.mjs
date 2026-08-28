@@ -42,7 +42,7 @@
  *   `vue.d.ts`. Nothing has ever dispatched it: the event is `helix-change`. It
  *   slipped the rule above because it carries none of this library's prefixes,
  *   so the verb is what catches it instead.
- * - **A subpath, resolved rather than assumed.** `@helix-io/styled/custom-elements.json`
+ * - **A subpath, resolved rather than assumed.** `@fusion.dev/helix/custom-elements.json`
  *   was recommended by two pages and refused by `require.resolve`: the export map
  *   answered it through a wildcard pattern that rewrites a subpath into a
  *   directory under `dist` with an index in it, so the path asked for a file that
@@ -52,7 +52,7 @@
  *   Writing that pattern out literally in this comment is what broke this file
  *   once, the wildcard and the slash closing the block. Described rather than
  *   quoted, for the same reason a docs page shows a mistake as plain text.
- * - **A package.** `@helix-io/react` was in the Tiers package table, counted
+ * - **A package.** `@fusion.dev/helix-react` was in the Tiers package table, counted
  *   among "five packages", two pages after the Introduction said there is no
  *   React package. The rules file went further and documented regenerating
  *   wrappers in a `helix/react` that has never been in the repository. A package
@@ -360,7 +360,7 @@ for (const page of pages()) {
       continue
     }
     if (!explained(match.index)) {
-      problems.push(`${where}: \`${name}\` is not a token \`@helix-io/styles\` declares.`)
+      problems.push(`${where}: \`${name}\` is not a token \`@fusion.dev/helix-styles\` declares.`)
     }
   }
 

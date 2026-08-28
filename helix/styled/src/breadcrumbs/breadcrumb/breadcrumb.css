@@ -38,6 +38,20 @@
     calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
   );
 
+  /* And the inline rhythm, which the height alone does not buy.
+   *
+   * The same token `[part="link"]` pads with below, so a trigger and the steps
+   * either side of it cannot drift: `--helix-space-control` is `md` and a crumb
+   * is `xs`, so a labelled trigger sat in twice the room every other crumb
+   * takes and read as a chunk wedged into the row. A control in a crumb is a
+   * crumb, with a chevron on it. */
+  --button-padding-inline: var(--breadcrumbs-control-padding-inline, var(--helix-space-xs));
+
+  /* And the gap inside it, which is what sits between a label and its chevron.
+     `[part="link"]` flanks its own label at `2xs` and the button at `xs`, so a
+     trigger's caret stood twice as far off its word as a crumb's icon does. */
+  --button-gap: var(--helix-space-2xs);
+
   align-items: center;
   display: inline-flex;
   gap: var(--breadcrumbs-gap, var(--helix-space-xs));

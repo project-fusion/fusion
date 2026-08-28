@@ -20,7 +20,7 @@
  * for something that already has one, and the copy is always the stale one.
  *
  * **The rendering is not here any more.** It is `reference()` in
- * `@helix-io/docs`, because a manifest-to-markdown renderer is documentation
+ * `@fusion.dev/helix-docs`, because a manifest-to-markdown renderer is documentation
  * for Helix rather than a build step of this repository: a consumer installing
  * the docs package should get the component reference along with the prose, and
  * this script should be one of its readers rather than its owner. What is left

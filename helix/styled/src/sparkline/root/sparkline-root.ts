@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSparkline } from '@helix-io/headless/sparkline'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSparkline } from '@fusion.dev/helix-headless/sparkline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'

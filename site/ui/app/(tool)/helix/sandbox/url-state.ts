@@ -34,7 +34,7 @@
  * `localStorage`, set from the drawer and read off `:root[data-api-tier]`, and a
  * preference is exactly what the color mode below is refused for. What makes it
  * different is that it is *also* a property of what is being shown: the
- * workbench loads `@helix-io/headless` or `@helix-io/styled` from it, so two
+ * workbench loads `@fusion.dev/helix-headless` or `@fusion.dev/helix` from it, so two
  * sandboxes at the same address showing different packages is the link failing
  * to say what it is about. So it is carried, and it forces the tier for this
  * page only. Following somebody's link must never re-set your own drawer, which

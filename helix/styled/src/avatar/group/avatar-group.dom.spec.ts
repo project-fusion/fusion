@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /** Read inside `beforeAll`, so it is a `let` rather than an import. */
 let FOLDS_UP_TO = 0
@@ -13,7 +13,7 @@ beforeAll(async () => {
      throws out of its own HTML parser on the first `innerHTML`,
      `undefined is not an object (evaluating 'attributes.getNamedItem')`, which
      names neither the import nor the spec. */
-  ;({ FOLDS_UP_TO } = await import('@helix-io/headless/avatar'))
+  ;({ FOLDS_UP_TO } = await import('@fusion.dev/helix-headless/avatar'))
 })
 
 type Group = HTMLElement & {

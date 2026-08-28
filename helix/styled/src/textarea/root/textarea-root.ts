@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTextarea } from '@helix-io/headless/textarea'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTextarea } from '@fusion.dev/helix-headless/textarea'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'

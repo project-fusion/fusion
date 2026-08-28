@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessListbox } from '@helix-io/headless/listbox'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessListbox } from '@fusion.dev/helix-headless/listbox'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'

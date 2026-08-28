@@ -1,7 +1,7 @@
 'use client'
 
-import type { HelixBeforeResizeEvent, HelixSandboxPreview } from '@helix-io/styled'
-import { type DerivedTheme, initTheme, type ThemeEngine } from '@helix-io/theme'
+import type { HelixBeforeResizeEvent, HelixSandboxPreview } from '@fusion.dev/helix'
+import { type DerivedTheme, initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
@@ -1383,7 +1383,7 @@ export function ThemeBuilder({
               field-label="The generated stylesheet"
               language="css"
               name="artifact"
-              read-only
+              readonly
               slot="source"
               value={css}
             ></helix-sandbox-editor>

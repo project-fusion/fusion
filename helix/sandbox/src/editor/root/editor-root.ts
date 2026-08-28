@@ -11,7 +11,7 @@ import {
   HelixBeforeEditEvent,
   HelixCaretEvent,
   HelixElement,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -39,7 +39,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * or say where the cursor is, and a status bar reading line and column has to
  * ask something.
  *
- * **On its own path.** This is `@helix-io/sandbox/editor` rather than part of
+ * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
  * the barrel, because CodeMirror is around 110 KB over the wire where the rest
  * of this package is a few. A sandbox with no editable pane should not pay for
  * one, and neither should a site that registers its elements once.
@@ -92,7 +92,7 @@ export class HelixSandboxEditor extends HelixElement {
    * keymap: a reader still needs to select the text, scroll it, and put a
    * cursor in it to read a long line. What it stops is the typing.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   private readonly readOnly$ = new Compartment()

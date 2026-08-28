@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ssr } from '@helix-io/testing/ssr'
+import { ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

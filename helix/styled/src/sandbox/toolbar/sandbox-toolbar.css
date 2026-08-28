@@ -25,7 +25,7 @@
      the figure" for as long as the rule said `control-lg`: `2eea9ff` raised the
      bars to 48 on purpose and left the sentence describing the value before
      it. */
-  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-lg));
+  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-loose));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

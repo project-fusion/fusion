@@ -244,7 +244,7 @@
  * where the same mark in the muted foreground is a control that is available. */
 [part="remove"] {
   all: unset;
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-tight);
 
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -254,8 +254,8 @@
   display: flex;
   flex: none;
   justify-content: center;
-  min-block-size: var(--helix-size-icon-lg);
-  min-inline-size: var(--helix-size-icon-lg);
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -314,7 +314,7 @@
  * them as siblings under the same name is what makes both this rule and the
  * column above it work, and it is the arrangement the examples use. */
 ::slotted(helix-icon[slot="trigger"]) {
-  --icon-size: var(--helix-size-icon-lg);
+  --icon-size: var(--helix-size-icon-loose);
 
   color: var(--helix-color-foreground-muted);
 }

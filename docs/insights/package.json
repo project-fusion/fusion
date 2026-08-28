@@ -1,5 +1,5 @@
 {
-  "name": "@fusion-io/insights",
+  "name": "@fusion.dev/insights",
   "description": "The site's own prose, as MDX with a typed registry.",
   "version": "0.0.0-dev",
   "private": true,

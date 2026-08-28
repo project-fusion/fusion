@@ -6,7 +6,7 @@ import {
   HelixElement,
   hostAria,
   requestChange,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
 import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'

@@ -6,7 +6,7 @@
  *
  * Deliberately skeletal. No color beyond `currentColor`, no type ramp and no
  * token, because this is a diagram of what has to be styled rather than a theme
- * to copy: `@helix-io/styled` is the theme, and a second one growing inside an
+ * to copy: `@fusion.dev/helix` is the theme, and a second one growing inside an
  * example would be a design system nobody decided on.
  *
  * **The input is the box, and a first draft of this got that backwards.** It

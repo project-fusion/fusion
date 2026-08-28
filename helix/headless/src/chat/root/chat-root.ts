@@ -5,7 +5,7 @@ import {
   hostAria,
   MixinCollection,
   requestChange,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'

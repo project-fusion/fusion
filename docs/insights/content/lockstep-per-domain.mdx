@@ -15,13 +15,13 @@ Helix goes to 1.4.0 as a set; Cortex is on whatever number Cortex is on.
 The obvious alternative is full-repo lockstep, one version for everything, which
 is simpler to explain and simpler to automate. It is wrong here for a specific
 reason: the docs packages carry the version of the thing they document.
-Publishing a Cortex fix under full-repo lockstep would bump `@helix-io/docs` to
+Publishing a Cortex fix under full-repo lockstep would bump `@fusion.dev/helix-docs` to
 a version in which nothing about Helix changed, and a reader landing on those
 docs would be reading a version number that describes an unrelated repair to an
 unrelated product.
 
 Per-domain keeps the property that actually matters, which is that
-`@helix-io/headless@x` works with `@helix-io/styled@x`. That is the guarantee a
+`@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`. That is the guarantee a
 consumer needs. Everything else about the numbering is bookkeeping.
 
 ## The version lives in the tag

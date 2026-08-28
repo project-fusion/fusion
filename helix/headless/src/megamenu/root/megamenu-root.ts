@@ -4,7 +4,8 @@ import {
   HelixElement,
   MixinControllerOpen,
   PopoverController,
-} from '@helix-io/core'
+  tellDisclosure,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -189,6 +190,14 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     placement: () => 'bottom-start',
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
+
+  /** Tells a slotted trigger the disclosure state, by property. See `tellDisclosure`. */
+  private tellTrigger(): void {
+    const slotted = this.slotted
+    if (slotted) {
+      tellDisclosure(slotted, this.open)
+    }
+  }
 
   /** What the consumer slotted, if they slotted anything. */
   private get slotted(): HTMLElement | undefined {
@@ -456,24 +465,48 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     /* The one thing the stylesheet cannot work out for itself, since the
        breakpoint is declared up here. */
     this.toggleAttribute('data-narrow', this.narrow)
-    /* A slotted trigger gets the disclosure state too.
-     
-       `render` writes `aria-expanded` and `aria-controls` onto the button it
-       renders itself, and a consumer who takes the documented `trigger` slot
-       replaces that button and got neither: the panel opened and closed and
-       nothing announced it, so a screen reader was told the control was a plain
-       button forever. Silent, because the slot works perfectly in every other
-       respect and the failure is only audible.
-     
-       Written here rather than in the template because the element belongs to
-       the consumer's tree, which a Lit binding cannot reach. Client only, which
-       is where it belongs: `updated` does not run on the server, and the slotted
-       button carries no expanded state until there is something to expand. */
-    const slotted = this.slotted
-    if (slotted) {
-      slotted.setAttribute('aria-controls', 'panel')
-      slotted.setAttribute('aria-expanded', this.open ? 'true' : 'false')
-    }
+    /* A slotted trigger is told the disclosure state, by property.
+
+       `render` writes `aria-expanded` onto the button it renders itself, and a
+       consumer who takes the documented `trigger` slot replaces that button: the
+       panel opened and closed and nothing announced it, so a reader was told the
+       control was a plain button forever. Silent, because the slot works in
+       every other respect and the failure is only audible.
+
+       **It was `setAttribute` and that really was a hydration mismatch**, which
+       is what `Popover`'s class note has said since the day it was written.
+       *Measured 28 Aug 2026 against React 19.2.8*, four families server-rendered
+       and hydrated with the definitions loaded either side of `hydrateRoot`:
+       this one and `SpeedDial` produced "some attributes of the server rendered
+       HTML didn't match the client properties. This won't be patched up" in both
+       orders, and `Popover` and `Menu`, which write nothing, were clean in both.
+       React answers a mismatch by discarding the server's HTML for that subtree
+       and rebuilding it, which is the expensive half rather than the console
+       line.
+
+       **The property is the way through, and it is this library's own answer
+       already.** `Menu` tells its items by property for exactly this reason and
+       says so. React diffs the attributes it rendered and never looks at a
+       property, so `expanded` travels to the trigger, lands as `aria-expanded`
+       inside that element's shadow root, and the consumer's markup is left as
+       they served it. Both notes get what they were protecting: nothing is
+       written onto their element, and the reader is still told.
+
+       **What it cannot reach is a trigger that is not a Helix element.** A plain
+       `<button slot="trigger">` has no shadow root to hide the state in and no
+       property to take it, and a React consumer cannot mirror it themselves
+       because the open state is this element's. That case is warned about rather
+       than written to, on the same argument `Tooltip` makes about a link it
+       will not write for the consumer.
+
+       **`aria-controls` is not written here and cannot be.** It named `panel`,
+       an id inside this shadow root, and an IDREF resolves only within the tree
+       that holds it: from a light-DOM trigger looking in, the reference was to
+       nothing. Measured, `document.querySelector('#panel')` came back `null`
+       while the same id resolved inside `megamenu.shadowRoot`. An inert
+       `aria-controls` is worse than none, an audit tool reporting it satisfied
+       and a screen reader following it nowhere. See #322. */
+    this.tellTrigger()
     if (this.open) {
       /* Before showing this one, so the two are never both up for a frame. The
          other closes through `requestOpen`, so a consumer holding it open is

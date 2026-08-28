@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessOption } from '@helix-io/headless/option'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessOption } from '@fusion.dev/helix-headless/option'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './option-root.css.js'
 

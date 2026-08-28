@@ -8,7 +8,7 @@ import {
   MixinCollection,
   requestChange,
   slotFilled,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'

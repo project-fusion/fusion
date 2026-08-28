@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@helix-io/testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -193,7 +193,7 @@ describe('input number keyboard', () => {
   })
 
   test('a read-only field reads its value and refuses to move', async () => {
-    const host = await field('default-value="5" read-only')
+    const host = await field('default-value="5" readonly')
     await press(host, 'ArrowUp')
     expect(host.value).toBe('5')
   })
@@ -321,7 +321,7 @@ describe('number input scrub', () => {
   })
 
   test('a read-only field does not move', async () => {
-    const host = await scrubField('default-value="10" step="1" read-only')
+    const host = await scrubField('default-value="10" step="1" readonly')
     await drag(host, 40)
     expect((host as HTMLElement & { value: string }).value).toBe('10')
   })

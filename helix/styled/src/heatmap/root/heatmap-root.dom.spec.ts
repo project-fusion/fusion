@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless behavior. The tones, the
  * bucketing and the published count are the headless tier's and are asserted
@@ -78,7 +78,7 @@ describe('the styled heatmap', () => {
    */
   test('this tier is what the names are worth', async () => {
     /* Imported here rather than at the top of the file: the sheet pulls in
-       `@helix-io/core`, and a module that touches the DOM globals before
+       `@fusion.dev/helix-core`, and a module that touches the DOM globals before
        `registerDom` has installed them takes happy-dom's parser down with it. */
     const { styles } = await import('./heatmap-root.css.js')
     const declared = [styles].flat().map(String).join('\n')

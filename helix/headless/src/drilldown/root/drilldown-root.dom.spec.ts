@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@helix-io/testing/dom'
+import { mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason: an
    element registered against the `customElements` happy-dom then replaces never

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { HelixManifest } from '@helix-io/cem'
+import type { HelixManifest } from '@fusion.dev/helix-cem'
 import { catalog, type ExampleSource, findInCatalog } from './catalog.js'
 
 const manifest: HelixManifest = {

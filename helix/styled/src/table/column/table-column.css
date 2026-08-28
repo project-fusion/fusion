@@ -27,7 +27,7 @@
   /* Taller than a row, because the header is a band rather than the first row
      of data: at the same height it read as one, and the rule under it as the
      first of the row separators rather than as the line the table starts at. */
-  min-block-size: var(--helix-size-control-lg);
+  min-block-size: var(--helix-size-control-loose);
   min-inline-size: 0;
   padding-inline-end: var(--helix-space-md);
 }

@@ -1,4 +1,4 @@
-import { navigation } from '@helix-io/docs'
+import { navigation } from '@fusion.dev/helix-docs'
 import { CONTACT } from '@/content/contact/contact'
 import type { CopyBlock, PageCopy } from '@/content/copy/copy'
 import { LANDING } from '@/content/landing/landing'

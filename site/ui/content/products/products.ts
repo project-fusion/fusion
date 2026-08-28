@@ -197,7 +197,7 @@ export const PRODUCTS: Product[] = [
       },
     ],
     href: '/helix',
-    install: 'bun add @helix-io/styled',
+    install: 'bun add @fusion.dev/helix',
     license: 'MIT',
     mark: 'helix',
     name: 'Helix',

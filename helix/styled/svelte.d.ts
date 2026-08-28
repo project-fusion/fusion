@@ -3,7 +3,7 @@
 // Svelte binds a handler as `onhelix-input={…}`, which is the shape the JSX
 // types already describe, so this augments `SvelteHTMLElements` with them
 // rather than emitting a second copy that could disagree.
-import type { CustomElements } from '@helix-io/styled/jsx'
+import type { CustomElements } from '@fusion.dev/helix/jsx'
 
 declare module 'svelte/elements' {
   interface SvelteHTMLElements {

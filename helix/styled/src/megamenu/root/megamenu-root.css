@@ -28,7 +28,7 @@
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-2xs);
-  min-block-size: var(--helix-size-control-sm);
+  min-block-size: var(--helix-size-control-tight);
   padding-inline: var(--helix-space-xs);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),

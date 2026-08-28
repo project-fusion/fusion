@@ -6,14 +6,14 @@ import { useEffect } from 'react'
  * Registers the sandbox editor, after React has hydrated.
  *
  * **The editor is not in the site's own registrar and cannot be.**
- * `HelixElements` imports `@helix-io/styled` and `@helix-io/sandbox`, and the
+ * `HelixElements` imports `@fusion.dev/helix` and `@fusion.dev/helix-sandbox`, and the
  * sandbox barrel exports the JSX helpers and the spec runner and not this: the
  * editor carries CodeMirror, so registering it from the root layout would put
  * it on every page of the site to serve two. So the two routes that render one
  * ask for it themselves, and that is correct.
  *
  * **What was wrong was the shape of the asking.** Both wrote
- * `import '@helix-io/sandbox/editor'` at module scope, which registers the
+ * `import '@fusion.dev/helix-sandbox/editor'` at module scope, which registers the
  * definitions during the client bundle's evaluation rather than after
  * hydration, and that is the failure `helix-elements.tsx` was written to
  * prevent: the elements upgrade first, write their own bookkeeping onto
@@ -43,12 +43,12 @@ import { useEffect } from 'react'
  * the bundle a reader pays for before they have opened an editor. What changed
  * is that it is a code-splitting decision rather than a hydration fix.
  *
- * The window where the tag is unknown is what `@helix-io/styled/elements.css`
+ * The window where the tag is unknown is what `@fusion.dev/helix/elements.css`
  * already covers, hiding `:not(:defined)` by visibility so nothing reflows when
  * the definition lands.
  */
 export function useSandboxEditor(): void {
   useEffect(() => {
-    void import('@helix-io/sandbox/editor')
+    void import('@fusion.dev/helix-sandbox/editor')
   }, [])
 }

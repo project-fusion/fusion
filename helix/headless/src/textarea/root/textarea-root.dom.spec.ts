@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@helix-io/testing/dom'
+import { formValue, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -57,7 +57,7 @@ describe('textarea', () => {
   test('read-only still submits, unlike disabled', async () => {
     // A read-only field is a value the reader may take and may not change.
     const host = await mount(
-      '<helix-headless-textarea label="A" name="q" read-only default-value="x"></helix-headless-textarea>',
+      '<helix-headless-textarea label="A" name="q" readonly default-value="x"></helix-headless-textarea>',
     )
     expect(control(host).readOnly).toBe(true)
     expect(formValue(host)).toBe('x')

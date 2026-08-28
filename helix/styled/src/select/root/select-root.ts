@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSelect } from '@helix-io/headless/select'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSelect } from '@fusion.dev/helix-headless/select'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
@@ -7,7 +7,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './select-root.css.js'
 /* Side-effect imports, because this renders `<helix-listbox>` in its own shadow
    root and a custom element registers on import. Without them a consumer who
-   imported `@helix-io/styled/select` and nothing else got a select whose panel
+   imported `@fusion.dev/helix/select` and nothing else got a select whose panel
    never upgraded: an unknown element with unstyled options inside it, and no
    error anywhere, because an unknown element is legal HTML.
  

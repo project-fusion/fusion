@@ -1,4 +1,9 @@
-import { customElement, HelixElement, type TokenColor, TokenColorController } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  type TokenColor,
+  TokenColorController,
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'

@@ -7,7 +7,7 @@ import {
   part,
   registerDom,
   type Updatable,
-} from '@helix-io/testing/dom'
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -47,7 +47,7 @@ describe('input', () => {
     const off = await mount('<helix-input label="A" disabled></helix-input>')
     expect(control(off)?.disabled).toBe(true)
 
-    const frozen = await mount('<helix-input label="A" read-only></helix-input>')
+    const frozen = await mount('<helix-input label="A" readonly></helix-input>')
     expect(control(frozen)?.readOnly).toBe(true)
   })
 
@@ -461,7 +461,7 @@ describe('input clears itself', () => {
     expect(part(off, 'clear')).toBeNull()
 
     const fixed = await cleared(
-      '<helix-input clearable default-value="q" label="Search" read-only></helix-input>',
+      '<helix-input clearable default-value="q" label="Search" readonly></helix-input>',
     )
     expect(part(fixed, 'clear')).toBeNull()
   })

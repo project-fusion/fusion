@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixInput } from '@helix-io/styled'
+import type { HelixInput } from '@fusion.dev/helix'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'

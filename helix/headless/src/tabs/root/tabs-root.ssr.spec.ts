@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
+import { partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 

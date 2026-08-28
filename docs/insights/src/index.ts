@@ -19,7 +19,7 @@
  * `check:docs` refuses in the two documentation packages and what this package
  * should inherit when it grows one.
  *
- * Shaped like `@helix-io/docs` and `@cortex-io/docs` deliberately, so a third
+ * Shaped like `@fusion.dev/helix-docs` and `@fusion.dev/cortex-docs` deliberately, so a third
  * content package is a thing this repository already knows how to render,
  * check and serve.
  */

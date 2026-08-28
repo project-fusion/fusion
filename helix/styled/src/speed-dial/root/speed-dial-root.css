@@ -175,7 +175,7 @@
  * matching nothing, no error and no warning. */
 [part="trigger"] {
   all: unset;
-  --icon-size: var(--helix-size-icon-md);
+  --icon-size: var(--helix-size-icon);
 
   align-items: center;
   /* **`primary-surface`, not `primary`, and the difference is a real failure in

@@ -144,7 +144,7 @@ jobs:
             done < /tmp/released
             echo
             echo '```bash'
-            echo "bun add @helix-io/styled@pr-$NUMBER"
+            echo "bun add @fusion.dev/helix@pr-$NUMBER"
             echo '```'
             echo
             echo "Tagged \`pr-$NUMBER\`. Nothing resolves to this by asking for" \

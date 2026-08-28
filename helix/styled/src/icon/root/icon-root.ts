@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessIcon } from '@helix-io/headless/icon'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessIcon } from '@fusion.dev/helix-headless/icon'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './icon-root.css.js'
 

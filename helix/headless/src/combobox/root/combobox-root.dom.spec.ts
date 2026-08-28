@@ -6,7 +6,7 @@ import {
   registerDom,
   settle,
   type Updatable,
-} from '@helix-io/testing/dom'
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()

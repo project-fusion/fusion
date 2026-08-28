@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessOutline } from '@helix-io/headless/outline'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessOutline } from '@fusion.dev/helix-headless/outline'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './outline-root.css.js'
 

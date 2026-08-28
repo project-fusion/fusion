@@ -11,7 +11,7 @@ import {
   type Series,
   seriesIndex,
   ticks,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'

@@ -222,7 +222,7 @@
    * absorbs the remainder instead, so the row stays one line until the tags
    * genuinely fill it. The floor keeps somewhere to type. */
   flex-basis: 0;
-  min-inline-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-loose);
 }
 
 /* The count of what is not shown, reading as a note rather than as another tag:

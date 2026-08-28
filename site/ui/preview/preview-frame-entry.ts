@@ -20,7 +20,7 @@
  * around it does.
  */
 
-import '@helix-io/styled'
+import '@fusion.dev/helix'
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'

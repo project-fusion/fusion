@@ -1,4 +1,4 @@
-import { navigation } from '@helix-io/docs'
+import { navigation } from '@fusion.dev/helix-docs'
 import Link from 'next/link'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import shell from '../components/(reference)/docs.module.css'
@@ -20,7 +20,7 @@ import styles from './docs-index.module.css'
  *
  * The sections come from `navigation()`, which is the same call the sidebar
  * makes. Nothing about the shape of the documentation is written here: a
- * section added to `@helix-io/docs` appears without this file being touched,
+ * section added to `@fusion.dev/helix-docs` appears without this file being touched,
  * which is the property the registry exists to have.
  */
 export const metadata = pageMetadata({

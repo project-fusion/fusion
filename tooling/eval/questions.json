@@ -1928,7 +1928,7 @@
       "answer": "breadcrumbs/switcher",
       "id": "example-275",
       "kind": "example",
-      "prompt": "Which Helix example shows this? \"A crumb that opens a filterable list, for switching what the trail is about.\"",
+      "prompt": "Which Helix example shows this? \"A crumb that opens a menu, for switching what the trail is about.\"",
       "tag": "helix-breadcrumbs"
     },
     {
@@ -5085,2149 +5085,2149 @@
       "answer": "yes",
       "id": "token-726",
       "kind": "token",
-      "prompt": "Is `--helix-color-background` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-background` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-727",
       "kind": "token",
-      "prompt": "Is `--helix-color-background-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-background-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-728",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-729",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-730",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-raised` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-raised` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-731",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-raised-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-raised-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-732",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-overlay` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-overlay` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-733",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-overlay-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-overlay-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-734",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-sunken` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-sunken` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-735",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-sunken-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-sunken-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-736",
       "kind": "token",
-      "prompt": "Is `--helix-color-well` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-well` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-737",
       "kind": "token",
-      "prompt": "Is `--helix-color-well-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-well-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-738",
       "kind": "token",
-      "prompt": "Is `--helix-color-overlay` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-overlay` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-739",
       "kind": "token",
-      "prompt": "Is `--helix-color-overlay-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-overlay-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-740",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-741",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-strong` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-strong` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-742",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-muted` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-muted` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-743",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-muted-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-muted-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-744",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-745",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-subtle-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-subtle-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-746",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-on-accent` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-on-accent` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-747",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-on-accent-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-on-accent-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-748",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-inverse` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-inverse` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-749",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-inverse-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-inverse-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-750",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-inverse` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-inverse` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-751",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-inverse-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-inverse-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-752",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-media` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-media` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-753",
       "kind": "token",
-      "prompt": "Is `--helix-color-surface-media-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-surface-media-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-754",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-media` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-media` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-755",
       "kind": "token",
-      "prompt": "Is `--helix-color-foreground-media-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-foreground-media-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-756",
       "kind": "token",
-      "prompt": "Is `--helix-color-border` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-border` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-757",
       "kind": "token",
-      "prompt": "Is `--helix-color-border-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-border-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-758",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-759",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-strong` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-strong` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-760",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-761",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-762",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-active` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-active` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-763",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-active-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-active-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-764",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-765",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-subtle-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-subtle-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-766",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-767",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-strong` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-strong` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-768",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-769",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-770",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-active` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-active` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-771",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-active-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-active-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-772",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-773",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-subtle-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-subtle-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-774",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-775",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-776",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-777",
       "kind": "token",
-      "prompt": "Is `--helix-color-accent-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-accent-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-778",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-779",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-780",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-781",
       "kind": "token",
-      "prompt": "Is `--helix-color-primary-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-primary-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-782",
       "kind": "token",
-      "prompt": "Is `--helix-color-focus-ring` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-focus-ring` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-783",
       "kind": "token",
-      "prompt": "Is `--helix-color-focus-ring-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-focus-ring-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-784",
       "kind": "token",
-      "prompt": "Is `--helix-color-brand-mark` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-brand-mark` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-785",
       "kind": "token",
-      "prompt": "Is `--helix-color-brand-mark-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-brand-mark-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-786",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-callable` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-callable` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-787",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-callable-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-callable-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-788",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-comment` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-comment` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-789",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-comment-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-comment-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-790",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-constant` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-constant` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-791",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-constant-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-constant-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-792",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-invalid` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-invalid` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-793",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-invalid-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-invalid-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-794",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-keyword` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-keyword` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-795",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-keyword-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-keyword-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-796",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-name` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-name` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-797",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-name-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-name-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-798",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-string` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-string` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-799",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-string-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-string-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-800",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-tag` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-tag` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-801",
       "kind": "token",
-      "prompt": "Is `--helix-color-syntax-tag-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-syntax-tag-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-802",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-1` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-1` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-803",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-1-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-1-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-804",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-2` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-2` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-805",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-2-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-2-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-806",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-3` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-3` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-807",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-3-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-3-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-808",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-4` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-4` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-809",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-4-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-4-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-810",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-5` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-5` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-811",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-5-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-5-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-812",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-6` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-6` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-813",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-6-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-6-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-814",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-7` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-7` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-815",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-7-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-7-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-816",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-8` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-8` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-817",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-8-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-8-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-818",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-9` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-9` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-819",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-9-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-9-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-820",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-10` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-10` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-821",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-10-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-10-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-822",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-11` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-11` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-823",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-11-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-11-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-824",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-12` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-12` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-825",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-12-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-12-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-826",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-13` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-13` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-827",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-13-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-13-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-828",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-14` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-14` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-829",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-14-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-14-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-830",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-15` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-15` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-831",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-15-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-15-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-832",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-16` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-16` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-833",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-16-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-16-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-834",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-17` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-17` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-835",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-17-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-17-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-836",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-18` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-18` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-837",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-18-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-18-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-838",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-19` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-19` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-839",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-19-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-19-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-840",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-20` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-20` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-841",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-20-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-20-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-842",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-21` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-21` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-843",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-21-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-21-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-844",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-22` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-22` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-845",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-22-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-22-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-846",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-23` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-23` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-847",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-23-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-23-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-848",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-24` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-24` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-849",
       "kind": "token",
-      "prompt": "Is `--helix-color-series-24-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-series-24-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-850",
       "kind": "token",
-      "prompt": "Is `--helix-color-info` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-851",
       "kind": "token",
-      "prompt": "Is `--helix-color-info-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-852",
       "kind": "token",
-      "prompt": "Is `--helix-color-success` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-853",
       "kind": "token",
-      "prompt": "Is `--helix-color-success-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-854",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-855",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-856",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-857",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-858",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-859",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-860",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-861",
       "kind": "token",
-      "prompt": "Is `--helix-color-danger-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-danger-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-862",
       "kind": "token",
-      "prompt": "Is `--helix-color-info-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-863",
       "kind": "token",
-      "prompt": "Is `--helix-color-info-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-864",
       "kind": "token",
-      "prompt": "Is `--helix-color-info-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-865",
       "kind": "token",
-      "prompt": "Is `--helix-color-info-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-info-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-866",
       "kind": "token",
-      "prompt": "Is `--helix-color-success-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-867",
       "kind": "token",
-      "prompt": "Is `--helix-color-success-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-868",
       "kind": "token",
-      "prompt": "Is `--helix-color-success-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-869",
       "kind": "token",
-      "prompt": "Is `--helix-color-success-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-success-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-870",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-871",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-872",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning-surface-hover` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning-surface-hover` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-873",
       "kind": "token",
-      "prompt": "Is `--helix-color-warning-surface-hover-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-color-warning-surface-hover-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-874",
       "kind": "token",
-      "prompt": "Is `--helix-space-none` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-none` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-875",
       "kind": "token",
-      "prompt": "Is `--helix-space-none-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-none-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-876",
       "kind": "token",
-      "prompt": "Is `--helix-space-2xs` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-2xs` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-877",
       "kind": "token",
-      "prompt": "Is `--helix-space-2xs-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-2xs-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-878",
       "kind": "token",
-      "prompt": "Is `--helix-space-xs` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-xs` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-879",
       "kind": "token",
-      "prompt": "Is `--helix-space-xs-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-xs-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-880",
       "kind": "token",
-      "prompt": "Is `--helix-space-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-881",
       "kind": "token",
-      "prompt": "Is `--helix-space-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-882",
       "kind": "token",
-      "prompt": "Is `--helix-space-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-883",
       "kind": "token",
-      "prompt": "Is `--helix-space-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-884",
       "kind": "token",
-      "prompt": "Is `--helix-space-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-885",
       "kind": "token",
-      "prompt": "Is `--helix-space-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-886",
       "kind": "token",
-      "prompt": "Is `--helix-space-xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-887",
       "kind": "token",
-      "prompt": "Is `--helix-space-xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-888",
       "kind": "token",
-      "prompt": "Is `--helix-space-2xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-2xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-889",
       "kind": "token",
-      "prompt": "Is `--helix-space-2xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-2xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-890",
       "kind": "token",
-      "prompt": "Is `--helix-space-3xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-3xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-891",
       "kind": "token",
-      "prompt": "Is `--helix-space-3xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-3xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-892",
       "kind": "token",
-      "prompt": "Is `--helix-radii-none` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-none` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-893",
       "kind": "token",
-      "prompt": "Is `--helix-radii-none-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-none-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-894",
       "kind": "token",
-      "prompt": "Is `--helix-radii-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-895",
       "kind": "token",
-      "prompt": "Is `--helix-radii-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-896",
       "kind": "token",
-      "prompt": "Is `--helix-radii-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-897",
       "kind": "token",
-      "prompt": "Is `--helix-radii-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-898",
       "kind": "token",
-      "prompt": "Is `--helix-radii-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-899",
       "kind": "token",
-      "prompt": "Is `--helix-radii-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-900",
       "kind": "token",
-      "prompt": "Is `--helix-radii-full` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-full` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-901",
       "kind": "token",
-      "prompt": "Is `--helix-radii-full-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-radii-full-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-902",
       "kind": "token",
-      "prompt": "Is `--helix-font-sans` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-sans` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-903",
       "kind": "token",
-      "prompt": "Is `--helix-font-sans-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-sans-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-904",
       "kind": "token",
-      "prompt": "Is `--helix-font-mono` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-mono` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-905",
       "kind": "token",
-      "prompt": "Is `--helix-font-mono-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-mono-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-906",
       "kind": "token",
-      "prompt": "Is `--helix-font-display` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-display` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-907",
       "kind": "token",
-      "prompt": "Is `--helix-font-display-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-font-display-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-908",
       "kind": "token",
-      "prompt": "Is `--helix-text-xs` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-xs` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-909",
       "kind": "token",
-      "prompt": "Is `--helix-text-xs-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-xs-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-910",
       "kind": "token",
-      "prompt": "Is `--helix-text-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-911",
       "kind": "token",
-      "prompt": "Is `--helix-text-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-912",
       "kind": "token",
-      "prompt": "Is `--helix-text-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-913",
       "kind": "token",
-      "prompt": "Is `--helix-text-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-914",
       "kind": "token",
-      "prompt": "Is `--helix-text-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-915",
       "kind": "token",
-      "prompt": "Is `--helix-text-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-916",
       "kind": "token",
-      "prompt": "Is `--helix-text-xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-917",
       "kind": "token",
-      "prompt": "Is `--helix-text-xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-918",
       "kind": "token",
-      "prompt": "Is `--helix-text-2xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-2xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-919",
       "kind": "token",
-      "prompt": "Is `--helix-text-2xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-2xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-920",
       "kind": "token",
-      "prompt": "Is `--helix-text-3xl` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-3xl` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-921",
       "kind": "token",
-      "prompt": "Is `--helix-text-3xl-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-3xl-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-922",
       "kind": "token",
-      "prompt": "Is `--helix-weight-regular` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-regular` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-923",
       "kind": "token",
-      "prompt": "Is `--helix-weight-regular-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-regular-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-924",
       "kind": "token",
-      "prompt": "Is `--helix-weight-medium` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-medium` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-925",
       "kind": "token",
-      "prompt": "Is `--helix-weight-medium-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-medium-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-926",
       "kind": "token",
-      "prompt": "Is `--helix-weight-semibold` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-semibold` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-927",
       "kind": "token",
-      "prompt": "Is `--helix-weight-semibold-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-weight-semibold-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-928",
       "kind": "token",
-      "prompt": "Is `--helix-leading-tight` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-tight` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-929",
       "kind": "token",
-      "prompt": "Is `--helix-leading-tight-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-tight-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-930",
       "kind": "token",
-      "prompt": "Is `--helix-leading-normal` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-normal` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-931",
       "kind": "token",
-      "prompt": "Is `--helix-leading-normal-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-normal-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-932",
       "kind": "token",
-      "prompt": "Is `--helix-leading-loose` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-loose` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-933",
       "kind": "token",
-      "prompt": "Is `--helix-leading-loose-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-loose-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-934",
       "kind": "token",
-      "prompt": "Is `--helix-leading-heading` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-heading` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-935",
       "kind": "token",
-      "prompt": "Is `--helix-leading-heading-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-leading-heading-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-936",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-tight` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-tight` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-937",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-tight-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-tight-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-938",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-normal` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-normal` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-939",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-normal-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-normal-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-940",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-wide` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-wide` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-941",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-wide-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-wide-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-942",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-wider` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-wider` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-943",
       "kind": "token",
-      "prompt": "Is `--helix-tracking-wider-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-tracking-wider-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-944",
       "kind": "token",
-      "prompt": "Is `--helix-border-thin` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-thin` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-945",
       "kind": "token",
-      "prompt": "Is `--helix-border-thin-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-thin-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-946",
       "kind": "token",
-      "prompt": "Is `--helix-border-thick` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-thick` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-947",
       "kind": "token",
-      "prompt": "Is `--helix-border-thick-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-thick-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-948",
       "kind": "token",
-      "prompt": "Is `--helix-border-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-949",
       "kind": "token",
-      "prompt": "Is `--helix-border-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-950",
       "kind": "token",
-      "prompt": "Is `--helix-border-floating` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-floating` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-951",
       "kind": "token",
-      "prompt": "Is `--helix-border-floating-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-border-floating-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-952",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-none` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-none` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-953",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-none-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-none-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-954",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-955",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-956",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-957",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-958",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-959",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-960",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-surface` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-surface` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-961",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-surface-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-surface-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-962",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-floating` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-floating` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-963",
       "kind": "token",
-      "prompt": "Is `--helix-shadow-floating-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-shadow-floating-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-964",
       "kind": "token",
-      "prompt": "Is `--helix-material-backdrop` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-backdrop` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-965",
       "kind": "token",
-      "prompt": "Is `--helix-material-backdrop-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-backdrop-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-966",
       "kind": "token",
-      "prompt": "Is `--helix-material-opacity` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-opacity` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-967",
       "kind": "token",
-      "prompt": "Is `--helix-material-opacity-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-opacity-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-968",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-969",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-970",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-971",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-972",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-973",
       "kind": "token",
-      "prompt": "Is `--helix-material-blur-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-blur-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-974",
       "kind": "token",
-      "prompt": "Is `--helix-material-translucent` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-translucent` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-975",
       "kind": "token",
-      "prompt": "Is `--helix-material-translucent-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-translucent-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-976",
       "kind": "token",
-      "prompt": "Is `--helix-material-translucent-strong` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-translucent-strong` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-977",
       "kind": "token",
-      "prompt": "Is `--helix-material-translucent-strong-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-translucent-strong-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-978",
       "kind": "token",
-      "prompt": "Is `--helix-material-border` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-border` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-979",
       "kind": "token",
-      "prompt": "Is `--helix-material-border-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-material-border-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-980",
       "kind": "token",
-      "prompt": "Is `--helix-duration-instant` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-instant` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-981",
       "kind": "token",
-      "prompt": "Is `--helix-duration-instant-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-instant-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-982",
       "kind": "token",
-      "prompt": "Is `--helix-duration-fast` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-fast` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-983",
       "kind": "token",
-      "prompt": "Is `--helix-duration-fast-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-fast-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-984",
       "kind": "token",
-      "prompt": "Is `--helix-duration-normal` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-normal` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-985",
       "kind": "token",
-      "prompt": "Is `--helix-duration-normal-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-normal-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-986",
       "kind": "token",
-      "prompt": "Is `--helix-duration-slow` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-slow` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-987",
       "kind": "token",
-      "prompt": "Is `--helix-duration-slow-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-duration-slow-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-988",
       "kind": "token",
-      "prompt": "Is `--helix-easing-standard` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-standard` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-989",
       "kind": "token",
-      "prompt": "Is `--helix-easing-standard-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-standard-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-990",
       "kind": "token",
-      "prompt": "Is `--helix-easing-emphasized` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-emphasized` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-991",
       "kind": "token",
-      "prompt": "Is `--helix-easing-emphasized-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-emphasized-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-992",
       "kind": "token",
-      "prompt": "Is `--helix-easing-decelerate` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-decelerate` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-993",
       "kind": "token",
-      "prompt": "Is `--helix-easing-decelerate-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-decelerate-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-994",
       "kind": "token",
-      "prompt": "Is `--helix-easing-accelerate` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-accelerate` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-995",
       "kind": "token",
-      "prompt": "Is `--helix-easing-accelerate-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-accelerate-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-996",
       "kind": "token",
-      "prompt": "Is `--helix-easing-spring` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-spring` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-997",
       "kind": "token",
-      "prompt": "Is `--helix-easing-spring-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-easing-spring-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-998",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-999",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1000",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1001",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1002",
       "kind": "token",
-      "prompt": "Is `--helix-size-control` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1003",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1004",
       "kind": "token",
-      "prompt": "Is `--helix-text-control` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-control` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1005",
       "kind": "token",
-      "prompt": "Is `--helix-text-control-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-text-control-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1006",
       "kind": "token",
-      "prompt": "Is `--helix-space-control` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-control` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1007",
       "kind": "token",
-      "prompt": "Is `--helix-space-control-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-space-control-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1008",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1009",
       "kind": "token",
-      "prompt": "Is `--helix-size-control-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-control-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1010",
       "kind": "token",
-      "prompt": "Is `--helix-size-button` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-button` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1011",
       "kind": "token",
-      "prompt": "Is `--helix-size-button-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-button-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1012",
       "kind": "token",
-      "prompt": "Is `--helix-size-badge` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-badge` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1013",
       "kind": "token",
-      "prompt": "Is `--helix-size-badge-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-badge-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1014",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1015",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1016",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1017",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1018",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1019",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1020",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1021",
       "kind": "token",
-      "prompt": "Is `--helix-size-avatar-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-avatar-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1022",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1023",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1024",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1025",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1026",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1027",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1028",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1029",
       "kind": "token",
-      "prompt": "Is `--helix-size-tag-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-tag-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1030",
       "kind": "token",
-      "prompt": "Is `--helix-size-progress` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-progress` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1031",
       "kind": "token",
-      "prompt": "Is `--helix-size-progress-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-progress-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1032",
       "kind": "token",
-      "prompt": "Is `--helix-size-meter` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-meter` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1033",
       "kind": "token",
-      "prompt": "Is `--helix-size-meter-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-meter-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1034",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1035",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1036",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1037",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1038",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1039",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1040",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1041",
       "kind": "token",
-      "prompt": "Is `--helix-size-checkbox-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-checkbox-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1042",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1043",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1044",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1045",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1046",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1047",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1048",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1049",
       "kind": "token",
-      "prompt": "Is `--helix-size-switch-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-switch-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1050",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1051",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1052",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1053",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1054",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1055",
       "kind": "token",
-      "prompt": "Is `--helix-size-loader-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-loader-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1056",
       "kind": "token",
-      "prompt": "Is `--helix-size-header` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-header` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1057",
       "kind": "token",
-      "prompt": "Is `--helix-size-header-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-header-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1058",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1059",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1060",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-lg` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-lg` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1061",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-lg-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-lg-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1062",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-md` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-md` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1063",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-md-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-md-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1064",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-sm` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-sm` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1065",
       "kind": "token",
-      "prompt": "Is `--helix-size-icon-sm-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-icon-sm-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1066",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-ring` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-ring` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1067",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-ring-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-ring-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1068",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-offset` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-offset` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1069",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-offset-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-offset-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1070",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-reach` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-reach` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1071",
       "kind": "token",
-      "prompt": "Is `--helix-size-focus-reach-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-size-focus-reach-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1072",
       "kind": "token",
-      "prompt": "Is `--helix-layer-beneath` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-beneath` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1073",
       "kind": "token",
-      "prompt": "Is `--helix-layer-beneath-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-beneath-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1074",
       "kind": "token",
-      "prompt": "Is `--helix-layer-base` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-base` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1075",
       "kind": "token",
-      "prompt": "Is `--helix-layer-base-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-base-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1076",
       "kind": "token",
-      "prompt": "Is `--helix-layer-raised` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-raised` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1077",
       "kind": "token",
-      "prompt": "Is `--helix-layer-raised-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-raised-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1078",
       "kind": "token",
-      "prompt": "Is `--helix-layer-sticky` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-sticky` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1079",
       "kind": "token",
-      "prompt": "Is `--helix-layer-sticky-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-sticky-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1080",
       "kind": "token",
-      "prompt": "Is `--helix-layer-overlay` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-overlay` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1081",
       "kind": "token",
-      "prompt": "Is `--helix-layer-overlay-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-overlay-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",
       "id": "token-1082",
       "kind": "token",
-      "prompt": "Is `--helix-layer-toast` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-toast` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "no",
       "id": "token-1083",
       "kind": "token",
-      "prompt": "Is `--helix-layer-toast-subtle` a token that @helix-io/styles declares?"
+      "prompt": "Is `--helix-layer-toast-subtle` a token that @fusion.dev/helix-styles declares?"
     },
     {
       "answer": "yes",

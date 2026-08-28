@@ -1,5 +1,5 @@
-import { CopyController, customElement } from '@helix-io/core'
-import { check, copy } from '@helix-io/icons'
+import { CopyController, customElement } from '@fusion.dev/helix-core'
+import { check, copy } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

@@ -1,5 +1,5 @@
 {
-  "name": "@helix-io/styled",
+  "name": "@fusion.dev/helix",
   "description": "Styled component tier. Extends the headless tier with token-driven presentation.",
   "version": "0.0.0-dev",
   "license": "MIT",
@@ -50,15 +50,15 @@
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
-    "@helix-io/core": "workspace:*",
-    "@helix-io/headless": "workspace:*",
-    "@helix-io/styles": "workspace:*"
+    "@fusion.dev/helix-core": "workspace:*",
+    "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-styles": "workspace:*"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@happy-dom/global-registrator": "^20.0.0",
-    "@helix-io/cem": "workspace:*",
-    "@helix-io/testing": "workspace:*",
+    "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
     "@lit-labs/ssr": "^3.3.0",
     "@types/bun": "^1.3.0",
     "lit": "^3.2.1"

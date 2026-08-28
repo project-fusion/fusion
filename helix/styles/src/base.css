@@ -494,11 +494,11 @@ helix-text[tone="danger"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-xs);
+  gap: var(--button-gap, var(--helix-space-xs));
   justify-content: center;
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-tight);
-  padding-inline: var(--helix-space-control);
+  padding-inline: var(--button-padding-inline, var(--helix-space-control));
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -694,27 +694,27 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   border-color: transparent;
 }
 
-/* Type and inset follow the density the button is in, the same way its height
-   does. They were three rules keyed on a `size` that no longer exists.
+/* **Type and inset follow density through the tokens, and there is nothing left
+ * to say here.** *Four rules deleted 28 Aug 2026.*
  *
- * Listed rather than grouped with `:is()`. A pseudo-element is not valid inside
- * `:is()`, and the list is forgiving, so writing it that way dropped the
- * `::part` branch silently and left the component behind while the recipe
- * worked. Measured: a `helix-button` in a `[data-density="sm"]` region kept
- * 14px type and 16px insets while an `<a data-button>` beside it correctly took
- * 12px and 12px. Only the height moved, because that travels as a custom
- * property and never went through this rule. */
-[data-density="sm"] [data-button],
-[data-density="sm"][data-button] {
-  font-size: var(--helix-text-xs);
-  padding-inline: var(--helix-space-sm);
-}
-
-[data-density="lg"] [data-button],
-[data-density="lg"][data-button] {
-  font-size: var(--helix-text-md);
-  padding-inline: var(--helix-space-lg);
-}
+ * There were two mechanisms doing this and the second was written when the
+ * first did not exist yet. `[data-button]` above reads `--helix-text-control`
+ * and `--helix-space-control` directly, which is the mechanism that crosses a
+ * shadow boundary and is the only reason the recipe and `helix-button` agree at
+ * all; the four rules that stood here re-stated the same two properties per
+ * stop, at higher specificity, resolving to the same values.
+ *
+ * The note they carried is worth keeping, because it is what makes the deletion
+ * safe rather than merely tidy: a pseudo-element is not valid inside `:is()` and
+ * the list is forgiving, so an earlier version of this dropped its `::part`
+ * branch silently and moved the recipe while leaving the component behind.
+ * Nothing reaches for a `::part` here now, so that trap is gone with the rules.
+ *
+ * **Verified by measurement rather than by reading**, since "these look
+ * equivalent" is exactly the claim that was wrong the first time. An
+ * `<a data-button>` and a `<helix-button>` beside it, in all three regions:
+ * 32/12/12, 40/13/16 and 48/14/24 for height, type and inset, identical across
+ * the pair at every stop, before and after. */
 
 /* A checkbox's label reads at the density it is in, the same as a button's. */
 [data-density="sm"] helix-checkbox::part(label) {
@@ -778,6 +778,20 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
  * icon, switch and tag ramps were each drawn at, and a number that happened to
  * land near it would be a coincidence rather than that drawing. */
 [data-density] {
+  /* **The relative pair is redeclared here, and it has to be.** A custom
+     property substitutes at computed-value time, so `--helix-size-control-tight`
+     resolved once on `:root` against the `md` step is what every descendant
+     inherits, whatever region it is in: measured, an option row stayed 32px in
+     all three while the trigger above it moved 32, 40, 48. That is the same trap
+     the note above records about setting the seed on a container, one level out.
+     Recomputing them wherever the step they read is redeclared is what makes
+     them relative to the region rather than to the document. */
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
   --helix-text-control: calc(var(--helix-text-sm) * var(--helix-density, 1));
   --helix-space-control: calc(var(--helix-space-md) * var(--helix-density, 1));
   --helix-size-checkbox: calc(var(--helix-size-checkbox-md) * var(--helix-density, 1));
@@ -788,6 +802,12 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
 }
 
 [data-density="sm"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
   --helix-text-control: var(--helix-text-xs);
   --helix-space-control: var(--helix-space-sm);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
@@ -797,7 +817,26 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 
+/* **The `md` stop declares all seven, and it declared five.**
+ *
+ * Every stop re-declares from its own step rather than inheriting, which is what
+ * makes nesting not compound. `md` listed only the five `--helix-size-*` tokens,
+ * so `--helix-text-control` and `--helix-space-control` fell through to the
+ * `[data-density]` rule above and kept its `--helix-density` multiplier while
+ * the heights did not. Measured before the fix, on
+ * `<div data-density="md" style="--helix-density: .6">`: a button 40px tall
+ * wearing 7.8px type and 9.6px insets, which is a control at the full step
+ * carrying a fraction of one. The two stops either side listed all seven and
+ * were correct, so the one stop nobody writes was the one that was wrong. */
 [data-density="md"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-text-control: var(--helix-text-sm);
+  --helix-space-control: var(--helix-space-md);
   --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-size-control: var(--helix-size-control-md);
@@ -806,6 +845,12 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
 }
 
 [data-density="lg"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
   --helix-text-control: var(--helix-text-md);
   --helix-space-control: var(--helix-space-lg);
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
@@ -1593,8 +1638,22 @@ helix-toggle[disabled]::part(item) {
  */
 :where([data-card]) {
   /* Matched to the card so the focus ring traces the surface rather than a
-     rectangle around it. */
-  border-radius: var(--card-radii, var(--helix-radii-sm));
+     rectangle around it, which is what this said while doing the opposite.
+     `Card` falls back to `--helix-radii-lg` and this fell back to
+     `--helix-radii-sm`, so a link that did not set `--card-radii` drew its ring
+     at 4px around a surface drawn at 12px. Measured on the component gallery,
+     where the card is `12px` and the anchor around it was `4px`; reported as
+     the border looking off kilter, which is exactly what a ring three quarters
+     of the way to square around a rounded card looks like.
+
+     **The two fallbacks have to name the same token, not merely a similar
+     one.** They are the same custom property read on either side of a shadow
+     boundary, and this recipe exists to wrap that component: its whole
+     documented shape is an anchor around a `helix-card`. A default that
+     disagrees with the thing it is documented to wrap is wrong for every
+     consumer who does not override it, and it was, silently, until one of them
+     patched the radius back on locally instead. */
+  border-radius: var(--card-radii, var(--helix-radii-lg));
   color: inherit;
   display: block;
   /* Drawn transparent at rest rather than appearing on hover.
@@ -1778,7 +1837,7 @@ helix-toast:not([data-color-mode]) {
  * tried and does not help, the parser validating the inner selector regardless
  * and the gate then risking a browser that supports the feature and not the
  * query. What is left is moving the rule out of the bundled stylesheet, and
- * that is the consumer-level patch: this rule belongs to `@helix-io/styles`,
+ * that is the consumer-level patch: this rule belongs to `@fusion.dev/helix-styles`,
  * a highlight can only be styled from the document the text lives in, and
  * relocating it into the site to quiet one build would take it away from every
  * other consumer to fix nothing. It goes when Turbopack's parser learns the

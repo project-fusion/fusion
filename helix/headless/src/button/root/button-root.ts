@@ -4,7 +4,7 @@ import {
   HelixFallbackCommandEvent,
   HelixFormElement,
   supportsInvokers,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -233,6 +233,37 @@ export class HelixHeadlessButton extends HelixFormElement {
   focusable = true
 
   /**
+   * Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place.
+   */
+  @property({ attribute: false })
+  expanded?: boolean
+
+  /**
    * Submits the form as this button, for the length of one call.
    *
    * Everything a native submitter carries is written onto the form, the
@@ -384,6 +415,7 @@ export class HelixHeadlessButton extends HelixFormElement {
     return html`<button
       part="button"
       type="button"
+      aria-expanded=${this.expanded === undefined ? nothing : String(this.expanded)}
       aria-label=${this.label || nothing}
       command=${this.command || nothing}
       tabindex=${stop}

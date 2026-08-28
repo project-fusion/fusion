@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixColorPicker } from '@helix-io/styled'
+import type { HelixColorPicker } from '@fusion.dev/helix'
 import { useEffect, useRef } from 'react'
 import styles from './landing-c.module.css'
 import { useThemeControls } from './theme-context'

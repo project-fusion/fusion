@@ -23,7 +23,7 @@ export function Example() {
 
   return (
     <helix-flex direction="column" gap="md">
-      <helix-copy-button onhelix-copy={copied} value="bun add @helix-io/styled" />
+      <helix-copy-button onhelix-copy={copied} value="bun add @fusion.dev/helix" />
 
       <helix-list divided label="What arrived">
         {heard.map((one, at) => (

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessEmpty } from '@helix-io/headless/empty'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessEmpty } from '@fusion.dev/helix-headless/empty'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './empty-root.css.js'
 

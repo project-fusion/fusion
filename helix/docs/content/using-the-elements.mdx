@@ -75,8 +75,8 @@ and renders `null`:
 
 ```tsx
 'use client'
-import '@helix-io/styled/card'
-import '@helix-io/styled/button'
+import '@fusion.dev/helix/card'
+import '@fusion.dev/helix/button'
 
 export function HelixElements(): null {
   return null
@@ -91,8 +91,8 @@ would not be a design system.
 ## Import `elements.css` beside the base layer
 
 ```ts
-import '@helix-io/styles/base.css'
-import '@helix-io/styled/elements.css'
+import '@fusion.dev/helix-styles/base.css'
+import '@fusion.dev/helix/elements.css'
 ```
 
 It hides each tag with `:not(:defined)` until it upgrades, using `visibility` so
@@ -106,8 +106,8 @@ your framework's dev overlay.
 ## Import from subpaths
 
 ```ts
-import '@helix-io/styled/card' // ✅ one family
-import '@helix-io/styled' // ❌ the barrel
+import '@fusion.dev/helix/card' // ✅ one family
+import '@fusion.dev/helix' // ❌ the barrel
 ```
 
 One family per module, so you are not shipping the library to use a button.

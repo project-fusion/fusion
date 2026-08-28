@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom } from '@helix-io/testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for it: an element
    registered against the `customElements` happy-dom replaces never upgrades. */

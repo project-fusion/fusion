@@ -212,7 +212,7 @@ jobs:
     # compares 610 examples in 701 seconds on an M-series Mac, and the 20 it
     # used to share left it about ten after checkout, install, build and
     # `playwright install`. It never once finished: three runs, three
-    # `cancelled` conclusions, which report as neither pass nor fail and read
+    # `cancelled` conclusions, which report as neither pass nor fail and read  # dialect:quoted, GitHub spells this conclusion value so
     # in the summary as a job that simply did not object. That is the fault
     # `check:floors` exists to catch, one level up, in the workflow rather than
     # in the script.

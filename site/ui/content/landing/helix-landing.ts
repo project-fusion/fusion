@@ -55,7 +55,7 @@ export const HERO = {
    */
   description:
     'Ship faster because the system does the checking. An open source design system, machine-readable and verified on every build, and the engineers behind it.',
-  install: 'bun add @helix-io/styled',
+  install: 'bun add @fusion.dev/helix',
   /**
    * **One sentence, because the hero already says enough.** `Ship faster` is the
    * outcome and `because the system does the checking` is the mechanism, which

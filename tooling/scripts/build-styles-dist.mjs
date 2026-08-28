@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Writes what `@helix-io/styles` ships, which is the source without the prose.
+ * Writes what `@fusion.dev/helix-styles` ships, which is the source without the prose.
  *
  * **The package exported `./src/*.css` and every consumer downloaded the
  * reasoning.** Measured across the four files plus the two `helix/styled`
@@ -20,12 +20,12 @@
  * that reads these files, eleven scripts across tokens, seeds, motion and
  * overrule checks, keeps reading `src`, because what it checks is what somebody
  * wrote. Only `exports` moves, so a consumer writing
- * `@helix-io/styles/tokens.css` is unaffected and gets the smaller file.
+ * `@fusion.dev/helix-styles/tokens.css` is unaffected and gets the smaller file.
  *
  * **The relative `@import`s in `all.css` survive because the whole set lands
  * side by side.** `dist/all.css` importing `./tokens.css` finds `dist/tokens.css`.
  *
- * Run with `bun run styles:dist`, which `@helix-io/styles`' `build` calls.
+ * Run with `bun run styles:dist`, which `@fusion.dev/helix-styles`' `build` calls.
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -140,7 +140,7 @@ for (const name of readdirSync(SOURCE)
     process.exit(1)
   }
 
-  const body = `/* ${name} from @helix-io/styles. The source, with the reasoning in it, is in the repository. */\n${stripped}\n`
+  const body = `/* ${name} from @fusion.dev/helix-styles. The source, with the reasoning in it, is in the repository. */\n${stripped}\n`
   writeFileSync(join(OUT, name), body)
   raw += source.length
   shipped += body.length

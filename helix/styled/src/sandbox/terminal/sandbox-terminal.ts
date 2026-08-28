@@ -1,4 +1,4 @@
-import { type ConsoleDetail, customElement, HelixElement } from '@helix-io/core'
+import { type ConsoleDetail, customElement, HelixElement } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'

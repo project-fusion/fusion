@@ -222,7 +222,7 @@ export const analyze = (
  * expensive one on the list.
  *
  * **Helix already detects this, and detecting it again here would be worse.**
- * `@helix-io/core`'s `customElement` decorator sees the second registration as
+ * `@fusion.dev/helix-core`'s `customElement` decorator sees the second registration as
  * it happens, with both class objects in hand, which is a position nothing
  * later can improve on: by the time a page can be scanned, the losing class is
  * unreachable and all that is left is an identity mismatch to infer from. So

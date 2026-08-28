@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessPopover } from '@helix-io/headless/popover'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessPopover } from '@fusion.dev/helix-headless/popover'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './popover-root.css.js'

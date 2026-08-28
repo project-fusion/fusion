@@ -8,10 +8,10 @@ title: Installation
 # Installation
 
 ```sh
-bun add @helix-io/styled
+bun add @fusion.dev/helix
 ```
 
-`@helix-io/styles` is not optional and not a peer dependency by accident. The
+`@fusion.dev/helix-styles` is not optional and not a peer dependency by accident. The
 components reference semantic tokens and paint nothing without them: a Helix
 page with the elements installed and the tokens missing renders unstyled boxes
 rather than an unthemed version of itself.
@@ -19,7 +19,7 @@ rather than an unthemed version of itself.
 ## The stylesheets go in this order
 
 ```ts
-import '@helix-io/styled/helix.css'
+import '@fusion.dev/helix/helix.css'
 ```
 
 One import, and it is four files in the order they have to be in:
@@ -28,8 +28,8 @@ load-bearing and the failure is silent, which these instructions demonstrated
 for longer than anyone would like, so it is stated once inside the package
 rather than by every consumer.
 
-It resolves `@helix-io/styles` through this package's own dependency, so
-installing `@helix-io/styled` is enough. A bare specifier in an `@import` is
+It resolves `@fusion.dev/helix-styles` through this package's own dependency, so
+installing `@fusion.dev/helix` is enough. A bare specifier in an `@import` is
 resolved by a bundler and never by a browser, so a page serving CSS through a
 `<link>` takes the four by path instead.
 
@@ -66,7 +66,7 @@ order is visible in one place and stays that way.
 ## Register the elements
 
 ```ts
-import '@helix-io/styled'
+import '@fusion.dev/helix'
 ```
 
 A side-effect import. It calls `customElements.define` for every element, once,
@@ -77,8 +77,8 @@ the module with it.
 You can register a subset instead, from a subpath:
 
 ```ts
-import '@helix-io/styled/button'
-import '@helix-io/styled/dialog'
+import '@fusion.dev/helix/button'
+import '@fusion.dev/helix/dialog'
 ```
 
 Worth doing when you use a handful of components. Not worth doing in the belief

@@ -1,10 +1,10 @@
-import { findSitePage, sitePageSources } from '@fusion-io/insights'
+import { findSitePage, sitePageSources } from '@fusion.dev/insights'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { renderDocument } from '../../../utils/mdx/mdx'
 import { DocumentPage } from '../document-page'
 
 /**
- * The thesis, rendered from `@fusion-io/insights`.
+ * The thesis, rendered from `@fusion.dev/insights`.
  *
  * **The prose is a flat MDX file and this is a frame around it.** It was three
  * TypeScript arrays and a page of JSX before, which meant the layers, the

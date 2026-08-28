@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessDateInput } from '@helix-io/headless/date-input'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessDateInput } from '@fusion.dev/helix-headless/date-input'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect import, because the headless tier's template names `helix-date-picker`
    rather than the base tag, and a custom element registers on import. Without it

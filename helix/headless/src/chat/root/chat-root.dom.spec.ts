@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /** What a named slot was actually given, which is the only proof of assignment. */
 const assigned = (element: HTMLElement, name: string): Element[] =>

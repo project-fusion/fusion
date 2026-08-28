@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixShortcutEvent } from '@helix-io/core'
+import { customElement, HelixElement, HelixShortcutEvent } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

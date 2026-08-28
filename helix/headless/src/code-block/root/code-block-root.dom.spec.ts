@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@helix-io/testing/dom'
+import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -22,7 +22,7 @@ describe('code block', () => {
      copy of the code to go stale. */
   test('copies what was slotted', async () => {
     const el = await mount(
-      '<helix-headless-code-block>bun add @helix-io/styled</helix-headless-code-block>',
+      '<helix-headless-code-block>bun add @fusion.dev/helix</helix-headless-code-block>',
     )
     /* Twice. The slot is empty on the first render, because assignment happens
        after it; `slotchange` then schedules the update that fills the button.
@@ -32,7 +32,7 @@ describe('code block', () => {
     const copy = el.shadowRoot?.querySelector('helix-headless-copy-button') as HTMLElement & {
       value: string
     }
-    expect(copy.value).toBe('bun add @helix-io/styled')
+    expect(copy.value).toBe('bun add @fusion.dev/helix')
   })
 })
 

@@ -6,7 +6,7 @@
  * registry; it does not own it.
  *
  * **There is no version axis in here.** The package version is the version:
- * `@helix-io/docs@0.2.0` documents Helix 0.2.0, because every package in a
+ * `@fusion.dev/helix-docs@0.2.0` documents Helix 0.2.0, because every package in a
  * domain moves in lockstep. A `versions` array beside that would be a second
  * source of truth with nothing keeping the two in step, and the first time they
  * disagreed the registry would win over the package that shipped it.

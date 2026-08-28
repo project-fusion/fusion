@@ -103,10 +103,10 @@
 [part="option"][data-between]::part(item)::after {
   content: "";
   background-color: currentColor;
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   border-radius: var(--helix-radii-full);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
   margin-inline-start: auto;
   opacity: 0.4;
   scale: 0.3;

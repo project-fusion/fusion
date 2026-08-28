@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessLoader } from '@helix-io/headless/loader'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessLoader } from '@fusion.dev/helix-headless/loader'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './loader-root.css.js'

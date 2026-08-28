@@ -1,9 +1,9 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
-import { createHelixCemConfig } from '@helix-io/cem'
+import { createHelixCemConfig } from '@fusion.dev/helix-cem'
 
 const config: Config = createHelixCemConfig({
   frameworkTypes: true,
-  packageName: '@helix-io/styled',
+  packageName: '@fusion.dev/helix',
   tier: 'styled',
 })
 

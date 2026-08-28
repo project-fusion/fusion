@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCopyButton } from '@helix-io/headless/copy-button'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCopyButton } from '@fusion.dev/helix-headless/copy-button'
 import type { CSSResultGroup } from 'lit'
 import { HelixIconButton } from '../../icon-button/root/icon-button-root.js'
 import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

@@ -259,12 +259,12 @@
 :host([variant="chip"]) [part="item"] {
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
-  block-size: var(--radio-chip-size, var(--helix-size-control-md));
+  block-size: var(--radio-chip-size, var(--helix-size-control));
   border-radius: var(--helix-radii-full);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--radio-chip-size, var(--helix-size-control-md));
+  inline-size: var(--radio-chip-size, var(--helix-size-control));
   justify-content: center;
   padding: 0;
   transition:

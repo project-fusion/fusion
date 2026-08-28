@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Runs `@helix-io/diagnostics` in a real engine, against real components.
+ * Runs `@fusion.dev/helix-diagnostics` in a real engine, against real components.
  *
  * **The unit specs cannot cover the part that matters most.** happy-dom's CSS
  * parser drops a `::part()` rule on the floor: a stylesheet whose only content
@@ -74,11 +74,11 @@ if (!bundle.success) {
 const collector = await bundle.outputs[0].text()
 
 const manifests = {
-  '@helix-io/headless': JSON.parse(
-    await readFile(join(root, 'helix/headless/custom-elements.json'), 'utf8'),
-  ),
-  '@helix-io/styled': JSON.parse(
+  '@fusion.dev/helix': JSON.parse(
     await readFile(join(root, 'helix/styled/custom-elements.json'), 'utf8'),
+  ),
+  '@fusion.dev/helix-headless': JSON.parse(
+    await readFile(join(root, 'helix/headless/custom-elements.json'), 'utf8'),
   ),
 }
 

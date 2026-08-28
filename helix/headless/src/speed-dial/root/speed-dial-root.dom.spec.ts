@@ -1,9 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  // A Helix trigger, which is the arrangement this component recommends and the
+  // only kind that can hold the state without it reaching the markup.
+  await import('../../button/index.js')
 })
 
 type Dial = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
@@ -45,20 +48,56 @@ describe('a speed dial', () => {
     expect(role(part(actions[0], 'item') as HTMLElement)).toBe('menuitem')
   })
 
-  test('a slotted trigger is told what it is doing', async () => {
+  test('a slotted trigger is told what it is doing, by property', async () => {
     /* The arrangement this component recommends is an icon button slotted as the
        trigger, and that is the consumer's markup: the state it has to announce
        is state only the dial holds. Left to them it goes unsaid, and the failure
-       is silent to everyone who can see the screen. */
-    const { host } = await dial()
-    const trigger = host.querySelector('button[slot="trigger"]') as HTMLElement
-    expect(trigger.getAttribute('aria-haspopup')).toBe('menu')
-    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+       is silent to everyone who can see the screen.
+
+       **A property, not an attribute, and the attribute is what this asserted
+       until 28 Aug 2026.** Writing onto the consumer's element is a hydration
+       mismatch React reports and does not patch up, measured against 19.2.8 on
+       this family and `Megamenu`. A property never reaches the markup, so React
+       has nothing to compare, and a Helix trigger renders `aria-expanded`
+       inside its own shadow root. See `tellDisclosure` and #322. */
+    const host = (await mount(
+      `<helix-headless-speed-dial label="Actions">
+        <helix-headless-button slot="trigger">Open</helix-headless-button>
+        <helix-headless-speed-dial-item value="share">Share</helix-headless-speed-dial-item>
+      </helix-headless-speed-dial>`,
+    )) as Dial
+    await host.updateComplete
+    const trigger = host.querySelector('helix-headless-button') as HTMLElement & {
+      expanded?: boolean
+      updateComplete: Promise<boolean>
+    }
+    await trigger.updateComplete
+    expect(trigger.expanded).toBe(false)
+    // The consumer's markup is exactly what they wrote, which is the whole point.
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
 
     host.open = true
     await host.updateComplete
-    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    await trigger.updateComplete
+    expect(trigger.expanded).toBe(true)
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
+    expect(part(trigger, 'button')?.getAttribute('aria-expanded')).toBe('true')
     expect((part(host, 'actions') as HTMLElement).hasAttribute('hidden')).toBe(false)
+  })
+
+  test('and a trigger that cannot hold it is left alone rather than written to', async () => {
+    /* A plain `<button slot="trigger">` has no shadow root to keep the state out
+       of the markup and no property to take it. Writing the attribute anyway is
+       the mismatch above, so nothing is written and `tellDisclosure` says so
+       once on the console. The reader loses the announcement, which is the cost
+       this records rather than hides. */
+    const { host } = await dial()
+    const trigger = host.querySelector('button[slot="trigger"]') as HTMLElement
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
+
+    host.open = true
+    await host.updateComplete
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
   })
 
   test('a default trigger carries the name and says it opens a menu', async () => {

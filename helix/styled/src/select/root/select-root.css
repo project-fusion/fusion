@@ -80,7 +80,7 @@
 
 :host([emphasis="ghost"]) [part="trigger"] {
   background-color: transparent;
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   border-color: transparent;
   justify-content: start;
   padding-inline: var(--helix-space-2xs);
@@ -337,10 +337,10 @@
    pixels wide before this. A slotted `helix-icon` brings its own size, which is
    why this only showed on the fallback. */
 [part="indicator"] {
-  block-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.

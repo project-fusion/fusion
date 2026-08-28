@@ -5,7 +5,7 @@ import {
   HelixElement,
   onUnlessFalse,
   restoreValue,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -77,9 +77,9 @@ export class HelixSandboxSource extends HelixElement {
    * **The shipped shell could not fill its own readout before this.**
    * `SandboxRoot` binds a `helix-caret` listener and writes `line` and `column`
    * onto every slotted status bar, and `SandboxStatusBar` renders a `caret` part
-   * as soon as it has both, and both of those ship from `@helix-io/styled`. The one
+   * as soon as it has both, and both of those ship from `@fusion.dev/helix`. The one
    * pane that reported a position was `SandboxEditor`, which is in
-   * `@helix-io/sandbox` and is `private` while Helix is pre-release. So a
+   * `@fusion.dev/helix-sandbox` and is `private` while Helix is pre-release. So a
    * consumer taking the published shell and this pane got a status bar that
    * could never show a position, and the only fix available to them was a
    * package they cannot install.

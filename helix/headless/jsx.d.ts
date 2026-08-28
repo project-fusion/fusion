@@ -150,7 +150,7 @@ import type {
   isTime,
   toMinutes,
   writeTime,
-} from '@helix-io/headless';
+} from '@fusion.dev/helix-headless';
 
 /**
  * This type can be used to create scoped tags for your components.
@@ -1355,6 +1355,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  expanded?: HelixHeadlessButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -1494,6 +1521,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  "prop:expanded"?: HelixHeadlessButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -3786,6 +3840,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessCopyButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  expanded?: HelixHeadlessCopyButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -3933,6 +4014,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessCopyButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  "prop:expanded"?: HelixHeadlessCopyButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -4358,7 +4466,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "read-only"?: HelixHeadlessDateInput["readOnly"];
+  readonly?: HelixHeadlessDateInput["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -4621,7 +4729,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "bool:read-only"?: HelixHeadlessDateInput["readOnly"];
+  "bool:readonly"?: HelixHeadlessDateInput["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -4852,7 +4960,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "read-only"?: HelixHeadlessDatePicker["readOnly"];
+  readonly?: HelixHeadlessDatePicker["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -5027,7 +5135,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "bool:read-only"?: HelixHeadlessDatePicker["readOnly"];
+  "bool:readonly"?: HelixHeadlessDatePicker["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -6475,6 +6583,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   focusable?: HelixHeadlessIconButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  expanded?: HelixHeadlessIconButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -6614,6 +6749,33 @@ and the stop lands on the inner control inside the shadow root.
 No attribute, because it is coordination between elements rather than
 anything a consumer sets. */
   "prop:focusable"?: HelixHeadlessIconButton["focusable"];
+  /** Whether this button is a disclosure trigger, and whether its panel is open.
+
+**Set by whatever owns the panel, and a property rather than an attribute
+for the reason `Menu` already states about its items**: an attribute
+written onto a consumer's element after it upgrades is a hydration mismatch
+waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+hydrated with the definitions loaded either side of `hydrateRoot`:
+`Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+and React reported "some attributes of the server rendered HTML didn't
+match the client properties. This won't be patched up" in both orders;
+`Popover` and `Menu`, which write nothing, were clean in both.
+
+**A property crosses that gap because React never looks at one.** It diffs
+the attributes it rendered, and this one is `attribute: false`, so the state
+travels to the inner `<button>` and lands inside a shadow root React does
+not own and cannot compare. The consumer's own element is left exactly as
+they served it, which is what `Popover`'s note asks for, and the reader is
+still told what the control does, which is what `SpeedDial`'s note asks
+for. See #322.
+
+`undefined` renders nothing at all, so a button that is not a trigger
+carries no `aria-expanded`: the resting state is the attribute's absence,
+which is the rule every reflected property here follows.
+
+A consumer who wants to say this statically writes `aria-expanded` on the
+host instead, which `AriaForwardController` carries to the same place. */
+  "prop:expanded"?: HelixHeadlessIconButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, and this element had the resolution and kept
@@ -6679,7 +6841,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  "fetch-priority"?: HelixHeadlessImage["fetchPriority"];
+  fetchpriority?: HelixHeadlessImage["fetchPriority"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -6760,7 +6922,7 @@ two attributes rather than one: `loading="eager"` stops it waiting for the
 viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
-  "attr:fetch-priority"?: HelixHeadlessImage["fetchPriority"];
+  "attr:fetchpriority"?: HelixHeadlessImage["fetchPriority"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -6839,9 +7001,51 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
 
 Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
-  /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixHeadlessInput["readOnly"];
-  /** Whether the field refuses input while still submitting its value. */
+  /** Whether the field refuses input while still submitting its value.
+
+**`readonly`, which is the platform's spelling, and it was `read-only`
+until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+and the library had been answering that question two ways: thirteen
+attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+platform writes as one. `readonly` was the only one on both lists, this
+spelling on `Rating` and `read-only` on the eight other fields, so one
+library shipped both and each was inert on the other's families.
+
+The cost of the dash-cased form is the one this repository keeps writing
+down about attributes: nothing warns. `<helix-input readonly>` is what
+anybody who has written HTML types, it parsed to no property at all, and
+the field stayed editable with no error anywhere. Measured before the
+rename: `readOnly` came back `false`.
+
+Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+about the part it renamed for the same kind of reason: there is no
+`helix-v` tag, so no consumer is holding the old spelling, and this is free
+today and a deprecation after the first release.
+`check:attribute-names` holds it from here. */
+  readonly?: HelixHeadlessInput["readOnly"];
+  /** Whether the field refuses input while still submitting its value.
+
+**`readonly`, which is the platform's spelling, and it was `read-only`
+until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+and the library had been answering that question two ways: thirteen
+attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+platform writes as one. `readonly` was the only one on both lists, this
+spelling on `Rating` and `read-only` on the eight other fields, so one
+library shipped both and each was inert on the other's families.
+
+The cost of the dash-cased form is the one this repository keeps writing
+down about attributes: nothing warns. `<helix-input readonly>` is what
+anybody who has written HTML types, it parsed to no property at all, and
+the field stayed editable with no error anywhere. Measured before the
+rename: `readOnly` came back `false`.
+
+Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+about the part it renamed for the same kind of reason: there is no
+`helix-v` tag, so no consumer is holding the old spelling, and this is free
+today and a deprecation after the first release.
+`check:attribute-names` holds it from here. */
   readOnly?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
@@ -6995,9 +7199,51 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
 
 Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessInput["placeholder"];
-  /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixHeadlessInput["readOnly"];
-  /** Whether the field refuses input while still submitting its value. */
+  /** Whether the field refuses input while still submitting its value.
+
+**`readonly`, which is the platform's spelling, and it was `read-only`
+until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+and the library had been answering that question two ways: thirteen
+attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+platform writes as one. `readonly` was the only one on both lists, this
+spelling on `Rating` and `read-only` on the eight other fields, so one
+library shipped both and each was inert on the other's families.
+
+The cost of the dash-cased form is the one this repository keeps writing
+down about attributes: nothing warns. `<helix-input readonly>` is what
+anybody who has written HTML types, it parsed to no property at all, and
+the field stayed editable with no error anywhere. Measured before the
+rename: `readOnly` came back `false`.
+
+Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+about the part it renamed for the same kind of reason: there is no
+`helix-v` tag, so no consumer is holding the old spelling, and this is free
+today and a deprecation after the first release.
+`check:attribute-names` holds it from here. */
+  "bool:readonly"?: HelixHeadlessInput["readOnly"];
+  /** Whether the field refuses input while still submitting its value.
+
+**`readonly`, which is the platform's spelling, and it was `read-only`
+until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+and the library had been answering that question two ways: thirteen
+attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+platform writes as one. `readonly` was the only one on both lists, this
+spelling on `Rating` and `read-only` on the eight other fields, so one
+library shipped both and each was inert on the other's families.
+
+The cost of the dash-cased form is the one this repository keeps writing
+down about attributes: nothing warns. `<helix-input readonly>` is what
+anybody who has written HTML types, it parsed to no property at all, and
+the field stayed editable with no error anywhere. Measured before the
+rename: `readOnly` came back `false`.
+
+Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+about the part it renamed for the same kind of reason: there is no
+`helix-v` tag, so no consumer is holding the old spelling, and this is free
+today and a deprecation after the first release.
+`check:attribute-names` holds it from here. */
   "prop:readOnly"?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
@@ -8822,7 +9068,7 @@ what a reader wants from a whole key. */
 Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixHeadlessNumberInput["readOnly"];
+  readonly?: HelixHeadlessNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixHeadlessNumberInput["readOnly"];
   /** Whether a grip is shown that changes the value when it is dragged.
@@ -8949,7 +9195,7 @@ what a reader wants from a whole key. */
 Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessNumberInput["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixHeadlessNumberInput["readOnly"];
+  "bool:readonly"?: HelixHeadlessNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixHeadlessNumberInput["readOnly"];
   /** Whether a grip is shown that changes the value when it is dragged.
@@ -9840,7 +10086,7 @@ and a dot in each is a choice about how much the field should announce
 itself before anybody has touched it. */
   placeholder?: HelixHeadlessPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
-  "read-only"?: HelixHeadlessPinInput["readOnly"];
+  readonly?: HelixHeadlessPinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */
   readOnly?: HelixHeadlessPinInput["readOnly"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
@@ -9964,7 +10210,7 @@ and a dot in each is a choice about how much the field should announce
 itself before anybody has touched it. */
   "prop:placeholder"?: HelixHeadlessPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
-  "bool:read-only"?: HelixHeadlessPinInput["readOnly"];
+  "bool:readonly"?: HelixHeadlessPinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */
   "prop:readOnly"?: HelixHeadlessPinInput["readOnly"];
   /** Accessible name for one box, with `{index}` and `{length}` filled in. */
@@ -12423,7 +12669,7 @@ corrupt data rather than as a table that ran out of room. The zero was
 chosen to stop one long value pushing the table past its container, and
 that was the right worry with nowhere for the overflow to go.
 
-Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
 long value pushes past the container as the old comment feared, and the
 table scrolls instead of the value being destroyed. Measured at 375: tracks
 of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
@@ -12494,7 +12740,7 @@ corrupt data rather than as a table that ran out of room. The zero was
 chosen to stop one long value pushing the table past its container, and
 that was the right worry with nowhere for the overflow to go.
 
-Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
 long value pushes past the container as the old comment feared, and the
 table scrolls instead of the value being destroyed. Measured at 375: tracks
 of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
@@ -12937,7 +13183,7 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
 Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "read-only"?: HelixHeadlessTextarea["readOnly"];
+  readonly?: HelixHeadlessTextarea["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixHeadlessTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
@@ -13086,7 +13332,7 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
 Not a label: it goes when typing starts. */
   "prop:placeholder"?: HelixHeadlessTextarea["placeholder"];
   /** Whether the field refuses input while still submitting its value. */
-  "bool:read-only"?: HelixHeadlessTextarea["readOnly"];
+  "bool:readonly"?: HelixHeadlessTextarea["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixHeadlessTextarea["readOnly"];
   /** How many lines the box is before anything is typed. */
@@ -13321,7 +13567,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "read-only"?: HelixHeadlessTimeInput["readOnly"];
+  readonly?: HelixHeadlessTimeInput["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -13530,7 +13776,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "bool:read-only"?: HelixHeadlessTimeInput["readOnly"];
+  "bool:readonly"?: HelixHeadlessTimeInput["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -13772,7 +14018,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "read-only"?: HelixHeadlessTimePicker["readOnly"];
+  readonly?: HelixHeadlessTimePicker["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -13957,7 +14203,7 @@ Not `disabled`, which is the confusion worth naming: a disabled control
 submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
-  "bool:read-only"?: HelixHeadlessTimePicker["readOnly"];
+  "bool:readonly"?: HelixHeadlessTimePicker["readOnly"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -15633,7 +15879,7 @@ something else is worse than a name the platform does not have, and
 `check:platform-fidelity` could not see it: it compares names. */
   defaultMuted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  "plays-inline"?: HelixHeadlessVideo["playsInline"];
+  playsinline?: HelixHeadlessVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
   playsInline?: HelixHeadlessVideo["playsInline"];
   /** Whether the browser draws the controls instead of this element.
@@ -15657,11 +15903,11 @@ be read. */
 be read. */
   crossOrigin?: HelixHeadlessVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
-  "disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
+  disablepictureinpicture?: HelixHeadlessVideo["disablePictureInPicture"];
   /** Whether the browser may offer picture in picture. */
   disablePictureInPicture?: HelixHeadlessVideo["disablePictureInPicture"];
   /** Whether the browser may offer playback on a remote device. */
-  "disable-remote-playback"?: HelixHeadlessVideo["disableRemotePlayback"];
+  disableremoteplayback?: HelixHeadlessVideo["disableRemotePlayback"];
   /** Whether the browser may offer playback on a remote device. */
   disableRemotePlayback?: HelixHeadlessVideo["disableRemotePlayback"];
   /** Controls beyond the ones every player has, named in the order they appear.
@@ -15878,7 +16124,7 @@ something else is worse than a name the platform does not have, and
 `check:platform-fidelity` could not see it: it compares names. */
   "prop:defaultMuted"?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
-  "bool:plays-inline"?: HelixHeadlessVideo["playsInline"];
+  "bool:playsinline"?: HelixHeadlessVideo["playsInline"];
   /** Whether it plays where it sits rather than taking over the screen. */
   "prop:playsInline"?: HelixHeadlessVideo["playsInline"];
   /** Whether the browser draws the controls instead of this element.
@@ -15902,11 +16148,11 @@ be read. */
 be read. */
   "prop:crossOrigin"?: HelixHeadlessVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
-  "bool:disable-picture-in-picture"?: HelixHeadlessVideo["disablePictureInPicture"];
+  "bool:disablepictureinpicture"?: HelixHeadlessVideo["disablePictureInPicture"];
   /** Whether the browser may offer picture in picture. */
   "prop:disablePictureInPicture"?: HelixHeadlessVideo["disablePictureInPicture"];
   /** Whether the browser may offer playback on a remote device. */
-  "bool:disable-remote-playback"?: HelixHeadlessVideo["disableRemotePlayback"];
+  "bool:disableremoteplayback"?: HelixHeadlessVideo["disableRemotePlayback"];
   /** Whether the browser may offer playback on a remote device. */
   "prop:disableRemotePlayback"?: HelixHeadlessVideo["disableRemotePlayback"];
   /** Controls beyond the ones every player has, named in the order they appear.
@@ -16199,7 +16445,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16306,7 +16552,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16393,7 +16639,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16511,7 +16757,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16637,7 +16883,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16702,7 +16948,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16780,7 +17026,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -16962,7 +17208,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17039,7 +17285,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17141,7 +17387,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17245,7 +17491,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17326,7 +17572,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17460,6 +17706,32 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -17487,7 +17759,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17596,7 +17868,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17671,7 +17943,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17806,7 +18078,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -17903,7 +18175,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18005,7 +18277,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18135,7 +18407,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18263,7 +18535,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18429,7 +18701,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18590,7 +18862,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18657,7 +18929,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -18835,7 +19107,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -19120,7 +19392,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -19466,7 +19738,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -19671,7 +19943,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -19850,6 +20122,32 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -19877,7 +20175,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -20098,7 +20396,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -20253,7 +20551,7 @@ export type CustomElements = {
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -20365,7 +20663,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -20571,7 +20869,7 @@ export type CustomElements = {
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -20656,7 +20954,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -20875,7 +21173,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -20980,7 +21278,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21137,7 +21435,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21296,7 +21594,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21401,7 +21699,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21496,7 +21794,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21583,7 +21881,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21701,7 +21999,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -21889,7 +22187,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22075,7 +22373,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22255,6 +22553,32 @@ export type CustomElements = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -22282,7 +22606,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22395,7 +22719,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22456,7 +22780,7 @@ export type CustomElements = {
    * that is not is the exception worth writing down.
    * - `srcset`: The candidate widths, passed through to the picture.
    * - `sizes`: How much of the line it will take, passed through to the picture.
-   * - `fetch-priority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
+   * - `fetchpriority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
    *
    * The hero of a page is usually its largest contentful paint, and the fix is
    * two attributes rather than one: `loading="eager"` stops it waiting for the
@@ -22516,7 +22840,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22603,7 +22927,28 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
+   *
+   * **`readonly`, which is the platform's spelling, and it was `read-only`
+   * until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+   * and the library had been answering that question two ways: thirteen
+   * attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+   * `formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+   * platform writes as one. `readonly` was the only one on both lists, this
+   * spelling on `Rating` and `read-only` on the eight other fields, so one
+   * library shipped both and each was inert on the other's families.
+   *
+   * The cost of the dash-cased form is the one this repository keeps writing
+   * down about attributes: nothing warns. `<helix-input readonly>` is what
+   * anybody who has written HTML types, it parsed to no property at all, and
+   * the field stayed editable with no error anywhere. Measured before the
+   * rename: `readOnly` came back `false`.
+   *
+   * Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+   * about the part it renamed for the same kind of reason: there is no
+   * `helix-v` tag, so no consumer is holding the old spelling, and this is free
+   * today and a deprecation after the first release.
+   * `check:attribute-names` holds it from here.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -22724,7 +23069,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22905,7 +23250,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -22997,7 +23342,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23179,7 +23524,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23268,7 +23613,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23357,7 +23702,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23545,7 +23890,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23720,7 +24065,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -23875,7 +24220,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24036,7 +24381,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24160,7 +24505,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24337,7 +24682,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24407,7 +24752,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24508,7 +24853,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24630,7 +24975,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24740,7 +25085,7 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
    *
    * The label is what is dragged, so this adds no chrome at all. Still opt-in,
@@ -24821,7 +25166,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -24959,7 +25304,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25121,7 +25466,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25250,7 +25595,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25454,7 +25799,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25573,7 +25918,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25678,7 +26023,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25757,7 +26102,7 @@ export type CustomElements = {
    * Empty by default, because a row of boxes already reads as a row of boxes
    * and a dot in each is a choice about how much the field should announce
    * itself before anybody has touched it.
-   * - `read-only`/`readOnly`: Whether the boxes refuse input while still submitting their value.
+   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
    * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -25824,7 +26169,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -25985,7 +26330,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26132,7 +26477,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26226,7 +26571,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26284,7 +26629,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26405,7 +26750,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26555,7 +26900,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26740,7 +27085,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -26897,7 +27242,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27054,7 +27399,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27206,7 +27551,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27370,7 +27715,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27589,7 +27934,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27661,7 +28006,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -27778,7 +28123,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28020,7 +28365,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28108,7 +28453,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28183,7 +28528,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28295,7 +28640,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28406,7 +28751,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28537,7 +28882,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28668,7 +29013,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28734,7 +29079,7 @@ export type CustomElements = {
    * chosen to stop one long value pushing the table past its container, and
    * that was the right worry with nowhere for the overflow to go.
    *
-   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
    * long value pushes past the container as the old comment feared, and the
    * table scrolls instead of the value being destroyed. Measured at 375: tracks
    * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
@@ -28803,7 +29148,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28895,7 +29240,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -28956,7 +29301,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29015,7 +29360,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29116,7 +29461,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29195,7 +29540,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29270,7 +29615,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29336,7 +29681,7 @@ export type CustomElements = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
    *
@@ -29442,7 +29787,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29601,7 +29946,7 @@ export type CustomElements = {
    * Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -29709,7 +30054,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -29939,7 +30284,7 @@ export type CustomElements = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -30020,7 +30365,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30185,7 +30530,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30266,7 +30611,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30380,7 +30725,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30502,7 +30847,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30637,7 +30982,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30785,7 +31130,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -30860,7 +31205,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31051,7 +31396,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31193,7 +31538,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31306,7 +31651,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31466,7 +31811,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31593,7 +31938,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31696,7 +32041,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31786,7 +32131,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31886,7 +32231,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -31994,7 +32339,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32117,7 +32462,7 @@ export type CustomElements = {
    * than whether there was sound. A name matching the platform's while meaning
    * something else is worse than a name the platform does not have, and
    * `check:platform-fidelity` could not see it: it compares names.
-   * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *
    * A fallback rather than a default. Two bars over one video is worse than
@@ -32131,8 +32476,8 @@ export type CustomElements = {
    * start control, which is the correct thing to be looking at.
    * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
    * be read.
-   * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
-   * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
+   * - `disablepictureinpicture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
+   * - `disableremoteplayback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -32261,7 +32606,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32449,7 +32794,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32552,7 +32897,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32660,7 +33005,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32750,7 +33095,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32869,7 +33214,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -32998,7 +33343,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33064,7 +33409,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33145,7 +33490,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33330,7 +33675,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33410,7 +33755,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33513,7 +33858,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33618,7 +33963,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33700,7 +34045,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33835,6 +34180,32 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -33862,7 +34233,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -33974,7 +34345,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34052,7 +34423,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34190,7 +34561,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34290,7 +34661,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34393,7 +34764,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34524,7 +34895,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34655,7 +35026,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34822,7 +35193,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -34986,7 +35357,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -35056,7 +35427,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -35237,7 +35608,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -35523,7 +35894,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -35870,7 +36241,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -36078,7 +36449,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -36260,6 +36631,32 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -36287,7 +36684,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -36509,7 +36906,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -36667,7 +37064,7 @@ export type CustomElementsSolidJs = {
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -36779,7 +37176,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -36988,7 +37385,7 @@ export type CustomElementsSolidJs = {
    * - `max`: Latest selectable date, as `YYYY-MM-DD`.
    * - `label`: Accessible name for the grid.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -37073,7 +37470,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37293,7 +37690,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37401,7 +37798,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37561,7 +37958,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37721,7 +38118,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37829,7 +38226,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -37925,7 +38322,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38015,7 +38412,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38136,7 +38533,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38327,7 +38724,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38514,7 +38911,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38697,6 +39094,32 @@ export type CustomElementsSolidJs = {
    *
    * No attribute, because it is coordination between elements rather than
    * anything a consumer sets. (property only)
+   * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it, which is what `Popover`'s note asks for, and the reader is
+   * still told what the control does, which is what `SpeedDial`'s note asks
+   * for. See #322.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, and this element had the resolution and kept
@@ -38724,7 +39147,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38838,7 +39261,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -38902,7 +39325,7 @@ export type CustomElementsSolidJs = {
    * that is not is the exception worth writing down.
    * - `srcset`: The candidate widths, passed through to the picture.
    * - `sizes`: How much of the line it will take, passed through to the picture.
-   * - `fetch-priority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
+   * - `fetchpriority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
    *
    * The hero of a page is usually its largest contentful paint, and the fix is
    * two attributes rather than one: `loading="eager"` stops it waiting for the
@@ -38962,7 +39385,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39052,7 +39475,28 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
+   *
+   * **`readonly`, which is the platform's spelling, and it was `read-only`
+   * until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
+   * and the library had been answering that question two ways: thirteen
+   * attributes kept the name HTML uses (`crossorigin`, `maxlength`,
+   * `formnovalidate`, `dirname` and the rest) and five dash-cased a word the
+   * platform writes as one. `readonly` was the only one on both lists, this
+   * spelling on `Rating` and `read-only` on the eight other fields, so one
+   * library shipped both and each was inert on the other's families.
+   *
+   * The cost of the dash-cased form is the one this repository keeps writing
+   * down about attributes: nothing warns. `<helix-input readonly>` is what
+   * anybody who has written HTML types, it parsed to no property at all, and
+   * the field stayed editable with no error anywhere. Measured before the
+   * rename: `readOnly` came back `false`.
+   *
+   * Taken now for the reason [#213](../../../../../docs/19-queue.md) gives
+   * about the part it renamed for the same kind of reason: there is no
+   * `helix-v` tag, so no consumer is holding the old spelling, and this is free
+   * today and a deprecation after the first release.
+   * `check:attribute-names` holds it from here.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected**, and it was. Reflection exists so a selector can reach a
@@ -39173,7 +39617,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39357,7 +39801,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39452,7 +39896,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39637,7 +40081,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39729,7 +40173,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -39821,7 +40265,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40012,7 +40456,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40190,7 +40634,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40348,7 +40792,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40512,7 +40956,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40639,7 +41083,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40819,7 +41263,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40892,7 +41336,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -40994,7 +41438,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41117,7 +41561,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41228,7 +41672,7 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
    *
    * The label is what is dragged, so this adds no chrome at all. Still opt-in,
@@ -41309,7 +41753,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41448,7 +41892,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41611,7 +42055,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41743,7 +42187,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -41950,7 +42394,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42070,7 +42514,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42176,7 +42620,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42256,7 +42700,7 @@ export type CustomElementsSolidJs = {
    * Empty by default, because a row of boxes already reads as a row of boxes
    * and a dot in each is a choice about how much the field should announce
    * itself before anybody has touched it.
-   * - `read-only`/`readOnly`: Whether the boxes refuse input while still submitting their value.
+   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
    * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
@@ -42323,7 +42767,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42487,7 +42931,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42637,7 +43081,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42734,7 +43178,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42795,7 +43239,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -42919,7 +43363,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43070,7 +43514,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43258,7 +43702,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43418,7 +43862,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43576,7 +44020,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43731,7 +44175,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -43898,7 +44342,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44120,7 +44564,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44195,7 +44639,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44313,7 +44757,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44558,7 +45002,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44649,7 +45093,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44727,7 +45171,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44842,7 +45286,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -44956,7 +45400,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45090,7 +45534,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45224,7 +45668,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45293,7 +45737,7 @@ export type CustomElementsSolidJs = {
    * chosen to stop one long value pushing the table past its container, and
    * that was the right worry with nowhere for the overflow to go.
    *
-   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
    * long value pushes past the container as the old comment feared, and the
    * table scrolls instead of the value being destroyed. Measured at 375: tracks
    * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
@@ -45362,7 +45806,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45455,7 +45899,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45519,7 +45963,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45581,7 +46025,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45685,7 +46129,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45767,7 +46211,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45845,7 +46289,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -45914,7 +46358,7 @@ export type CustomElementsSolidJs = {
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
-   * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
    * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
    *
@@ -46020,7 +46464,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -46182,7 +46626,7 @@ export type CustomElementsSolidJs = {
    * Absent uses the runtime's own.
    * - `placeholder`: What the field says before a time is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -46290,7 +46734,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -46523,7 +46967,7 @@ export type CustomElementsSolidJs = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `read-only`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -46604,7 +47048,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -46770,7 +47214,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -46852,7 +47296,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -46969,7 +47413,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47094,7 +47538,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47232,7 +47676,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47381,7 +47825,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47459,7 +47903,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47653,7 +48097,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47798,7 +48242,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -47914,7 +48358,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48077,7 +48521,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48207,7 +48651,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48313,7 +48757,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48406,7 +48850,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48507,7 +48951,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48616,7 +49060,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -48740,7 +49184,7 @@ export type CustomElementsSolidJs = {
    * than whether there was sound. A name matching the platform's while meaning
    * something else is worse than a name the platform does not have, and
    * `check:platform-fidelity` could not see it: it compares names.
-   * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
    * - `controls`: Whether the browser draws the controls instead of this element.
    *
    * A fallback rather than a default. Two bars over one video is worse than
@@ -48754,8 +49198,8 @@ export type CustomElementsSolidJs = {
    * start control, which is the correct thing to be looking at.
    * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
    * be read.
-   * - `disable-picture-in-picture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
-   * - `disable-remote-playback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
+   * - `disablepictureinpicture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
+   * - `disableremoteplayback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -48884,7 +49328,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
@@ -49075,7 +49519,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@helix-io/testing` was written around and the reason two checkbox specs
+   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
    * were misread as a token fault for days.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a

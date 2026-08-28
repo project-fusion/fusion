@@ -3,7 +3,7 @@
  * Which events each tag dispatches, registered so the React prop audit can tell
  * a handler on the wrong element from one on the right one. See
  * `helix/core/src/events/element-events.ts`. */
-import { registerElementEvents } from '@helix-io/core'
+import { registerElementEvents } from '@fusion.dev/helix-core'
 
 registerElementEvents({
   'helix-headless-accordion-item': ['helix-before-close', 'helix-before-open', 'toggle'],

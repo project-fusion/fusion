@@ -88,7 +88,7 @@ if (tag === 'latest') {
 
 /* The domain's shipping members. A private package versions with its siblings
    and is stamped like them, and it is not published: a Helix byproduct is still
-   Helix, and `@helix-io/cem` is a build tool for this repository. */
+   Helix, and `@fusion.dev/helix-cem` is a build tool for this repository. */
 const packages = [...manifests()].filter(
   ([name, { manifest }]) => domainOf(name) === domain && publishes(manifest),
 )
@@ -171,7 +171,7 @@ if (promote !== undefined) {
  * Removes the source maps from a packed tarball, and their references with them.
  *
  * **Every map we ship is inert, measured rather than assumed.** Packed for real:
- * 1,158 maps across `@helix-io/core`, `@helix-io/headless` and `@helix-io/styled`,
+ * 1,158 maps across `@fusion.dev/helix-core`, `@fusion.dev/helix-headless` and `@fusion.dev/helix`,
  * **none with `sourcesContent`, and all 1,158 naming a `sources` path that is
  * not in the tarball**. `files` is `custom-elements.json` plus `dist`, so
  * `package/src/` has no entries at all. The trade this was meant to buy, a

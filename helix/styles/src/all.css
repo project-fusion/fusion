@@ -15,7 +15,7 @@
  * two of. One entry point cannot be, which is the whole reason to have it.
  *
  * **It stops at this package's own boundary.** `elements.css` belongs to
- * `@helix-io/styled` and stays a second import: a bare specifier in an
+ * `@fusion.dev/helix` and stays a second import: a bare specifier in an
  * `@import` is resolved by the bundler rather than by CSS, so a cross-package
  * one works in most toolchains and silently does not in the rest, which is the
  * class of failure this file was written to end rather than to move.

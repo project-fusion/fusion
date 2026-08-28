@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCallout } from '@helix-io/headless/callout'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCallout } from '@fusion.dev/helix-headless/callout'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './callout-root.css.js'
 

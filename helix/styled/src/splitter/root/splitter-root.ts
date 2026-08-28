@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessSplitter } from '@helix-io/headless/splitter'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessSplitter } from '@fusion.dev/helix-headless/splitter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './splitter-root.css.js'

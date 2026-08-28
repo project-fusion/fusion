@@ -30,7 +30,7 @@
  *
  * Import it once, beside the base layer:
  *
- *     import '@helix-io/gallery/gallery.css'
+ *     import '@fusion.dev/helix-gallery/gallery.css'
  *
  * A plain document stylesheet and not a shadow one, because the art is light
  * DOM: it is slotted into a card's media region, so it is styled by the page

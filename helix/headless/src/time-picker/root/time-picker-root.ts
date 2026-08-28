@@ -5,7 +5,7 @@ import {
   type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerValue,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
@@ -468,7 +468,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /** Refuses every change while read-only. See `readOnly`. */
@@ -496,15 +496,64 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * browser points its bubble at.
    */
   private reportRequired(): void {
+    const anchor = this.renderRoot?.querySelector<HTMLElement>('[part="list"]') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose a time.',
-        this.renderRoot?.querySelector<HTMLElement>('[part="list"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
+      this.internals.setValidity({ valueMissing: true }, 'Choose a time.', anchor)
+      return
     }
+    /* A value the wheels cannot read is bad input, the same as on the calendar
+       and for the same measured reason: `value="not-a-time"` marked no row,
+       reported `:valid` and was handed to the form. `asTime` rejects the hours
+       and minutes that are shaped right and out of range as well as the ones
+       that are not shaped right at all. */
+    const held = this.held
+    if (held.length > 0 && held.some((one) => asTime(one) === null)) {
+      this.internals.setValidity(
+        { badInput: true },
+        this.mode === undefined
+          ? 'Enter a time as HH:mm.'
+          : 'Enter times as HH:mm, separated by commas.',
+        anchor,
+      )
+      return
+    }
+    this.internals.setValidity({})
+  }
+
+  /**
+   * Reports the times to the form, one entry each.
+   *
+   * **This element was form-associated, took a `name`, held a `value` and
+   * reported `valueMissing`, and never called `setFormValue` at all.** So
+   * `<helix-time-picker name="start" required>` refused the submit until a
+   * reader filled it and then submitted nothing, which is the worst shape the
+   * omission takes: every visible signal says the control is participating.
+   * Measured before the fix, one form holding both pickers, both named and
+   * both seeded: the entry list carried the date and no time.
+   *
+   * `FormData` and one entry per time, which is `DatePicker.report` exactly.
+   * `mode="multiple"` is genuinely several answers, and a server reading
+   * `times=09:00,17:00` would have to split it on a convention this library
+   * invented; `range` sends its two in order, so start and end arrive as the
+   * pair they already are.
+   *
+   * **Nothing at all without a `name`.** A `FormData` carries its own names and
+   * its entries are appended whatever the element is called, so an unnamed
+   * picker would submit empty-named times rather than being skipped the way a
+   * control reporting a plain string is. That is the same guard, for the same
+   * reason, that the calendar's own note spells out.
+   */
+  private report(): void {
+    const times = this.held
+    if (this.name === '' || this.disabled || times.length === 0) {
+      this.internals.setFormValue(null)
+      return
+    }
+    const data = new FormData()
+    for (const time of times) {
+      data.append(this.name, time)
+    }
+    this.internals.setFormValue(data)
   }
 
   /**
@@ -543,6 +592,10 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
+    /* Here rather than in `updated`, which is where `DatePicker` reports from
+       too: the value is known before the render and a form read between the two
+       should not see the previous one. */
+    this.report()
   }
 
   protected override updated(changed: PropertyValues): void {

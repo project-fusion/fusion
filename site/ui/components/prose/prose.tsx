@@ -1,4 +1,4 @@
-import { type HighlightLanguage, highlight } from '@helix-io/sandbox/highlight'
+import { type HighlightLanguage, highlight } from '@fusion.dev/helix-sandbox/highlight'
 import {
   type AnchorHTMLAttributes,
   Children,
@@ -224,7 +224,7 @@ const widthsOf = (rows: ReactNode[][]): number[] => {
  * A column short enough that it should simply never wrap.
  *
  * Set from what these columns actually hold: `--helix-color-background` is 24
- * characters and `@helix-io/headless` is 18, and both were being broken across
+ * characters and `@fusion.dev/helix-headless` is 18, and both were being broken across
  * three lines by a track that had no reason to be as wide as the prose beside
  * it. Above this a column is carrying a sentence or a token value, and wrapping
  * is the only thing it can do.

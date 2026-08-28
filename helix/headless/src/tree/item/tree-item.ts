@@ -1,5 +1,10 @@
-import { customElement, HelixElement, HelixSelectEvent, MixinControllerOpen } from '@helix-io/core'
-import { caretDown } from '@helix-io/icons'
+import {
+  customElement,
+  HelixElement,
+  HelixSelectEvent,
+  MixinControllerOpen,
+} from '@fusion.dev/helix-core'
+import { caretDown } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

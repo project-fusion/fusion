@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCommand } from '@helix-io/headless/command'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCommand } from '@fusion.dev/helix-headless/command'
 import type { CSSResultGroup } from 'lit'
 /* Side-effect imports: this renders both, and a custom element registers on
    import, so a consumer importing this family alone would otherwise get two

@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@helix-io/core'
-import { arrowDown, arrowUp, minus } from '@helix-io/icons'
+import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'

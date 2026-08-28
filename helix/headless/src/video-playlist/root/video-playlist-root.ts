@@ -1,4 +1,4 @@
-import { customElement, HelixElement, MixinControllerActive } from '@helix-io/core'
+import { customElement, HelixElement, MixinControllerActive } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'

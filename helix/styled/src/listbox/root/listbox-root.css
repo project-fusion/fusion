@@ -110,10 +110,10 @@
 
 [part="filter-icon"] svg,
 slot[name="filter-icon"]::slotted(*) {
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-tight);
 
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* The field that narrows the list.
@@ -140,7 +140,7 @@ slot[name="filter-icon"]::slotted(*) {
   flex: 1 1 auto;
   min-inline-size: 0;
   background-color: transparent;
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--helix-size-control-tight);
   border: none;
   box-sizing: border-box;
   color: var(--helix-color-foreground);

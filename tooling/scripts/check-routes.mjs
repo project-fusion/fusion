@@ -54,7 +54,7 @@ if (all.length === 0) {
 /* **The two halves read the registry from different places, and a stale build
    makes that look like a content problem.**
    
-   `routes()` is app code, so it imports `@helix-io/docs` and gets `dist`.
+   `routes()` is app code, so it imports `@fusion.dev/helix-docs` and gets `dist`.
    `build-catalog.mjs` is tooling, so it reads `src` directly, the way every
    generator here reads source. Both are right, and between a content edit and
    the next build they disagree: the catalog writes a document for a page the

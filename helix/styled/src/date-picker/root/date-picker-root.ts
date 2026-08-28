@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessDatePicker } from '@helix-io/headless/date-picker'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessDatePicker } from '@fusion.dev/helix-headless/date-picker'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './date-picker-root.css.js'
 

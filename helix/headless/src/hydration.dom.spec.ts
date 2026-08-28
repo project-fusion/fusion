@@ -1,5 +1,5 @@
 import { beforeAll, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 let mount: (html: string) => Promise<Element>
 let tags: string[] = []
@@ -48,7 +48,7 @@ let definitions: { ctor: CustomElementConstructor; tag: string }[] = []
  */
 beforeAll(async () => {
   registerDom()
-  ;({ mount } = await import('@helix-io/testing/dom'))
+  ;({ mount } = await import('@fusion.dev/helix-testing/dom'))
   /* Read back from the registration the barrel performs, so the list is every
      tag this package really defines rather than a list here that goes stale the
      day one is added.
@@ -62,7 +62,7 @@ beforeAll(async () => {
      * the cause. `declaredTags` reads what the generated registration left and
      * gives the same answer whoever imported first. */
   await import('./index.js')
-  const { definedTags } = await import('@helix-io/core')
+  const { definedTags } = await import('@fusion.dev/helix-core')
   definitions = definedTags().flatMap((tag) => {
     const ctor = customElements.get(tag)
     return ctor ? [{ ctor, tag }] : []

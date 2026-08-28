@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTable } from '@helix-io/headless/table'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTable } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './table-root.css.js'
 

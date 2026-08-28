@@ -18,7 +18,7 @@ path = "src/main.rs"
 # **The derivation is a library and this is a caller.** A binary that scaffolds
 # projects is not the home of color math, so `fusion-helix-theme` stays its own crate
 # and keeps its WASM wrapper buildable without dragging the command surface into
-# `@helix-io/theme`.
+# `@fusion.dev/helix-theme`.
 fusion-helix-theme = { path = "../theme", features = ["serde"] }
 clap = { version = "4", features = ["derive"] }
 # **Only the CLI takes this.** `fusion-helix-theme` computes and does not draw, and a

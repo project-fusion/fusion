@@ -7,8 +7,9 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
-} from '@helix-io/core'
-import { plus } from '@helix-io/icons'
+  tellDisclosure,
+} from '@fusion.dev/helix-core'
+import { plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
@@ -161,19 +162,30 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * template. A trigger the consumer slotted is their markup, and the state it
    * needs to announce is state only this element holds: without this, the
    * arrangement this component recommends, an icon button slotted as the
-   * trigger, is a control that opens a menu and never says it has one.
+   * trigger, is a control that opens a menu and never says it has one. A
+   * consumer who has to mirror `open` back onto their own trigger is a consumer
+   * who will forget, and the failure is silent to everyone who can see the
+   * screen.
    *
-   * Written onto their element rather than asked of them, because a consumer who
-   * has to mirror `open` back onto their own trigger is a consumer who will
-   * forget, and the failure is silent to everyone who can see the screen.
+   * **Every word of that survives; the mechanism does not.** This wrote
+   * `aria-expanded` and `aria-haspopup` onto the consumer's element with
+   * `setAttribute`, and measured against React 19.2.8 that is a hydration
+   * mismatch React reports and does not patch up. `tellDisclosure` carries the
+   * argument and the measurement: the state travels as a property now, into the
+   * trigger's own shadow root, where React neither looks nor compares.
+   *
+   * `aria-haspopup` goes with it rather than being written separately. It is a
+   * constant, so it could stay an attribute without changing on every open, and
+   * an attribute the consumer's server never sent is a mismatch whether or not
+   * it moves afterwards: that was measured too, both load orders. A trigger that
+   * says it is expanded is already saying it has something to expand.
    */
   private announce(): void {
     const trigger = this.trigger
     if (trigger === this.renderRoot?.querySelector('[part="trigger"]')) {
       return
     }
-    trigger.setAttribute('aria-expanded', this.open ? 'true' : 'false')
-    trigger.setAttribute('aria-haspopup', 'menu')
+    tellDisclosure(trigger, this.open)
   }
 
   protected override updated(changed: PropertyValues): void {

@@ -9,8 +9,9 @@ import {
   type Placement,
   PopoverController,
   scrollItemIntoView,
-} from '@helix-io/core'
-import { caretLeft } from '@helix-io/icons'
+  tellDisclosure,
+} from '@fusion.dev/helix-core'
+import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -145,6 +146,20 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
+  /**
+   * Tells a slotted trigger the disclosure state, by property.
+   *
+   * This menu wrote nothing onto its trigger, which was the right call and cost
+   * a reader the one thing they needed: a control that opens a menu and never
+   * says so. The class note above already gives the mechanism for the way out,
+   * that items are "told by property, not by attribute", and `tellDisclosure`
+   * is that argument applied one level up. See #322.
+   */
+  private tellTrigger(): void {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open)
+  }
+
   /** The element the surface opens against. */
   private get trigger(): HTMLElement {
     return anchorElement(
@@ -263,11 +278,17 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (!item) {
       return
     }
-    /* `menu`, which is the part this template actually renders. It said
-       `surface` and therefore always found null, so `scrollItemIntoView` ran
-       with no scroller and took the page behind the menu with it, which is the
-       one thing that method exists to prevent. The controller three lines up
-       had the right name all along. */
+    /* `surface`, which is the part this template renders and the name the
+       whole library spells this box with.
+
+       *Rewritten 28 Aug 2026, because it had come to say the reverse.* The
+       fault it records is real and was the other way round: the lookup asked
+       for a name the template did not render, found null, and `scrollItemIntoView`
+       ran with no scroller and took the page behind the menu with it, which is
+       the one thing that method exists to prevent. What the comment could not
+       know is that `check:vocabulary` later renamed the part *to* `surface`, so
+       a note naming `menu` as the right answer now teaches the opposite of the
+       rule that settled it. The lookup and the part have agreed since. */
     const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
@@ -328,6 +349,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    // Every update, so a trigger slotted after the first render is told too.
+    this.tellTrigger()
     /* Put the panel where `open` says, however it got there. `show()` and
        `hide()` raised and lowered it and nothing else did, so a menu opened by
        declaring `open` rendered visible, out of the top layer and unanchored:

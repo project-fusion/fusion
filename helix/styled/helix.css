@@ -12,7 +12,7 @@
  * The order is the whole content of this file, and it cannot be got wrong from
  * outside it.
  *
- * **It reaches into `@helix-io/styles`, and that is a declared dependency
+ * **It reaches into `@fusion.dev/helix-styles`, and that is a declared dependency
  * rather than a hopeful specifier.** This package depends on it, so the
  * resolution is guaranteed by the manifest rather than by what happens to be
  * installed. Verified through this repository's own toolchain in development
@@ -24,10 +24,10 @@
  * the documentation describes, who import from JavaScript. Anyone serving CSS
  * directly takes the four files by path.
  *
- * The individual files keep their exports. `@helix-io/styles/all.css` is the
+ * The individual files keep their exports. `@fusion.dev/helix-styles/all.css` is the
  * three that package owns, for a page that wants Helix's type and color
  * without any custom elements; the four singles are there for anyone
  * substituting a layer.
  */
-@import "@helix-io/styles/all.css";
+@import "@fusion.dev/helix-styles/all.css";
 @import "./elements.css";

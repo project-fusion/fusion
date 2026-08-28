@@ -9,7 +9,7 @@
  * a library release.
  *
  * **Both tiers are passed together when both are installed.** A part that
- * `@helix-io/headless` publishes and `@helix-io/styled` does not forward is a
+ * `@fusion.dev/helix-headless` publishes and `@fusion.dev/helix` does not forward is a
  * real fault (148 of them across 19 families, found by hand), and it is only
  * visible when the two manifests are compared. Which manifest an entry came
  * from is therefore tracked rather than merged away.

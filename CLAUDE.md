@@ -97,7 +97,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
   not touch it, and nothing should try to dedupe them. **A cem plugin must never
   import `typescript` itself.** The analyzer re-exports it and hands the module
   to each plugin as `analyzePhase({ node, ts })`, so the AST a plugin sees is
-  5.4's. Taking `ts` off the callback is what keeps `@helix-io/cem` compiling
+  5.4's. Taking `ts` off the callback is what keeps `@fusion.dev/helix-cem` compiling
   under 7, and an import would pull 7's types onto 5.4's nodes. This floor is
   the analyzer's own. The Node one above it is ours, and belongs to the config
   format rather than to the analyzer.
@@ -140,18 +140,18 @@ tooling/   CI and build scripts
   it, because granting an exemption is a decision and `field/` needs the first
   rule while declaring no hooks at all.
 
-  **They cannot move to `@helix-io/styles`**, which is the question they invite.
+  **They cannot move to `@fusion.dev/helix-styles`**, which is the question they invite.
   That package ships document CSS; these are shadow styles, and `:host([terminus="ring"])`
   and `[part="label"]` mean nothing outside a shadow root.
 - **The folder drops the domain prefix; the package name keeps it.**
-  `helix/styled` is `@helix-io/styled`; `cortex/core` is the crate `fusion-cortex-core`.
+  `helix/styled` is `@fusion.dev/helix`; `cortex/core` is the crate `fusion-cortex-core`.
   Scope searches by path (`cortex/core`), not folder name, since bare leaf
   names recur across domains.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
   typed registry. The site that renders it is separate and depends on it.
 - **`docs/` is the repository's own writing, grouped by what a file is**, and it
   is the one folder that is not a product domain. `plan/` is strategy, `insights/`
-  is what gets published, and a package inside it is scoped `@fusion-io/*`
+  is what gets published, and a package inside it is scoped `@fusion.dev/*`
   because the writing belongs to the company rather than to any product.
 
   *Amended 24 Aug 2026, when `site/content` became `docs/insights`.* This said
@@ -175,7 +175,7 @@ Every package within a domain shares one version; domains move independently.
 Full-repo lockstep is wrong here because docs packages carry the version of what
 they document: publishing a Cortex fix would bump the Helix docs to a version in
 which nothing about Helix changed. Per-domain keeps the property that matters,
-that `@helix-io/headless@x` works with `@helix-io/styled@x`.
+that `@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`.
 
 **Rust crates carry their own version and never inherit one.**
 `[workspace.package]` holds the edition, the license and the toolchain floor,
@@ -197,7 +197,7 @@ version computation reads both so a failed release burns a number rather than
 poisoning the next one.
 
 Eight packages publish and the Rust crates do not yet (`publish = false`), so a
-Cortex release currently ships `@cortex-io/docs` alone.
+Cortex release currently ships `@fusion.dev/cortex-docs` alone.
 
 **The crates are meant to publish, and crates.io cannot hold them privately.**
 There is no private mode: a private Cargo release needs an alternate registry,
@@ -214,18 +214,18 @@ both directions, so the day the flag changes is the day the workflow has to.
 - **Products get evocative names**: Helix, Cortex. A module earns one only when
   it carries a differentiated idea: inside Cortex that is exactly three, Engram
   (memory), Trace (provenance), Recall (context). The rest stay descriptive.
-- **npm scopes name the domain, not the audience**: `@helix-io/*` and
-  `@cortex-io/*` for anything belonging to that product, `@fusion-io/*` for what
-  spans the company. Package names drop the product prefix: `@helix-io/styled`, not
-  `@helix-io/helix-styled`.
+- **npm scopes name the domain, not the audience**: `@fusion.dev/helix-*` and
+  `@fusion.dev/cortex-*` for anything belonging to that product, `@fusion.dev/*` for what
+  spans the company. Package names drop the product prefix: `@fusion.dev/helix`, not
+  `@fusion.dev/helix-helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong
-  to Helix and still never leave: `@helix-io/cem` is the analyzer configuration
-  and `@helix-io/sandbox` the editor and spec runner, both Helix byproducts and
-  both build tooling for this repository. Naming them `@fusion-io/*` to say
+  to Helix and still never leave: `@fusion.dev/helix-cem` is the analyzer configuration
+  and `@fusion.dev/helix-sandbox` the editor and spec runner, both Helix byproducts and
+  both build tooling for this repository. Naming them `@fusion.dev/*` to say
   "does not publish" would file Helix-specific tooling beside the repository
   root and the site, and claim they are general Fusion tooling, which is the one
   thing they are not. `bun run check:publishable` enforces the rest:
-  `@fusion-io/*` is always private, a published package may never depend on an
+  `@fusion.dev/*` is always private, a published package may never depend on an
   unpublished one, and every published package agrees on visibility.
 - **CLI binaries drop `-cli`**: the crate `cortex-cli` ships `cortex`.
 

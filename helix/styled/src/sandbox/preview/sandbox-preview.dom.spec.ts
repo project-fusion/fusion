@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@helix-io/testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -24,7 +24,7 @@ const preview = async (attributes = 'src="/frame.html"'): Promise<Preview> =>
  * that attacks the page, which nothing here runs on purpose.
  *
  * These are the assertions that make the name honest. `Sandbox.Preview` shipping
- * from `@helix-io/styled` was argued on exactly this: the component is the boundary
+ * from `@fusion.dev/helix` was argued on exactly this: the component is the boundary
  * rather than a layout that happens to sit near one.
  */
 describe('the preview pane', () => {

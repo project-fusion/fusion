@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessBreadcrumb } from '@helix-io/headless/breadcrumbs'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessBreadcrumb } from '@fusion.dev/helix-headless/breadcrumbs'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './breadcrumb.css.js'
 
@@ -26,6 +26,7 @@ import { styles } from './breadcrumb.css.js'
  *
  * @csspart separator - The separator preceding the item.
  *
+ * @cssproperty --breadcrumbs-control-padding-inline - Inline padding of a control slotted into a crumb, matching the steps either side of it.
  * @cssproperty --breadcrumbs-control-size - How tall a control slotted into a crumb is.
  * @cssproperty --breadcrumbs-hover-color - Fill behind a step under the pointer.
  * @cssproperty --breadcrumbs-separator-color - Color of the chevron.

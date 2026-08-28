@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@helix-io/testing/dom'
+import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One turn, and the four things that can have happened to it. */
 

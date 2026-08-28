@@ -6,7 +6,7 @@
  * registry; it does not own it.
  *
  * **There is no version axis in here.** The package version is the version:
- * `@cortex-io/docs@0.2.0` documents Cortex 0.2.0, because every package in a
+ * `@fusion.dev/cortex-docs@0.2.0` documents Cortex 0.2.0, because every package in a
  * domain moves in lockstep. A `versions` array beside that would be a second
  * source of truth with nothing keeping the two in step, and the first time they
  * disagreed the registry would win over the package that shipped it.

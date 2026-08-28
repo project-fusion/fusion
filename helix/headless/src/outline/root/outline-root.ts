@@ -3,7 +3,7 @@ import {
   HelixBeforeActivateEvent,
   HelixElement,
   IndicatorController,
-} from '@helix-io/core'
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCarousel } from '@helix-io/headless/carousel'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCarousel } from '@fusion.dev/helix-headless/carousel'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './carousel-root.css.js'

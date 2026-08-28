@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@helix-io/testing/ssr'
+import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -40,7 +40,7 @@ describe('input server output', () => {
 
   test('required and read-only are served on the control', () => {
     const markup = partTag(
-      ssr(html`<helix-headless-input name="q" required read-only></helix-headless-input>`),
+      ssr(html`<helix-headless-input name="q" required readonly></helix-headless-input>`),
       'control',
     )
     expect(markup).toContain('required')

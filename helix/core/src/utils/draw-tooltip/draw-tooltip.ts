@@ -19,7 +19,7 @@ import type { Row } from '../read-series/read-series.js'
  *
  * **The tooltip's tag is an argument, because this file is on the wrong tier to
  * know it.** It wrote `<helix-tooltip>` literally, which `helix/styled` registers
- * and `@helix-io/headless` does not, so a consumer of the headless tier alone
+ * and `@fusion.dev/helix-headless` does not, so a consumer of the headless tier alone
  * got an inert unknown element where the reading should be: the chart correct,
  * the markup correct, and resting a pointer on a bar doing nothing. Nothing
  * here could catch it. `check:composed` holds a *component* to interpolating

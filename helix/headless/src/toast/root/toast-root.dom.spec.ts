@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@helix-io/testing/dom'
+import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -26,7 +26,7 @@ type Item = HTMLElement & {
  * almost always, and stops guessing at a number that has already been wrong.
  *
  * **Under the harness timeout, which 2000 was not.** `TIMEOUT` in
- * `@helix-io/testing/browser` is 2000ms, so a poll of exactly that killed the
+ * `@fusion.dev/helix-testing/browser` is 2000ms, so a poll of exactly that killed the
  * test before it could assert and printed `timed out after 2000ms` where the
  * diagnostic should have been. A budget has to leave room to report.
  */

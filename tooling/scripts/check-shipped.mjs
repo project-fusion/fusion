@@ -3,7 +3,7 @@
  * Nothing in `dist` outlives the source it was compiled from.
  *
  * **Found by sweeping for a pattern rather than by anything failing**, 25 Aug
- * 2026. `@helix-io/core` measured 103 shipped files after a cached build and
+ * 2026. `@fusion.dev/helix-core` measured 103 shipped files after a cached build and
  * 101 after a forced one, and the four that appeared were
  * `dist/utils/severities/severities.{js,d.ts}` and their maps. The source was
  * deleted in 2aa6f3d4, nothing imports it, and `files` publishes `dist`, so a
@@ -28,7 +28,7 @@ const ROOT = resolve(import.meta.dirname, '../..')
 
 /**
  * Packages whose `dist` is one file per source file, so the mapping back is
- * exact. `@helix-io/styles` is built by a script that emits a bundle rather than
+ * exact. `@fusion.dev/helix-styles` is built by a script that emits a bundle rather than
  * a tree, and `site/ui` is a Next application, so neither can be checked this
  * way and neither publishes a `dist` of compiled modules.
  */

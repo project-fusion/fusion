@@ -13,8 +13,8 @@
  * inherited from `build-headless-examples.mjs`, which this replaces: the
  * findings outlive the mechanism that found them.
  *
- * **What that generator got backwards was the direction.** `@helix-io/styled`
- * depends on `@helix-io/headless`, so headless is the base and styled builds on
+ * **What that generator got backwards was the direction.** `@fusion.dev/helix`
+ * depends on `@fusion.dev/helix-headless`, so headless is the base and styled builds on
  * it. The generator derived each headless example from the styled one beside it,
  * which made the base tier's examples a function of the tier above it and left
  * `helix/headless` with no examples of its own at all. The defense was that

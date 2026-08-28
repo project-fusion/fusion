@@ -144,7 +144,7 @@ for (const file of walk(root, '.css')) {
   const css = readFileSync(file, 'utf8')
   const out = `${file}.ts`
   const source = `// Generated from ${rel} by \`bun run styles\`. Do not edit.
-import { createSheet } from '@helix-io/core'
+import { createSheet } from '@fusion.dev/helix-core'
 
 export const styles = createSheet(\`${escapeForTemplate(stripComments(css))}\`)
 `

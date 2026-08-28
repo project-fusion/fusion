@@ -3,7 +3,7 @@
  * Holds the theme engine's seed names and the stylesheet's, in both directions.
  *
  * **Two derivations compute this palette and nothing has ever compared them.**
- * `@helix-io/theme` solves tokens in JavaScript and emits a block of custom
+ * `@fusion.dev/helix-theme` solves tokens in JavaScript and emits a block of custom
  * properties; `helix/styles` derives its own ramp in CSS from a handful of
  * seeds. They meet at exactly one place, the seed names, and until #141 they
  * disagreed there in silence: `toCss` wrote `--helix-seed-density` and

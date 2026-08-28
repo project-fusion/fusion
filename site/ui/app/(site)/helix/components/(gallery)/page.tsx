@@ -1,4 +1,4 @@
-import { ComponentArt } from '@helix-io/gallery'
+import { ComponentArt } from '@fusion.dev/helix-gallery'
 import Link from 'next/link'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'

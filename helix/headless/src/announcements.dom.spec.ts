@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, settle } from '@helix-io/testing/dom'
+import { mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 /**
  * One change, one pair of native announcements, however many elements are inside.

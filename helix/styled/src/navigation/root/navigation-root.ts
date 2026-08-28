@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessNavigation } from '@helix-io/headless/navigation'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessNavigation } from '@fusion.dev/helix-headless/navigation'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './navigation-root.css.js'
 

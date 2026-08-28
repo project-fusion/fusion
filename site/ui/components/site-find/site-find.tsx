@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixCommand } from '@helix-io/styled'
+import type { HelixCommand } from '@fusion.dev/helix'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import styles from '../chrome.module.css'
@@ -39,7 +39,7 @@ const DESTINATIONS: Findable[] = [
          and the catalog already offers its reference page; this is the tool
          that page describes, which nothing else in the palette could reach. */
       { description: 'The component workbench', href: '/helix/sandbox', label: 'Sandbox' },
-      /* The other tool, and the same reasoning: `@helix-io/theme` is a package
+      /* The other tool, and the same reasoning: `@fusion.dev/helix-theme` is a package
          rather than a component family, so the catalog cannot offer it and
          nothing else in the palette could reach the thing that drives it. */
       { description: 'A palette and its audit', href: '/helix/theme', label: 'Theme builder' },
@@ -50,7 +50,7 @@ const DESTINATIONS: Findable[] = [
          `motion.mdx` mentions the aura shader in a sentence about what stops
          under reduced motion, without linking it.
 
-         The link is here rather than in that sentence because `@helix-io/docs`
+         The link is here rather than in that sentence because `@fusion.dev/helix-docs`
          is a content package and `/helix/aura` is this site's route. The
          package links its own pages relatively and describes the sandbox and
          the theme builder without linking either, which is the same boundary

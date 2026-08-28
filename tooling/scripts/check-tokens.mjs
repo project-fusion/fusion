@@ -13,7 +13,7 @@
  *      durations, font sizes, weights, and z-index must come from
  *      `var(--helix-*)`.
  *   2. No reaching past the semantic layer. `--_helix-*` primitives are
- *      internal to @helix-io/styles; a component referencing one is coupled to
+ *      internal to @fusion.dev/helix-styles; a component referencing one is coupled to
  *      a ramp position rather than a role.
  *   3. No references to tokens that do not exist. A renamed or mistyped token
  *      resolves to nothing and the property silently falls back to the browser
@@ -335,7 +335,7 @@ for (const file of walk(root)) {
           violations.push({
             at,
             line,
-            message: `${name} is not defined by @helix-io/styles. Renamed or mistyped.`,
+            message: `${name} is not defined by @fusion.dev/helix-styles. Renamed or mistyped.`,
             rule: 'unknown-token',
           })
         }

@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessAppHeader } from '@helix-io/headless/app-header'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessAppHeader } from '@fusion.dev/helix-headless/app-header'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './app-header-root.css.js'

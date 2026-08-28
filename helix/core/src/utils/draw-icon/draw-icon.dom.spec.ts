@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import type { HelixIcon } from '@helix-io/icons'
-import { registerDom } from '@helix-io/testing/dom'
+import type { HelixIcon } from '@fusion.dev/helix-icons'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The mark a component draws for itself, as opposed to the one a consumer names.

@@ -1,4 +1,4 @@
-import { customElement, formatNumbers, HelixElement } from '@helix-io/core'
+import { customElement, formatNumbers, HelixElement } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

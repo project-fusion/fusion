@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, settle, type Updatable } from '@helix-io/testing/dom'
+import {
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /**
  * The box the headless tier does not draw, and the list cannot work without.

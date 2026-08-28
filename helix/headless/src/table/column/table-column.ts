@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -99,7 +99,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * chosen to stop one long value pushing the table past its container, and
    * that was the right worry with nowhere for the overflow to go.
    *
-   * Somewhere now exists: `@helix-io/styled` scrolls the table's own box. So a
+   * Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
    * long value pushes past the container as the old comment feared, and the
    * table scrolls instead of the value being destroyed. Measured at 375: tracks
    * of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page

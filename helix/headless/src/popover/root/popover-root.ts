@@ -7,7 +7,8 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
-} from '@helix-io/core'
+  tellDisclosure,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -179,6 +180,12 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** Tells a slotted trigger the disclosure state, by property. See `tellDisclosure`. */
+  private tellTrigger(): void {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open)
+  }
+
   /**
    * Puts the panel where `open` says it should be, however it got there.
    *
@@ -196,6 +203,11 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* Every update, not only the ones that move `open`: a trigger slotted after
+       the first render has to be told too, and a slot change is not a property
+       change. Idempotent, so saying it twice costs an assignment Lit compares
+       and discards. */
+    this.tellTrigger()
     if (!changed.has('open')) {
       return
     }

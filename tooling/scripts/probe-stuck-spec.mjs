@@ -108,7 +108,7 @@ const built = await Bun.build({
     {
       name: 'browser-spec-harness',
       setup(build) {
-        build.onResolve({ filter: /^(bun:test|@helix-io\/testing\/dom)$/ }, () => ({
+        build.onResolve({ filter: /^(bun:test|@fusion\.dev\/helix-testing\/dom)$/ }, () => ({
           path: harness,
         }))
         build.onLoad({ filter: /testing\/src\/browser\.ts$/ }, async (item) => {

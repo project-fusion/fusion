@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessTabPanel } from '@helix-io/headless/tabs'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessTabPanel } from '@fusion.dev/helix-headless/tabs'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './tab-panel.css.js'
 

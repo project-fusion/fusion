@@ -2,7 +2,7 @@
  * Holds every `<helix-icon name="…">` to a glyph the set actually has.
  *
  * The name is a string, and a string in a template is checked by nothing. The
- * import beside it is: `import { plus } from '@helix-io/icons'` fails to
+ * import beside it is: `import { plus } from '@fusion.dev/helix-icons'` fails to
  * compile the moment `plus` is not there, which is why nobody thought to look
  * at the other spelling of the same mistake. A wrong name renders a
  * `<helix-icon>` that draws nothing at all: no error, no warning, and a control

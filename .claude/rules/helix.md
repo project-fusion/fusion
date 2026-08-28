@@ -260,7 +260,7 @@ render is broken in any non-browser context.
 
 Shadow styles now arrive with the definition rather than in the markup, so the
 flash window is "before the element upgrades", covered by
-`@helix-io/styled/elements.css`. Within that, the risk is still **state, not
+`@fusion.dev/helix/elements.css`. Within that, the risk is still **state, not
 styling**.
 
 1. **Never initialize state in `connectedCallback`.** SSR does not call it.
@@ -515,7 +515,7 @@ binds would depend on whether they passed a property, and an HTML consumer would
 have no ergonomic spelling for the controlled half at all, a prefixed event
 having no inline handler attribute. See 294.
 
-**Shared test scaffolding lives in `@helix-io/testing`**, one module per
+**Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
 Lit's server shim. `registerDom()` is idempotent because bun runs every DOM spec
 in one process and `GlobalRegistrator.register()` throws on the second call. It
@@ -719,7 +719,7 @@ difference.** The package exported `./src/*.css` until 24 Aug 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
 `primitives.css` 82, `base.css` 75, and the set was 60,944 bytes gzipped against
 8,219 of declarations. `bun run styles:dist` strips comments into `dist` and
-`exports` points there, so a consumer writing `@helix-io/styles/tokens.css` is
+`exports` points there, so a consumer writing `@fusion.dev/helix-styles/tokens.css` is
 unaffected and gets a quarter of the bytes.
 
 **Comments only.** Squeezing whitespace on top saves a further 4,395 raw and 354
@@ -826,17 +826,29 @@ narrowed 18 Aug 2026: the base layer styles `h1`–`h6` and `:where(a)` only und
 `[data-prose]` now, for the reason in the section above.* Prose the design system
 never renders (markdown, a CMS) still has to look right, and says so on its
 container. But an app written
-against Helix reaches for `Heading`, `Text`, `Link`, `Flex`, and `Grid` rather
-than raw tags, so dropping a component in works without the app knowing which
-token to apply.
+against Helix reaches for `Text`, `Flex` and `Grid` rather than raw tags, so
+dropping a component in works without the app knowing which token to apply.
+
+*Corrected 28 Aug 2026, and it named two components that do not exist.* It read
+`Heading`, `Text`, `Link`, `Flex`, and `Grid`. There is no `Heading`: `Text`
+absorbed it, and `as="h2"` picks the element while `variant` picks the ramp,
+which is the separation the paragraph below describes under the other name.
+There is no `Link` either, a link being the `[data-link]` recipe in the base
+layer, which exists precisely because the *outer* tree styles a slotted anchor
+and a component cannot. Both were found by reading this file against the tag
+list, which is the fourth time a rule here has outlived its decision.
 
 The earlier rule said a component is only built when it has behavior. That was
 right about what *earns* an element and wrong about what an app should *write*:
 `Flex` has no behavior and still removes every hand-rolled layout div.
 
-`Heading` keeps `level` and `size` separate, which is the risk that killed the
-first `Text`. They default to matching, so a heading is correct by doing
-nothing, and `size` is only ever a deliberate exception.
+`Text` keeps `as` and `variant` separate, which is the risk that killed the
+first version of it. They default to matching, so a heading is correct by
+writing `as="h2"` and nothing else, and `variant` is only ever a deliberate
+exception: a section's second heading that has to look smaller without lying
+about the outline, or a `<p>` that has to read as a caption. The pairing is
+resolved in CSS rather than by computing an attribute, so the element writes
+nothing onto its own host that a server's markup did not have.
 
 Layout components are presentation with no structure or a11y of their own, so
 they ship in `helix/styled` with **no headless tier**. The tier split exists to
@@ -963,7 +975,7 @@ turns out to be, the way `check:axes` names work rather than blocking on it.
 
 ## The manifest
 
-`@helix-io/cem` owns the analyzer config and plugins. Packages call
+`@fusion.dev/helix-cem` owns the analyzer config and plugins. Packages call
 `createHelixCemConfig({ tier })` rather than configuring the analyzer.
 
 - **`dependencies: true` is set**, which is what lets inheritance resolve across
@@ -1330,7 +1342,7 @@ component holds every element import and renders `null`:
 
 ```tsx
 'use client'
-import '@helix-io/styled/card'
+import '@fusion.dev/helix/card'
 export function HelixElements(): null {
   return null
 }
@@ -1341,7 +1353,7 @@ unregistered tag is just an unknown element in the HTML that upgrades when the
 definition lands. Consumers are on the App Router; asking them to mark every
 page `'use client'` to use a button would not be a design system.
 
-**Import `@helix-io/styled/elements.css` beside the base layer.** It is generated
+**Import `@fusion.dev/helix/elements.css` beside the base layer.** It is generated
 from the element sources by `tooling/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
 does not reflow. Without it a card arrives as a run of unstyled text and then
@@ -1393,7 +1405,7 @@ beside them. Consumers write `<helix-card>` directly, which the section below on
 using the elements has said the whole time.
 
 The rule outlived the decision the same way the event-naming one did, and with
-the same cost: `tiers.mdx` carried an `@helix-io/react` row in its package table
+the same cost: `tiers.mdx` carried an `@fusion.dev/helix-react` row in its package table
 while `introduction.mdx` two pages earlier said there is no React package, and
 `DisclosureRoot` was cited here as a naming example for a family that has never
 existed. Found by reading the documentation end to end.
@@ -1415,7 +1427,7 @@ What survived is the naming, which was never about wrappers:
   and it is not.
 
   **`CodeBlock` holds no parser, and that is the interesting half.** Syntax
-  highlighting is `@helix-io/sandbox/highlight`, a Lezer parse and a tree walk
+  highlighting is `@fusion.dev/helix-sandbox/highlight`, a Lezer parse and a tree walk
   with no editor mounted and no DOM required, so it runs during a build and a
   static page ships coloured markup with no JavaScript spent on it. Those
   grammars are already in that package for the editor, so nothing new is
@@ -1515,7 +1527,7 @@ change visible, not a claim that what it pictures is good.
 
 ## The sandbox
 
-`@helix-io/styled` ships the sandbox shell and `@helix-io/sandbox` the editor and
+`@fusion.dev/helix` ships the sandbox shell and `@fusion.dev/helix-sandbox` the editor and
 the spec runner; `site/ui` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
@@ -1528,7 +1540,7 @@ one client component.
 
   **That measurement was taken when the barrel was the only way in.** Subpath
   exports and honestly declared `sideEffects` are what changed it: a consumer
-  importing `@helix-io/styled/card` never sees a sandbox. The cost the old rule was
+  importing `@fusion.dev/helix/card` never sees a sandbox. The cost the old rule was
   protecting against is now opt-in, and what is left is a question about what
   the thing *is* rather than what it weighs.
 
@@ -1545,7 +1557,7 @@ one client component.
   that happens to sit near one. Had the isolation stayed behind, the name would
   have had to go with it.
 
-- **`editor` and `specs` stayed in `@helix-io/sandbox`.** The editor carries
+- **`editor` and `specs` stayed in `@fusion.dev/helix-sandbox`.** The editor carries
   CodeMirror, about 4 MB installed against a design system of roughly the same
   size, and a `dependencies` entry is paid at install time by every consumer
   whether or not they import it. **That is the one cost a subpath export cannot
@@ -1553,9 +1565,9 @@ one client component.
   at the package boundary. The spec runner imports and runs this repository's
   own spec files, so it is internal by definition rather than by weight.
 
-  **And `@helix-io/sandbox` is `private` while Helix is pre-release**, so today
+  **And `@fusion.dev/helix-sandbox` is `private` while Helix is pre-release**, so today
   the cost is not opt-in, it is unavailable: a consumer gets the published shell
-  from `@helix-io/styled` and brings their own source pane. The shell is slot-based
+  from `@fusion.dev/helix` and brings their own source pane. The shell is slot-based
   and the root hands its value to whatever is slotted in, so this degrades
   rather than breaks. The scope still says Helix, because the package is Helix;
   `private` is what says it does not ship, and flipping it is a one-line change
@@ -1593,7 +1605,7 @@ module graph from `helix/styled/dist`, so `bun run dev:watch` rebuilds it and HM
 shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
 classic-script IIFE built by `bun run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
-It was 400 kB before the sandbox shell moved into `@helix-io/styled`, which the
+It was 400 kB before the sandbox shell moved into `@fusion.dev/helix`, which the
 frame imports whole: the shell now rides in every preview, which is what lets an
 example render a `<helix-sandbox>` at all.
 
@@ -1604,7 +1616,7 @@ reach a tab that is already open.
 - **`frame` is a turbo task**, `dependsOn: ["^build"]`, and `dev:watch` watches
   it rather than `build`. Because of that dependency, watching the frame
   rebuilds every library it carries as well, so the command does more and says
-  less: `turbo watch frame --filter=@fusion-io/site-ui`. Turbo does not accept
+  less: `turbo watch frame --filter=@fusion.dev/site-ui`. Turbo does not accept
   `--filter=pkg#task`, which is what makes the obvious version of this fail.
 - **The preview reloads itself.** HMR never re-creates the iframe, so the bundle
   it executed at page load is the one still running, forever. The workbench
@@ -1760,9 +1772,9 @@ caught first.
 repeating "Helix" on every row inside the Helix site is noise. The tag keeps its
 prefix, because that is a real identifier a consumer types.
 
-## Tree-shaking## Tree-shaking
+## Tree-shaking
 
-One family per module, subpath exports (`@helix-io/styled/card`) so consumers need
+One family per module, subpath exports (`@fusion.dev/helix/card`) so consumers need
 not import the barrel, and `sideEffects` declared honestly: `styled` has them
 because `@customElement` registers on import, `headless` does not. Getting it
 wrong is silent both ways.

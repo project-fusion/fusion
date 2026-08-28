@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessAnnouncement } from '@helix-io/headless/announcement'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessAnnouncement } from '@fusion.dev/helix-headless/announcement'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './announcement-root.css.js'
 

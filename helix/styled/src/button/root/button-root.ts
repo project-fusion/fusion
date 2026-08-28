@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessButton } from '@helix-io/headless/button'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessButton } from '@fusion.dev/helix-headless/button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
@@ -31,7 +31,9 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-background-color - Fill behind the button, in every state.
  * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover.
  * @cssproperty --button-foreground-color - Label and icon color.
+ * @cssproperty --button-gap - Space between the label and whatever flanks it.
  * @cssproperty --button-inline-size - Width taken by `width="standard"`.
+ * @cssproperty --button-padding-inline - Inline padding, for a container whose rhythm is not the control default.
  * @cssproperty --button-radii - Corner radius of the control.
  * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
  * @cssproperty --button-radii-end-end - The bottom trailing corner, for a group stacking down.

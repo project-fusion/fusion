@@ -1,4 +1,4 @@
-import { customElement, HelixElement, type Series, SourceController } from '@helix-io/core'
+import { customElement, HelixElement, type Series, SourceController } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 

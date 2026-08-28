@@ -53,7 +53,7 @@ const SPECS = '/helix/sandbox/specs'
  * What the effect still buys is load order, which is the half worth keeping:
  * the definitions leave the critical path and arrive after the page does,
  * measured at 169ms against a load event at 136. The window where a tag is
- * unknown is what `@helix-io/styled/elements.css` covers, hiding `:not(:defined)`
+ * unknown is what `@fusion.dev/helix/elements.css` covers, hiding `:not(:defined)`
  * by visibility so the page does not reflow when the definitions land.
  *
  * **A timing fix could never have been the guarantee**, which is why the state
@@ -70,11 +70,13 @@ export function HelixElements(): null {
       return
     }
     let live = true
-    void Promise.all([import('@helix-io/styled'), import('@helix-io/sandbox/specs')]).then(() => {
-      if (live) {
-        setRegistered(true)
-      }
-    })
+    void Promise.all([import('@fusion.dev/helix'), import('@fusion.dev/helix-sandbox/specs')]).then(
+      () => {
+        if (live) {
+          setRegistered(true)
+        }
+      },
+    )
     return () => {
       live = false
     }

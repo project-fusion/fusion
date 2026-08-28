@@ -6,7 +6,7 @@
  * `instanceof`, never by tag name. Matching `helix-accordion-item` would tie
  * this tier to the styled one." Nine headless families resolve their
  * relationships that way; two did it by tag, and both named `helix-*` tags that
- * only `@helix-io/styled` registers, which is a headless package depending on a
+ * only `@fusion.dev/helix` registers, which is a headless package depending on a
  * styled one by string.
  *
  * The consequence is silent rather than loud. Subclassing a headless element under

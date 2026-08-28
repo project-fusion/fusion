@@ -7,8 +7,8 @@ import {
   hostAria,
   MixinControllerValue,
   requestChange,
-} from '@helix-io/core'
-import { caretLeft, caretRight } from '@helix-io/icons'
+} from '@fusion.dev/helix-core'
+import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -560,7 +560,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
    */
-  @property({ attribute: 'read-only', reflect: true, type: Boolean })
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /** Refuses every change while read-only. See `readOnly`. */
@@ -588,15 +588,33 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * browser points its bubble at.
    */
   private reportRequired(): void {
+    const anchor = this.renderRoot?.querySelector<HTMLElement>('[part="grid"]') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity(
-        { valueMissing: true },
-        'Choose a date.',
-        this.renderRoot?.querySelector<HTMLElement>('[part="grid"]') ?? undefined,
-      )
-    } else {
-      this.internals.setValidity({})
+      this.internals.setValidity({ valueMissing: true }, 'Choose a date.', anchor)
+      return
     }
+    /* **A value the calendar cannot read is bad input, and it used to be
+       valid.** The grid draws only what it can parse, so `value="not-a-date"`
+       selected nothing, said nothing, reported `:valid`, and handed the string
+       to the form: measured, a form carrying `dp=not-a-date` that submitted
+       without complaint. `DateInput` had this right all along, because it
+       relays the validity of an inner control it can ask.
+
+       `asDate` rather than the shape alone, which is the half `DateInput`'s own
+       regex still misses: `2026-02-30` matches `YYYY-MM-DD` and is not a day,
+       and `valueAsDate` reads the parts back after constructing to say so. */
+    const held = this.selected
+    if (held.length > 0 && held.some((one) => asDate(one) === null)) {
+      this.internals.setValidity(
+        { badInput: true },
+        this.mode === undefined
+          ? 'Enter a date as YYYY-MM-DD.'
+          : 'Enter dates as YYYY-MM-DD, separated by commas.',
+        anchor,
+      )
+      return
+    }
+    this.internals.setValidity({})
   }
 
   protected override willUpdate(changed: PropertyValues): void {

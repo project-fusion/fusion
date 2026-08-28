@@ -1,5 +1,5 @@
-import { customElement } from '@helix-io/core'
-import { HelixHeadlessCode } from '@helix-io/headless/code'
+import { customElement } from '@fusion.dev/helix-core'
+import { HelixHeadlessCode } from '@fusion.dev/helix-headless/code'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './code-root.css.js'
 

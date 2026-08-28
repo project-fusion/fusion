@@ -5,5 +5,5 @@
  * read, so a wrong attribute or a wrong event detail is a compile error rather
  * than a silent no-op.
  */
-import '@helix-io/styled/jsx'
-import '@helix-io/sandbox/jsx'
+import '@fusion.dev/helix/jsx'
+import '@fusion.dev/helix-sandbox/jsx'

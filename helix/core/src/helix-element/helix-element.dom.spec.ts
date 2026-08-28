@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { registerDom } from '@helix-io/testing/dom'
+import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 const tag = 'probe-element'
 
@@ -334,7 +334,7 @@ describe('the settled mark', () => {
   test('resolves its `whenSettled` promise from the same frame', async () => {
     /* A custom state cannot be observed and an attribute could, so the promise
        is the signal anything waiting on the old attribute now takes.
-       `readyToMove` in `@helix-io/testing` is the caller this is for. */
+       `readyToMove` in `@fusion.dev/helix-testing` is the caller this is for. */
     const element = mounted()
     let resolved = false
     void element.whenSettled.then(() => {

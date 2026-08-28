@@ -101,7 +101,7 @@ const source = readFileSync(registrar, 'utf8')
 
 /* A static import outranks every guard below it, so this is checked whichever
    mechanism is in force. */
-if (/^import\s[^\n]*['"]@helix-io\/(?:styled|sandbox\/specs)['"]/m.test(source)) {
+if (/^import\s[^\n]*['"]@fusion\.dev\/(?:helix-sandbox\/specs|helix)['"]/m.test(source)) {
   console.error(
     `specs-isolated: ${relative(root, registrar)} imports the library at module scope.\n\n` +
       '  That runs on every route, including the specs document, and no guard inside a hook\n' +
