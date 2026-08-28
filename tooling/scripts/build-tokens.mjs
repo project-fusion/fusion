@@ -36,7 +36,7 @@ import { join } from 'node:path'
 
 const SOURCE = 'helix/styles/tokens.json'
 const OUTPUT = 'fusion/docs/token-reference.md'
-const ROOTS = ['helix', 'site']
+const ROOTS = ['fusion', 'helix']
 
 /** The fifteen, in the order the stylesheet declares them. */
 const CATEGORIES = [
@@ -100,7 +100,7 @@ const walk = (dir, found = []) => {
  * **A generated file is the sources counted again.** Three kinds were being
  * counted. `bun run styles` writes a `.css.ts` beside every `.css` holding the
  * same rules as a template literal, which doubled every stylesheet;
- * `helix/styled/elements.css` and `site/ui/public/sandbox/frame.css` are the style
+ * `helix/styled/elements.css` and `fusion/site/public/sandbox/frame.css` are the style
  * layers concatenated, and `frame.css` alone holds 238 reads that are copies of
  * reads already counted in the files it was built from.
  *

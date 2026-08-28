@@ -41,7 +41,7 @@ const problems = []
 
 /** Every workspace package with a `src` and a `test` script. */
 const packages = []
-for (const domain of ['helix', 'cortex', 'site', 'tooling', 'docs']) {
+for (const domain of ['helix', 'cortex', 'fusion', 'tooling']) {
   let entries
   try {
     entries = readdirSync(join(ROOT, domain), { withFileTypes: true })

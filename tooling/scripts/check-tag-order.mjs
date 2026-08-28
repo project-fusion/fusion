@@ -72,7 +72,7 @@ const SECTIONS = [
  */
 const SORTED = new Set(['csspart', 'cssproperty', 'event', 'slot'])
 
-const ROOTS = ['cortex', 'helix', 'site']
+const ROOTS = ['cortex', 'fusion', 'helix']
 
 const IGNORED = new Set([
   '.next',

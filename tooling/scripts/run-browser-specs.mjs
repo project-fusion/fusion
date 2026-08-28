@@ -36,7 +36,7 @@ import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
-const specs = join(root, 'site/ui/public/specs')
+const specs = join(root, 'fusion/site/public/specs')
 /* The sandbox's stylesheet, which is the base layer and every token in it.
    Without it a component's own shadow styles still arrive, because those come
    with the definition, but every `var(--helix-...)` in them resolves to nothing:
@@ -46,7 +46,7 @@ const specs = join(root, 'site/ui/public/specs')
    greater than 0" on a box that had simply never been given a size. The sandbox
    loads it, so a spec runner that does not is not running what the sandbox
    runs. */
-const base = join(root, 'site/ui/public/sandbox/frame.css')
+const base = join(root, 'fusion/site/public/sandbox/frame.css')
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
 

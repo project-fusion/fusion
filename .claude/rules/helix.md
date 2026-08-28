@@ -999,7 +999,7 @@ turns out to be, the way `check:css:axes` names work rather than blocking on it.
   every archived page point at today's source, which is the one thing a
   versioned reference must not do. What is durable is where a directory sits in
   the repository; what is not is which commit anyone wants to read.
-  `site/ui/lib/source.ts` is the only file a version selector has to touch.
+  `fusion/site/lib/source.ts` is the only file a version selector has to touch.
 
 - **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
   own copy and two copies produce types `exactOptionalPropertyTypes` will not
@@ -1528,7 +1528,7 @@ change visible, not a claim that what it pictures is good.
 ## The sandbox
 
 `@fusion.dev/helix` ships the sandbox shell and `@fusion.dev/helix-sandbox` the editor and
-the spec runner; `site/ui` is the Next site that renders them. Both dev and
+the spec runner; `fusion/site` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
 
@@ -1616,7 +1616,7 @@ reach a tab that is already open.
 - **`frame` is a turbo task**, `dependsOn: ["^build"]`, and `dev:watch` watches
   it rather than `build`. Because of that dependency, watching the frame
   rebuilds every library it carries as well, so the command does more and says
-  less: `turbo watch frame --filter=@fusion.dev/site-ui`. Turbo does not accept
+  less: `turbo watch frame --filter=@fusion.dev/site`. Turbo does not accept
   `--filter=pkg#task`, which is what makes the obvious version of this fail.
 - **The preview reloads itself.** HMR never re-creates the iframe, so the bundle
   it executed at page load is the one still running, forever. The workbench

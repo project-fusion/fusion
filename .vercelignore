@@ -1,6 +1,6 @@
 # What the site build does not need.
 #
-# The deploy runs from the repo root, because site/ui is a workspace package and
+# The deploy runs from the repo root, because fusion/site is a workspace package and
 # its dependencies are built from source. That would otherwise upload the whole
 # company: strategy, the planning documents had no part in
 # building a component gallery, so they did not leave the machine.
@@ -25,7 +25,7 @@
 # So the pattern names the files rather than the folder. The three markdown
 # documents left at the top of `fusion/docs/` are the queue and two generated
 # references, none of them read by anything on the build path and all three
-# repository-internal, which `site/ui/app/helix/tokens.json/route.ts` says of
+# repository-internal, which `fusion/site/app/helix/tokens.json/route.ts` says of
 # the token reference in as many words.
 /fusion/docs/*.md
 

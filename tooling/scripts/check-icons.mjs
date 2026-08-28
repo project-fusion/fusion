@@ -62,7 +62,7 @@ const walk = (dir, take) => {
 const files = [
   ...walk(join(ROOT, 'helix'), (name) => name.endsWith('.html')),
   ...walk(join(ROOT, 'helix'), (name) => name.endsWith('.ts') && !name.includes('.spec.')),
-  ...walk(join(ROOT, 'site/ui/app'), (name) => name.endsWith('.tsx') || name.endsWith('.html')),
+  ...walk(join(ROOT, 'fusion/site/app'), (name) => name.endsWith('.tsx') || name.endsWith('.html')),
 ]
 
 /* `name` on a `helix-icon`, however the attribute is written: an HTML example
@@ -109,7 +109,7 @@ for (const file of files) {
 const RENDERED = /<helix-(?:headless-)?icon\b/
 for (const file of files) {
   /* The library's own components, and nothing else. `<helix-icon>` is a public
-     element and an app writing one is using it as intended: `site/ui` does, in
+     element and an app writing one is using it as intended: `fusion/site` does, in
      its nav and its wordmark, and it pays for the whole set once rather than
      per component. What this forbids is a *component* making that choice on a
      consumer's behalf, which is the case they cannot opt out of. */

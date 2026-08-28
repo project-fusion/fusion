@@ -35,7 +35,7 @@ export const OUT = join(ROOT, 'helix/theme/wasm')
  * file under `public/` is served on terms this repository controls rather than
  * on whatever a bundler decides about an asset import this year.
  */
-const SERVED = join(ROOT, 'site/ui/public/helix/theme.wasm')
+const SERVED = join(ROOT, 'fusion/site/public/helix/theme.wasm')
 
 const run = (command, args) => {
   execFileSync(command, args, { cwd: ROOT, stdio: 'inherit' })

@@ -21,7 +21,7 @@
  * **`git log` on this file starts at the extraction, and that is not a mistake
  * to fix.** The `.tsx` files beside it were moved, so rename detection follows
  * them and each drawing keeps its history; these 584 lines were *lifted out of*
- * `site/ui/app/site.css`, which still exists, and git has no way to read that
+ * `fusion/site/app/site.css`, which still exists, and git has no way to read that
  * as a rename. Every rule in here older than the move has its reasoning in that
  * file's history: `git log -L` a line range there, or read `site.css` at
  * `115d24cc~1` around lines 828 to 1411. Written down because "why does this

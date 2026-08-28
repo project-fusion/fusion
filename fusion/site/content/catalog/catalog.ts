@@ -8,7 +8,7 @@ import generated from './catalog.generated.json'
  * **Nothing about a component is written down in this app.** The shaping lives
  * in `@fusion.dev/helix-docs`, the sources are the manifests and the `.examples/*.html`
  * files beside each component, and `bun run gen:catalog` joins the two into the
- * file imported above. `site/ui` runs it before `next build` and `next dev`,
+ * file imported above. `fusion/site` runs it before `next build` and `next dev`,
  * the same way it already builds the frame and the specs.
  *
  * This used to reach out of the project with `fs` to find those sources, which

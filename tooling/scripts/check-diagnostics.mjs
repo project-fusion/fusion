@@ -30,7 +30,7 @@ import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
-const specs = join(root, 'site/ui/public/specs')
+const specs = join(root, 'fusion/site/public/specs')
 
 /* One real family, chosen because it publishes parts on both tiers and so
    exercises the unforwarded-part finding as well as the dead-part one. */
@@ -113,7 +113,7 @@ const server = createServer(async (request, response) => {
   try {
     const body = await readFile(
       path === '/frame.css'
-        ? join(root, 'site/ui/public/sandbox/frame.css')
+        ? join(root, 'fusion/site/public/sandbox/frame.css')
         : join(specs, path.replace(/^\/+/, '')),
     )
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })

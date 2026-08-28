@@ -44,8 +44,8 @@ import { dirname, join, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..')
-const app = join(root, 'site/ui/app')
-const registrar = join(root, 'site/ui/components/helix-elements/helix-elements.tsx')
+const app = join(root, 'fusion/site/app')
+const registrar = join(root, 'fusion/site/components/helix-elements/helix-elements.tsx')
 
 const walk = (dir) => {
   const out = []
@@ -67,7 +67,7 @@ const files = new Set(walk(app))
 const frame = [...files].find((file) => file.endsWith(`${sep}spec-frame.tsx`))
 if (!frame) {
   console.error(
-    'specs-isolated: no `spec-frame.tsx` under `site/ui/app`.\n\n' +
+    'specs-isolated: no `spec-frame.tsx` under `fusion/site/app`.\n\n' +
       '  This check finds the specs document by that file. If the frame was renamed, rename it\n' +
       '  here too; if the specs route is gone, so is this check.\n',
   )

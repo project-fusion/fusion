@@ -48,7 +48,7 @@ const PACKAGES = {
    in it and nothing to hydrate. Registering at module scope is what its entry
    point is *for*, and the race this check exists to prevent cannot happen
    there. */
-const EXEMPT = ['site/ui/preview/']
+const EXEMPT = ['fusion/site/preview/']
 
 const walk = (dir) => {
   const found = []
@@ -100,7 +100,7 @@ const STATIC_IMPORT = /^import\s+(?!type\b)(?:[^'"]*?\sfrom\s+)?['"]([^'"]+)['"]
 const problems = []
 let read = 0
 
-for (const file of walk(join(ROOT, 'site/ui'))) {
+for (const file of walk(join(ROOT, 'fusion/site'))) {
   const rel = relative(ROOT, file)
   if (EXEMPT.some((prefix) => rel.startsWith(prefix))) {
     continue

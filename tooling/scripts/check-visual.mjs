@@ -64,7 +64,7 @@
  *
  * **The three brand faces are served, because `frame.css` asks for them.** It
  * carries `@font-face` rules naming `/fonts/*.woff2`, real files under
- * `site/ui/public/fonts` since the frame stopped inlining them. Left
+ * `fusion/site/public/fonts` since the frame stopped inlining them. Left
  * unanswered, `document.fonts` reports `Fusion Sans: error` and the styled
  * examples are drawn in whatever the platform calls `sans-serif`, so a baseline
  * would picture the library in a face the sandbox never shows it in. Served,
@@ -149,9 +149,9 @@ const WIDTHS = [
    and the document together, so one of them missing means none of them is
    trustworthy. The bundle alone was checked until the styled tier was added,
    which was sufficient exactly while nothing needed a token. */
-const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
-const SHEET = join(root, 'site/ui/public/sandbox/frame.css')
-const FONTS = join(root, 'site/ui/public/fonts')
+const FRAME = join(root, 'fusion/site/public/sandbox/frame.js')
+const SHEET = join(root, 'fusion/site/public/sandbox/frame.css')
+const FONTS = join(root, 'fusion/site/public/fonts')
 
 /* The family is the first argument that is not a flag, rather than the first
    argument. `visual:update` puts `--update` in that slot itself, so reading

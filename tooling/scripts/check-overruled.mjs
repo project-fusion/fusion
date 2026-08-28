@@ -56,7 +56,7 @@ import { join } from 'node:path'
  * component they are using has no reason to know that it beats the component's
  * own, whatever the specificity and whatever the layer.
  *
- * Three landed in `site/ui` in a single session and each looked like something
+ * Three landed in `fusion/site` in a single session and each looked like something
  * else. `.showcaseCard { display: block }` beat `:host { display: grid }`, so
  * every card in the panel was a block and the region gap did nothing.
  * `.showcaseTrendLine { inline-size: 100% }` would have held a full-bleed chart
@@ -64,7 +64,7 @@ import { join } from 'node:path'
  * `:host([interactive])`, so an aura asked for the pointer and reported that it
  * refused it. None of the three errored, and the check that exists for exactly
  * this was not looking. */
-const STYLES = ['helix/styles/src', 'site/ui/app']
+const STYLES = ['helix/styles/src', 'fusion/site/app']
 /** Every `.css` under a directory, skipping the generated `.css.ts` beside it. */
 const stylesheets = (dir) => {
   const found = []

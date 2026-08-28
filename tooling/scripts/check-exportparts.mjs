@@ -154,10 +154,16 @@ for (const site of sites) {
  *
  * Sheets, examples, documentation and the site alike: a selector naming a part
  * nothing publishes is dead in all four, and the consequence is the same.
- * Generated output under `site/ui/public` is skipped, being a copy of a source
+ * Generated output under `fusion/site/public` is skipped, being a copy of a source
  * this already reads.
  */
-const OUTSIDE = ['helix/styled/src', 'helix/headless/src', 'helix/docs/content', 'site/ui', 'docs']
+const OUTSIDE = [
+  'helix/styled/src',
+  'helix/headless/src',
+  'helix/docs/content',
+  'fusion/site',
+  'fusion/docs',
+]
 const SKIP = new Set(['.next', '.turbo', 'node_modules', 'public'])
 
 const everyFile = (dir, found = []) => {

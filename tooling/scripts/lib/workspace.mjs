@@ -81,7 +81,7 @@ export function manifests() {
 /**
  * The domain a package name belongs to, or undefined for one that belongs to no
  * product. `@fusion.dev/helix` and `@fusion.dev/helix-core` both answer helix;
- * `@fusion.dev/site-ui` answers nothing, and `check:pkg:publishable` is what then
+ * `@fusion.dev/site` answers nothing, and `check:pkg:publishable` is what then
  * requires it to be private.
  */
 export const domainOf = (name) => {

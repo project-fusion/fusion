@@ -39,7 +39,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = ['site', 'helix']
+const ROOTS = ['fusion', 'helix']
 const IGNORED = new Set(['dist', 'node_modules', '.next', '.next-dev', '.turbo', 'public'])
 
 const sheets = (dir, found = []) => {

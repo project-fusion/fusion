@@ -239,7 +239,7 @@ tooling/   CI and build scripts, and shrinking
   **What settled it was this file's own next bullet.** A `<domain>/docs` is a
   content package and *the site that renders it is separate*, which is exactly
   what `site/content` was not: filing the published writing under `site/` made it
-  a part of the renderer, so replacing `site/ui` would have taken the company's
+  a part of the renderer, so replacing `fusion/site` would have taken the company's
   written arguments with it. The insights are rendered by the site and are not of
   it, and that is the same relationship `helix/docs` already has to the docs
   site.

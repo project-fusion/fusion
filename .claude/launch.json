@@ -3,7 +3,7 @@
     {
       "name": "fusion",
       "port": 3000,
-      "runtimeArgs": ["run", "--cwd", "site/ui", "dev"],
+      "runtimeArgs": ["run", "--cwd", "fusion/site", "dev"],
       "runtimeExecutable": "bun"
     }
   ],

@@ -53,7 +53,7 @@ import { join } from 'node:path'
 /* Every package that ships source, plus the scripts, which carry more prose per
    line than anything else here and are the likeliest place for a block to come
    adrift during an edit. */
-const ROOTS = ['cortex', 'helix', 'site', 'tooling']
+const ROOTS = ['cortex', 'fusion', 'helix', 'tooling']
 
 const IGNORED = new Set(['dist', 'node_modules', '.next', '.turbo', 'coverage'])
 

@@ -49,7 +49,7 @@ import { dirname, join } from 'node:path'
    thing here pointing at a file that does not exist, and this check could not see
    it: every path it scanned was inside a package. A root file is where a reader
    starts, which makes it the worst place to be unchecked. */
-const ROOTS = ['helix', 'cortex', 'tooling', 'fusion', 'site/ui']
+const ROOTS = ['helix', 'cortex', 'tooling', 'fusion', 'fusion/site']
 
 /* The repository's own top-level files, checked without descending.
    `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left

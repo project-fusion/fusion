@@ -63,7 +63,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const SOURCES = [join(root, 'helix/headless/src'), join(root, 'helix/styled/src')]
 const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
-const out = join(root, 'site/ui/public/specs')
+const out = join(root, 'fusion/site/public/specs')
 
 /**
  * What every family imports instead of inlining, and the file each one gets.

@@ -55,7 +55,7 @@ const DEDICATED = new Set([
  * What the checks read, built before any of them run, in `verify`'s order.
  *
  * **`build` is here because `catalog` does not reach everything.** `catalog` is
- * a `site/ui` task and turbo builds what that package depends on, which is not
+ * a `fusion/site` task and turbo builds what that package depends on, which is not
  * the whole workspace: `@fusion.dev/helix-headless` is not one of its dependencies, and
  * `check:gen:metrics` measures `helix/headless/dist`. Shards without a full build
  * measured a dist nobody had produced, which passed on a machine where an

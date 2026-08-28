@@ -4,7 +4,7 @@
  *
  * **Three packages had this wrong and CI is the only thing that could have
  * found them.** `helix/theme`'s wasm, `helix/icons/src/generated.ts` and
- * `site/ui`'s catalog are all gitignored, all produced by their package's
+ * `fusion/site`'s catalog are all gitignored, all produced by their package's
  * `build`, and all were read by a `typecheck` that made none of them. Locally
  * they pass forever, because a build ran at some point and left the artifact on
  * disk. On a fresh checkout they fail, which is every runner, every time.

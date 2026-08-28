@@ -43,7 +43,7 @@ import { join } from 'node:path'
    somebody ran this script, which is precisely the failure the check's own
    comment predicts: a fix in generated output is undone by the next build. The
    name is the fix, because the exemption is what the name is for. */
-const OUT = join(import.meta.dirname, '../../site/ui/content/faces/faces.generated.ts')
+const OUT = join(import.meta.dirname, '../../fusion/site/content/faces/faces.generated.ts')
 const SOURCE = 'https://fonts.google.com/metadata/fonts'
 
 /* What the token layer asks for. `--helix-weight-*` resolves to these three, so

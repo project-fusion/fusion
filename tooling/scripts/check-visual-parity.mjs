@@ -59,9 +59,9 @@ const TIERS = [
   { name: 'styled', sheet: true, source: join(root, 'helix/styled/src') },
 ]
 
-const FRAME = join(root, 'site/ui/public/sandbox/frame.js')
-const SHEET = join(root, 'site/ui/public/sandbox/frame.css')
-const FONTS = join(root, 'site/ui/public/fonts')
+const FRAME = join(root, 'fusion/site/public/sandbox/frame.js')
+const SHEET = join(root, 'fusion/site/public/sandbox/frame.css')
+const FONTS = join(root, 'fusion/site/public/fonts')
 const BUILT = join(root, '.local/parity')
 
 /* One width, not the two `check:spec:visual` takes. That check is asking whether the

@@ -403,7 +403,7 @@ const declared = [
 ].map(([, name]) => name)
 
 const readAnywhere = new Set()
-for (const root of ['helix', 'site']) {
+for (const root of ['fusion', 'helix']) {
   for (const path of walk(root)) {
     if (path.endsWith('tokens.css') || path.endsWith('primitives.css')) {
       continue

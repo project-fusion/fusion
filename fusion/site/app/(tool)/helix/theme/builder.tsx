@@ -44,7 +44,7 @@ const PREVIEW_SHARE = 68
  *
  * **A preview is not a deployment, which is what makes this fine here.** The
  * Sovereignty Constraint is about what a Fusion product does to a consumer's
- * page: `site/ui/app/fonts.css` vendors the site's own three faces precisely so
+ * page: `fusion/site/app/fonts.css` vendors the site's own three faces precisely so
  * the wordmark does not sit behind someone else's uptime. Nothing here ships to
  * anybody. A reader is trying faces on, and trying one on means fetching it.
  *

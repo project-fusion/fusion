@@ -765,7 +765,7 @@ const output = join(ROOT, OUTPUT)
  * value is already computed for the MDX above, and measuring them twice is how
  * two documents come to disagree about one run.
  */
-const CLAIMS_OUT = 'site/ui/content/landing/claims.generated.ts'
+const CLAIMS_OUT = 'fusion/site/content/landing/claims.generated.ts'
 
 const claims = [
   {

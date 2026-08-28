@@ -158,7 +158,7 @@ const PAIRS = [
    literally, and it sat outside this list while holding nine British spellings,
    which is the failure this check exists to prevent, in the one directory
    written to be copied from. */
-const ROOTS = ['cortex', 'fusion', 'helix', 'site', 'tooling', '.claude', '.github']
+const ROOTS = ['cortex', 'fusion', 'helix', 'tooling', '.claude', '.github']
 
 /* Root files are named rather than globbed, so one that is not named is not
    swept: `Cargo.toml` carried a British spelling in a comment for as long as it

@@ -32,7 +32,7 @@ import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
-const frame = join(root, 'site/ui/public/sandbox')
+const frame = join(root, 'fusion/site/public/sandbox')
 const source = join(root, 'helix/styled/src')
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }

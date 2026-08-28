@@ -29,7 +29,7 @@ const ROOT = resolve(import.meta.dirname, '../..')
 /**
  * Packages whose `dist` is one file per source file, so the mapping back is
  * exact. `@fusion.dev/helix-styles` is built by a script that emits a bundle rather than
- * a tree, and `site/ui` is a Next application, so neither can be checked this
+ * a tree, and `fusion/site` is a Next application, so neither can be checked this
  * way and neither publishes a `dist` of compiled modules.
  */
 const PACKAGES = [

@@ -147,7 +147,7 @@ if (!built.success) {
 }
 console.log(`probe:stuck: built ${family} from ${specs.length} spec file(s), unminified`)
 
-const base = join(root, 'site/ui/public/sandbox/frame.css')
+const base = join(root, 'fusion/site/public/sandbox/frame.css')
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
 const server = createServer(async (request, response) => {
   const path = (request.url ?? '/').split('?')[0]

@@ -21,7 +21,7 @@
  */
 import { globSync, readFileSync } from 'node:fs'
 
-const modules = globSync('site/ui/app/**/*.module.css')
+const modules = globSync('fusion/site/app/**/*.module.css')
 const owned = new Map()
 for (const file of modules) {
   const text = readFileSync(file, 'utf8')
@@ -35,7 +35,7 @@ for (const file of modules) {
 }
 
 const found = []
-for (const file of globSync('site/ui/**/*.tsx')) {
+for (const file of globSync('fusion/site/**/*.tsx')) {
   if (file.includes('node_modules') || file.includes('.next')) {
     continue
   }

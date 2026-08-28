@@ -208,7 +208,7 @@ if (promote !== undefined) {
  * **Here rather than in `tsconfig`**, because the maps work in this repository
  * and only stop working once packed: `dist/tag/root/tag-root.js.map` resolves to
  * `helix/styled/src/tag/root/tag-root.ts`, which is there, and `declarationMap` is
- * what lands go-to-definition on the source for `site/ui` and every
+ * what lands go-to-definition on the source for `fusion/site` and every
  * cross-package import. Turning the compiler options off would strip the tarball
  * and take that with it.
  *

@@ -66,10 +66,10 @@ jobs:
       # tracked.
       #
       # **It is also what writes the frame, and the styled tier cannot be
-      # pictured without it.** `site/ui`'s own build is
+      # pictured without it.** `fusion/site`'s own build is
       # `catalog && frame && specs && next build`, and `frame` is
       # `tooling/scripts/build-frame.mjs`, which empties
-      # `site/ui/public/sandbox` and writes `frame.js`, `frame.css` and
+      # `fusion/site/public/sandbox` and writes `frame.js`, `frame.css` and
       # `frame.html` together. The whole directory is gitignored, so a checkout
       # has none of it and this step is the only thing that supplies it.
       # `check:spec:visual` hard-fails naming `bun run gen:frame` when either the bundle

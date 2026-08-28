@@ -38,7 +38,7 @@ import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const SITE = join(ROOT, 'site/ui')
+const SITE = join(ROOT, 'fusion/site')
 const MANIFESTS = [
   'helix/core/custom-elements.json',
   'helix/headless/custom-elements.json',

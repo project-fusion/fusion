@@ -18,7 +18,7 @@
  *
  * **Generated rather than committed.** It is 2.4 MB derived entirely from files
  * that are already in the repository, so committing it would be a second copy
- * of the examples that can go stale. `site/ui` runs this before `next build`
+ * of the examples that can go stale. `fusion/site` runs this before `next build`
  * and before `next dev`, the same way it already runs the frame and the specs.
  *
  * **The cost is dev freshness**, which the reader this replaces was careful
@@ -34,8 +34,8 @@ import { catalog } from '../../helix/docs/src/catalog.ts'
 import { reference } from '../../helix/docs/src/reference.ts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = join(ROOT, 'site/ui/content/catalog/catalog.generated.json')
-const PUBLIC = join(ROOT, 'site/ui/public')
+const OUT = join(ROOT, 'fusion/site/content/catalog/catalog.generated.json')
+const PUBLIC = join(ROOT, 'fusion/site/public')
 
 /**
  * The manifests the reference is built from: the two published packages.
@@ -218,10 +218,12 @@ for (const page of docPages) {
  * pointer, which is honest and close to useless. That is the remaining half of
  * this work rather than a design: an `.md` that invented the prose would be the
  * stale parallel site the whole arrangement exists to prevent. */
-const { routes } = await import('../../site/ui/content/routes/routes.ts')
-const { renderCopy, copyFor } = await import('../../site/ui/utils/copy-markdown/copy-markdown.ts')
+const { routes } = await import('../../fusion/site/content/routes/routes.ts')
+const { renderCopy, copyFor } = await import(
+  '../../fusion/site/utils/copy-markdown/copy-markdown.ts'
+)
 const { findSitePage, sitePageSources } = await import('../../fusion/docs/insights/src/index.ts')
-const { SERVICES } = await import('../../site/ui/content/services/services.ts')
+const { SERVICES } = await import('../../fusion/site/content/services/services.ts')
 let prose = 0
 
 for (const route of routes()) {

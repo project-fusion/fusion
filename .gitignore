@@ -42,8 +42,8 @@ sandbox/ui/dist/
 .env*
 
 # Generated vision film. Recapture with `bun tooling/scripts/capture-scale-film.mjs`.
-site/ui/public/media/sovereignty.jpg
-site/ui/public/media/sovereignty.webm
+fusion/site/public/media/sovereignty.jpg
+fusion/site/public/media/sovereignty.webm
 
 # Generated icon set, built from raw/.
 helix/icons/src/generated.ts
@@ -55,12 +55,12 @@ helix/icons/src/generated.ts
 # Event probes, written by the `specs` step of `bun run dev`. Generated like
 # `public/specs` beside it, and ignored for the same reason: `biome ci` lints
 # what it can see, and a generated page failing lint fails the push.
-site/ui/public/probe-events/
+fusion/site/public/probe-events/
 
-site/ui/public/specs
+fusion/site/public/specs
 
 # The sandbox preview document, built from source by `bun run gen:frame`.
-site/ui/public/sandbox
+fusion/site/public/sandbox
 
 # Scratch pages written by hand to look at a composition in a real browser, and
 # served by the dev server because the sandbox preview cannot be: the in-app
@@ -73,7 +73,7 @@ site/ui/public/sandbox
 # read that as the parity harness's build and said so; it is not, and
 # `check:spec:visual-parity` builds to `.local/parity`, as that commit's own message
 # conceded it had not established.
-site/ui/public/check
+fusion/site/public/check
 
 # Worktrees an agent made for isolation. A second checkout of this repo, so
 # tracking it would track everything twice and linting it collides with this
@@ -81,13 +81,13 @@ site/ui/public/check
 .claude/worktrees/
 
 # Measurement scratch: pages written to probe layout and paint, never shipped.
-site/ui/public/.probe/
+fusion/site/public/.probe/
 
 # The visual lab: pages generated from a component's own source so a drawing can
 # be measured with real fonts and real tokens. Served by the dev server, which is
 # why it sits under public, and regenerated on demand, which is why it is never
 # committed.
-site/ui/public/_lab/
+fusion/site/public/_lab/
 
 # The artifact a failed visual comparison leaves behind, marked with the pixels
 # that moved. What belongs in the history is the baseline a reviewer approved,
@@ -96,12 +96,12 @@ site/ui/public/_lab/
 *.parity.png
 
 # Derived from the manifests and the example files by `bun run gen:catalog`.
-site/ui/content/catalog/catalog.generated.json
-site/ui/public/helix/components/
-site/ui/public/helix/docs/
-site/ui/public/helix/*.md
-site/ui/public/*.md
-site/ui/public/insights/
+fusion/site/content/catalog/catalog.generated.json
+fusion/site/public/helix/components/
+fusion/site/public/helix/docs/
+fusion/site/public/helix/*.md
+fusion/site/public/*.md
+fusion/site/public/insights/
 # **The wasm is tracked, and it is the only binary here that is.** Every other
 # generated artifact in this repository is committed and held to its generator by
 # a check: `custom-elements.json`, `tokens.css`, `jsx.d.ts`. This one was ignored

@@ -16,7 +16,7 @@
  * the same arrangement `build-reference.mjs` and `build-tokens.mjs` already
  * use. A content package must not read the filesystem at runtime: a site
  * importing one that did would trace the whole package into its server bundle,
- * which is a warning `site/ui` has today for exactly this reason.
+ * which is a warning `fusion/site` has today for exactly this reason.
  *
  * **Validation lives here rather than in a separate check**, because an invalid
  * registry should be impossible to generate rather than possible to generate

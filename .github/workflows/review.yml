@@ -17,7 +17,7 @@
 # whenever a finding could have been caught by one. The proper output of an AI
 # reviewer here is not a comment, it is the next check.
 #
-# Vercel Agent covers `site/**` and is configured in the Vercel dashboard rather
+# Vercel Agent covers `fusion/site/**` and is configured in the Vercel dashboard rather
 # than here, so the two do not both review the same diff. Nothing in this file
 # turns it on or off.
 #
