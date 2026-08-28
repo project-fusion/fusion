@@ -82,7 +82,9 @@ const changedFrom = changedAt === -1 ? undefined : args[changedAt + 1]
    filter to, matched nothing, and reported a clean scoped run over an empty
    corpus. Excluding the slot after the flag is what keeps the positional
    argument positional. */
-const only = args.find((one, at) => !one.startsWith('--') && at !== changedAt + 1)
+const only = args.find(
+  (one, at) => !one.startsWith('--') && !(changedAt !== -1 && at === changedAt + 1),
+)
 
 /**
  * Paths that can move any picture in the corpus, so a change to one runs all of it.
