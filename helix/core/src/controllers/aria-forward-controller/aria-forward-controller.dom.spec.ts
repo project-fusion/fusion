@@ -95,20 +95,42 @@ describe('an id that resolves to nothing', () => {
     expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
   })
 
-  /* Null rather than an empty array, so the property is cleared rather than
-     left holding the last good value. An `aria-describedby` naming a heading
-     that has been removed is a stale reference, not an unchanged one. */
+  /* Null rather than an empty array, so a reference this controller established
+     is cleared rather than left holding the last good value. An
+     `aria-describedby` naming a heading that has been removed is a stale
+     reference, not an unchanged one.
+
+     Established through the controller rather than by hand, which is the whole
+     of what these two assert now. Assigning the property directly and expecting
+     it to be cleared is a test for clearing what this controller did not write,
+     and that is the fault below. */
   test('and clears the property when none of them resolve', () => {
-    const { control, forward } = scene('aria-describedby="gone"')
-    ;(control as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
+    const { control, forward, host } = scene('aria-describedby="tip"')
+    forward.forward()
+    host.setAttribute('aria-describedby', 'gone')
     forward.forward()
     expect(held(control, 'ariaDescribedByElements')).toBeNull()
   })
 
-  test('as does having no reference at all', () => {
-    const { control, forward } = scene('')
+  test('as does the reference being taken off the host', () => {
+    const { control, forward, host } = scene('aria-describedby="tip"')
+    forward.forward()
+    host.removeAttribute('aria-describedby')
     forward.forward()
     expect(held(control, 'ariaDescribedByElements')).toBeNull()
+  })
+
+  /* **A host that never named anything leaves the control alone**, which is the
+     ordinary case and was the expensive one. `MixinField` writes
+     `aria-describedby` on the control for its own hint, and assigning null to an
+     element-reference property removes the content attribute rather than merely
+     clearing the property, so forwarding nothing described the hint to nobody on
+     every form control this reaches. */
+  test('and a control the host said nothing about keeps what it wrote itself', () => {
+    const { control, forward } = scene('')
+    ;(control as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
+    forward.forward()
+    expect(held(control, 'ariaDescribedByElements')).toEqual([''])
   })
 })
 
