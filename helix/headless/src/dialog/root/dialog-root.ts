@@ -228,9 +228,34 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open && !dialog.open) {
-      dialog.showModal()
+      /* **After the slotted elements have rendered, or the modal focuses
+         itself.** `showModal()` moves focus to the first focusable descendant,
+         and a custom element that has not rendered its shadow yet has none: the
+         browser falls back to the dialog. Markup never showed this, the parser
+         having upgraded everything before this element's first update, and
+         React does: it creates and connects the dialog before the chat inside
+         it has rendered, so a `default-open` dialog opened with focus on the
+         dialog rather than on the field, measured against the markup twin.
+
+         Awaited only for children that are Lit elements and only on the way
+         open; a dialog with no such children resolves on the same microtask and
+         is unchanged. */
+      void this.openWhenSlotted(dialog)
     } else if (!this.open && dialog.open) {
       dialog.close()
+    }
+  }
+
+  /** Opens once anything slotted has had its first render. See `updated`. */
+  private async openWhenSlotted(dialog: HTMLDialogElement): Promise<void> {
+    await Promise.all(
+      [...this.children]
+        .map((one) => (one as Partial<{ updateComplete: Promise<unknown> }>).updateComplete)
+        .filter((one): one is Promise<unknown> => one instanceof Promise),
+    )
+    /* Re-checked, because both facts can have moved while that resolved. */
+    if (this.open && !dialog.open && this.isConnected) {
+      dialog.showModal()
     }
   }
 

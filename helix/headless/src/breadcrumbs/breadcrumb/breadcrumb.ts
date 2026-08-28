@@ -60,12 +60,27 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   /**
    * Where the crumb goes, and nothing where it is the current page.
    *
-   * Empty rather than optional and unreflected: an `href` written onto every
-   * host would be a link to the current page on every crumb nobody asked to be
-   * one, and nothing selects on it.
+   * **Optional and reflected, because a stylesheet does select on it.**
+   * `breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
+   * block padding off a crumb that is not a link, so the attribute is what
+   * decides how tall a crumb is. Unreflected, an `href` set from script reached
+   * the property, rendered the anchor, and left the host looking unlinked: the
+   * crumb drew at 20px where a markup twin drew at 28.
+   *
+   * *This said the opposite until 27 Aug 2026*, and named the reason as
+   * "nothing selects on it", which was not true when it was written. The
+   * paragraph is worth keeping because the rest of it is right and is what makes
+   * this optional rather than defaulted: an `href` written onto every host would
+   * be a link to the current page on every crumb nobody asked to be one. That is
+   * the general rule as well, that a reflected property takes no default, so the
+   * two agree.
+   *
+   * Found by the picture comparison rather than by reading: React assigns a
+   * matching property instead of an attribute, so every crumb in the React twin
+   * of `breadcrumbs/links` lost its padding at once.
    */
-  @property()
-  href = ''
+  @property({ reflect: true })
+  href?: string
 
   /** Where the link opens, for the rare crumb that leaves the site. */
   @property()
@@ -109,7 +124,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
        page to itself is a known screen-reader annoyance and `aria-current` is
        what conveys position. So `current` wins over `href` rather than the two
        contradicting each other in the markup. */
-    const linked = this.href !== '' && !this.current
+    const linked = (this.href ?? '') !== '' && !this.current
 
     return html`<span part="separator" aria-hidden="true"
         >${this.renderSeparator()}</span
@@ -117,7 +132,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
         linked
           ? html`<a
               part="link"
-              href=${this.href}
+              href=${this.href ?? ''}
               target=${this.target || nothing}
               rel=${this.rel || nothing}
               >${label}</a

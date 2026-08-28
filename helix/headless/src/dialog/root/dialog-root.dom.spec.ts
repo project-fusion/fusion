@@ -269,3 +269,61 @@ describe('dialog framing', () => {
     expect(host.hasAttribute('align')).toBe(false)
   })
 })
+
+/**
+ * A dialog that opens on its own waits for what is inside it to have rendered.
+ *
+ * **The fault this exists for is a modal that focuses itself.** `showModal()`
+ * moves focus to the first focusable descendant, and a custom element that has
+ * not rendered its shadow yet has none, so the browser falls back to the dialog.
+ * Markup never showed it, the parser having upgraded everything before this
+ * element's first update. React does: it connects the dialog before a nested
+ * component has rendered, and a `default-open` dialog opened with focus on the
+ * dialog rather than on the field inside it. Measured against the markup twin of
+ * `chat/command`, `document.activeElement` was `dialog[dialog]` where the markup
+ * one had `textarea[field]`.
+ *
+ * **What is asserted here is the deferral, not the focus**, and deliberately.
+ * Focus after `showModal()` is the browser's own behavior and happy-dom does not
+ * implement it, so a focus assertion would pass vacuously in `bun run test` and
+ * only mean something in `specs:browser`. The deferral is the change, it is
+ * observable in both, and `check:visual-parity` holds the focus outcome by
+ * rendering the two twins and comparing them.
+ */
+describe('a dialog opening on its own', () => {
+  test('waits for a slotted element to render before it opens', async () => {
+    const host = await mount(
+      `<helix-headless-dialog default-open label="Filters">
+         <helix-headless-button>Later</helix-headless-button>
+       </helix-headless-dialog>`,
+    )
+    const inner = part(host, 'dialog') as HTMLDialogElement
+
+    /* The host has rendered, which is what `mount` waits for. The dialog has
+       not opened yet, because the button inside it has not finished its own
+       first update. */
+    expect(inner.open).toBe(false)
+
+    await Promise.all(
+      [...host.children].map(
+        (one) => (one as Partial<{ updateComplete: Promise<unknown> }>).updateComplete,
+      ),
+    )
+    await Promise.resolve()
+
+    expect(inner.open).toBe(true)
+    host.remove()
+  })
+
+  /* Nothing to wait for is the common case and must not cost a turn of the
+     event loop that a consumer could see: a dialog with plain children opens on
+     the microtask its own update ends in. */
+  test('and opens without waiting when nothing slotted has an update to finish', async () => {
+    const host = await mount(
+      `<helix-headless-dialog default-open label="Filters"><p>Plain</p></helix-headless-dialog>`,
+    )
+    await Promise.resolve()
+    expect((part(host, 'dialog') as HTMLDialogElement).open).toBe(true)
+    host.remove()
+  })
+})

@@ -32,7 +32,15 @@
  * distrust is the new one. The diff is written beside the example as
  * `<slug>.parity.png` and left there to be looked at.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
 import { createServer } from 'node:http'
 import { join, relative, resolve } from 'node:path'
 import pixelmatch from 'pixelmatch'
@@ -75,6 +83,89 @@ if (absent.length > 0) {
   process.exit(1)
 }
 
+/**
+ * The bundle has to be newer than the components, or a fix looks like a failure.
+ *
+ * **Both sides render from `frame.js`**, so a change to a component reaches
+ * neither of them until `bun run frame` has rebuilt it. That is not a stale
+ * picture, it is a stale *library*, and it reads as the fix not having worked:
+ * `breadcrumbs/links` was repaired, re-run, and still reported 1,236 pixels,
+ * because the bundle predated the repair. Checked rather than remembered.
+ */
+const newest = (dir) => {
+  let latest = 0
+  for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith('.ts') || entry.name.includes('.spec.')) {
+      continue
+    }
+    latest = Math.max(latest, statSync(join(entry.parentPath ?? entry.path, entry.name)).mtimeMs)
+  }
+  return latest
+}
+
+const bundled = statSync(FRAME).mtimeMs
+const sources = Math.max(...TIERS.map((tier) => newest(tier.source)))
+if (sources > bundled) {
+  console.error(
+    'parity: `frame.js` is older than the components it bundles, so both sides would render the\n' +
+      '  library as it was before your change. Run `bun run frame` and try again.',
+  )
+  process.exit(1)
+}
+
+/**
+ * The three that are not compared, each with what was measured rather than a name.
+ *
+ * **An exception here is a recorded fact, not a silenced failure**, which is why
+ * each carries its numbers: a reader can re-run the measurement and take the
+ * entry out. Two are the harness meeting something it cannot hold still even across a
+ * retry, and one is a real difference between the two idioms.
+ */
+const UNCOMPARED = new Map([
+  [
+    'styled/pagination/footer',
+    /* Nondeterministic on *both* sides, so the comparison is a coin flip rather
+       than a reading. The row settles within a load, six frames of 274 on one
+       side and 273 on the other, and settles somewhere else on the next:
+       measured across three loads, the markup twin alone came out 272, 273 and
+       275. The width that moves is `helix-pagination-size`, 223 to 228, and the
+       trigger inside it is sized by the browser from its widest option rather
+       than by any code here.
+
+       Ruled out, so the next reader does not repeat it: it is not scroll and not
+       an unsettled layout, since the row holds one value for six straight frames
+       within a load and picks a different one on the next; it is not a React
+       fault, since the markup side varies just as much; and it is not the brand
+       font failing, which a scratch probe suggested and was an artifact of that
+       probe having no `/fonts/` route where this file has one. */
+    'unstable on both sides across loads: 272, 273 and 275 for the markup twin alone',
+  ],
+  [
+    'styled/video/native',
+    /* The native control strip is the user agent's own shadow DOM, and nothing
+       here reaches it: `animations: 'disabled'` covers author animations and the
+       settle loop covers author layout. It survives the retry too, which is what
+       separates it from `aura/streaks`: that one paints to a canvas and clears
+       on a second pass, while this differs every time by a different amount.
+       Measured at 22, 34 and 122 pixels, all of it inside the controls. */
+    "the user agent's own video controls, which no wait or retry here can settle",
+  ],
+  [
+    'styled/outline/events',
+    /* A real difference between the idioms, and the React side is the honest
+       one. The outline announces its opening reading position during its first
+       update, deliberately, so a consumer syncing a URL hash does not have to
+       poll for it. A deferred module script binds after that has happened and
+       misses it; a React `onhelix-before-activate` prop does not, because
+       `bindReactHandler` binds at dispatch. The markup twin's log reads "Nothing
+       yet" and the React twin's records the announcement, and both are telling
+       the truth about how they were written. Making them agree means crippling
+       the React one or teaching the markup one to listen on `document` before
+       anything upgrades, and the second is a worse example. */
+    'the markup twin binds too late to hear the opening announcement; React does not',
+  ],
+])
+
 /** Every example that is authored in both syntaxes, which is what can be paired. */
 const corpus = []
 for (const tier of TIERS) {
@@ -90,9 +181,10 @@ for (const tier of TIERS) {
       .filter((one) => one.endsWith('.html'))
       .sort()) {
       const slug = file.replace(/\.html$/, '')
-      if (existsSync(join(dir, `${slug}.tsx`))) {
-        corpus.push({ dir, family: entry.name, slug, tier })
+      if (!existsSync(join(dir, `${slug}.tsx`))) {
+        continue
       }
+      corpus.push({ dir, family: entry.name, slug, tier })
     }
   }
 }
@@ -347,12 +439,22 @@ tab.on('pageerror', (one) => said.push(String(one)))
 const picture = async (url) => {
   said.length = 0
   await tab.goto(url, { waitUntil: 'load' })
+  const undefinedTags = await tab.evaluate(async () => {
+    /* **Bounded, because `whenDefined` on a tag nothing registers never
+       settles.** An example naming an element the bundle does not define used to
+       hang the run outright: no output, no failure, no way to tell a slow
+       machine from a stuck one, and a full sweep that sat for forty minutes and
+       had to be killed. The wait is the same wait; what is new is that it gives
+       up and says which tags it was waiting for. Five seconds is far past any
+       real upgrade and far short of noticing it by hand. */
+    const pending = [...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)
+    await Promise.race([
+      Promise.all([...new Set(pending)].map((tag) => customElements.whenDefined(tag))),
+      new Promise((done) => setTimeout(done, 5000)),
+    ])
+    return [...new Set(pending)].filter((tag) => customElements.get(tag) === undefined)
+  })
   await tab.evaluate(async () => {
-    await Promise.all(
-      [...document.querySelectorAll(':not(:defined)')].map((one) =>
-        customElements.whenDefined(one.localName),
-      ),
-    )
     /* Three frames rather than the two `check:visual` waits. React mounts in a
        task of its own and an example that sets state in an effect, which the
        timestamped ones do, needs the render that follows it. */
@@ -360,17 +462,105 @@ const picture = async (url) => {
       requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(done))),
     )
     await document.fonts.ready
+
+    /* **Every Helix element's own settle signal, which is the one the library
+       publishes for exactly this.** `HelixElement` resolves `whenSettled` from
+       the frame after `firstUpdated`, once its first style resolution is done
+       and the transition suppression lifts; `@helix-io/testing` already waits on
+       it for the same reason. Without it the comparison reads a stopwatch:
+       `pagination/footer` reported 419 pixels on one run and 842 on the next
+       from the same two files.
+
+       Bounded, because an element that never settles must not hang the sweep. */
+    await Promise.race([
+      Promise.all(
+        [...document.querySelectorAll('*')]
+          .map((one) => one.whenSettled)
+          .filter((one) => one instanceof Promise),
+      ),
+      new Promise((done) => setTimeout(done, 5000)),
+    ])
+
+    /* **And wait for scrolling to stop, which `animations: 'disabled'` does not
+       do.** Playwright cancels CSS animations and fast-forwards transitions; a
+       programmatic `scrollTo({ behavior: 'smooth' })` is neither, so a component
+       that scrolls itself on the first update is caught wherever it happened to
+       be. Measured on `carousel/controlled`, which scrolls to its opening slide:
+       three runs of the same page reported `scrollLeft` of 135, 184 and 239. The
+       comparison was reading a stopwatch, not a difference between two examples.
+
+       Polled rather than waited on `scrollend`, which does not fire for a scroll
+       that never started, and bounded so a component scrolling forever cannot
+       hang the run. */
+    /* **Geometry as well as scroll, because the page is still moving after
+       both.** A nested control that measures itself settles a frame or two after
+       everything this already waits for, and the flex row it sits in
+       redistributes when it does. Measured on `pagination/footer`, whose width
+       came out 272, 273 and 275 across three runs of the *same* file: both sides
+       were unstable, so the comparison was reading whichever frame it caught
+       rather than a difference between two examples.
+
+       One signal covering scroll offsets and boxes together, held for three
+       frames and bounded, so a component that never stops moving reports a
+       difference instead of hanging. */
+    const shape = () =>
+      [...document.querySelectorAll('*')]
+        .map((one) => {
+          const box = one.getBoundingClientRect()
+          return `${Math.round(box.x)},${Math.round(box.y)},${Math.round(box.width)},${Math.round(box.height)},${one.scrollLeft},${one.scrollTop}`
+        })
+        .join('|')
+    let last = shape()
+    for (let still = 0, spent = 0; still < 3 && spent < 120; spent += 1) {
+      await new Promise((done) => requestAnimationFrame(done))
+      const now = shape()
+      still = now === last ? still + 1 : 0
+      last = now
+    }
   })
-  return tab.screenshot({ animations: 'disabled', fullPage: true })
+  return { shot: await tab.screenshot({ animations: 'disabled', fullPage: true }), undefinedTags }
 }
 
 const findings = []
+/** Listed exceptions that have started matching, which is a fact worth failing on. */
+const stale = []
 let compared = 0
 
 for (const entry of entries) {
   const where = `${entry.tier.name}/${entry.family}/${entry.slug}`
-  const from = await picture(`${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`)
-  const to = await picture(`${origin}/react/${entry.tier.name}/${entry.family}/${entry.slug}/`)
+  /**
+   * Taken twice when they disagree, and reported only if they disagree again.
+   *
+   * **A real difference reproduces and a flake does not**, which is what makes
+   * this honest rather than a way of going green. `chat/command` reported 2,566
+   * pixels on three consecutive runs before it was fixed; `aura/streaks` paints
+   * to a canvas and reported 33 pixels on one run in three, and nothing here can
+   * know when a canvas has finished. The retry costs a second pass only on the
+   * examples that differ, and a difference that survives it is a difference.
+   */
+  let first = await picture(`${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`)
+  let second = await picture(`${origin}/react/${entry.tier.name}/${entry.family}/${entry.slug}/`)
+  if (!first.shot.equals(second.shot)) {
+    first = await picture(`${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`)
+    second = await picture(`${origin}/react/${entry.tier.name}/${entry.family}/${entry.slug}/`)
+  }
+  const from = first.shot
+  const to = second.shot
+
+  /* An element nothing registers is a broken example, not a difference between
+     two of them, and it is worth saying so rather than diffing two pictures of
+     an inert tag. Both sides are named because only one of them usually has it:
+     a renamed component reaches the markup twin and not the TSX one, or the
+     bundle predates both. */
+  const missing = [...new Set([...first.undefinedTags, ...second.undefinedTags])]
+  if (missing.length > 0) {
+    findings.push(
+      `${where}: ${missing.map((tag) => `\`<${tag}>\``).join(', ')} never upgraded, so nothing ` +
+        'registers them. The example names an element the bundle does not define: check the tag ' +
+        'against the component, and that `bun run frame` has run since it was renamed.',
+    )
+    continue
+  }
 
   /* **Asserted rather than assumed, because a blank page is a picture too.**
      Everything that can go wrong on the React side (a module that would not
@@ -406,6 +596,37 @@ for (const entry of entries) {
   const moved = pixelmatch(html.data, react.data, diff.data, html.width, html.height, {
     threshold: 0.1,
   })
+
+  /* **A listed example is still rendered and still compared; only the verdict is
+     inverted.** An exception nobody re-measures is an exception that outlives its
+     reason, which is the drift this repository writes down about itself more than
+     once. Skipping them would save two page loads and cost the only signal that
+     one has been fixed. */
+  const excused = UNCOMPARED.get(where)
+  if (excused !== undefined) {
+    /* **Confirmed before it is called spent, the same way a difference is
+       confirmed before it is called real.** Two of these three are on the list
+       for being unstable, so one matching run is as likely to be luck as a fix:
+       `video/native` matched once and differed on the next run, which had this
+       reporting the entry as stale every other time. A second pass costs one
+       reload on three examples and turns a coin flip into a reading. */
+    if (moved === 0) {
+      const again = await picture(
+        `${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`,
+      )
+      const twin = await picture(
+        `${origin}/react/${entry.tier.name}/${entry.family}/${entry.slug}/`,
+      )
+      if (again.shot.equals(twin.shot)) {
+        stale.push(
+          `${where}: matched twice, so the entry is spent. It was listed for "${excused}". ` +
+            'Take it out of UNCOMPARED.',
+        )
+      }
+    }
+    continue
+  }
+
   if (moved > 0) {
     const file = join(entry.dir, `${entry.slug}.parity.png`)
     writeFileSync(file, PNG.sync.write(diff))
@@ -420,6 +641,15 @@ for (const entry of entries) {
 await browser.close()
 server.close()
 
+if (stale.length > 0) {
+  console.error(
+    `parity: ${stale.length} recorded exception(s) no longer differ.\n\n  ` +
+      `${stale.join('\n  ')}\n\n` +
+      '  This is the good failure: something was fixed. Delete the entry and the check goes green.\n',
+  )
+  process.exit(1)
+}
+
 if (findings.length > 0) {
   console.error(
     `parity: ${findings.length} of ${compared} examples render differently.\n\n  ` +
@@ -429,4 +659,11 @@ if (findings.length > 0) {
   process.exit(1)
 }
 
-console.log(`parity: ${compared} examples render identically from their HTML and their TSX`)
+console.log(
+  `parity: ${compared} examples render identically from their HTML and their TSX` +
+    /* Named every run, because an exception nobody is reminded of is an
+       exception that becomes permanent. */
+    (UNCOMPARED.size > 0
+      ? `, and ${UNCOMPARED.size} are not compared: ${[...UNCOMPARED.keys()].join(', ')}`
+      : ''),
+)

@@ -178,7 +178,7 @@ jobs:
       - run: bun run rs:check
       - run: bun run rs:test
 
-  # Four jobs, because they need a browser and `verify` deliberately does not:
+  # Six jobs, because they need a browser and `verify` deliberately does not:
   # everything in `verify` runs anywhere bun runs. These are the checks behind
   # `hasLayout()`, which happy-dom skips because it has no boxes, and they are
   # the ones worth most: a component can render perfect markup in the wrong
@@ -195,10 +195,16 @@ jobs:
   # restores cost almost nothing. Until `TURBO_TOKEN` has Remote Cache write
   # access, this trades compute for latency knowingly.
   #
-  # The matrix is written out rather than derived, unlike `checks`: these four
+  # The matrix is written out rather than derived, unlike `checks`: these six
   # are not in `verify` and there is no list to read. Adding a browser check
   # means adding it here, which is the drift `run-checks.mjs` exists to avoid
   # and is unavoidable for a set that lives nowhere else.
+  #
+  # **The count in this comment is part of that drift and had already slipped.**
+  # It read "four" against a matrix of five when `parity` was added, `diagnostics`
+  # having arrived without it. A number kept by hand beside a list is the thing
+  # the paragraph above is warning about, so if it is wrong again, trust the
+  # matrix.
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -232,6 +238,21 @@ jobs:
           # clean. See 148.
           - task: visual
             run: bun run check:visual
+          # Every example rendered twice, from its HTML and from its TSX, and
+          # the two compared. Both are authored now, neither derived from the
+          # other, which is the right arrangement and costs exactly one thing:
+          # nothing else notices them drifting. `check:examples-paired` holds
+          # the two files to each other; only a picture can hold the two
+          # renders.
+          #
+          # Here rather than in `verify` for the reason `visual` is, and for one
+          # more: it wants a `frame.js` newer than the components, which
+          # `bun run build` produces above and a contributor's tree may not
+          # have. Unlike `visual` it needs no baseline, so it does not care
+          # which platform it runs on: it compares two renders taken seconds
+          # apart in one browser.
+          - task: parity
+            run: bun run check:visual-parity
           # The collector in `@helix-io/diagnostics`, against real components.
           # Here and not in `verify` because the DOM `verify` runs under drops a
           # `::part()` rule on the floor: happy-dom parses
@@ -295,6 +316,8 @@ jobs:
             helix/headless/src/*/.examples/preview.narrow.diff.png
             helix/styled/src/*/.examples/preview.diff.png
             helix/styled/src/*/.examples/preview.narrow.diff.png
+            helix/headless/src/*/.examples/*.parity.png
+            helix/styled/src/*/.examples/*.parity.png
 
   # **One context to require, because the job names are not stable enough to
   # require directly.** A branch protection rule matches a job name, and this

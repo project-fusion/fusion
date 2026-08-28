@@ -60,8 +60,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * present, which is true. Measured, and it is why this is named the other way
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
+   * reserves the copy button's width with `:host(:not([no-copy]))`, so the
+   * attribute is what decides whether the block pays for a control. Set from
+   * script the button went away, `render` reading the property, and the 40px it
+   * stood in stayed reserved: the exact waste that rule was written to stop,
+   * arrived at from the other side.
+   *
+   * A false boolean reflects as the attribute's absence, so this costs no
+   * `no-copy=""` on hosts that never asked for one, and the rule about a
+   * reflected property taking no default is satisfied by the default being
+   * `false`.
    */
-  @property({ attribute: 'no-copy', type: Boolean })
+  @property({ attribute: 'no-copy', reflect: true, type: Boolean })
   noCopy = false
 
   /**

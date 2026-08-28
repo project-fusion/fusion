@@ -18,6 +18,12 @@
 # minutes is a hook people pass `--no-verify` to, which costs the checks that
 # were worth having.
 #
+# *Widened 27 Aug 2026.* A second class earns a place: a check that is fast and
+# whose failure is otherwise silent. `biome ci` was always that and was never
+# described, and `check:reachable` is the second. The bar is the one this file
+# already sets, seconds rather than minutes, and the reason is the same one the
+# regeneration argument makes: the cheapest place to learn is before the push.
+#
 # Installed by `git config core.hooksPath .githooks`, which the `prepare` script
 # runs on `bun install`. Skip once with `git push --no-verify`.
 set -e
@@ -38,6 +44,26 @@ bunx biome ci . >/dev/null 2>&1 || {
 # did not write it, so the remedy this repository documents did not produce the
 # fix. A check in `verify` whose writer is not in `regen` is a red build with no
 # published way out of it.
+
+# **One check here is not about generated files, and it is worth saying why.**
+# `check:reachable` reads `:host([x])` selectors against whether `x` reflects,
+# which CI can do perfectly well and does. It is here because the fault it
+# catches is silent in every other way: the component works, the attribute is
+# correct, and a rule simply never matches for anybody who sets the property
+# instead of writing the attribute. Four had drifted before it existed, three of
+# them found by rendering pictures rather than by reading code, and the cost of
+# finding out on the far side of a push is an afternoon. It runs in about a
+# second, which is the bar anything joining this list has to clear.
+printf 'pre-push: reachable host rules\n'
+bun run check:reachable >/tmp/pre-push-$$.log 2>&1 || {
+  printf '\n'
+  grep -v '^\$' /tmp/pre-push-$$.log | tail -4 | sed 's/^/  /'
+  printf '\n'
+  rm -f /tmp/pre-push-$$.log
+  exit 1
+}
+rm -f /tmp/pre-push-$$.log
+
 printf 'pre-push: generated files\n'
 for task in reference element-events tokens-reference metrics docs samples routes content themed-page eval queue; do
   bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {

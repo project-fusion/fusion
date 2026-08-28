@@ -50,11 +50,28 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   @property()
   label = 'Playlist'
 
-  /** The entries, in the order the consumer wrote them. */
+  /**
+   * The entries, in the order the consumer wrote them.
+   *
+   * **Found by tag and filtered on the property, never on `[value]`.** The
+   * prefilter used to be an attribute selector, which is redundant beside the
+   * tag match and is the half that broke: React assigns a matching property
+   * rather than an attribute, so a playlist written in JSX carried no `value`
+   * attribute anywhere and `querySelectorAll('[value]')` returned nothing. Every
+   * entry vanished from the list, the active one included, and the component
+   * threw no error because an empty playlist is a legal playlist.
+   *
+   * Reading `one.value` answers the same question and answers it the same way
+   * whether the consumer wrote markup or set a property, which is the only form
+   * that works for both. Found by rendering the React twin of this family's
+   * examples beside the markup ones.
+   */
   private get items(): HelixHeadlessVideoPlaylistItem[] {
-    return [...this.querySelectorAll<HelixHeadlessVideoPlaylistItem>('[value]')].filter((one) =>
-      one.matches('helix-video-playlist-item, helix-headless-video-playlist-item'),
-    )
+    return [
+      ...this.querySelectorAll<HelixHeadlessVideoPlaylistItem>(
+        'helix-video-playlist-item, helix-headless-video-playlist-item',
+      ),
+    ].filter((one) => one.value !== '')
   }
 
   /*
