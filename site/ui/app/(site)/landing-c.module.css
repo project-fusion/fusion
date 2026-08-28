@@ -1119,23 +1119,6 @@
   inline-size: 100%;
 }
 
-/* The tooltip is now the flex child, so it carries the sizing the slider had. */
-.fabTip {
-  flex: 1 1 0;
-  min-inline-size: 0;
-}
-
-.fabTip .fabChannel {
-  inline-size: 100%;
-}
-
-/**
- * A band that stops the field.
- *
- * Opaque rather than translucent: the point is to interrupt the light, and a
- * band that merely dims it still has a moving gradient behind a panel of live
- * controls. `isolation` so anything inside keeps its own stacking context.
- */
 /**
  * The field's drift.
  *
