@@ -17,9 +17,10 @@
   <dt>Date:</dt>
   <dd>
     <helix-headless-format-date
-      class="stamp"
+      date="2026-03-14T15:09:00.000Z"
       day="numeric"
       month="short"
+      time-zone="UTC"
       year="numeric"
     ></helix-headless-format-date>
   </dd>
@@ -27,24 +28,28 @@
   <dt>Time:</dt>
   <dd>
     <helix-headless-format-date
-      class="stamp"
+      date="2026-03-14T15:09:00.000Z"
       hour="numeric"
       minute="2-digit"
+      time-zone="UTC"
     ></helix-headless-format-date>
   </dd>
 
   <dt>Weekday:</dt>
   <dd>
     <helix-headless-format-date
-      class="stamp"
+      date="2026-03-14T15:09:00.000Z"
       day="numeric"
       month="long"
+      time-zone="UTC"
       weekday="long"
     ></helix-headless-format-date>
   </dd>
 </dl>
 
 <script>
+  /* Only the elapsed reading is computed; the three absolute ones are pinned in
+     the markup above. The styled twin carries the measurement that decided it. */
   const at = new Date(Date.now() - 42 * 60_000).toISOString()
   for (const stamp of document.querySelectorAll('.stamp')) {
     stamp.date = at
