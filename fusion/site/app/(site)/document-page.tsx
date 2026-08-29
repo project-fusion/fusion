@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
-import { HeroField } from '@/components/hero-field/hero-field'
 import { PageOutline } from '@/components/page-outline/page-outline'
 import type { OutlineEntry } from '@/utils/outline/outline'
-import browser from './browser.module.css'
 import styles from './document-page.module.css'
 
 /**
@@ -95,7 +93,19 @@ export function DocumentPage({
         {title}
       </helix-text>
       {lede && (
-        <helix-text as="p" class={styles.documentLede} tone="muted">
+        /* **Muted on the page and not on the band, which is a contrast finding
+           rather than a preference.** Over the gradient in light the ground under
+           this paragraph is a pale blue rather than the page's white, and a muted
+           ink on it measures 4.23:1 at 18px, under the 4.5 body text answers to.
+           Measured against the painted pixel with the column hidden, so the
+           reading is the band rather than a glyph.
+
+           Full strength clears it at once, and costs nothing the head needs: on
+           the band the standfirst is already told apart from the title by size
+           and by weight, and the tone was doing the same job a second time. On
+           the plain head there is no band, the ground is the page, and muted is
+           what separates the standfirst from the body under it. */
+        <helix-text as="p" class={styles.documentLede} tone={hero ? undefined : 'muted'}>
           {lede}
         </helix-text>
       )}
@@ -105,25 +115,8 @@ export function DocumentPage({
   return (
     <div className={styles.document}>
       {hero && (
-        <section className={`${browser.pageHero} ${styles.documentHero}`}>
-          {/* The same light the galleries cast, so a piece and the index it came
-              from are one place. Absolute against the hero, which already
-              isolates and positions itself for the lattice, so the light stays
-              in the band and the head keeps its raised layer above it. */}
-          <helix-aura
-            class={styles.documentAura}
-            gain={1.15}
-            scale={0.45}
-            speed={0.5}
-            variant="rays"
-          ></helix-aura>
-          <HeroField />
-          <helix-flex
-            align="start"
-            class={`${browser.pageHeroInner} ${styles.documentHeroInner}`}
-            direction="column"
-            gap="lg"
-          >
+        <section className={styles.documentHero}>
+          <helix-flex align="start" class={styles.documentHeroInner} direction="column" gap="lg">
             {trail}
             {meta}
             {head}

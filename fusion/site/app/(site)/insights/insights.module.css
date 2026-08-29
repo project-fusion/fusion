@@ -107,8 +107,17 @@
  * there because a prefix is a category qualifying a label and should not
  * outshout it, and that reasoning survives the thing being a face rather than a
  * word: this is a byline, not a profile. */
+/* **The face is the byline's now, and it is no longer a prefix.**
+ *
+ * This was sized against a tag's text because it sat inside one, at 1.4 of
+ * `text-xs`, which is the right size for a qualifier in front of a label and far
+ * too small standing on its own at the foot of an essay. Two lines sit beside it
+ * now, the name and the reading time, so it is sized to the pair rather than to
+ * a word: the line height of both, which is what makes the face and the text
+ * block the same height and stops the row looking like a face with a caption
+ * falling off it. */
 .insightByline helix-avatar {
-  --avatar-size: calc(var(--helix-text-xs) * 1.4);
+  --avatar-size: calc(var(--helix-text-sm) * var(--helix-leading-normal) * 2);
 }
 
 /* A row that is a link. Cards were tried here and are wrong at the foot of an
@@ -185,7 +194,7 @@
  * No `outlined` here, since an outlined chip with no outline is nothing at all.
  * Every tag is `subtle` and the subject keeps `primary`, which is the one
  * distinction the row makes with color. */
-.insightByline helix-tag {
+.insightFiling helix-tag {
   --tag-border-color: transparent;
 }
 
@@ -200,7 +209,7 @@
  * `inline-flex` so the anchor is exactly the chip. Left inline it takes the
  * line box's height instead, which puts a taller invisible target around a
  * short chip and lands the row's `align: center` on the wrong box. */
-.insightByline a {
+.insightFiling a {
   display: inline-flex;
 }
 

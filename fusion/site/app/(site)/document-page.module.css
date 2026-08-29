@@ -16,52 +16,58 @@
 }
 
 /**
- * The head on a lit band, for a document read as a piece.
+ * The head on a gradient, for a document read as a piece.
  *
- * **Shorter than the index heroes, because this one is a head rather than an
- * arrival.** `/insights` opens on a band a reader lands in and looks around;
- * this one is the top of something they have already chosen to read, so it is
- * sized to hold the filing, the title and the standfirst and then get out of the
- * way. The lattice and its falloff are `.pageHero`'s, unchanged, so the two
- * bands are the same material at two heights.
+ * **A gradient rather than the galleries' lit field, because this band is a
+ * cover rather than a place.** `/insights` opens on a lattice with two dozen
+ * dots lighting on long cycles: something to look at while a reader decides
+ * what to read. A piece they have already chosen wants the opposite, a ground
+ * that carries the title and then gets out of its way, and a field of moving
+ * dots behind a paragraph is competing with the words it is under.
+ *
+ * So no lattice, no rays and no `.pageHero`: this band shares that one's
+ * geometry and none of its texture, and composing it only to switch its
+ * texture off would leave a reader tracing which half applied.
+ *
+ * **Diagonal, because the light has to come from somewhere.** A vertical ramp
+ * over a full-width band reads as a printing artifact; struck across the corner
+ * it reads as light falling on a surface. Bright at the top left, where the
+ * wordmark is and where a reader's eye lands, and gone by the bottom, so the
+ * band ends in the page rather than against it and there is no seam to see.
+ *
+ * **Mixed from `--helix-color-primary` into `--helix-color-background`**, so it
+ * darkens on a dark page and lightens on a light one from one declaration.
+ * `oklab` rather than `srgb` for the reason the whole palette is authored in it:
+ * a mix through sRGB of a saturated blue and a near-black passes through a
+ * muddy middle that neither end asked for.
  */
 .documentHero {
-  min-block-size: auto;
+  background-color: var(--helix-color-background);
+  background-image: linear-gradient(
+    152deg,
+    color-mix(in oklab, var(--helix-color-primary) 62%, var(--helix-color-background)) 0%,
+    color-mix(in oklab, var(--helix-color-primary) 38%, var(--helix-color-background)) 30%,
+    color-mix(in oklab, var(--helix-color-primary) 16%, var(--helix-color-background)) 62%,
+    var(--helix-color-background) 100%
+  );
+  /* The header's own height plus the hairline under it, so the band starts at
+     the top of the window rather than under the bar. */
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
   padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+  position: relative;
 }
 
 /**
  * The band's column, aligned to the body's.
  *
- * `.pageHeroInner` centers its text and caps at 46rem, which is right for an
- * index hero standing alone and wrong here: the paragraph below this is capped
- * at the measure and left aligned, so a centered head over it reads as two
- * pages stacked. The cap is the measure plus the gutter either side, which is
- * what the shell resolves to, so the title's left edge and the prose's are the
- * same edge.
+ * The cap is the measure plus the gutter either side, which is what the shell
+ * resolves to, so the title's left edge and the prose's are the same edge.
  */
 .documentHeroInner {
+  margin-inline: auto;
   max-inline-size: calc(var(--document-measure) + var(--helix-space-lg) * 2);
   padding-inline: var(--helix-space-lg);
-}
-
-/* Behind the head and inside the band. */
-.documentAura {
-  inset: 0;
-  pointer-events: none;
-  position: absolute;
-  z-index: var(--helix-layer-base);
-}
-
-/* **Stated on the elements rather than inherited from the column**, because the
-   column's own centering comes from `.pageHeroInner` in another module and which
-   of the two lands last is a fact about import order rather than about either
-   rule. The head is left aligned on this page whatever that order turns out to
-   be. */
-.documentHeroInner .documentHeroTitle,
-.documentHeroInner .documentLede,
-.documentHeroInner .documentKicker {
-  text-align: start;
+  inline-size: 100%;
 }
 
 /**

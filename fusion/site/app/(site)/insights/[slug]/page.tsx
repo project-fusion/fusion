@@ -70,6 +70,26 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       body={await renderDocument(source)}
       footer={
         <helix-flex class="insightMore" direction="column" gap="lg">
+          {/* **The byline at the foot, where a byline answers a question the
+              reader now has.** At the head it is one of five chips competing
+              with the title for the one glance a reader gives a piece before
+              deciding; at the end it is the natural place to ask who wrote this,
+              and the reading time is the same kind of fact, so the two sit
+              together rather than one on each end of the page.
+
+              Above the divider, which then separates the piece and its author
+              from what to read next rather than separating the piece from its
+              own byline. */}
+          <helix-flex align="center" class={styles.insightByline} gap="sm">
+            <helix-avatar name={insight.author}></helix-avatar>
+            <helix-flex direction="column" gap="2xs">
+              <helix-text variant="label">{insight.author}</helix-text>
+              <helix-text tone="muted" variant="caption">
+                {insight.minutes} min read
+              </helix-text>
+            </helix-flex>
+          </helix-flex>
+
           <helix-divider></helix-divider>
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-text as="h2" variant="title">
@@ -120,41 +140,29 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       hero
       lede={insight.summary}
       meta={
-        <>
-          {/* One metadata line, and every fact on it is a tag.
-
-                The byline and the filing are the same kind of fact, so drawing
-                them as text with hairlines beside chips makes one row out of two
-                vocabularies. As tags they are one set, and there are no dividers,
-                because a chip already has an edge and a rule between two of them
-                is a third boundary in a row that only has two.
-
-                `outlined` for the facts about this post, which is the appearance
-                `Tag` documents for exactly this case: a dense set of them filled
-                would turn a row into a mosaic. The subject keeps its wash, so the
-                one tag that leads somewhere else is the one that looks like it
-                does, and the kind stays neutral beside it. */}
-          <helix-flex align="center" class={styles.insightByline} gap="xs" wrap>
-            <helix-tag>
-              <helix-avatar name={insight.author} slot="prefix"></helix-avatar>
-              {insight.author}
-            </helix-tag>
-            <helix-tag>
-              <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
-            </helix-tag>
-            <helix-tag>{insight.minutes} min read</helix-tag>
-            {/* The two that lead somewhere actually lead there. The gallery
-                  already seeds its filters from the query string on the server, so
-                  a topic is a working filter rather than a label describing one,
-                  and it costs an `href`. */}
-            <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
-              <helix-tag tone="primary">{insight.topic}</helix-tag>
-            </Link>
-            <Link data-link="quiet" href={`/insights?kind=${encodeURIComponent(insight.kind)}`}>
-              <helix-tag>{insight.kind}</helix-tag>
-            </Link>
-          </helix-flex>
-        </>
+        /* **Two facts on the band, and the rest at the foot.**
+         *
+         * The head of a piece answers what it is about and when it was written,
+         * which is what a reader deciding whether to keep reading is asking. Who
+         * wrote it and how long it takes are answers to a different question,
+         * and five chips under a title made the filing look like the content.
+         *
+         * The kind went entirely. Every insight here is an essay, so a chip
+         * reading `Essay` on every one of them distinguished nothing; the
+         * gallery still filters on it, where it sits beside the kinds it is not.
+         *
+         * The topic keeps its wash and its link, so the one tag that leads
+         * somewhere is the one that looks like it does, and the date beside it
+         * is text rather than a second chip: two chips read as a set of filters
+         * and this is one filter and one fact. */
+        <helix-flex align="center" class={styles.insightFiling} gap="sm" wrap>
+          <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
+            <helix-tag tone="primary">{insight.topic}</helix-tag>
+          </Link>
+          <helix-text tone="muted" variant="caption">
+            <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
+          </helix-text>
+        </helix-flex>
       }
       title={insight.title}
       trail={
