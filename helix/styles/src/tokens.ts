@@ -277,24 +277,39 @@ export const TOKENS: Token[] = [
      So it lands between the steps, where no surface sits and nothing can
      collide.
 
-     **The two arms are matched on the result, not on the recipe.** The same
-     percentage in both modes does not give the same line: the ramp is tighter
-     at the dark end, 700 to 800 spanning 0.04 against 300 to 200's 0.05, and
-     the dark line starts much further from its surface, 0.12 of lightness
-     against light's 0.075, so one nudge is a quarter of the gap in one mode and
-     an eighth in the other.
+     **The two arms are matched on the result, not on the recipe**, and what
+     counts as the result is the *worst* ground each one has to be seen on
+     rather than the surface it is nominally measured against. In light that is
+     `surface-sunken`, where the line reads 1.094:1; the page, the surface and
+     the raised rung are all easier than that.
 
-     So dark is measured from the other side: mixed down from 800 rather than
-     across from 700, landing at 0.266 against a 0.21 surface. That is 0.055 of
-     separation, which is what light has. The two modes read as the same line
-     rather than as the same arithmetic.
+     Dark is mixed up from 800 toward 700, and the percentage is solved against
+     that figure rather than chosen: 30 percent lands on `surface-raised`, its
+     own worst ground, at 1.103:1. Measured across the candidates, 40 percent
+     gives 1.130 and 25 gives 1.077, so 30 is the one that reads as the same
+     line rather than as the same arithmetic.
+
+     *It used to mix down from 800 toward 900, and that stopped working when the
+     dark ladder came down.* The old arrangement put the line between `surface`
+     and `surface-raised`, which was room that existed while those sat 0.08
+     apart; they sit 0.028 apart now and nothing fits between them. Left alone
+     the mix followed the surfaces down and measured 1.019:1 on raised, which is
+     one code point and is no line at all, on the five components that fill with
+     raised and draw a border. So the line now sits above raised rather than
+     under it, in the gap between that rung and 700, where no surface sits and
+     nothing can collide.
+
+     **And it is what 700 is for.** That rung was read by nothing at all until
+     this: the note in `primitives.css` kept it as the only step left between the
+     inks and the surfaces, which is where a dark border has to come from once a
+     mix of two surface rungs stops separating from them.
 
      Still flat and still opaque, which is what keeps it distinct from
      `--helix-material-border`: that one is alpha because it is drawn over
      translucent panes, and this one is not. */
   [
     'color-border',
-    'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-800) 70%, var(--_helix-neutral-900)))',
+    'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))',
   ],
   /* Interaction. */
   ['color-primary', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
