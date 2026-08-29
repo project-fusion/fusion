@@ -648,7 +648,7 @@ typography, and it follows the text around it.
 
 **A `[part=]` selector for a part nothing renders fails silently.** It is valid
 CSS that matches nothing, so there is no error, no warning, and no clue beyond
-the feature quietly not happening. `bun run check:css:selectors` catches it, and it
+the feature quietly not happening. `helix component --only selectors` catches it, and it
 found two: Card's `orientation="horizontal"` had done nothing since the refactor
 that moved its container onto the host, and the Accordion had no border, no
 corner radius, and a dead `appearance="plain"` for the same reason.
@@ -881,7 +881,7 @@ twice in a file whose own comment says splitter has a `separator` and no
 `helix-dialog::part(panel)` on an element publishing `dialog`.
 
 **A `[part=]` written in TypeScript is checked like one written in CSS**, and
-only `check:css:selectors` reads stylesheets, so a rename verified against CSS alone
+only `selectors` reads stylesheets, so a rename verified against CSS alone
 is verified against half the callers. A stale `querySelector('[part="x"]')`
 returns `null`, so what breaks is behavior rather than appearance and an optional
 chain swallows it. Ninety-seven lookups exist. Only a lookup on the component's

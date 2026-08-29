@@ -56,6 +56,7 @@ pub mod reflected;
 pub mod reflected_defaults;
 pub mod run;
 pub mod seams;
+pub mod selectors;
 pub mod separation;
 pub mod ssr;
 pub mod stable;
@@ -461,6 +462,11 @@ pub fn all() -> Vec<Rule> {
             name: "seams",
             run: Runner::Source(seams::run),
             summary: "a base component renders another family behind an overridable method",
+        },
+        Rule {
+            name: "selectors",
+            run: Runner::Source(selectors::run),
+            summary: "every selector a component writes matches something it renders",
         },
         Rule {
             name: "separation",
