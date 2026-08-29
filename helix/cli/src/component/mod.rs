@@ -45,6 +45,7 @@ pub mod separation;
 pub mod ssr;
 pub mod stable;
 pub mod tier;
+pub mod token_defaults;
 pub mod vocabulary;
 
 use std::collections::BTreeMap;
@@ -70,6 +71,14 @@ pub struct Context {
 pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
+
+    /// The stylesheets defining the token layer, in cascade order.
+    ///
+    /// Not component source, which is why it is its own key: a rule asking
+    /// whether a token resolves has to read the sheets that declare it, and
+    /// guessing at a directory would be reading a layout rather than a decision.
+    #[serde(default)]
+    pub layer: Vec<String>,
 
     /// The tiers that extend one another, ordered from the base outward.
     ///
@@ -313,6 +322,11 @@ pub fn all() -> Vec<Rule> {
             name: "tier",
             run: Runner::Source(tier::run),
             summary: "a component that renders a child renders one from its own layer",
+        },
+        Rule {
+            name: "token-defaults",
+            run: Runner::Source(token_defaults::run),
+            summary: "a token a component reads resolves on a page matching no state",
         },
         Rule {
             name: "vocabulary",

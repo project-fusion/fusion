@@ -4,6 +4,11 @@
     "sandbox": "A development tool that owns its whole window, not a component put on a page."
   },
   "floors": true,
+  "layer": [
+    "helix/styles/src/primitives.css",
+    "helix/styles/src/tokens.css",
+    "helix/styles/src/base.css"
+  ],
   "layers": [
     {
       "prefix": "helix-headless-",
