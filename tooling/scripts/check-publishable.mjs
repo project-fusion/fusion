@@ -3,28 +3,19 @@
  * What may leave the repository, and what a package must be to do it.
  *
  * **Two questions, two answers.** The name says which domain a package belongs
- * to; `private` says whether it ships. `@fusion.dev/helix-cem` is Helix's analyzer
- * configuration, so it is Helix, and it is also a build tool of no use to
- * anyone outside this repository. Both of those are true at once, and a rule
- * that read publication off the name could only express one of them: it would
- * have forced a rename to `@fusion.dev/cem`, filing Helix-specific tooling
- * beside the repository root and the site, and claiming it is general Fusion
- * tooling, which is exactly what it is not.
+ * to; `private` says whether it ships. `@fusion.dev/helix-cem` is Helix's
+ * analyzer configuration and also a build tool of no use to anyone outside this
+ * repository, and a rule reading publication off the name could express only
+ * one of those: it would force a rename to `@fusion.dev/cem`, claiming
+ * Helix-specific tooling is general Fusion tooling.
  *
  * `private` is still not an allowlist. It lives in the manifest of the package
  * it describes, which anyone changing that package already has open, rather
  * than in a central list nothing makes you read.
  *
  * **A package belonging to no domain is always private**, and that is the whole
- * of what the name decides. `insights`, `site-ui` and `source` name no product,
- * so there is no reading under which they ship.
- *
- * *Rewritten 28 Aug 2026, when three scopes became one.* This read "the scope
- * says which domain a package belongs to", and named `@fusion-io/*` as the
- * company-internal scope that is always private. Both were facts about scopes
- * that no longer exist. The argument survives the move unchanged, because it was
- * never really about the scope: publication and ownership are two questions, and
- * one string cannot answer both. What moved is which string answers the first.
+ * of what the name decides. `cli`, `insights`, `site` and `source` name no
+ * product, so there is no reading under which they ship.
  *
  * **A published package may not depend on an unpublished one.** This is the
  * failure this file exists for. Inside the workspace every dependency resolves,
@@ -35,7 +26,7 @@
  * visible from inside any single package, which is why it is worth a script.
  *
  * `devDependencies` are exempt, because a consumer never installs them.
- * `@fusion.dev/helix-testing` is a devDependency of three published packages and that
+ * `@fusion.dev/helix-testing` is a devDependency of published packages and that
  * is correct.
  *
  * **`types` before `default`.** Conditions match top to bottom, so a `types`

@@ -88,7 +88,7 @@ const byTitle = (a: DocPage, b: DocPage): number =>
  * The pages of one section, in the order a sidebar renders them.
  *
  * **Alphabetical, except a section that is a path, and except one pinned entry
- * page where a section has one.** The exemption is the same one `CLAUDE.md`
+ * page where a section has one.** The exemption is the same one `AGENTS.md`
  * grants positional arguments and middleware chains, that ordering is skipped
  * where order is semantic. Written down so a section is not silently reordered
  * by whoever next notices it is not alphabetical.

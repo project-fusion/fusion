@@ -13,22 +13,19 @@
  * styled one. Each tier side-effect imports its own version of the family, so a
  * consumer on either tier gets children from the tier they are on.
  *
- * **Naming the public tag was the first arrangement, and it was wrong.** A base
- * component rendering `<helix-select>` composes a styled element out of a tier
- * that must not depend on the styled one, and it leaves the headless tier broken for
- * anyone who imports only it: nothing registers that tag, so the control is an
- * inert unknown element. Forty-two sites across sixteen families did this. The
- * argument for it was that each tier imports its own element under one name,
- * which holds only while nobody imports both, and the docs site imports both.
+ * **Naming the public tag instead is wrong.** A base component rendering
+ * `<helix-select>` composes a styled element out of a tier that must not depend
+ * on the styled one, and it leaves the headless tier broken for anyone who
+ * imports only it: nothing registers that tag, so the control is an inert
+ * unknown element. The argument for it, that each tier imports its own element
+ * under one name, holds only while nobody imports both, and the docs site
+ * imports both.
  *
- * **It went wrong the first time it was used.** Date Input's headless tier
- * imported the base calendar and rendered `helix-date-picker`, and its styled tier
- * imported no calendar at all. Measured: importing that one family registered
- * `helix-date-input` and `helix-headless-date-picker`, and left `helix-date-picker`
- * undefined. Every example still looked right, because the sandbox and the docs
- * site both import the whole barrel, which is exactly the condition under which
- * a missing import is invisible. It would have shipped that way to the first
- * consumer who imported one component.
+ * **A missing import is invisible here.** The sandbox and the docs site both
+ * import the whole barrel, so every example looks right while a family that
+ * registers `helix-date-input` and `helix-headless-date-picker` leaves
+ * `helix-date-picker` undefined for the first consumer who imports one
+ * component.
  *
  * **What counts as rendering a tag.** `<${this.tag('name')}`, which is the only
  * way a template may name one, plus a literal `<helix-…` opening tag, which is
@@ -39,12 +36,10 @@
  * **A styled component renders whatever its base renders.** It extends the
  * headless class and almost never overrides `render`, so the tags are in the
  * tier below and the obligation is inherited with them. Checking only the file
- * the tag is written in is the version of this check that does not work: it was
- * written that way first, and it passed with the Date Input bug reintroduced,
- * because the headless file did import a calendar. It was the styled tier that
- * imported none, and the styled tier has no `<helix-date-picker>` in it to find.
- * So each styled file is held to what its counterpart one tier down renders,
- * matched by the path they share.
+ * the tag is written in cannot work: the headless file may import the family
+ * while the styled one imports nothing, and the styled file has no tag in it to
+ * find. So each styled file is held to what its counterpart one tier down
+ * renders, matched by the path they share.
  *
  * **What counts as importing it.** A side-effect `import '…/index.js'` whose path
  * ends in the family's folder.
@@ -53,16 +48,13 @@
  * its name.** Taking the tier prefix off the tag and calling the rest the family
  * is right for a root and wrong for a part: `helix-menu-item` is declared in
  * `menu/item/`, so the name says `menu-item` and the folder to import is `menu`.
- * That went unexercised until `Video` rendered rows into a menu, and it reported
- * a component that had done exactly the right thing. Every tag in the repo
- * declares itself with `@customElement`, and the file it does that in is three
- * segments deep, so the folder is not a guess.
+ * Every tag in the repo declares itself with `@customElement`, and the file it
+ * does that in is three segments deep, so the folder is not a guess.
  *
  * A component rendering its own family is exempt, since a part rendering a
  * sibling part is one folder importing itself.
  *
- * **The styled tier has to say it is the styled tier**, and forgetting to is the
- * failure this arrangement replaces the old one's with. `tier` defaults to
+ * **The styled tier has to say it is the styled tier.** `tier` defaults to
  * `helix-headless-`, so a styled component that inherits an interpolating template
  * and does not override it renders base children inside a styled shadow root:
  * unstyled, silent, and passing every other check. One line, `static override
@@ -76,14 +68,13 @@ import { SOURCE, TAG_PREFIX, TIERS } from './lib/workspace.mjs'
 
 /* **Where a tag can be written by something that is not a component.**
  *
- * `drawTooltip` in `helix/core` wrote `<helix-tooltip>` into a template three
- * charts render, and every rule above was blind to it: they hold a *component*
- * to interpolating through `tier`, and this is a free function with no class and
- * no tier to read. The consequence was the one the tier split exists to
- * prevent, a headless consumer getting an inert unknown element where the
- * reading should be, and no test here could see it either, since the sandbox
- * frame and the docs site both import the whole library so the tag is always
- * registered by the time anything looks.
+ * A free function in `helix/core` has no class and no tier to read, so every
+ * rule above is blind to a literal tag written in one: they hold a *component*
+ * to interpolating through `tier`. The consequence is the one the tier split
+ * exists to prevent, a headless consumer getting an inert unknown element, and
+ * no test can see it either, since the sandbox frame and the docs site both
+ * import the whole library so the tag is always registered by the time anything
+ * looks.
  *
  * A free function takes the tag as an argument instead, which is what every
  * component already does one level up. */
@@ -112,9 +103,9 @@ const withoutComments = (source) =>
  * The family folder a tag is declared in.
  *
  * Built from `@customElement` rather than from the tag's own text, for the
- * reason the note above records. The fallback is the old guess, which is right
- * for every root and is all there is to say about a tag this repo does not
- * declare.
+ * reason the note above records. The fallback is the tag's own name, which is
+ * right for every root and is all there is to say about a tag this repo does
+ * not declare.
  */
 const declaredIn = new Map()
 const familyOf = (name) => declaredIn.get(name) ?? name
@@ -250,12 +241,12 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-/* **The number is why `check:spec:floors` can see this check at all.** It read
-   integers out of a success line and skipped a line that has none, so this one
-   was silently exempt from the thing floors exists to catch: a check that has
-   quietly stopped checking. `checked` is a tally of *assertions*, one per tag
-   resolved or refused, rather than of files scanned, which would be a fact
-   about the corpus and would keep rising while the checking fell to zero. */
+/* **The number is why `check:spec:floors` can see this check at all.** Floors
+   reads integers out of a success line and skips a line that has none, so a
+   check that prints no number is exempt from the thing floors exists to catch.
+   `checked` is a tally of *assertions*, one per tag resolved or refused, rather
+   than of files scanned, which would keep rising while the checking fell to
+   zero. */
 console.log(
   `composed: ${checked} rendered helix tags, every one imported by the file that renders it`,
 )

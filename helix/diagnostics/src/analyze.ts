@@ -227,7 +227,7 @@ export const analyze = (
  * later can improve on: by the time a page can be scanned, the losing class is
  * unreachable and all that is left is an identity mismatch to infer from. So
  * this reads `duplicateRegistrations()` rather than re-deriving it, which is
- * `CLAUDE.md`'s rule about where a fix lives applied to a detector.
+ * `AGENTS.md`'s rule about where a fix lives applied to a detector.
  *
  * The identity check stays as a fallback, for the copy that never went through
  * Helix's own decorator: a fork, a hand-written `customElements.define`, or a

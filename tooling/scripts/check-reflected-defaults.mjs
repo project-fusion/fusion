@@ -11,31 +11,19 @@
  * patch up, and it is invisible to every other check here: the component works,
  * the attribute is correct, and the two renders simply disagree.
  *
- * **Three of them in one day is why this exists.** `helix-heatmap` reflected
- * `rows`, which defaults to 1; it reflected `visible`, a derived getter, which
- * has a second fault of its own; and `helix-chat` reflected `pinned`, which
- * defaults to true because a conversation opens at its most recent turn. All
- * three were caught by an SSR spec asserting the served attributes, one family
- * at a time, which is a check that only runs where somebody thought to write it.
- *
  * **What is allowed.** A reflected boolean defaulting to `false` writes nothing,
  * which is the ordinary case and most of the library.
  *
- * **This said a reflected string defaulting to `''` writes nothing, and that was
- * false.** Lit reflects the empty string as `author=""`. Measured by mounting
- * the element: a consumer writing `<helix-chat-message>` got back
- * `author="" state=""`, so the one component relying on the exemption was the
- * one shipping the mismatch this file exists to prevent. The exemption is gone
- * and both properties are undefined at rest.
+ * **A reflected string defaulting to `''` is not silent.** Lit reflects the
+ * empty string as `author=""`. Measured by mounting the element: a consumer
+ * writing `<helix-chat-message>` got back `author="" state=""`. Both properties
+ * are undefined at rest.
  *
- * **And it offered `updated` as the remedy, which is the same bug.** "Written
- * after the first render" is not written after hydration: `updated` runs in the
- * microtask checkpoint `firstUpdated` runs in, before React need have reached
- * the node. `helix-heatmap` was moved there to satisfy this check and went on
- * writing `visible="0"` onto every server-rendered instance;
- * `helix-notifications` did the same with `unread="0"`. That is the fault
- * `data-settled` was found for four separate times, patched three of them as
- * route-specific bugs before anyone looked at the cause.
+ * **Nor is `updated` a remedy.** "Written after the first render" is not written
+ * after hydration: `updated` runs in the microtask checkpoint `firstUpdated`
+ * runs in, before React need have reached the node. A property moved there to
+ * satisfy this check goes on writing `visible="0"` onto every server-rendered
+ * instance, which is the fault `data-settled` exists for.
  *
  * **The rule is the resting state, not the timing.** A property writes nothing
  * until it departs from what a consumer's server would have sent, whichever
@@ -43,8 +31,8 @@
  * hook inverts: `helix-toast-item` publishes `data-closed` rather than
  * `data-open`, a toast being open at rest.
  *
- * **A static pass cannot see most of this**, which is why it is no longer the
- * only guard. Reflection is one route; `setAttribute`, `toggleAttribute` and a
+ * **A static pass cannot see most of this**, which is why it is not the only
+ * guard. Reflection is one route; `setAttribute`, `toggleAttribute` and a
  * `dataset` write are three more, and they produce the identical symptom from
  * somewhere this file has no reason to look.
  * `helix/headless/src/hydration.dom.spec.ts` mounts every registered element and
@@ -89,9 +77,9 @@ const sources = (from, found = []) => {
 /**
  * A default that writes no attribute when reflected.
  *
- * `''` was on this list and does not belong: Lit reflects the empty string as
- * `author=""`, measured on `helix-chat-message`, which is the attribute a
- * consumer's server never sent. An absent initialiser and an explicit
+ * `''` does not belong on this list: Lit reflects the empty string as
+ * `author=""`, measured on `helix-chat-message`, which is an attribute a
+ * consumer's server never sent. An absent initializer and an explicit
  * `undefined` are the two that genuinely write nothing, and `false` is the third
  * because a reflected boolean removes the attribute rather than writing it.
  */
@@ -131,10 +119,9 @@ for (const tier of TIERS) {
            controlled property in this library reads `this.xState ?? this.defaultX`,
            so what it returns before anybody writes to it is `defaultX`'s
            initializer. `helix-chat`'s `pinned` defaults to true, because a
-           conversation opens at its most recent turn, and reflected it wrote
-           `pinned` onto a host the server had served without one. The setter
-           rule above lets an accessor through, so without this the check would
-           have missed the case that prompted it. */
+           conversation opens at its most recent turn, and reflected it writes
+           `pinned` onto a host the server served without one. The setter rule
+           above lets an accessor through, so nothing else catches that. */
         const body = text.slice(match.index).match(/\{([\s\S]*?)\n\s{2}\}/)?.[1] ?? ''
         const backing = body.match(/\?\?\s*this\.(\w+)/)?.[1]
         const fallback = backing

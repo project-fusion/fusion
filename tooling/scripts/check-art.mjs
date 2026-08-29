@@ -8,20 +8,18 @@
  * count on screen cannot be wrong.
  *
  * The card art is the other half and is hand-written, keyed by that same slug in
- * five files under `helix/gallery/src`. Two things about it are silent:
+ * six files under `helix/gallery/src`. Two things about it are silent:
  *
  * - **A family with no entry renders nothing**, deliberately: Card's media
  *   region is a bare `<slot>`, so an unassigned one generates no box and a new
  *   component simply gets a card with no picture. That is the right default and
  *   it means nobody finds out.
- * - **The counts in those files' own docblocks are prose.** They were written by
- *   hand, they are used in the argument for splitting five files, and they
- *   drifted twice in one afternoon: fifty-eight in the comment against
- *   fifty-seven on the page, because one component was added and the number was
- *   bumped by two.
+ * - **The counts in those files' own docblocks are prose.** They are written by
+ *   hand and carry the argument for the split, so they drift from the count the
+ *   page derives.
  *
- * Third of its shape after `check:css:hooks` and `check:api:parts`, and the same
- * argument: nothing about a missing entry fails, warns, or looks wrong.
+ * Nothing about a missing entry fails, warns, or looks wrong, which is why it
+ * takes a check. Same shape as `check:css:hooks` and `check:api:parts`.
  *
  * Run with `bun run check:prose:art` (also part of `bun run verify`).
  */
@@ -80,13 +78,11 @@ for (const slug of [...drawn].sort()) {
  * answerable: **in these two files a number written as a word is the family
  * count or the folder count, and every other count is written as digits.**
  *
- * The rule earns itself. Without it there are three shapes to chase: the
- * headline "All fifty-seven families", the folder comparison, and sentences like
- * "stated once rather than fifty-seven times" that carry the same number with no
- * noun to match on. Matching only the first two let a partial bump through,
- * measured: changing one of three occurrences in `core.tsx` passed. Forbidding
- * every number word was wrong the other way, and flagged a true sentence about
- * how many cards move.
+ * Matching by the noun beside the number cannot work: a sentence like "stated
+ * once rather than fifty-seven times" carries the count with no noun to match
+ * on, and a check that reads only the headline and the folder comparison passes
+ * a partial bump. Forbidding every number word is wrong the other way, and
+ * flags a true sentence about how many cards move.
  *
  * Digits for anything else is the cheap half of the rule and costs the prose
  * nothing, so a word in range is always one of two values and the check is
@@ -95,19 +91,9 @@ for (const slug of [...drawn].sort()) {
 /* **The counter and the matcher are built from the same two arrays, which is
  * the whole of what this section is for.**
  *
- * They used to be two hand-written lists: a `WORDS` table of every count from
- * forty-nine up, and a separate alternation of decades in the regex below. Two
- * lists that have to agree and nothing making them, so they drifted exactly as
- * that arrangement does. The table reached `eighty-five` while the pattern
- * stopped at `seventy`, and for two families' worth of catalog growth the check
- * found no words to compare and reported that the prose agreed.
- *
- * Extending the pattern to `ninety` fixed the instance and left the shape: the
- * table then ran to `one hundred and twenty`, a phrase with a space in it that
- * the decade alternation could not have matched under any suffix, so the same
- * failure was sitting ten families out. At eighty-nine today that is close
- * enough to be worth doing properly.
- *
+ * A spelled-out table and a separate alternation of decades in the regex are two
+ * lists that have to agree with nothing making them, and a pattern that stops
+ * one decade short finds no words to compare and reports that the prose agreed.
  * So `wordFor` spells any number rather than looking one up, the pattern is
  * assembled from the arrays it spells with, and the assertion underneath walks
  * the range and proves the second can find everything the first can say. None
@@ -165,8 +151,8 @@ const wordFor = (count) => {
 
 /* Every number word from the floor up, hundreds first so a longer phrase is not
    matched as its own opening decade. The suffix stays `[a-z-]+` rather than the
-   ones enumerated: what broke was the decade list, and a loose tail means an
-   invented compound like `forty-odd` is still caught and reported. */
+   ones enumerated, so an invented compound like `forty-odd` is still caught and
+   reported. */
 const NUMBER_WORD =
   `\\b(` +
   `(?:${ONES.slice(1, 10).join('|')}) hundred(?: and [a-z-]+)?` +
@@ -193,8 +179,8 @@ const said = wordFor(families.size)
    directory with an `index.ts` is what the barrel exports and what
    `check:prose:examples` already calls a family, and it is the difference that
    matters: `field/` is a directory holding the shared field stylesheets, it
-   exports nothing and has no element, so counting it made this check disagree
-   with correct prose on its first run. */
+   exports nothing and has no element, and counting it makes this check disagree
+   with correct prose. */
 const folders = readdirSync(SOURCE.styled, { withFileTypes: true }).filter(
   (one) => one.isDirectory() && existsSync(join(SOURCE.styled, one.name, 'index.ts')),
 ).length
@@ -220,17 +206,13 @@ for (const file of ['index.tsx', 'core.tsx']) {
 
 /* And every stroked shape has something that strokes it.
  *
- * **The count was checked and the ink never was.** A card with an entry passes
- * the check above whatever that entry draws, and `code` drew nothing at all: its
- * three paths carried `artOn`, which is a hover animation and not a color, so
- * the whole card was an empty field. Four families were doing it, and one of
- * them, `code-block`, rendered part of its drawing and looked merely sparse.
+ * **The count above is checked and the ink is not.** A card with an entry passes
+ * it whatever that entry draws, including nothing.
  *
  * A shape with `fill="none"` and a stroke width has no paint of its own, so it
- * takes one from a class or it is invisible. The classes that supply one are
- * below, and the two that were being reached for, `artLine` and `artFade`, were
- * not classes at all: eight usages across two files, defined nowhere, styling
- * nothing. That is the shape of this fault, a name that looks like paint.
+ * takes one from a class or it is invisible. The fault is a name that looks like
+ * paint and is not: a class that only animates (`artOn` is a hover animation,
+ * not a color), or one that was never defined anywhere.
  *
  * Read off the stylesheet rather than listed here, so a new paint class works
  * the day it is written and a renamed one fails the same day. */

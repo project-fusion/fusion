@@ -10,7 +10,7 @@
  * them is a failure with the offending token named, rather than two lists
  * quietly meaning different things.
  *
- * The alternative was serialising the resolved intent into the oracle so this
+ * The alternative was serializing the resolved intent into the oracle so this
  * file could be deleted, which needs a `Serialize` on every shape in the
  * vocabulary including three unions with hand-written readers. Seventeen small
  * literals held to each other by a check is the cheaper honest answer.

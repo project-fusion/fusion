@@ -10,19 +10,18 @@
  * live. That reads as a control that is simply broken, and it is invisible in
  * every example that does not happen to use a fieldset.
  *
- * **Measured before this was written.** Every form control in the library was
- * rendered twice, once with the attribute and once inside a disabled fieldset,
- * and the two were compared. Nineteen of twenty matched. `helix-button` was the
- * one that did not: full primary in the fieldset, half opacity with the
- * attribute, from a single `:host([disabled])` on its `[part="button"]` rule.
+ * **Measured** by rendering every form control twice, once with the attribute
+ * and once inside a disabled fieldset: nineteen of twenty matched, and the one
+ * that did not painted full primary in the fieldset against half opacity with
+ * the attribute, from a single `:host([disabled])` on one rule.
  *
  * **Only form-associated components are held to this**, and per part rather than
  * per family, which is what makes the rule precise rather than a blanket ban.
  * `helix-radio` extends `HelixElement` and `helix-radio-group` extends
  * `HelixFormElement`: a lone radio is not a control, it is an answer to one, so
  * it never inherits a fieldset's state and the `disabled` its group writes onto
- * it really is a plain attribute. Keyed on the family, this check called that a
- * bug twice. A component qualifies if the headless file at the same path reaches
+ * it really is a plain attribute, so keying on the family reports it as a bug.
+ * A component qualifies if the headless file at the same path reaches
  * `HelixFormElement`, matched the way `check:api:composed` matches its tiers.
  *
  * Run with `bun run check:api:disabled` (also part of `bun run verify`).

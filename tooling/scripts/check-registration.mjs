@@ -15,13 +15,9 @@
  * Neither needs an exception here: a dynamic import is not a static one, and
  * this only reads static specifiers.
  *
- * **Written because a row could not do the job a check can.** 241 named
- * `builder.tsx` and `workbench.tsx`, fixed both, and was closed on the strength
- * of its own list. `preview.tsx` had the same import and was not on it, so every
- * `/helix/components/<family>` page went on reporting a `data-settled` the
- * server never sent for a day, while the two named routes had gone quiet. The
- * fault lives in a shape, "any file importing a registering module at module
- * scope", and a shape is what a check enumerates and a list forgets. See 250.
+ * **The fault lives in a shape**, "any file importing a registering module at
+ * module scope", and a shape is what a check enumerates and a hand-kept list
+ * forgets. See 250.
  *
  * **What registers is read from the packages rather than listed here**, so a new
  * family or a new subpath is covered on the day it lands. A subpath registers

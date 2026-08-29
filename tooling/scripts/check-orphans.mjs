@@ -9,11 +9,8 @@
  * words are still there, so nobody deletes them and nobody notices they stopped
  * being attached to anything.
  *
- * Thirty of these were found across twenty-one files. `Slider.markerLabels`
- * shipped carrying another property's text, and `Menu` held two paragraphs
- * describing methods that had been removed. The fix each time is to demote the
- * stranded block to a plain `/* *\/`, which keeps every word where it is and
- * stops it claiming to describe the member below.
+ * The fix is to demote the stranded block to a plain `/* *\/`, which keeps every
+ * word where it is and stops it claiming to describe the member below.
  *
  * **A blank line between them changes nothing**, which is why this looks past
  * whitespace. A reader sees two paragraphs and assumes the first belongs to the
@@ -21,10 +18,10 @@
  *
  * **A file header is not this, and exempting it is the whole subtlety.** A
  * module's own block sits above the first member's block by convention, so
- * every file with both looks like the fault from the pattern alone: the first
- * run reported thirty-eight, of which twenty-nine were headers doing their job.
- * A header is recognized by position rather than by a tag, because most of
- * ours carry no `@file` and adding one to sixty files to satisfy a check would
+ * every file with both looks like the fault from the pattern alone: matching on
+ * the pattern reports thirty-eight, of which twenty-nine are headers doing their
+ * job. A header is recognized by position rather than by a tag, because most of
+ * ours carry no `@file` and adding one to every file to satisfy a check would
  * be the check deciding the house style. Nothing but a shebang and whitespace
  * above it means it is the file's.
  *
@@ -35,15 +32,13 @@
  * same way and is harder to see, because the block it is in does document
  * something. A JSDoc description ends at the first tag, so a paragraph written
  * below `@csspart` or `@documentation` reaches no manifest and prints on no
- * page while sitting in the middle of a block that works. Twenty-five were
- * found, of which sixteen were added the same day by the person writing this
- * check, which is the argument for it existing.
+ * page while sitting in the middle of a block that works.
  *
  * A tag's own description may run to several lines and often does, so a
  * continuation is not this: the fault is a *new paragraph*, marked by a blank
  * comment line before it and text at the comment margin rather than indented
- * under a bullet. Without that distinction the same scan reported sixty-eight,
- * and forty-three were a tag's own words wrapping.
+ * under a bullet. Without that distinction the same scan reports sixty-eight,
+ * forty-three of them a tag's own words wrapping.
  *
  * Run with `bun run check:prose:orphans` (also part of `bun run verify`).
  */

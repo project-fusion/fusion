@@ -12,11 +12,9 @@
  * **Which fails silently, and that is the reason this exists.** The child is
  * the right element with the right behavior and no stylesheet, so it works: it
  * opens, it closes, it announces itself, and it is drawn by the browser's own
- * defaults. Three chart tiers shipped this way. The bar chart's reading bubble
- * came out with a 1.5px white border, square corners, `0.25em` of padding and
- * the page's font size, sitting under a UA `margin: auto` that centered it in
- * the viewport, and it read as a positioning bug for long enough to be
- * "fixed" twice at the wrong layer.
+ * defaults. What that looks like is a UA border, square corners, the page's font
+ * size and a UA `margin: auto` centering an overlay in the viewport, which reads
+ * as a styling or positioning bug and gets chased at the wrong layer.
  *
  * Nothing else catches it. The manifests describe what a component renders and
  * not which tier it renders it from; the specs mount the styled tag and assert

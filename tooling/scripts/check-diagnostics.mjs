@@ -169,11 +169,10 @@ try {
 
       /* The dedup claim, asserted on the work rather than on the count.
          `coverage.sheets` is the size of the identity set and so is deduped
-         whether or not the guard that skips a repeat is there, which made the
-         first version of this assertion one that could not fail. What actually
-         changes is how many times a rule is collected: one sheet adopted by
-         twenty hosts yields its rules once with the guard and twenty times
-         without it. */
+         whether or not the guard that skips a repeat is there, so an assertion
+         on it cannot fail. What changes is how many times a rule is collected:
+         one sheet adopted by twenty hosts yields its rules once with the guard
+         and twenty times without it. */
       const { rules } = collect(document)
       /* Keyed on the rule object, which CSSOM makes unique per sheet and
          position. The obvious key, `${sheet}#${index}`, is not an identity: a

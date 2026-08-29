@@ -2,13 +2,8 @@
 /**
  * Derives the Helix docs registry from the frontmatter of the pages themselves.
  *
- * **Title and description used to exist twice**, once in `src/registry.ts` and
- * once in each file's frontmatter, with nothing holding the two together. Only
- * three of the nine pages had frontmatter at all, so the copy that was supposed
- * to be authoritative did not exist for two thirds of the library and nobody
- * noticed, which is the shape of the failure rather than an accident of it.
- *
- * **The frontmatter wins.** It is what a `.md` consumer receives, so a registry
+ * **The frontmatter wins**, and title and description are not written a second
+ * time in `src/registry.ts`. It is what a `.md` consumer receives, so a registry
  * that disagreed with it would be right only for readers of the rendered site.
  * Adding a page is now one file.
  *
@@ -134,8 +129,8 @@ const declaredSections = () => {
 const sections = declaredSections()
 const sectionTitles = new Set(sections.map((section) => section.title))
 
-/* The registry, and the primitive map the values resolve against. Both are
-   read once: 41 pages would otherwise parse the same two files 41 times. */
+/* The registry, and the primitive map the values resolve against. Both are read
+   once rather than per page, which would parse the same two files every time. */
 const registry = JSON.parse(readFileSync(REGISTRY, 'utf8'))
 /** Every token name, for the check that a page does not invent one. */
 const tokenNames = new Set(registry.tokens.map((token) => token.name))
@@ -174,14 +169,12 @@ const table = (name) => {
   const described = rows.every((token) => token.description)
   /* **A color is shown, and every other kind is written.**
    *
-   * The value column held the declaration, which for a color is the
-   * derivation and not the answer: `light-dark(oklch(0.985 var(--helix-seed-
-   * neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)), oklch(0.21 ...))`
-   * wrapped to six lines and asked a reader to evaluate a color function in
-   * their head, on a page where only one arm of the `light-dark()` even
-   * applies. A swatch answers it at a glance, and answers it *live*: it reads
-   * the token, so it follows the reader's own color mode and any theme over
-   * it, which no string in a table can do.
+   * A color's declaration is its derivation and not its answer: a
+   * `light-dark(oklch(...), oklch(...))` wrapped over six lines asks a reader
+   * to evaluate a color function in their head, on a page where only one arm
+   * of the `light-dark()` even applies. A swatch answers it at a glance, and
+   * answers it *live*: it reads the token, so it follows the reader's own color
+   * mode and any theme over it, which no string in a table can do.
    *
    * Only color. A space, a radius and a duration are already one short token
    * long, and a swatch of `0.75rem` would be a worse answer than the text.
@@ -261,7 +254,7 @@ for (const slug of slugs) {
 
   /* Filled before anything else reads it, so the em dash rule, the childless
      component rule and the inlined sources all see the page a reader will.
-     
+
      A marker naming something the registry does not have throws, and a throw
      out of here is a stack trace where every other problem in this script is a
      sentence. Caught and reported like the rest of them. */
@@ -276,7 +269,7 @@ for (const slug of slugs) {
     refilled.push(slug)
   }
 
-  /* The rule is stated in CLAUDE.md and nothing else enforces it in prose. It
+  /* The rule is stated in AGENTS.md and nothing else enforces it in prose. It
      is checked here rather than in a sweep of its own because this is the one
      script that already reads every page. */
   if (source.includes('—')) {
@@ -284,13 +277,6 @@ for (const slug of slugs) {
   }
 
   /* Every token a page names has to exist.
-   *
-   * **This is the check the Foundations pages needed and did not have.** Ten of
-   * them were written with their token lists typed by hand, and two names in
-   * them were invented: `--helix-color-border-strong` in a code sample a reader
-   * would copy, and `--helix-size-loader` in a sentence claiming the loader
-   * follows a rule it is the sole exception to. A one-line diff found both,
-   * hours after they shipped, and nothing in the repository would have.
    *
    * It covers prose, which is more than generating the tables does: a table can
    * be filled from the registry and a paragraph beside it can still name
@@ -454,10 +440,6 @@ ${pages.map(literal).join('\n')}
 ]
 `
 
-/* The MDX itself, inlined for the same reason `@fusion.dev/insights` inlines
-   its own: a page that reads the file at request time is the filesystem access
-   that traced this repository into a server bundle, and a content package must
-   not be the thing that puts it back. */
 /* Written back, because the file is the source of both surfaces: the page
    renders it and `/helix/docs/<slug>.md` serves it. A table that existed only
    in a generated module would leave the document with a hole in it, which is
@@ -471,6 +453,10 @@ if (!check && refilled.length > 0) {
   }
 }
 
+/* The MDX itself, inlined for the same reason `@fusion.dev/insights` inlines
+   its own: a page that reads the file at request time is the filesystem access
+   that traced this repository into a server bundle, and a content package must
+   not be the thing that puts it back. */
 const sources = `/**
  * Every page's MDX, inlined by \`bun run gen:docs\`. Do not edit: the files in
  * \`content/\` are the source, and \`bun run check:gen:docs\` fails when this module

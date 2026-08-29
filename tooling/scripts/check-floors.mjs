@@ -3,15 +3,14 @@
  * Runs every other check and refuses a success line that counts nothing.
  *
  * **A check that silently stops checking reads exactly like a check that
- * passes.** `check:prose:art` held the number words in the gallery prose against the
- * real family count, and its pattern ran `forty` through `seventy` and stopped
- * matching the day the catalog passed seventy-nine. It went on printing
- * `art: 85 families, every one drawn, and the prose agrees` for two families'
- * worth of drift, because eighty-five families were still being *looked at*.
+ * passes.** `check:prose:art` held the number words in the gallery prose against
+ * the real family count with a pattern running `forty` through `seventy`, and
+ * once the catalog passed seventy-nine it matched nothing while still printing
+ * `art: 85 families, every one drawn, and the prose agrees`, because eighty-five
+ * families were still being *looked at*.
  *
- * That is the trap this is for, and it is a specific one: the number a check
- * reports has to be the number of things it *tested*, not the number it walked
- * past. A corpus size is reassuring and proves nothing.
+ * So the number a check reports has to be the number of things it *tested*, not
+ * the number it walked past. A corpus size is reassuring and proves nothing.
  *
  * So this runs each check and reads the integers out of its success line. A
  * zero anywhere in that line is a failure, on the grounds that a check with
@@ -50,10 +49,10 @@ const checks = Object.keys(scripts)
      here would measure every family a second time for fifteen seconds and
      learn nothing the first run did not. */
 
-  /* The four that `verify.yml` gives their own `browser` jobs. They were run
-     here too, which meant one shard rendered the entire browser matrix a
-     second time, single file, while the six jobs built for it sat idle. That
-     shard was the critical path for the whole workflow and nothing named it.
+  /* The four that `verify.yml` gives their own `browser` jobs. Running them
+     here too makes one shard render the entire browser matrix a second time,
+     single file, while the six jobs built for it sit idle, and that shard then
+     sets the critical path for the whole workflow.
 
      The floor they lose is real and it is the cheaper half of the trade: each
      of the four already fails loudly on an empty corpus, because rendering

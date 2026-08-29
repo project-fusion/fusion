@@ -5,8 +5,7 @@
  * The React prop audit in `helix/core` warns about a handler prop attached to
  * nothing. It knew every event name the library has and not which element sends
  * which, so a real name on the wrong element passed silently: the mistake you
- * make while writing a *correct* event, and the one that cost a session on
- * 25 Aug 2026.
+ * make while writing a *correct* event.
  *
  * The manifest already knows. `@event` is declared per component and
  * `check:api:events` holds those declarations and the dispatches together in both
@@ -18,12 +17,12 @@
  * fills the map, so a consumer importing one component is checked against that
  * component and nothing else.
  *
- * **It formats its own output, and the first version did not.** `bun run fix`
- * runs Biome over the tree, which rewrapped the arrays this emits, and from then
- * on the generator's text never matched the file again: `--check` reported it
- * behind its manifest on every run and regenerating did not settle it, because
- * the next `check` undid the write. A generated file has to arrive in the shape
- * the formatter would leave it in, or the two disagree forever.
+ * **It formats its own output.** `bun run fix` runs Biome over the tree and
+ * rewraps the arrays this emits, after which the generator's text never matches
+ * the file again: `--check` reports it behind its manifest on every run and
+ * regenerating does not settle it, because the next `fix` undoes the write. A
+ * generated file has to arrive in the shape the formatter would leave it in, or
+ * the two disagree forever.
  *
  * `--check` compares without writing, for `verify`.
  */

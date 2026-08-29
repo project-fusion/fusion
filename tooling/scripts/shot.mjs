@@ -2,9 +2,9 @@
 /**
  * Screenshots a page, or one element on it, into `.local/shots`.
  *
- * **The editor's browser pane cannot do this, and the reason is worth writing
- * down rather than rediscovering.** Its document is `hidden`: the panel is not
- * displayed, so the renderer is backgrounded and rasterizes no new tiles. What
+ * **The editor's browser pane cannot do this.** Its document is `hidden`: the
+ * panel is not displayed, so the renderer is backgrounded and rasterizes no new
+ * tiles. What
  * was rastered at load captures correctly and nothing else does. Measured on the
  * home page: at `scrollY: 0` a perfect frame, and at `scrollY: 600` the masthead
  * drawn six hundred pixels below where it belongs with white above it, which is
@@ -58,11 +58,10 @@
  * which is worth having in one command: a screenshot showing 16px of room is
  * worth more beside the number than on its own.
  *
- * **`--frame` reaches into the sandbox**, which the docs site needs and which is
- * the first thing this could not do. A component's examples are rendered in an
- * iframe, so the reference page for Carousel has no `helix-carousel` in its own
- * document, and every selector here has to be resolved against the frame rather
- * than the page.
+ * **`--frame` reaches into the sandbox**, which the docs site needs. A
+ * component's examples are rendered in an iframe, so the reference page for
+ * Carousel has no `helix-carousel` in its own document, and every selector here
+ * has to be resolved against the frame rather than the page.
  */
 import { mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -198,12 +197,10 @@ try {
   }
   /* Settle before measuring, and again before shooting.
    *
-   * **`--eval` used to run on the frame the interaction landed**, so anything
-   * reading a transitioned property read the value it was transitioning away
-   * from. It cost three consecutive readings of one fix: a button whose hover
-   * fill had just been repaired measured at its resting color twice, which
-   * reads as a change that did nothing. The same ordering would have made a
-   * broken fix look fine, which is the worse direction.
+   * **`--eval` must not run on the frame the interaction landed on**, or
+   * anything reading a transitioned property reads the value it is
+   * transitioning away from, which makes a repair look like a change that did
+   * nothing and a broken fix look fine.
    *
    * So the wait is taken here as well. The flag reads as "settle the page
    * before you look at it", and an `--eval` that measures is looking at it. The
@@ -216,12 +213,12 @@ try {
   if (script !== undefined) {
     /* An expression first, then the same text as a function body.
      *
-     * Wrapped in an async function either way, so `await` works. `return ${…}`
-     * alone is what this did and it takes only half of what anybody types: a
-     * bare expression returns its value, and the moment the script declares
-     * anything, `return const c = …` is a syntax error before it runs. The body
-     * form takes statements and returns whatever the last one chose to, so the
-     * two together take both without asking which was meant. */
+     * Wrapped in an async function either way, so `await` works. The expression
+     * form alone takes only half of what anybody types: a bare expression
+     * returns its value, and the moment the script declares anything,
+     * `return const c = …` is a syntax error before it runs. The body form
+     * takes statements and returns whatever the last one chose to, so the two
+     * together take both without asking which was meant. */
     let answer
     try {
       answer = await scope.evaluate(`(async () => (${script}))()`)

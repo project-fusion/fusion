@@ -1,16 +1,12 @@
 /**
  * What the theme engine says about itself, read from the oracle.
  *
- * **The engine is Rust now, and three checks used to read its TypeScript with a
- * regular expression.** That worked while the source was JavaScript and it was
- * never what those checks wanted: each of them is about what the engine *emits*,
- * and each was approximating that from what its templates look like.
- *
+ * **Read from what the engine emits, never from the engine's source.** Every
+ * check built on this is about the emitted names, and a regular expression over
+ * the templates only approximates them: it can see a family and never a leaf.
  * `oracle.json` is the emitted answer for seventeen intents, and `cargo test`
  * asserts the engine against it, so it cannot go stale without the Rust suite
- * failing. That makes it a better source than the source was: `check:css:seeds` used
- * to match `` `--${namespace}-${family}-${` `` and could see a family but never a
- * leaf, and here the leaves are literally present.
+ * failing.
  *
  * **The one thing lost is a name no theme exercises.** Reading templates saw
  * every branch whether or not anything ran it; reading output sees the branches

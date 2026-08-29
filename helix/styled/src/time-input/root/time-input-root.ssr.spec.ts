@@ -1,15 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(html`<helix-time-input
+const markup = withoutStyles(
+  ssr(html`<helix-time-input
   hint="Any quarter hour"
   label="Starts"
   locale="en-GB"
   name="starts"
   value="09:15"
-></helix-time-input>`)
+></helix-time-input>`),
+)
 
 describe('input time server output', () => {
   test('the field and its input ship, before any script runs', () => {

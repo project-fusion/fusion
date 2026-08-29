@@ -13,16 +13,11 @@
  * a coin landing. That one was decided rather than derived, and the decision is
  * the constant below.
  *
- * **Within a group the entries were in no order at all.** 62 files held a tag
- * list of four or more that was not alphabetical, which reads as deliberate
- * until the list is long enough to search, and then it reads as nothing.
- * `video-root.ts` is the case that argues for the check rather than another
- * sweep: it declares 48 parts, and its `captions-menu-*` family had drifted
- * into three separate runs with `fullscreen` and the whole `overflow-*` set
- * between them. Nothing was wrong with any line of it. The parts had simply
- * been appended in the order they were built over some months, which is what
- * every unsorted list is, and the only reader who could tell was one who
- * already knew the answer.
+ * **Within a group the entries sort alphabetically.** An unsorted list reads as
+ * deliberate until it is long enough to search, and then it reads as nothing:
+ * `video-root.ts` declares 48 parts, appended in the order they were built, and
+ * a `captions-menu-*` family split into three runs is invisible to any reader
+ * who does not already know the answer.
  *
  * **A docs page is generated from this order.** The manifest carries the tags
  * in source order and `bun run gen:reference` writes them out that way, so an
@@ -47,7 +42,7 @@ import { join } from 'node:path'
  * The tag order, one array per section, and a blank line between sections.
  *
  * Tags inside a section sit together with no blank line, which is what makes
- * the five metadata tags read as one block rather than five statements.
+ * the six metadata tags read as one block rather than six statements.
  *
  * The sequence is the corpus's own except for `@event` against `@csspart`,
  * which the corpus split almost evenly and which is settled here: slots and

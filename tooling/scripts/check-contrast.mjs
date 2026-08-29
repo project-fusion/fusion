@@ -91,9 +91,9 @@ const origin = `http://127.0.0.1:${server.address().port}`
    `surface-raised` in dark until the engine was asked instead. Naming the
    unpainted pairs turns the hole into a list.
 
-   **Read from what the engine emitted, not from its source.** `check:css:pairings`
-   carries the argument: the model is Rust now, and the regular expression that
-   used to stand in for it missed every status ink's grounds. */
+   **Read from what the engine emitted, not from its source.** The model is
+   Rust, and a regular expression standing in for it misses every status ink's
+   grounds. `check:css:pairings` carries the argument. */
 
 /** Every token the model names, which the page resolves to a color per mode. */
 const named = [...new Set([...pairs].flatMap((pair) => pair.split(' on ')))]
@@ -202,10 +202,10 @@ for (const mode of ['light', 'dark']) {
          without saying so. The first run of this reported eight measurements
          across 509 examples and called it a pass.
 
-         `tokens.css` records the same lesson from the other side: painting the
+         `tokens.css` records the same rule from the other side: painting the
          color and reading the pixel back is the only way to get sRGB out of
-         these, and reading the three numbers inside an `oklch()` as if they were
-         RGB is how earlier attempts produced figures that meant nothing. */
+         these. Reading the three numbers inside an `oklch()` as if they were RGB
+         produces figures that mean nothing. */
         const swatch = document.createElement('canvas')
         swatch.width = 1
         swatch.height = 1

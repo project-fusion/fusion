@@ -17,38 +17,32 @@
  * there and why that tier still needs no stylesheet from outside its own
  * directory.
  *
- * **The styled tier was refused, on an argument that was right when it was made
- * and has since expired.** It read: the styled tier cannot offer that
- * determinism while theming is in flight, because a seed change would redraw
- * all eighty-three baselines and say nothing about any component. That was true
- * of a library whose ramp, spacing and surfaces were being rebuilt weekly.
- * Re-measured 25 Aug 2026 against `helix/styles/src/tokens.css`: **0 of the
- * last 30 commits touched it, 1 of the last 100, and 4 of the last 300.** The
- * one inside a hundred is `bf7ffdc1`, a translucency moved from 72% to 60%. A
- * file that moves four times in three hundred commits is not in flight, and a
- * token change that does redraw every styled picture is now itself the kind of
- * thing worth seeing laid out as a diff rather than discovered on a page.
+ * **The styled tier depends on the token layer holding still**, because a seed
+ * change redraws every styled baseline at once and says nothing about any
+ * component. Measured 25 Aug 2026 against `helix/styles/src/tokens.css`: **0 of
+ * the last 30 commits touched it, 1 of the last 100, and 4 of the last 300**,
+ * the one inside a hundred moving a translucency from 72% to 60%. A file that
+ * moves four times in three hundred commits is not in flight, and a token change
+ * that does redraw every styled picture is itself worth seeing laid out as a
+ * diff rather than discovered on a page.
  *
- * So both tiers are pictured. Eighty-eight styled families against eighty-three
- * headless ones, every headless name also a styled name: layout and effect
- * families ship in the styled tier alone, having no behavior to separate, so a
- * family with no headless twin is expected rather than a fault.
+ * So both tiers are pictured, and every headless name is also a styled name:
+ * layout and effect families ship in the styled tier alone, having no behavior
+ * to separate, so a family with no headless twin is expected rather than a
+ * fault.
  *
- * **The styled tier needs `frame.css`, and learning that cost a set of false
- * findings rather than a broken picture, which is the more expensive way.** A
- * styled sheet resolves design tokens and nothing in this harness defines one;
- * the elements upgrade from `frame.js` either way, so a styled page rendered
- * without the stylesheet looks like a page rather than like an error. All
- * eighty-eight styled families measured at 640, both ways: without the sheet,
- * **23 of the 30 `<helix-icon>` elements in the corpus are 100px or wider**,
- * most of them 300 by 300, and three pages report wider than the viewport they
- * were given, `app-header` at 707, `pin-input` at 984 and `toolbar` at 667.
- * With `/frame.css` served, no icon reaches 100px, the same ones measure 16 or
- * 20, and no page reports over 640. Four of those families had already been
- * filed as responsiveness faults by a sweep that rendered them this way, and
- * not one of them overflows anything. A baseline taken without the sheet bakes
- * that in as the expected picture, which is worse than having no baseline at
- * all: from then on the check defends it.
+ * **The styled tier needs `frame.css`, and without it the pages look plausible
+ * rather than broken.** A styled sheet resolves design tokens and nothing else
+ * in this harness defines one; the elements upgrade from `frame.js` either way.
+ * Every styled family measured at 640, both ways: without the sheet, **23 of the
+ * 30 `<helix-icon>` elements in the corpus are 100px or wider**, most of them
+ * 300 by 300, and three pages report wider than the viewport they were given,
+ * `app-header` at 707, `pin-input` at 984 and `toolbar` at 667. With
+ * `/frame.css` served, no icon reaches 100px, the same ones measure 16 or 20,
+ * and no page reports over 640. Rendering this way produces responsiveness
+ * findings against families that overflow nothing, and a baseline taken without
+ * the sheet bakes that in as the expected picture, which is worse than having no
+ * baseline at all: from then on the check defends it.
  *
  * **The link comes before the inline style, and the ordering is load-bearing.**
  * `frame.css` sets `:root { color-scheme: light dark }` and a `body` background
@@ -110,10 +104,8 @@ const root = resolve(import.meta.dirname, '../..')
 /**
  * The two tiers, each read from the package that authors its own examples.
  *
- * The headless examples were filed under `helix/styled/src` once, and generated
- * from the styled example beside them, which made the base tier's evidence a
- * function of the tier above it. Both tiers author their own now, under the
- * same name, so each is pictured from where it lives.
+ * Each tier authors its own examples, under the same name, so neither tier's
+ * evidence is a function of the other's.
  *
  * `sheet` is the whole difference between them. A headless example is
  * deliberately token-free and its `preview.css` is the only styling it wants; a
@@ -128,17 +120,15 @@ const TIERS = [
 /**
  * The widths every family is pictured at, and why there are two.
  *
- * **One was 640, which is neither a phone nor a desktop**, and 244 named that
- * as the reason a responsiveness pass would be something somebody did once
- * rather than something that stayed done. A library with exactly one
- * viewport-width media query in it, Dialog's, and two families declaring
+ * **640 alone is neither a phone nor a desktop**, which makes a responsiveness
+ * pass something done once rather than something that stays done. A library with
+ * one viewport-width media query in it, Dialog's, and two families declaring
  * `container-type` has no policy yet; what it can have first is a picture of
  * what narrow currently looks like, so a change to it is visible.
  *
- * 390 is the width 244 reported its findings at, an iPhone's, and it is where
- * the splitter keeps a horizontal orientation and cuts its source pane to
- * 237px. The suffix is empty for the original so the committed baselines stay
- * valid and only the new width needs taking.
+ * 390 is an iPhone's, and it is where the splitter keeps a horizontal
+ * orientation and cuts its source pane to 237px. The suffix is empty at 640 so
+ * those baselines keep the names they were committed under.
  */
 const WIDTHS = [
   { suffix: '', width: 640 },
@@ -148,8 +138,7 @@ const WIDTHS = [
 /* Both halves of what `bun run gen:frame` writes, and both are required.
    `build-frame.mjs` empties the directory and writes the bundle, the stylesheet
    and the document together, so one of them missing means none of them is
-   trustworthy. The bundle alone was checked until the styled tier was added,
-   which was sufficient exactly while nothing needed a token. */
+   trustworthy. */
 const FRAME = join(root, 'fusion/site/public/sandbox/frame.js')
 const SHEET = join(root, 'fusion/site/public/sandbox/frame.css')
 const FONTS = join(root, 'fusion/site/public/fonts')
@@ -318,9 +307,9 @@ const tab = await browser.newPage({ viewport: { height: 800, width: WIDTHS[0].wi
  * load clips from MDN. Left open, a baseline records whatever those hosts
  * happened to return, so the check goes red the day one of them is slow, is
  * down, or re-encodes a picture, none of which is a fact about this library.
- * The first run proved it: the poster arrived over the network and the clip did
- * not, because Playwright's Chromium ships without the proprietary codecs, so
- * the picture recorded a photograph and an error message together.
+ * Left open, the poster arrives over the network and the clip does not, because
+ * Playwright's Chromium ships without the proprietary codecs, so the picture
+ * records a photograph and an error message together.
  *
  * Blocked, all three render the same missing-media state everywhere, which is
  * deterministic and is still the thing under test: what a baseline guards on

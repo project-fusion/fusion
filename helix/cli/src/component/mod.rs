@@ -40,6 +40,8 @@ pub mod reflected;
 pub mod run;
 pub mod seams;
 pub mod separation;
+pub mod ssr;
+pub mod stable;
 pub mod tier;
 pub mod vocabulary;
 
@@ -286,6 +288,16 @@ pub fn all() -> Vec<Rule> {
             summary: "a surface hooks both its edge and its lift",
         },
         Rule {
+            name: "ssr",
+            run: Runner::Source(ssr::run),
+            summary: "a server-rendered assertion is made against structure, not the string",
+        },
+        Rule {
+            name: "stable",
+            run: Runner::Source(stable::run),
+            summary: "`@status stable` means what stable has to mean",
+        },
+        Rule {
             name: "tier",
             run: Runner::Source(tier::run),
             summary: "a component that renders a child renders one from its own layer",
@@ -296,6 +308,15 @@ pub fn all() -> Vec<Rule> {
             summary: "one spelling for each role a part name can play",
         },
     ]
+}
+
+/// Every spec under `directory` whose name ends with `suffix`.
+///
+/// **The one walker that wants what `sources` throws away.** A rule about the
+/// components reads what declares them; a rule about whether they are proven
+/// reads what asserts about them, and the two sets do not overlap.
+pub fn specs(directory: &Path, suffix: &'static str, found: &mut Vec<PathBuf>) {
+    collect(directory, found, &|_, name| name.ends_with(suffix));
 }
 
 /// Every stylesheet under `directory`.

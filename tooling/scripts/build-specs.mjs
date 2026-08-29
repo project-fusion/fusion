@@ -10,10 +10,8 @@
  * Two `Bun.build` calls: one shared runtime, and one bundle per family that
  * imports it rather than inlining it.
  *
- * **Splitting was on and had to come off.** It emitted Lit and anything two
- * families shared once instead of into every bundle, which is the right instinct
- * and is not worth what it costs here: a family's entry now imports *both*
- * tiers, because its behavior is specified in `helix/headless` and its
+ * **Splitting cannot be on for the family build.** A family's entry imports
+ * *both* tiers, because its behavior is specified in `helix/headless` and its
  * appearance in `helix/styled`, and the styled class extends the headless one. An
  * `extends` clause is evaluated the moment its module runs, so when the two land
  * in different chunks neither can go first, and every entry dies on
@@ -50,12 +48,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 /**
  * Both tiers, merged by family.
  *
- * The specs moved when the tiers stopped sharing tags: a family's functional
- * tests are `helix/headless`'s and its stylesheet tests are `helix/styled`'s, so
- * twenty files left one directory for the other. Reading only `helix/styled`,
- * which is what this did, would have dropped every one of them from the browser
- * runner while still printing a family count and a size, which is the shape of
- * a coverage loss nobody sees.
+ * A family's functional tests are `helix/headless`'s and its stylesheet tests
+ * are `helix/styled`'s. Reading one tier drops the other's specs from the
+ * browser runner while still printing a family count and a size, which is the
+ * shape of a coverage loss nobody sees.
  *
  * Merged rather than kept apart, because the sandbox opens a *family*: pressing
  * Select should run what Select is tested by, and which tier a file sits in is
@@ -232,7 +228,7 @@ const result = await Bun.build({
   plugins: [shareRuntime, useBrowserHarness],
   /* Off, for the reason the header gives: an entry holding both tiers of a
      family puts a subclass and its base in different chunks and the cycle is
-     unresolvable. `SHARED` below fixed the same fault for one pair of Lit
+     unresolvable. `RUNTIME` above fixes the same fault for one pair of Lit
      directives and cannot fix this one, since the pair is different per
      family. */
   splitting: false,
@@ -291,11 +287,11 @@ await rm(entries, { force: true, recursive: true })
 /**
  * The families, written down rather than left to be guessed from filenames.
  *
- * The runner used to take every `.js` that did not look like a hashed chunk,
- * `-[a-z0-9]{8}.js`, and that is a guess a family name can satisfy by accident:
- * `video-playlist.js` ends in eight lowercase alphanumerics, so it was read as
- * a chunk and skipped. Its specs had never run in a browser and nothing said so,
- * because a suite that silently covers 87 of 88 families reports a clean pass.
+ * Taking every `.js` that does not look like a hashed chunk, `-[a-z0-9]{8}.js`,
+ * is a guess a family name can satisfy by accident: `video-playlist.js` ends in
+ * eight lowercase alphanumerics, so it reads as a chunk and is skipped. Its
+ * specs then never run in a browser and nothing says so, because a suite that
+ * silently covers 87 of 88 families reports a clean pass.
  */
 await writeFile(
   join(out, 'families.json'),

@@ -18,14 +18,8 @@
  * page, and no scan of the text can know which without laying the page out.
  *
  * That is a reason to read this as a floor rather than a census. A pair it
- * finds is real; the pairs it cannot find are why #141 still wants the DOM
- * walker #124 built and never committed, which composites real grounds on a
- * rendered page and answers the other two thirds.
- *
- * **The first run found four the model did not have**, of which the sharpest is
- * `foreground-on-accent` on `foreground-muted`: the time picker fills a range
- * end with the muted gray and puts the on-accent ink on it, deliberately and
- * with the measurement in its comment, and the model had no idea.
+ * finds is real; the pairs it cannot find need a DOM walker that composites
+ * real grounds on a rendered page, which would answer the other two thirds.
  *
  * Run with `bun run check:css:pairings` (also part of `bun run verify`).
  */
@@ -71,12 +65,11 @@ const walk = (dir) => {
 }
 walk(TIER)
 
-/* **The pairs the engine measures, read from what it emitted.** This used to
-   match the model's TypeScript with a regular expression, and two things ended
-   that: the model is Rust now, and the expression was quietly missing a third of
-   the pairs. Every status ink's grounds are built by a loop the pattern could not
-   see, so `color-danger on color-surface` and nineteen like it were never
-   checked, which is exactly the case a status fill painted by hand would land in.
+/* **The pairs the engine measures, read from what it emitted.** Never match the
+   model's source with a regular expression instead: every status ink's grounds
+   are built by a loop no pattern can see, so `color-danger on color-surface` and
+   nineteen like it go unchecked, which is exactly the case a status fill painted
+   by hand lands in.
 
    `oracle.json` is the emitted answer and `cargo test` asserts the engine
    against it, so it cannot go stale without the Rust suite going red. */

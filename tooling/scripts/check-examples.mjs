@@ -6,16 +6,6 @@
  * component leaves its examples rendering an element that silently ignores
  * them, and the sandbox shows a component that does not do what it says.
  *
- * **It held a rule about declared state until 26 Aug 2026, and that rule is
- * gone with the model it enforced.** It read `@controlled` out of the manifest
- * and failed an example that declared a controlled attribute without a listener
- * for the event that settled it, because `value="Ada"` was a claim of ownership
- * and a calendar written that way had arrows that did nothing. A declared
- * property is a seed now, so an example may write one and the control still
- * works when a reader copies it. Removed rather than left inert: the tag is
- * gone from the manifest, so the rule would have read an empty set, passed
- * everything, and gone on looking thorough. See 294.
- *
  * Run with `bun run check:prose:examples` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -29,12 +19,10 @@ const LAYOUTS = ['centered', 'fullscreen', 'hug', 'padded']
 /* Both tiers, because an example may show either.
  *
  * The examples live beside the styled components and most of them use styled
- * tags, so this read the styled manifest alone and would have reported
- * `<helix-headless-checkbox>` as an element that does not exist. It does exist: it
- * is registered by `helix/headless`, which is the tier the headless examples are
- * there to show is real and consumable. Reading one manifest meant a base
- * example could not be validated at all, so a typo in one would have rendered
- * an inert unknown element and passed. */
+ * tags, but `<helix-headless-checkbox>` and its siblings are registered by
+ * `helix/headless`. Reading the styled manifest alone reports those as elements
+ * that do not exist, and leaves a base example unvalidated: a typo in one
+ * renders an inert unknown element and passes. */
 const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-elements.json']
 const ROOT = SOURCE.styled
 
@@ -130,10 +118,9 @@ for (const family of families) {
      *
      * `helix-examples` reads `@summary` into the manifest and the reference
      * page prints it in the Examples table, so an example without one is a row
-     * with a slug and a blank. **279 of 344 were blank**, which is four fifths
-     * of the library documented by a plugin that was built, documented, and
-     * used by sixty-five files. Nothing said so, because a missing description
-     * renders as an empty cell and an empty cell looks like a layout. */
+     * with a slug and a blank. **279 of 344 were blank** and nothing said so,
+     * because a missing description renders as an empty cell and an empty cell
+     * looks like a layout. */
     if (!/<!--\s*@summary\s+\S/.test(markup)) {
       problems.push(
         `${family}/${file}: has no \`<!-- @summary … -->\`. The Examples table will print its ` +
@@ -145,8 +132,8 @@ for (const family of families) {
      * The value reaches the frame through the manifest and is applied as an
      * attribute, so a typo does not throw: it sets `data-layout="centred"`, no  (dialect:quoted)
      * rule matches, the example renders unstyled by any mode and looks merely
-     * wrong. Three modes exist and they are named here so the misspelling fails
-     * at the check rather than in a picture somebody has to notice.
+     * wrong. The four modes are named in `LAYOUTS` so the misspelling fails at
+     * the check rather than in a picture somebody has to notice.
      *
      * Only the shape is checked, not whether the annotation is present: absent
      * is the ordinary case and means the default. */
@@ -169,11 +156,10 @@ for (const family of families) {
     }
     /* And it links `styles.css`, whatever the file beside it is called.
        The pair on disk is keyed by slug, `nested.html` and `nested.css`, and the
-       sandbox shows them as `index.html` and `styles.css`. Twenty three examples
-       linked the slug and seven linked `styles.css`, so the link a reader could
-       see named a file they could not: it looked like the stylesheet in the tab
-       beside it was not the one being applied. The name a reader is shown is the
-       name the markup should say. */
+       sandbox shows them as `index.html` and `styles.css`. Linking the slug
+       names a file the reader cannot see, so the stylesheet in the tab beside it
+       looks like it is not the one being applied. The name a reader is shown is
+       the name the markup should say. */
     const href = link ? /\bhref=(["'])([^"']+)\1/i.exec(link[0])?.[2] : undefined
     if (href && href !== 'styles.css') {
       problems.push(
@@ -233,10 +219,8 @@ for (const family of families) {
 /* The documentation's HTML samples, held to the same rule.
  *
  * A reader copies what is in front of them, and a `style` attribute in a code
- * fence teaches the habit exactly as well as one in an example does. This check
- * walked `.examples` only, so the prose was the one place a `style` could
- * survive the sweep, and one did: the composition page's own argument is that
- * width belongs to the layout, illustrated with an inline style.
+ * fence teaches the habit exactly as well as one in an example does. Walking
+ * `.examples` alone leaves the prose as the one place a `style` survives.
  *
  * Fenced HTML only. Prose may name the attribute, and a CSS fence may set
  * properties without any of this applying to it. */

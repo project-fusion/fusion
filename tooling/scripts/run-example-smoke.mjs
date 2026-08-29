@@ -5,9 +5,9 @@
  * `check:prose:examples` reads them: it knows an attribute a component does not
  * declare, a slot nothing offers, an inline style. What it cannot know is
  * whether the example *works*, because the only way to find that out is to run
- * it. Nothing did. An example could throw on upgrade, name an element that is
- * registered nowhere, or render an empty box, and the first anyone would hear
- * of it is a reader opening the sandbox.
+ * it. An example could throw on upgrade, name an element that is registered
+ * nowhere, or render an empty box, and the first anyone would hear of it is a
+ * reader opening the sandbox.
  *
  * What is checked, per example:
  *
@@ -15,8 +15,7 @@
  *   `console.error` a component wrote on its way past.
  * - **Every `helix-` element upgraded.** An element whose module is missing
  *   from the bundle renders its children inline and looks, in a screenshot,
- *   almost exactly like a component that worked. That failure has cost this
- *   repository a day.
+ *   almost exactly like a component that worked.
  * - **Something was drawn.** An example that lays out to nothing at all is
  *   broken however quiet it is.
  *
@@ -110,9 +109,8 @@ const NETWORK = /Failed to load resource/
  * and nothing here interacts: this renders each example and looks at it. So it
  * catches only an example that drives itself, which today means none, since the
  * autoplaying carousel first moves at five seconds and this waits fifty
- * milliseconds. It is here so that the day something does interact, or an
- * example self-drives, the trap is already covered rather than needing to be
- * remembered. Do not read a green smoke run as saying the examples are all
+ * milliseconds. It is here so the trap is already covered the day something
+ * does interact. Do not read a green smoke run as saying the examples are all
  * correctly wired: that is what `check:prose:examples` and a reader's console say. */
 const AUDIT = /is controlled: `/
 

@@ -2,12 +2,12 @@
 /**
  * Fails the build when component CSS bypasses the semantic token layer.
  *
- * The token layer only holds if nothing routes around it. One `#f5f5f5` in one
- * component is invisible in review and then invisible in every theme that
- * component appears in: the theme changes, that one value does not, and the
- * bug surfaces as "the disclosure looks wrong in dark mode" months later.
+ * One `#f5f5f5` in one component is invisible in review and then invisible in
+ * every theme that component appears in: the theme changes, that one value does
+ * not, and the bug surfaces as "the disclosure looks wrong in dark mode" months
+ * later.
  *
- * Two rules:
+ * Three rules:
  *
  *   1. No raw values in properties that have tokens. Colors, spacing, radii,
  *      durations, font sizes, weights, and z-index must come from
@@ -30,13 +30,9 @@ import { SOURCE } from './lib/workspace.mjs'
 /* A git worktree is a second checkout of this repository, and a check that
      walks into one is reading another branch. `.claude/worktrees/*` holds the
      ones the agent tooling makes, so a session working on a different branch
-     puts a whole second copy of `helix/` inside this directory tree.
-     
-     This was not theoretical. `check:css:tokens` passed locally and failed in CI on
-     the same commit, because the sibling worktree was checked out before
-     `--helix-color-border-strong` was removed and its `tokens.css` put the
-     token back into the "defined" set. A real violation on `main` was masked by
-     a branch nobody was looking at. */
+     puts a whole second copy of `helix/` inside this directory tree, and its
+     `tokens.css` adds names to the "defined" set. That masks a real violation
+     on this branch and passes locally while CI fails on the same commit. */
 const IGNORED = new Set([
   '.claude',
   '.git',
@@ -137,16 +133,14 @@ const blankComments = (source) =>
 /**
  * Extracts CSS blocks: whole file for .css, `css\`...\`` templates for .ts.
  *
- * **Prose was opening blocks, and the cost was silence.** A comment naming a
- * stylesheet writes the word `css` immediately before a backtick, so every
- * mention of `site.css` or `theme.css` in a doc comment looked exactly like a
- * tagged template. On the file this was found with, four such mentions matched
- * and the fourth ran on past the real `css` template and consumed its opening
- * backtick, so the stylesheet itself was never extracted and the check passed
- * over a file it had not read: renaming eight tokens to
- * `--helix-space-nonexistent` still reported no violations. That is the worst
- * shape a check can fail in, and it fails this way for any `.ts` file whose
- * comments mention a `.css` file, which in this repository is most of them.
+ * **Prose can open a block, and the cost is silence.** A comment naming a
+ * stylesheet writes the word `css` immediately before a backtick, so a mention
+ * of `site.css` or `theme.css` looks exactly like a tagged template, runs on
+ * past the real `css` template and consumes its opening backtick. The
+ * stylesheet is then never extracted and the check passes over a file it has
+ * not read: renaming eight tokens to `--helix-space-nonexistent` still reported
+ * no violations. That is the worst shape a check can fail in, and it threatens
+ * any `.ts` file whose comments mention a `.css` file.
  *
  * Two guards, because the two cases are different. Comments are blanked first,
  * which removes the whole class. The lookbehind then rejects a `css` that is
@@ -189,15 +183,15 @@ const root = process.argv[2] ?? process.cwd()
  */
 const defined = new Set()
 /**
- * The private half, which had no check at all.
+ * The private half.
  *
  * `unknown-token` matches `--helix-` and therefore never sees a `--_helix-`
- * name, so a semantic token could be built on a primitive that did not exist
- * and nothing said so. `--helix-shadow-lg` was `0 12px 32px
- * var(--_helix-shadow-ink-lg)` for eight hours with that ink defined nowhere,
- * which makes the whole declaration invalid at computed-value time: every
- * shadow in the library resolved to none, in a build where all 177 tokens were
- * present and every check passed.
+ * name, so a semantic token built on a primitive that does not exist goes
+ * unreported. A missing primitive makes the whole declaration invalid at
+ * computed-value time: `--helix-shadow-lg: 0 12px 32px
+ * var(--_helix-shadow-ink-lg)` with that ink defined nowhere resolves every
+ * shadow in the library to none, with all 177 tokens present and every other
+ * check passing.
  *
  * A dangling primitive is worse than a dangling semantic token, because the
  * component that goes unstyled is not the file that names it.
@@ -234,13 +228,11 @@ for (const file of walk(root)) {
    * reaching for one would teach the opposite of what it is for, and a reader
    * copying it would get a stylesheet resolving to nothing.
    *
-   * Read off the markup rather than the filename, which used to be the better of
-   * two ways and is now the only one: a stylesheet is exempt when the example
-   * beside it renders a `helix-headless-` element, which is the thing that makes
-   * it a headless example. The file was called `headless.css` when this was
-   * written, so the name carried the answer and was merely a convention to
-   * remember. Both tiers call it `preview.css` now, the directory carrying the
-   * tier, so the name cannot answer at all and the markup is the fact itself. */
+   * Read off the markup rather than the filename: a stylesheet is exempt when
+   * the example beside it renders a `helix-headless-` element, which is the
+   * thing that makes it a headless example. Both tiers call the file
+   * `preview.css`, the directory carrying the tier, so the name cannot answer
+   * and the markup is the fact itself. */
   if (rel.includes('.examples') && file.endsWith('.css')) {
     const markup = file.replace(/\.css$/, '.html')
     if (existsSync(markup) && readFileSync(markup, 'utf8').includes('<helix-headless-')) {
@@ -255,10 +247,9 @@ for (const file of walk(root)) {
        not choices about a design.** `font-weight: 100 900` there is the range
        the variable font supplies and `font-style: normal` is what it contains;
        a token would be a category error, and `--helix-weight-regular` is not a
-       range and could not be written in that slot anyway. This never fired
-       before the brand faces moved from `next/font` into CSS on 24 Aug 2026,
-       which is why the rule had not met one. Tracked by depth rather than by
-       filename, so a `@font-face` anywhere is covered and nothing else is. */
+       range and could not be written in that slot anyway. Tracked by depth rather
+       than by filename, so a `@font-face` anywhere is covered and nothing else
+       is. */
     let inFace = false
     let faceDepth = 0
 
@@ -286,24 +277,21 @@ for (const file of walk(root)) {
 
       /* A primitive named and defined nowhere, checked before the skip below,
          because a definition line is the only place this can happen.
-         
+
          Only inside the styles package: everywhere else `no-primitive-access`
          refuses the reference outright, and reporting both would say the name
          is wrong when what is wrong is reaching for it at all.
-         
-         The skip exists so that a token definition may hold a raw value, which
-         is true and is about the right-hand side being a color rather than a
-         `var()`. Applied to the whole line it also skipped every reference one
-         token makes to another, which is where `--helix-shadow-lg` sat naming
-         an ink that did not exist. Written after the skip, this check passed on
-         the exact bug it was written for.
-         
+
+         The skip below lets a token definition hold a raw value, and applied to
+         the whole line it would also skip every reference one token makes to
+         another, which is exactly where a dangling primitive hides.
+
          **A bare reference only.** `var(--x, y)` is not dropped, it resolves to
          `y`, so an undefined name behind a fallback is the idiom for a primitive
          a theme may supply and this library need not: `--helix-font-display`
-         asks for `--_helix-family-display` and settles for the sans stack. The
-         first version of this flagged that line, which is the check telling a
-         working declaration it is broken. */
+         asks for `--_helix-family-display` and settles for the sans stack.
+         Flagging that line would be the check telling a working declaration it
+         is broken. */
       if (ownsPrimitives) {
         for (const [, name] of line.matchAll(/var\(\s*(--_helix-[\w-]+)\s*\)/g)) {
           if (!privates.has(name)) {
@@ -372,21 +360,20 @@ for (const file of walk(root)) {
   }
 }
 
-/* The third rule, and the one the other two could not see: a token named after
- * a component, that no component reads.
+/* One more rule, and the one the others cannot see: a token named after a
+ * component, that no component reads.
  *
- * `check:css:tokens` has always asked that every token *referenced* exists, which
- * catches a rename. It cannot ask that every token *declared* is read, because
- * most of the ones that are not are scale rungs: `--helix-radii-lg` has no
- * reader today and is still part of a complete scale a consumer reaches into.
- * A check that fires on all seven of those is worse than no check.
+ * `check:css:tokens` asks that every token *referenced* exists, which catches a
+ * rename. It cannot ask that every token *declared* is read, because most of the
+ * ones that are not are scale rungs: `--helix-radii-lg` has no reader today and
+ * is still part of a complete scale a consumer reaches into. A check that fires
+ * on those is worse than no check.
  *
  * But a token whose last word is a component's name is not a rung. It is a
  * promise about that component, and when the component stops reading it the
  * promise is left standing: `--helix-layer-popover` sat at 1100 with no reader
  * at all, offering a consumer a number to sit between two of ours that had
- * stopped meaning anything the day `popover` moved to the top layer. That is
- * the fault, it is the whole of the fault, and it is mechanical.
+ * stopped meaning anything the day `popover` moved to the top layer.
  *
  * The reference doc lists every unread token for a human to look at, which is
  * the honest treatment of the rest.

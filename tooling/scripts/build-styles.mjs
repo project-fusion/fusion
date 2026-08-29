@@ -57,17 +57,16 @@ const walk = function* (dir, suffix) {
  *
  * **The stylesheet is inside a template literal, which a JS minifier cannot
  * reach into.** `minify: true` in the bundler minifies the module around the
- * string and leaves the string itself byte for byte, so every prose comment in
- * every component stylesheet was being served to every visitor. Measured across
- * the tier: 68 percent of the shipped CSS was commentary, 206,486 brotli bytes
- * of it, and a page with seven components carried 23,660 where 3,923 was the
- * whole of the actual CSS.
+ * string and leaves the string itself byte for byte, so without this every
+ * prose comment in every component stylesheet is served to every visitor.
+ * Measured across the tier: 68 percent of the shipped CSS was commentary,
+ * 206,486 brotli bytes of it, and a page with seven components carried 23,660
+ * where 3,923 was the whole of the actual CSS.
  *
- * **Comments only, and that is a decision rather than laziness.** A real
- * minifier also rewrites values and selectors, and bun's lowers `light-dark()`
- * into malformed output on the 90 files here that use it. Comments are 68 of
- * the 72 strippable points, so the transformation that cannot change a rule
- * gets 98.8 percent of the saving.
+ * **Comments only.** A real minifier also rewrites values and selectors, and
+ * bun's lowers `light-dark()` into malformed output on the 90 files here that
+ * use it. Comments are 68 of the 72 strippable points, so the transformation
+ * that cannot change a rule gets 98.8 percent of the saving.
  *
  * **The source keeps every word.** Only the generated `.css.ts` is stripped,
  * and that file is gitignored and regenerated, so the prose stays where it is

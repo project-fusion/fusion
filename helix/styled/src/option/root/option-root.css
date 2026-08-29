@@ -27,13 +27,10 @@
      icon in it was taller than the one above it, and a list whose rows differ by
      two pixels reads as a list nobody measured.
 
-     **`control-sm` is a fixed step of the ramp, and this comment used to claim
-     the opposite.** *Corrected 28 Aug 2026.* It read "it is the token that moves
-     with density rather than a number that does not", and the density rules
-     redeclare the unsuffixed `--helix-size-control`; the `-sm`, `-md` and `-lg`
-     tokens are the scale and never move. Measured across the three regions, an
-     option row is 32px in every one of them while a button beside it is 32, 40
-     and 48.
+     **`control-sm` is a fixed step of the ramp.** The density rules redeclare
+     the unsuffixed `--helix-size-control`; the `-sm`, `-md` and `-lg` tokens are
+     the scale and never move. Measured across the three regions, an option row
+     is 32px in every one of them while a button beside it is 32, 40 and 48.
 
      Left pinned rather than swept, because whether a row in a floating panel
      *should* follow the region's density is a real question and this file cannot

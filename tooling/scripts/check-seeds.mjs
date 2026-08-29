@@ -5,12 +5,9 @@
  * **Two derivations compute this palette and nothing has ever compared them.**
  * `@fusion.dev/helix-theme` solves tokens in JavaScript and emits a block of custom
  * properties; `helix/styles` derives its own ramp in CSS from a handful of
- * seeds. They meet at exactly one place, the seed names, and until #141 they
- * disagreed there in silence: `toCss` wrote `--helix-seed-density` and
- * `--helix-seed-radius` while the stylesheet read `--_helix-seed-density` and
- * `--_helix-seed-radii`, both private with no public name to fall back through.
- * Two of the five intent knobs did nothing, and a spec asserting one of the
- * dead names passed the whole time.
+ * seeds. They meet at exactly one place, the seed names, and a disagreement
+ * there is silent: two of the five intent knobs once did nothing at all, and a
+ * spec asserting one of the dead names passed the whole time.
  *
  * A spec can only hold a name it names, which is why this is a check and not a
  * test. It reads both sides and compares the sets.
@@ -18,8 +15,8 @@
  * **Both directions, because each failure is different.**
  *
  * 1. **Emitted and unread.** The engine writes a name no stylesheet consumes,
- *    so a consumer sets an intent input and nothing moves. This is the failure
- *    #141 found, and it is invisible from either file alone.
+ *    so a consumer sets an intent input and nothing moves. It is invisible from
+ *    either file alone.
  * 2. **Read and never emitted.** The stylesheet offers a public seed the engine
  *    cannot produce, so the documented path to a theme cannot reach part of the
  *    palette and a consumer has to hand-write CSS to finish the job.
@@ -47,10 +44,8 @@
  * the job it does.** The boundary is the same one: every color token the
  * engine emits has to be a name `tokens.css` declares, or a themed page sets a
  * property nothing reads, which is the seed bug one level up and with thirty-six
- * more chances to happen. They agree today, measured, which is precisely the
- * state the seed names were in before they drifted. `seeds` stays the name
- * because the seeds are the sharp edge and a renamed check loses its history in
- * commit messages that cite it.
+ * more chances to happen. `seeds` stays the name because the seeds are the sharp
+ * edge.
  *
  * Run with `bun run check:css:seeds` (also part of `bun run verify`).
  */
@@ -84,18 +79,14 @@ const PLANNED = new Map([
 const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 /* Comments hold seed names too: `primitives.css` explains the whole scheme in
-   prose directly above the block, and `derive.ts` documents the two names it
-   used to get wrong. Reading those in makes the check pass on the bug it was
-   written for, which is the trap `check:api:composed`, `check:api:seams` and
-   `check:css:grounds` each record hitting. */
+   prose directly above the block, and `derive.ts` names the ones it documents.
+   Reading those in makes the check pass on the exact bug it was written for. */
 const uncommented = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
 
-/* **The seeds the engine emitted, rather than two regular expressions guessing
-   at how it writes them.** They used to be matched in the TypeScript source in
-   two forms, as an object key and as a rendered property, because the literal
-   prefix was never in the source to match on. The engine is Rust now and the
-   answer is in the oracle: these are the keys it actually wrote. */
+/* **The seeds the engine emitted, rather than a regular expression guessing at
+   how it writes them.** The literal prefix is never in the source to match on,
+   so the answer comes from the oracle: these are the keys it actually wrote. */
 const emitted = seedNames
 
 const consumed = new Set()
@@ -176,20 +167,17 @@ for (const name of [...new Set(modelNames)].sort()) {
   }
 }
 
-/* **Every other token `toCss` writes, which was the gap this check had.** It
-   held the seeds and the model's color names and nothing else, so the whole
-   non-color half of the emitted block was unguarded: separation, material,
-   type and motion. `--helix-font-body` shipped that way and nothing read it,
-   the token layer calling it `--helix-font-sans`, so setting a body face moved
-   the headings and left every other word on the page alone.
+/* **Every other token `toCss` writes**, so the non-color half of the emitted
+   block is guarded too: separation, material, type and motion. A name the token
+   layer spells differently (`--helix-font-body` against `--helix-font-sans`)
+   sets a property nothing reads, and nothing else notices.
 
-   **Read from what the engine emitted across every oracle intent**, where it
-   used to be matched against the template literals. The templates could see a
-   family and never a leaf, `--${namespace}-text-${name}` stopping the pattern at
-   the first `$`, and they could not see the color tokens at all, those being
-   written by a loop: fifty-three emitted names were outside this check. The
-   trade is that a branch no intent reaches is now invisible, which is why four
-   of the seventeen exist to turn on the tail of the emission. */
+   **Read from what the engine emitted across every oracle intent**, not matched
+   against the template literals: a template can see a family and never a leaf,
+   `--${namespace}-text-${name}` stopping the pattern at the first `$`, and it
+   cannot see the color tokens at all, those being written by a loop. The trade
+   is that a branch no intent reaches is invisible, which is why four of the
+   seventeen intents exist to turn on the tail of the emission. */
 const written = new Set([...emittedNames].filter((name) => !name.startsWith('seed-')))
 
 const declaredAll = new Set(
@@ -199,9 +187,9 @@ const declaredAll = new Set(
 )
 
 /* **A name interpolated twice is a family, and the family still has to exist.**
-   The type ramp is written `--${namespace}-text-${name}:`, so the whole of it
-   slipped past the pattern above, which stops at the first `$`. Matching the
-   prefix catches the failure that matters here, a family the token layer does
+   The type ramp is written `--${namespace}-text-${name}:`, which no pattern over
+   the source can reach past the first `$`. Matching the prefix catches the
+   failure that matters here, a family the token layer does
    not have at all: `--helix-typeface-lg` would be reported where
    `--helix-text-lg` is fine. It cannot check the leaf, and saying so is better
    than implying otherwise. */

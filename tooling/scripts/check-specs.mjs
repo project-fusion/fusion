@@ -10,18 +10,15 @@
  * `not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule*.
  * Both say nothing about what rendered.
  *
- * That has produced a false pass twice, once hiding a stale build for several
- * commits, which is what a prose rule is worth against a spec that looks right.
- *
  * The helpers in `@fusion.dev/helix-testing/ssr` are the way through: `withoutStyles`
  * strips the sheet, `hostTag` and `hostAttributes` read the host, `partTag` and
  * `hasPart` read one rendered part. Anything that went through one of them is
  * fine; the raw return of `ssr()` is not.
  *
- * `toContain` and `toMatch`, in both polarities. `toMatch` is the one that was
- * actually lying when this was written: `expect(markup).toMatch(/orientation="horizontal"/)`
- * on the card passed against `:host([orientation="horizontal"])` in the card's
- * own inlined stylesheet, on a host that carries no such attribute at all.
+ * `toContain` and `toMatch`, in both polarities. `toMatch` lies the same way:
+ * `expect(markup).toMatch(/orientation="horizontal"/)` on the card passes
+ * against `:host([orientation="horizontal"])` in the card's own inlined
+ * stylesheet, on a host that carries no such attribute at all.
  *
  * An `expect(markup).toBe` comparison of the whole string is left alone: it is
  * not a substring search and would fail loudly rather than quietly.

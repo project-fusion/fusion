@@ -36,8 +36,8 @@ export interface Tier {
 /**
  * What one tag publishes, per tier.
  *
- * Not `Element`, which it was: that shadows the DOM's own `Element` wherever
- * both are in scope, and `analyze.ts` needs both in the same file.
+ * Not `Element`: that name shadows the DOM's own `Element` wherever both are in
+ * scope, and `analyze.ts` needs both in the same file.
  */
 export interface Published {
   hooks: Map<string, Set<string>>

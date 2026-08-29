@@ -2,19 +2,12 @@
 /**
  * One attribute per line in an open tag, shared by everything that writes one.
  *
- * Extracted when a generator for the headless examples arrived, because two
- * writers of the same files have to agree: it wrote its markup one way, the
- * formatter rewrote it the other, and `bun run fix` cleaned nine files that
- * the very next `--check` then reported as drifted. That generator is gone,
- * both tiers being authored now, and this stays because the formatter still
- * has other writers to agree with. That is the same rule the
- * React wrappers already record, that a generator formats its own output or
- * every build dirties what `check` just cleaned, and the only way two of them
- * can hold it is to run the same code.
+ * Two writers of the same markup have to agree, or every build dirties what
+ * `check` just cleaned, and the only way they can agree is to run the same
+ * code. That is the rule the React wrappers already record.
  *
- * `format-examples.mjs` keeps the reasoning about *why* the rule is what it is,
- * along with the sweep across the three bodies of markup. What is here is the
- * mechanism alone.
+ * `format-examples.mjs` keeps the reasoning about *why* the rule is what it is.
+ * What is here is the mechanism alone.
  */
 
 /**
@@ -65,14 +58,13 @@ const OPEN = /<([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g
 /**
  * The attribute's name, which is the only part of it the order depends on.
  *
- * Sorting the whole `name="value"` token is what this did, and it is wrong in a
- * way that only shows up between an attribute and one that extends it:
- * `localeCompare` gives punctuation almost no weight, so `data-button-fill` and
- * `data-button` compared as `databuttonfillstandard` against
- * `databuttonghost` and the longer name won on the `f`. The same fault put
- * `value-text` ahead of `value`. Biome's own HTML formatter sorts on the name
- * and disagreed with both, which is how they were found: two formatters in one
- * `check` have to agree or they take turns undoing each other.
+ * Never sort the whole `name="value"` token, which goes wrong only between an
+ * attribute and one that extends it: `localeCompare` gives punctuation almost no
+ * weight, so `data-button-fill` and `data-button` compare as
+ * `databuttonfillstandard` against `databuttonghost` and the longer name wins on
+ * the `f`. The same fault puts `value-text` ahead of `value`. Biome's own HTML
+ * formatter sorts on the name, and two formatters in one `check` have to agree
+ * or they take turns undoing each other.
  */
 const name = (part) => part.split('=')[0].toLowerCase()
 

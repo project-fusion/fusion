@@ -9,8 +9,8 @@
  * `helix-change` that is the *only* way to refuse a change, and neither
  * declared it, so the refusal path was undiscoverable from the docs.
  *
- * Third of its shape after `check:css:hooks` and `check:api:parts`, and the same
- * argument: nothing about a missing `@event` fails, warns, or looks wrong.
+ * Nothing about a missing `@event` fails, warns, or looks wrong, which is why it
+ * takes a check. Same shape as `check:css:hooks` and `check:api:parts`.
  *
  * **Declared on the class that dispatches, or on one it extends.** A styled
  * component almost never dispatches anything of its own, and an event announced
@@ -55,11 +55,10 @@ for (const [, cls, name] of eventSource.matchAll(
   names.set(cls, name)
 }
 if (names.size === 0) {
-  /* Loud rather than empty. Read the other way, every construction resolved to
-     `undefined`, `filter(Boolean)` dropped them all, and the check reported all
-     fifty-eight declared events as never dispatched: a total failure that
-     looked exactly like a total success would have if the map were built and
-     nothing was wrong. */
+  /* Loud rather than empty. With no names, every construction resolves to
+     `undefined`, `filter(Boolean)` drops them all, and the check finds nothing
+     wrong because it can see nothing at all: total failure and total success
+     are the same output. */
   console.error('events: no event names found in events.ts, so nothing could be checked')
   process.exit(1)
 }
@@ -71,8 +70,7 @@ if (names.size === 0) {
  * so the map cannot disagree with the classes. What is left is one step a
  * person can still forget: a class exported and dispatched and never added to
  * the object. Forgotten, `addEventListener` types it as a bare `Event` and a
- * consumer reaches `detail` through a cast, which is what happened to
- * `helix-filter` and `helix-navigate` while the map was kept by hand.
+ * consumer reaches `detail` through a cast.
  */
 const registered = new Set(
   (eventSource.match(/const registry = \{([\s\S]*?)\} as const/)?.[1] ?? '')
@@ -83,12 +81,9 @@ const registered = new Set(
 /**
  * And every registered class is exported, which is a third hand-kept list.
  *
- * `helix/core/src/index.ts` re-exports the event classes by name. Adding
- * `HelixToggleEvent` to the registry, the map and the dispatch site left it out
- * of the barrel, and the failure was one tier away: `helix/core` compiled, and
- * `helix/headless` could not import the class it was told to dispatch. The
- * registry ended the drift between the classes and the map; this ends it
- * between the classes and what a consumer can import.
+ * `helix/core/src/index.ts` re-exports the event classes by name, and a class
+ * left out of that barrel fails one tier away: `helix/core` compiles, and
+ * `helix/headless` cannot import the class it is told to dispatch.
  */
 const barrel = readFileSync('helix/core/src/index.ts', 'utf8')
 const unexported = [...names.keys()].filter((cls) => !new RegExp(`\\b${cls}\\b`).test(barrel))
@@ -134,29 +129,20 @@ for (const tier of TIERS) {
     const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
     /* Any `new HelixSomethingEvent(...)`, not only one inside a `dispatchEvent`.
        Half of them are built in a factory the controlled-change util dispatches
-       for you, `event: (value) => new HelixChangeEvent(...)`, and matching the
-       dispatch alone missed every one: the check passed while `Tabs` and
-       `Toggle.Group` still had the undeclared `helix-change` the audit found.
-       These classes exist to be dispatched and are constructed nowhere else,
-       which is what makes the looser match the accurate one. */
+       for you, `event: (value) => new HelixChangeEvent(...)`, so matching the
+       dispatch site misses every one. These classes exist to be dispatched and
+       are constructed nowhere else, which is what makes the looser match the
+       accurate one. */
     const dispatched = [...code.matchAll(/new (Helix\w*Event)\s*\(/g)]
       .map((m) => names.get(m[1]))
       .filter(Boolean)
-    /* And any hand-rolled `new Event('helix-…')` or `new CustomEvent(…)`, which
-       this matched none
-       of. `Tour.Stop` dispatched `helix-tour-ask` that way: it bubbled, it was
-       composed, a consumer could listen for it, and it appeared in no manifest
-       and no documentation, because the check only ever asked about the event
-       classes. An event nobody can find is not API, and the way to notice is to
-       hold the raw form to the same rule.
-     *
-     * `Event` as well as `CustomEvent`, and that took two goes. The first
-       widening covered `CustomEvent` alone, so `ColorPicker`'s
-       `helix-sample-start` and `helix-sample-end`, dispatched as bare `Event`s
-       and bound by `ColorInput`, stayed invisible: audible to a consumer,
-       absent from the manifest, the React types and the docs page. Widening for
-       the constructor somebody happened to think of is how a check comes to
-       cover one case. */
+    /* And any hand-rolled `new Event('helix-…')` or `new CustomEvent(…)`, held
+       to the same rule: dispatched raw, an event bubbles and composes and a
+       consumer can listen for it while appearing in no manifest, no React types
+       and no documentation. `Event` as well as `CustomEvent`, because
+       `ColorPicker` sends `helix-sample-start` and `helix-sample-end` as bare
+       `Event`s. Covering only the constructor somebody happened to think of is
+       how a check comes to cover one case. */
     for (const [, name] of code.matchAll(
       /new (?:Custom)?Event(?:<[^>]*>)?\s*\(\s*['"`](helix-[\w-]+)['"`]/g,
     )) {
@@ -222,16 +208,11 @@ for (const [name, entry] of components) {
  *
  * **The two checks are per component and this one is per class**, so an event
  * class that no component declares and no component constructs satisfies both by
- * being absent from both. Three reached that state through 294 and 296:
- * `HelixChangeEvent` when the eleven generic families took verbs of their own,
- * and `HelixInputEvent` and `HelixToggleEvent` when the value and checked
- * controls moved to the platform's `input`, `change` and `toggle`. All three
- * were still exported and still in `HTMLElementEventMap`, which is the part that
- * costs a consumer something: the name types clean against `addEventListener`,
- * the handler is never called, and nothing anywhere says why.
- *
- * Found by grep during an audit rather than by this file, twice, which is the
- * argument for it being here.
+ * being absent from both. A class reaches that state whenever a family moves to
+ * a verb of its own or to a platform event, and stays exported and in
+ * `HTMLElementEventMap`, which is the part that costs a consumer something: the
+ * name types clean against `addEventListener`, the handler is never called, and
+ * nothing anywhere says why.
  */
 const everyDispatch = new Set()
 for (const tier of TIERS) {
@@ -244,11 +225,10 @@ for (const tier of TIERS) {
     }
   }
 }
-/* Every source file rather than the component classes above, which is a
-   correction this check needed on its first run: it reported `HelixCopyEvent`
-   as orphaned, and `CopyController` dispatches it on behalf of whatever host
-   applies it. A controller is not a component and dispatches all the same, and
-   `MixinChartSource` and the other mixins are the same shape. */
+/* Every source file rather than the component classes above. A controller is not
+   a component and dispatches all the same: `CopyController` sends
+   `HelixCopyEvent` on behalf of whatever host applies it, and `MixinChartSource`
+   and the other mixins are the same shape. */
 const orphaned = [...names.entries()].filter(([, event]) => !everyDispatch.has(event))
 if (orphaned.length > 0) {
   console.error(`Event classes nothing dispatches (${orphaned.length}):\n`)

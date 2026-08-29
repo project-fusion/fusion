@@ -2,14 +2,13 @@
 /**
  * Holds GLSL written inside JavaScript template literals to being GLSL.
  *
- * **Written against a failure that happened twice in one afternoon.** A shader
- * is a template literal, and a backtick anywhere inside it, including inside a
- * GLSL comment quoting a CSS property, ends the literal early. What follows is
- * parsed as JavaScript, and the results are not a syntax error at the backtick:
- * once it stripped every brace out of a two hundred line shader, and the
- * compiler reported `'return' : syntax error` on line seventeen. Neither
- * message names the cause, and both arrive at runtime, in a browser, from the
- * GPU driver.
+ * **A shader is a template literal, and a backtick anywhere inside it ends that
+ * literal early**, including a backtick inside a GLSL comment quoting a CSS
+ * property. What follows is parsed as JavaScript, and the result is not a syntax
+ * error at the backtick: every brace can vanish out of a two hundred line
+ * shader, and the compiler reports `'return' : syntax error` on line seventeen.
+ * Neither message names the cause, and both arrive at runtime, in a browser,
+ * from the GPU driver.
  *
  * There is no linter for this. Biome sees a valid string and Prettier formats
  * it happily; the GLSL is opaque to both. So the check is here.
@@ -25,11 +24,10 @@ import { ROOTS } from './lib/workspace.mjs'
 
 const OPENER = '`#version 300 es'
 
-/* **The roots are named once and this glob spelled them out**, so when `site/`
-   became `fusion/site` the pattern went on matching nothing under that name and
-   the check went on passing: 1,117 files scanned where 1,343 exist, and it only
-   stayed green because both shaders are in `helix/`. A check that silently
-   narrows reads exactly like a check that found nothing. */
+/* **The roots come from `ROOTS`, never spelled out here.** A folder that moves
+   leaves a written-out pattern matching nothing under its new name, and the
+   check goes on passing: a check that silently narrows reads exactly like a
+   check that found nothing. */
 const FILES = globSync(`{${ROOTS.join(',')}}/**/*.{ts,tsx,mjs,js}`, {
   exclude: (path) => path.includes('node_modules') || path.includes('/dist/'),
 })

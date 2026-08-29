@@ -7,14 +7,9 @@
  * is silent: no build error, no type error, no failing test. The page simply
  * loses a rule.
  *
- * It has already happened twice. `.heroInstall code` stayed in the global sheet
- * while `.heroInstall` moved, and the install line lost its type color and its
- * button sizing. Then `pageHero` was left as a bare word inside a template
- * literal on both galleries while the rule moved to a module, which took
- * `position: relative` and `min-block-size` off the hero: the hero collapsed and
- * the lattice it was meant to contain escaped over the whole page.
- *
- * Both were found by eye, days apart, and neither had to be.
+ * The bare name is easiest to miss inside a template literal, and a descendant
+ * selector left behind in the global sheet (`.heroInstall code`, where
+ * `.heroInstall` has moved) is the same fault seen from the other side.
  *
  * `:global()` names are exempt, because that is exactly what the syntax is for:
  * a rule reaching a name the module does not own.

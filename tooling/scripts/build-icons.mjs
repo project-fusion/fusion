@@ -12,12 +12,6 @@ import { fileURLToPath } from 'node:url'
  * icon at every weight sits in `node_modules`; what ships is the handful named
  * here, inlined into `generated.ts`.
  *
- * It used to be a folder of SVGs pasted in by hand, which drifted: the copies
- * were the stroked form Phosphor's site exports and the package draws the
- * regular weight as one filled path, so the same glyph was in the repo twice in
- * two techniques with no way to tell which was current. Adding an icon is
- * adding a line now.
- *
  * Icons are data, not components, and the data is the SVG's inner markup rather
  * than a single path string. Phosphor draws some glyphs with several elements
  * at once, a `<polyline>` beside a `<circle>` beside a `<rect>`, and each
@@ -25,16 +19,12 @@ import { fileURLToPath } from 'node:url'
  * lose those, so the inner markup is kept verbatim and the component renders
  * it.
  *
- * `fusion.svg` is not skipped, and the reason it used to be was wrong. It
- * defines gradients by id, and the note here said ids are document-global so
- * two marks on one page would fight over the same names. Ids are scoped to
- * their *tree*, and a shadow root is a tree: `helix-icon` renders into one, so
- * two of them resolve their own gradients even with identical ids next door.
- * Measured, with two copies in separate shadow roots and two more in the light
- * DOM for comparison.
- *
- * Which leaves the light DOM as the case the old note was actually describing,
- * and no component here renders an icon there.
+ * `fusion.svg` defines gradients by id and is not skipped for it. Ids are
+ * scoped to their *tree*, and a shadow root is a tree: `helix-icon` renders
+ * into one, so two of them resolve their own gradients even with identical ids
+ * next door. Measured, with two copies in separate shadow roots and two more in
+ * the light DOM for comparison. The light DOM is where the collision would be
+ * real, and no component here renders an icon there.
  */
 
 // `fileURLToPath`, not `import.meta.dir`: the latter is Bun's and is undefined
@@ -47,17 +37,17 @@ const OUT = join(ROOT, 'helix/icons/src/generated.ts')
 
 /* Bold first, then fill, then `raw/` for the marks Phosphor does not draw.
  *
- * Bold rather than regular, which is what this drew before. Phosphor's regular
- * is a hairline next to the type it sits beside: at `icon-sm` in a tree row or
- * a listbox option it reads as a lighter gray than the words it belongs to,
- * which is the opposite of what a mark is for. Bold matches the medium weight
- * every row in this library is set in.
+ * Bold rather than regular. Phosphor's regular is a hairline next to the type
+ * it sits beside: at `icon-sm` in a tree row or a listbox option it reads as a
+ * lighter gray than the words it belongs to, which is the opposite of what a
+ * mark is for. Bold matches the medium weight every row in this library is set
+ * in.
  *
  * The four `-fill` names are unaffected, and that is deliberate rather than
  * incidental: fill is a different statement from weight, chosen by the
  * components that use it to say a thing is complete or is a state rather than a
  * control, and there is no bold of a fill to want. They miss in `bold/` and land
- * in `fill/`, which is the same fall-through that used to catch them.
+ * in `fill/`.
  *
  * Only `regular/` names its files bare. Every other weight suffixes them, so
  * the bold of `caret-down` is `caret-down-bold.svg`, and the lookup has to say
@@ -92,7 +82,7 @@ const entries = readFileSync(LIST, 'utf8')
       .replace(/^[\s\S]*?<svg[^>]*>/, '')
       .replace(/<\/svg>[\s\S]*$/, '')
       // The component supplies the accessible name, so a baked-in one would
-      // announce twice and could not be localised.
+      // announce twice and could not be localized.
       .replace(/<title>[\s\S]*?<\/title>/g, '')
       .replace(/\s+/g, ' ')
       .trim()

@@ -1,26 +1,15 @@
 # What the site build does not need.
 #
 # The deploy runs from the repo root, because fusion/site is a workspace package and
-# its dependencies are built from source. That would otherwise upload the whole
-# company: strategy, the planning documents had no part in
-# building a component gallery, so they did not leave the machine.
+# its dependencies are built from source. That would otherwise upload a great
+# deal the build has no use for.
 #
 # Leading slash matters: `docs/` is a gitignore-style pattern and would also
 # match `cortex/docs` and `helix/docs`, which are workspace members. Excluding
 # those breaks `bun install` before the build starts.
 #
-# **Amended 25 Aug 2026, and the old rule had started doing the harm it warns
-# about one line up.** `/docs/` was written when that folder held the numbered
-# strategy and nothing else. Two things have changed since: the strategy left
-# with the history rewrite, so the exclusion now protects nothing that exists,
-# and `site/content` became `fusion/docs/insights`, so the folder holds
-# `@fusion.dev/insights`, a workspace member the site depends on. Excluding it
-# failed `bun install` exactly as this comment predicted for the nested ones.
-#
-# *Amended again 28 Aug 2026, when the folder moved to `fusion/docs`.* The
-# pattern is now three levels from the root and no longer collides with any
-# `docs` folder at all, the hazard the first paragraph is about having been a
-# property of the name rather than of the path.
+# `fusion/docs/insights` is `@fusion.dev/insights`, a workspace member the site
+# depends on, so the folder itself can never be excluded.
 #
 # So the pattern names the files rather than the folder. The three markdown
 # documents left at the top of `fusion/docs/` are the queue and two generated

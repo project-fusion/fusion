@@ -2,24 +2,18 @@
 /**
  * Writes `fusion/docs/component-reference.md` from the manifest.
  *
- * **Unnumbered, and that is the point of the name.** It sat at
- * `11-component-reference.md`, taking a slot in the 00 to 99 strategy sequence
- * because that is where prose about this repository already lived, and it
- * arrived there in `b3b3a4c9` beside a List port rather than by decision. A
- * sequence number is a reading order for documents somebody wrote; this one is
- * written by a script and nobody reads it in order. `docs/` is still the right
- * folder: it is repository-internal, which is exactly what this is, and moving
- * it under `helix/` would either publish a whole-library download that
+ * **Unnumbered, and that is the point of the name.** A sequence number is a
+ * reading order for documents somebody wrote; this one is written by a script
+ * and nobody reads it in order. `docs/` is the right folder: it is
+ * repository-internal, which is exactly what this is, and moving it under
+ * `helix/` would either publish a whole-library download that
  * `coding-agents.mdx` argues against or leave it somewhere with no reader.
  *
- * The document it replaces was transcribed by hand, and had drifted in both
- * directions at once: missing `Divider`, `Menu`, `Tree`, `Flex`, `Grid` and
- * `TableColumn`, while still describing a `Clock`, a `Combobox`, a `CopyButton`
- * and a `DatePicker` that this repository has never had. Both faults are the
- * same fault. A reference maintained by retyping is a second source of truth
- * for something that already has one, and the copy is always the stale one.
+ * Never maintain it by retyping. A reference kept by hand is a second source of
+ * truth for something that already has one, and the copy is always the stale
+ * one.
  *
- * **The rendering is not here any more.** It is `reference()` in
+ * **The rendering is not here.** It is `reference()` in
  * `@fusion.dev/helix-docs`, because a manifest-to-markdown renderer is documentation
  * for Helix rather than a build step of this repository: a consumer installing
  * the docs package should get the component reference along with the prose, and

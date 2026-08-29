@@ -11,20 +11,11 @@
  * `outlined` appears in two of those groups meaning different things: on a Card
  * it says where the surface ends, on a Button it says how much ink.
  *
- * **A registry is the deliverable and the renames are the consequence.** The
- * words drifted because nothing held them, not because anybody chose badly:
- * `tone` is already five incompatible value sets plus `severity` as a sixth
- * spelling of it, which is the same disease one stage earlier. Without a check,
- * this converges back to one word inside a year, which is what happened the
- * first time.
+ * Without a check the words converge back onto one inside a year: `tone` is
+ * already five incompatible value sets plus `severity` as a sixth spelling of
+ * it, which is the same disease one stage earlier.
  *
- * **The library found this itself and could not act on it.** `megamenu-root.css`
- * reads: "a consumer can make the panel glass, which is not an appearance:
- * `full` already occupies that axis with a layout ... Two things that can be
- * true at once are two axes". It derived the test, had nowhere to put the
- * answer, and fell back to an unnamed custom property.
- *
- * Three rules, and the third is what makes it a sweep rather than a rename:
+ * Four rules, and the third is what makes it a sweep rather than a rename:
  *
  * - A property named after an axis draws only from that axis. A component may
  *   take a subset, because most surfaces have meaning for two of the four, and
@@ -38,9 +29,9 @@
  *   between two widgets is structural wherever it is made. What it may not be
  *   is a place to put something that *is* on an axis, which is the failure mode
  *   `appearance` demonstrated for 21 components.
- * - `appearance` is refused outright. It is not a word this library uses: it
- *   held 21 declarations across four axes, and `UNSWEPT` is empty now, so a
- *   component reintroducing it fails rather than being asked to explain itself.
+ * - `appearance` is refused outright. It is not a word this library uses, and
+ *   `UNSWEPT` is empty, so a component reintroducing it fails rather than being
+ *   asked to explain itself.
  *
  * Run with `bun run check:css:axes`, after `bun run analyze`.
  */
@@ -56,54 +47,35 @@ const AXES = {
   /* `transparent` is on this axis rather than beside it: opaque, glass and
      transparent are three points of one optical language, and `app-header`
      proves it from the inside by emitting the same two declarations for its
-     transparent bar once anything has scrolled under it. `matte` is not here.
-     It was in the first sketch of this registry and nothing needs it, which is
-     the same test `UNSWEPT` applies to itself. */
+     transparent bar once anything has scrolled under it. `matte` is not here
+     because nothing needs it, which is the test `UNSWEPT` applies to itself. */
   material: ['frosted', 'glass', 'transparent'],
   /* **`outlined` is here and on `emphasis`, and that is not a collision because
-     the two axes partition the library.** Measured 24 Aug 2026 from the styled
-     manifest: 11 families declare `emphasis`, 5 declare `separation`, and none
-     declares both. Emphasis is asked of controls and marks, how loud this one
-     is; separation is asked of containers, where the surface ends. `outlined`
-     means bordered in each, one word with one meaning applied to two kinds of
-     thing, and `solid` beside `filled` and `ghost` beside `plain` are the same
-     pattern: near-synonyms that never meet.
-
-     What was never true is that anything stopped a family declaring both, and
-     the day one does `outlined` is two answers to one question. The guard below
-     refuses it. A guard rather than a rename, because the words are right where
-     they are: a button is not `plain` and a card is not `ghost`, and one merged
-     list would hand every component the other's vocabulary. See 254.
+     the two axes partition the library.** See the guard below, which is what
+     keeps that true.
 
      **These are the states of `ThemeIntent.separation`'s mechanisms, one to
      one, and the two word forms are the point rather than a collision.** The
      theme names what does the separating and a component names what the surface
      then is: `border` and `outlined`, `fill` and `filled`, `shadow` and
-     `elevated`, `space` and `plain`. Written down here because `fill` had a
-     third use, `Button.fill` for how wide a control is, which is now `width`,
-     and the two that are left agree with each other. The one that remains is
-     CSS's own `fill` property, which every chart writes for paint and which is
-     not ours to rename. */
+     `elevated`, `space` and `plain`. The remaining `fill` is CSS's own
+     property, which every chart writes for paint and which is not ours to
+     rename. */
   separation: ['elevated', 'filled', 'outlined', 'plain'],
-  /* **Geometry, and the word had six vocabularies and no check until 26 Aug
-     2026.** Avatar said `circle` and `square`, Meter and Progress said `arc`
-     and `ring`, QR Code said `dots`, `rounded` and `square`, Skeleton said
-     `text` and `circle`, and Aura said `aurora`, `braid`, `caustics` and eight
-     more. Five of those are the same idea, the outline the thing takes; the
-     sixth was eleven names for a look, which is `variant` by this registry's
-     own rule and was renamed to it.
+  /* Geometry: the outline a thing takes. A list of names for a *look* is not on
+     this axis, it is `variant` by this registry's own rule.
 
      `text` earns its place beside the round words: a skeleton shaped like lines
      of prose is a shape in the sense that matters here, which is what outline a
      placeholder takes rather than whether that outline is a circle. */
   shape: ['arc', 'circle', 'dots', 'ring', 'rounded', 'square', 'text'],
   /* `muted` and `subtle` are the neutral role's own quiet inks rather than an
-     emphasis axis fused into this one, which was the reading until it was
-     measured. Every *other* tone is already solved to the least extreme value
-     that clears its target and so sits on the AA floor: headroom over 4.5 runs
-     0.17 for `primary` down to zero for `success` and `warning`, against 2.70
-     for `foreground`. A quieter danger has nowhere to go, so the cross product
-     `preview.css` feared has one populated column and these two are values here. */
+     emphasis axis fused into this one. Every *other* tone is already solved to
+     the least extreme value that clears its target and so sits on the AA floor:
+     headroom over 4.5 runs 0.17 for `primary` down to zero for `success` and
+     `warning`, against 2.70 for `foreground`. A quieter danger has nowhere to
+     go, so the cross product `preview.css` feared has one populated column and
+     these two are values here. */
   tone: [
     'accent',
     'danger',
@@ -118,13 +90,9 @@ const AXES = {
   ],
   /* Geometry rather than paint, and registered because it is cross-cutting:
      anything that lets a consumer say how much of its container it takes says
-     it with this word and these three values. It was `fill` on `Button`, whose
-     docstring had to open "Width and not weight" because `emphasis` on the same
-     element is documented as "How filled it is drawn". `size` is not the word
-     either, for the reason `Dialog` gives when it takes one: that rule's test is
-     whether two of them sitting together could legitimately differ, and two
-     buttons do. This is a width policy and not a scale, `standard` existing
-     precisely to stop a row being ragged. */
+     it with this word and these three values. Not `fill`, which collides with
+     how filled a control is *drawn*, and not `size`: this is a width policy and
+     not a scale, `standard` existing precisely to stop a row being ragged. */
   width: ['auto', 'full', 'standard'],
 }
 
@@ -132,13 +100,9 @@ const AXES = {
  * Families whose `appearance` has not been reclassified yet, each with what it
  * turns out to be.
  *
- * **Empty, and the check below is what keeps it that way.** It held 21
- * declarations when this was written and now holds none: `appearance` is not a
- * word this library uses, so any component reintroducing it fails outright
- * rather than being asked to explain itself. The entries are in the history of
- * this file if the reasoning is ever wanted; each named the axis its family
- * turned out to be on, and two of them were wrong because they were read from
- * value names rather than from what the values did.
+ * **Empty, and the check below is what keeps it that way.** `appearance` is not
+ * a word this library uses, so any component reintroducing it fails outright
+ * rather than being asked to explain itself.
  */
 const UNSWEPT = {}
 
@@ -146,12 +110,6 @@ const UNSWEPT = {}
  * Values off the registry that another row already owns, so this check names the
  * work rather than blocking on it. Same contract as `UNSWEPT`: an entry nothing
  * needs is refused below.
- *
- * **Empty, and both entries were cleared by deciding rather than by deferring.**
- * `helix-bar-chart.material` held `gradient`, which is a way of distributing a
- * fill rather than a thing a bar is made of: it is `wash` now, local to charts.
- * `helix-text.tone` held `muted` and `subtle`, which turned out to be tone
- * values after all once the headroom was measured.
  */
 const PENDING = {}
 
@@ -168,7 +126,7 @@ const PENDING = {}
  * a track being what the headless tier feeds `grid-template-columns`.
  *
  * What it does not excuse is a *policy* under another name. `fill`, `span` and
- * `block` are the ones to watch for, and `fill` is where this started.
+ * `block` are the ones to watch for.
  */
 const LENGTHS = new Set(['table'])
 
@@ -307,9 +265,9 @@ for (const family of Object.keys(UNSWEPT)) {
  * families, so it would compare a bar chart against a blockquote. Too coarse and
  * too narrow at once. A group says which families are read together.
  *
- * The sharpest case is the one that motivated it: `legend` renders a swatch, and
- * a key whose swatches are solid while the bars they key are outlined is a
- * legend that does not match its own chart. Nothing else here could see that.
+ * The sharpest case: `legend` renders a swatch, and a key whose swatches are
+ * solid while the bars they key are outlined is a legend that does not match its
+ * own chart. Nothing else here could see that.
  *
  * Reported rather than failed on, for the reason `check:gen:routes` counts its
  * stubs: the answer to a disagreement is sometimes that the axis genuinely does
@@ -338,21 +296,19 @@ for (const [group, families] of inGroups) {
 /* **`outlined` is in two vocabularies, and no component may be asked both.**
  *
  * `emphasis` is `ghost | outlined | solid | subtle` and `separation` is
- * `elevated | filled | outlined | plain`, and `outlined` is in both verbatim,
- * with `solid` beside `filled` and `ghost` beside `plain` as near-synonyms. That
- * looks like a collision and is not one, because the two axes partition the
- * library: measured, 11 families declare `emphasis`, 5 declare `separation`, and
- * **none declares both**. Emphasis is asked of controls and marks, how loud this
- * one is; separation is asked of containers, where the surface ends. `outlined`
- * means bordered in both, which is one word with one meaning applied to two kinds
- * of thing.
+ * `elevated | filled | outlined | plain`, and `outlined` is in both verbatim.
+ * That looks like a collision and is not one, because the two axes partition the
+ * library: 11 families declare `emphasis`, 5 declare `separation`, and **none
+ * declares both**. Emphasis is asked of controls and marks, how loud this one
+ * is; separation is asked of containers, where the surface ends. `outlined`
+ * means bordered in both, one word with one meaning applied to two kinds of
+ * thing.
  *
- * What has never been true is that anything stopped a family from declaring both,
- * and the day one does, `outlined` becomes two answers to one question with
- * nothing to say which wins. This is that stop. It is a guard rather than a
- * rename because the words are right: a button is not `plain` and a card is not
- * `ghost`, and merging the two lists would hand every component the other's
- * vocabulary. See 254. */
+ * Nothing but this stops a family from declaring both, and the day one does
+ * `outlined` becomes two answers to one question with nothing to say which wins.
+ * A guard rather than a rename because the words are right: a button is not
+ * `plain` and a card is not `ghost`, and merging the two lists would hand every
+ * component the other's vocabulary. See 254. */
 const bothSurfaceAxes = [...declaresAxis]
   .filter(([, axes]) => axes.has('emphasis') && axes.has('separation'))
   .map(([family]) => family)

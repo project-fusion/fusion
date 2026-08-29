@@ -85,7 +85,7 @@ jobs:
           claude_args: --model claude-opus-5
           prompt: |
             Review this pull request against the standards this repository has
-            written down for itself. Read CLAUDE.md and every file in
+            written down for itself. Read AGENTS.md and every file in
             .claude/rules/ first. Those are the standard. Your own taste is not.
 
             Work in two passes.
@@ -96,7 +96,7 @@ jobs:
             them. In particular:
 
             - A fix applied at the consumer level when the cause is deeper.
-              CLAUDE.md calls this out: a patch at the consumer masks an
+              AGENTS.md calls this out: a patch at the consumer masks an
               architectural gap, and the fix goes where the cause is.
             - A raw value where a semantic token exists, or a token invented
               rather than used.
@@ -113,7 +113,7 @@ jobs:
             Pass two, refute. For each candidate, argue against yourself as hard
             as you can. Is it actually wrong, or merely different from how you
             would have written it? Would it really fail, and under exactly what
-            input or state? Does a rule in CLAUDE.md or .claude/rules/ genuinely
+            input or state? Does a rule in AGENTS.md or .claude/rules/ genuinely
             say this, or are you paraphrasing something adjacent? Is it already
             caught by an existing `check:*` script? Drop everything that does not
             survive. Default to dropping.

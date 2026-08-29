@@ -3,11 +3,10 @@
  * Every component that animates has to answer `prefers-reduced-motion` itself.
  *
  * The base layer has a global rule capping animation and transition duration for
- * a reader who asked not to be moved, and its comment used to claim it beat "a
- * component's own transition". It does not. The rule is `*, *::before,
- * *::after` in the document, and `*` does not cross a shadow boundary, so it
- * reaches prose, layout and the `data-` recipes and **not one part of any
- * component in this library**.
+ * a reader who asked not to be moved, and it does not reach a component. The
+ * rule is `*, *::before, *::after` in the document, and `*` does not cross a
+ * shadow boundary, so it reaches prose, layout and the `data-` recipes and
+ * **not one part of any component in this library**.
  *
  * Measured under `prefers-reduced-motion: reduce`: a light-DOM element resolved
  * to `1e-05s`, and a component's shadow child kept its full authored duration.
@@ -18,11 +17,9 @@
  * appears inside a `@media (prefers-reduced-motion: reduce)` block in the same
  * stylesheet.
  *
- * **Per selector, not per file, and the difference mattered.** The first version
- * asked only whether a reduce block existed anywhere in the sheet, which eight
- * families satisfied while still moving: the toast's exit collapse, the tree's
- * chevron, the select's trigger, the carousel's indicator, and the card
- * appearances on checkbox and radio. Each had a block that named something else.
+ * **Per selector, not per file.** Asking only whether a reduce block exists
+ * anywhere in the sheet is satisfied by eight families that still move, each
+ * carrying a block that names something else.
  *
  * It still does not check *what* the block does, because there is no single
  * right answer and the component knows which one applies:
@@ -42,8 +39,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
 import { SOURCE } from './lib/workspace.mjs'
 
-/* `helix/styles/src` is in the list, and leaving it out was the gap that let two
-   moving `::part()` rules ship unanswered. `::part()` is the one construct that
+/* `helix/styles/src` is in the list because `::part()` is the one construct that
    lets a document sheet write into a shadow tree, so it is the one place a
    component genuinely cannot answer for itself. */
 const TIERS = [SOURCE.styles, SOURCE.styled, SOURCE.sandbox, SOURCE.gallery]
@@ -138,8 +134,7 @@ for (const tier of TIERS) {
     /* What the sheet has already answered for. Compared as normalized selector
        text: a reduce rule has to name the same selector, which also means it
        carries the same specificity and therefore actually wins. Naming a looser
-       one silently loses, which is the trap that made the per-file check
-       useless. */
+       one silently loses. */
     const answered = new Set(
       parsed.filter((rule) => rule.reduced).flatMap((rule) => parts(rule.selector)),
     )
@@ -176,13 +171,11 @@ for (const tier of TIERS) {
 /**
  * A `@starting-style` rule needs an ordinary rule of its own selector, above it.
  *
- * This is the shape of a transition that only works one way, and it has now been
- * written twice. `Drawer` had its starting style first in the file and records
- * what that looked like: a starting style and an ordinary rule of the same
- * specificity are separated by source order, so the ordinary one wins even on
- * the opening frame and the element arrives already open. The exit still ran,
- * because closing is an ordinary change between two rendered states, which is
- * exactly what makes this hard to see. `Megamenu` hit the same thing later.
+ * This is the shape of a transition that only works one way. A starting style
+ * and an ordinary rule of the same specificity are separated by source order, so
+ * a starting style written first loses even on the opening frame and the element
+ * arrives already open. The exit still runs, because closing is an ordinary
+ * change between two rendered states, which is what makes it hard to see.
  *
  * What is flagged is one thing only: **an ordinary rule with the same selector,
  * below the starting style.** Identical selectors carry identical specificity,
@@ -192,8 +185,7 @@ for (const tier of TIERS) {
  * specificity is the other legitimate way to do this and `Tree` does it:
  * `@starting-style { [part="group"]:not([hidden]) }` is (0,2,0) against a
  * settled `[part="group"]` at (0,1,0), so it wins wherever it sits and needs no
- * counterpart. An earlier draft of this check required the twin and condemned
- * it.
+ * counterpart.
  *
  * **What this deliberately does not check** is whether a component that
  * transitions `display` with `allow-discrete` has a starting style at all. That

@@ -22,9 +22,7 @@
  *    settled.
  *
  * What it deliberately does not check is whether the component is any good.
- * That is the judgment in the queue row, and it belongs to a person: the ten
- * that went stable first are the ones an audit read end to end and found
- * nothing substantive in, and no script would have known that.
+ * That is the judgment in the queue row, and it belongs to a person.
  *
  * Run with `bun run check:api:stable` (also part of `bun run verify`).
  */
@@ -79,12 +77,10 @@ for (const family of families(SOURCE.styled)) {
   }
 
   for (const part of parts(web)) {
-    /* Both tiers, because a part's specs are split across them now. The
-       functional ones moved to `headless`, which is where the behavior is, and
-       what stays in `web` is what asserts presentation. A part is covered when
-       the pair exists somewhere, not when it exists here: reading only `web`
-       reported eleven stable families as untested the day the specs moved, and
-       every one of them had gained coverage rather than lost it. */
+    /* Both tiers, because a part's specs are split across them: the functional
+       ones live in `headless`, where the behavior is, and what sits in `web`
+       asserts presentation. A part is covered when the pair exists somewhere,
+       not when it exists here. */
     const dirs = [join(web, part), join(headless, part)].filter((one) => existsSync(one))
     const files = dirs.flatMap((one) => readdirSync(one))
     if (!files.some((one) => one.endsWith('.dom.spec.ts'))) {

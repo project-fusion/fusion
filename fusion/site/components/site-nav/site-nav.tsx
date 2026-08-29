@@ -18,7 +18,7 @@ import styles from '../chrome.module.css'
  * **Products, not the verticals, and that is the whole change.** A vertical is
  * how the company is organized and a product is what a reader uses: nobody uses
  * Fusion Design, they use Helix. A menu labeled Products that listed divisions
- * would promise one thing and hand over another, and `CLAUDE.md` already draws
+ * would promise one thing and hand over another, and `AGENTS.md` already draws
  * that line by giving verticals descriptive names and products evocative ones.
  *
  * The verticals are still one click away, in the panel's third column, because

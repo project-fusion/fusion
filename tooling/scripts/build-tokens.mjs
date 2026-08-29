@@ -3,17 +3,14 @@ import { execFileSync } from 'node:child_process'
 /**
  * Writes `fusion/docs/token-reference.md` from the token registry.
  *
- * It read `tokens.css` and matched declarations out of it with a regular
- * expression, which worked and was the only reader that source had. The tokens
- * are TypeScript now and `helix/styles/tokens.json` is what they emit, so this
- * reads the map rather than re-deriving it: one fewer parser, and the same
- * names an agent and a Foundations page get.
+ * The tokens are TypeScript and `helix/styles/tokens.json` is what they emit, so
+ * this reads that map rather than matching declarations out of `tokens.css` with
+ * a regular expression: one fewer parser, and the same names an agent and a
+ * Foundations page get.
  *
  * Generated for the reason the component reference is: a list of tokens
  * transcribed by hand is a second source of truth for something that already
- * has one, and the copy is the stale one. This one would have gone stale
- * immediately, since `--helix-layer-popover` was deleted and `--helix-radii-lg`
- * lost its last reader in the same week it was asked for.
+ * has one, and the copy is the stale one.
  *
  * **Semantic tokens only.** `primitives.css` is `helix/styles`'s own business
  * and nothing outside may read it, so publishing that list would be publishing
@@ -97,24 +94,23 @@ const walk = (dir, found = []) => {
 /**
  * What git ignores, which is this repository's own record of what is generated.
  *
- * **A generated file is the sources counted again.** Three kinds were being
- * counted. `bun run styles` writes a `.css.ts` beside every `.css` holding the
- * same rules as a template literal, which doubled every stylesheet;
- * `helix/styled/elements.css` and `fusion/site/public/sandbox/frame.css` are the style
- * layers concatenated, and `frame.css` alone holds 238 reads that are copies of
- * reads already counted in the files it was built from.
+ * **A generated file is the sources counted again.** `bun run styles` writes a
+ * `.css.ts` beside every `.css` holding the same rules as a template literal,
+ * which doubles every stylesheet; `helix/styled/elements.css` and
+ * `fusion/site/public/sandbox/frame.css` are the style layers concatenated, and
+ * `frame.css` alone holds 238 reads that are copies of reads already counted in
+ * the files it was built from.
  *
  * Every one of them is gitignored, so they exist after a build and not before,
- * and counting them made each number here a fact about whether somebody had run
+ * and counting them makes each number here a fact about whether somebody had run
  * `bun run build` rather than about the library. Measured on one commit,
  * changing nothing but build state: `--helix-color-background` read 63 in a
  * fresh checkout and 105 after a build.
  *
- * A hand-kept ignore list is what let this happen: this script had one, it named
- * `node_modules`, `dist` and `.next`, and it drifted from the two other places
- * that also decide what is generated. `.gitignore` is the one place that has to
- * be right for the repository to work at all, so it is the one to ask. One
- * `git check-ignore` for the whole candidate list, rather than one per file.
+ * A hand-kept ignore list drifts from the other places that decide what is
+ * generated. `.gitignore` is the one place that has to be right for the
+ * repository to work at all, so it is the one to ask. One `git check-ignore` for
+ * the whole candidate list, rather than one per file.
  */
 const generated = (paths) => {
   if (paths.length === 0) {
@@ -150,10 +146,9 @@ for (const root of ROOTS) {
       continue
     }
     /* The layer's own sources, which declare tokens rather than reading them.
-       `tokens.ts` joined this list when it became the source: a semantic token
-       whose value references another, as `shadow-surface` does `shadow-none`,
-       otherwise counts its own declaration as a use and the token stops being
-       reported as unread. Two were, immediately. */
+       `tokens.ts` is one of them: a semantic token whose value references
+       another, as `shadow-surface` does `shadow-none`, otherwise counts its own
+       declaration as a use and stops being reported as unread. */
     if (
       path.endsWith('tokens.css') ||
       path.endsWith('tokens.ts') ||

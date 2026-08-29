@@ -540,14 +540,11 @@
   }
 }
 
-/* **Emphasis, and it takes three values now.** *Rewritten 25 Aug 2026, and the
-   note it replaces refused `outlined` outright.* That note was right about the
-   mark and wrong about the conclusion. A slice is a stroke on a ring, the edge
-   *is* the mark, and there is genuinely nothing within it to fade, so it read
-   that as `outlined` requiring slices to be filled paths instead of arcs, and
-   called that changing what a donut is to satisfy a word.
+/* **Emphasis, and it takes three values now.** A slice is a stroke on a ring and
+   the edge *is* the mark, with nothing within it to fade, which reads at first
+   as `outlined` requiring slices to be filled paths instead of arcs.
 
-   The step it missed is that both shapes can be present. The arc still draws the
+   Both shapes can be present. The arc still draws the
    slice and still carries the animation; a closed path traces the same wedge
    beside it, `part="segment-edge"`, and is `stroke: none` until something asks.
    The donut is unchanged and a second geometry sits next to it. `renderEdge` on

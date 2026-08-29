@@ -8,7 +8,7 @@
  * React and serves the same bytes as `/thesis.md`, and it must do both without
  * touching the filesystem: a path this app cannot statically scope traces the
  * whole repository into the server bundle, which Turbopack warns about on every
- * build and which took two commits to get rid of.
+ * build.
  *
  * So the files become a `Record<string, string>` here, the same arrangement
  * `pages.generated.ts` and `catalog.generated.json` already use. Committed, and
@@ -48,12 +48,7 @@ const frontmatter = (slug, source) => {
 }
 
 /**
- * Reading time, counted rather than authored.
- *
- * The field used to say it was authored because "the bodies are JSX, so
- * counting their words would mean walking a React tree at build time to save an
- * integer". They are markdown now, so the reason is gone and so is the number
- * nobody was maintaining. 200 words a minute, floor of one.
+ * Reading time, counted rather than authored. 200 words a minute, floor of one.
  */
 const minutesOf = (body) => Math.max(1, Math.round(body.trim().split(/\s+/).length / 200))
 
@@ -166,9 +161,9 @@ ${essays
 `
 
 if (process.argv.includes('--check')) {
-  /* Named rather than compared inline, because the first version of this
-     compared one file against its formatted form and the other against its raw
-     one, and reported a staleness that regenerating could never fix. */
+  /* Named rather than compared inline, so both sides are compared against their
+     formatted form. Comparing one against its raw form reports a staleness that
+     regenerating can never fix. */
   const wantSources = formatted(generated, 'sources.generated.ts')
   const wantPages = formatted(registries, 'pages.generated.ts')
   const stale = [

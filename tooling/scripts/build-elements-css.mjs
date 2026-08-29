@@ -71,10 +71,9 @@ ${selector} {
  * well: every \`<helix-flex align="center">\` was centering its text, which is a
  * thing nobody asked for and nothing in the component could be blamed for.
  *
- * Neutralised here rather than in each component, which is where it was. Flex
- * and Grid both remembered and both were right, and nothing would have told the
- * next one. Enumerated for the same reason the rule above is: CSS cannot select
- * "any custom element".
+ * Neutralized here rather than in each component, so the next component with an
+ * \`align\` property does not have to remember. Enumerated for the same reason
+ * the rule above is: CSS cannot select "any custom element".
  *
  * \`:where()\` keeps this at zero specificity, so a consumer setting
  * \`text-align\` on the same element still wins.

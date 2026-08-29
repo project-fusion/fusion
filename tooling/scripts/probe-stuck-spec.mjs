@@ -40,10 +40,6 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
  * ```
  * bun run probe:stuck virtual-list 15 --watch 'globalThis.__mine.slice(-8).join("\n")'
  * ```
- *
- * Written for row 174, where it found that `VirtualizeController` was measuring
- * a box whose height its own render decided, and oscillating between two
- * windows forever.
  */
 import { createServer } from 'node:http'
 import { extname, join, relative, resolve } from 'node:path'

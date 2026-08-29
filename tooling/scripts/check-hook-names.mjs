@@ -15,12 +15,12 @@
  * the minority spelling was the accurate one; and `-radii` is the plural naming
  * a token *ramp* while a hook sets one corner.
  *
- * **The rule is narrow on purpose, and the first version of this check was not.**
- * It derived the expected name from the property each hook feeds and required
- * every hook to end with it, which reported 79 hooks and was wrong about most of
- * them: `--dialog-scrim` feeds `background-color`, `--dialog-rise` feeds
- * `translate`, `--chat-message-measure` feeds `max-inline-size`, and in every
- * one of those the name is *better* than the property. A hook may name the idea
+ * **The rule is narrow on purpose.** Deriving the expected name from the
+ * property each hook feeds and requiring every hook to end with it reports 79
+ * hooks and is wrong about most of them: `--dialog-scrim` feeds
+ * `background-color`, `--dialog-rise` feeds `translate`,
+ * `--chat-message-measure` feeds `max-inline-size`, and in every one of those
+ * the name is *better* than the property. A hook may name the idea
  * it controls; what it may not do is name the same idea a second way. So this
  * checks synonyms rather than derivation, which is `check:css:axes`' shape: a closed
  * vocabulary, one spelling each, and silence about everything outside it.

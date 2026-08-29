@@ -2,11 +2,9 @@
 /**
  * Three ways a spec stops being a test and becomes an outage.
  *
- * Every one of these was found the same way: a suite that did not report a
- * failure, it reported nothing, and the reason took hours to find because the
- * runner had no output to give. A failing assertion is cheap. A spec that hangs
- * the run, or exhausts the machine, or silently tests the previous build, costs
- * an afternoon each and looks like a hardware problem while it does it.
+ * A failing assertion is cheap. A spec that hangs the run, or exhausts the
+ * machine, or silently tests the previous build, reports nothing at all: the
+ * runner has no output to give, and the symptom looks like a hardware problem.
  *
  * **A deep equality against a DOM node exhausts the machine.** See 297.
  * `expect(heard).toEqual([host])` is instant while the two match by reference
@@ -28,8 +26,8 @@
  * passing when their own file ran alone. Relative paths already work.
  *
  * **An unbounded settle loop hangs the run.** See 299.
- * `while ((await host.updateComplete) === false) {}` is the right idea and had
- * no ceiling in ten files. A component that asks for another update every time
+ * `while ((await host.updateComplete) === false) {}` is the right idea and
+ * needs a ceiling. A component that asks for another update every time
  * turns it into an infinite await: it blocks nothing, allocates nothing, prints
  * nothing, and never returns. `settle` in `@fusion.dev/helix-testing/dom` is the same
  * loop with a bound, and it names the element when it gives up.

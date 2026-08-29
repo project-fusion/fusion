@@ -15,19 +15,18 @@ import { eachComponent } from '../types.js'
  * What no prop survives is hydration. React attaches no custom element listener
  * while hydrating server-rendered markup, whatever it is called, until it
  * commits an update for some other reason. That is React's own bug, filed as
- * facebook/react#35446, and it is what an earlier reading here mistook for a
- * limit on hyphens.
+ * facebook/react#35446.
  */
 export const toReactProp = (eventName: string): string => `on${eventName}`
 
 /**
  * Records the React prop name generated for each event.
  *
- * The mapping is a convention (kebab event to `onFooBar` prop) that is
- * currently implicit in the wrapper generator. Writing it into the manifest
- * makes it inspectable: an agent reading the manifest learns the React API
- * without knowing the generator's rules, and a drift between the documented
- * event and the shipped prop becomes visible in a diff.
+ * The mapping is a convention (the event name prefixed with `on`) that is
+ * otherwise implicit. Writing it into the manifest makes it inspectable: an
+ * agent reading the manifest learns the React API without deriving it, and a
+ * drift between the documented event and the shipped prop becomes visible in a
+ * diff.
  */
 export const reactEvents = (): Plugin => ({
   name: 'helix-react-events',

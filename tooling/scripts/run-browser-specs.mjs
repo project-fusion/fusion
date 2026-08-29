@@ -19,12 +19,10 @@ import { readFile } from 'node:fs/promises'
  * it to that one: `bun run specs:browser carousel`.
  *
  * **The whole suite is eighty-eight families and twenty minutes**, which is
- * fine for CI and is not a thing anybody runs while fixing one component. The
- * absence of a filter is why a throwaway copy of this script got written during
- * a carousel fix, and that copy left out the stylesheet below and reported
- * three failures that were all the missing tokens: the same mistake this
- * script's first run made, made again, because the fix lived in a comment here
- * rather than in something reusable.
+ * fine for CI and is not a thing anybody runs while fixing one component, so it
+ * takes a family filter. Without one somebody writes a throwaway copy of this
+ * script, leaves out the stylesheet below, and reads the missing tokens as
+ * component failures.
  *
  * Playwright rather than Puppeteer, for one reason worth naming: its GitHub
  * action installs the browser and its system libraries in one step, and a
@@ -40,12 +38,10 @@ const specs = join(root, 'fusion/site/public/specs')
 /* The sandbox's stylesheet, which is the base layer and every token in it.
    Without it a component's own shadow styles still arrive, because those come
    with the definition, but every `var(--helix-...)` in them resolves to nothing:
-   a checkbox whose size is a token comes out zero by zero. The first run of this
-   script reported four failures that were all this and none of which said
-   anything about the components, including one that read "expected 0 to be
-   greater than 0" on a box that had simply never been given a size. The sandbox
-   loads it, so a spec runner that does not is not running what the sandbox
-   runs. */
+   a checkbox whose size is a token comes out zero by zero. The failures that
+   produces say nothing about the components: "expected 0 to be greater than 0"
+   on a box that was never given a size. The sandbox loads it, so a spec runner
+   that does not is not running what the sandbox runs. */
 const base = join(root, 'fusion/site/public/sandbox/frame.css')
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
@@ -78,11 +74,10 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
 /* The families the builder wrote down, rather than every `.js` that does not
-   look like a hashed chunk. That test was a guess and a family name could
-   satisfy it: `video-playlist.js` ends in eight lowercase alphanumerics, the
-   same shape as a hash, so it was skipped and its specs had never run here.
-   Nothing reported it, because a suite covering 87 of 88 families still says
-   it passed. */
+   look like a hashed chunk. A family name can satisfy that test: `video-playlist.js`
+   ends in eight lowercase alphanumerics, the same shape as a hash, so it is
+   skipped and its specs never run. Nothing reports it, because a suite covering
+   87 of 88 families still says it passed. */
 /* Positional, so a flag must not be mistaken for a family name: passing
    `--throttle 4` alone reported "no bundle for `--throttle`". */
 const only = process.argv
@@ -127,9 +122,8 @@ const freshPage = async () => {
   const made = await browser.newPage()
   made.on('pageerror', (error) => crashes.push(String(error)))
 
-  /* **A way to reproduce a runner's speed on a desk**, because three specs
-     failed only in CI and two rounds of guessing at why cost more than this
-     took to write. A GitHub runner is two slow cores; this machine is neither,
+  /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
+     only in CI. A GitHub runner is two slow cores; this machine is neither,
      and every timing assertion in here was written against the fast one.
      `node tooling/scripts/run-browser-specs.mjs --throttle 4` divides the CPU
      by four through the same CDP switch DevTools uses. A flag rather than an
@@ -180,12 +174,9 @@ for (const family of families) {
        yields, so the page never comes back, `page.evaluate` never settles, and
        the run stops with no output and no name to blame.
      *
-       `virtual-list` did exactly that until #174, and it cost several runs that
-       read as the suite hanging rather than as one family failing. It was
-       measuring a box whose height its own render decided, so the window never
-       settled; it is fixed, and this stays, because the failure it catches is a
-       shape rather than a component. `bun run probe:stuck <family>` is what to
-       reach for the next time this line fires.
+       A spec measuring a box whose height its own render decides is the shape
+       that does this: the window never settles. `bun run probe:stuck <family>`
+       is what to reach for when this line fires.
      *
        Sixty seconds is thirty times the slowest family measured, so this can
        only ever catch something genuinely stuck. */
@@ -213,10 +204,8 @@ for (const family of families) {
     /* The `try` inside the page cannot catch this one: the context it would
        have run in is gone. A family navigates the page, or crashes the
        renderer, and everything after it would then be evaluated against a page
-       that no longer exists, so the whole run ended with no results at all.
-       That is the opposite of what the comment above intends, and it is how
-       this runner spent a day reporting nothing while thirty-six specs in one
-       family were the only thing wrong. */
+       that no longer exists, so the whole run reports nothing at all rather than
+       naming the one family that broke. */
     results = [
       {
         error: `it destroyed the page: ${String(error).split('\n')[0]}. A spec that navigates, submits a form for real, or crashes the renderer will do this, and none of them show up under happy-dom.`,

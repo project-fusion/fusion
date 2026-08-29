@@ -2,20 +2,14 @@
 /**
  * Holds every word this repository writes to American spelling.
  *
- * **The rule was never written down, which is why it did not survive.**
- * `1f1a8af9` swept it on 19 Aug 2026, titled 391 words in 105 files, and took
- * the count from 658 occurrences to 239. Four days later it was 1,685 across
- * 386 files. Nothing checked it and `CLAUDE.md` stated the em dash rule and
- * said nothing about spelling, so there was no line for a contributor to have
- * read and no script to fail. This file is the remedy `check:prose:queue` already
- * demonstrates: the rule nobody re-reads survives exactly as long as nobody
- * re-reads it.
+ * **The rule was never written down, which is why it did not survive.** A sweep
+ * on 19 Aug 2026 took the count from 658 occurrences to 239, and four days later
+ * it was 1,685 across 386 files. Nothing checked it, so there was no line for a
+ * contributor to have read and no script to fail.
  *
  * **Comments count, and that is the whole of why the first sweep decayed.** An
  * unwritten convention is learned from the corpus, so prose in the wrong
- * dialect teaches the next person to write it. The agent that filed this row
- * added fifteen more the same day, matching a house voice it inferred from the
- * text around it.
+ * dialect teaches the next person to write it.
  *
  * **Pairs rather than a dictionary.** A spell checker would need a word list
  * for every proper noun, token name and API term this repository invents, and
@@ -28,29 +22,15 @@
  * rewritten from it. Fixing a manifest by hand would be fixed back on the next
  * `analyze`.
  *
- * **And this file skips its own list, which it did not until 25 Aug 2026.** The
- * denylist is British by construction and lives inside a tree the writer walks,
- * so `bun run fix:dialect` rewrote it: measured on the commit that introduced the
- * check, every pair in it is already `['color', 'color']`, meaning the list has
- * never held a British form and the check has never been able to fail. It
- * reports 1,974 files all in American spelling and it is reading nothing. Only
- * the `PAIRS` literal is exempt; the prose around it is checked like any other
- * file's, which is the half that matters, this being thirty lines of the
- * repository's own writing about how it writes.
- *
- * **What is still owed is the restore, and it is a sweep rather than an edit.**
- * Measured 25 Aug 2026 with the real British forms put back: **75 occurrences
- * across 23 files**, 39 of them in `fusion/docs/19-queue.md`, led by `color` at 19,
- * `behavior` at 6 and `centered`, `judgment` and `license` at 6 each. Restoring
- * the list without rewriting those turns `verify` red, so the two belong in one
- * change and that change is not this one. The pairs below are the ones this
- * file's own prose needed, and they are proof the mechanism works rather than
- * the whole list.
+ * **And this file skips its own list.** The denylist is British by construction
+ * and lives inside a tree the writer walks, so `bun run fix:dialect` rewrites it
+ * into pairs with the same word on both sides, after which the check reports
+ * every file American while reading nothing. Only the `PAIRS` literal is exempt;
+ * the prose around it is checked like any other file's.
  *
  * Run `bun run fix:dialect` to rewrite, and `bun run check:prose:dialect` to
- * fail when a
- * British form is left. `verify` runs the check, for the reason it runs
- * `biome ci`.
+ * fail when a British form is left. `verify` runs the check, for the reason it
+ * runs `biome ci`.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -115,11 +95,8 @@ const PAIRS = [
   ['pretence', 'pretense'],
   ['prioritise', 'prioritize'],
   ['prioritised', 'prioritized'],
-  /* The one family that is live, and the reason the exemption above exists.
-     `check-visual.mjs` described text rasterization in British and passed,
-     because a denylist that has eaten itself objects to nothing. Six
-     inflections rather than a stem: `\b` bounds the pattern at both ends, so
-     `rasterise` never matches inside `rasterises`, which is why `analyse` is
+  /* Six inflections rather than a stem: `\b` bounds the pattern at both ends,
+     so `rasterise` never matches inside `rasterises`, which is why `analyse` is
      three entries here as well. */
   ['rasterisation', 'rasterization'],
   ['rasterising', 'rasterizing'],
@@ -151,19 +128,15 @@ const PAIRS = [
   ['whilst', 'while'],
 ]
 
-/* **`.claude` is in here for the reason the docblock gives, not as an
-   afterthought.** The argument above is that an unwritten convention is learned
-   from the corpus, so prose in the wrong dialect teaches the next contributor
-   to write it. `.claude/rules` is the corpus an agent reads first and most
-   literally, and it sat outside this list while holding nine British spellings,
-   which is the failure this check exists to prevent, in the one directory
-   written to be copied from. */
+/* **`.claude` is in here for the reason the docblock gives.** An unwritten
+   convention is learned from the corpus, and `.claude/rules` is the corpus an
+   agent reads first and most literally: the one directory written to be copied
+   from is the last one that may sit outside this list. */
 const ROOTS = ['cortex', 'fusion', 'helix', 'tooling', '.claude', '.github']
 
-/* Root files are named rather than globbed, so one that is not named is not
-   swept: `Cargo.toml` carried a British spelling in a comment for as long as it
-   has existed, and nothing here looked at it. */
-const FILES = ['CLAUDE.md', 'CONTRIBUTING.md', 'Cargo.toml', 'README.md']
+/* Root files are named rather than globbed, so a root file that is not named
+   here is never swept. */
+const FILES = ['AGENTS.md', 'CLAUDE.md', 'Cargo.toml', 'README.md']
 
 const IGNORED = new Set([
   '.next',
@@ -214,19 +187,17 @@ const SELF = join('tooling', 'scripts', 'check-dialect.mjs')
 /**
  * The marker a line uses to say its British spellings are quoted, not written.
  *
- * **Prose about spelling has to be able to name a spelling.** Two rows in the
- * queue do: one records that `::part(center)` was a real public part before it
- * was renamed, and one carries the measurement behind #288. Swept, the first
- * loses the name of the thing it is about and the second reports that the most
- * common British spelling in the repository is `color`.
+ * **Prose about spelling has to be able to name a spelling.** A queue row
+ * recording that `::part(center)` was a real public part loses the name of the
+ * thing it is about the moment the sweep reaches it.
  *
- * An explicit marker rather than a rule that guesses. Backticks were the
- * tempting signal and are the wrong one: an identifier named in a comment is
+ * An explicit marker rather than a rule that guesses. Backticks are the
+ * tempting signal and the wrong one: an identifier named in a comment is
  * backticked too, and an identifier spelled the British way is exactly what
  * this should catch. Whether a word is being used or named is something only
  * the author knows, so the author says it, on the line, where a reader sees it.
  *
- * An HTML comment because both rows are markdown table cells, where nothing
+ * An HTML comment because those rows are markdown table cells, where nothing
  * else is invisible to a reader and legal inside a `|` delimited row.
  */
 const QUOTED = 'dialect:quoted'
@@ -271,13 +242,11 @@ let rewritten = 0
 /**
  * Every pair, plus the regular inflections of each.
  *
- * **`\b` at both ends is what made the list a list of exact words**, so a stem
- * never matched inside its own plural and the pair for the commonest word in
- * the repository caught one occurrence of eighty-six. That is why two families
- * are enumerated by hand below, six entries and three: they are the two
- * somebody hit, and every other pair was left as a stem that only ever matched
- * its own bare form. Measured 28 Aug 2026, after the pairs were made live: 255
- * occurrences past the check, four stems accounting for 194 of them.
+ * **`\b` at both ends makes the list a list of exact words**, so a stem never
+ * matches inside its own plural: the pair for the commonest word in the
+ * repository caught one occurrence of eighty-six, and stems alone let 255
+ * occurrences past the check, four of them accounting for 194. Enumerating
+ * inflections by hand covers a family; these suffixes cover the rest.
  *
  * A closed suffix set rather than `[a-z]*`, because the open form matches a
  * compound as readily as an inflection: `aria-labelledby` is the platform's
@@ -331,13 +300,11 @@ for (const path of [...ROOTS.flatMap((root) => files(root)), ...FILES]) {
     }
     for (const [british, american] of INFLECTED) {
       const found = new RegExp(`\\b${british}\\b`, 'i').exec(line)
-      /* A match that the rewrite would not change is not a finding, and the
-         reporter said otherwise until 25 Aug 2026. It named every pair whose
-         left side appeared on the line, which was harmless only while every
-         pair had the same word on both sides: the first live pair turned one
-         British word in `fusion/docs/19-queue.md` into 169 complaints, most of them
-         "`color` is British. Write `color`." The line above decides what gets
-         written; this decides what gets said, and the two have to agree. */
+      /* A match the rewrite would not change is not a finding. Reporting every
+         pair whose left side appears on the line turns one British word into a
+         complaint per pair, most of them naming the same word as both the fault
+         and the fix. The line above decides what gets written; this decides
+         what gets said, and the two have to agree. */
       if (found && like(found[0], american) !== found[0]) {
         problems.push(`${path}:${index + 1}: \`${found[0]}\` is British. Write \`${american}\`.`)
         break

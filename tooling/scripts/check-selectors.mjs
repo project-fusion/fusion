@@ -13,12 +13,6 @@
  * error, no warning, and no visual clue beyond the feature quietly not
  * happening.
  *
- * It has happened. Card rendered a `<div part="container">` until the refactor
- * that moved it onto the host, which left two rules behind: one a verbatim copy
- * of the `:host` block, and the other the entire horizontal layout. Nothing
- * caught it, and `orientation="horizontal"` did nothing for however long it sat
- * there. A card told to lay out sideways laid out as a stack.
- *
  * Parts are resolved through `extends`, because a styled component usually
  * renders none of its own: `helix-icon-button` styles `[part="button"]` and the
  * markup for it lives in `HelixHeadlessButton`, in another tier and another family.
@@ -30,10 +24,9 @@
  * written as bare text between its tags gets none of it. The type simply does
  * not apply, and the component renders at whatever the page hands it.
  *
- * Found in five: the blockquote set a passage in display type that only reached
- * a quote wrapped in a paragraph, and the stat's value was `text-3xl` for
- * anyone who wrapped it and body text for anyone who did not. Both look like a
- * component that was never styled rather than one whose rule missed.
+ * Found in five. The symptom is that the type reaches content wrapped in an
+ * element and not the same content written bare, which reads as a component
+ * that was never styled rather than one whose rule missed.
  *
  * Only the default slot. A named slot can hold nothing but elements, because
  * `slot="…"` is an attribute and a text node has none, so `::slotted()` there
@@ -51,9 +44,7 @@
  * **A `:host([attr])` for an attribute no class declares.** The selector works,
  * which is what makes it worse than a dead one: the attribute is a real API
  * that reaches no manifest, no JSX type and no documentation page, so the only
- * way to find it is to read the stylesheet. `appearance` on the toggle group
- * was exactly this, branching on `[appearance="filled"]` and on the attribute
- * being absent, for as long as the component had existed.
+ * way to find it is to read the stylesheet.
  *
  * Attribute names are resolved the way Lit resolves them: a property's own name
  * lowercased, or the explicit `attribute:` where one is given, gathered through
@@ -61,12 +52,11 @@
  * those are written imperatively rather than declared, which is the whole
  * reason they are `data-`.
  *
- * This one is written down in the area rules and shipped anyway. The drawer
- * hid its header with `:host(:not(:has([slot="header"])))`, the rule did
- * nothing, and every drawer with no header painted a hairline across its top
- * with nothing above it. There is no fix at the selector level, because the
- * detection does not exist: a region that cannot know whether it was filled
- * must not draw anything that depends on it being filled.
+ * There is no fix at the selector level, because the detection does not exist:
+ * a region that cannot know whether it was filled must not draw anything that
+ * depends on it being filled. Hiding a header with
+ * `:host(:not(:has([slot="header"])))` does nothing, and the border it was meant
+ * to suppress paints over empty space.
  *
  * Run with `bun run check:css:selectors` (also part of `bun run verify`).
  */
@@ -134,13 +124,11 @@ const fileOf = new Map()
 for (const tier of TIERS) {
   for (const file of sources(tier)) {
     /* Comments out of the source too, and for a sharper reason than in the CSS.
-       These components document themselves in prose that quotes markup: the base
-       card's own JSDoc explains that `<div part="container">` would be a second
-       box doing nothing, which is exactly the wrapper it does not render. Read
-       with comments in, the scanner credited it with rendering the very part
-       whose absence it was describing, and the check passed on the bug it was
-       written for. Verified by putting that bug back: reported clean before this
-       line, reported on the line after. */
+       These components document themselves in prose that quotes markup, and a
+       JSDoc explaining which wrapper a component does *not* render names that
+       part in `part="…"` form. Read with comments in, the scanner credits the
+       component with rendering the very part whose absence is being described,
+       and passes on exactly the bug this check is for. */
     const text = readFileSync(file, 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '')
@@ -149,16 +137,14 @@ for (const tier of TIERS) {
     )) {
       /* Newlines allowed in the clause, which is not a detail. A chain long
          enough to wrap, as `Select`'s is at three mixins, does not match a
-         class excluding them, so the scanner saw no bases at all and reported
-         every inherited part as dead. It read as five faults in a new component
-         and was one in the regex here.
- 
+         pattern excluding them, so the scanner sees no bases at all and reports
+         every inherited part as dead: it reads as a fault in the component and
+         is one in the regex here.
+
          Every name in the clause, not just the innermost. A styled control
          extends something like `MixinControllerChecked(MixinField(HelixFormElement))`
          and each of those three renders part of the markup, so reading only the
-         base left everything a mixin renders looking dead. Found by the check
-         itself the first time a mixin rendered a part: it reported five, and all
-         five existed. */
+         base leaves everything a mixin renders looking dead. */
       for (const parent of base?.match(/\w+/g) ?? []) {
         if (parent !== name) {
           bases.set(name, [...(bases.get(name) ?? []), parent])
@@ -182,11 +168,10 @@ for (const tier of TIERS) {
       }
       /* And the parts a shared `draw…` helper writes on the component's behalf.
        *
-       * The same blind spot `check:api:parts` had, and it fails the opposite way,
-       * which is why both were needed: there, five real parts read as
-       * documented-and-never-rendered; here, five live stylesheet rules read as
-       * matching nothing. Two checks disagreeing with the code in opposite
-       * directions about one fact. */
+       * `check:api:parts` has the same blind spot and fails the opposite way,
+       * which is why both are needed: there a real part reads as
+       * documented-and-never-rendered, here a live stylesheet rule reads as
+       * matching nothing. */
       for (const [, helper] of text.matchAll(/\b(draw[A-Z]\w*)\s*\(/g)) {
         for (const part of helpers.get(helper) ?? []) {
           renders.get(last)?.add(part)
@@ -234,8 +219,8 @@ for (const tier of TIERS) {
   for (const sheet of stylesheets(tier)) {
     /* Comments out first. These stylesheets explain themselves at length, and
        a comment naming the part a rule used to select on is prose about a
-       mistake, not the mistake. Reported once for real, on the accordion, where
-       the note explaining the fix was itself flagged as the fault. */
+       mistake, not the mistake. Left in, a note explaining a fix is flagged as
+       the fault it describes. */
     const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     const selected = new Set([...css.matchAll(/\[part="([a-z-]+)"\]/g)].map(([, name]) => name))
     if (selected.size === 0) {
@@ -320,14 +305,13 @@ for (const tier of TIERS) {
     /* Each decorator with the property that follows it. `attribute: false` opts
        out of having one at all, and `attribute: 'x'` names it.
       *
-      * **`get` and `set` are skipped, and leaving them out recorded the wrong
-      * name.** A controlled property is declared as an accessor pair, which is
-      * what the controlled/uncontrolled convention is built on, so
-      * `@property({ reflect: true }) get read()` matched `get` as the property
-      * and 26 accessor-backed attributes across the two tiers were all filed
-      * under that one name. None of them was selectable, and the only way to
-      * find out was to write a `:host([read])` for one and be told it does not
-      * exist.
+      * **`get` and `set` must be skipped, or the wrong name is recorded.** A
+      * controlled property is declared as an accessor pair, which is what the
+      * controlled/uncontrolled convention is built on, so
+      * `@property({ reflect: true }) get read()` matches `get` as the property
+      * name: 26 accessor-backed attributes across the two tiers filed under that
+      * one word, none of them selectable, and the only way to find out is to
+      * write a `:host([read])` for one and be told it does not exist.
       */
     for (const [, options, property] of text.matchAll(
       /@property\(([^)]*)\)\s*(?:override\s+)?(?:(?:get|set)\s+)?(\w+)/g,
@@ -445,10 +429,8 @@ for (const tier of TIERS) {
  * way, and a renamed part turns each of those into a silent no-op with an
  * optional chain swallowing it.
  *
- * Nothing covered it. Everything above reads stylesheets, so a rename verified
- * against CSS alone is verified against half the callers. Ninety-seven lookups
- * exist and were audited by hand once, which is the argument for doing it here
- * instead: a hand audit is right on the day it is run.
+ * Everything above reads stylesheets, so a rename verified against CSS alone is
+ * verified against half the callers.
  *
  * The family rather than the file, because a lookup may legitimately reach an
  * element the family rendered in another file: `megamenu-root.ts` reads
@@ -460,15 +442,12 @@ for (const tier of TIERS) {
  * out of whatever host applies it, so there is no family to check it against and
  * the charts that do render those are checked in their own right.
  *
- * **And a `[part="x"]` inside a selector string is not a render**, which is the
- * hole this rule fell into first. Harvesting `part="x"` without excluding the
- * bracket let a lookup satisfy itself: the very selector being checked was
- * counted as evidence that the part exists, so this rule passed on a name
- * nothing rendered. It is the same shape as `check:api:parts` counting a JSDoc that
- * quotes markup, and it was live across 53 files. Once fixed it found one:
- * `command` documented `search-field` after that name stopped being forwarded,
- * and the `querySelector('[part="search-field"]')` three hundred lines away had
- * been holding `check:api:parts` green over it.
+ * **And a `[part="x"]` inside a selector string is not a render.** Harvesting
+ * `part="x"` without excluding the leading bracket lets a lookup satisfy itself:
+ * the very selector being checked counts as evidence that the part exists, so
+ * the rule passes on a name nothing renders. That is why the pattern below
+ * carries `(?<!\[)`. It is the same shape as `check:api:parts` counting a JSDoc
+ * that quotes markup.
  */
 const OWNS_PARTS = (tier) => tier !== SOURCE.core
 
@@ -479,7 +458,7 @@ const OWNS_PARTS = (tier) => tier !== SOURCE.core
  * `Command` walks `this.renderRoot.querySelector('[part="listbox"]')` and then
  * `?.renderRoot?.querySelector('[part="search-field"]')`, and the second name is
  * the listbox's, checked where the listbox is. Reading every lookup regardless
- * of receiver reported that one as broken, which it is not.
+ * of receiver reports that one as broken, which it is not.
  *
  * The receiver may sit on its own line, so the whitespace is not optional.
  */

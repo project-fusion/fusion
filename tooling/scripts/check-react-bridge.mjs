@@ -30,8 +30,7 @@
  * prose does not, and nothing in `verify` reads a comment: a note is true on a
  * date and goes on reading as true forever. So a react-dom bump fails here until
  * somebody re-runs the probe and moves the date, which is the only thing that
- * makes the note worth trusting. This is the general fault #126 was filed about,
- * fixed for the one measurement in the repository that names a version.
+ * makes the note worth trusting.
  *
  * Run with `bun run check:pkg:react-bridge` (also part of `bun run verify`).
  */

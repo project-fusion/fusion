@@ -2,13 +2,9 @@
 /**
  * Nothing in `dist` outlives the source it was compiled from.
  *
- * **Found by sweeping for a pattern rather than by anything failing**, 25 Aug
- * 2026. `@fusion.dev/helix-core` measured 103 shipped files after a cached build and
- * 101 after a forced one, and the four that appeared were
- * `dist/utils/severities/severities.{js,d.ts}` and their maps. The source was
- * deleted in 2aa6f3d4, nothing imports it, and `files` publishes `dist`, so a
- * release cut from a tree in that state would have shipped a module that does
- * not exist.
+ * **Nothing fails when one does.** `files` publishes `dist` whole, so a release
+ * cut from a tree holding the output of a deleted source ships a module that
+ * does not exist, and no build, test or import complains on the way there.
  *
  * **`tsc` does not remove the output of a source you delete**, and no package
  * here cleans `dist` first. So a stale file sits there until somebody notices,
@@ -18,8 +14,8 @@
  *
  * Cleaning before every build would also fix it and costs a full recompile each
  * time. This is the cheaper half of the trade: builds stay incremental and the
- * strays are named rather than tolerated, which is the same shape as `verify`
- * judging while `check` writes.
+ * strays are named rather than tolerated, which is the same shape as `check`
+ * judging while `fix` writes.
  */
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'

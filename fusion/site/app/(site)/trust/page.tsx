@@ -6,10 +6,9 @@ import { DocumentPage } from '../document-page'
 /**
  * The trust bar, rendered from `@fusion.dev/insights`.
  *
- * **The point is that it is finite.** `the internal plan` names the risk
- * this page exists to answer: a trust bar that is never defined can never be
- * met, and perpetual pre-launch is what happens to a company that keeps raising
- * one. Written down and counted, it converts an internal gate that can be moved
+ * **The point is that it is finite.** The risk this page exists to answer is
+ * that a trust bar which is never defined can never be met, and perpetual
+ * pre-launch is what happens to a company that keeps raising one. Written down and counted, it converts an internal gate that can be moved
  * forever into a public commitment that can actually be reached.
  *
  * The six are a numbered list in the file rather than an array of six objects,

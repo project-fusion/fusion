@@ -3,26 +3,18 @@
  *
  * The name is a string, and a string in a template is checked by nothing. The
  * import beside it is: `import { plus } from '@fusion.dev/helix-icons'` fails to
- * compile the moment `plus` is not there, which is why nobody thought to look
- * at the other spelling of the same mistake. A wrong name renders a
- * `<helix-icon>` that draws nothing at all: no error, no warning, and a control
- * that is simply empty.
- *
- * Twice in one day. `dots-three` was written into Breadcrumbs' overflow trigger
- * and was not in the set, so the control a reader was meant to press was a
- * blank box; and an Image example asked for `image-broken`, which has never
- * existed. Both survived review, both survived `verify`, and both were found by
- * a person looking at a screen.
+ * compile the moment `plus` is not there, and the attribute spelling of the same
+ * mistake fails nowhere. A wrong name renders a `<helix-icon>` that draws
+ * nothing at all: no error, no warning, and a control that is simply empty.
  *
  * `icons.txt` is the source rather than the generated module, because it is the
  * file a person edits and the one under version control. The generated module
  * is derived from it and is gitignored, so a check reading that would pass on a
  * stale build and fail on a clean checkout.
  *
- * Examples and component sources both. The example is where this was filed
- * from, and the component source is where the worse instance was: an example
- * with a blank icon is a wrong picture on a docs page, and a component with one
- * ships the blank to everybody.
+ * Examples and component sources both: an example with a blank icon is a wrong
+ * picture on a docs page, and a component with one ships the blank to
+ * everybody.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -98,13 +90,13 @@ for (const file of files) {
  * Two smaller reasons, both real. A named import is checked when the package
  * compiles, where a `name` string is checked only when this script runs. And
  * `helix-icon` is not registered on the headless tier at all, which registers
- * `helix-headless-icon`, so a headless consumer got an inert element and no mark.
+ * `helix-headless-icon`, so a headless consumer gets an inert element and no
+ * mark.
  *
- * **Nothing does this today**, which is exactly when to write the rule down: it
- * was nine components a week ago, the last two were converted deliberately, and
- * without a check the next one costs nobody anything to add. Comments are
- * stripped first, because several files explain this decision by naming the tag
- * they no longer use.
+ * **Nothing does this today**, and the check is what keeps it that way, since
+ * adding the next one costs nobody anything. Comments are stripped first,
+ * because several files explain this decision by naming the tag they no longer
+ * use.
  */
 const RENDERED = /<helix-(?:headless-)?icon\b/
 for (const file of files) {

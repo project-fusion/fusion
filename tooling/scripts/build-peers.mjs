@@ -4,7 +4,7 @@
  *
  * **Separate from `bun run gen:metrics` because this one needs the network.** It
  * writes a throwaway package into `.local`, installs four design systems at
- * pinned versions, and bundles the same five components out of each. `.local`
+ * pinned versions, and bundles the same components out of each. `.local`
  * is the declared per-machine scratch and is gitignored, so nothing about those
  * installs enters this repository except the numbers.
  *
@@ -24,7 +24,7 @@
  * component libraries are excluded for the same reason: comparing a custom
  * element against a React component measures the framework.
  *
- * **Five components, all of which every system has, except where noted.** A
+ * **Seven components, all of which every system has, except where noted.** A
  * comparison across a system's whole library would be a comparison of how many
  * components each vendor decided to ship, which is the number that looks most
  * like a measurement and means least.
@@ -41,9 +41,9 @@ const SCRATCH = join(ROOT, '.local/metrics-peers')
 const OUTPUT = join(ROOT, 'helix/docs/peers.json')
 
 /**
- * **When these go stale, and why nothing stops them.** Asked by 192, answered on
- * 24 Aug 2026: the date on the page is the whole answer, and it is deliberate
- * rather than a gap somebody has not got to.
+ * **When these go stale, and why nothing stops them (192).** The date on the
+ * page is the whole answer, and it is deliberate rather than a gap somebody has
+ * not got to.
  *
  * A check on the calendar would fire for a reason nobody caused, because nothing
  * in this repository changes when Shoelace releases. A check that installed the
@@ -59,12 +59,12 @@ const OUTPUT = join(ROOT, 'helix/docs/peers.json')
  *
  * The four, pinned exactly.
  *
- * **Seven components now, and the two added clear the same bar the first five
- * did**: each is a thing every one of the four ships, under a name nobody has to
- * argue about. `radio` and `switch` are both universal; what differs is only
- * spelling, and a naming note is what the table already uses for `dialog` being
- * Carbon's Modal and `tabs` being Shoelace's Tab Group. Carbon calls a radio a
- * Radio Button and a switch a Toggle, which is the same kind of difference.
+ * **Seven components, each a thing every one of the four ships**, under a name
+ * nobody has to argue about. `radio` and `switch` are both universal; what
+ * differs is only spelling, and a naming note is what the table already uses for
+ * `dialog` being Carbon's Modal and `tabs` being Shoelace's Tab Group. Carbon
+ * calls a radio a Radio Button and a switch a Toggle, which is the same kind of
+ * difference.
  *
  * **What was refused, and why, because the refusals are the rule.** Anything
  * charting, anything with a date in it, and `select`, which is a listbox in one

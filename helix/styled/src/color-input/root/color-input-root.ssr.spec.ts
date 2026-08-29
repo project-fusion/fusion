@@ -1,15 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(html`<helix-color-input
+const markup = withoutStyles(
+  ssr(html`<helix-color-input
   hint="Any syntax"
   label="Brand"
   name="brand"
   swatches="#ff0000,#00ff00"
   value="#3366ff"
-></helix-color-input>`)
+></helix-color-input>`),
+)
 
 describe('input color server output', () => {
   test('the field and its input ship, before any script runs', () => {

@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(
-  html`<helix-color-picker swatches="#ff0000,#00ff00" value="#3366ff"></helix-color-picker>`,
+const markup = withoutStyles(
+  ssr(html`<helix-color-picker swatches="#ff0000,#00ff00" value="#3366ff"></helix-color-picker>`),
 )
 
 describe('color server output', () => {

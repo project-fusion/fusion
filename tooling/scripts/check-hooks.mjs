@@ -4,15 +4,11 @@
  *
  * `@cssproperty` is how a component publishes a custom property a consumer may
  * set. It reaches the manifest, the reference doc and the API page, so a name
- * written there is a promise. Nothing checked that any rule read it, and the
+ * written there is a promise. Nothing else checks that a rule reads it, and the
  * failure is completely silent: the consumer sets the property, the cascade
- * carries it, and no declaration ever asks for it.
- *
- * Found the same way it is checked here, on `Button`. Its box moved to the base
- * layer and the shadow rules that read `--button-background-color`,
- * `--button-foreground-color` and `--button-radii` moved out from under it, so
- * three of its four documented hooks had been inert since that refactor while
- * the API page went on listing them.
+ * carries it, and no declaration ever asks for it. A box moving to the base
+ * layer while the shadow rules that read its hooks stay behind leaves them inert
+ * with the API page still listing them.
  *
  * Both directions, because both are silent in their own way:
  *
@@ -23,15 +19,11 @@
  * Design tokens (`--helix-name`) are excluded, because `check:css:tokens` already
  * owns them and a component reading one is not publishing a hook.
  *
- * **Private properties (`--_name`) used to be excluded outright, and that was
- * the hole.** The reasoning was that they are a component talking to itself and
- * so nobody's API, which is true of what they promise and says nothing about
- * whether anyone answers. `--_toggle-height` was written by Toggle Group and
- * read by nothing at all: the item it was meant to size used a literal
- * `block-size: 100%` in its own sheet, and the property sat there through every
- * run of this check because the exemption was on the name rather than on the
- * question. A private property with no reader is the same broken promise as a
- * public one, and it is harder to see, because no API page lists it.
+ * **Private properties (`--_name`) are in scope, not exempt.** That they are a
+ * component talking to itself is true of what they promise and says nothing
+ * about whether anyone answers. A private property with no reader is the same
+ * broken promise as a public one, and harder to see, because no API page lists
+ * it.
  *
  * So the third rule below: a private property declared in a component
  * stylesheet and read by nothing in its own package is dead. Package rather
@@ -44,20 +36,14 @@
  * rung with no reader is fine: `--_helix-neutral-500` is not dead, it is a step
  * nothing has needed yet. And `.examples/` is excluded because a headless
  * example's gray palette is written whole in every family's `preview.css`, so a
- * family that uses four of the seven is not a fault in the example. It was
- * emitted whole by a generator when this was written and is authored whole now,
- * which changes who repeats it and not that it repeats.
+ * family that uses four of the seven is not a fault in the example.
  *
  * **A hook is named after the family that owns it, and that is the third
  * silent failure this file covers.** A consumer predicts `--card-padding` from
  * `<helix-card>` and predicts nothing at all from a name that does not follow,
  * and a custom property naming no declaration is inert with no error: the same
- * class as a `::part()` that resolves to nothing. Six were unguessable.
- * `<helix-pin-input>` published `--pin-gap`. `<helix-breadcrumb>` published
- * `--breadcrumb-hover-color` and `--breadcrumb-control-size` beside its own
- * `--breadcrumbs-separator-color`, so one component shipped both spellings and
- * neither reading was wrong from inside it. The sandbox published
- * `--status-bar-color` and `--terminal-size`, which name no component at all.
+ * class as a `::part()` that resolves to nothing. Six were unguessable when this
+ * rule went in, one component having shipped two spellings of its own prefix.
  *
  * **The family, not the element**, which took a measurement to settle. The
  * obvious rule is the tag, and it is wrong in both tiers at once: the headless
@@ -66,13 +52,11 @@
  * `--tree-*` because the hook belongs to Tree rather than to the row. Fifty-odd
  * correct names fail a tag rule and none of them should change.
  *
- * **A public name may not be shared, which is the rule `--_color` was split
- * for.** Two elements in one family documenting one hook is inheritance and is
- * fine, `--table-columns` at both tiers being exactly that. Two *families* is a
- * collision: `--toolbar-gap` was declared by `<helix-toolbar>` defaulting to
- * `space-2xs` and by `<helix-sandbox-toolbar>` defaulting to `space-sm`, so one
- * declaration on a container holding both set two different things and neither
- * component could be blamed.
+ * **A public name may not be shared.** Two elements in one family documenting
+ * one hook is inheritance and is fine, `--table-columns` at both tiers being
+ * exactly that. Two *families* is a collision: one declaration on a container
+ * holding both sets two different things, with two different defaults, and
+ * neither component can be blamed.
  *
  * Run with `bun run check:css:hooks` (also part of `bun run verify`).
  */
@@ -81,9 +65,8 @@ import { extname, join } from 'node:path'
 import { SOURCE, TOKEN_PREFIX } from './lib/workspace.mjs'
 
 /* Every tier that ships CSS or documents a component. `helix/styles` reads
-   hooks without declaring any, which is exactly the pairing that made Button's
-   go missing: the declaration stayed in one tier and the rule moved to
-   another. */
+   hooks without declaring any, and that split is how a hook goes missing: the
+   declaration stays in one tier while the rule moves to another. */
 const TIERS = [SOURCE.core, SOURCE.headless, SOURCE.styles, SOURCE.styled]
 
 const walk = (dir, found = []) => {
@@ -142,9 +125,9 @@ const SHARED_ROOT = 'helix/styled/src/shared'
  *
  * `field/` is the case that separates them: seventeen families import it and it
  * declares no `--field-*` at all, reading only tokens. Registering it in `SHARED`
- * to get the two-reader rule would have handed it a naming exemption for hooks
- * that do not exist, so the day one appeared it would have escaped the check
- * silently. Discovered here, and named there when something needs it.
+ * to get the two-reader rule would hand it a naming exemption for hooks that do
+ * not exist, so the day one appeared it would escape the check silently.
+ * Discovered here, and named there when something needs it.
  */
 const sharedFolders = () => {
   try {
@@ -173,9 +156,9 @@ const ownerOf = (path) => {
 }
 
 /* A comment quoting `var(--_thing)` is prose about a reader, not one. The
-   public halves above scan the file whole and have got away with it; this rule
-   cannot, because a property's own explanation sits directly above it and
-   routinely spells out the rule that was supposed to read it. */
+   private rule has to strip comments where the public halves need not, because a
+   property's own explanation sits directly above it and routinely spells out the
+   rule that was supposed to read it. */
 const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const declared = new Map()
@@ -184,11 +167,10 @@ const declared = new Map()
    one family is a hook documented at both tiers, which is inheritance. */
 const declaredBy = new Map()
 /* Every declaration, not just the last, so a name written twice is visible.
-   `declared` above is a Map and the second `set` overwrote the first, which is
-   why this check has never been able to see a duplicate: by the time it counts,
-   each name appears once. Measured on `Divider`, which declared
-   `--divider-color` and `--divider-thickness` twice apiece under two different
-   descriptions, and shipped all eight to the manifest and the API page. */
+   `declared` above is a Map whose second `set` overwrites the first, so by the
+   time it counts each name appears once and no duplicate can be seen. The
+   manifest keeps every one, and a hook declared twice reaches the API page
+   twice. */
 const declaredAt = new Map()
 const read = new Map()
 /* `--_name` -> package -> the file that declared it, and the packages that read it. */
@@ -250,10 +232,9 @@ for (const tier of TIERS) {
     if (extname(path) === '.ts') {
       for (const [, attribute] of text.matchAll(/style="([^"]*)"/g)) {
         /* A family read through an interpolation, `var(--chart-series-${n})`.
-           The number is chosen at runtime, so no literal `--chart-series-7`
-           exists anywhere and matching names alone reported twenty-four live
-           hooks as dead. What the component states is that it reads the whole
-           family, so that is what is recorded. */
+           The suffix is chosen at runtime, so no literal `--chart-series-7`
+           exists anywhere to match. What the component states is that it reads
+           the whole family, so that is what is recorded. */
         for (const [, prefix] of attribute.matchAll(/var\(\s*(--[a-z0-9-]+)-\$\{/g)) {
           if (ours(prefix)) {
             families.set(prefix, path)
@@ -274,22 +255,17 @@ const problems = []
 /**
  * A member of a family something reads through an interpolation.
  *
- * **The suffix used to have to be a number, and the family is what was
- * recorded.** `--chart-series-${n}` was the only case when this was written, and
- * an index is what a series has, so the two facts were conflated into one test.
- * Heatmap reads `--heatmap-tone-${tone}` where a tone is a name: `success` and
- * `danger` for a status strip, `1` through `5` for the ramp, and whatever a
- * consumer invents for their own. Under the digit test the ramp members passed
- * and the semantic ones did not, from one interpolation, so the family could be
- * published only in the half that happened to be numbered and the rest were API
- * nothing named.
+ * **Do not require the suffix to be a number.** An index is what a series has,
+ * but Heatmap reads `--heatmap-tone-${tone}` where a tone is a name: `success`
+ * and `danger` for a status strip, `1` through `5` for the ramp, and whatever a
+ * consumer invents. A digit test passes the ramp members and fails the semantic
+ * ones out of one interpolation, publishing half a family and leaving the rest
+ * API nothing names.
  *
- * The collector above already records exactly the right thing, which is the
- * prefix a component says it reads the whole of. This now trusts it. It is a
- * real widening: any `--foo-bar-*` counts as read once something interpolates
+ * So any `--foo-bar-*` counts as read once something interpolates
  * `var(--foo-bar-${…})`. That is what "reads the whole family" means, and the
- * two directions this file exists for both survive it, because a name still has
- * to be declared by a rule somebody wrote and a family prefix still has to be
+ * two directions this file exists for both survive it: a name still has to be
+ * declared by a rule somebody wrote, and a family prefix still has to be
  * interpolated by a component somebody wrote.
  */
 const inFamily = (name) => {
@@ -376,17 +352,12 @@ for (const [name, where] of [...privateDeclared].sort()) {
 /**
  * A sheet in a shared folder is imported by more than one family.
  *
- * **`SHARED` states that bar in prose and nothing held anything to it**, so a
- * sheet drifted in and stayed. `chart/terminus.css` sat there read by
- * `Sparkline` alone, which made `--chart-terminus-*` a hook exempted from the
- * family-naming rule as shared while being read by one family: the same
- * paragraph that grants the exemption calls that "a family hook that has
- * drifted". Worse, the claim reached a consumer, because Sparkline's `terminus`
- * documentation says the shapes are "shared with every other chart that ends a
- * line", which is on the published API page and was not true.
- *
- * So the folder is asked the question its own comment asks. One importer means
- * the sheet belongs inside that family, and the hooks belong to it too.
+ * `SHARED` states that bar in prose, and this holds something to it. A sheet
+ * with one importer takes the family-naming exemption while being read by one
+ * family, which is the drift that exemption is not for, and the claim reaches a
+ * consumer: the API page says the part is shared with the other families, and it
+ * is not. One importer means the sheet belongs inside that family, and the hooks
+ * belong to it too.
  */
 for (const folder of sharedFolders()) {
   let sheets

@@ -27,8 +27,6 @@ export interface HelixCemOptions {
    * everything else reads: `jsx.d.ts` by `@wc-toolkit/jsx-types` for the whole
    * JSX family, and `vue.d.ts` by `@wc-toolkit/vuejs-types` for Vue templates,
    * which are not JSX and augment a different interface.
-   *
-   * It was `jsxTypes` while JSX was all it emitted.
    */
   frameworkTypes?: boolean
 

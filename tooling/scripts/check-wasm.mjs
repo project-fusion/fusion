@@ -2,19 +2,18 @@
  * The browser distribution answers what the engine answers.
  *
  * **The oracle is the reference for both halves, which is what makes this
- * cheap.** `oracle.json` holds sixteen whole themes as the TypeScript derives
+ * cheap.** `oracle.json` holds seventeen whole themes as the TypeScript derives
  * them, and `cargo test` asserts the crate against it on the host. So what is
  * left to prove here is that nothing is lost crossing the boundary, and that
  * `wasm32` computes what the host computes.
  *
- * **The second half turned out not to be free, and this is where it was found.**
- * A `wasm32` build does not use the host's libm: it takes Rust's own, so `powf`,
- * `cbrt` and `atan2` are allowed to land a last place apart from what macOS
- * answers. Measured across seventeen themes: 103 of 3,249 intermediates differ,
- * worst 1.56e-13 on a hue. Nothing about that is alarming and all of it has to
- * be stated, because "one implementation" now means one algorithm in two float
- * environments rather than one binary, and the figure this prints is what would
- * move if that ever stopped being true.
+ * **The second half is not free.** A `wasm32` build does not use the host's
+ * libm: it takes Rust's own, so `powf`, `cbrt` and `atan2` are allowed to land a
+ * last place apart from what macOS answers. Measured across seventeen themes:
+ * 103 of 3,249 intermediates differ, worst 1.56e-13 on a hue. "One
+ * implementation" means one algorithm in two float environments rather than one
+ * binary, and the figure this prints is what would move if that stopped being
+ * true.
  *
  * So the artifact is asserted exactly and the intermediates to a tolerance,
  * which is the policy `assert_token` already applies to the same class of
@@ -40,14 +39,12 @@ const WASM = join(ROOT, 'helix/theme/wasm')
 const TOLERANCE = 1e-12
 
 if (!existsSync(join(WASM, 'fusion_helix_theme.js'))) {
-  /* **Refused rather than built here, and rather than skipped.** This no longer
-     runs `bun run gen:wasm` first, which is the point of it: the artifact is tracked
-     now, so what gets measured against the oracle is the file that ships rather
-     than a fresh one built beside it. Reaching this line means the tracked file
-     is gone, which is a deleted artifact rather than a missing toolchain.
-     Saying so and failing is the point: a check that quietly passes when it
-     cannot run is a green tick with nothing behind it, which is worse than a
-     red one. */
+  /* **Refused rather than built here, and rather than skipped.** The artifact is
+     tracked, so what gets measured against the oracle is the file that ships
+     rather than a fresh one built beside it. Reaching this line means the
+     tracked file is gone, which is a deleted artifact rather than a missing
+     toolchain. A check that quietly passes when it cannot run is a green tick
+     with nothing behind it. */
   console.error(
     'wasm: helix/theme/wasm is tracked and is not here, so this check has\n' +
       'nothing to measure. Restore it, or rebuild it with `bun run gen:wasm`, which\n' +
@@ -70,10 +67,10 @@ const intents = new Map(INTENTS.map(({ intent, label }) => [label, intent]))
 const wrong = []
 /** The largest last-place difference seen, so the claim above is a measurement. */
 let worst = { apart: 0, at: 'nothing' }
-/* **Two counters, because one of them would lie.** The first version counted
-   only the values that differed and reported them as "intermediates agree to
-   1e-12", which reads as coverage and means the opposite: a port that agreed
-   everywhere would have announced that it checked nothing. */
+/* **Two counters, because one of them would lie.** Counting only the values that
+   differ and reporting them as "intermediates agree to 1e-12" reads as coverage
+   and means the opposite: a port that agreed everywhere would announce that it
+   checked nothing. */
 let compared = 0
 let differing = 0
 

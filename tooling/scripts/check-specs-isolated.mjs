@@ -16,10 +16,8 @@
  * point of writing it as an invariant rather than as a test of today's code. A
  * path guard in the registrar is what holds it now. A root layout of its own for
  * the tool routes is the structural version, and Next supports one per top-level
- * route group; it moves every route in the app into a group, so it is not a
- * change to make while another branch is holding thirty files open in the same
- * directory. Either way the assertion is the same, and this check is what lets
- * the second one land without anybody having to remember why the first existed.
+ * route group, at the cost of moving every route in the app into a group. Either
+ * way the assertion is the same.
  *
  * **What it is really guarding is the string.** The guard compares
  * `window.location.pathname` against a literal, and the route is a directory on
@@ -31,11 +29,11 @@
  * together.
  *
  * **And it refuses a static import of the library in the registrar**, which is
- * the edit this file most expects to see. The comment there now says a
- * module-scope import is safe *for hydration*, which is true and was measured,
- * and which reads as an invitation to simplify the effect away. It is not safe
- * for this: an import at module scope runs on every route including the one
- * below, and no guard inside a hook can reach it.
+ * the edit this file most expects to see. The comment there says a module-scope
+ * import is safe *for hydration*, which is true and reads as an invitation to
+ * simplify the effect away. It is not safe for this: an import at module scope
+ * runs on every route including the one below, and no guard inside a hook can
+ * reach it.
  *
  * Run with `bun run check:spec:specs-isolated`.
  */

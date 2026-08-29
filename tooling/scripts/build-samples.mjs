@@ -2,18 +2,16 @@
 /**
  * Fills the Rust samples in the Cortex documentation from the crates themselves.
  *
- * **The samples used to be typed into the MDX and compiled by nothing.** Eight
- * fenced `rust` blocks across three pages, and `cargo test --workspace --doc`
- * reported zero doc-tests for all three crates, so a rename in `cortex/trace`
- * left the page that documents it still describing the old signature and every
- * check in the repository passed. Worse than a stale signature, the pages made
- * behavioral claims (`trace.len() == 4`, `removed.len() == 3`) that no signature
- * check could ever have held: those are assertions about what the code does, and
- * only running it settles them.
+ * **A fenced `rust` block typed into MDX is compiled by nothing.** A rename in
+ * `cortex/trace` leaves the page documenting it describing the old signature,
+ * and every check in the repository passes. Worse than a stale signature, a page
+ * makes behavioral claims (`trace.len() == 4`, `removed.len() == 3`) that no
+ * signature check could ever hold: those are assertions about what the code
+ * does, and only running it settles them.
  *
- * So the samples moved into `///` doc comments, where `cargo test` runs them,
- * and this script interpolates them back into the pages. The compiler owns
- * whether a sample is correct; the page owns the prose around it.
+ * So the samples live in `///` doc comments, where `cargo test` runs them, and
+ * this script interpolates them back into the pages. The compiler owns whether a
+ * sample is correct; the page owns the prose around it.
  *
  * **The key in a marker is the name rustdoc prints.** `Graph::why` in the
  * marker is `Graph::why` in `cargo test --doc` output, so a reader who sees a

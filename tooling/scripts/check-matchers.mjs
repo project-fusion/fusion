@@ -2,18 +2,12 @@
 /**
  * Every matcher a spec reaches for exists in the browser harness.
  *
- * **This is the third time and the first check.** `bun test` runs the DOM specs
- * under happy-dom with `bun:test`'s `expect`, which has every matcher there is.
+ * **Two runners, two matcher sets.** `bun test` runs the DOM specs under
+ * happy-dom with `bun:test`'s `expect`, which has every matcher there is.
  * `bun run specs:browser` runs the same files through the hand-written harness
  * in `helix/testing/src/browser.ts`, which has the dozen somebody needed. A
  * spec written against the first type-checks, passes locally, and dies in the
  * second on a name that object never had.
- *
- * `browser.ts` says so in its own comment: three of six failures in its first
- * run were exactly this. Then `toBeCloseTo` arrived with the charts and nine
- * geometry assertions started throwing instead of asserting. A rule stated in a
- * comment beside the thing it governs is the version of this that has already
- * been tried.
  *
  * **A missing matcher is worse than a failing assertion, because it looks like
  * one.** `TypeError: B(...).toBeCloseTo is not a function` is reported as a
@@ -23,21 +17,19 @@
  * the report said they had been checked and failed.
  *
  * **And the pressure is to write the spec around it, which is the real cost.**
- * `dialog-root.dom.spec.ts` carried a comment saying it could not use
- * `not.toThrow` because the harness lacked it, so the assertion that the press
- * survived was left unwritten and the one after it carried the meaning alone. A
- * spec shaped by its harness's gaps stops saying what it meant, quietly, and
- * nothing about it looks wrong afterwards.
+ * An assertion the harness cannot express gets left unwritten and the one after
+ * it carries the meaning alone. A spec shaped by its harness's gaps stops saying
+ * what it meant, quietly, and nothing about it looks wrong afterwards.
  *
  * **What it reads.** Every `.dom.spec.ts` under `helix/`, for names in the
  * matcher position: after `expect(...)` or `.not.`. That is what makes it
  * different from grepping for `to[A-Z]`, which finds `toLowerCase` and
  * `toString` on ordinary values and would need an ignore list that grows.
  *
- * **What it cannot see**, said plainly. A matcher called through a variable, a
- * helper that takes a matcher name, or anything built at run time. Nothing in
- * this repository does that, and if something starts, this check goes quiet
- * rather than wrong, which is the failure direction to prefer.
+ * **What it cannot see.** A matcher called through a variable, a helper that
+ * takes a matcher name, or anything built at run time. Nothing in this
+ * repository does that, and if something starts, this check goes quiet rather
+ * than wrong, which is the failure direction to prefer.
  *
  * Run with `bun run check:spec:matchers` (also part of `bun run verify`).
  */

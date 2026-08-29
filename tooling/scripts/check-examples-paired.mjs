@@ -9,19 +9,15 @@
  * collapsed, twenty-one glyphs nobody outside the component could reach, a chart
  * palette no consumer could set, and a token the headless tier named and could
  * not resolve. None of those was visible from the styled tier, which is exactly
- * the point, and all of it is why the examples exist at all. That paragraph is
- * inherited from `build-headless-examples.mjs`, which this replaces: the
- * findings outlive the mechanism that found them.
+ * the point, and all of it is why the examples exist at all.
  *
- * **What that generator got backwards was the direction.** `@fusion.dev/helix`
- * depends on `@fusion.dev/helix-headless`, so headless is the base and styled builds on
- * it. The generator derived each headless example from the styled one beside it,
- * which made the base tier's examples a function of the tier above it and left
- * `helix/headless` with no examples of its own at all. The defense was that
- * styled is headless plus invented presentation, so only the lossy direction is
- * mechanical. That is true and it is an argument for deriving neither: styled
- * inventing presentation is the whole purpose of the tier, not an obstacle to
- * be worked around.
+ * **Neither tier's example is derived from the other's, and the tempting
+ * direction is the wrong one.** `@fusion.dev/helix` depends on
+ * `@fusion.dev/helix-headless`, so deriving headless from styled makes the base
+ * tier's examples a function of the tier above it and leaves `helix/headless`
+ * with no examples of its own. That only the styled-to-headless direction is
+ * mechanical is an argument for deriving neither: styled inventing presentation
+ * is the whole purpose of the tier, not an obstacle to be worked around.
  *
  * So both are authored, in their own package, under the same name, and this
  * holds them to each other instead. The directory carries the tier and the file
@@ -53,11 +49,11 @@ const CANONICAL = 'preview.html'
  * differently. Comments go. Whitespace collapses, because one tier's markup
  * nests deeper than the other's and indentation is not copy.
  *
- * **And `<style>` goes, contents and all**, which the first version of this
- * missed: it stripped tags and compared what was between them, so `virtual-list`
- * failed on `var(--helix-space-sm)` against `0.5rem`. A headless stylesheet
- * writing raw values is not a difference in copy, it is the tier working as
- * documented, and `check:css:tokens` permits it by name.
+ * **And `<style>` goes, contents and all.** Stripping only the tags compares
+ * stylesheet bodies, so `virtual-list` fails on `var(--helix-space-sm)` against
+ * `0.5rem`. A headless stylesheet writing raw values is not a difference in
+ * copy, it is the tier working as documented, and `check:css:tokens` permits it
+ * by name.
  */
 const copy = (markup) =>
   markup
@@ -137,22 +133,18 @@ console.log(
 /**
  * Every example is authored in both syntaxes, and neither is generated.
  *
- * **The same argument as the tiers above, one axis over.** `htmlToJsx` derived
- * the React view of an example from its HTML at read time, which is the mistake
- * `build-headless-examples.mjs` made and this file was written to replace. It
- * failed harder: the styled-to-headless derivation was merely lossy, while this
- * one emitted a `<script>` into a JSX fragment, so all 28 script-bearing
- * examples produced a *syntax error* rather than a wrong picture. Measured with
- * `bun build`: `{ name: 'archive.tar.gz' }` in JSX children is an expression
- * container, not an object.
- *
- * It was wrong on script-free examples too, in three ways nobody had looked
- * for: a leading comment was not counted as a root so no fragment was emitted
- * (27 files), the stylesheet-to-import rule required `rel` before `href` and
- * every example writes them alphabetically so it had never once fired (172
- * files), and `for` was renamed to `htmlFor` on custom elements, where React
- * writes the attribute verbatim and the browser lowercases it to something no
- * component reads (41 files, and the corpus contains no actual `<label for=>`).
+ * **The same argument as the tiers above, one axis over.** Deriving the React
+ * view from the HTML at read time (`htmlToJsx`, since deleted) emitted a
+ * `<script>` into a JSX fragment, so all 28 script-bearing examples produced a
+ * *syntax error* rather than a wrong picture: measured with `bun build`,
+ * `{ name: 'archive.tar.gz' }` in JSX children is an expression container, not
+ * an object. It was wrong on script-free examples too, silently: a leading
+ * comment was not counted as a root so no fragment was emitted (27 files), the
+ * stylesheet-to-import rule required `rel` before `href` and every example
+ * writes them alphabetically so it never once fired (172 files), and `for` was
+ * renamed to `htmlFor` on custom elements, where React writes the attribute
+ * verbatim and the browser lowercases it to something no component reads (41
+ * files).
  *
  * **What is asserted here is that both exist, not that they read alike.** A
  * React example legitimately moves copy out of the markup: a caption becomes a

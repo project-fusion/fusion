@@ -26,7 +26,7 @@ export interface Destination {
    * would be the part that lied.
    *
    * **The stage rather than "Coming soon", which said one thing three times.**
-   * `CLAUDE.md` keeps the vocabulary honest and says never to soften it, and the
+   * `AGENTS.md` keeps the vocabulary honest and says never to soften it, and the
    * Cortex page two clicks away already reports Engram and Trace as Building and
    * Recall as Declared. A menu calling all three the same thing is the softening
    * that rule exists to refuse, and it disagreed with the page besides.
@@ -41,7 +41,7 @@ export interface Destination {
 /**
  * A product: the evocative half of the naming rule.
  *
- * Two of them, and there will not be many. `CLAUDE.md` reserves an evocative
+ * Two of them, and there will not be many. `AGENTS.md` reserves an evocative
  * name for a module carrying a differentiated idea, so this list grows only
  * when something earns one, and everything else stays descriptive and stays
  * out of here.
@@ -146,7 +146,7 @@ export interface Product {
  *
  * Cortex carries one destination and Helix carries four, and the asymmetry is
  * the honest reporting rather than a gap to fill. Engram, Trace and Recall are
- * named in `CLAUDE.md` and none of them is built, so none of them is a row
+ * named in `AGENTS.md` and none of them is built, so none of them is a row
  * here. The day one is, it is a row.
  */
 export const PRODUCTS: Product[] = [
@@ -208,7 +208,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     body: 'Memory and provenance. What a system knows, where it learned it, and how much of it to trust. Not a model wrapper: the part that remains true when the model underneath is replaced.',
-    /* The three modules that have earned an evocative name, per `CLAUDE.md`:
+    /* The three modules that have earned an evocative name, per `AGENTS.md`:
        inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
        descriptive. They are named here before they are built because the
        division of the thing is what Cortex *is*, and a panel showing only what

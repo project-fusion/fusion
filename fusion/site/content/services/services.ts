@@ -37,27 +37,20 @@ export interface Service {
 }
 
 /**
- * The three offers, in the order the plan sequences them.
+ * The three offers, in the order they are meant to be read.
  *
  * **Not alphabetized, because the order is the argument.** This is a ladder:
  * the audit is cheap enough to say yes to and is what qualifies a client for
  * the sprint, and the sprint is what makes the build engagement legible. Sorted
  * by name it would open on the largest number on the page.
  *
- * Copy is derived from `the internal plan` and `the internal plan`
- * rather than written fresh, so the site and the plan cannot drift on what is
- * actually sold or for how much.
- *
- * **It named only the plan once, and drifted for exactly that reason.**
- * The plan carries the offers and the prices; the model carries the durations
- * and the capacity they are costed against, and it was never opened. So the
- * sprint was published at six to ten weeks when it runs four, and
- * the build was published with no number at all although it has one.
- * `the internal plan` is the reconciliation and is the authority where
- * the two disagree. Settled 20 Aug 2026: the sprint is four weeks, and the price does not move.
+ * **Prices and durations are stated here once and read everywhere**, so the
+ * pages that show them cannot drift from each other on what is actually sold or
+ * for how much. Settled 20 Aug 2026: the sprint is four weeks, and the price
+ * does not move.
  *
  * **Every offer states the commitment and not only the elapsed time**, which is
- * section 5.2 of that document and the highest-value line in it. Four weeks with
+ * the highest-value line in the set. Four weeks with
  * no shape given invites a full-time reading, and the price then reads as something it is not. Four weeks at two days a week is what it is costed against, and that is what it is. The
  * number was never the problem: what it was divided by was.
  *

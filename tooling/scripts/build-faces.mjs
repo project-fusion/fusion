@@ -31,18 +31,16 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-/* **`.generated.` is load-bearing, not decoration.** Seven scripts here find a
-   generated file by that segment in its name, and this was called `faces.ts`
-   and caught by none of them.
+/* **`.generated.` is load-bearing, not decoration.** Scripts here find a
+   generated file by that segment in its name, and one called `faces.ts` is
+   caught by none of them.
 
-   `check:prose:dialect` is the one that showed it. Google ships a family called
+   `check:prose:dialect` is the one that shows it. Google ships a family called
    `Grey Qo`, which the sweep reads as a British color and refuses. dialect:quoted
 
-   The fix that had been applied was that marker, hand-written into a row of the
-   generated file, under a header saying not to edit it. It survived until
-   somebody ran this script, which is precisely the failure the check's own
-   comment predicts: a fix in generated output is undone by the next build. The
-   name is the fix, because the exemption is what the name is for. */
+   Hand-writing that marker into a row of the generated file is not the fix: a
+   fix in generated output is undone by the next build. The name is the fix,
+   because the exemption is what the name is for. */
 const OUT = join(import.meta.dirname, '../../fusion/site/content/faces/faces.generated.ts')
 const SOURCE = 'https://fonts.google.com/metadata/fonts'
 
@@ -81,12 +79,10 @@ const weightsFor = (family) => {
  * flag widened into an enumeration rather than a second field, so the row stays
  * three long and the file stays the size it was.
  *
- * **The counts in this file's prose are deliberately round.** The exact one is
- * Google's and moves on their schedule rather than ours: it was 1,942 when this
- * was written, 1,939 when the catalog was last refreshed before that, and 1,943
- * now, and every one of those was written into a comment by hand. The arguments
- * here are about scale and hold at any of them. The generated file states the
- * real figure, because it is regenerated when the figure changes.
+ * **The counts in this file's prose are deliberately round.** The exact figure
+ * is Google's and moves on their schedule rather than ours, and the arguments
+ * here are about scale. The generated file states the real one, because it is
+ * regenerated when the figure changes.
  *
  * A digit rather than the word, for the reason the tuple exists at all: two thousand
  * rows ship to a browser, and `'Handwriting'` is twelve bytes against one.

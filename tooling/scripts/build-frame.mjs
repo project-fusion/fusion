@@ -1,11 +1,10 @@
 /**
  * Builds the sandbox preview document as a static, self-contained page.
  *
- * It was a Next route, and a route cannot be sandboxed. A frame with
- * `sandbox="allow-scripts"` has an opaque origin, and from there every module
- * import and `fetch` back to the site is cross-origin without CORS headers, so
- * the route's own chunks never load and the document never comes alive.
- * Measured: the frame said nothing at all.
+ * A Next route cannot be sandboxed. A frame with `sandbox="allow-scripts"` has
+ * an opaque origin, and from there every module import and `fetch` back to the
+ * site is cross-origin without CORS headers, so the route's own chunks never
+ * load and the document never comes alive.
  *
  * A classic `<script src>` is not CORS-checked and does run there, which is why
  * this emits one IIFE with the component library inside it, and a plain HTML
@@ -34,7 +33,7 @@ const layers = [
   'helix/styles/src/base.css',
   'helix/styled/elements.css',
   // The frame's own layout modes, which belong to the document rather than to
-  // the site that used to render it.
+  // the site around it.
   'fusion/site/preview/preview-frame.css',
 ]
 
@@ -68,7 +67,6 @@ await writeFile(join(out, 'frame.js'), script)
  * inline. A dialog looks permanently open with buttons that do nothing, which
  * reads as a broken component rather than a stale file.
  *
- * Reported exactly that way, and it cost an hour of looking at the component.
  * The content decides the token, so a rebuild that changes nothing changes no
  * URL and the cache still does its job. */
 const stamp = (contents) => createHash('sha256').update(contents).digest('hex').slice(0, 8)
@@ -78,23 +76,23 @@ const css = await Promise.all(layers.map((layer) => readFile(join(root, layer), 
 /* The brand faces, fetched rather than inlined.
  *
  * The frame is a sandboxed document with an opaque origin, so a font request
- * from it arrives as `Origin: null`: `@font-face` fetches in CORS mode, and
- * nothing on the other end used to allow that. What is *not* true, and was
- * assumed here for a while, is that the frame cannot resolve a URL. It loads
- * from `/sandbox/frame.html`, an ordinary same-origin address, so only the
- * origin is opaque and a path resolves the way any page's does.
+ * from it arrives as `Origin: null`: `@font-face` fetches in CORS mode, so the
+ * other end has to allow it. What is *not* true is that the frame cannot
+ * resolve a URL. It loads from `/sandbox/frame.html`, an ordinary same-origin
+ * address, so only the origin is opaque and a path resolves the way any page's
+ * does.
  *
- * So the fix was one header. `next.config.ts` sends
+ * So this takes one header. `next.config.ts` sends
  * `Access-Control-Allow-Origin: *` for `/fonts/*`, the faces sit at a stable
  * public path instead of behind `next/font`'s content hash, and the site and
- * the frame now ask for the same three URLs.
+ * the frame ask for the same three URLs.
  *
- * **This used to inline them**, 111,208 bytes of base64 over 83,340 bytes of
- * woff2, which was 38% of a 292,825 byte `frame.css`. Worse than its size: the
- * stylesheet is stamped with a hash of its own contents, so the faces rode
- * inside a bundle re-stamped by any change to any token in `helix/styles`, and
- * a one-character color change cost every preview visitor a fresh 111KB of
- * font.
+ * **Do not inline them instead**, which is the shorter-looking fix: base64
+ * costs 111,208 bytes over 83,340 bytes of woff2, 38% of a 292,825 byte
+ * `frame.css`. Worse than its size, the stylesheet is stamped with a hash of
+ * its own contents, so inlined faces ride inside a bundle re-stamped by any
+ * change to any token in `helix/styles`, and a one-character color change costs
+ * every preview visitor a fresh 111KB of font.
  *
  * Without any of this the preview rendered in the fallback stack while the site
  * around it rendered in the brand's, so the one place a reader compares a

@@ -2,33 +2,30 @@
 /**
  * One attribute per line in every example, unless the element has only one.
  *
- * The examples were the one body of source in this repository nothing kept
- * consistent, and it showed: an element with six attributes ran off the side of
- * the sandbox's source pane, which is the pane a reader is looking at when they
- * meet the component. The rule is the one a reader can apply without thinking
- * about a column count. One attribute stays where it is, because wrapping
+ * An element with six attributes runs off the side of the sandbox's source
+ * pane, which is the pane a reader is looking at when they meet the component.
+ * The rule is the one a reader can apply without thinking about a column count.
+ * One attribute stays where it is, because wrapping
  * `<helix-card appearance="plain">` onto three lines is noise; two or more go
  * one per line, because that is where scanning for a particular attribute
  * starts costing something.
  *
  * **Three bodies of markup are under it**, because a reader copies whichever one
  * is in front of them: the `.examples` in `helix/styled` and `helix/sandbox`, and
- * the fenced HTML in the documentation. The fences were the one place a
- * six-attribute one-liner could survive the sweep, and one had.
+ * the fenced HTML in the documentation.
  *
  * **Biome sorts attributes too, now that `useSortedAttributes` is on**, and this
  * has to agree with it or the two take turns undoing each other inside a single
- * `bun run fix`. They did disagree, and Biome was right: see `name` below.
+ * `bun run fix`.
  *
  * The closing `>` goes on its own line at the tag's indentation, so the
  * attribute block reads as a list and the tag's own name and its end line up.
  * `/>` keeps its slash.
  *
  * **And they are alphabetized**, case-insensitively, which is the same rule this
- * repository applies to object keys, interface members and exported types. It
- * was left alone at first on the argument that a reader's own order says
- * something, and across every file it did not: the same element appeared with
- * `id` first here and `appearance` first there, so there was no order to
+ * repository applies to object keys, interface members and exported types. A
+ * reader's own order says nothing here: the same element appears with `id`
+ * first in one file and `appearance` first in another, so there is no order to
  * preserve, only an absence of one. Alphabetical is the order you can find an
  * attribute in without reading the others.
  *
@@ -49,10 +46,9 @@ import { join } from 'node:path'
 const ROOTS = [SOURCE.styled, SOURCE.sandbox]
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
-   is. `check:prose:examples` already holds these fences to the rules about inline
-   styles and declared state, and left the shape of the markup alone, so the one
-   place a six-attribute one-liner could survive the sweep was a code fence. One
-   had. */
+   is. `check:prose:examples` holds these fences to the rules about inline styles
+   and declared state and leaves the shape of the markup alone, so a code fence
+   is the one place a six-attribute one-liner could otherwise survive. */
 const DOCS = ['helix/docs/content', 'cortex/docs/content']
 
 const walk = (dir, found = []) => {

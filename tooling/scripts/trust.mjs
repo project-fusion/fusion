@@ -9,9 +9,8 @@
  * also what npm's own UI tells you to use instead of a bypass-2FA token.
  *
  * **The relationship is per package and per workflow file**, so ten packages
- * published by two workflows is twenty registrations. That is exactly the sort
- * of thing done by hand once, wrongly, and discovered on a release night, so it
- * is written down here instead.
+ * published by two workflows is twenty registrations, which is why they are
+ * written down here rather than made by hand.
  *
  * **Bound to an environment.** `--environment` is the part worth having:
  * `release.yml` may publish only from `production` and `release-experimental.yml`
@@ -20,17 +19,10 @@
  * governance gate cryptographic rather than procedural, which is a stronger
  * claim than a required reviewer alone.
  *
- * **A 403 is about the credential, not about the package.** This file said the
- * opposite for a week, and said it from a real measurement: on 20 Aug 2026
- * every registration returned `403 Forbidden` on `POST /-/package/<pkg>/trust`,
- * `npm trust list` returned 403 for a plain GET that needs no permission at
- * all, and `npm view @fusion.dev/helix` returned 404. The packages genuinely did
- * not exist, so nonexistence looked like the whole cause, and the 2FA
- * deprecation notice printed alongside was written off as unrelated.
- *
- * It was the cause. Measured again on 28 Aug 2026 against the same npm 11.18.0,
- * with `@fusion.dev/cortex-docs` published and confirmed present: `npm trust list`
- * under a granular token still returned 403, while the same command in the same
+ * **A 403 is about the credential, not about the package.** A missing package
+ * looks like the same thing and is not. Measured against npm 11.18.0 with
+ * `@fusion.dev/cortex-docs` published and confirmed present: `npm trust list`
+ * under a granular token returned 403, while the same command in the same
  * minute under the logged-in session returned `EOTP` and asked for a one-time
  * password. A 403 that turns into an `EOTP` when only the credential changes is
  * a statement about the credential.
@@ -47,9 +39,8 @@
  *     pipes stdio and nothing reaches the terminal. It fails once per
  *     registration and reports 403 for none of them.
  *
- * The package does have to exist, which is the true half of what this said
- * before, and npm/cli#8544 asks for that to change and is still open. It is
- * simply not what a 403 tells you.
+ * The package does have to exist, and npm/cli#8544 asks for that to change and
+ * is still open. It is simply not what a 403 tells you.
  *
  * Bootstrapping is still a real step and it still comes first:
  *
@@ -64,14 +55,12 @@
  * can never be mistaken for a release. It exists so that the package does, and
  * for no other reason.
  *
- * **`--tag bootstrap` does not keep it off `latest`.** This used to say that it
- * did. npm points `latest` at the first version a package ever receives
- * whatever `--tag` asked for: measured 28 Aug 2026, `@fusion.dev/cortex-docs` came
- * back carrying `bootstrap` and `latest` on the same `0.0.0-dev`. The
- * pre-release rule protects ranges and not bare installs, which is the
- * distinction the old sentence missed. `^1.0.0` can never resolve to a
- * pre-release; `npm i @fusion.dev/cortex-docs` resolves `latest` and gets the
- * placeholder.
+ * **`--tag bootstrap` does not keep it off `latest`.** npm points `latest` at
+ * the first version a package ever receives whatever `--tag` asked for:
+ * measured, `@fusion.dev/cortex-docs` came back carrying `bootstrap` and
+ * `latest` on the same `0.0.0-dev`. The pre-release rule protects ranges and not
+ * bare installs: `^1.0.0` can never resolve to a pre-release, while
+ * `npm i @fusion.dev/cortex-docs` resolves `latest` and gets the placeholder.
  *
  * It corrects itself at the first real release, when promotion moves `latest`
  * onto a version that was staged and proved. Until then `latest` is a stub, on

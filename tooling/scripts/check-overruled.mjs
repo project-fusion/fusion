@@ -15,20 +15,9 @@
  * is dead. Nothing catches it: the selector matches, the property is spelled
  * correctly, the token resolves, and the element simply shows another value.
  *
- * **It has happened twice, and cost hours both times.** Outline styled its links
- * `foreground-muted` from the day it was written, and `:where(a)` in the base
- * layer painted every one of them brand blue and underlined instead. By the
- * comment left beside the workaround, no outline had ever shown the color the
- * component asked for. Dialog's header size was lifted into the base layer for
- * the same reason and the component kept a `font-size` beside it that read as
- * the deciding value and was not: changing it moved nothing, which is a
- * genuinely disorienting thing to debug, because every other declaration in the
- * same rule does apply.
- *
- * That is the tell this looks for, and it is why the check is worth having
- * rather than a rule in a document nobody greps: the failure is per-declaration,
- * not per-rule. `font-weight` and `letter-spacing` come through from the shadow
- * while `font-size` and `color` do not, so the rule looks alive.
+ * The failure is per-declaration, not per-rule, which is the tell this looks
+ * for: `font-weight` and `letter-spacing` come through from the shadow while
+ * `font-size` and `color` do not, so the rule looks alive.
  *
  * **What counts as a document rule reaching a component.** A selector in
  * `helix/styles` that names a `helix-*` tag and then reaches past it: a
@@ -51,20 +40,10 @@ import { SOURCE } from './lib/workspace.mjs'
 
 /* **The base layer and the site, because both are document stylesheets.**
  *
- * This scanned `helix/styles` alone, on the reading that the base layer is where
- * a document rule naming a `helix-*` tag comes from. An app is the other place,
- * and it turns out to be the more likely one: a consumer writing a rule for a
- * component they are using has no reason to know that it beats the component's
- * own, whatever the specificity and whatever the layer.
- *
- * Three landed in `fusion/site` in a single session and each looked like something
- * else. `.showcaseCard { display: block }` beat `:host { display: grid }`, so
- * every card in the panel was a block and the region gap did nothing.
- * `.showcaseTrendLine { inline-size: 100% }` would have held a full-bleed chart
- * to the content width. `.reelAura { pointer-events: none }` overruled
- * `:host([interactive])`, so an aura asked for the pointer and reported that it
- * refused it. None of the three errored, and the check that exists for exactly
- * this was not looking. */
+ * An app is the more likely source of the collision, not the base layer: a
+ * consumer writing a rule for a component they are using has no reason to know
+ * that it beats the component's own, whatever the specificity and whatever the
+ * layer. */
 const STYLES = [SOURCE.styles, 'fusion/site/app']
 /** Every `.css` under a directory, skipping the generated `.css.ts` beside it. */
 const stylesheets = (dir) => {
@@ -145,15 +124,9 @@ for (const path of STYLES.flatMap((dir) => stylesheets(dir))) {
 
 /* The component side: what each stylesheet declares for its host and its slots. */
 for (const path of stylesheets(SOURCE.styled)) {
-  /* **The element this file styles, not the family it lives in.**
-   *
-   * This read the family from the directory and compared every stylesheet in it
-   * against a rule naming `helix-<family>`, so a document rule for the root was
-   * held against each of the family's parts. Harmless while only the base layer
-   * was scanned and wrong the moment the site was: `.workbenchMain
-   * helix-sandbox` setting `block-size` was reported against
-   * `sandbox-toolbar.css`, whose `:host` is `helix-sandbox-toolbar` and which
-   * the rule cannot reach.
+  /* **The element this file styles, not the family it lives in.** Comparing
+   * every stylesheet in a family against `helix-<family>` holds a document rule
+   * for the root against each of the family's parts, which it cannot reach.
    *
    * A part's tag is its file name, which is how the composition plugin reads
    * this tree too: `sandbox/root/sandbox-root.css` is `helix-sandbox` and
@@ -163,11 +136,8 @@ for (const path of stylesheets(SOURCE.styled)) {
   /* **The host and the slots are two sets, because a document rule reaches one
      or the other and never both.**
    *
-   * These were merged, so any rule naming the tag was held against everything
-   * the file declared anywhere. `.workbenchMain helix-sandbox` setting
-   * `block-size` was reported against `sandbox-root.css`, which sets
-   * `block-size` on `::slotted([slot="panel"])` and on the preview: a rule for
-   * the host cannot reach a slotted child, and nothing was dead.
+   * Merging them reports a rule for the host against what the file declares on
+   * a slotted child, which it cannot reach.
    *
    * `reaches` already records what follows the tag. Nothing after it is the
    * host; anything after it is a descendant, which is what `::slotted` styles. */

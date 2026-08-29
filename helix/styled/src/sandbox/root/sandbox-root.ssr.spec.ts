@@ -11,13 +11,13 @@ const markup = ssr(html`<helix-sandbox>
 /**
  * The divider inside a named splitter, rather than the first one in the file.
  *
- * There are two now, nested, and the outer one comes first: a spec reaching for
- * "the separator" got the panel's and read its bounds as the panes'.
+ * Two splitters are nested and the outer one comes first, so reaching for "the
+ * separator" finds the panel's and reads its bounds as the panes'.
  *
  * `withoutStyles` first, and that is not tidiness. Declarative shadow DOM inlines
  * each component's stylesheet into the very markup being searched, and this one
- * names `[part="panes"]` in a selector: the search found the CSS, started from
- * there, and the next divider after it was the panel's again.
+ * names `[part="panes"]` in a selector: the search finds the CSS, starts from
+ * there, and the next divider after it is the panel's again.
  */
 const bare = withoutStyles(markup)
 

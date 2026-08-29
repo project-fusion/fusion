@@ -8,9 +8,7 @@
  * the component adopts. That is the same finding `check:css:motion` already made
  * about motion, and this is the same check for the same reason.
  *
- * **Every family, now that every family has an answer.** This required two
- * categories while the rest were undecided; all ninety have a rule now, so the
- * check is the simple one it should have been: a family with a stylesheet says
+ * **Every family, with no exempt categories.** A family with a stylesheet says
  * what it does on paper, or it fails here.
  *
  * The answers are four, and each family's own sheet carries the reason. Chrome

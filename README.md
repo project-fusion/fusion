@@ -44,11 +44,9 @@ on purpose and are not softened as the company matures.
 
 ## Documents
 
-The strategy is not in this repository. The numbered plan (thesis, planning documents) lives in the internal repository, because this one is public.
-
-What is here is the writing meant to be read: `fusion/docs/insights/` is the published
-essays, `fusion/docs/19-queue.md` is the work queue, and the two generated references
-beside them are `component-reference.md` and `token-reference.md`.
+`fusion/docs/insights/` is the published essays, `fusion/docs/19-queue.md` is the
+work queue, and the two generated references beside them are
+`component-reference.md` and `token-reference.md`.
 
 ## Packages
 
@@ -58,7 +56,7 @@ beside them are `component-reference.md` and `token-reference.md`.
 | **Cortex** (crates, `@fusion.dev/cortex-*`) | `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram` `docs` |
 
 Versions are **lockstep within a domain**, independent across domains. See
-[`CLAUDE.md`](CLAUDE.md).
+[`AGENTS.md`](AGENTS.md).
 
 ## Stack
 

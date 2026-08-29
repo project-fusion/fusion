@@ -2,18 +2,14 @@
 /**
  * Holds every reference to this repository to the one place that says where it is.
  *
- * **A move left residue in sixteen files and nothing noticed.** Measured 24 Aug
- * 2026, after `former-org/former-repo` became `project-fusion/fusion`: eight
- * published manifests still carried the old `repository.url`, so the wrong path
- * would have shipped in every tarball and shown on every npm page; `source.ts`
- * still built the View Source link on all eighty-eight reference pages from it;
- * and `CODEOWNERS` still named a team under the old org.
+ * **A move leaves residue and nothing notices.** A published manifest carries
+ * its `repository.url` into every tarball and onto its npm page, `source.ts`
+ * builds the View Source link on every reference page from it, and `CODEOWNERS`
+ * names a team under the org.
  *
- * **The shape of the fault is the duplication.** The repository URL was written
- * out ten times and nothing held the copies together, so moving updated none of
- * them. The root `package.json` declares it once now, which is the conventional
- * field for it and is declarative there rather than published, the root being
- * private.
+ * **The shape of the fault is the duplication**, so the root `package.json`
+ * declares the URL once, which is the conventional field for it and is
+ * declarative there rather than published, the root being private.
  *
  * **`FORMER` is a list and that is deliberate.** The alternative is inferring
  * which `github.com` paths are ours, which cannot be done: `facebook/react` and

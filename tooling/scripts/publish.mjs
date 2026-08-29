@@ -10,10 +10,10 @@
  *
  * **Promotion moves a tag, it does not republish.** Staging publishes at the
  * real version under `next`; promotion is `npm dist-tag add pkg@version latest`
- * and nothing is rebuilt. The alternative that keeps being proposed, a
- * `0.0.1-staging` version promoted by publishing `0.0.1`, ships bytes to users
- * that no smoke test ever ran, because the second publish is a second build.
- * It also cannot be undone: promotion here is moving the tag back.
+ * and nothing is rebuilt. The obvious alternative, a `0.0.1-staging` version
+ * promoted by publishing `0.0.1`, ships bytes to users that no smoke test ever
+ * ran, because the second publish is a second build. It also cannot be undone:
+ * promotion here is moving the tag back.
  *
  * **`bun install` must have run since the version was stamped.** `bun pm pack`
  * reads a sibling's version from `bun.lock` rather than from that sibling's
@@ -86,9 +86,8 @@ if (tag === 'latest') {
   )
 }
 
-/* The domain's shipping members. A private package versions with its siblings
-   and is stamped like them, and it is not published: a Helix byproduct is still
-   Helix, and `@fusion.dev/helix-cem` is a build tool for this repository. */
+/* The domain's shipping members. A private package versions and is stamped with
+   its siblings and still never publishes. */
 const packages = [...manifests()].filter(
   ([name, { manifest }]) => domainOf(name) === domain && publishes(manifest),
 )
@@ -128,11 +127,10 @@ function npm(args, doing) {
           'what stops a number being handed out twice.',
       )
     }
-    /* `EOTP` and the sentence npm prints beside it, and nothing looser. The
-       previous pattern also matched `bypass 2fa`, which npm prints as a
-       deprecation notice on every token-authenticated command, so any failure
-       under a token arrived wearing two-factor advice whatever its cause. That
-       is the same misreading `trust.mjs` records against its own 403. */
+    /* `EOTP` and the sentence npm prints beside it, and nothing looser. A
+       pattern matching `bypass 2fa` catches the deprecation notice npm prints
+       on every token-authenticated command, so every failure under a token
+       arrives wearing two-factor advice whatever its cause. */
     if (/EOTP|one-time password/i.test(output)) {
       console.error(
         '\n  npm wants a one-time password, which means two-factor is set to "authorization and ' +
@@ -259,21 +257,13 @@ for (const [name, { directory, manifest }] of packages) {
 
   const into = join(staging, name.replace('@', '').replace('/', '-'))
   mkdirSync(into, { recursive: true })
-  /* **Stripped before the pack, not after it.** This used to unpack the
-     tarball, delete the maps and re-tar, and every problem the first real
-     publish hit came from that reopening: BSD tar writes an entry for
-     `package/` and the registry answers `415 invalid path: package/`, and it
-     writes AppleDouble `._name` companions for files carrying macOS xattrs,
-     which shipped as junk in eight packages at 0.1.0.
-
-     Stripping `dist` first means bun packs a tree that is already correct and
-     nothing touches the archive afterwards, which is also what makes the
-     file's own promise true: what is packed is what is published.
-
-     The maps are emitted on purpose and are wanted in development, where
-     `declarationMap` is what lands go-to-definition on the source across
-     packages. Turning them off in the compiler would take that with it, and
-     doing it per package means a second tsconfig in every one of them. */
+  /* **Stripped before the pack, never by reopening the tarball.** Unpacking,
+     deleting the maps and re-tarring breaks the archive: BSD tar writes an
+     entry for `package/` and the registry answers `415 invalid path: package/`,
+     and it writes AppleDouble `._name` companions for files carrying macOS
+     xattrs. Stripping `dist` first means bun packs a tree that is already
+     correct and nothing touches the archive afterwards, which is what makes the
+     file's own promise true: what is packed is what is published. */
   const dropped = strip(directory)
   run('bun', ['pm', 'pack', '--destination', into], join(root, directory))
   const [file] = readdirSync(into)

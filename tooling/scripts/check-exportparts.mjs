@@ -8,13 +8,11 @@
  * keeps meeting: `helix-date-input::part(cell)` is valid CSS that matches
  * nothing, with no error, no warning, and nothing to search for.
  *
- * **Measured before this was written.** Thirty-seven sites across nineteen
- * families render another Helix element. Eight forwarded anything at all, and
- * 148 published child parts were unreachable from the outside: `color-input`
- * hid all sixteen of `color-picker`'s, `date-input` all thirteen of
- * `date-picker`'s, and `video` all five of the menu's, twice. Those are the
- * high-level components a consumer reaches for first, so the composed half of
- * the library was also the least styleable half.
+ * **Measured before this was written:** thirty-seven sites across nineteen
+ * families render another Helix element, eight forwarded anything at all, and
+ * 148 published child parts were unreachable from the outside. The composed
+ * components a consumer reaches for first were the least styleable half of the
+ * library.
  *
  * `overriding-a-component.mdx` already told consumers that a part they cannot
  * reach is a bug worth reporting. This is the check that stops it being one.
@@ -26,37 +24,23 @@
  *   effect is that the composed component is less useful than its parts.
  * - **Prefix with the role**, which is the `part` the parent gave the child, or
  *   the name it chose for the child's contribution where it renders no part of
- *   its own. Bare forwarding collides, and had: `command` forwarded the
- *   listbox's `search-field` under a name it also rendered itself, so
- *   `helix-command::part(search-field)` matched two elements.
+ *   its own. Bare forwarding collides: `command` forwarding the listbox's
+ *   `search-field` under a name it renders itself makes
+ *   `helix-command::part(search-field)` match two elements.
  * - **A part already named for its role keeps the role alone.** A `dialog`
- *   inside the `dialog` role is `dialog`, not `dialog-dialog`. The library's two
- *   pre-existing forwards were both written this way before there was a rule,
- *   which is the usual sign of the right one, and the collision rule below is
- *   what keeps the collapse safe.
+ *   inside the `dialog` role is `dialog`, not `dialog-dialog`. The collision
+ *   rule below is what keeps the collapse safe.
  *
  * **A forwarded part still needs its `@csspart`,** and `check:api:parts` is what
  * asks for it: it counts an `exportparts` name as rendered, so a forward
  * without a declaration fails there rather than here. The two checks are one
  * contract read from two ends.
  *
- * **And the door has to be checked from outside, which nothing did.**
- * `check:css:selectors` reads `[part="x"]` inside a component's own sheet and stops
- * there, so `helix-thing::part(nothing)` written from outside was unchecked in
- * every sheet, doc and page in the repository. It is the same silence as every
- * other part failure, in the one place nobody looks, and it had eight:
- *
- * - `INDICATOR`, in the generator that then wrote the headless examples, names
- *   the box the indicator is
- *   positioned against, and three of its four families were given a part they do
- *   not render: navigation and outline render `nav` and were given `list`,
- *   toggle group renders `track` and was given `group`. The `position: relative`
- *   never landed, so every indicator in those examples was measured against the
- *   wrong containing block.
- * - `splitter` was given `divider` twice, in a file whose own comment says
- *   "`splitter` has a `separator` and no `divider`".
- * - `overriding-a-component.mdx`, the page that teaches parts, styled
- *   `helix-dialog::part(panel)`. Dialog publishes `dialog`.
+ * **And the door has to be checked from outside.** `check:css:selectors` reads
+ * `[part="x"]` inside a component's own sheet and stops there, so
+ * `helix-thing::part(nothing)` written from outside is unchecked in every sheet,
+ * doc and page in the repository. It is the same silence as every other part
+ * failure, in the one place nobody looks, and it had eight.
  *
  * Run with `bun run check:api:exportparts` (also part of `bun run verify`).
  */

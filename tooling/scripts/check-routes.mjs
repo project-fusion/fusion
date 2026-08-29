@@ -60,7 +60,7 @@ if (all.length === 0) {
    the next build they disagree: the catalog writes a document for a page the
    route registry has never heard of, and the message for that is "a document no
    route points at", which sends a reader looking through content for a file
-   that is not the problem. It cost a detour once already.
+   that is not the problem.
    
    Cheaper to say so. The content directory is the truth either way. */
 const authored = new Set(
@@ -201,10 +201,10 @@ if (problems.length > 0) {
    into the record it is about to be judged against.
    
    **And never a page nobody has committed.** A draft sitting untracked in a
-   content folder is a route while it is on disk, and this recorded one, so
-   removing the draft looked exactly like deleting a published page and demanded
-   a redirect for an address that was never served. Publishing is a thing git
-   knows about and the filesystem does not. */
+   content folder is a route while it is on disk, so recording it makes removing
+   the draft look exactly like deleting a published page and demand a redirect
+   for an address that was never served. Publishing is a thing git knows about
+   and the filesystem does not. */
 const untracked = new Set(
   spawnSync(
     'git',
@@ -229,14 +229,13 @@ if (problems.length === 0) {
   const committed = [...live].filter((path) => !untracked.has(path.split('/').at(-1) ?? ''))
   const merged = [...new Set([...published.paths, ...committed])].sort()
   if (merged.join() !== published.paths.join()) {
-    /* **This is the one check here that wrote, and writing is what made it
+    /* **This is the one check here that writes, and writing is what makes it
        fail.** `verify` asserts the tree is unchanged by verifying it, so a
-       check that appends a newly published address turns the next component
-       into a red build on a shard that names nothing: measured on the run
-       that added Chat, `checks (2)` and `checks (4)` failing on
-       `git diff --exit-code` with the whole of the diff being one path.
-    
-       `check` fixes and `verify` judges, which `CLAUDE.md` states and
+       check that appends a newly published address turns the next page into a
+       red build on a shard that names nothing: `git diff --exit-code` failing
+       with the whole of the diff being one path.
+
+       `check` fixes and `verify` judges, which `AGENTS.md` states and
        `check:prose:dialect` already follows. The record is written under `--write`,
        which `bun run gen:routes` and `bun run regen` pass; without it the check
        says the file is behind and stops. */
@@ -246,8 +245,7 @@ if (problems.length === 0) {
       /* Reported here rather than pushed onto `problems`, which is read and
          acted on two hundred lines above this: appended to after the fact it
          changes nothing and the check passes while saying so to nobody, which
-         is the shape of a check that cannot fail. Found by reverting the file
-         and watching this branch report clean. */
+         is the shape of a check that cannot fail. */
       console.error(
         'routes: fusion/docs/insights/published.json is behind the routes that exist. Run ' +
           '`bun run gen:routes` and commit the result.\n',
@@ -266,9 +264,6 @@ const kinds = all.reduce((counts, route) => {
 }, {})
 
 /* How many prose pages still serve the stub.
- *
- * Zero as of the commit that serialized the insight essays. The count stays
- * because the next page added is the one that will need it.
  *
  * **Counted rather than failed on**, because a stub is the honest state of a
  * page whose copy has not moved into a typed module yet, and failing on it

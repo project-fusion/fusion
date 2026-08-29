@@ -7,14 +7,12 @@
  * platform, and every property the native element has and ours does not is a
  * thing they have to discover is missing. Worse is when the capability exists
  * under a word we invented, because then nothing is missing and nothing is
- * findable: `Radio` carries `selected` where the platform says `checked`, and
- * `Video` exposes `position` while reading `video.currentTime` two lines away.
+ * findable.
  *
  * **The audit that produced this found 128 divergences across 33 families**, and
- * the reason it is a script rather than the list it produced is that a list goes
- * stale the day a component is edited. Both sources are already in the tree:
- * `lib.dom.d.ts`, which ships with TypeScript, and the manifest the analyzer
- * writes. See 295.
+ * it is a script rather than that list because a list goes stale the day a
+ * component is edited. Both sources are already in the tree: `lib.dom.d.ts`,
+ * which ships with TypeScript, and the manifest the analyzer writes. See 295.
  *
  * **Only the element's own members count.** Comparing against the whole
  * inherited surface would report `accessKey` and `style` on every component and
@@ -35,8 +33,7 @@
  *
  * **Not in `verify` yet, deliberately.** It reports the open findings in 295, so
  * adding it now would make `verify` red on work that has not been done. It joins
- * the gate on the day that row closes, and the same reasoning is why the
- * required `verify` context waited on the baselines in 261.
+ * the gate on the day that row closes.
  *
  * **Events are the same question asked of the other half of the surface.** Two
  * assertions, and the second is the one worth having:
@@ -109,12 +106,9 @@ const ownMembers = (source, name) => {
   }
   const members = new Set()
   /* Carried from the doc comment onto the member it documents, because the
-     answer is already in the file being read. `DEPRECATED` below is a hand list
-     of the same fact, and a hand copy of something the source states drifts: it
-     was missing `HTMLImageElement.name`, which lib.dom marks and which the
-     parser could not see because it skips comment lines. Reading the marker
-     leaves the list holding only what is not marked, which is the half that
-     needs a person. */
+     answer is already in the file being read. `DEPRECATED` below is a hand copy
+     of the same fact and drifts; reading the marker leaves that list holding
+     only what lib.dom does not mark, which is the half that needs a person. */
   let deprecated = false
   for (const line of source.slice(start, at - 1).split('\n')) {
     const text = line.trim()
@@ -138,33 +132,30 @@ const ownMembers = (source, name) => {
   return members
 }
 
-/* The attribute table from the HTML specification, by input type. `value` and
-   `defaultValue` are in every scope because every input has them. */
+/* Three notes on `VOCABULARY` below, which is read from
+   `tooling/config/platform-fidelity.json`.
 
-/**
- * What to call an interface in a message, where stripping the name gets it wrong.
- *
- * The tag is derived from the interface (`HTMLTextAreaElement` is `<textarea>`)
- * and three do not survive it. `HTMLImageElement` came out `<image>`, which is
- * not a misspelling of `<img>` but `SVGImageElement`, a different element with a
- * different surface: a reader sent to look up `x` and `y` would have found them
- * on the wrong spec and concluded the check was reading SVG. `HTMLOListElement`
- * came out `<olist>`, which is nothing. `HTMLMediaElement` has no element at
- * all, being the base `<video>` and `<audio>` share, and saying so is more use
- * than inventing `<media>` for it.
- */
+   `propertyGroups` is the attribute table from the HTML specification, by input
+   type. `value` and `defaultValue` are in every scope because every input has
+   them.
 
-/**
- * The native element each family stands in for, and the scope to read of it.
- *
- * **`Radio` and `Toggle` are options rather than inputs, and mapping them at
- * `HTMLInputElement` produced a false finding that nearly became a rename.**
- * Both extend `HelixElement` and not `HelixFormElement`: the group owns the
- * value and each one is a choice inside it, which is `<option>`'s shape and not
- * `<input type="radio">`'s. So `selected` is the platform's word here, matching
- * `<option selected>`, and `checked` would have been the divergence. A mapping
- * is a claim about what a component *is*, and a wrong one reads as a finding.
- */
+   `tags` says what to call an interface in a message, because the tag derived
+   from the interface name (`HTMLTextAreaElement` is `<textarea>`) is wrong for
+   three of them. `HTMLImageElement` derives `<image>`, which is not a
+   misspelling of `<img>` but `SVGImageElement`, a different element with a
+   different surface, so a reader sent to look up `x` and `y` lands on the wrong
+   spec. `HTMLOListElement` derives `<olist>`, which is nothing.
+   `HTMLMediaElement` has no element at all, being the base `<video>` and
+   `<audio>` share, and saying so is more use than inventing `<media>`.
+
+   `native` maps `Radio` and `Toggle` to `HTMLOptionElement`, not
+   `HTMLInputElement`, which produced a false finding that nearly became a
+   rename. Both extend `HelixElement` and not `HelixFormElement`: the group owns
+   the value and each one is a choice inside it, which is `<option>`'s shape and
+   not `<input type="radio">`'s. So `selected` is the platform's word here,
+   matching `<option selected>`, and `checked` would have been the divergence. A
+   mapping is a claim about what a component *is*, and a wrong one reads as a
+   finding. */
 
 /**
  * What a shadow component cannot mirror, whatever the element.
@@ -181,9 +172,8 @@ const ownMembers = (source, name) => {
  * resolves nothing and would look exactly like support. This repository already
  * states the rule for `aria-labelledby`, which is the same wall; the difference
  * is that a component can put the label inside and cannot put the consumer's
- * datalist there. Eleven families were reported for it, and what they should
- * reach for is `Combobox`, which is this library's answer to the same question
- * and works across the boundary because it renders the list itself.
+ * datalist there. `Combobox` is this library's answer to the same question and
+ * works across the boundary because it renders the list itself.
  */
 const UNMIRRORABLE = new Set([
   'audioTracks',
@@ -244,13 +234,10 @@ const DEPRECATED = new Set([
   'width',
 ])
 
-/**
- * Divergences that are decisions, each with the reason it was taken.
- *
- * A reason here is load-bearing. Without one this file is a mute allowlist, and
- * an allowlist nobody can read the argument for is where a real finding goes to
- * be forgotten.
- */
+/* `EXCUSED` holds divergences that are decisions, each with the reason it was
+   taken. A reason there is load-bearing: without one it is a mute allowlist, and
+   an allowlist nobody can read the argument for is where a real finding goes to
+   be forgotten. */
 
 /** Where a family's headless source lives, for the hardcoded check below. */
 const headlessSource = (tag) => {
@@ -300,19 +287,15 @@ const nativeEventNames = (source) => {
   return names
 }
 
-/**
- * The events a native element sends, which its stand-in should send too.
- *
- * From the HTML specification rather than from `lib.dom.d.ts`, which files
- * `change` and `input` under `GlobalEventHandlers` and so cannot say which
- * element fires them. Deliberately short: the events a consumer reaches for
- * first, not every event the element can possibly send.
- */
-/**
- * Prefixed events whose verb matches a native name for a reason.
- *
- * The bar is that the two mean different things, not that ours is nicer.
- */
+/* `EXPECTED_EVENTS` is the events a native element sends, which its stand-in
+   should send too. From the HTML specification rather than from `lib.dom.d.ts`,
+   which files `change` and `input` under `GlobalEventHandlers` and so cannot say
+   which element fires them. Deliberately short: the events a consumer reaches
+   for first, not every event the element can possibly send.
+
+   `EXCUSED_EVENTS` is prefixed events whose verb matches a native name for a
+   reason. The bar is that the two mean different things, not that ours is
+   nicer. */
 
 const library = domLibrary()
 if (!library) {
@@ -349,7 +332,7 @@ for (const module of manifest.modules ?? []) {
          of a `private duration` it paints and never publishes, and was flagged
          for `currentTime` only because its own mirror happens to be spelled
          `position`. Getting the name wrong was the whole of what the check
-         could see. Thirty-nine of Video's fifty-nine fields are private. */
+         could see. Thirty-nine of Video's seventy-eight fields are private. */
       if (
         member.kind === 'field' &&
         member.privacy !== 'private' &&
@@ -375,22 +358,18 @@ let compared = 0
 let events = 0
 
 /**
- * The vocabulary, lifted out of this file on 28 Aug 2026.
+ * The vocabulary, which is data rather than rule.
  *
- * **Seventy-seven element names lived here, 92% of every specific name in
- * `tooling/scripts`.** They are data: which native interface each family wraps,
- * which property group comes with it, what is excused and why. The rule is the
- * argument; this is the subject it argues about, and a consumer with their own
- * components has their own subject.
+ * Which native interface each family wraps, which property group comes with it,
+ * what is excused and why. The script is the argument; this file is the subject
+ * it argues about, and a consumer with their own components has their own
+ * subject.
  *
- * `properties` names a group rather than inlining one, because six families
- * share `temporal` and four share `color`, and a list written four times is
- * four places to forget.
+ * `properties` names a group rather than inlining one, because four families
+ * share `temporal` and two share `color`, and a list written four times is four
+ * places to forget.
  *
- * **Read back into the shape the checks already expect**, `[interface,
- * properties, also]`, so lifting the data changed no logic. The measurement
- * either side of the move is identical: 265 native properties and 50 native
- * events across 33 families.
+ * Read back into the shape the checks expect, `[interface, properties, also]`.
  */
 const VOCABULARY = JSON.parse(
   readFileSync(join(import.meta.dirname, '../config/platform-fidelity.json'), 'utf8'),
@@ -486,9 +465,9 @@ for (const [tag, expected] of Object.entries(EXPECTED_EVENTS)) {
 }
 
 /* A prefixed event whose verb the platform already owns is a rename.
-   Reported once per event rather than once per tag: `helix-change` is one
-   decision taken on twenty-five components, and twenty-five identical lines
-   would bury the seven other findings under it. */
+   Reported once per event rather than once per tag: one such rename is a single
+   decision taken across every component that sends the event, and a line per
+   family would bury every other finding under it. */
 const knownEvents = nativeEventNames(library.source)
 for (const [tag, sends] of dispatched) {
   for (const event of sends) {

@@ -12,7 +12,7 @@ Last updated 26 August 2026. **Not reviewed by a lawyer.**
 You retain copyright in what you contribute. You grant Fusion Development Group
 and every recipient of this project a perpetual, worldwide, non-exclusive,
 royalty-free, irrevocable license to use, reproduce, modify, distribute and
-sublicense your contribution under the MIT license in `LICENSE`.
+sublicense your contribution under the MIT license in the repository root.
 
 **A license rather than an assignment**, deliberately. A copyright assignment
 takes ownership away from the person who wrote the code, and a project whose

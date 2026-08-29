@@ -10,22 +10,12 @@
  * declares them. Prose was the one surface with no such tie, and a rename that
  * swept the code had nothing to make it sweep the pages.
  *
- * It was written after an end-to-end read found four of exactly that, all from
- * one rename. `appearance` is refused outright by `check:css:axes`, and `tiers.mdx`
- * taught it three times over: in the package table, in the prose about what the
- * styled tier owns, and in the code sample a reader would copy. The same page
- * named a `WithOpen` mixin that does not exist, a `disclosure` family that does
- * not exist, complete with file paths, and `@fires`, a tag this library has
- * never used. None of that is a shape a grep would have been pointed at, which
- * is the argument for a check rather than another reading.
- *
- * Four things are held, and they are the four a page can get wrong while
+ * Seven things are held, and they are the seven a page can get wrong while
  * reading perfectly:
  *
  * - **A tag.** `<helix-disclosure>` in an example is an element that will not
  *   upgrade, and it looks exactly like one that will. In a selector too:
- *   `helix-disclosure::part(trigger)` was the form the first version of this
- *   check missed, and it is the form an override example takes.
+ *   `helix-disclosure::part(trigger)` is the form an override example takes.
  * - **A token, and a per-component hook.** `--helix-color-border-subtle`
  *   resolves to nothing and the property silently falls back, which is the same
  *   failure `check:css:tokens` already catches in CSS and could not see in prose. A
@@ -36,28 +26,19 @@
  *   nothing dispatches is a handler that never runs.
  * - **An exported name.** A mixin, an element class or a helper named in a code
  *   fence has to be something the workspace exports.
- * - **Anything said to be dispatched.** `SourceChange` was named as the sandbox's
- *   coordination event in this page, in the rules file, and in two JSDoc blocks
- *   that carry it into the manifest and from there into `jsx.d.ts` and
- *   `vue.d.ts`. Nothing has ever dispatched it: the event is `helix-change`. It
- *   slipped the rule above because it carries none of this library's prefixes,
- *   so the verb is what catches it instead.
- * - **A subpath, resolved rather than assumed.** `@fusion.dev/helix/custom-elements.json`
- *   was recommended by two pages and refused by `require.resolve`: the export map
- *   answered it through a wildcard pattern that rewrites a subpath into a
- *   directory under `dist` with an index in it, so the path asked for a file that
- *   is not there. A package name existing says nothing about a path inside it,
- *   and the only honest test is Node's own resolver.
+ * - **Anything said to be dispatched.** An invented event name carrying none of
+ *   this library's prefixes slips every rule above, so the verb is what catches
+ *   it: a sentence saying a thing is dispatched has to name a thing that is.
+ * - **A subpath, resolved rather than assumed.** A package name existing says
+ *   nothing about a path inside it. An export map answers a subpath through a
+ *   wildcard that can rewrite it into a directory under `dist`, so the path a
+ *   page recommends may name a file that is not there, and the only honest test
+ *   is Node's own resolver.
  *
- *   Writing that pattern out literally in this comment is what broke this file
- *   once, the wildcard and the slash closing the block. Described rather than
- *   quoted, for the same reason a docs page shows a mistake as plain text.
- * - **A package.** `@fusion.dev/helix-react` was in the Tiers package table, counted
- *   among "five packages", two pages after the Introduction said there is no
- *   React package. The rules file went further and documented regenerating
- *   wrappers in a `helix/react` that has never been in the repository. A package
- *   name is the cheapest of these to verify and was the one thing the first
- *   version of this check could not see.
+ *   That pattern is described rather than quoted here, because the wildcard and
+ *   the slash written literally close this comment block.
+ * - **A package.** A package name is the cheapest of these to verify, and a docs
+ *   page counting a package the workspace does not have reads perfectly.
  *
  * **What it deliberately does not check is English.** The word "appearance" in a
  * sentence about how something looks is not an API reference, so only backticked
@@ -86,12 +67,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
  *
  * **The published pages and the files that instruct an agent, which is the same
  * problem twice.** `.claude/rules/helix.md` and the skills beside it are read by
- * a machine that then writes code, and they drifted worse than the documentation
- * did: the rules file documented regenerating React wrappers in a directory that
- * has never existed, named `SourceChange` as an event nothing dispatches, and
- * illustrated a naming convention with `Card.Header` nine hundred lines above its
- * own note that Card's header became a slot. The skill carried `appearance` and a
- * group rule the rules file had corrected a week earlier.
+ * a machine that then writes code, and they drift harder than the documentation
+ * does.
  *
  * A page that is wrong misleads a reader who can push back. A rule that is wrong
  * is read by something that cannot, and it is read first.
@@ -130,7 +107,7 @@ const pages = () => {
       }
     }
   }
-  const root = join(ROOT, 'CLAUDE.md')
+  const root = join(ROOT, 'AGENTS.md')
   if (existsSync(root)) {
     found.push(root)
   }
@@ -288,16 +265,15 @@ if (tags.size === 0) {
 /**
  * A mention that says the thing does not work is allowed to name it.
  *
- * Two shapes, and the second was found by widening this check to the rules files.
- * **Historical**: a sentence saying the thing was removed. **Counter-example**: a
- * sentence naming the wrong thing in order to warn about it, which the rules file
- * and the root `CLAUDE.md` do deliberately three times, with `onhelix-opne` as a
- * typo that compiles clean, `HelixOpen` as the event `onHelixOpen` binds and
- * nobody dispatches, and one package name the naming rule refuses.
+ * Two shapes. **Historical**: a sentence saying the thing was removed.
+ * **Counter-example**: a sentence naming the wrong thing in order to warn about
+ * it, which the rules files and the root `AGENTS.md` do deliberately, with
+ * `onhelix-opne` as a typo that compiles clean and `HelixOpen` as an event
+ * nobody dispatches.
  *
- * All three are the check working on prose that is correct, so exempting them is
- * not a loosening. A check with three permanent false positives is one people
- * learn to skip, and then it holds nothing at all.
+ * Those are the check firing on prose that is correct, so exempting them is not
+ * a loosening. A check with permanent false positives is one people learn to
+ * skip, and then it holds nothing at all.
  */
 const HISTORICAL =
   /\b(was|were|used to|no longer|removed|refused|gone|deleted|instead of|rather than|gained|renamed|nobody|nothing|invented|never|typo|cannot)\b/i
@@ -321,7 +297,7 @@ for (const page of pages()) {
   const explained = (at) => HISTORICAL.test(around(at)) || NEGATED(text.slice(0, at))
 
   /* In markup and in a selector. The second is how an override example is
-     written and is the form the first version of this check let through. */
+     written. */
   for (const match of text.matchAll(
     /(?:<(helix-[a-z][a-z0-9-]*)|\b(helix-[a-z][a-z0-9-]*)(?=::|\s*\{))/g,
   )) {
@@ -381,7 +357,7 @@ for (const page of pages()) {
 
   /* A scoped name, and the subpath with it. The package half is a lookup and the
      subpath half is Node's resolver, because an export map is a program and
-     reading it is how the `./*` pattern got believed in the first place. */
+     reading one by eye is how a subpath that does not resolve gets believed. */
   for (const match of text.matchAll(
     /@(?:helix|cortex|fusion)-io\/[a-z][a-z0-9-]*(\/[A-Za-z0-9][\w./-]*)?/g,
   )) {
@@ -418,7 +394,7 @@ for (const page of pages()) {
   }
 
   /* Only the names this library would own. A backticked `Promise` or `Set` is
-     not ours to verify, and a bare capitalised word in prose is a sentence. */
+     not ours to verify, and a bare capitalized word in prose is a sentence. */
   for (const match of text.matchAll(/`((?:Helix|Mixin|With)[A-Z][A-Za-z0-9]*)`/g)) {
     checked += 1
     if (!exports_.has(match[1]) && !explained(match.index)) {

@@ -50,11 +50,11 @@ const MANIFESTS = [
  * Attributes that survive being set as properties, because the platform reflects
  * them itself.
  *
- * **Not "nothing declares them", which is the wrong reason and was the first one
- * written here.** Every one of these *is* a property on `HTMLElement`, so React
- * assigns them exactly the way it assigns `label`. What makes them safe is that
- * the HTML specification defines them as reflected IDL attributes: writing
- * `element.hidden` writes the attribute, with no help from Lit.
+ * **Not because nothing declares them, which is the wrong reason.** Every one of
+ * these *is* a property on `HTMLElement`, so React assigns them exactly the way
+ * it assigns `label`. What makes them safe is that the HTML specification
+ * defines them as reflected IDL attributes: writing `element.hidden` writes the
+ * attribute, with no help from Lit.
  *
  * `data-` and `aria-` are exempt for the other reason: they are not properties
  * at all, so React has nowhere to put them but an attribute.

@@ -3,13 +3,11 @@
  * Collects the manifests and the example files into the catalog the site
  * imports, and writes the whole markdown surface as static files.
  *
- * **This exists to close a build warning, and the warning was right.** The site
- * used to reach out of its own project with `join(process.cwd(), '..', '..')`
- * to find the manifests and `helix/styled/src/<family>/.examples`. Turbopack
- * cannot statically scope a path like that, so it traced the whole repository
- * into the server bundle, public folder and all, and said so on every build:
- * "this is usually unintentional and leads to all source files being deployed
- * as part of the server code".
+ * **The site must not reach out of its own project to find these.** Turbopack
+ * cannot statically scope `join(process.cwd(), '..', '..')`, so it traces the
+ * whole repository into the server bundle, public folder and all, and warns
+ * that "this is usually unintentional and leads to all source files being
+ * deployed as part of the server code".
  *
  * Its own advice is to scope the path to a subfolder or to read only in
  * development. This does neither by doing better than both: the app imports a
@@ -21,10 +19,8 @@
  * of the examples that can go stale. `fusion/site` runs this before `next build`
  * and before `next dev`, the same way it already runs the frame and the specs.
  *
- * **The cost is dev freshness**, which the reader this replaces was careful
- * about: it read the examples with `fs` precisely so that adding one showed up
- * without restarting. Editing an example now means re-running this, which
- * `bun run watch` does. That is the trade the warning asks for, and it is
+ * **The cost is dev freshness.** Editing an example means re-running this,
+ * which `bun run watch` does. That is the trade the warning asks for, and it is
  * worth naming rather than discovering.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -43,11 +39,8 @@ const PUBLIC = join(ROOT, 'fusion/site/public')
  *
  * **`helix/sandbox` is not among them, and the omission is the point.**
  * `@fusion.dev/helix-sandbox` is `private: true`, the editor and spec runner that build
- * this repository. Reading its manifest put `helix-sandbox-editor` in the
- * reference as a family of its own, called Editor, with no examples and a nav
- * entry pointing at a component nobody can install, and slipped
- * `helix-sandbox-specs` into the Sandbox family's element table beside six that
- * do ship.
+ * this repository, and reading its manifest puts elements nobody can install
+ * into the reference and into the nav.
  *
  * A reference documents what a reader can take. The line to draw is whether a
  * package publishes, and `check:pkg:publishable` already holds that flag, so this
@@ -60,13 +53,11 @@ const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-e
 /**
  * Where the example files sit, one folder per family, in both tiers.
  *
- * **The headless half was never read.** This scanned `helix/styled/src` alone,
- * so every example reached the catalog as `styled` and the tier switch on a
- * reference page had nothing to switch to: a reader choosing Base got the
- * headless *tables* and the styled *example*, which is the one combination that
- * teaches something untrue. `catalog()` has handled both tiers since it was
- * written and its spec asserts a headless example at index one; it was simply
- * never given any.
+ * **Both tiers, or the tier switch lies.** Scanning `helix/styled/src` alone
+ * makes every example reach the catalog as `styled`, and a reader choosing Base
+ * then gets the headless *tables* with the styled *example*, which is the one
+ * combination that teaches something untrue. `catalog()` handles both tiers and
+ * its spec asserts a headless example at index one.
  *
  * Order matters and styled is first. The canonical example is the family's
  * headline and `catalog()` takes the first it is handed, so a reader with no
@@ -122,13 +113,12 @@ writeFileSync(OUT, `${JSON.stringify(families)}\n`)
  * the point of this surface is that it survives one not running.
  *
  * `12-ai-native-web.md` specifies a catch-all route with
- * `generateStaticParams`, and that was built and did work. It is not what
- * shipped, for two reasons found by building it. It has to read the MDX and the
- * per-family markdown off disk at request time, which is the filesystem access
- * that took this app's whole repository into the server bundle and was just
- * removed; and a root-level catch-all swallows every unmatched URL unless it
- * calls `notFound()` for anything without the extension, which is a hazard to
- * remember rather than one to remove. Files have neither problem.
+ * `generateStaticParams` instead, and it works but is not what ships. It has to
+ * read the MDX and the per-family markdown off disk at request time, which is
+ * the filesystem access that takes this app's whole repository into the server
+ * bundle; and a root-level catch-all swallows every unmatched URL unless it
+ * calls `notFound()` for anything without the extension. Files have neither
+ * problem.
  *
  * The `.json` beside each family is the catalog entry verbatim rather than a
  * second shape of it. It is what the page renders from, so anything else would
@@ -149,7 +139,7 @@ mkdirSync(DOCS, { recursive: true })
  *
  * Clearing at all is not tidiness. Without it a deleted page leaves its `.md`
  * behind, still served, still linked from nothing, and `check:gen:routes` reports
- * it as a document no route points at. Found exactly that way. */
+ * it as a document no route points at. */
 for (const dir of [PUBLIC, join(PUBLIC, 'insights')]) {
   if (!existsSync(dir)) {
     continue
@@ -216,9 +206,8 @@ for (const page of docPages) {
  * and neither can drift: there is one set of words.
  *
  * A page that has not moved its copy yet gets the title, the summary and a
- * pointer, which is honest and close to useless. That is the remaining half of
- * this work rather than a design: an `.md` that invented the prose would be the
- * stale parallel site the whole arrangement exists to prevent. */
+ * pointer, which is honest and close to useless. An `.md` that invented the
+ * prose would be the stale parallel site this arrangement exists to prevent. */
 const { routes } = await import('../../fusion/site/content/routes/routes.ts')
 const { renderCopy, copyFor } = await import(
   '../../fusion/site/utils/copy-markdown/copy-markdown.ts'

@@ -3,7 +3,7 @@
  * Where the packages are. A module, not a script: nothing here runs alone.
  *
  * **Scope says which domain, `private` says whether it ships.** These are two
- * questions and were briefly answered by one field. `@fusion.dev/helix-cem` is Helix's
+ * questions and one field cannot answer both. `@fusion.dev/helix-cem` is Helix's
  * analyzer configuration: it hardcodes Helix conventions, it belongs to Helix,
  * and it is of no use to anyone outside this repository. Renaming it to
  * `@fusion.dev/cem` to express "does not publish" would file it beside the
@@ -11,14 +11,13 @@
  * the one thing it is not.
  *
  * So the domain is the namespace and publication is a flag on the package. The
- * flag still cannot drift into a stale allowlist, because it lives in the
- * manifest anyone editing that package already has open.
+ * flag cannot drift into a stale allowlist, because it lives in the manifest
+ * anyone editing that package already has open.
  *
- * Three scripts need the same answer to "which manifests are there", and the
- * answer is already written down once, in the root `workspaces` field. Restated
- * a third time it would be a second definition of the workspace, and the first
- * package added outside it would be silently uncovered by every check that had
- * its own copy.
+ * "Which manifests are there" is written down once, in the root `workspaces`
+ * field. A script with its own copy of that answer is a second definition of the
+ * workspace, and the first package added outside it is silently uncovered by
+ * every check holding one.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -26,10 +25,10 @@ import { join, resolve } from 'node:path'
 export const root = resolve(import.meta.dirname, '../../..')
 
 /**
- * The one scope, and the domains inside it. The scope used to name the domain,
- * so `domainOf` could read it off the prefix; a single company scope cannot say
- * that and the name is where it moved. `@fusion.dev/helix` is the styled tier
- * itself, so a domain matches its own bare name as well as its prefix.
+ * The one scope, and the domains inside it. The scope is the company, so the
+ * domain is read off the name rather than the prefix. `@fusion.dev/helix` is the
+ * styled tier itself, so a domain matches its own bare name as well as its
+ * prefix.
  */
 export const SCOPE = '@fusion.dev/'
 export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
@@ -44,25 +43,18 @@ export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
  * ask a question rather than assert an answer, which is the difference between
  * a rule that ships and a rule that only ever runs here.
  *
- * Eleven sites, which is the whole of it: the rest of what looks like prefix
- * coupling is either a specific element name, which is vocabulary, or a package
- * name, which is a dependency. Measured 28 Aug 2026 after the source paths
- * moved behind `SOURCE`.
+ * The rest of what looks like prefix coupling is either a specific element name,
+ * which is vocabulary, or a package name, which is a dependency.
  */
 export const TAG_PREFIX = 'helix-'
 export const TOKEN_PREFIX = '--helix-'
 
 /**
- * Where source lives, named once because a folder rename found every copy the
- * hard way.
+ * Where source lives, named once so a folder rename has one copy to find.
  *
- * **Twenty-seven of these lists were written out across twenty-five scripts**,
- * and moving `docs/` and `site/` into `fusion/` on 28 Aug 2026 broke ten of
- * them in three separate rounds: two found by the checks failing, seven by a
- * grep, and `check-exportparts` by none of that, surfacing only when its group
- * ran. Every one reported `ENOENT: scandir 'docs'`, which is a check that
- * cannot start rather than one that fails, so nothing in the message says what
- * was going unchecked.
+ * A script holding its own copy of these paths fails a rename with
+ * `ENOENT: scandir 'docs'`, which is a check that cannot start rather than one
+ * that fails, so nothing in the message says what was going unchecked.
  *
  * **Named places rather than one list**, because the lists are not the same
  * question and collapsing them would lose that: `check:css:motion` reads the

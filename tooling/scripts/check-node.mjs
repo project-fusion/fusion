@@ -16,15 +16,14 @@
  * eight `check:*` scripts assert against it, so a stale Node does not break the
  * build, it quietly changes what the library claims to be.
  *
- * **`engines` cannot do this job.** It is in the root manifest and has said
- * `>=20.11` for months, but bun does not enforce it and nothing reads it, so it
- * is a comment in a field that looks like a constraint. This runs first in
- * `verify` and says the version, the floor, and what goes wrong above nothing.
+ * **`engines` cannot do this job.** It is in the root manifest, but bun does not
+ * enforce it and nothing reads it, so it is a comment in a field that looks like
+ * a constraint. This runs first in `verify` and says the version, the floor, and
+ * what goes wrong below it.
  *
- * **The floor, and how it was arrived at.** Measured rather than recalled: a
- * plain `.ts` file fails on 20.9, 22.11 and 22.12 and runs on 22.22 and 24.13,
- * and 22.12 runs it with `--experimental-strip-types`, which names the
- * mechanism as type stripping. Node unflagged that in 22.18, which is the
+ * **The floor.** Measured: a plain `.ts` file fails on 20.9, 22.11 and 22.12
+ * and runs on 22.22 and 24.13, and 22.12 runs it with
+ * `--experimental-strip-types`, which names the mechanism as type stripping. Node unflagged that in 22.18, which is the
  * boundary this asserts. The other floor in the repo is `import.meta.dirname`,
  * used by four scripts here and added in 20.11, so it is the lower of the two
  * and this one covers it.
@@ -43,8 +42,7 @@
  *
  * **What it deliberately does not do** is check the Node that CI uses, which is
  * a different problem with a different fix: `verify.yml` pins it the way it
- * already pins bun. Before that it set up bun and Rust and never Node at all,
- * so the floor was met by whatever the runner image happened to ship.
+ * already pins bun.
  *
  * Run with `bun run check:pkg:node` (also the first step of `bun run verify`).
  */
@@ -53,10 +51,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /* `import.meta.url` and not `import.meta.dirname`, which is the very thing this
-   file exists to notice the absence of: written the shorter way it crashed on
-   Node 18 with `The "path" argument must be of type string`, which is the
-   instrument failing on exactly the case it was built to explain. A check has to
-   run on the oldest runtime it might meet. */
+   file exists to notice the absence of: written the shorter way it crashes on
+   Node 18 with `The "path" argument must be of type string`, the instrument
+   failing on exactly the case it was built to explain. A check has to run on the
+   oldest runtime it might meet. */
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const declared = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).engines?.node
 

@@ -11,7 +11,7 @@
  * question in it is answerable from a current artifact, and that a responder
  * which reads those artifacts directly gets every one right. A question the
  * reference cannot answer is a badly formed question, not a hard one, and it
- * would otherwise sit in the corpus penalising every real agent that met it.
+ * would otherwise sit in the corpus penalizing every real agent that met it.
  *
  * So `check:gen:eval` runs the reference and demands 100%. That is not circular and
  * it is not a claim about any agent: it is the corpus checking itself, the same
@@ -78,17 +78,16 @@ const reference = () => {
   /**
    * The quoted things in a prompt, in order.
    *
-   * **A list rather than the first one, and the first version took the first.**
-   * A part question names the tag before the part, ``Does `helix-toggle` publish
-   * a CSS part named `item`?``, so the reference was asking whether `helix-toggle`
-   * has a part called `helix-toggle` and answering no to all 471 of them. Every
-   * "no" question passed, which is what made the score 20% rather than 0% and is
-   * the shape of a grader bug that looks like a hard category.
+   * **A list rather than the first one.** A part question names the tag before
+   * the part, ``Does `helix-toggle` publish a CSS part named `item`?``, so taking
+   * the first asks whether `helix-toggle` has a part called `helix-toggle` and
+   * answers no to all 471 of them. Every "no" question still passes, scoring 20%
+   * rather than 0%, which is the shape of a grader bug that looks like a hard
+   * category.
    *
-   * That is the harness catching its own corpus on the first run, which is the
-   * whole reason `--check` demands a perfect reference: a malformed question in a
-   * shipped corpus penalises every real agent that meets it, forever, and reads
-   * as the agent's fault.
+   * `--check` demands a perfect reference for that reason: a malformed question
+   * in a shipped corpus penalizes every real agent that meets it, forever, and
+   * reads as the agent's fault.
    */
   const quoted = (prompt) =>
     [...prompt.matchAll(/"([^"]+)"|`([^`]+)`/g)].map((match) => match[1] ?? match[2])
@@ -183,8 +182,7 @@ if (process.argv.includes('--check')) {
      70 is not using it, and one under 55 is answering the yes/no half at chance
      and getting the retrieval half wrong.
 
-     The number is a judgment and it is written here so it is a judgment made in
-     advance. It applies to a model responder, which is not built: the reference
-     scores 100 by construction and proving otherwise is what `--check` is for. */
+     It applies to a model responder, which is not built: the reference scores
+     100 by construction and proving otherwise is what `--check` is for. */
   console.log('  floor for a model responder: 90% overall, and never under 70%')
 }

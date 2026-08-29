@@ -2,13 +2,12 @@
 /**
  * What a component costs in time, measured in a real browser.
  *
- * **The metrics page argued one half of the question.** It carried eleven tables
- * of bytes and nothing about time, which is the half a reader actually
- * experiences: a package that is small and slow to upgrade is not the trade
- * anybody wanted. `23-helix-docs.md` said bundle size first and load later, and
- * later arrived. See 190.
+ * **Bytes are one half of the question and time is the other**, and time is the
+ * half a reader experiences: a package that is small and slow to upgrade is not
+ * the trade anybody wanted. `23-helix-docs.md` said bundle size first and load
+ * later. See 190.
  *
- * **Two numbers, and they are different in kind.**
+ * **Three numbers, and they are different in kind.**
  *
  * *Time to upgrade* is the gap between markup being in the document and its
  * shadow root existing. That is the flash of unstyled content a reader sees, and
@@ -39,19 +38,16 @@
  * and the number looks fine. One entry importing both is what keeps them on one
  * copy, and it is the same duplicate-Lit trap 279 records from the sandbox.
  *
- * **And adoption is asserted rather than assumed.** Before the definition
- * loads, a node inside the parsed shadow root is stamped. If Lit adopted the
- * tree the stamp is still on it afterwards; if Lit threw the tree away and
- * rebuilt, the stamp went with it. `adopted` is recorded beside every reading,
- * and a run that reports `false` is a re-render figure wearing a hydration
- * label, which is the failure this was left out for until it could be told
- * apart.
+ * **And adoption is asserted rather than assumed.** The `[part]` nodes in the
+ * parsed shadow root are counted before the definition loads and again after:
+ * adoption adds nothing, a rebuild appends a second copy of the tree. `adopted`
+ * is recorded beside every reading, and a run that reports `false` is a
+ * re-render figure wearing a hydration label.
  *
  * **The median of nine, and no `check:`.** A timing moves several percent
  * between runs on one machine and much more between machines, so a gate on it
- * would fail for reasons nobody caused, which is the fastest way to teach a team
- * to ignore a red build. `verify` does not run this. It is refreshed by hand,
- * the same as the peer table and for the same reason, and the page says when.
+ * would fail for reasons nobody caused. `verify` does not run this. It is
+ * refreshed by hand, the same as the peer table, and the page says when.
  *
  * Run with `bun run gen:timings`.
  */

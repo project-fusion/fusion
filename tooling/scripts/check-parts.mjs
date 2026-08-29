@@ -7,12 +7,9 @@
  * promise, and a part rendered without one is a working hook nobody is told
  * about and nothing stops a later edit from renaming.
  *
- * The same shape as `check:css:hooks`, for the same reason: three of these turned up
- * in the audit and none of them could have been caught by reading, because a
- * `::part()` that resolves to nothing is valid CSS that matches nothing.
- * `Breadcrumbs` published a `nav` part the family does not render; `Checkbox`
- * renders a `field` part the styled tier builds its whole card appearance on and
- * never declared it; `Slider` was missing three.
+ * The same shape as `check:css:hooks`, and for the same reason: neither
+ * direction can be caught by reading, because a `::part()` that resolves to
+ * nothing is valid CSS that matches nothing.
  *
  * **Parts are inherited.** A styled component usually renders nothing of its
  * own and takes its markup from the headless class it extends, so the render to
@@ -45,7 +42,6 @@ const walk = (dir, found = []) => {
 const isSource = (path) =>
   extname(path) === '.ts' && !path.endsWith('.css.ts') && !path.includes('.spec.')
 
-/** Every component in both tiers, by class name. */
 /* What each shared `draw…` helper writes, read once from core's utils. */
 const helpers = new Map()
 for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) {
@@ -101,11 +97,10 @@ for (const tier of TIERS) {
        render side so a part named in prose is not counted as one. */
     const documented = [...text.matchAll(/@csspart\s+([a-z0-9-]+)/g)].map((m) => m[1])
     const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
-    /* `exportparts` publishes a part too, and until the sandbox forwarded the
-       splitter's divider nothing here did: a part reached through it read as
-       documented-but-never-rendered, and the fix would have been to stop
-       documenting a part consumers can style. The exposed name is what they
-       write, so an aliased `inner: outer` counts as `outer`. */
+    /* `exportparts` publishes a part too. Missing it reads as
+       documented-but-never-rendered, and the fix that finding suggests is to
+       stop documenting a part consumers can style. The exposed name is what
+       they write, so an aliased `inner: outer` counts as `outer`. */
     const forwarded = [...code.matchAll(/exportparts="([^"]+)"/g)].flatMap((m) =>
       m[1]
         .split(',')
@@ -182,23 +177,17 @@ for (const [name, entry] of components) {
   if (entry.documented.length === 0) {
     continue
   }
-  /* **The whole render chain, not the class's own markup.** This read
-     `entry.rendered` and so asked only what the file in front of it wrote, while
-     the other direction above has always resolved through `extends`. One
-     direction inherited and the other did not, which leaves exactly one gap and
-     it is the expensive one: a part rendered by a *base* that nobody in the
-     chain documents is invisible to both halves. The subclass never renders it,
-     so this loop never saw it; the base documents nothing, so the guard below
-     skips the base entirely.
-
-     `MixinCollection` sat in that gap. It writes `part="loading"` and
-     `part="empty"`, five families apply it, all five style both in their
-     stylesheets, and nine of the ten pairs were published to nobody. Working,
-     styled, and undocumented, which is the exact thing this check exists to
-     refuse.
+  /* **The whole render chain, not the class's own markup.** Asking only what the
+     file in front of it wrote leaves one gap, and it is the expensive one: a
+     part rendered by a *base* that nobody in the chain documents is invisible to
+     both halves. The subclass never renders it, so this loop never sees it; the
+     base documents nothing, so the guard above skips the base entirely.
+     `MixinCollection` sat in that gap: it writes `part="loading"` and
+     `part="empty"`, five families apply it and style both, and nine of the ten
+     pairs were published to nobody.
 
      Reported on the class that publishes a surface rather than on the base,
-     which is what the guard below already arranges: a mixin documenting nothing
+     which is what the guard above already arranges: a mixin documenting nothing
      is skipped, so this says it once per component that has an API page for it
      to be missing from. */
   for (const part of rendered) {

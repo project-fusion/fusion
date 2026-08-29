@@ -33,7 +33,7 @@ export interface JsxNativeEventsOptions {
  * The manifest does, and `BaseProps<T>` beside it already names the element,
  * which is what makes this a rewrite rather than a table to keep.
  *
- * **Generic rather than per-component, which was the first shape tried.**
+ * **Generic rather than per-component.**
  * Emitting an override for each native event a component declares needs the
  * declarations read, kept in step, and intersected with the shared bag, and an
  * intersection of two handler types is an overload rather than a replacement:

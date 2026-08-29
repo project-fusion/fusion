@@ -2,10 +2,9 @@
 /**
  * Writes what `@fusion.dev/helix-styles` ships, which is the source without the prose.
  *
- * **The package exported `./src/*.css` and every consumer downloaded the
- * reasoning.** Measured across the four files plus the two `helix/styled`
- * ships: 193,009 bytes raw and 60,944 gzipped, of which 53,445 and 8,219 are
- * declarations. `tokens.css` is 71 percent comment, `primitives.css` 82,
+ * **Exporting `./src/*.css` makes every consumer download the reasoning.**
+ * Measured across the four files plus the two `helix/styled` ships: 193,009
+ * bytes raw and 60,944 gzipped, of which 53,445 and 8,219 are declarations. `tokens.css` is 71 percent comment, `primitives.css` 82,
  * `base.css` 75. The prose is the best thing about these files and it is not
  * something a browser should be asked to parse on every cold load.
  *
@@ -17,9 +16,8 @@
  * else's dependency.
  *
  * **`src` stays the readable original and nothing else moves.** The tooling
- * that reads these files, eleven scripts across tokens, seeds, motion and
- * overrule checks, keeps reading `src`, because what it checks is what somebody
- * wrote. Only `exports` moves, so a consumer writing
+ * that reads these files, across tokens, seeds, motion and overrule checks,
+ * keeps reading `src`, because what it checks is what somebody wrote. Only `exports` moves, so a consumer writing
  * `@fusion.dev/helix-styles/tokens.css` is unaffected and gets the smaller file.
  *
  * **The relative `@import`s in `all.css` survive because the whole set lands
@@ -85,12 +83,11 @@ const withoutComments = (css) => {
 /**
  * Every declaration in a sheet, in order, as `property:value`.
  *
- * **It does not remove comments, and that is the entire point.** The first
- * version ran the scanner above over both sides before comparing, so it
- * compared the stripper's output to itself and passed on anything, verified by
- * breaking the scanner on purpose and watching the build stay green while it
- * dropped 293 bytes of real CSS. A check that shares an implementation with the
- * thing it checks is a check that agrees with itself.
+ * **It does not remove comments, and that is the entire point.** Running the
+ * scanner above over both sides compares the stripper's output to itself, so it
+ * passes on anything, including a scanner broken badly enough to drop real CSS.
+ * A check that shares an implementation with the thing it checks is a check
+ * that agrees with itself.
  *
  * So the two sides are reached by two implementations. The source is cleared
  * with a regex, which is simple and correct for anything without a comment

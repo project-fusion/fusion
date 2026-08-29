@@ -28,35 +28,27 @@
  * CSS value or a piece of English, and guessing which would report the prose
  * that is doing its job.
  *
- * **And a markdown link target, which is the fourth shape and was the gap.**
- * The three above all live inside comments, so a link written as
- * `[the plan](../the internal plan)` was invisible to every one of them:
- * markdown prose is not a comment. Moving the strategy into `docs/plan` found
- * three links that had been broken before the move and that this check had been
- * reporting green over, all the same slip of naming `theming.md` where the file
- * is `theming.mdx`. Resolved relative to the file that holds the link, which is
- * how a reader follows it, and only for targets that look like a repository
- * file: anything with a scheme, an anchor alone, or a bare word is left alone.
+ * **And a markdown link target, which is the fourth shape.** The three above all
+ * live inside comments, and markdown prose is not a comment, so a link written
+ * as `[the guide](../guides/theming.md)` is invisible to every one of them. The
+ * usual slip is naming `theming.md` where the file is `theming.mdx`. Resolved
+ * relative to the file that holds the link, which is how a reader follows it,
+ * and only for targets that look like a repository file: anything with a
+ * scheme, an anchor alone, or a bare word is left alone.
  *
  * Run with `bun run check:prose:references` (also part of `bun run verify`).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
-/* The repository root is in the list, and it was the omission that mattered.
-   `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left
-   with the rewritten history, so the first link a contributor follows was the one
-   thing here pointing at a file that does not exist, and this check could not see
-   it: every path it scanned was inside a package. A root file is where a reader
-   starts, which makes it the worst place to be unchecked. */
+/* The trees that are walked, and the prefixes that make a backticked path a
+   claim about this repository rather than an illustration. */
 const ROOTS = ['helix', 'cortex', 'tooling', 'fusion', 'fusion/site']
 
-/* The repository's own top-level files, checked without descending.
-   `CLAUDE.md` linked `plan/00-thesis.md` for a day after the strategy folder left
-   with the rewritten history, so the first link a contributor follows was the one
-   thing here pointing at a file that does not exist, and this check could not see
-   it: every path it scanned was inside a package. A root file is where a reader
-   starts, which makes it the worst place to be unchecked.
+/* The repository's own top-level files, checked without descending. A root file
+   is where a reader starts, which makes it the worst place to be unchecked:
+   `AGENTS.md` linked a file that had moved and nothing saw it, because every
+   path this check scanned was inside a package.
 
    Listed rather than walked from `.`, because walking the root would scan every
    package a second time and descend into `target`, which is 2.4GB of Rust build
@@ -72,11 +64,10 @@ const PROSE = /\.mdx?$/
    alone. The icons package names its own build script in a comment and is right
    to: the script is in its own manifest, and a check reading only the root
    reported the one comment in the repo that had looked it up.
- *
- * This paragraph originally quoted that script, and the check reported itself:
- * a file in `tooling/scripts` cannot run it, and prose *about* a reference
- * looks exactly like a reference. Which is the honest limit of the whole idea
- * and the reason it only reads three narrow shapes. */
+
+   Prose *about* a reference looks exactly like a reference, so quoting a script
+   the file cannot run makes this check report itself. That is the honest limit
+   of the idea, and the reason it reads only three narrow shapes. */
 const scriptsFor = (file) => {
   const found = new Set()
   const parts = file.split('/')

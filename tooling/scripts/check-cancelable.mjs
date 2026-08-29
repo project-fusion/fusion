@@ -10,21 +10,13 @@
  * because nothing in the type says it: `HelixSelectEvent` and `HelixCompleteEvent`
  * are both `CustomEvent` subclasses and only one of them can be refused.
  *
- * Measured 28 Aug 2026 across the two tiers: `Pagination` declares
- * `helix-navigate` as *"Fired before the page changes, and cancelable. The only
- * way to refuse one"*, and `Carousel` routes its state change through the
- * identically cancelable `helix-select` while declaring it *"Fired when the
- * slide in view changes"*. `Steps` does the same with `helix-before-activate`,
- * *"Fired when the active step changes"*. Same mechanism, opposite
- * documentation, in one library.
- *
  * Two ways to be wrong and both are reported:
  *
  * - **Cancelable and not saying so.** A consumer reads a notification, binds a
  *   handler to learn what happened, and reads a stale `currentTarget`. Worse, a
  *   handler that calls `preventDefault()` for an unrelated reason silently
- *   freezes the component, which is what `Carousel` does today: refusing
- *   `helix-select` stops the slide moving and nothing says it would.
+ *   freezes the component: refusing `helix-select` on a carousel stops the
+ *   slide moving.
  * - **Saying so and not being cancelable.** A consumer writes a veto that never
  *   takes, which is the failure this repository keeps naming: valid code, no
  *   error, and the feature quietly not happening.

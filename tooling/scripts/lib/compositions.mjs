@@ -43,13 +43,12 @@ export const familyOf = (path) => path.split('/')[3] ?? ''
 /**
  * Reads the open tag that starts at `from`, and returns its attributes.
  *
- * **A window of N characters is not good enough and the first version used
- * one.** An open tag here carries Lit bindings, so it holds `${…}` with nested
- * braces, quotes inside those braces, and `>` inside arrow functions: measured,
- * a fixed window cut four of the twenty-eight composition sites in half and
- * silently reported them as carrying no `exportparts`. So this scans, tracking
- * interpolation depth and quoting, and stops at the first `>` that is really
- * the end of the tag.
+ * **A fixed window of N characters is not good enough.** An open tag here
+ * carries Lit bindings, so it holds `${…}` with nested braces, quotes inside
+ * those braces, and `>` inside arrow functions: measured, a fixed window cut
+ * four of the twenty-eight composition sites in half and silently reported them
+ * as carrying no `exportparts`. So this scans, tracking interpolation depth and
+ * quoting, and stops at the first `>` that is really the end of the tag.
  */
 export const openTag = (source, from) => {
   let depth = 0
@@ -89,11 +88,10 @@ export const openTag = (source, from) => {
 /**
  * Every part a tag publishes, by the tag's suffix, resolved through `extends`.
  *
- * **By tag and not by directory**, which is the correction a measurement
- * forced. `this.tag('menu-item')` names an element that lives in `menu/item/`,
- * so a directory lookup asked for a family called `menu-item`, found none, and
- * reported nine composition sites as having nothing to forward. Nine of the
- * twenty-eight.
+ * **By tag and not by directory.** `this.tag('menu-item')` names an element that
+ * lives in `menu/item/`, so a directory lookup asks for a family called
+ * `menu-item`, finds none, and reports nine of the twenty-eight composition
+ * sites as having nothing to forward.
  *
  * **Unioned across both tiers**, because a styled component usually renders
  * none of its own markup and takes it from the headless class it extends. The
@@ -213,8 +211,7 @@ export const partDocsByTag = () => {
  *
  * **Except where the part already is the role**, which is the stutter the rule
  * would otherwise produce: a `dialog` inside a `part="dialog"` is `dialog`, not
- * `dialog-dialog`. The two existing forwards in the library were both written
- * that way before there was a rule, which is the usual sign of the right one.
+ * `dialog-dialog`.
  */
 export const exposedAs = (role, part) => (part === role ? role : `${role}-${part}`)
 

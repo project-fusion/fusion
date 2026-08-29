@@ -25,7 +25,7 @@ import { borrowedStyles } from './borrowed-styles.js'
  * hoisting produces, and the walk finds it from wherever this file is run.
  *
  * The plugin itself never imports `typescript` at all, which is the rule in
- * `CLAUDE.md`: it takes `ts` off the callback so 7's types never land on 5.4's
+ * `AGENTS.md`: it takes `ts` off the callback so 7's types never land on 5.4's
  * nodes. A test is allowed to reach for the module because it is not compiled
  * into the package, and it reaches for the same copy the analyzer would pass.
  */

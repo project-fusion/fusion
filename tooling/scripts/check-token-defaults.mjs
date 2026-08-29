@@ -9,8 +9,8 @@
  * page is in no density region at all, and there the `var()` falls through to
  * nothing and the whole declaration is dropped.
  *
- * Measured 28 Aug 2026 when exactly that happened to the six relative size
- * tokens, against the values from before they existed:
+ * Measured when exactly that happened to the six relative size tokens, against
+ * the values from before they existed:
  *
  * ```
  * select caret   16px -> 950     menu item   32 -> 18
@@ -22,16 +22,12 @@
  * rules in `base.css` still declared them. Fifty-nine stylesheets were reading a
  * token that resolved to nothing on the default page.
  *
- * **It happened three times in one day, which is what makes it a check.** Once
- * when the declarations were lost from `tokens.css`; once when they were
- * restored with `git checkout`, which brought back a version from before they
- * existed; and once when they were hand-written into `tokens.css` at all, that
- * file being *generated* from `tokens.ts` and rewritten by the next `regen`. The
- * third is the interesting one: the fix looked right, the browser disagreed, and
- * nothing between the two said so.
+ * **Do not hand-write the declaration into `tokens.css`.** That file is
+ * *generated* from `tokens.ts` and the next `regen` rewrites it, so the fix
+ * looks right and does not survive, and nothing between the edit and the
+ * browser says so.
  *
- * **A selector list containing `:root` is unconditional**, which the first
- * version of this analysis got wrong and reported all 186 tokens for. Most of
+ * **A selector list containing `:root` is unconditional.** Most of
  * the layer is declared on `:root, [data-helix-theme]`, and a list applies if any
  * one of its selectors matches. Comments are stripped before the braces are
  * counted, for the reason `check:css:selectors` records: a `{` inside a comment ends

@@ -2,18 +2,13 @@
 /**
  * An example may only ask for an attribute value the component accepts.
  *
- * **The failure this was written for, and why nothing else saw it.** Icon
- * Button's `shapes` example set `shape="square"`. The component takes `'circle'`
- * or nothing, so the middle button rendered the default, stood beside an
- * identical one, and the page claimed to show two shapes while showing one. The
- * summary line said "round or square" and had said it for as long as the file
- * existed.
- *
- * Nothing failed, which is the whole problem. An unknown attribute value is not
- * an error anywhere: the element keeps its default, the page renders, the
- * screenshot looks deliberate, and the only way to notice is to know what the
- * component offers and count the differences. That is a reference site teaching
- * an API that does not exist.
+ * **An unknown attribute value fails nowhere, which is the whole problem.** The
+ * element keeps its default, the page renders, the screenshot looks deliberate,
+ * and the only way to notice is to know what the component offers and count the
+ * differences: an example writing `shape="square"` on a component that takes
+ * `'circle'` or nothing renders a second identical button, and the page claims
+ * to show two shapes while showing one. That is a reference site teaching an API
+ * that does not exist.
  *
  * `check:api:attributes` is a different question, whether a *document rule* selects
  * on something a component reflects. This one is about the markup in the

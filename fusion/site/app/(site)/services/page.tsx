@@ -26,11 +26,10 @@ export const metadata = pageMetadata({
  * and what they are not signing up for, it is the thing they wanted to know.
  * The rule itself lives on `/trust`.
  *
- * Copy lives in `services.ts`, derived from `the internal plan` and
- * `the internal plan`, so the site and the plan cannot drift on what is
- * actually sold. `the internal plan` is the reconciliation where the
- * two disagree, and is also why the figure sits under the summary rather than
- * beside the name.
+ * Copy lives in `services.ts` rather than here, so this page and the offer
+ * cannot drift on what is actually sold or for how much. That file is also
+ * where the figure's placement is argued, which is why it sits under the
+ * summary rather than beside the name.
  *
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
@@ -110,8 +109,8 @@ export default async function Page() {
                 {/* The number comes after the sentence that says what this is,
                     and it used to come before it.
                     
-                    `the internal plan` is precise about the cost: a
-                    reader anchored on a component library in a design tool is
+                    The cost of the old order is specific: a reader anchored on
+                    a component library in a design tool is
                     comparing the sprint against a different kind of purchase and
                     will not reach the second sentence. What is being sold is
                     shipped software in their repository, and the price only

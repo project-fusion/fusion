@@ -17,8 +17,7 @@
  * post the author forgot. `lockstep-per-domain-2` is a slug nobody can read and
  * it hides the thing worth knowing, so this stops and names the existing file.
  * `--slug` is the way through, and it is also how a long title gets a short
- * address: `lockstep-per-domain` is the best of the six slugs here and it is the
- * only one that was never derived.
+ * address.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

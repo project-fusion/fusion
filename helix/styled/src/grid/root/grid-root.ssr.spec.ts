@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,8 +12,8 @@ describe('grid server output', () => {
   })
 
   test('a fixed column count is plain CSS, so it holds before upgrade', () => {
-    const markup = ssr(html`<helix-grid columns="3">x</helix-grid>`)
-    expect(markup).toContain(':host([columns="3"])')
+    const served = ssr(html`<helix-grid columns="3">x</helix-grid>`)
+    expect(styles(served)).toContain(':host([columns="3"])')
   })
 
   test('content reaches the markup', () => {

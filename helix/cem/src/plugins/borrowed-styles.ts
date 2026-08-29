@@ -20,13 +20,10 @@ import type {
  * follow, so the manifest said zero and a consumer reading the documentation
  * could not know the three exist. See 290.
  *
- * **Found by the thing built to find it**, which is the part worth keeping:
- * `@fusion.dev/helix-diagnostics` called two correct declarations in this
- * repository's own `landing.module.css` dead, and chasing the false positive is
- * what surfaced the gap. The collector settles it at runtime now by reading the
- * element's own shadow styles for a `var()`, which is stronger evidence than
- * the manifest and available only in a page. This is the half a consumer gets
- * before they have a page.
+ * **This is the half a consumer gets before they have a page.**
+ * `@fusion.dev/helix-diagnostics` settles the same question at runtime by
+ * reading the element's own shadow styles for a `var()`, which is stronger
+ * evidence than the manifest and available only in a page.
  *
  * **A plugin rather than three `@cssproperty` tags on the borrower**, which was
  * the other option and is worse twice over. It is manual, so it drifts the day
@@ -43,9 +40,6 @@ import type {
  * statically decidable. Anything computed is left alone rather than guessed at:
  * a hook wrongly attributed to a component reads as API and is worse than one
  * that is missing, because a consumer sets it and nothing happens.
- *
- * One borrower today, counted: every other styled root composes its stylesheet
- * from its own file. The plugin is here so the second one is free.
  */
 export const borrowedStyles = (): Plugin => {
   /*
@@ -82,7 +76,7 @@ export const borrowedStyles = (): Plugin => {
         /* Taken off the callback's own `ts` rather than imported. The analyzer
            hands each plugin its bundled TypeScript 5.4, so an import here would
            pull 7's node types onto 5.4's nodes, which is the rule at the top of
-           `CLAUDE.md` about what a cem plugin may not do. */
+           `AGENTS.md` about what a cem plugin may not do. */
         type Node = Parameters<typeof ts.forEachChild>[0]
 
         const sources: string[] = []

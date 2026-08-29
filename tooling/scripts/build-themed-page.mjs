@@ -3,17 +3,14 @@
  * Renders the theme builder's preview page to strings the browser never has to
  * produce.
  *
- * **The builder used to read it back out of the DOM, and that lost half of it.**
- * `<ThemedPage />` was rendered into a hidden holder and taken as `innerHTML`,
- * which works on a cold load and silently fails on a client navigation. React
+ * **Never render `<ThemedPage />` into a holder and take it as `innerHTML`.**
+ * That works on a cold load and silently fails on a client navigation. React
  * assigns to an element's *property* when one exists and writes an attribute
  * only when it does not, and on a soft navigation the Helix definitions are
  * already registered: `command` and `name` are declared properties, Lit
- * reflects neither, and `innerHTML` cannot see a property. Measured on one
- * button, a cold load serialised `arrow-right` twice and a navigation zero
- * times, and the hero's trigger reached the frame as
- * `<helix-button commandfor="walkthrough">` with no `command` at all: a missing
- * arrow and a dialog that did nothing.
+ * reflects neither, and `innerHTML` cannot see a property. The hero's trigger
+ * reaches the frame as `<helix-button commandfor="walkthrough">` with no
+ * `command` at all: a missing arrow and a dialog that does nothing.
  *
  * **The obvious fix is barred, which is why this is a script.** Rendering it in
  * the server component with `renderToStaticMarkup` is the right shape and Next
@@ -27,13 +24,12 @@
  * held by `--check` so the two cannot drift, the same arrangement
  * `build-catalog.mjs` and `build-reference.mjs` already have.
  *
- * **One string per layout and context, which is the whole cost.** Nine
- * renderings, and they are far from nine times one page: a minimal layout is a
- * third the markup of the marketing one, and the three contexts of any layout
+ * **One string per layout and context, which is the whole cost.** Sixteen
+ * renderings, and they are far from sixteen times one page: a minimal layout is
+ * a third the markup of the marketing one, and the four contexts of any layout
  * are the same structure with different words in it. Both of those make the
- * cost sublinear on the wire, and the numbers are in the run's own output
- * rather than in this comment, which is where a measurement belongs when it
- * changes every time somebody edits the copy.
+ * cost sublinear on the wire. The numbers are in the run's own output, because
+ * they change every time somebody edits the copy.
  *
  * The alternative to pre-rendering is substituting the words in the frame,
  * which means a shipped component learning about this tool's data, and that is
@@ -94,7 +90,7 @@ const size = pairs.reduce((total, key) => total + markup[key].length, 0)
  * byte for byte: a textual comparison would fail the moment the formatter
  * chose a different quote or wrapped the assignment, which says nothing about
  * whether the markup is current. And the writer formats what it wrote, because
- * `CLAUDE.md` asks a generator to, or every run dirties a file `check` has just
+ * `AGENTS.md` asks a generator to, or every run dirties a file `check` has just
  * cleaned. */
 const say = (state) =>
   `themed page: ${LAYOUTS.length} layouts by ${CONTEXTS.length} contexts, ${size} characters, ${state}`
