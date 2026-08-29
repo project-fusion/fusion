@@ -1,15 +1,28 @@
 {
-  "base": "helix/headless/src",
   "chrome": {
     "app-header": "The bar across the top of the page, which is page chrome by definition.",
     "sandbox": "A development tool that owns its whole window, not a component put on a page."
   },
   "floors": true,
+  "layers": [
+    {
+      "prefix": "helix-headless-",
+      "source": "helix/headless/src"
+    },
+    {
+      "prefix": "helix-",
+      "source": "helix/styled/src"
+    }
+  ],
   "leaves": {
     "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
   },
-  "tagPrefix": "helix-headless-",
-  "tiers": ["helix/core/src", "helix/headless/src", "helix/sandbox/src", "helix/styled/src"],
+  "tiers": [
+    "helix/core/src",
+    "helix/headless/src",
+    "helix/sandbox/src",
+    "helix/styled/src"
+  ],
   "unresolved": {
     "body": "Steps: a step's name and description together, which is a summary rather than a body."
   }

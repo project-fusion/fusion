@@ -130,14 +130,14 @@ fn seams(text: &str) -> Vec<(usize, usize)> {
 }
 
 pub fn run(context: &Context) -> Report {
-    let Some(base) = context.settings.base.as_ref() else {
+    let Some(base) = context.settings.layers.first() else {
         return Report {
             checked: 0,
             findings: Vec::new(),
             unit: "families composing another",
         };
     };
-    let tier = context.root.join(base);
+    let tier = context.root.join(&base.source);
     let mut files = Vec::new();
     sources(&tier, &mut files);
 
@@ -152,9 +152,7 @@ pub fn run(context: &Context) -> Report {
             continue;
         };
         let tag = &found[1];
-        let name = tag
-            .strip_prefix(&context.settings.tag_prefix)
-            .unwrap_or(tag);
+        let name = tag.strip_prefix(&base.prefix).unwrap_or(tag);
         families.insert(name.to_owned(), owner.to_owned());
     }
 

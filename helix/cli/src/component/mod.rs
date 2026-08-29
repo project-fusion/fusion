@@ -28,6 +28,7 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod categories;
 pub mod disabled;
 pub mod fallbacks;
 pub mod floors;
@@ -39,6 +40,7 @@ pub mod reflected;
 pub mod run;
 pub mod seams;
 pub mod separation;
+pub mod tier;
 pub mod vocabulary;
 
 use std::collections::BTreeMap;
@@ -65,13 +67,18 @@ pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
 
-    /// The tier another one extends, if the layout has one.
+    /// The tiers that extend one another, ordered from the base outward.
     ///
-    /// A rule about what a tier above can override has nothing to say where
-    /// there is no tier above, so this is optional and the seam rule reports
-    /// nothing without it.
+    /// **`tiers` is where the source is and this is how it is stacked**, and the
+    /// two answer different questions. A rule holding a reflected property to no
+    /// default wants every file; a rule about what the layer above can override
+    /// wants to know which layer that is, and a rule about a prefix wants a
+    /// different prefix for each of them.
+    ///
+    /// Optional, and the rules that need it report nothing without it: a library
+    /// with one layer has no layer above to disagree with.
     #[serde(default)]
-    pub base: Option<String>,
+    pub layers: Vec<Layer>,
 
     /// Families that are the page's own furniture, each with why it is.
     ///
@@ -98,10 +105,6 @@ pub struct Settings {
     /// not already give them, so wrapping each use would be seams nobody opens.
     #[serde(default)]
     pub leaves: BTreeMap<String, String>,
-
-    /// The prefix on a custom element name, stripped to get the family's key.
-    #[serde(default, rename = "tagPrefix")]
-    pub tag_prefix: String,
 
     /// Whether to refuse a rule that counted nothing. Off unless asked for.
     ///
@@ -154,6 +157,16 @@ impl Settings {
             .map(String::as_str)
             .collect()
     }
+}
+
+/// One layer of the stack: where its source is and how it names an element.
+#[derive(Debug, Deserialize)]
+pub struct Layer {
+    /// The prefix on a custom element declared here, stripped to get its key.
+    #[serde(default)]
+    pub prefix: String,
+    /// Where this layer's source is, relative to the root.
+    pub source: String,
 }
 
 /// One thing wrong, in the place it is wrong.
@@ -223,6 +236,11 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "categories",
+            run: Runner::Source(categories::run),
+            summary: "both layers give one answer about what a family is for",
+        },
+        Rule {
             name: "disabled",
             run: Runner::Source(disabled::run),
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
@@ -266,6 +284,11 @@ pub fn all() -> Vec<Rule> {
             name: "separation",
             run: Runner::Source(separation::run),
             summary: "a surface hooks both its edge and its lift",
+        },
+        Rule {
+            name: "tier",
+            run: Runner::Source(tier::run),
+            summary: "a component that renders a child renders one from its own layer",
         },
         Rule {
             name: "vocabulary",
