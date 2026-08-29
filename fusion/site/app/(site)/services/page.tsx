@@ -10,7 +10,7 @@ import styles from './services.module.css'
 
 export const metadata = pageMetadata({
   description:
-    'Three offers: an AI capability audit, a design system sprint, and conversational build. Prices stated.',
+    'Three offers: an AI capability audit, a design system sprint, and conversational build.',
   path: '/services',
   title: 'Services',
 })
@@ -18,9 +18,15 @@ export const metadata = pageMetadata({
 /**
  * Services.
  *
- * **The only page on the site with a price on it**, which is why it is written
- * plainly and why every number is stated rather than gated behind a call. An
- * offer whose cost appears only after a conversation cannot be compared.
+ * **No figures on the page, which is a reversal and is worth saying so.** This
+ * read "the only page on the site with a price on it", on the argument that an
+ * offer whose cost appears only after a conversation cannot be compared. That
+ * argument is still true about *offers*; what changed is the judgment about
+ * whether this page is where the number belongs, and that is a commercial call
+ * rather than a design one.
+ *
+ * The ranges are still in `services.ts`, where the costing that produces
+ * them is argued. Nothing renders them today.
  *
  * The constraint appears here as terms rather than as a principle. Quoted at a
  * buyer mid-page it asks them to care about a governance rule while they are
@@ -29,9 +35,7 @@ export const metadata = pageMetadata({
  * lives on `/trust`.
  *
  * Copy lives in `services.ts` rather than here, so this page and the offer
- * cannot drift on what is actually sold or for how much. That file is also
- * where the figure's placement is argued, which is why it sits under the
- * summary rather than beside the name.
+ * cannot drift on what is actually sold.
  *
  * **It is built out of the landing page's parts, which was the point of the
  * rebuild.** A lit band for the head, one glass panel per idea, and the same
@@ -49,19 +53,42 @@ const page = findSitePage('/services')
 export default async function Page() {
   const source = page ? sitePageSources[page.slug] : undefined
   return (
-    <>
+    /* **One field behind the whole page, not one inside the head.**
+     *
+     * The panels below are `[data-material="glass"]`, and glass admits what is
+     * behind it. With the light confined to the hero there was nothing under
+     * them but the page's own black, so every panel was paying for a
+     * `backdrop-filter` that blurred a flat color: the effect was in the
+     * computed styles and invisible on the screen, which is the same finding
+     * the closing card on the landing page records about a blur with an opaque
+     * ground in front of it.
+     *
+     * Absolute against this box rather than fixed against the window, for the
+     * reason `.reelAura` gives: fixed pins the light to the viewport and the
+     * content slides over a field that never moves, which is a wallpaper rather
+     * than a page.
+     *
+     * **No `z-index` on the layer, and one would be wrong.** This box is
+     * positioned and so are the sections in it, and positioned boxes with no
+     * layer of their own paint in tree order, so the markup already says the
+     * order. A negative layer would escape to the nearest ancestor that forms a
+     * stacking context and paint behind *its* background, which is opaque, and
+     * the field would disappear. */
+    <div className={styles.servicesField}>
+      <helix-aura
+        class={styles.servicesAura}
+        data-layer
+        gain={1.15}
+        scale={1.5}
+        speed={0.5}
+        variant="fracture"
+      ></helix-aura>
+
       {/* The head on the same lit field the galleries use. The page opened on
           flat black with the title floating in it and a screen of nothing
           between the standfirst and the first offer: the space was there
           because the section had padding, not because anything filled it. */}
       <section className={`${browser.pageHero} ${styles.servicesHero}`}>
-        <helix-aura
-          class={styles.servicesAura}
-          gain={1.15}
-          scale={0.45}
-          speed={0.5}
-          variant="rays"
-        ></helix-aura>
         <HeroField />
         <helix-flex class={styles.servicesHeroInner} data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
@@ -69,9 +96,6 @@ export default async function Page() {
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
             {page?.title}
-          </helix-text>
-          <helix-text as="p" data-measure>
-            {page?.lede}
           </helix-text>
         </helix-flex>
       </section>
@@ -87,6 +111,26 @@ export default async function Page() {
       <section className={styles.fieldBand} data-band data-reveal>
         <helix-flex data-shell direction="column">
           <div className={styles.bandCard} data-material="glass" data-substrate>
+            {/* **A head on the card, which is what makes it the same object as
+                the landing's.** That one opens with a label, a heading and a
+                standfirst over its ruled row; this opened straight onto three
+                columns, so the same material and the same rules still read as a
+                table rather than as a panel making a point.
+
+                The standfirst is the page's own, moved down from the band above
+                rather than written for here: a hero carrying a kicker, a display
+                title and a four-line paragraph was asking a reader to take all
+                three before anything was shown, and the paragraph is what the
+                offers under it are the answer to. Nothing new is said. */}
+            <helix-flex class={styles.bandSection} direction="column" gap="md">
+              <helix-text tone="subtle" variant="label">
+                Three offers
+              </helix-text>
+              <helix-text as="p" data-measure>
+                {page?.lede}
+              </helix-text>
+            </helix-flex>
+
             <div className={styles.offerRow}>
               {SERVICES.map((service) => (
                 <div className={styles.offer} key={service.name}>
@@ -104,16 +148,18 @@ export default async function Page() {
                     </helix-text>
                   </helix-flex>
 
-                  {/* The number comes after the sentence that says what this is.
-                      Above it, a reader anchored on a component library in a
-                      design tool compares the sprint against a different kind of purchase and does not reach the second sentence. What is
-                      being sold is shipped software in their repository, and the
-                      price only reads correctly once that has landed. */}
-                  <helix-flex class={styles.offerPrice} direction="column" gap="2xs">
-                    <helix-text variant="title">{service.price}</helix-text>
-                    <helix-text tone="subtle" variant="caption">
-                      {service.duration}
+                  {/* **How long, in the unit the buyer thinks in.**
+                      It reads as the third of four labeled facts rather than as
+                      a footnote to a figure, which is what it was while it sat
+                      under a price in caption type. What somebody is committing
+                      to is a fortnight or two months of their team's attention,
+                      and on a page with no number on it that is the commitment
+                      being described. */}
+                  <helix-flex direction="column" gap="2xs">
+                    <helix-text tone="subtle" variant="label">
+                      How long it runs
                     </helix-text>
+                    <helix-text as="p">{service.duration}</helix-text>
                   </helix-flex>
 
                   <helix-flex direction="column" gap="sm">
@@ -177,6 +223,6 @@ export default async function Page() {
           </div>
         </helix-flex>
       </section>
-    </>
+    </div>
   )
 }

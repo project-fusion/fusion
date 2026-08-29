@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Light | Dark | Reads |
 |---|---|---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | `#ffffff` | `#000000` | 81 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 40 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 39 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | `#f5f5f5` | `#181818` | 19 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | `#ffffff` | `#181818` | 24 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | `#f2f2f2` | `#0b0b0b` | 56 |
@@ -157,7 +157,7 @@ Font size.
 | `--helix-text-sm` | `var(--_helix-size-13)` | 83 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 31 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 23 |
-| `--helix-text-xl` | `var(--_helix-size-24)` | 15 |
+| `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 14 |
 | `--helix-text-control` | `var(--helix-text-sm)` | 5 |
@@ -311,7 +311,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-beneath` | `-1` | 0 |
-| `--helix-layer-base` | `0` | 8 |
+| `--helix-layer-base` | `0` | 7 |
 | `--helix-layer-raised` | `10` | 18 |
 | `--helix-layer-sticky` | `100` | 5 |
 | `--helix-layer-overlay` | `1000` | 2 |

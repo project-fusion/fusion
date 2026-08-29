@@ -353,7 +353,11 @@ export function Showcase(): React.ReactElement {
           {/* A form, laid out as one: fields first, then the two that are
                 settings. Controls stacked at even spacing are a pile rather
                 than a thing anybody would fill in. */}
-          <helix-card class={`showcaseCard ${styles.showcaseTall}`} separation="outlined">
+          <helix-card
+            class={`showcaseCard ${styles.showcaseTall}`}
+            data-card-edge
+            separation="outlined"
+          >
             <helix-flex direction="column" gap="md">
               <helix-select default-value="dark" label="Color mode" name="mode">
                 <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -380,7 +384,7 @@ export function Showcase(): React.ReactElement {
             </helix-flex>
           </helix-card>
 
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-flex align="center" gap="sm" wrap>
                 <helix-button emphasis="solid" tone="primary">
@@ -415,7 +419,7 @@ export function Showcase(): React.ReactElement {
               one field that is several boxes and one value, and a rating is a
               scale that reports a number rather than a mood, which is the thing
               the faces below deliberately are not. */}
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-pin-input
                 label="Verification code"
@@ -430,7 +434,11 @@ export function Showcase(): React.ReactElement {
           {/* Both columns: five faces at about 87 apiece need 435, and half
                 the panel is 297, so in one column the scale wrapped onto two
                 rows. A scale that has to be read in two goes is not a scale. */}
-          <helix-card class={`showcaseCard ${styles.showcaseWide}`} separation="outlined">
+          <helix-card
+            class={`showcaseCard ${styles.showcaseWide}`}
+            data-card-edge
+            separation="outlined"
+          >
             <helix-radio-group
               class={styles.showcaseFaces}
               default-value="good"
@@ -509,7 +517,7 @@ export function Showcase(): React.ReactElement {
             ></helix-sparkline>
           </helix-card>
 
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-timeline label="Release history">
               <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
                 <helix-icon name="check" slot="marker"></helix-icon>
@@ -529,7 +537,7 @@ export function Showcase(): React.ReactElement {
               anything draws them. The table is hidden visually and not from a
               screen reader, which is the whole reason the component takes this
               shape rather than an array of values. */}
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               {/* **Two value columns, which is all a grouped bar chart is.**
                   The component reads every column the table plots and draws one
@@ -592,7 +600,7 @@ export function Showcase(): React.ReactElement {
               cards. A ring rather than a second line: it answers shares where
               the sparkline above answers trend, so the two are not one chart
               drawn twice. */}
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <table data-hidden-visually id="showcase-sources">
                 <caption>Downloads by source</caption>
@@ -665,7 +673,7 @@ export function Showcase(): React.ReactElement {
             {"bun add @fusion.dev/helix\nimport '@fusion.dev/helix/card'"}
           </helix-code-block>
 
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-flex align="center" gap="sm" justify="between" wrap>
                 <helix-avatar-group>
@@ -693,7 +701,7 @@ export function Showcase(): React.ReactElement {
               the one surface here that is a surface *and* a control: it is the
               only thing in this view a reader can open, so it says something
               the tags and the avatars beside it cannot. */}
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-accordion mode="single">
               {/* `default-open`, not `open`: writing `open` is a claim of
                   ownership, and the generated types refuse it without a handler
@@ -711,7 +719,7 @@ export function Showcase(): React.ReactElement {
             </helix-accordion>
           </helix-card>
 
-          <helix-card class="showcaseCard" separation="outlined">
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-breadcrumbs aria-label="Breadcrumb">
                 <helix-breadcrumb>

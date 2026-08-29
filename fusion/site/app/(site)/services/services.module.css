@@ -30,17 +30,44 @@
  * page somebody reads to decide something, so the head introduces the offers
  * and hands over rather than filling a screen on its own.
  */
+/* Transparent, so the page's own field shows through it. `.pageHero` fills with
+   the page color, which was right while the light lived inside this band and is
+   an opaque lid over it now. The lattice stays: it is this band's own texture
+   and is what still tells the head apart from the sections under it. */
 .servicesHero {
-  background-color: var(--helix-color-surface);
+  background-color: transparent;
   min-block-size: auto;
 }
 
-/* Behind the head and inside the band. */
+/**
+ * The field the whole page is lit by, and the thing its panels blur.
+ *
+ * `block-size: auto` with `inset: 0` so it takes the page's height rather than
+ * a screen of it. Half strength, because the field is the ground rather than
+ * the subject: `gain` is the other lever and changes what the shader draws,
+ * brightening the lit parts and leaving the dark ones, which flattens the
+ * fracture. Opacity takes the whole field down evenly and keeps its shape.
+ *
+ * Safe on this element specifically. An opacity below 1 makes a backdrop root
+ * of its own descendants, and this has none: the panels that blur it are
+ * siblings further down the page, and what they sample is the field as painted.
+ */
 .servicesAura {
+  block-size: auto;
   inset: 0;
+  opacity: 0.5;
   pointer-events: none;
   position: absolute;
-  z-index: var(--helix-layer-base);
+}
+
+/* The box the field is measured against, and the ordering that keeps the
+   sections in front of it without either side naming a layer. */
+.servicesField {
+  position: relative;
+}
+
+.servicesField > *:not([data-layer]) {
+  position: relative;
 }
 
 /* Above the light, which the aura and the lattice both sit in. */
@@ -81,7 +108,9 @@
 .bandCard {
   backdrop-filter: var(--site-glass-backdrop);
   background: var(--site-glass);
-  border: var(--helix-border-thin) solid var(--helix-material-border);
+  /* No border here: `[data-material="glass"]` draws the hairline and `site.css`
+     draws the light that travels it. Stating it again would be a second owner
+     for one edge. */
   border-radius: var(--helix-radii-lg);
   display: grid;
   overflow: hidden;
@@ -105,6 +134,10 @@
  * apart.
  */
 .offerRow {
+  /* The rule under the head, which is the landing row's own: a section and the
+     row below it are told apart by a line rather than by a gap, because a gap
+     inside one panel reads as two panels that failed to meet. */
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   /* The four bands every offer is made of: what it is, what it costs, what is
@@ -147,14 +180,6 @@
     border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
     border-inline-start: 0;
   }
-}
-
-/* The figure, as its own block so the duration sits under it rather than
-   trailing the number on the same line: at three across there is not room for
-   both, and a duration that wraps under a price it is not part of reads as a
-   second price. */
-.offerPrice helix-text:first-child {
-  font-size: var(--helix-text-xl);
 }
 
 /* **Nothing pushes this down, and that is the change subgrid paid for.**
