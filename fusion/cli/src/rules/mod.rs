@@ -8,6 +8,7 @@
 
 pub mod barrels;
 pub mod floors;
+pub mod help;
 pub mod icons;
 pub mod modules;
 pub mod node;
@@ -233,6 +234,12 @@ pub fn all() -> Vec<Rule> {
             summary: "no barrel import of a package that cannot be tree-shaken",
         },
         floor(),
+        Rule {
+            fix: None,
+            name: "help",
+            run: Runner::Source(help::run),
+            summary: "a doc comment a command line prints is written for its reader",
+        },
         Rule {
             fix: None,
             name: "icons",

@@ -41,12 +41,15 @@ struct Cli {
     #[command(subcommand)]
     noun: Noun,
 
+    /* **Available on every verb, always**, which is the contract rather than a
+    convenience: a command with a human form and no JSON form is one a script
+    has to parse prose out of, and prose is the thing this reserves the right to
+    improve. The reasoning stays here and out of the help text, which is a
+    reader's and carries no markup. */
     /// Emit machine-readable JSON on stdout.
     ///
-    /// **Available on every verb, always**, which is the contract rather than a
-    /// convenience: a command with a human form and no JSON form is one a script
-    /// has to parse prose out of, and prose is the thing this reserves the right
-    /// to improve.
+    /// Available on every verb. Rules, their counts and their findings, in a
+    /// shape a script can read without parsing sentences.
     #[arg(long, global = true)]
     json: bool,
 
@@ -57,13 +60,14 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Noun {
+    /* **A route rather than a reimplementation**, which is what keeps the two
+    from disagreeing: the line goes to `helix` untouched and its exit code comes
+    back. A convenience over a CLI that works standalone, never a gate in front
+    of one. */
     /// Run the Helix command line, which owns its own nouns.
     ///
-    /// **A route rather than a reimplementation.** The rest of the line goes to
-    /// `helix` untouched and its exit code comes back, so `fusion helix
-    /// component audit` and `helix component audit` cannot disagree. It is a
-    /// convenience over a CLI that works standalone, never a gate in front of
-    /// one.
+    /// Everything after `helix` is passed to it as written, and its exit code
+    /// is returned. Needs `helix` installed.
     #[command(disable_help_flag = true)]
     Helix {
         /// Everything after `helix`, handed over as written.
@@ -71,13 +75,11 @@ enum Noun {
         args: Vec<String>,
     },
 
+    /* **A separate noun rather than more workspace rules**, because the subject
+    is different and a consumer asking one question should not pay for the
+    other: a workspace rule reads manifests and build output, and a prose rule
+    reads what people wrote. */
     /// Hold the prose to what it describes.
-    ///
-    /// **A separate noun rather than more workspace rules**, because the subject
-    /// is different and a consumer asking one question should not pay for the
-    /// other: a workspace rule reads manifests and build output, and a prose
-    /// rule reads what people wrote. Nothing in either can answer the other's
-    /// question.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Prose {
         #[command(subcommand)]
@@ -138,13 +140,14 @@ struct Common {
     #[arg(long, value_delimiter = ',')]
     only: Vec<String>,
 
+    /* **The tty already decides and this is the override.** A screen written to
+    a pipe is escape sequences in a log file, so `audit` prints when stdout is
+    not a terminal. */
     /// Print the audit rather than drawing it.
     ///
-    /// **The tty already decides and this is the override.** A screen written to
-    /// a pipe is escape sequences in a log file, so `audit` prints when stdout
-    /// is not a terminal; this is for the reader who is at one and wants the
-    /// lines anyway — to copy them, to grep them, or because a screen is the
-    /// wrong shape for what they are doing.
+    /// `audit` already prints when its output is not a terminal. Use this at
+    /// one, to copy the lines, to grep them, or because a screen is the wrong
+    /// shape for what you are doing.
     #[arg(long)]
     plain: bool,
 
