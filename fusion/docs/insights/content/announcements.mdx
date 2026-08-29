@@ -1,25 +1,55 @@
 ---
-description: What is shipping, what is being built, and what is committed but not started.
+description: Helix is the first thing Fusion is shipping, and this is what it gives you.
 kicker: Announcements
-lede: 'Fusion is being built in the open. This page is what that means in practice: what is running with users today, what is real work in progress, and what is a stated direction with nothing behind it yet.'
+lede: Helix is the first thing we are shipping. Here is what it is, what you can buy around it, and what follows.
 path: /announcements
-title: What is coming, and what is already here
+title: Helix is what comes first
 ---
 
-## The stages, and why they are labeled this way
+## What Helix is
 
-Three labels, used literally. **Active** ships with users. **Building** is real
-work with nothing shipped. **Declared** is a committed direction with no work
-started.
+A design system that ships as custom elements. Every component is a Lit-based
+element with a manifest, so React, Vue, Svelte and whatever comes next consume
+the same primitive rather than a wrapper written per framework.
 
-Separating them is the whole point of the page. The third is the one every
-roadmap blurs, and a list that puts all three under one heading is a list where
-a plan and a product look the same, which leaves a reader unable to tell which
-one they are being offered.
+It arrives in two tiers. The headless one carries structure, accessibility,
+state and form participation with no stylesheet at all. The styled one extends
+it and adds the presentation. You can take the second, or take the first and
+bring your own.
 
-## What is published here
+## What that gives you
 
-Nothing yet. The stages above are the vocabulary this page will use, and the
-entries under them are added as each one becomes true rather than when it
-becomes likely. A roadmap that is written ahead of the work is a forecast, and
-this page is not one.
+**One brand color in, a full palette out.** The theme engine derives the whole
+palette from a seed and refuses one it cannot make readable, so contrast is a
+property of the derivation rather than something audited afterwards.
+
+**Components that upgrade in any framework, or none.** A custom element is the
+platform's own extension point, so the same component works in the app you have
+now and in the one you migrate to.
+
+**A system an agent can read.** Every tag, property and event is in one manifest
+at a URL, and every page answers as Markdown. What a teammate reads and what a
+model reads are the same document.
+
+**Your repository, your license.** MIT, and the exit test is the point: if you
+stopped talking to us tomorrow, you would still have it.
+
+## What we take on around it
+
+Three offers, in the order they usually happen. An **audit** is two weeks at a
+fixed price to find out what is worth building. A **design system sprint** is
+Helix applied to your product, shipped into your repository rather than drawn in
+a design tool. A **conversational build** is development where the specification
+is a conversation, for work whose shape is still moving.
+
+[What each involves](/services) is written out, with what you keep at the end of
+each one.
+
+## What follows
+
+Cortex is next: memory and provenance, so what a company knows is an asset it
+holds rather than something rented back a quarter at a time. It is real work
+with nothing shipped, and it will be listed here when that changes.
+
+Nothing on this page is a forecast. Entries are added as they become true rather
+than when they become likely.

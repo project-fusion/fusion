@@ -42,8 +42,9 @@ export default async function Page() {
   return (
     <DocumentPage
       body={source ? await renderDocument(source) : null}
-      kicker={page.kicker}
+      centered
       lede={page.lede}
+      meta={<helix-tag tone="primary">Announcement</helix-tag>}
       title={page.title}
     />
   )

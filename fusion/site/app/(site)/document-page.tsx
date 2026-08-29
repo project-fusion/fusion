@@ -22,6 +22,7 @@ import styles from './document-page.module.css'
  */
 export function DocumentPage({
   body,
+  centered,
   footer,
   hero,
   kicker,
@@ -35,6 +36,20 @@ export function DocumentPage({
   body: ReactNode
   /** Anything after the argument, such as a list of what to read next. */
   footer?: ReactNode
+  /**
+   * The head centered over the body rather than aligned to its left edge.
+   *
+   * **The default is left, and has to be**: a title over a paragraph starts
+   * where the paragraph starts, or the page has two left edges. That holds for
+   * every document whose head is a title and a standfirst and nothing else.
+   *
+   * It stops holding when the head carries a mark of its own. A centered tag over
+   * a centered title is a masthead, and a masthead is what a page announcing
+   * something wants: the reader is being told what this is before they are told
+   * anything else, and a chip pinned to the left margin reads as filing rather
+   * than as a banner.
+   */
+  centered?: boolean
   /**
    * The head on a lit band rather than on the page, for a document that is read
    * as a piece rather than consulted as a reference.
@@ -126,10 +141,16 @@ export function DocumentPage({
 
       <helix-flex class={styles.documentShell} direction="column" gap="xl">
         {!hero && (
-          <helix-flex align="start" class={styles.documentHead} direction="column" gap="lg">
+          <helix-flex
+            align={centered ? 'center' : 'start'}
+            class={`${styles.documentHead} ${centered ? styles.documentHeadCentred : ''}`}
+            direction="column"
+            gap="lg"
+          >
             {trail}
+            {centered ? meta : undefined}
             {head}
-            {meta}
+            {centered ? undefined : meta}
           </helix-flex>
         )}
 

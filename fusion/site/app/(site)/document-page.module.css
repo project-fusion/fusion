@@ -282,3 +282,19 @@
   display: block;
   padding-block-end: var(--helix-space-xs);
 }
+
+/**
+ * A head that is a masthead rather than the top of a column.
+ *
+ * Stated on the head's own children rather than left to inherit, for the reason
+ * the band's head states it: which of two rules lands last is a fact about
+ * import order, not about either rule.
+ *
+ * The measure still caps the line; what moves is where the capped block sits.
+ */
+.documentHeadCentred,
+.documentHeadCentred .documentTitle,
+.documentHeadCentred .documentLede,
+.documentHeadCentred .documentKicker {
+  text-align: center;
+}
