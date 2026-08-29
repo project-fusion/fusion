@@ -202,7 +202,7 @@ const lines = [
   'business and `check:css:tokens` fails on any reference to it from outside.',
   '',
   'Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are',
-  'not here. They are API, they default to a semantic token, and `check:css:hooks`',
+  'not here. They are API, they default to a semantic token, and the `hooks` rule',
   'holds them to both directions.',
   '',
   '**Reads** counts every `var()` of that token across `helix` and',

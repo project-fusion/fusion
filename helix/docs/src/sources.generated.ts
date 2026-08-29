@@ -571,7 +571,7 @@ These are the difference between code that looks right and code that passes:
 |---|---|
 | A dispatched event must be declared | \`helix component --only events\` |
 | A documented part must be rendered | \`check:api:parts\` |
-| A documented CSS hook must be read | \`check:css:hooks\` |
+| A documented CSS hook must be read | \`helix component --only hooks\` |
 | A visual property draws from its axis | \`check:css:axes\` |
 | A form control styles with \`:disabled\` | \`helix component --only disabled\` |
 | A component that animates answers reduced motion | \`helix component --only motion\` |
@@ -2253,7 +2253,7 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 864,079 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-core\` | 864,077 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 9,630,123 | 422 | 736,265 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |

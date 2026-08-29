@@ -19,7 +19,7 @@
  *   page derives.
  *
  * Nothing about a missing entry fails, warns, or looks wrong, which is why it
- * takes a check. Same shape as `check:css:hooks` and `helix component`'s `parts`.
+ * takes a check. Same shape as the `hooks` rule and `helix component`'s `parts`.
  *
  * Run with `bun run check:prose:art` (also part of `bun run verify`).
  */

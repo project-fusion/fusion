@@ -9,7 +9,7 @@ layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:css:tokens` fails on any reference to it from outside.
 
 Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are
-not here. They are API, they default to a semantic token, and `check:css:hooks`
+not here. They are API, they default to a semantic token, and the `hooks` rule
 holds them to both directions.
 
 **Reads** counts every `var()` of that token across `helix` and
@@ -32,7 +32,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 27 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 55 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | 10 |
-| `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 12 |
+| `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 11 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 194 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 127 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 90 |
@@ -108,11 +108,11 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 135 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 204 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 203 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 166 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 113 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 96 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 165 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 112 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 95 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 44 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 50 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 13 |
@@ -127,7 +127,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 127 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 21 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 20 |
 | `--helix-radii-full` | `9999px` | 44 |
 
 ## font
@@ -288,8 +288,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 4 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
-| `--helix-size-icon` | `var(--helix-size-icon-md)` | 60 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 20 |
+| `--helix-size-icon` | `var(--helix-size-icon-md)` | 59 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 9 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 10 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 24 |

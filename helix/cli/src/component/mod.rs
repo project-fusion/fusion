@@ -43,6 +43,7 @@ pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
 pub mod hook_names;
+pub mod hooks;
 pub mod leaks;
 pub mod motion;
 pub mod observers;
@@ -127,6 +128,16 @@ pub struct Settings {
     /// this says which families are on that side of it.
     #[serde(default)]
     pub lengths: BTreeMap<String, String>,
+
+    /// Prefixes owned by a shared vocabulary rather than by one family.
+    ///
+    /// **Registered rather than inferred, so the exemption is a decision
+    /// somebody made.** A hook five components read is not one family's however
+    /// it was declared, and naming it after the family that happens to declare
+    /// it would be the lie. The bar is a file more than one family imports;
+    /// anything else is a family hook that has drifted.
+    #[serde(default)]
+    pub shared: Vec<String>,
 
     /// The layout modes a preview frame offers an example.
     ///
@@ -389,6 +400,11 @@ pub fn all() -> Vec<Rule> {
             name: "hook-names",
             run: Runner::Source(hook_names::run),
             summary: "a component hook spells one idea one way",
+        },
+        Rule {
+            name: "hooks",
+            run: Runner::Source(hooks::run),
+            summary: "a documented CSS hook is read, named after its family, and owned by one",
         },
         Rule {
             name: "leaks",

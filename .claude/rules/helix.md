@@ -162,7 +162,7 @@ marking them told the one consumer who has to read them that they may not. All
 41 lost the sigil and gained an `@cssproperty`: 32 on the headless components
 that write them, 9 on the two controllers in `core`.
 
-**`check:css:hooks` was what the underscore had been evading**, which is the part
+**the `hooks` rule was what the underscore had been evading**, which is the part
 worth remembering. It pairs an `@cssproperty` with a rule that reads one, in
 both directions, and exempts `--_` names as a component talking to itself. Strip
 the sigil and every undeclared one fails immediately. The convention was not
@@ -725,7 +725,7 @@ that shares an implementation with the thing it checks agrees with itself.
 Reaching the two sides by two methods is what gives it teeth.
 
 **A hook is named after the family that owns it, and owned by one family.**
-`check:css:hooks` holds both. A consumer predicts `--card-padding` from
+`helix component`'s `hooks` holds both. A consumer predicts `--card-padding` from
 `<helix-card>` and predicts nothing from a name that does not follow, and a
 custom property naming no declaration is inert with no error: the same silence
 as a `::part()` that resolves to nothing. Six were unguessable.

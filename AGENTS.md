@@ -156,7 +156,7 @@ tooling/   CI and build scripts, and shrinking
   `helix/styled/src/shared/field` and `helix/styled/src/shared/chart` hold
   stylesheets several families import, and they are not families.
 
-  **The bar is a file more than one family imports**, and `check:css:hooks` holds
+  **The bar is a file more than one family imports**, and `helix component`'s `hooks` holds
   it: a sheet in there with one reader belongs inside that reader, and every
   folder under `shared/` is discovered rather than listed.
 

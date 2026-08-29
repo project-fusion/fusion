@@ -27,7 +27,7 @@ import type {
  *
  * **A plugin rather than three `@cssproperty` tags on the borrower**, which was
  * the other option and is worse twice over. It is manual, so it drifts the day
- * the icon button gains a fourth hook. And it does not even work: `check:css:hooks`
+ * the icon button gains a fourth hook. And it does not even work: the `hooks` rule
  * derives a hook's owner from the directory the declaring file sits in, so
  * `@cssproperty --icon-button-radii` written in `copy-button/root/` documents a
  * name `copy-button` does not own, which is exactly the rule that check exists

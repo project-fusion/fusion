@@ -18,11 +18,11 @@
 }
 
 [part="summary"][data-state="pass"] {
-  color: var(--specs-pass-color, var(--helix-color-success));
+  color: var(--sandbox-specs-pass-color, var(--helix-color-success));
 }
 
 [part="summary"][data-state="fail"] {
-  color: var(--specs-fail-color, var(--helix-color-danger));
+  color: var(--sandbox-specs-fail-color, var(--helix-color-danger));
 }
 
 [part="results"] {
@@ -66,7 +66,7 @@
 }
 
 [part="result"][data-state="pass"] [part="status"] {
-  color: var(--specs-pass-color, var(--helix-color-success));
+  color: var(--sandbox-specs-pass-color, var(--helix-color-success));
 }
 
 [part="result"][data-state="fail"] {
@@ -74,12 +74,12 @@
 }
 
 [part="result"][data-state="fail"] [part="status"] {
-  color: var(--specs-fail-color, var(--helix-color-danger));
+  color: var(--sandbox-specs-fail-color, var(--helix-color-danger));
 }
 
 /* Under the name, in the second column, so it reads as belonging to it. */
 [part="error"] {
-  color: var(--specs-fail-color, var(--helix-color-danger));
+  color: var(--sandbox-specs-fail-color, var(--helix-color-danger));
   font-family: var(--helix-font-mono);
   grid-column: 2;
   margin: var(--helix-space-2xs) var(--helix-space-none) var(--helix-space-none);

@@ -52,8 +52,7 @@ interface ResultsMessage {
  * decides whether it is laid out at all: inside the panel it was a descendant of
  * an inactive tab, so on any tab but this one it had `display: none` above it
  * and every rectangle inside it was zero. Specs that read geometry then passed
- * against nothing, which is the failure that looks most like success. Found by
- * putting a known misplacement back and watching the specs stay green.
+ * against nothing, which is the failure that looks most like success.
  *
  * @since 0.1.0
  * @status experimental
@@ -68,8 +67,8 @@ interface ResultsMessage {
  * @csspart suite - A describe block's heading.
  * @csspart summary - The counts, and how long the run took.
  *
- * @cssproperty --specs-fail-color - Color of a failing one.
- * @cssproperty --specs-pass-color - Color of a passing test.
+ * @cssproperty --sandbox-specs-fail-color - Color of a failing one.
+ * @cssproperty --sandbox-specs-pass-color - Color of a passing test.
  */
 @customElement('helix-sandbox-specs')
 export class HelixSandboxSpecs extends HelixElement {
