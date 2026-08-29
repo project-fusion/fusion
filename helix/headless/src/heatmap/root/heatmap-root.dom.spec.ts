@@ -265,11 +265,11 @@ describe('what a narrow container does', () => {
 describe('rows', () => {
   test('the row count reaches the stylesheet, which is the only thing that needs it', async () => {
     const element = await strip('rows="7"', [['Mon', 1]])
-    expect(part(element, 'strip')?.getAttribute('style')).toContain('--_heatmap-rows: 7')
+    expect(part(element, 'strip')?.getAttribute('style')).toContain('--heatmap-rows: 7')
   })
 
   test('nonsense is one row rather than a broken grid', async () => {
     const element = await strip('rows="0"', [['Mon', 1]])
-    expect(part(element, 'strip')?.getAttribute('style')).toContain('--_heatmap-rows: 1')
+    expect(part(element, 'strip')?.getAttribute('style')).toContain('--heatmap-rows: 1')
   })
 })

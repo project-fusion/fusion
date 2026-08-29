@@ -82,6 +82,8 @@ helix-headless-carousel::part(rotation-mark) {
    view, this tier having no `per-view` arithmetic to do and no token to do it
    with. */
 helix-headless-carousel::part(track) {
+  background-color: transparent;
+  block-size: auto;
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
@@ -97,12 +99,4 @@ helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
-}
-
-helix-headless-carousel::part(track) {
-  background-color: transparent;
-  block-size: auto;
-  display: flex;
-  gap: 0.5rem;
-  overflow: hidden;
 }

@@ -77,8 +77,6 @@ export interface HelixCssProperty extends Documented {
 export interface HelixMember extends Documented {
   /** Helix's own fields, namespaced the way the declaration's are. */
   helix?: {
-    /** Events that answer this property, where it is controlled. */
-    controlled?: string[]
     /**
      * Where the platform feature this is built on is specified.
      *

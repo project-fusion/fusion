@@ -92,7 +92,7 @@
   gap: var(--heatmap-gap, var(--helix-space-2xs));
   grid-auto-columns: var(--_heatmap-cell-width);
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--_heatmap-cell-height));
+  grid-template-rows: repeat(var(--heatmap-rows, 1), var(--_heatmap-cell-height));
   justify-content: start;
   /* The tooltip's mark is placed against this box. */
   position: relative;

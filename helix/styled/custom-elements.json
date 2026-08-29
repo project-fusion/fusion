@@ -11127,6 +11127,20 @@
             },
             {
               "kind": "field",
+              "name": "failedLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Not sent'",
+              "description": "Label for a message that did not send.",
+              "attribute": "failed-label",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "retryLabel",
               "type": {
                 "text": "string"
@@ -11474,6 +11488,19 @@
               "default": "'Sending'",
               "description": "What to call each state, for a reader who cannot see it.",
               "fieldName": "sendingLabel",
+              "inheritedFrom": {
+                "name": "HelixHeadlessChatMessage",
+                "module": "src/chat/message/chat-message.ts"
+              }
+            },
+            {
+              "name": "failed-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Not sent'",
+              "description": "Label for a message that did not send.",
+              "fieldName": "failedLabel",
               "inheritedFrom": {
                 "name": "HelixHeadlessChatMessage",
                 "module": "src/chat/message/chat-message.ts"
@@ -35563,6 +35590,14 @@
             {
               "description": "What `warning` is worth.",
               "name": "--heatmap-tone-warning",
+              "inheritedFrom": {
+                "name": "HelixHeadlessHeatmap",
+                "module": "src/heatmap/root/heatmap-root.ts"
+              }
+            },
+            {
+              "description": "How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.",
+              "name": "--heatmap-rows",
               "inheritedFrom": {
                 "name": "HelixHeadlessHeatmap",
                 "module": "src/heatmap/root/heatmap-root.ts"
@@ -61906,7 +61941,7 @@
               "type": {
                 "text": "'chip' | 'plain' | 'card' | undefined"
               },
-              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n- `chip` is the answer as its own small surface, for a row of short\n  choices read at a glance. It hides the circle, the surface being the\n  whole mark, which is why `hide-control` says it is unnecessary here.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
               "attribute": "variant",
               "reflects": true
             },
@@ -62200,7 +62235,7 @@
               "type": {
                 "text": "'chip' | 'plain' | 'card' | undefined"
               },
-              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
+              "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n- `chip` is the answer as its own small surface, for a row of short\n  choices read at a glance. It hides the circle, the surface being the\n  whole mark, which is why `hide-control` says it is unnecessary here.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
               "fieldName": "variant"
             },
             {

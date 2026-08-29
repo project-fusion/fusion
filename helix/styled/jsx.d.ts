@@ -2934,6 +2934,10 @@ Empty is the runtime's own. */
   "sending-label"?: HelixChatMessage["sendingLabel"];
   /** What to call each state, for a reader who cannot see it. */
   sendingLabel?: HelixChatMessage["sendingLabel"];
+  /** Label for a message that did not send. */
+  "failed-label"?: HelixChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  failedLabel?: HelixChatMessage["failedLabel"];
   /** Label for the control offered on a failed message. */
   "retry-label"?: HelixChatMessage["retryLabel"];
   /** Label for the control offered on a failed message. */
@@ -2989,6 +2993,10 @@ Empty is the runtime's own. */
   "attr:sending-label"?: HelixChatMessage["sendingLabel"];
   /** What to call each state, for a reader who cannot see it. */
   "prop:sendingLabel"?: HelixChatMessage["sendingLabel"];
+  /** Label for a message that did not send. */
+  "attr:failed-label"?: HelixChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  "prop:failedLabel"?: HelixChatMessage["failedLabel"];
   /** Label for the control offered on a failed message. */
   "attr:retry-label"?: HelixChatMessage["retryLabel"];
   /** Label for the control offered on a failed message. */
@@ -11786,6 +11794,9 @@ export type HelixRadioProps = {
   explain themselves: a description, an icon, a price. It is the half a
   `data-card` link cannot do, because a link reports no value and belongs
   to no group, so a card that is genuinely an answer has to be this.
+- `chip` is the answer as its own small surface, for a row of short
+  choices read at a glance. It hides the circle, the surface being the
+  whole mark, which is why `hide-control` says it is unnecessary here.
 
 The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
@@ -11860,6 +11871,9 @@ export type HelixRadioSolidJsProps = {
   explain themselves: a description, an icon, a price. It is the half a
   `data-card` link cannot do, because a link reports no value and belongs
   to no group, so a card that is genuinely an answer has to be this.
+- `chip` is the answer as its own small surface, for a row of short
+  choices read at a glance. It hides the circle, the surface being the
+  whole mark, which is why `hide-control` says it is unnecessary here.
 
 The circle stays in both. A card whose only marker was its own border would
 ask a reader to compare surfaces across a row to find the answer, and would
@@ -20117,6 +20131,7 @@ export type CustomElements = {
    *
    * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -24018,6 +24033,7 @@ export type CustomElements = {
    * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
    * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
    * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-rows`: How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    *
    * ## CSS Parts
@@ -28135,6 +28151,9 @@ export type CustomElements = {
    *   explain themselves: a description, an icon, a price. It is the half a
    *   `data-card` link cannot do, because a link reports no value and belongs
    *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
    *
    * The circle stays in both. A card whose only marker was its own border would
    * ask a reader to compare surfaces across a row to find the answer, and would
@@ -36427,6 +36446,7 @@ export type CustomElementsSolidJs = {
    *
    * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -40401,6 +40421,7 @@ export type CustomElementsSolidJs = {
    * - `--heatmap-tone-primary`: What `primary` is worth. (default: `undefined`)
    * - `--heatmap-tone-success`: What `success` is worth, as a name or a `data-tone`. (default: `undefined`)
    * - `--heatmap-tone-warning`: What `warning` is worth. (default: `undefined`)
+   * - `--heatmap-rows`: How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    *
    * ## CSS Parts
@@ -44618,6 +44639,9 @@ export type CustomElementsSolidJs = {
    *   explain themselves: a description, an icon, a price. It is the half a
    *   `data-card` link cannot do, because a link reports no value and belongs
    *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
    *
    * The circle stays in both. A card whose only marker was its own border would
    * ask a reader to compare surfaces across a row to find the answer, and would
@@ -51177,6 +51201,8 @@ export type CustomCssProperties = {
   "--heatmap-tone-success"?: string;
   /** What `warning` is worth. */
   "--heatmap-tone-warning"?: string;
+  /** How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. */
+  "--heatmap-rows"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
   /** Edge length of the icon's box. */

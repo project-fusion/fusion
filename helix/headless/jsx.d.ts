@@ -1884,6 +1884,10 @@ Empty is the runtime's own. */
   "sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
   /** What to call each state, for a reader who cannot see it. */
   sendingLabel?: HelixHeadlessChatMessage["sendingLabel"];
+  /** Label for a message that did not send. */
+  "failed-label"?: HelixHeadlessChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  failedLabel?: HelixHeadlessChatMessage["failedLabel"];
   /** Label for the control offered on a failed message. */
   "retry-label"?: HelixHeadlessChatMessage["retryLabel"];
   /** Label for the control offered on a failed message. */
@@ -1920,6 +1924,10 @@ Empty is the runtime's own. */
   "attr:sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
   /** What to call each state, for a reader who cannot see it. */
   "prop:sendingLabel"?: HelixHeadlessChatMessage["sendingLabel"];
+  /** Label for a message that did not send. */
+  "attr:failed-label"?: HelixHeadlessChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  "prop:failedLabel"?: HelixHeadlessChatMessage["failedLabel"];
   /** Label for the control offered on a failed message. */
   "attr:retry-label"?: HelixHeadlessChatMessage["retryLabel"];
   /** Label for the control offered on a failed message. */
@@ -17092,6 +17100,7 @@ export type CustomElements = {
    *
    * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -21030,6 +21039,7 @@ export type CustomElements = {
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
+   * - `--heatmap-rows`: How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
@@ -32744,6 +32754,7 @@ export type CustomElementsSolidJs = {
    *
    * Empty is the runtime's own.
    * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
    * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -36733,6 +36744,7 @@ export type CustomElementsSolidJs = {
    * - `--heatmap-cell-radius`: How far a cell's corners are rounded. (default: `undefined`)
    * - `--heatmap-cell-size`: The size a cell wants on both axes, where neither is given its own. (default: `undefined`)
    * - `--heatmap-gap`: Space between cells. Zero is a continuous field rather than a grid of tiles. (default: `undefined`)
+   * - `--heatmap-rows`: How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. (default: `undefined`)
    * - `--heatmap-tone`: The tone of the cell this is set on. Written by the component, read by the sheet that paints. (default: `undefined`)
    * - `--heatmap-tone-1`: The quietest step of the magnitude ramp, reached by `tones="1 …"`. (default: `undefined`)
    * - `--heatmap-tone-2`: The second step of the magnitude ramp. (default: `undefined`)
@@ -46840,6 +46852,8 @@ export type CustomCssProperties = {
   "--heatmap-cell-size"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
+  /** How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. */
+  "--heatmap-rows"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */

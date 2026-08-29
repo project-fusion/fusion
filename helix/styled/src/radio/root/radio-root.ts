@@ -45,6 +45,9 @@ export class HelixRadio extends HelixHeadlessRadio {
    *   explain themselves: a description, an icon, a price. It is the half a
    *   `data-card` link cannot do, because a link reports no value and belongs
    *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
    *
    * The circle stays in both. A card whose only marker was its own border would
    * ask a reader to compare surfaces across a row to find the answer, and would

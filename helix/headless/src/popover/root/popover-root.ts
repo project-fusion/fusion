@@ -215,15 +215,6 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    /* No `hostAria` here. The name is the panel's, not the host's: the host
-       carries no role, so a name written to its internals lands on a generic
-       element while the panel it names renders with none. `render` puts both
-       the `dialog` role and `label` on the panel, where a name has something to
-       be the name of. */
-  }
-
   protected override render(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
       <div

@@ -110,7 +110,6 @@ const UNSTABLE = 10
  * between scroll offset and index, which never disagrees with itself. Rows of
  * genuinely different heights are a different component and a harder one.
  */
-
 export class VirtualizeController implements ReactiveController {
   private readonly host: ReactiveControllerHost
   private readonly options: VirtualizeOptions

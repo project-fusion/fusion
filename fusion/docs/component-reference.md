@@ -1094,6 +1094,7 @@ is the signal, and decorating it competes with the thing it is decorating.
 | --- | --- | --- | --- | --- | --- |
 | `at` | `at` | `string` | `''` | `HelixHeadlessChatMessage` | When it was said, as anything `Date` parses. |
 | `author` | `author` | `string \| undefined` | - | `HelixHeadlessChatMessage` | Who said it. |
+| `failedLabel` | `failed-label` | `string` | `'Not sent'` | `HelixHeadlessChatMessage` | Label for a message that did not send. |
 | `locale` | `locale` | `string` | `''` | `HelixHeadlessChatMessage` | Locale for the timestamp. |
 | `retryLabel` | `retry-label` | `string` | `'Try again'` | `HelixHeadlessChatMessage` | Label for the control offered on a failed message. |
 | `sendingLabel` | `sending-label` | `string` | `'Sending'` | `HelixHeadlessChatMessage` | What to call each state, for a reader who cannot see it. |
@@ -2949,6 +2950,7 @@ compare two cells by. Both are hooks, so a page may answer differently.
 | `--heatmap-tone-primary` | `HelixHeadlessHeatmap` | What `primary` is worth. |
 | `--heatmap-tone-success` | `HelixHeadlessHeatmap` | What `success` is worth, as a name or a `data-tone`. |
 | `--heatmap-tone-warning` | `HelixHeadlessHeatmap` | What `warning` is worth. |
+| `--heatmap-rows` | `HelixHeadlessHeatmap` | How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. |
 | `--heatmap-tone` | `HelixHeadlessHeatmap` | The tone of the cell this is set on. Written by the component, read by the sheet that paints. |
 
 ## Icon

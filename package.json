@@ -10,8 +10,7 @@
   "scripts": {
     "analyze": "turbo run analyze",
     "build": "turbo run build",
-    "check": "bun run check:api && bun run check:cli && bun run check:css && bun run check:gen && bun run check:pkg && bun run check:prose && bun run check:spec",
-    "check:api": "",
+    "check": "bun run check:cli && bun run check:css && bun run check:gen && bun run check:prose && bun run check:spec",
     "check:cli": "bun run check:cli:component && bun run check:cli:workspace",
     "check:cli:component": "bun run helix component audit",
     "check:cli:workspace": "bun run fusion workspace audit",
@@ -31,7 +30,6 @@
     "check:gen:themed-page": "bun tooling/scripts/build-themed-page.mjs --check",
     "check:gen:tokens-layer": "bun tooling/scripts/build-token-layer.mjs --check",
     "check:gen:tokens-reference": "node tooling/scripts/build-tokens.mjs --check",
-    "check:pkg": "",
     "check:prose": "bun run check:prose:art && bun run check:prose:dialect && bun run check:prose:documented && bun run check:prose:orphans && bun run check:prose:references && bun run check:prose:repository && bun run check:prose:tag-order",
     "check:prose:art": "node tooling/scripts/check-art.mjs",
     "check:prose:dialect": "node tooling/scripts/check-dialect.mjs",

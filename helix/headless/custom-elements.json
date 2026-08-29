@@ -7387,6 +7387,16 @@
             },
             {
               "kind": "field",
+              "name": "failedLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Not sent'",
+              "description": "Label for a message that did not send.",
+              "attribute": "failed-label"
+            },
+            {
+              "kind": "field",
               "name": "retryLabel",
               "type": {
                 "text": "string"
@@ -7698,6 +7708,15 @@
               "default": "'Sending'",
               "description": "What to call each state, for a reader who cannot see it.",
               "fieldName": "sendingLabel"
+            },
+            {
+              "name": "failed-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Not sent'",
+              "description": "Label for a message that did not send.",
+              "fieldName": "failedLabel"
             },
             {
               "name": "retry-label",
@@ -26884,6 +26903,10 @@
             {
               "description": "Space between cells. Zero is a continuous field rather than a grid of tiles.",
               "name": "--heatmap-gap"
+            },
+            {
+              "description": "How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.",
+              "name": "--heatmap-rows"
             },
             {
               "description": "The tone of the cell this is set on. Written by the component, read by the sheet that paints.",

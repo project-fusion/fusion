@@ -989,6 +989,10 @@ Empty is the runtime's own. */
   "sending-label"?: HelixHeadlessChatMessage["sendingLabel"];
   /** What to call each state, for a reader who cannot see it. */
   sendingLabel?: HelixHeadlessChatMessage["sendingLabel"];
+  /** Label for a message that did not send. */
+  "failed-label"?: HelixHeadlessChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  failedLabel?: HelixHeadlessChatMessage["failedLabel"];
   /** Label for the control offered on a failed message. */
   "retry-label"?: HelixHeadlessChatMessage["retryLabel"];
   /** Label for the control offered on a failed message. */
@@ -7885,6 +7889,8 @@ export type CustomCssProperties = {
   "--heatmap-cell-size"?: string;
   /** Space between cells. Zero is a continuous field rather than a grid of tiles. */
   "--heatmap-gap"?: string;
+  /** How many rows the strip lays out. Written by the component from the data, read by the tier that draws it. */
+  "--heatmap-rows"?: string;
   /** The tone of the cell this is set on. Written by the component, read by the sheet that paints. */
   "--heatmap-tone"?: string;
   /** The quietest step of the magnitude ramp, reached by `tones="1 …"`. */

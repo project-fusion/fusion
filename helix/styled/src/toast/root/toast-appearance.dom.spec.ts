@@ -221,10 +221,6 @@ if (hasLayout()) {
       await found_item.updateComplete
       const action = found.querySelector('helix-button') as HTMLElement
       const dismiss = part(found_item, 'dismiss') as HTMLElement
-      const middle = (element: HTMLElement): number => {
-        const box = element.getBoundingClientRect()
-        return Math.round(box.top + box.height / 2)
-      }
       /* Heights, not centers: the action sits on a row of its own, so the
          centers do not agree and should not. Without the density a slotted
          control comes out at the full 40px beside a 32px dismiss. */
@@ -232,7 +228,6 @@ if (hasLayout()) {
         Math.round(dismiss.getBoundingClientRect().height),
       )
       expect(Math.round(action.getBoundingClientRect().height)).toBe(32)
-      void middle
     })
 
     test('the mark and the close hold the first line, and the action sits under the words', async () => {

@@ -103,7 +103,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
   sendingLabel = 'Sending'
 
   /**
-   * @internal
+   * Label for a message that did not send.
    */
   @property({ attribute: 'failed-label' })
   failedLabel = 'Not sent'

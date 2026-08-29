@@ -92,6 +92,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
+ * @cssproperty --heatmap-rows - How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
@@ -432,7 +433,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     return html`<div
         part="strip"
         id="helix-chart-plot"
-        style="--_heatmap-rows: ${this.rowCount}"
+        style="--heatmap-rows: ${this.rowCount}"
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
       >

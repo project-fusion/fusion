@@ -76,7 +76,7 @@ helix-headless-heatmap::part(strip) {
   gap: 2px;
   grid-auto-columns: 8px;
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), 8px);
+  grid-template-rows: repeat(var(--heatmap-rows, 1), 8px);
   justify-content: start;
   /* The mark the tooltip hangs off is placed against this box. */
   position: relative;

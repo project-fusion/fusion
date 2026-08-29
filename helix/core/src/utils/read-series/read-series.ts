@@ -12,6 +12,10 @@ export interface SeriesPoint {
    * The machine-readable instant, if the row header carries a `<time>`.
    */
   when?: string
+  /**
+   * The tone the cell asked for through `data-tone`, where it carries one.
+   */
+  tone?: string
 }
 
 /** One column of a table, read as a series. */
