@@ -166,7 +166,7 @@ jobs:
 
       - id: version
         run: |
-          node tooling/scripts/version.mjs \
+          node fusion/scripts/version.mjs \
             --domain "${{ matrix.target.domain }}" --bump "${{ matrix.target.level }}" --write
 
       # Before anything is published, and deliberately so. A version that has
@@ -201,7 +201,7 @@ jobs:
       - run: bun run build
 
       - name: Publish to staging
-        run: node tooling/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
+        run: node fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
 
       # The smoke test, against what was actually published rather than against
       # a rebuild of it: installed from the registry, from outside the
@@ -217,7 +217,7 @@ jobs:
       - name: Promote to production
         if: vars.PUBLISHING == 'on'
         run: |
-          node tooling/scripts/publish.mjs \
+          node fusion/scripts/publish.mjs \
             --domain "${{ matrix.target.domain }}" \
             --promote latest \
             --version "${{ steps.version.outputs.version }}"

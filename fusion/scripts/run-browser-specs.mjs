@@ -125,7 +125,7 @@ const freshPage = async () => {
   /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
      only in CI. A GitHub runner is two slow cores; this machine is neither,
      and every timing assertion in here was written against the fast one.
-     `node tooling/scripts/run-browser-specs.mjs --throttle 4` divides the CPU
+     `node fusion/scripts/run-browser-specs.mjs --throttle 4` divides the CPU
      by four through the same CDP switch DevTools uses. A flag rather than an
      environment variable because nothing else in here reads one. */
   if (THROTTLE > 1) {

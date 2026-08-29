@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  // Read by `tooling/scripts/version.mjs`, which hands the resolved release
+  // Read by `fusion/scripts/version.mjs`, which hands the resolved release
   // version back to the workflow that asked for it. Declared so the lint that
   // watches for undeclared environment access stays meaningful.
   // **The platform is part of the hash, because turbo does not put it there and
@@ -121,8 +121,8 @@
     "styles": {
       "inputs": [
         "src/**/*.css",
-        "$TURBO_ROOT$/tooling/scripts/build-styles.mjs",
-        "$TURBO_ROOT$/tooling/scripts/build-elements-css.mjs"
+        "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
+        "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],
       "outputs": ["src/**/*.css.ts", "elements.css"]
     },

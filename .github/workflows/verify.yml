@@ -68,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - id: shards
-        run: echo "shards=$(node tooling/scripts/run-checks.mjs --list --of 6)" >> "$GITHUB_OUTPUT"
+        run: echo "shards=$(node fusion/scripts/run-checks.mjs --list --of 6)" >> "$GITHUB_OUTPUT"
 
   checks:
     needs: plan
@@ -105,7 +105,7 @@ jobs:
       # machine that pushed.
       - run: bun install --frozen-lockfile
 
-      - run: node tooling/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of 6
+      - run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of 6
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches

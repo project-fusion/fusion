@@ -1,0 +1,21 @@
+{
+  "name": "@fusion.dev/docs",
+  "description": "The references every product's documentation is generated into, and the scripts that write them.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "fusion/docs",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "scripts": {
+    "content": "bun scripts/build-content.mjs",
+    "reference": "bun scripts/build-reference.mjs",
+    "tokens": "node scripts/build-tokens.mjs"
+  },
+  "devDependencies": {
+    "@fusion.dev/scripts": "workspace:*"
+  }
+}

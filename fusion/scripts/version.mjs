@@ -50,10 +50,10 @@
  * makes the whole version invalid and npm rejects it. Roughly one commit in
  * 270. `git describe` prefixes `g` for exactly this reason.
  *
- *   node tooling/scripts/version.mjs --domain helix
- *   node tooling/scripts/version.mjs --domain helix --bump minor
- *   node tooling/scripts/version.mjs --domain helix --bump minor --pre exp.42.ga1b2c3d --write
- *   node tooling/scripts/version.mjs --domain helix --set 0.0.0-dev --write
+ *   node fusion/scripts/version.mjs --domain helix
+ *   node fusion/scripts/version.mjs --domain helix --bump minor
+ *   node fusion/scripts/version.mjs --domain helix --bump minor --pre exp.42.ga1b2c3d --write
+ *   node fusion/scripts/version.mjs --domain helix --set 0.0.0-dev --write
  *
  * `--set` bypasses the tag scan, which is how the manifests are returned to
  * their resting value and how a release is pinned by hand if one ever has to be.

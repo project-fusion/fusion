@@ -37,7 +37,7 @@
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.ts",
     "build": "tsc -p tsconfig.json",
-    "styles": "node ../../tooling/scripts/build-styles.mjs .",
+    "styles": "node ../../fusion/scripts/build-styles.mjs .",
     "test": "bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",
     "test:ssr": "bun test ssr.spec",

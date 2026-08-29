@@ -35,10 +35,10 @@
  * `npm stage publish`, a first-class staged release that may express exactly
  * the publish-then-promote shape this file implements by hand.
  *
- *   node tooling/scripts/publish.mjs --domain helix --tag next
- *   node tooling/scripts/publish.mjs --domain helix --tag next --dry-run
- *   node tooling/scripts/publish.mjs --domain helix --tag bootstrap --otp 123456
- *   node tooling/scripts/publish.mjs --domain helix --promote latest --version 1.4.0
+ *   node fusion/scripts/publish.mjs --domain helix --tag next
+ *   node fusion/scripts/publish.mjs --domain helix --tag next --dry-run
+ *   node fusion/scripts/publish.mjs --domain helix --tag bootstrap --otp 123456
+ *   node fusion/scripts/publish.mjs --domain helix --promote latest --version 1.4.0
  */
 import { execFileSync } from 'node:child_process'
 import {
@@ -139,7 +139,7 @@ function npm(args, doing) {
           '    A token in the environment. A granular or automation token publishes with no ' +
           'one-time password:\n\n' +
           '      env "npm_config_//registry.npmjs.org/:_authToken=$NPM_ADMIN_TOKEN" \\\n' +
-          '        node tooling/scripts/publish.mjs --domain <domain> --tag bootstrap\n\n' +
+          '        node fusion/scripts/publish.mjs --domain <domain> --tag bootstrap\n\n' +
           '    A token cannot do `npm trust`, so it finishes the bootstrap and none of the ' +
           'registrations that follow it.\n\n' +
           '    Two-factor on "authorization only", set in the web settings and set back after. ' +

@@ -20,8 +20,8 @@
  * tasks whose outputs are cached, so with a warm cache they cost a restore
  * rather than a run.
  *
- *   node tooling/scripts/run-checks.mjs --list
- *   node tooling/scripts/run-checks.mjs --shard 0 --of 6
+ *   node fusion/scripts/run-checks.mjs --list
+ *   node fusion/scripts/run-checks.mjs --shard 0 --of 6
  */
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'

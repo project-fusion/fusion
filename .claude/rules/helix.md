@@ -1306,7 +1306,7 @@ definition lands. Consumers are on the App Router; asking them to mark every
 page `'use client'` to use a button would not be a design system.
 
 **Import `@fusion.dev/helix/elements.css` beside the base layer.** It is generated
-from the element sources by `tooling/scripts/build-elements-css.mjs` and hides
+from the element sources by `fusion/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
 does not reflow. Without it a card arrives as a run of unstyled text and then
 snaps into a card. CSS cannot select "any custom element", and a bare

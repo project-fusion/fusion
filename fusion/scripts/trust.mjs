@@ -45,8 +45,8 @@
  * Bootstrapping is still a real step and it still comes first:
  *
  *   bun run build
- *   node tooling/scripts/publish.mjs --domain helix --tag bootstrap
- *   node tooling/scripts/publish.mjs --domain cortex --tag bootstrap
+ *   node fusion/scripts/publish.mjs --domain helix --tag bootstrap
+ *   node fusion/scripts/publish.mjs --domain cortex --tag bootstrap
  *   bun run trust --apply
  *
  * That publishes the resting version, `0.0.0-dev`, under a `bootstrap` dist-tag,
@@ -83,8 +83,8 @@
  * Prints what it would do. Pass `--apply` to actually do it, because this
  * changes settings on the npm registry rather than anything in this repository.
  *
- *   node tooling/scripts/trust.mjs
- *   node tooling/scripts/trust.mjs --apply
+ *   node fusion/scripts/trust.mjs
+ *   node fusion/scripts/trust.mjs --apply
  */
 import { execFileSync } from 'node:child_process'
 import { domainOf, manifests, publishes } from '@fusion.dev/scripts/workspace'
@@ -171,8 +171,8 @@ if (failed > 0) {
         'trusted publisher to one that was never published. `npm view <name>` returning 404 is ' +
         'what that looks like, and bootstrap is the fix:\n\n' +
         '  bun run build\n' +
-        '  node tooling/scripts/publish.mjs --domain helix --tag bootstrap\n' +
-        '  node tooling/scripts/publish.mjs --domain cortex --tag bootstrap\n',
+        '  node fusion/scripts/publish.mjs --domain helix --tag bootstrap\n' +
+        '  node fusion/scripts/publish.mjs --domain cortex --tag bootstrap\n',
     )
   }
   if (challenged.size > 0) {

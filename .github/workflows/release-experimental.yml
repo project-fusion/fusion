@@ -104,7 +104,7 @@ jobs:
             level=$(gh api "repos/${{ github.repository }}/issues/$NUMBER/labels" \
               --jq ".[].name | select(startswith(\"$domain:\"))" | head -1 | cut -d: -f2)
             [ -n "$level" ] || continue
-            version=$(node tooling/scripts/version.mjs \
+            version=$(node fusion/scripts/version.mjs \
               --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
             printf '%s %s\n' "$domain" "$version" >> /tmp/released
           done
@@ -129,7 +129,7 @@ jobs:
           set -euo pipefail
           [ -s /tmp/released ] || exit 0
           while read -r domain version; do
-            node tooling/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
+            node fusion/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
           done < /tmp/released
 
       - name: Say how to install it
