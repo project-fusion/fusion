@@ -16,10 +16,16 @@ describe('scroll area server output', () => {
   test('says nothing about edges, because the server cannot measure', () => {
     /* Which edges have more past them is a reading of a laid-out box, and the
        server has none. Guessing would put a fade over content that fits.
-     
-       Asked of the host's attributes rather than of the whole document: the
-       stylesheet ships inside the output and names `data-more` in its own
-       selectors, so a substring check found it every time and passed on nothing. */
+
+       The edges are custom states now and a state cannot be serialized, so this
+       holds by construction. It stays because the attribute is what a future
+       change would reach for: `data-more` on the host is markup a framework did
+       not render, and writing it on upgrade is the hydration mismatch this
+       element used to report on every load.
+
+       Asked of the host's attributes rather than of the whole document, since a
+       substring check over the output found the name in the stylesheet that
+       ships inside it and passed on nothing. */
     const markup = ssr(
       html`<helix-headless-scroll-area label="Notes"><p>One</p></helix-headless-scroll-area>`,
     )

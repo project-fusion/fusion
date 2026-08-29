@@ -81,10 +81,10 @@
   inset-inline: 0;
 }
 
-/* `~=` so the element can name the edges in one attribute and a stylesheet can
-   ask about one of them, the way it would ask about a class. */
-:host([data-more~="block-start"])::before,
-:host([data-more~="block-end"])::after {
+/* One state per edge. A custom state is a name and not a value, so there is no
+   `~=` to ask with and the four are four selectors. */
+:host(:state(more-block-start))::before,
+:host(:state(more-block-end))::after {
   opacity: 1;
 }
 
@@ -127,8 +127,8 @@
   inset-inline-end: 0;
 }
 
-:host([data-more~="inline-start"]) [part="edges"]::before,
-:host([data-more~="inline-end"]) [part="edges"]::after {
+:host(:state(more-inline-start)) [part="edges"]::before,
+:host(:state(more-inline-end)) [part="edges"]::after {
   opacity: 1;
 }
 

@@ -35,11 +35,20 @@ if (hasLayout()) {
 
     const box = (host: Area): HTMLElement => part(host, 'viewport') as HTMLElement
 
+    /* Custom states rather than an attribute, which is what keeps this element
+       hydratable: `states` is not in the DOM, so nothing a framework rendered
+       disagrees with what upgrade writes. Read back in the order the component
+       measures them. */
+    const more = (host: Area): string[] =>
+      ['block-start', 'block-end', 'inline-start', 'inline-end'].filter((edge) =>
+        host.matches(`:state(more-${edge})`),
+      )
+
     test('says which edge has more past it, and only that edge', async () => {
       /* The whole component is this one fact, because CSS has no reading of
          scroll position and cannot work it out for itself. */
       const host = await sized(20)
-      expect(host.getAttribute('data-more')).toBe('block-end')
+      expect(more(host)).toEqual(['block-end'])
     })
 
     test('both edges once it is somewhere in the middle', async () => {
@@ -47,7 +56,7 @@ if (hasLayout()) {
       box(host).scrollTop = 40
       box(host).dispatchEvent(new Event('scroll'))
       await host.updateComplete
-      expect(host.getAttribute('data-more')).toBe('block-start block-end')
+      expect(more(host)).toEqual(['block-start', 'block-end'])
     })
 
     test('and the far edge goes out at the end rather than a pixel short', async () => {
@@ -59,14 +68,14 @@ if (hasLayout()) {
       box(host).scrollTop = box(host).scrollHeight
       box(host).dispatchEvent(new Event('scroll'))
       await host.updateComplete
-      expect(host.getAttribute('data-more')).toBe('block-start')
+      expect(more(host)).toEqual(['block-start'])
     })
 
     test('takes the keyboard when it scrolls', async () => {
       // A box a reader can only reach with a pointer is one some cannot read.
       const host = await sized(20)
       expect(box(host).getAttribute('tabindex')).toBe('0')
-      expect(host.hasAttribute('data-scrolls')).toBe(true)
+      expect(host.matches(':state(scrolls)')).toBe(true)
     })
 
     test('names the sideways edges too, and draws them', async () => {
@@ -83,16 +92,16 @@ if (hasLayout()) {
           settled(undefined)
         })
       })
-      expect(host.getAttribute('data-more')).toBe('inline-end')
+      expect(more(host)).toEqual(['inline-end'])
 
       const view = part(host, 'viewport') as HTMLElement
       view.scrollLeft = 100
       view.dispatchEvent(new Event('scroll'))
       await host.updateComplete
-      expect(host.getAttribute('data-more')).toBe('inline-start inline-end')
+      expect(more(host)).toEqual(['inline-start', 'inline-end'])
 
       /* After the fade, not during it. These cross-fade over `duration-fast`,
-         so reading the moment the attribute lands catches them partway and the
+         so reading the moment the state lands catches them partway and the
          number is whatever the frame happened to be on. */
       await new Promise((settled) => {
         setTimeout(settled, 250)
@@ -123,7 +132,7 @@ if (hasLayout()) {
          nothing, and a form full of them is worse than the problem. */
       const host = await sized(1)
       expect(box(host).getAttribute('tabindex')).toBe(null)
-      expect(host.hasAttribute('data-more')).toBe(false)
+      expect(more(host)).toEqual([])
     })
   })
 }
