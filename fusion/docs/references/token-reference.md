@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Light | Dark | Reads |
 |---|---|---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | `#ffffff` | `#000000` | 81 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 39 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 40 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | `#f5f5f5` | `#181818` | 19 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | `#ffffff` | `#181818` | 24 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | `#f2f2f2` | `#0b0b0b` | 56 |
@@ -119,8 +119,8 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 165 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 112 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 97 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 44 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 98 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 46 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 50 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 15 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
@@ -134,7 +134,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 32 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 130 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 15 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 20 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 21 |
 | `--helix-radii-full` | `9999px` | 44 |
 
 ## font
@@ -157,7 +157,7 @@ Font size.
 | `--helix-text-sm` | `var(--_helix-size-13)` | 83 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 31 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 23 |
-| `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
+| `--helix-text-xl` | `var(--_helix-size-24)` | 15 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 14 |
 | `--helix-text-control` | `var(--helix-text-sm)` | 5 |
@@ -200,7 +200,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 154 |
+| `--helix-border-thin` | `1px` | 157 |
 | `--helix-border-thick` | `2px` | 40 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 3 |
 | `--helix-border-floating` | `0` | 11 |
@@ -231,7 +231,7 @@ Blur and translucency, for a surface that lets the page through.
 | `--helix-material-blur-lg` | `32px` | 5 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 30%, transparent )` | 8 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 5 |
-| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 8 |
+| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 11 |
 
 ## duration
 
@@ -311,8 +311,8 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-beneath` | `-1` | 0 |
-| `--helix-layer-base` | `0` | 7 |
-| `--helix-layer-raised` | `10` | 17 |
+| `--helix-layer-base` | `0` | 8 |
+| `--helix-layer-raised` | `10` | 18 |
 | `--helix-layer-sticky` | `100` | 5 |
 | `--helix-layer-overlay` | `1000` | 2 |
 | `--helix-layer-toast` | `1200` | 1 |

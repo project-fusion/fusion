@@ -19,3 +19,151 @@
   align-items: start;
   inline-size: 100%;
 }
+
+/* ==================================================== the rebuild ======== */
+
+/**
+ * The lit band the head sits on.
+ *
+ * `.pageHero` carries the geometry, the lattice and the falloff; this adds the
+ * ground and stops the band being as tall as an index hero. `/services` is a
+ * page somebody reads to decide something, so the head introduces the offers
+ * and hands over rather than filling a screen on its own.
+ */
+.servicesHero {
+  background-color: var(--helix-color-surface);
+  min-block-size: auto;
+}
+
+/* Behind the head and inside the band. */
+.servicesAura {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* Above the light, which the aura and the lattice both sit in. */
+.servicesHeroInner {
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+/**
+ * A band that holds a layer, isolated so the layer stays in it.
+ *
+ * The same shape the landing bands take, and for the reason recorded there:
+ * marking what a *layer* is means the next one added is excluded from the
+ * stacking rule by being one, rather than by somebody remembering to extend a
+ * selector.
+ */
+.fieldBand {
+  isolation: isolate;
+  position: relative;
+}
+
+.fieldBand > *:not([data-layer]) {
+  position: relative;
+  z-index: 1;
+}
+
+/**
+ * One panel per idea.
+ *
+ * **The glass is read from the site's own tokens rather than from the landing
+ * page's scope.** `--site-glass` and `--site-glass-backdrop` are declared at
+ * `:root` in `site.css`, so a page does not have to be inside `.noRules` to be
+ * made of the same material; what that scope adds is applying them to every
+ * `[data-substrate]` under it, which is a landing page concern. Stating the two
+ * declarations here reads the same two tokens, so the pages cannot drift on the
+ * material even though each applies it itself.
+ */
+.bandCard {
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  overflow: hidden;
+}
+
+.bandSection {
+  padding: var(--helix-space-xl);
+}
+
+/**
+ * Three offers on one panel, and the rules between them are the whole point.
+ *
+ * `auto-fit` was not used, for the reason the landing rows record: a sibling
+ * rule cannot know a wrap happened, so the first cell of a wrapped row wears a
+ * divider on the side facing nothing. Both layouts are stated, and the divider
+ * turns with them.
+ *
+ * The floor is where a price stops fitting beside its own bullets rather than a
+ * device width: three tracks give each offer about 390px at 1440, which is what
+ * this content wants, and comparison wants them adjacent rather than a scroll
+ * apart.
+ */
+.offerRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* The four bands every offer is made of: what it is, what it costs, what is
+     in it, and what you keep. Named on the row so the cells can share them. */
+  grid-template-rows: repeat(4, auto);
+}
+
+/**
+ * **Each offer takes the row's own tracks, which is what lines the prices up.**
+ *
+ * Three flex columns beside each other agree about nothing: a summary that runs
+ * to three lines in one and four in another pushes that offer's price down, and
+ * the figures land on three different baselines on the one page whose whole job
+ * is that they can be compared. Measured before this: 698, 719 and 698.
+ *
+ * `subgrid` is the tool for exactly that, and it is why the cell is a `div`
+ * rather than a `helix-flex`. Setting `display: grid` on that component's host
+ * from a document rule would beat its own `display: flex` whatever the
+ * specificity, which is the failure `helix component`'s `overruled` exists to
+ * catch. A box the page owns is the page's to lay out.
+ */
+.offer {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  padding: var(--helix-space-xl);
+}
+
+.offer + .offer {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+@media (width < 64rem) {
+  .offerRow {
+    grid-template-columns: 1fr;
+  }
+
+  .offer + .offer {
+    border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+    border-inline-start: 0;
+  }
+}
+
+/* The figure, as its own block so the duration sits under it rather than
+   trailing the number on the same line: at three across there is not room for
+   both, and a duration that wraps under a price it is not part of reads as a
+   second price. */
+.offerPrice helix-text:first-child {
+  font-size: var(--helix-text-xl);
+}
+
+/* **Nothing pushes this down, and that is the change subgrid paid for.**
+ *
+ * It was `margin-block-start: auto`, which bottom-aligns the block inside its
+ * own cell: with the takeaways running two lines in one offer and three in
+ * another, the three ended on one line and *started* on three, so the labels a
+ * reader scans down the row sat 20px apart. Measured: 1089, 1089, 1109.
+ *
+ * The shared row already starts all three at the same place, which is the
+ * alignment that matters: `What you keep` is the thing being compared across
+ * the offers, and where the sentence under it happens to end is not. */
