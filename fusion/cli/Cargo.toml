@@ -20,6 +20,10 @@ path = "src/main.rs"
 clap = { version = "4", features = ["derive"] }
 # The `modules` rule reads class selectors out of stylesheets and class
 # attributes out of markup, neither of which is a substring search.
+# **Only `audit` takes this, and only on a terminal.** A rule computes and does
+# not draw; the screen is one way of reading what they returned, and `--plain`
+# and a pipe both get the printed form from the same measurement.
+ratatui = { workspace = true }
 regex = { workspace = true }
 # Every rule reads manifests, and `--json` is a contract on every verb.
 serde = { workspace = true }

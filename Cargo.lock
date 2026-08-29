@@ -533,6 +533,7 @@ name = "fusion-cli"
 version = "0.0.0-dev"
 dependencies = [
  "clap",
+ "ratatui",
  "regex",
  "serde",
  "serde_json",

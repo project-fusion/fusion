@@ -16,6 +16,7 @@
 
 mod prose;
 mod route;
+mod tui;
 mod rules;
 mod spec;
 mod workspace;
@@ -137,6 +138,16 @@ struct Common {
     #[arg(long, value_delimiter = ',')]
     only: Vec<String>,
 
+    /// Print the audit rather than drawing it.
+    ///
+    /// **The tty already decides and this is the override.** A screen written to
+    /// a pipe is escape sequences in a log file, so `audit` prints when stdout
+    /// is not a terminal; this is for the reader who is at one and wants the
+    /// lines anyway — to copy them, to grep them, or because a screen is the
+    /// wrong shape for what they are doing.
+    #[arg(long)]
+    plain: bool,
+
     /// The workspace to read. Defaults to the nearest one above the cwd.
     #[arg(long)]
     root: Option<PathBuf>,
@@ -211,8 +222,27 @@ fn main() -> ExitCode {
 
     match verb {
         Verb::Fix(_) => fix(&selected, &context, cli.json),
-        Verb::Audit(_) => report(&selected, &context, cli.json, true, color),
-        Verb::Check(_) => report(&selected, &context, cli.json, false, color),
+        /* **The tty decides here, where the verb is known**, rather than inside
+        the renderer: a screen written to a pipe is escape sequences in a log
+        file, and `check` never draws whatever the terminal is. */
+        Verb::Audit(_) => {
+            let form = if cli.json {
+                Form::Json
+            } else if common.plain || !std::io::stdout().is_terminal() {
+                Form::Printed { loud: true }
+            } else {
+                Form::Screen
+            };
+            report(&selected, &context, &form, color)
+        }
+        Verb::Check(_) => {
+            let form = if cli.json {
+                Form::Json
+            } else {
+                Form::Printed { loud: false }
+            };
+            report(&selected, &context, &form, color)
+        }
     }
 }
 
@@ -293,18 +323,28 @@ fn measure<'a>(
     reports
 }
 
-fn report(
-    selected: &[rules::Rule],
-    context: &Context,
-    json: bool,
-    loud: bool,
-    color: bool,
-) -> ExitCode {
+/// How a measurement comes out, which is one choice rather than four flags.
+///
+/// **Named rather than four bools**, because they were never independent: JSON
+/// outranks the rest, a screen is only ever an `audit` on a terminal, and
+/// `check`'s whole shape is silence on success, which a screen cannot be. As
+/// bools that is four values with three illegal combinations; as this it is
+/// three, and the call site says which one it means.
+enum Form {
+    /// Machine-readable on stdout. The contract, on every verb, always.
+    Json,
+    /// Every rule and its findings, printed. `loud` prints the clean ones too.
+    Printed { loud: bool },
+    /// Drawn, for a reader at a terminal who asked for an audit.
+    Screen,
+}
+
+fn report(selected: &[rules::Rule], context: &Context, form: &Form, color: bool) -> ExitCode {
     let reports = measure(selected, context);
     let failed: Vec<&(&rules::Rule, rules::Report)> =
         reports.iter().filter(|(_, report)| !report.ok()).collect();
 
-    if json {
+    if matches!(form, Form::Json) {
         let payload = serde_json::json!({
             "ok": failed.is_empty(),
             "rules": reports.iter().map(|(rule, report)| serde_json::json!({
@@ -326,6 +366,25 @@ fn report(
         };
     }
 
+    /* Both forms read the same measurement, so nothing here can disagree with
+    what the other would have shown. */
+    if matches!(form, Form::Screen) {
+        let code = if failed.is_empty() {
+            ExitCode::SUCCESS
+        } else {
+            ExitCode::FAILURE
+        };
+        let drawn: Vec<(&rules::Rule, rules::Report)> = reports;
+        if let Err(why) = tui::run(&drawn) {
+            eprintln!(
+                "fusion: cannot open the audit screen: {why}.\n  \
+                 Run the same command with `--plain` for the printed form."
+            );
+            return ExitCode::from(70);
+        }
+        return code;
+    }
+
     let paint = |code: &str, text: &str| {
         if color {
             format!("\u{1b}[{code}m{text}\u{1b}[0m")
@@ -334,7 +393,7 @@ fn report(
         }
     };
 
-    if loud {
+    if matches!(form, Form::Printed { loud: true }) {
         for (rule, report) in &reports {
             let mark = if report.ok() { " " } else { &paint("31", "x") };
             println!(
@@ -373,7 +432,7 @@ fn report(
         return ExitCode::FAILURE;
     }
 
-    if loud {
+    if matches!(form, Form::Printed { loud: true }) {
         println!("fusion: {} rules, every one clean", reports.len());
     }
     ExitCode::SUCCESS
