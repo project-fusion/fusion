@@ -573,7 +573,7 @@ These are the difference between code that looks right and code that passes:
 | A documented part must be rendered | \`check:api:parts\` |
 | A documented CSS hook must be read | \`check:css:hooks\` |
 | A visual property draws from its axis | \`check:css:axes\` |
-| A form control styles with \`:disabled\` | \`check:api:disabled\` |
+| A form control styles with \`:disabled\` | \`helix component --only disabled\` |
 | A component that animates answers reduced motion | \`check:css:motion\` |
 | No component reads a primitive token | \`check:css:tokens\` |
 

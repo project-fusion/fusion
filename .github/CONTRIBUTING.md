@@ -67,7 +67,7 @@ the cause is deeper, the fix still goes deeper.
 
 There is a skill for it: `.claude/skills/adding-helix-components`. A component
 is not one file. It is both tiers, tokens, specs on every part, manifest
-metadata and an example, and `bun run check:api:stable` knows the difference.
+metadata and an example, and `helix component --only stable` knows the difference.
 
 ## Commits
 

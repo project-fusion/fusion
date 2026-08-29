@@ -21,7 +21,7 @@
  * which of the four possible causes they have.
  */
 import { spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -34,9 +34,23 @@ const target = process.env.CARGO_TARGET_DIR
   ? resolve(process.env.CARGO_TARGET_DIR)
   : join(WORKSPACE, 'target')
 
-/** A built binary, newest profile first, or undefined. */
+/**
+ * The most recently built binary, or undefined.
+ *
+ * **By modification time, not by profile.** Preferring release outright is the
+ * obvious rule and it is a trap on a development machine: one `cargo build
+ * --release` leaves an artifact that shadows every `cargo build` after it, so a
+ * rule added an hour ago is not there and the command reports a smaller, older
+ * truth without saying anything is wrong. Measured: a release binary two commits
+ * behind reported nine rules against the debug build's twelve, and one of them
+ * as counting nothing. On a CI runner only one profile exists and this is the
+ * same answer either way.
+ */
 const built = () =>
-  [join(target, 'release', NAME), join(target, 'debug', NAME)].find((path) => existsSync(path))
+  [join(target, 'release', NAME), join(target, 'debug', NAME)]
+    .filter((path) => existsSync(path))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)
+    .at(0)
 
 /** Whether cargo is on the path, asked once and cheaply. */
 const hasCargo = () => spawnSync('cargo', ['--version'], { stdio: 'ignore' }).status === 0
