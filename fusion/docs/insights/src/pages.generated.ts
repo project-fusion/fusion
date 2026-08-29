@@ -1,7 +1,7 @@
 /**
  * The site's pages and essays, derived from the frontmatter of each file by
- * `bun run gen:content`. Do not edit: the files in `content/` are the source, and
- * `bun run check:gen:content` fails when this module and they disagree.
+ * `turbo run content`. Do not edit: the files in `content/` are the source, and
+ * `turbo run content -- --check` fails when this module and they disagree.
  *
  * **The slug is the file name.** Nothing here assigns one.
  */

@@ -1,6 +1,6 @@
 /**
- * Every page's MDX, inlined by `bun run gen:docs`. Do not edit: the files in
- * `content/` are the source, and `bun run check:gen:docs` fails when this module
+ * Every page's MDX, inlined by `turbo run docs`. Do not edit: the files in
+ * `content/` are the source, and `turbo run docs -- --check` fails when this module
  * and they disagree.
  */
 export const docSources: Record<string, string> = {
@@ -1058,8 +1058,8 @@ Eight tokens describing translucency rather than color:
 | \`--helix-material-blur-sm\` | \`8px\` | The lightest backdrop blur. |
 | \`--helix-material-blur-md\` | \`16px\` | The backdrop blur a modal takes. |
 | \`--helix-material-blur-lg\` | \`32px\` | The heaviest backdrop blur. |
-| \`--helix-material-translucent\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 30%, transparent)\` | The translucent ground, for a surface that admits what is behind it. |
-| \`--helix-material-translucent-strong\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)\` | The heavier translucent ground, for one that admits less. |
+| \`--helix-material-translucent\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 30%, transparent)\` | The translucent ground, for a surface that admits what is behind it. |
+| \`--helix-material-translucent-strong\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)\` | The heavier translucent ground, for one that admits less. |
 | \`--helix-material-border\` | \`light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))\` | The edge a translucent surface needs to have any at all. |
 
 [//]: # (/tokens)
@@ -1442,7 +1442,7 @@ failure rather than an empty box.
 
 ## Adding one
 
-Add the name to \`helix/icons/icons.txt\` and run \`bun run icons\`. Phosphor names
+Add the name to \`helix/icons/icons.txt\` and run \`turbo run icons\`. Phosphor names
 resolve from \`@phosphor-icons/core\` at build time, so adding a glyph is adding a
 line rather than hand-transcribing a path into a TypeScript object.
 
@@ -1921,7 +1921,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@fusion.dev/helix-headless\` | 514,790 | 130,349 | 102,008 | Every headless family, which is what the barrel means. |
 | \`@fusion.dev/helix-icons\` | 45,300 | 14,268 | 11,940 | The whole glyph set. |
 | \`@fusion.dev/helix-theme\` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@fusion.dev/helix\` | 957,884 | 215,856 | 158,160 | Every styled family. |
+| \`@fusion.dev/helix\` | 957,885 | 215,846 | 158,215 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1937,14 +1937,14 @@ is the whole cost of adopting the base layer on its own.
 | \`base.css\` | 23,052 | 3,527 | 3,024 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 8,290 | 1,875 | 1,600 | The components' own layer, generated from every family's stylesheet. |
 | \`all.css\` | 179 | 142 | 110 | The three above in one import, in the order they have to be in. |
-| \`primitives.css\` | 6,274 | 1,233 | 1,055 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
+| \`primitives.css\` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
 | \`tokens.css\` | 19,989 | 2,469 | 2,073 | The 185 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
 **Most of a first component is the runtime under it.** The median styled family is 13,974 bytes gzipped alone and adds 2,502 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`code\` at 9,057 gzipped alone, the dearest \`data-table\` at 48,895, over 93 components. Every family at once is 215,856.
+Across the tier: the cheapest is \`code\` at 9,057 gzipped alone, the dearest \`data-table\` at 48,893, over 93 components. Every family at once is 215,846.
 
 **No family imports a barrel, and the \`barrels\` rule in \`fusion workspace\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs 130,349 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -1952,7 +1952,7 @@ The headless tier never had the problem, and it is the control: \`@fusion.dev/he
 
 ## Against other systems
 
-Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`bun run gen:peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.
+Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`turbo run peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.
 
 **Every system here is built on Lit**, so the runtime under the comparison is the same library in every column and what is left is the components. A React component library is not in the table, because comparing a custom element with a React component measures the framework.
 
@@ -2007,7 +2007,7 @@ Every specifier measured is in [\`peers.json\`](https://github.com/project-fusio
 
 ## What it costs in time
 
-Measured on 2026-08-26 by \`bun run gen:timings\`, which drives a real browser against the built packages. The median of 9 runs each, on one machine.
+Measured on 2026-08-26 by \`turbo run timings\`, which drives a real browser against the built packages. The median of 9 runs each, on one machine.
 
 **These never join the comparison above, and that is not a hedge.** Bytes are a fact about a package and can be held against anybody else's. A timing is a fact about a page, a machine and a day, so a column of somebody else's milliseconds would be comparing two laptops rather than two libraries.
 
@@ -2160,7 +2160,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`combobox\` | 138,091 | 42,668 | 35,939 | 33,986 | 7,949 | 6,449 |
 | \`command\` | 108,535 | 33,272 | 27,504 | 27,372 | 6,849 | 5,474 |
 | \`copy-button\` | 119,731 | 38,540 | 32,488 | 21,728 | 5,095 | 3,889 |
-| \`data-table\` | 168,661 | 48,895 | 41,217 | 65,060 | 14,046 | 11,466 |
+| \`data-table\` | 168,661 | 48,893 | 41,204 | 65,060 | 14,044 | 11,429 |
 | \`date-input\` | 136,155 | 42,425 | 35,827 | 34,295 | 8,200 | 6,680 |
 | \`date-picker\` | 89,176 | 28,793 | 23,853 | 15,482 | 4,370 | 3,380 |
 | \`dialog\` | 34,636 | 11,185 | 9,860 | 6,854 | 2,117 | 1,480 |
@@ -2184,7 +2184,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`list\` | 31,940 | 10,292 | 9,050 | 5,770 | 1,577 | 1,138 |
 | \`listbox\` | 94,397 | 30,466 | 24,994 | 14,723 | 4,374 | 3,135 |
 | \`loader\` | 30,078 | 10,033 | 8,830 | 3,891 | 1,242 | 855 |
-| \`megamenu\` | 59,602 | 20,375 | 18,005 | 9,341 | 2,822 | 2,010 |
+| \`megamenu\` | 59,603 | 20,373 | 18,030 | 9,342 | 2,821 | 2,121 |
 | \`menu\` | 113,714 | 37,580 | 31,750 | 14,366 | 3,761 | 2,859 |
 | \`meter\` | 35,602 | 11,268 | 9,952 | 9,420 | 2,502 | 1,875 |
 | \`navigation\` | 30,359 | 10,243 | 9,007 | 3,094 | 1,176 | 671 |
@@ -2192,7 +2192,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`number-input\` | 89,733 | 28,943 | 23,754 | 12,050 | 3,452 | 2,495 |
 | \`option\` | 32,116 | 10,548 | 9,315 | 5,935 | 1,796 | 1,250 |
 | \`outline\` | 35,824 | 11,614 | 10,256 | 8,509 | 2,608 | 1,767 |
-| \`pagination\` | 147,372 | 44,254 | 37,344 | 43,971 | 9,561 | 7,645 |
+| \`pagination\` | 147,372 | 44,250 | 37,385 | 43,971 | 9,558 | 7,697 |
 | \`pin-input\` | 40,697 | 12,809 | 11,266 | 8,340 | 2,727 | 2,008 |
 | \`popover\` | 55,095 | 19,238 | 16,995 | 4,585 | 1,521 | 1,000 |
 | \`progress\` | 33,246 | 10,760 | 9,523 | 7,064 | 1,950 | 1,516 |
@@ -2202,7 +2202,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`rating\` | 41,008 | 13,169 | 11,612 | 8,574 | 2,963 | 2,079 |
 | \`sandbox\` | 61,201 | 16,804 | 14,912 | 34,739 | 8,056 | 6,547 |
 | \`scroll-area\` | 31,437 | 10,374 | 9,095 | 5,567 | 1,759 | 1,092 |
-| \`select\` | 130,971 | 41,220 | 34,723 | 27,696 | 6,679 | 5,266 |
+| \`select\` | 130,971 | 41,215 | 34,721 | 27,696 | 6,675 | 5,216 |
 | \`skeleton\` | 28,062 | 9,544 | 8,416 | 2,242 | 912 | 452 |
 | \`slider\` | 47,776 | 13,836 | 12,240 | 15,173 | 3,634 | 2,826 |
 | \`sparkline\` | 35,412 | 12,015 | 10,603 | 6,285 | 2,014 | 1,570 |
@@ -2223,7 +2223,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`toggle\` | 43,388 | 13,285 | 11,687 | 9,099 | 2,572 | 1,886 |
 | \`toolbar\` | 29,632 | 10,054 | 8,841 | 3,813 | 1,518 | 964 |
 | \`tooltip\` | 59,436 | 20,244 | 17,929 | 9,414 | 2,886 | 1,969 |
-| \`tour\` | 71,218 | 22,333 | 19,738 | 20,296 | 4,658 | 3,577 |
+| \`tour\` | 71,218 | 22,332 | 19,757 | 20,296 | 4,657 | 3,510 |
 | \`tree\` | 87,502 | 28,416 | 23,336 | 12,266 | 3,611 | 2,667 |
 | \`trend\` | 74,653 | 24,566 | 20,420 | 4,083 | 1,266 | 823 |
 | \`video\` | 148,293 | 45,053 | 38,250 | 48,691 | 10,878 | 9,207 |
@@ -2240,12 +2240,12 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 863,645 | 113 | 159,942 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-core\` | 863,651 | 113 | 159,942 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 9,626,448 | 422 | 735,736 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 63,952 | 11 | 20,403 | none |
-| \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
+| \`@fusion.dev/helix-styles\` | 83,184 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
-| \`@fusion.dev/helix\` | 9,587,095 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,587,360 | 717 | 287,239 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -2253,7 +2253,7 @@ Named rather than left out, because a metrics page is read for what it does
 not say as much as for what it does.
 
 - **No whole-library comparison, and no fifth component.** The comparison above is five components against four systems. Widening it means naming the equivalent element in each system by hand, which is where a comparison table starts arguing, so each addition is a deliberate one rather than a sweep.
-- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running \`bun run gen:peers\`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.
+- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running \`turbo run peers\`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.
 - **No first paint.** The timings above are facts about a component: time to upgrade, first render, hydration. First paint is a fact about a whole page, so it belongs to whatever renders one rather than to the library it renders.
 - **No per-component stylesheet bytes.** There are none to report: a family's CSS is compiled into its JavaScript, so it is already inside every number above. \`elements.css\` is the light-DOM layer and is in the stylesheet table.
 `,
@@ -2543,12 +2543,14 @@ Three doors are open, and they are in the order you should try them.
 
 \`\`\`css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 \`\`\`
 
 If every card, dialog and button should be squarer, that is a token change and
-you are done. Tokens cross shadow boundaries on their own, because custom
+you are done. The seed rather than \`--helix-radii-md\`, because the four rungs
+are derived from it: \`md\` on its own is one step of four, and the buttons and
+dialogs are on a different one. See [Shape and borders](./shape-and-borders). Tokens cross shadow boundaries on their own, because custom
 properties inherit, so one declaration reaches every component at once.
 
 Reach for this first. Most requests that arrive as "can I restyle the button"
@@ -3373,17 +3375,29 @@ square: a percentage radius on a wide element gives an ellipse, and a pill is
 what you wanted.
 
 Rounding is the fastest single change to how a system feels, and it is one
-token:
+token, but it is the **seed** rather than one of the four above:
 
 \`\`\`css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 \`\`\`
 
-That makes every card, dialog, input and button squarer at once. The theme
+That makes every card, dialog, input and button squarer at once, because \`sm\`,
+\`md\` and \`lg\` are all derived from it: they become 1px, 2px and 3px. The theme
 engine takes a \`radius\` intent input for exactly this reason. See [Deriving a
 theme](./theming).
+
+**Setting \`--helix-radii-md\` instead moves only what reads \`md\`**, which is
+neither the buttons, the inputs and the dialogs (\`sm\`) nor the cards (\`lg\`).
+The four rungs are siblings derived from the seed, not a chain, so overriding
+one is how you change a single step on purpose rather than how you reshape a
+system.
+
+**Every floating panel takes \`sm\`.** A dialog, a drawer, a menu, a popover, a
+tooltip, a toast, and the panel any field opens under itself: all the same
+corner, whatever the panel's size. A radius is read against the corner beside it
+rather than against the area behind it.
 
 **A shape that is round rather than softened does not use these.** An avatar, a
 loader and a radio are circles because of what they are, so they say \`50%\`
@@ -4078,7 +4092,7 @@ direction never reverses.
 | \`@fusion.dev/helix-styles\` | Tokens and the base layer. Pure CSS | nothing |
 | \`@fusion.dev/helix-core\` | Element base class, mixins, decorators | Lit |
 | \`@fusion.dev/helix-headless\` | Structure, accessibility, state, form participation | \`core\` |
-| \`@fusion.dev/helix\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`styles\` |
+| \`@fusion.dev/helix\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`turbo run styles\` |
 
 \`@fusion.dev/helix-theme\` and \`@fusion.dev/helix-icons\` ship beside the stack rather than in it:
 neither is a tier, and neither is needed to render a component. **There is no
@@ -4088,7 +4102,7 @@ the bridge that repairs React's hydration of custom events is in
 
 ## Why the split
 
-**\`headless\` must never depend on \`styles\`.**
+**\`headless\` must never depend on \`turbo run styles\`.**
 
 That single constraint is what makes the headless tier independently
 consumable. Consume it and bring your own
@@ -4576,9 +4590,11 @@ Two distinctions worth knowing before searching:
 
 Three doors, in the order to try them.
 
-1. **A token.** \`--helix-radii-md: 2px\` at \`:root\` reaches every component,
+1. **A token.** \`--helix-seed-radii: 2px\` at \`:root\` reaches every component,
    because custom properties inherit. Most "can I restyle the button" is really
-   "our brand has less rounding".
+   "our brand has less rounding". The seed and not \`--helix-radii-md\`: the four
+   radii are siblings derived from it, so \`md\` alone moves neither the buttons
+   nor the cards.
 2. **A per-component hook.** \`--card-padding\` on \`helix-card\`. Named after the
    component, documented on its page, defaults to a semantic token.
 3. **A part.** \`helix-select::part(trigger)\`. The most powerful and the one that

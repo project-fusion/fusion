@@ -1,6 +1,6 @@
 /**
  * Every page this package documents, derived from the frontmatter of each MDX
- * file by `bun run gen:docs`. Do not edit: `bun run check:gen:docs` fails when this
+ * file by `turbo run docs`. Do not edit: `turbo run docs -- --check` fails when this
  * file and the content disagree, and the content is the source.
  */
 import type { DocPage } from './registry.js'

@@ -1,6 +1,6 @@
 /**
- * Every page's MDX, inlined by `bun run gen:content`. Do not edit: the files in
- * `content/` are the source, and `bun run check:gen:content` fails when this
+ * Every page's MDX, inlined by `turbo run content`. Do not edit: the files in
+ * `content/` are the source, and `turbo run content -- --check` fails when this
  * module and they disagree.
  */
 export const sitePageSources: Record<string, string> = {

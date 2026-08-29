@@ -1,7 +1,7 @@
 # Component reference
 
-*Generated from `helix/styled/custom-elements.json` by `bun run gen:reference`. Do
-not edit: `bun run check:gen:reference` fails when this file and the manifest
+*Generated from `helix/styled/custom-elements.json` by `turbo run reference`. Do
+not edit: `turbo run reference -- --check` fails when this file and the manifest
 disagree, and the manifest is regenerated from the source on every build.*
 
 The styled tier, which is what an application writes. Every styled component
