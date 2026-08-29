@@ -1,4 +1,7 @@
 {
+  "accepted": {
+    "color-foreground-subtle on color-surface-sunken": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it."
+  },
   "chrome": {
     "app-header": "The bar across the top of the page, which is page chrome by definition.",
     "sandbox": "A development tool that owns its whole window, not a component put on a page."
@@ -23,6 +26,7 @@
   "leaves": {
     "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
   },
+  "oracle": "helix/theme/rust/oracle.json",
   "outside": [
     "helix/styled/src",
     "helix/headless/src",

@@ -43,6 +43,7 @@ pub mod leaks;
 pub mod motion;
 pub mod observers;
 pub mod overruled;
+pub mod pairings;
 pub mod parts;
 pub mod print;
 pub mod reachable;
@@ -90,12 +91,28 @@ pub struct Settings {
     #[serde(default)]
     pub outside: Vec<String>,
 
+    /// Ink-on-ground pairs a component paints on purpose that the model omits.
+    ///
+    /// A map rather than a list, for the reason every allowlist here is one: an
+    /// exemption without a reason becomes the place things go to stop being
+    /// questioned, and an entry nothing paints is reported so it gets deleted.
+    #[serde(default)]
+    pub accepted: BTreeMap<String, String>,
+
     /// Roots holding document stylesheets, which beat a component's own.
     ///
     /// A base layer and an application alike: both write rules outside every
     /// shadow root, and a rule written there wins whatever the specificity.
     #[serde(default)]
     pub documents: Vec<String>,
+
+    /// What the theme engine emitted, which is where the measured pairs are.
+    ///
+    /// **Read from what the engine emits, never from its source.** A status
+    /// ink's grounds are built by a loop no pattern can see, so matching the
+    /// model's source leaves twenty pairs unchecked.
+    #[serde(default)]
+    pub oracle: Option<String>,
 
     /// The stylesheets defining the token layer, in cascade order.
     ///
@@ -341,6 +358,11 @@ pub fn all() -> Vec<Rule> {
             name: "overruled",
             run: Runner::Source(overruled::run),
             summary: "a component's own CSS is not silently beaten by a document rule",
+        },
+        Rule {
+            name: "pairings",
+            run: Runner::Source(pairings::run),
+            summary: "every ink-on-ground pair a component paints is one the model measures",
         },
         Rule {
             name: "parts",
