@@ -27,10 +27,9 @@ procedure.
 - **A group is a part when it reports a form value** (`Radio.Group`,
   `Toggle.Group`), and its own family when it does not (`Checkbox Group`,
   `Button Group`). A container holding mixed content is its own family
-  (`Toolbar`). This read "where homogeneous" until `.claude/rules/helix.md`
-  corrected it on 15 Aug 2026: that is a fact about the members rather than about
-  the group, and by it two shipped families were violations. The correction
-  reached the rules file and not this one.
+  (`Toolbar`). Not "where homogeneous": that is a fact about the members rather
+  than about the group, and by it `Checkbox Group` and `Button Group` would both
+  be violations.
 - **Form-associated?** Extend `HelixFormElement`, not `HelixElement`.
   `formAssociated` must be a class field: it cannot be a controller.
 - **Reuse a mixin** if the component has open, checked, value, disabled, or

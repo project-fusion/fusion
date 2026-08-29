@@ -6,7 +6,7 @@
  * machine, or silently tests the previous build, reports nothing at all: the
  * runner has no output to give, and the symptom looks like a hardware problem.
  *
- * **A deep equality against a DOM node exhausts the machine.** See 297.
+ * **A deep equality against a DOM node exhausts the machine.** See (297).
  * `expect(heard).toEqual([host])` is instant while the two match by reference
  * and catastrophic the moment they do not: the runner walks the expected value
  * to build a diff, and a rendered element is a graph with cycles in it,
@@ -17,7 +17,7 @@
  * is the part a regex can see: an array of elements may not reach a deep
  * matcher. Count it, and compare identity with `toBe`.
  *
- * **A spec importing its own package by name tests `dist`.** See 298. The
+ * **A spec importing its own package by name tests `dist`.** See (298). The
  * package name resolves through `exports` to the built output, so the run holds
  * two copies of every element class, and `customElement` declines a taken tag
  * quietly by design: the winner is decided by file order and never announced.
@@ -25,7 +25,7 @@
  * whole suite. Nine tests in three unrelated families failed exactly that way,
  * passing when their own file ran alone. Relative paths already work.
  *
- * **An unbounded settle loop hangs the run.** See 299.
+ * **An unbounded settle loop hangs the run.** See (299).
  * `while ((await host.updateComplete) === false) {}` is the right idea and
  * needs a ceiling. A component that asks for another update every time
  * turns it into an infinite await: it blocks nothing, allocates nothing, prints

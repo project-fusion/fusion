@@ -207,10 +207,10 @@ failed release burns a number rather than poisoning the next one.
 
 ## The split that has now happened
 
-This section used to say the split had not. The Rust workspace held only Cortex
-crates, so \`[workspace.package] version\` was the Cortex version by accident of
-there being nothing else in it, and the day Helix gained a Rust crate the two
-domains would have been silently back in full lockstep.
+The Rust workspace held only Cortex crates, so \`[workspace.package] version\`
+was the Cortex version by accident of there being nothing else in it, and the
+day Helix gained a Rust crate the two domains would have been silently back in
+full lockstep.
 
 Helix has two Rust crates now, and the field is gone. \`[workspace.package]\`
 keeps the edition, the license and the toolchain floor, which are facts about
@@ -604,7 +604,7 @@ question is a real filter on breadth.
 
 ### It is the only defensible one
 
-Model quality is rented and commoditising. An architectural commitment
+Model quality is rented and commoditizing. An architectural commitment
 competitors structurally cannot copy, because their business model requires the
 chokepoint, is not.
 

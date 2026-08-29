@@ -14,7 +14,7 @@ const product = PRODUCTS.find((entry) => entry.href === '/helix')
  * The overview, not the component index: the index has its own route under
  * `/helix/components`, and one page being both is what made the masthead's
  * Components row point at a page titled Helix and `/helix/docs` a `redirect()`.
- * See 189.
+ * See (189).
  *
  * **It names the four surfaces**, where `/cortex` renders `VerticalPage` and
  * nothing else. That is right there, since there is genuinely nowhere to go

@@ -18,7 +18,7 @@ spine, not a module.
 |---|---|---|
 | **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
-| **Recall** | `cortex-recall` | Context assembly. Not built |
+| **Recall** | `fusion-cortex-recall` | Context assembly. Not built |
 | Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
 
 ## Invariants
@@ -41,21 +41,24 @@ spine, not a module.
 - **Deletion cascades.** Removing a memory must remove everything derived from
   it, or "delete" is a promise the system cannot keep. Prune the reverse index
   too, or it grows across a session.
-- **Two storage backends from the start**, SQLite and Postgres, held in lockstep
-  by a shared conformance suite. An abstraction with one implementation is a
-  guess, and SQLite assumptions leak into the domain model otherwise.
-- **Vectors are deferred, the seam is not.** Memory records carry a nullable
-  embedding field and relevance scoring is a strategy, so enabling them is
-  swapping a scorer. `pgvector` is an extension, not a migration.
+- **Two storage backends are required**, SQLite and Postgres, held in lockstep by
+  a shared conformance suite. Neither is built: `Memory` and `Graph` are
+  in-memory reference stores, and they are the shape the backends must match
+  behind a trait. An abstraction with one implementation is a guess, and SQLite
+  assumptions leak into the domain model otherwise.
+- **Vectors are deferred, the seam is not.** A memory record must carry a
+  nullable embedding field and relevance scoring must be a strategy, so enabling
+  vectors is swapping a scorer rather than migrating a schema. Neither exists
+  yet: `Fact` carries no embedding field today. `pgvector` is an extension, not a
+  migration.
 
 ## Documentation
 
 **Every Rust sample on a Cortex docs page lives in a `///` doc comment, and the
-page cites it.** The pages carried eight fenced `rust` blocks that nothing
-compiled, and the crates reported zero doc-tests, so a rename left the page
-wrong with every check green. Now `cargo test --workspace --doc` runs them,
-which also holds the behavioral claims (`trace.len() == 4`) that no signature
-check could.
+page cites it.** A fenced `rust` block typed into MDX is compiled by nothing, so
+a rename leaves the page describing the old signature with every check green. In
+a doc comment `cargo test --workspace --doc` runs it, which also holds the
+behavioral claims (`trace.len() == 4`) that no signature check could.
 
 - Write the sample as a doc example on the item it documents. Hidden `#` lines
   carry the setup, so the sample compiles standalone and the page still shows

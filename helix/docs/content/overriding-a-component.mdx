@@ -51,10 +51,7 @@ changes that component and nothing else.
 after the component (`--card-padding`, `--drawer-radius`) and a token is named
 `--helix-*`. Every documented hook is held to a rule that actually reads it, in
 both directions: declared and never read is a promise with nothing behind it,
-and read and never declared is a working feature nobody is told about. Three of
-`Button`'s four hooks were inert for a refactor's worth of time while the
-reference went on listing them, which is how that check came
-to exist.
+and read and never declared is a working feature nobody is told about.
 
 Each component's page lists its hooks under Custom properties.
 
@@ -77,10 +74,8 @@ internal structure.
 
 **A published part is a promise**, held both ways:
 a documented part that nothing renders, and a rendered part nobody was told
-about. The second is the worse of the two, because a `::part()` that resolves to
-nothing is valid CSS that matches nothing and reports nothing. `Breadcrumbs`
-published a `nav` part the family does not render; `Checkbox` renders the
-`field` part the whole styled appearance is built on and never declared it.
+about. The first is the worse of the two for you, because a `::part()` that
+resolves to nothing is valid CSS that matches nothing and reports nothing.
 
 Each component's page lists its parts.
 
@@ -108,9 +103,8 @@ itself, so `::part(search-field)` matched two elements at once.
 This is checked in both directions. `check:api:parts` holds a published part and a
 rendered one to each other, and `check:api:exportparts` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
-nothing. Before it existed, 148 published child parts were unreachable: all
-sixteen of the color picker's from inside a color input, all thirteen of the
-date picker's from inside a date input.
+nothing. So every part the color picker publishes is reachable from inside a
+color input, and every part the date picker publishes from inside a date input.
 
 If you still find a part you cannot reach, that is worth reporting rather than
 working around: the missing part is the bug.

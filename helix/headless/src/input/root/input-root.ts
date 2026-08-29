@@ -218,7 +218,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * the boundary. An insert-at-cursor toolbar, a format button, a mask that
    * repositions the caret after rewriting the value, all of them need this and
    * none of them could be written. Textarea gained the same surface for the same
-   * reason. See 295.
+   * reason. See (295).
    *
    * Zero before there is a control, which is where an empty field's caret would
    * be anyway.

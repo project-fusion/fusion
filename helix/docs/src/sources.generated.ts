@@ -217,7 +217,7 @@ report we want, and it is not one we would have caught.
 | \`oklch()\` | Every color in the system |
 | \`:has()\` | 11 rules, mostly relational styling of slotted content |
 | \`@starting-style\` | Entry transitions on overlays |
-| \`:state()\` | Every boolean state the library publishes: \`open\`, \`checked\`, \`selected\`, \`invalid\`, \`read\`, \`has-label\`, \`settled\`, \`empty\` |
+| \`:state()\` | Every boolean state the library publishes: \`open\`, \`checked\`, \`selected\`, \`invalid\`, \`read\`, \`has-label\`, \`settled\`, \`empty\`, \`controls\` |
 | \`CSS.highlights\` | Filter-match highlighting, in \`Command\` and \`Combobox\` |
 
 Positioning is \`@floating-ui/dom\` rather than CSS anchor positioning, which is a
@@ -471,12 +471,8 @@ Twenty-four \`--helix-color-series-*\` tokens, in order. A chart with three seri
 uses the first three. They are ordered to stay distinguishable in that order
 rather than to look good as a full set of twenty-four.
 
-The palette wraps, and where it wraps is one number in one place. It used to be
-four: four families held the same \`const PALETTE = 24\` and the legend held a
-fifth, so when the palette went from eight to twenty-four one of them was missed
-and drew every ninth series in the first color while the legend beside it named
-the ninth correctly. A number two files have to agree on is a number that will
-stop agreeing.
+The palette wraps, and where it wraps is one number in one place, so a chart and
+the legend beside it can never disagree about which color a series is.
 
 **A chart's mark carries its own series color as a custom property**, because a
 chart knows which series a bar belongs to and CSS cannot count it. That is what
@@ -525,13 +521,9 @@ https://fusion.dev/helix/custom-elements.json
 @fusion.dev/helix/custom-elements.json
 \`\`\`
 
-A URL and a package path, the same file either way. **The URL exists because this
-page's own argument required it**: an agent that found the library through
-\`llms.txt\` has this site and no checkout, and a specifier is reachable from a
-\`node_modules\` and from nowhere else. It was only the specifier until 24 Aug 2026,
-and the specifier did not resolve either: \`exports\` carried a \`./*\` pattern
-pointing at \`./dist/*/index.js\`, so the path two pages recommended was one
-\`require.resolve\` refused.
+A URL and a package path, the same file either way. **Both exist because a
+specifier is reachable from a \`node_modules\` and from nowhere else**, and an
+agent that found the library through \`llms.txt\` has this site and no checkout.
 
 Every element, every property with its literal type union, every event with its
 class, every slot, every part, every custom property. It is what the framework
@@ -593,8 +585,7 @@ existing.
 
 Start there rather than crawling: one request, and it names every page on the
 site plus the two machine-readable surfaces above. No count here, because a
-number typed into prose is a number that goes stale, which the read of these pages
-on 24 Aug 2026 found five of.
+number typed into prose is a number that goes stale.
 
 ## From a component's page
 
@@ -634,12 +625,9 @@ of a binary you installed, talking to a client you chose, with no network in it.
 page into one file is out of date the moment anything changes, where the links
 in \`llms.txt\` are individually cacheable and individually current.
 
-This page used to offer one anyway, a repository path to a generated document
-holding every family at once, which contradicted the paragraph above it and was
-not a thing a consumer could open: an agent reading the published package has
-this site and no checkout. What it was for is covered better by the two surfaces
-already here. \`llms.txt\` is the index, one request, and each family's \`.md\` is
-the document. Fetch the families you are using.
+What such a file would be for is covered better by the two surfaces already
+here. \`llms.txt\` is the index, one request, and each family's \`.md\` is the
+document. Fetch the families you are using.
 
 **A search index.** The site has one for humans; there is nothing an agent can
 query yet, and \`llms.txt\` plus the documents it names is a smaller thing to read
@@ -653,7 +641,7 @@ title: Color
 
 # Color
 
-Seventy-four of the library's 177 tokens are color, which is most of what a
+Seventy-four of the library's 185 tokens are color, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
 what it looks like, because a name like \`--brand-blue-500\` stops being true the
 moment anybody rethemes.
@@ -1197,7 +1185,7 @@ dispatch, so an event you can listen for is an event that is documented.
 | \`helix-navigate\` | A component is about to navigate |
 | \`helix-copy\` | Something was copied |
 | \`helix-caret\` | The cursor moved in a text control |
-| \`helix-load\`, \`helix-error\`, \`helix-complete\` | Media and async lifecycle |
+| \`helix-complete\` | A control that fills up has filled |
 | \`helix-create\` | A new item was made from a query |
 | \`helix-console\` | The sandbox relaying a log |
 | \`helix-tour-ask\`, \`helix-sample-start\`, \`helix-sample-end\` | Tour and color sampling |
@@ -1314,7 +1302,7 @@ Submitting an empty form blocks and points at the control. \`checkValidity()\`,
 \`reportValidity()\` and \`:invalid\` behave.
 
 **\`feedback\` overrides the message.** Left empty, the browser's own is shown,
-which is localised and familiar; set, it says what you want in the words your
+which is localized and familiar; set, it says what you want in the words your
 product uses:
 
 \`\`\`html
@@ -1343,12 +1331,10 @@ deliberately reports no value of its own.
 </fieldset>
 \`\`\`
 
-That works, and it did not always. The platform tells a form-associated element
-through \`formDisabledCallback\`, which nothing implemented, so a control inside a
-disabled fieldset stayed fully typeable and announced itself as enabled.
-Measured: a \`helix-input\` in one accepted text, reported \`disabled\` as false,
-and carried no \`aria-disabled\`, while the form's entry list correctly left it
-out. Interactive and unsubmittable is the worst of both.
+That works. The platform tells a form-associated element it has been disabled by
+an ancestor through \`formDisabledCallback\`, and every Helix control implements
+it, so a control inside a disabled fieldset refuses input and announces itself
+as off rather than staying typeable and unsubmittable.
 
 **For your own CSS this means one rule.** Style disabled controls with
 \`:disabled\`, never \`[disabled]\`:
@@ -1390,7 +1376,7 @@ returns to, which is usually what a seed in a form means:
 See [State and control](./state-and-control).
 `,
   iconography: `---
-description: 103 glyphs, one geometry, and how to draw one that is not in the set.
+description: 105 glyphs, one geometry, and how to draw one that is not in the set.
 section: Foundations
 title: Iconography
 ---
@@ -1401,10 +1387,12 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 \`\`\`
 
-103 glyphs, from Phosphor, drawn on a 256 box at stroke-width 16. That is
+105 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
 Phosphor's own geometry and it is kept rather than rescaled: normalizing to a 24
 box would change the optical weight of every glyph and stop the set matching
-anything upstream.
+anything upstream. Bold rather than regular, because Phosphor's regular is a
+hairline beside the medium weight this library sets its text in, and an icon
+that reads lighter than the words next to it is the opposite of a mark.
 
 ## Size and color come from the context
 
@@ -1454,21 +1442,22 @@ failure rather than an empty box.
 
 ## Adding one
 
-Drop the SVG into \`helix/icons/raw\` and run \`bun run icons\`. The set is
-generated from those files, so adding a glyph is adding a file rather than
-hand-transcribing a path into a TypeScript object.
+Add the name to \`helix/icons/icons.txt\` and run \`bun run icons\`. Phosphor names
+resolve from \`@phosphor-icons/core\` at build time, so adding a glyph is adding a
+line rather than hand-transcribing a path into a TypeScript object.
 
-Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
-different weight is visible immediately when it sits beside one that was not.
+A mark Phosphor does not draw goes into \`helix/icons/raw\` as an SVG under the
+same name, and is read from there when the package has no match. Keep it to the
+same geometry, a 256 box at the bold weight: a glyph drawn at a different weight
+is visible immediately when it sits beside one that was not.
 
 ## Icons this set does not have
 
 Product marks. Helix and Cortex have marks and they live in the icon package,
 but a mark is not an icon: it identifies a product and does not mean an action.
-Three earlier attempts at product marks were removed for being pictograms of a
-metaphor standing beside a parent that is a geometric monogram, and the rule
-that replaced them is that **a mark is one rounded body with material removed**.
-If you are reaching for the icon set to draw a logo, that is the wrong drawer.
+**A mark is one rounded body with material removed**, never a pictogram of a
+metaphor, because the parent it stands beside is a geometric monogram. If you
+are reaching for the icon set to draw a logo, that is the wrong drawer.
 `,
   installation: `---
 description: What to install, the order the stylesheets go in, and how to check it worked.
@@ -1496,8 +1485,7 @@ import '@fusion.dev/helix/helix.css'
 
 One import, and it is four files in the order they have to be in:
 \`primitives.css\`, \`tokens.css\`, \`base.css\`, \`elements.css\`. The order is
-load-bearing and the failure is silent, which these instructions demonstrated
-for longer than anyone would like, so it is stated once inside the package
+load-bearing and the failure is silent, so it is stated once inside the package
 rather than by every consumer.
 
 It resolves \`@fusion.dev/helix-styles\` through this package's own dependency, so
@@ -1513,13 +1501,12 @@ own ramp imports the two they want and skips the bundle.
 - **\`primitives.css\`** is the raw ramp the semantic layer is derived from, and
   it is where the seven \`--helix-seed-*\` knobs are read. Nothing in your own
   code should name a primitive, and leaving the file out is not a way to
-  enforce that: \`tokens.css\` refers to one 235 times, so without it every
+  enforce that: \`tokens.css\` refers to one 297 times, so without it every
   semantic token resolves to nothing at all. Measured on a page missing it,
   \`--helix-color-background\` computes to \`rgba(0, 0, 0, 0)\`, and so does every
   other color. It is also the file [theming](theming.mdx) depends on, since a
-  \`--helix-seed-brand\` nobody reads moves nothing. **This is the one that was
-  missing from this page**, which is why the bundle exists.
-- **\`tokens.css\`** declares the semantic layer, 177 custom properties in 15
+  \`--helix-seed-brand\` nobody reads moves nothing.
+- **\`tokens.css\`** declares the semantic layer, 185 custom properties in 15
   categories, plus \`color-scheme: light dark\` on \`:root\`. Everything below reads
   from it, and it reads primitives.
 - **\`base.css\`** is the element reset, the type scale on bare \`h1\` through
@@ -1736,7 +1723,7 @@ analysis time rather than left to review.
 bun add @fusion.dev/helix @fusion.dev/helix-styles
 \`\`\`
 
-Three imports at your app root, in this order, then the elements are usable
+Two imports at your app root, in this order, then the elements are usable
 anywhere:
 
 \`\`\`ts
@@ -2253,12 +2240,12 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 864,073 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
-| \`@fusion.dev/helix-headless\` | 9,627,976 | 422 | 735,855 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
+| \`@fusion.dev/helix-core\` | 864,123 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-headless\` | 9,628,307 | 422 | 735,855 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
-| \`@fusion.dev/helix\` | 9,586,485 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,586,886 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -2396,17 +2383,18 @@ should end up passing that string through.
 element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 \`\`\`
 
-**A declared \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.**
-The element announces the change and applies none of it, and waits to be told.
-Use \`default-value\`, \`default-open\` and their siblings for a control that owns
-its own state. This is the rule most likely to look like a bug, and
+**A declared \`value\`, \`open\`, \`checked\` or \`active\` is a seed.** The element
+starts there and goes on managing itself, exactly as \`<input value="Ada">\` does.
+To take one decision, listen for the matching \`helix-before-*\` event and call
+\`preventDefault()\`; to own the state outright, refuse and assign your own.
+\`default-value\`, \`default-open\` and their siblings are what a reset returns to.
 [State and control](./state-and-control) is the page about it.
 
 ## What each one needs
 
 | Framework | Notes |
 |---|---|
-| Solid | Sets properties on custom elements by default. Use \`prop:\` to force one and \`attr:\` to force the other. \`on:helix-change\` binds the literal name |
+| Solid | Sets properties on custom elements by default. Use \`prop:\` to force one and \`attr:\` to force the other. \`on:helix-before-change\` binds the literal name |
 | Qwik | Works as JSX. Bind with \`document:on…\` or a ref, since a plain \`on*\` prop is normalized |
 | Lit | \`.prop=\`, \`?bool=\` and \`@helix-before-change=\` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
@@ -2589,10 +2577,7 @@ changes that component and nothing else.
 after the component (\`--card-padding\`, \`--drawer-radius\`) and a token is named
 \`--helix-*\`. Every documented hook is held to a rule that actually reads it, in
 both directions: declared and never read is a promise with nothing behind it,
-and read and never declared is a working feature nobody is told about. Three of
-\`Button\`'s four hooks were inert for a refactor's worth of time while the
-reference went on listing them, which is how that check came
-to exist.
+and read and never declared is a working feature nobody is told about.
 
 Each component's page lists its hooks under Custom properties.
 
@@ -2615,10 +2600,8 @@ internal structure.
 
 **A published part is a promise**, held both ways:
 a documented part that nothing renders, and a rendered part nobody was told
-about. The second is the worse of the two, because a \`::part()\` that resolves to
-nothing is valid CSS that matches nothing and reports nothing. \`Breadcrumbs\`
-published a \`nav\` part the family does not render; \`Checkbox\` renders the
-\`field\` part the whole styled appearance is built on and never declared it.
+about. The first is the worse of the two for you, because a \`::part()\` that
+resolves to nothing is valid CSS that matches nothing and reports nothing.
 
 Each component's page lists its parts.
 
@@ -2646,9 +2629,8 @@ itself, so \`::part(search-field)\` matched two elements at once.
 This is checked in both directions. \`check:api:parts\` holds a published part and a
 rendered one to each other, and \`check:api:exportparts\` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
-nothing. Before it existed, 148 published child parts were unreachable: all
-sixteen of the color picker's from inside a color input, all thirteen of the
-date picker's from inside a date input.
+nothing. So every part the color picker publishes is reachable from inside a
+color input, and every part the date picker publishes from inside a date input.
 
 If you still find a part you cannot reach, that is worth reporting rather than
 working around: the missing part is the bug.
@@ -3010,9 +2992,9 @@ amount of JavaScript reproduces:
 - right-click offers Copy Link Address
 - a crawler follows it
 
-Before \`href\` existed, the docs sidebar put a \`<Link>\` inside each row. The
-anchor was 57px of a 240px row, so five sixths of every row did nothing, and
-Enter did nothing at all: the tree announced a selection and no anchor heard it.
+A \`<Link>\` inside each row buys none of it. In the docs sidebar the anchor was
+57px of a 240px row, so five sixths of every row did nothing, and Enter did
+nothing at all: the tree announced a selection and no anchor heard it.
 
 ## \`href\` and a framework's \`<Link>\`
 
@@ -3171,7 +3153,7 @@ host is the only element the listbox can point at.
 same browser, the accessibility tree for \`<div role="option"><a href>Open
 settings</a></div>\` inside a listbox is an option with *no accessible name*, and
 the link exposed as a child of it. The sibling option with plain text is named
-correctly. So the manoeuvre that works for \`treeitem\` and \`menuitem\`, moving the
+correctly. So the maneuver that works for \`treeitem\` and \`menuitem\`, moving the
 role onto the anchor, is exactly the one thing that cannot be done here.
 
 Two constraints pointing opposite ways, and no arrangement satisfies both.
@@ -3301,7 +3283,7 @@ has a tree.
 **Anything that inspects the tree runs in \`firstUpdated\` or later**, and is
 therefore a client-side enhancement by definition.
 
-## Never initialise state in \`connectedCallback\`
+## Never initialize state in \`connectedCallback\`
 
 SSR does not call it. Derive from properties, or seed in \`willUpdate\`, which SSR
 does call.
@@ -3425,11 +3407,10 @@ belong to [Surfaces and separation](./surfaces-and-separation): they are what a
 theme sets to zero to go shadow-first, or to a width to go border-first.
 
 This distinction is why a component's border width sits behind a per-component
-hook rather than being written inline. Of 68 border declarations reaching for
-\`--helix-color-border\` before this was fixed, eight put the *color* behind a
-hook and none put the width behind one, so a border could be recoloured and
-never removed, and the floating surfaces wrote \`border: none\` outright so one
-could never be added either.
+hook rather than being written inline. A width written inline can be recolored
+by a theme and never removed, and a hardcoded \`border: none\` can never have one
+added back, so a surface themes perfectly in one direction and not at all in the
+other.
 
 ## Corner radius on a group
 
@@ -3583,7 +3564,7 @@ Use them for gap, padding and margin:
 
 ## Size
 
-Thirty-four tokens, and almost all of them name a specific thing:
+Forty-one tokens, and almost all of them name a specific thing:
 \`--helix-size-control\`, \`--helix-size-checkbox\`, \`--helix-size-switch\`,
 \`--helix-size-avatar\`, \`--helix-size-icon\`, \`--helix-size-tag\`,
 \`--helix-size-header\`, \`--helix-size-progress\`, \`--helix-size-meter\`.
@@ -3645,11 +3626,11 @@ That works. Type in it and the value moves. Assign to it later and the value
 moves to what you assigned. There is no mode to be in and nothing to wire before
 the control responds.
 
-*This page said the opposite until 26 Aug 2026, and the sample above was printed
-as plain text with an instruction not to paste it. Writing a property was a
-claim of ownership, so the element announced its changes and applied none of
-them until it was told, and that markup produced a field that ignored every
-keystroke with nothing logged and nothing visibly wrong.*
+*This page said the opposite until 26 Aug 2026: writing a property was a claim
+of ownership, so the element announced its changes and applied none of them
+until it was told. The mode is deleted. If you were refusing a change by
+withholding a state update rather than by calling \`preventDefault()\`, that is
+the one thing that has to be rewritten.*
 
 ## Taking a decision
 
@@ -3896,9 +3877,9 @@ because Svelte was already right about custom elements.
 \`bind:\` does not work on a Helix control, because there is no two-way binding
 convention a custom element can opt into. Read the value off the event.
 
-And a declared \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership:
-the element announces and waits rather than applying the change itself. Use
-\`default-value\` and its siblings when you want the element to own its own state.
+And a declared \`value\`, \`open\`, \`checked\` or \`active\` is a seed: the element
+starts there and goes on applying its own changes. To refuse one, cancel the
+matching \`helix-before-*\` event; withholding a state update refuses nothing.
 See [State and control](./state-and-control).
 `,
   'theme-builder': `---
@@ -4284,10 +4265,10 @@ be lifted into: a raised surface goes *down* the ramp, not up.
   groove.
 
 **\`raised\` and \`overlay\` are the pair worth learning.** They land on the same
-step in dark mode, which is why one token tried to do both jobs for a while. In
-light they want opposite fills: a hovered row must be darker than a white page,
-and a thumb must be lighter than the groove it sits in. If something looks
-almost right in dark and wrong in light, this is usually why.
+step in dark mode, so one token looks like it would do both jobs. In light they
+want opposite fills: a hovered row must be darker than a white page, and a thumb
+must be lighter than the groove it sits in. If something looks almost right in
+dark and wrong in light, this is usually why.
 
 ## Per-component hooks
 
@@ -4497,37 +4478,37 @@ request and names every document plus these two surfaces.
 
 These are in order of how often they look like a library bug and are not.
 
-### 1. A declared \`value\` hands you the control
+### 1. Refusing a change by not answering
 
-\`\`\`text
-<!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
-<helix-input label="Name" value="Ada"></helix-input>
-\`\`\`
-
-Do not paste it. Plain text rather than a live example, the same way
-[State and control](./state-and-control) shows this one: a reader copies what is
-in front of them, and these are the two pages that have to show the mistake in
-order to name it.
-
-**Writing \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.** From
-then on the element announces changes and applies none of them, waiting to be
-told. Which mode it is in is read once, at its first update.
-
-Seed with the \`default-\` twin, or answer the event:
+**Writing \`value\`, \`open\`, \`checked\` or \`active\` is a seed and a correction.**
+The element starts there and goes on applying its own changes, exactly as
+\`<input value="Ada">\` does, so this works and needs no handler beside it:
 
 \`\`\`html
 <helix-input
-  default-value="Ada"
   label="Name"
+  value="Ada"
 ></helix-input>
 \`\`\`
 
+The trap is on the other side. React force-restores a native \`<input>\` whose
+state did not move and does not do this for a custom element, so a handler that
+declines to call \`setState\` leaves the element holding the new value. Refusal is
+\`preventDefault()\` on the matching \`helix-before-*\` event:
+
 \`\`\`tsx
-<helix-input label="Name" onChange={(e) => setName(e.currentTarget.value)} value={name} />
+<helix-input
+  label="Name"
+  onhelix-before-change={(event) => {
+    event.preventDefault()
+    setName(clean(event.detail.value))
+  }}
+  value={name}
+/>
 \`\`\`
 
-In TypeScript this is a compile error rather than a surprise. Everywhere else the
-element warns on its second unanswered request.
+\`default-value\` and its twins are what a reset returns to. See
+[State and control](./state-and-control).
 
 ### 2. The event name is the event's own
 
@@ -4569,10 +4550,11 @@ The tell for a missing layer is which. A flash before hydration is
 \`elements.css\`; bare headings are \`base.css\`. **No color anywhere means the
 ramp or the semantic layer, and the two are told apart by what is in the
 stylesheet rather than by what is on screen**: without \`tokens.css\` nothing
-declares \`--helix-color-*\` at all, while without \`primitives.css\` all 177 are
-declared and every one resolves to \`rgba(0, 0, 0, 0)\`, since \`tokens.css\` refers
-to a primitive 235 times and to nothing else. The second is the one that looks
-like a working install, and it is the reason \`all.css\` exists.
+declares \`--helix-color-*\` at all, while without \`primitives.css\` all 185
+semantic tokens are declared and every color resolves to \`rgba(0, 0, 0, 0)\`,
+since \`tokens.css\` refers to a primitive 297 times and to nothing else. The
+second is the one that looks like a working install, and it is the reason
+\`all.css\` exists.
 
 ## Choosing a family
 
@@ -4744,8 +4726,6 @@ inspecting it.
 - \`onHelixOpen\` binds an event called \`HelixOpen\`, which nobody dispatches. ❌
 
 The number of hyphens does not matter, measured in Chrome against React 19.2.8.
-An earlier version of this page said two were a hard stop; that was the
-hydration bug above, read as a fact about names.
 
 ## Register once, in a client component
 
@@ -4925,10 +4905,9 @@ and a component reintroducing it fails the build.
 
 ## Two axes, not one
 
-This is the test, and the library found it before the registry existed.
-\`megamenu-root.css\` reads: a consumer can make the panel glass, which is not an
-appearance, because \`full\` already occupies that axis with a layout. A panel can
-be glass *and* outlined. Two axes.
+This is the test. \`Megamenu\` is the worked example: a consumer can make the panel
+glass, which is not an appearance, because \`full\` already occupies that axis with
+a layout. A panel can be glass *and* outlined. Two axes.
 
 If you are adding a property and cannot decide which axis it belongs to, that is
 usually the answer: it is two properties.
@@ -5144,11 +5123,10 @@ against the stylesheet's own URL with no bundler involved. Copy the whole
 four requests and both layers resolve.
 
 *This page listed \`tokens.css\` and \`base.css\` and no \`primitives.css\` until 24
-Aug 2026, which is the same omission \`installation.mdx\`, \`introduction.mdx\` and
-the agent page carried. \`tokens.css\` refers to a primitive 235 times and imports
-nothing, so a reader who followed this got all 178 semantic tokens declared and
-every one resolving to \`rgba(0, 0, 0, 0)\`. Linking \`all.css\` is the fix that
-cannot be got wrong again.*
+Aug 2026. \`tokens.css\` refers to a primitive 297 times and imports nothing, so a
+reader who followed that got all 185 semantic tokens declared and every color
+resolving to \`rgba(0, 0, 0, 0)\`. If your page looks unstyled in exactly that
+way, link \`all.css\` instead.*
 
 \`elements.css\` stays its own link, being \`@fusion.dev/helix\`'s rather than this
 package's, and it matters more here than anywhere: with no bundler the module

@@ -13,7 +13,7 @@ import styles from './docs-index.module.css'
  * and the documentation had no product page to be part of. `/helix` is the
  * overview, so this is one section of a product rather than the whole of it,
  * and a reader arriving from the masthead's Docs row has asked what the
- * documentation covers. See 189.
+ * documentation covers. See (189).
  *
  * The sections come from `navigation()`, which is the same call the sidebar
  * makes. Nothing about the shape of the documentation is written here: a

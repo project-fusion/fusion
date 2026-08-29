@@ -606,7 +606,7 @@ export const part = (host: HTMLElement, name: string): Element | null =>
  * landed, and an unbounded loop hangs the whole run when a component never
  * settles. Written twice because the two harnesses share no code, which is the
  * arrangement `check:spec:matchers` already exists to police from the other side.
- * See 299.
+ * See (299).
  */
 export const settle = async (host: Updatable, turns = 40): Promise<void> => {
   let taken = 0

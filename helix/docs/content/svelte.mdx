@@ -39,7 +39,7 @@ because Svelte was already right about custom elements.
 `bind:` does not work on a Helix control, because there is no two-way binding
 convention a custom element can opt into. Read the value off the event.
 
-And a declared `value`, `open`, `checked` or `active` is a claim of ownership:
-the element announces and waits rather than applying the change itself. Use
-`default-value` and its siblings when you want the element to own its own state.
+And a declared `value`, `open`, `checked` or `active` is a seed: the element
+starts there and goes on applying its own changes. To refuse one, cancel the
+matching `helix-before-*` event; withholding a state update refuses nothing.
 See [State and control](./state-and-control).

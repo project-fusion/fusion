@@ -68,7 +68,7 @@ export interface HelixAttribute extends Documented {
  * answers because it borrowed another's stylesheet whole, which is a
  * relationship the analyzer has no field for: not inheritance, not a mixin and
  * not a part. The name still belongs to the lender, so recording it as the
- * borrower's own would be a rename nobody performed. See 290.
+ * borrower's own would be a rename nobody performed. See (290).
  */
 export interface HelixCssProperty extends Documented {
   inheritedFrom?: InheritedFrom
@@ -166,7 +166,7 @@ export type Category = (typeof CATEGORIES)[number]
  * **What it is for** is the visual axes: a legend whose swatches are solid while
  * the bars it keys are outlined is a legend that does not match its own chart,
  * and that is a fault no check could see while the only grouping was purpose.
- * `check:css:axes` reads it. See 176.
+ * `check:css:axes` reads it. See (176).
  *
  * Closed, the way `CATEGORIES` and the statuses are, so a typo lands a family
  * in a group of one rather than being trusted.

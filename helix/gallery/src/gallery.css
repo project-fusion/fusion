@@ -308,7 +308,7 @@
   transform-origin: center;
 }
 
-/* open — a panel arriving, then holding at a barely-there swell. */
+/* open: a panel arriving, then holding at a barely-there swell. */
 :has(> .componentArt):hover .artOpen {
   animation: helixArtSwell var(--art-sustain) var(--art-curve) infinite;
 }
@@ -346,7 +346,7 @@
   }
 }
 
-/* edge — arrives from the side it stays attached to, and does not sustain,
+/* edge: arrives from the side it stays attached to, and does not sustain,
    because it has arrived. Starts wholly outside its clip so no frame shows it
    displaced-but-visible.
 
@@ -364,7 +364,7 @@
   }
 }
 
-/* reveal — rows in their own order. Never from zero: a replay that starts at
+/* reveal: rows in their own order. Never from zero: a replay that starts at
    nothing blinks out the rows that are already on screen. */
 :has(> .componentArt):hover .artRow {
   animation: helixArtRow var(--art-arrive) var(--art-curve);
@@ -378,7 +378,7 @@
   }
 }
 
-/* toggle — the mark crosses and the track takes the accent.
+/* toggle: the mark crosses and the track takes the accent.
  *
  * **Drawn in the state it ends in, and the hover replays how it got there.** A
  * gallery card has to be identifying while nobody is pointing at it: at rest it
@@ -424,7 +424,7 @@
   }
 }
 
-/* travel — one marker moves and its fill follows, then wanders rather than
+/* travel: one marker moves and its fill follows, then wanders rather than
    parking, because a value is a state being held.
  *
  * Two axes, because one is not enough for the set. A slider, a nav bar's marker
@@ -462,7 +462,7 @@
  *
  * `scaleX(grow * 0.84)` looked equivalent and is not. Drift eases a marker to
  * 55% of its travel; a fill at 84% of its scale is a different fraction of its
- * own growth entirely — for the slider that is +10 units of fill under a thumb
+ * own growth entirely, for the slider that is +10 units of fill under a thumb
  * that has gone +19, so the thumb spends the whole sustain sitting off the end
  * of the track it is supposed to be filling. Same 0.55 on both, and they hold
  * together at every point rather than only at the ends. */
@@ -472,7 +472,7 @@
   }
 }
 
-/* turn — a mark that reverses, for a reading whose whole subject is direction.
+/* turn: a mark that reverses, for a reading whose whole subject is direction.
  * It is the only card where the motion is the meaning rather than a replay of
  * an entrance: two readings side by side say "here are two of them" where the
  * component says "here is which way it went".
@@ -555,7 +555,7 @@
   }
 }
 
-/* lift — the same rise the `data-card` recipe performs, then a slow float. */
+/* lift: the same rise the `data-card` recipe performs, then a slow float. */
 .artLift {
   transition: transform var(--art-lift) var(--art-curve);
 }

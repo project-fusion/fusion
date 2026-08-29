@@ -31,7 +31,7 @@ const DESCRIPTION =
  *
  * The `openGraph` and `twitter` blocks are defaults rather than the whole story:
  * a page that calls `pageMetadata` replaces them with its own, and a page that
- * forgets still unfurls as the site rather than as a bare domain. See 247.
+ * forgets still unfurls as the site rather than as a bare domain. See (247).
  */
 export const metadata: Metadata = {
   description: DESCRIPTION,

@@ -17,7 +17,7 @@
  *
  * **The fault lives in a shape**, "any file importing a registering module at
  * module scope", and a shape is what a check enumerates and a hand-kept list
- * forgets. See 250.
+ * forgets. See (250).
  *
  * **What registers is read from the packages rather than listed here**, so a new
  * family or a new subpath is covered on the day it lands. A subpath registers

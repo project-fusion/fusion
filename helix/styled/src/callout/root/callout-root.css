@@ -102,7 +102,7 @@ slot[name="title"]::slotted(*) {
 /* Print: the tone is a fill; the edge and the mark say the same thing in ink.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. See (165). */
 @media print {
   :host {
     background-color: transparent;

@@ -235,7 +235,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
    * whatever `<helix-chat>` it is slotted into, and neither element declares an
    * `input`: a consumer binding one on either received an undeclared event whose
    * target was a control they cannot reach. What a composer offers is
-   * `helix-send`, once, when the reader is done. See 308.
+   * `helix-send`, once, when the reader is done. See (308).
    */
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()

@@ -342,7 +342,7 @@ slot[name="caption"]::slotted(*) {
 
 /* Print: the dismiss control is not a thing on paper, and the unread mark is a
    fill printers drop unevenly. `@media print` does not cross a shadow boundary,
-   so every family says it for itself. See 165. */
+   so every family says it for itself. See (165). */
 @media print {
   [part="dismiss"] {
     display: none;

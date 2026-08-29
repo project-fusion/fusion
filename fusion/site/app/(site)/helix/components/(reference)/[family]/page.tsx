@@ -606,7 +606,7 @@ export default async function FamilyDocs({
 
   return (
     /* The shell and the rail are the layout's, so the nav survives a navigation
-       between families and keeps the state a reader set on it. See #119. */
+       between families and keeps the state a reader set on it. See (119). */
     <>
       <TierAddress />
       {forced && (

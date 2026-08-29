@@ -199,7 +199,7 @@ const REACT_PROPS = '__reactProps$'
  * a root can mount at any time, and memoizing "this node is not React's" would
  * silently disable the binding for any element that dispatches before React
  * commits, which is the exact failure this whole mechanism exists to repair.
- * It is around half a microsecond and it is filed rather than hidden. See #320.
+ * It is around half a microsecond and it is filed rather than hidden. See (320).
  */
 let reactPropsKey: string | undefined
 

@@ -732,7 +732,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -1925,7 +1925,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3240,7 +3240,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3507,7 +3507,7 @@ where the selection is, let alone move it: `querySelector` does not cross
 the boundary. An insert-at-cursor toolbar, a format button, a mask that
 repositions the caret after rewriting the value, all of them need this and
 none of them could be written. Textarea gained the same surface for the same
-reason. See 295.
+reason. See (295).
 
 Zero before there is a control, which is where an empty field's caret would
 be anyway. */

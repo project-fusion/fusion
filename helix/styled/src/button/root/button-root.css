@@ -337,7 +337,7 @@
  *
  * `@media print` does not cross a shadow boundary any more than a
  * reduced-motion rule does, so a page cannot answer this on a component's
- * behalf and every family says it for itself. See 165. */
+ * behalf and every family says it for itself. See (165). */
 @media print {
   :host {
     display: none;

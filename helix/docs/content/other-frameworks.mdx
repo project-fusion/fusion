@@ -32,17 +32,18 @@ should end up passing that string through.
 element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 ```
 
-**A declared `value`, `open`, `checked` or `active` is a claim of ownership.**
-The element announces the change and applies none of it, and waits to be told.
-Use `default-value`, `default-open` and their siblings for a control that owns
-its own state. This is the rule most likely to look like a bug, and
+**A declared `value`, `open`, `checked` or `active` is a seed.** The element
+starts there and goes on managing itself, exactly as `<input value="Ada">` does.
+To take one decision, listen for the matching `helix-before-*` event and call
+`preventDefault()`; to own the state outright, refuse and assign your own.
+`default-value`, `default-open` and their siblings are what a reset returns to.
 [State and control](./state-and-control) is the page about it.
 
 ## What each one needs
 
 | Framework | Notes |
 |---|---|
-| Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-change` binds the literal name |
+| Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-before-change` binds the literal name |
 | Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
 | Lit | `.prop=`, `?bool=` and `@helix-before-change=` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |

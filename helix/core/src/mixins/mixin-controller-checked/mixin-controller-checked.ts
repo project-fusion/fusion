@@ -126,7 +126,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * means the element updates itself, whether or not a consumer declared the
      * property: a declared property is a seed and a correction, the way
      * `<input value>` is, and a consumer who wants the change for themselves
-     * refuses it and assigns their own. See 294.
+     * refuses it and assigns their own. See (294).
      */
     requestChecked(next: boolean): boolean {
       if (this.checked === next) {

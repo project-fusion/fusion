@@ -12,7 +12,7 @@
  *
  * **Control is an action, not a mode.** The element always owns its state and
  * always applies it, and a consumer takes over for one interaction by refusing
- * here and assigning their own. See 294 for the argument, which is that a mode
+ * here and assigning their own. See (294) for the argument, which is that a mode
  * forks the event vocabulary by prop presence, has no ergonomic spelling in
  * HTML, and is invisible enough to need an audit to make it audible.
  *

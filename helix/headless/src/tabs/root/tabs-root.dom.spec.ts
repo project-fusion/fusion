@@ -241,7 +241,7 @@ describe('tabs, controlled and uncontrolled', () => {
     ;(tabs(host)[1] as unknown as { select(): void }).select()
     await host.updateComplete
 
-    // Announced and applied: a declared `active` is a seed. See 294.
+    // Announced and applied: a declared `active` is a seed. See (294).
     expect(host.active).toBe('two')
     expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
   })

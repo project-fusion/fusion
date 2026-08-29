@@ -396,7 +396,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      following somebody's link must not re-set your own preference, which is the
      half of the color-mode argument in `url-state.ts` that still applies to a
      tier. Null until the URL is read, which is after mount, so the first paint
-     follows the drawer exactly as it did. See 211. */
+     follows the drawer exactly as it did. See (211). */
   /* Whether the address has been read yet.
      **State rather than a ref, and the difference is the whole fix.** A ref set
      inside the reading effect is true before the values it read have landed:
@@ -444,7 +444,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    * already was and the text goes back: the sandbox's own examples were
    * unfilterable that way. The native `input` fires after the element applied,
    * so the target is the answer, which is what every handler ever written
-   * expects. See 294. */
+   * expects. See (294). */
   const filterChanged = (event: Event & { currentTarget: HelixInput }) => {
     setFilter(event.currentTarget.value)
   }

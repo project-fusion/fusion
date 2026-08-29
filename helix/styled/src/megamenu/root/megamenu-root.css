@@ -383,7 +383,7 @@
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. See (165). */
 @media print {
   :host {
     display: none;

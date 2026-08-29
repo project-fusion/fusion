@@ -544,7 +544,7 @@ const comparison = () => {
  * **Kept away from the comparison above and it always will be.** Bytes are a
  * fact about a package and can be held against anybody else's; a timing is a
  * fact about a page, a machine and a day, and putting another library's number
- * beside ours would be comparing two laptops. See 190.
+ * beside ours would be comparing two laptops. See (190).
  */
 const timing = () => {
   if (!timings) {

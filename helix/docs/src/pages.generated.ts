@@ -83,7 +83,7 @@ export const docPages: DocPage[] = [
     title: 'Forms and validation',
   },
   {
-    description: '103 glyphs, one geometry, and how to draw one that is not in the set.',
+    description: '105 glyphs, one geometry, and how to draw one that is not in the set.',
     section: 'Foundations',
     slug: 'iconography',
     title: 'Iconography',

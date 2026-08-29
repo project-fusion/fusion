@@ -651,7 +651,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See 270. */
+having the datum rather than by painting it invisibly. See (270). */
   material?: HelixBarChart["material"];
   /** How a column's fill is distributed across it.
 
@@ -1076,7 +1076,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -2487,7 +2487,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3218,7 +3218,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See 270. */
+having the datum rather than by painting it invisibly. See (270). */
   material?: HelixDonutChart["material"];
   /** The id of the table to read.
 
@@ -3928,7 +3928,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -4196,7 +4196,7 @@ where the selection is, let alone move it: `querySelector` does not cross
 the boundary. An insert-at-cursor toolbar, a format button, a mask that
 repositions the caret after rewriting the value, all of them need this and
 none of them could be written. Textarea gained the same surface for the same
-reason. See 295.
+reason. See (295).
 
 Zero before there is a control, which is where an empty field's caret would
 be anyway. */
@@ -4296,7 +4296,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See 270. */
+having the datum rather than by painting it invisibly. See (270). */
   material?: HelixLegend["material"];
   /** Which entries are drawn as an outline rather than a fill, by name.
 
@@ -4369,7 +4369,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See 270. */
+having the datum rather than by painting it invisibly. See (270). */
   material?: HelixLineChart["material"];
   /** The id of the table to read.
 

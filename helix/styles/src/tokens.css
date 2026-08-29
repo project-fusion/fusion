@@ -1056,7 +1056,7 @@
      `:root` is what every descendant inherits whatever region it is in. This is
      the default for a page in no density region, which is most pages, and losing
      it is not a subtle failure: measured with it absent, a select's caret drew at
-     950px and a menu item at 18. See #321 and #331. */
+     950px and a menu item at 18. See (321) and (331). */
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
@@ -1196,7 +1196,7 @@
      *child* of the band it lights has to sit behind that band's words, where the
      same field as a sibling of the bands gets the order for free. The ramp began
      at the document with nothing under it, so the only way to write this was a
-     raw -1, which is the thing a token ramp exists to stop. See 251. */
+     raw -1, which is the thing a token ramp exists to stop. See (251). */
   --helix-layer-beneath: -1;
   --helix-layer-base: 0;
   --helix-layer-raised: 10;

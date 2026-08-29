@@ -18,7 +18,7 @@ import type {
  * it put them there. The analyzer records none of it. It derives hooks from
  * `@cssproperty` on the class, and there is no class relationship here to
  * follow, so the manifest said zero and a consumer reading the documentation
- * could not know the three exist. See 290.
+ * could not know the three exist. See (290).
  *
  * **This is the half a consumer gets before they have a page.**
  * `@fusion.dev/helix-diagnostics` settles the same question at runtime by

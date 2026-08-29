@@ -500,7 +500,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        is to nothing. Measured, `document.querySelector('#panel')` came back
        `null` while the same id resolved inside `megamenu.shadowRoot`. An inert
        `aria-controls` is worse than none, an audit tool reporting it satisfied
-       and a screen reader following it nowhere. See #322. */
+       and a screen reader following it nowhere. See (322). */
     this.tellTrigger()
     if (this.open) {
       /* Before showing this one, so the two are never both up for a frame. The

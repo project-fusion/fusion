@@ -154,7 +154,7 @@ for (const kind of KINDS) {
 
     /* Control is an action rather than a mode: the element always applies, and
        a consumer takes the decision by refusing the event. A declared property
-       is a seed, never a claim of ownership. See 294. */
+       is a seed, never a claim of ownership. See (294). */
     test('a declared property is a seed, so the element announces and still moves', async () => {
       const host = await mount(`<${kind.tag} ${claimed(kind)}></${kind.tag}>`)
       let heard = 0
@@ -215,7 +215,7 @@ describe('saying the state moved', () => {
      families here fired neither: two render a real `<dialog>`, ten show a
      `popover="manual"` panel, and the browser was firing something on an
      element inside a shadow root where `toggle` neither bubbles nor composes.
-     The disclosures have no native element to fire anything at all. See 296. */
+     The disclosures have no native element to fire anything at all. See (296). */
   const heard = (host: HTMLElement, act: () => void): string[] => {
     const said: string[] = []
     const listen = (event: Event): void => {

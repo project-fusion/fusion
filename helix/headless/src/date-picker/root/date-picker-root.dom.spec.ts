@@ -370,7 +370,7 @@ describe('date picker as a form control', () => {
     expect(announced).toBe('2026-09')
     expect(cal.month).toBe('2026-09')
 
-    // And the consumer may still correct it. See 294.
+    // And the consumer may still correct it. See (294).
     cal.month = '2026-09'
     await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-09')

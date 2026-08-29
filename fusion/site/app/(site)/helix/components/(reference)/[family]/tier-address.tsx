@@ -10,7 +10,7 @@ import { useEffect } from 'react'
  * drawer that flips the same choice without writing the address leaves a reader
  * copying a URL that says nothing about tiers, so whoever opens it gets their
  * own preference: the failure the parameter exists to prevent, arrived at from
- * the other direction. See 245.
+ * the other direction. See (245).
  *
  * The address describes what is on the page, whichever control put it there,
  * and styled is the absence, so an ordinary reference URL stays clean. The

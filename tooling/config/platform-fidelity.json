@@ -4,7 +4,7 @@
       "autocomplete": "Renders a calendar of `<button>`s and no text entry, so there is nothing for a browser to fill. A property the platform cannot act on is worse than an absent one."
     },
     "helix-dialog": {
-      "cancel": "Intercepted rather than relayed. `handleCancel` prevents the native one so Escape is a request the element can refuse, so it never completes: relaying it would announce a dismissal that was refused. `helix-close` carries the ask. See 296."
+      "cancel": "Intercepted rather than relayed. `handleCancel` prevents the native one so Escape is a request the element can refuse, so it never completes: relaying it would announce a dismissal that was refused. `helix-close` carries the ask. See (296)."
     },
     "helix-drawer": {
       "cancel": "Intercepted rather than relayed, as on `helix-dialog`."
@@ -40,7 +40,7 @@
       "text": "Slotted, as `label` is."
     },
     "helix-select": {
-      "autocomplete": "Renders a `<button>` and a listbox rather than a `<select>`, so autofill has no control to write into. Real capability the platform has and this cannot offer. See 295."
+      "autocomplete": "Renders a `<button>` and a listbox rather than a `<select>`, so autofill has no control to write into. Real capability the platform has and this cannot offer. See (295)."
     },
     "helix-switch": {
       "indeterminate": "A switch is binary by definition. A third state is a checkbox."

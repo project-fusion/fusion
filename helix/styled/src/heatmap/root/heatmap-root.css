@@ -236,7 +236,7 @@
    page a printer will render unevenly. Keeping the fills but adding a hairline
    is what makes the cells countable on paper whatever the fills come out like.
    `@media print` does not cross a shadow boundary, so every family says it for
-   itself. See 165. */
+   itself. See (165). */
 @media print {
   [part="cell"] {
     outline: var(--helix-border-thin) solid var(--helix-color-border);

@@ -16,7 +16,7 @@
 # **So refreshing one was a person standing up a container by hand**, running
 # `bun run visual:update` and committing what it took, which is the step most
 # likely to be skipped on the day a diff looks obviously fine. That is the day it
-# matters. See 216.
+# matters. See (216).
 #
 # **`workflow_dispatch` rather than a trigger, and that is the whole design.** A
 # baseline that refreshes itself on push is a check that agrees with whatever

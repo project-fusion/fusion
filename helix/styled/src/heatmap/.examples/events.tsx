@@ -20,7 +20,7 @@ export function Example() {
   }
 
   /* Not cancelable: the grid is reporting what it can show, and the number is
-     true whether or not anybody wanted it. See 303. */
+     true whether or not anybody wanted it. See (303). */
   const measured = (event: CustomEvent<{ size: number }>) => {
     say('helix-resize', `${event.detail.size} cells fit, which is a report`)
   }

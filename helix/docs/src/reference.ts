@@ -245,7 +245,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
        borrowed a stylesheet from rather than be its own. Without it a borrowed
        `--icon-button-radii` reads on the Copy Button page as a hook Copy Button
        named, and a consumer who guesses `--copy-button-radii` from that gets
-       nothing. See 290. */
+       nothing. See (290). */
     table(
       depth + 1,
       'Custom properties',

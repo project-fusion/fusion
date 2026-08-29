@@ -94,7 +94,7 @@ export class HelixLegend extends HelixHeadlessLegend {
    *
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not
-   * having the datum rather than by painting it invisibly. See 270.
+   * having the datum rather than by painting it invisibly. See (270).
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'

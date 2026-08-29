@@ -214,7 +214,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * relays one to its host: `Input` gets this free from its one control,
      * while a `PinInput` of four boxes has no inner `change` that means the
      * code is entered, so a half-entered code is never `touched` and can never
-     * say what is wrong with it. See 311.
+     * say what is wrong with it. See (311).
      *
      * **The obvious shared fix is for `touched` to take a `focusout`, and it is
      * the wrong one**, because it is the paragraph above undone: a `focusout`

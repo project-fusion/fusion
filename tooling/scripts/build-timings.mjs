@@ -4,7 +4,7 @@
  *
  * **Bytes are one half of the question and time is the other**, and time is the
  * half a reader experiences: a package that is small and slow to upgrade is not
- * the trade anybody wanted. Bundle size came first and load later. See 190.
+ * the trade anybody wanted. Bundle size came first and load later. See (190).
  *
  * **Three numbers, and they are different in kind.**
  *

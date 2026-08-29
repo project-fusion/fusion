@@ -143,7 +143,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * A control that opens a menu has to say so. By property rather than by
    * attribute, which is the class note's rule about items applied one level up:
    * an attribute written onto a consumer's element after it upgrades is a
-   * hydration mismatch waiting to happen. See #322.
+   * hydration mismatch waiting to happen. See (322).
    */
   private tellTrigger(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')

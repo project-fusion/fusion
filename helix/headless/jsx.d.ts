@@ -1279,7 +1279,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -1440,7 +1440,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3592,7 +3592,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3761,7 +3761,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -6181,7 +6181,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -6342,7 +6342,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See #322.
+they served it and the reader is still told what the control does. See (322).
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -6700,7 +6700,7 @@ where the selection is, let alone move it: `querySelector` does not cross
 the boundary. An insert-at-cursor toolbar, a format button, a mask that
 repositions the caret after rewriting the value, all of them need this and
 none of them could be written. Textarea gained the same surface for the same
-reason. See 295.
+reason. See (295).
 
 Zero before there is a control, which is where an empty field's caret would
 be anyway. */
@@ -6864,7 +6864,7 @@ where the selection is, let alone move it: `querySelector` does not cross
 the boundary. An insert-at-cursor toolbar, a format button, a mask that
 repositions the caret after rewriting the value, all of them need this and
 none of them could be written. Textarea gained the same surface for the same
-reason. See 295.
+reason. See (295).
 
 Zero before there is a control, which is where an empty field's caret would
 be anyway. */
@@ -15407,7 +15407,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -16567,7 +16567,7 @@ export type CustomElements = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -17554,7 +17554,7 @@ export type CustomElements = {
    * means the element updates itself, whether or not a consumer declared the
    * property: a declared property is a seed and a correction, the way
    * `<input value>` is, and a consumer who wants the change for themselves
-   * refuses it and assigns their own. See 294.
+   * refuses it and assigns their own. See (294).
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -17940,7 +17940,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -17949,7 +17949,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -18208,7 +18208,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -18533,7 +18533,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -18542,7 +18542,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -18721,7 +18721,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -18879,7 +18879,7 @@ export type CustomElements = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -19412,7 +19412,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
@@ -19896,7 +19896,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -20282,7 +20282,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -21201,7 +21201,7 @@ export type CustomElements = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -21632,7 +21632,7 @@ export type CustomElements = {
    * the boundary. An insert-at-cursor toolbar, a format button, a mask that
    * repositions the caret after rewriting the value, all of them need this and
    * none of them could be written. Textarea gained the same surface for the same
-   * reason. See 295.
+   * reason. See (295).
    *
    * Zero before there is a control, which is where an empty field's caret would
    * be anyway. (property only)
@@ -21699,7 +21699,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -22497,7 +22497,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -22780,7 +22780,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -23048,7 +23048,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -23689,7 +23689,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -24644,7 +24644,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -24799,7 +24799,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -25202,7 +25202,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -25514,7 +25514,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -25813,7 +25813,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -25822,7 +25822,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -26101,7 +26101,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -26498,7 +26498,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -26997,7 +26997,7 @@ export type CustomElements = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    */
   "helix-headless-steps": Partial<
     HelixHeadlessStepsProps & BaseProps<HelixHeadlessSteps> & BaseEvents<HelixHeadlessSteps>
@@ -27232,7 +27232,7 @@ export type CustomElements = {
    * means the element updates itself, whether or not a consumer declared the
    * property: a declared property is a seed and a correction, the way
    * `<input value>` is, and a consumer who wants the change for themselves
-   * refuses it and assigns their own. See 294.
+   * refuses it and assigns their own. See (294).
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -27775,7 +27775,7 @@ export type CustomElements = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
@@ -28090,7 +28090,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -28338,7 +28338,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
@@ -29214,7 +29214,7 @@ export type CustomElements = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -29625,7 +29625,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -30021,7 +30021,7 @@ export type CustomElements = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -30125,7 +30125,7 @@ export type CustomElements = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
@@ -30515,7 +30515,7 @@ export type CustomElements = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
@@ -31052,7 +31052,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -32234,7 +32234,7 @@ export type CustomElementsSolidJs = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -33239,7 +33239,7 @@ export type CustomElementsSolidJs = {
    * means the element updates itself, whether or not a consumer declared the
    * property: a declared property is a seed and a correction, the way
    * `<input value>` is, and a consumer who wants the change for themselves
-   * refuses it and assigns their own. See 294.
+   * refuses it and assigns their own. See (294).
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -33634,7 +33634,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -33643,7 +33643,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -33903,7 +33903,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -34229,7 +34229,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -34238,7 +34238,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -34420,7 +34420,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -34581,7 +34581,7 @@ export type CustomElementsSolidJs = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -35118,7 +35118,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
@@ -35606,7 +35606,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -35999,7 +35999,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -36935,7 +36935,7 @@ export type CustomElementsSolidJs = {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See #322.
+   * they served it and the reader is still told what the control does. See (322).
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -37373,7 +37373,7 @@ export type CustomElementsSolidJs = {
    * the boundary. An insert-at-cursor toolbar, a format button, a mask that
    * repositions the caret after rewriting the value, all of them need this and
    * none of them could be written. Textarea gained the same surface for the same
-   * reason. See 295.
+   * reason. See (295).
    *
    * Zero before there is a control, which is where an empty field's caret would
    * be anyway. (property only)
@@ -37440,7 +37440,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -38256,7 +38256,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -38545,7 +38545,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -38819,7 +38819,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -39469,7 +39469,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -40435,7 +40435,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -40593,7 +40593,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -41008,7 +41008,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -41324,7 +41324,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -41627,7 +41627,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -41636,7 +41636,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -41921,7 +41921,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -42325,7 +42325,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -42836,7 +42836,7 @@ export type CustomElementsSolidJs = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    */
   "helix-headless-steps": Partial<
     HelixHeadlessStepsProps &
@@ -43077,7 +43077,7 @@ export type CustomElementsSolidJs = {
    * means the element updates itself, whether or not a consumer declared the
    * property: a declared property is a seed and a correction, the way
    * `<input value>` is, and a consumer who wants the change for themselves
-   * refuses it and assigns their own. See 294.
+   * refuses it and assigns their own. See (294).
    * - `toggleChecked() => boolean`: Requests the opposite of the current state.
    * - `formStateRestoreCallback(state: string | null) => void`: Restores the control when the browser brings a form back.
    *
@@ -43636,7 +43636,7 @@ export type CustomElementsSolidJs = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
@@ -43960,7 +43960,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -44211,7 +44211,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
@@ -45101,7 +45101,7 @@ export type CustomElementsSolidJs = {
    * itself, whether or not a consumer declared `value`: a declared property
    * is a seed and a correction, the way `<input value>` is, and a consumer
    * who wants the change for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `formResetCallback() => void`: Returns the control to the value its markup declared.
    *
    * Both halves are dropped, the consumer's and the control's, because a
@@ -45519,7 +45519,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Parts
@@ -45924,7 +45924,7 @@ export type CustomElementsSolidJs = {
    * element opens or closes itself, whether or not a consumer declared
    * `open`: a declared property is a seed and a correction, and a consumer
    * who wants the decision for themselves refuses it and assigns their own.
-   * See 294.
+   * See (294).
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    *
    * ## CSS Custom Properties
@@ -46031,7 +46031,7 @@ export type CustomElementsSolidJs = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
@@ -46429,7 +46429,7 @@ export type CustomElementsSolidJs = {
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back. Nobody refusing means the set updates itself,
    * whether or not a consumer declared `active`, a declared property being a
-   * seed and a correction. See 294.
+   * seed and a correction. See (294).
    *
    * ## CSS Parts
    *
