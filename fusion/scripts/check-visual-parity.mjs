@@ -277,7 +277,13 @@ const UNCOMPARED = new Map([
        within a load and picks a different one on the next; it is not a React
        fault, since the markup side varies just as much; and it is not the brand
        font failing, which a scratch probe suggested and was an artifact of that
-       probe having no `/fonts/` route where this file has one. */
+       probe having no `/fonts/` route where this file has one.
+
+       **And it is not motion**, re-measured after `reducedMotion` was added for
+       `aura`: 524, 1079, 762 and 781 changed pixels across four consecutive
+       runs, every one a different amount. That is the shape `video/native` has
+       and the opposite of what a paused animation looks like, which settles on
+       one number. The entry stays. */
     'unstable on both sides across loads: 272, 273 and 275 for the markup twin alone',
   ],
   [
