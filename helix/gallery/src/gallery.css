@@ -630,7 +630,7 @@
 
 /* Named one selector at a time. A reduce rule written looser than the rule it
    answers loses on specificity and does nothing, which is the trap
-   `check:css:motion` exists to catch in the library. */
+   `helix component`'s `motion` exists to catch in the library. */
 @media (prefers-reduced-motion: reduce) {
   :has(> .componentArt):hover .artBody:not(:has(.artMotion, .artSweep, .artSpin)),
   :has(> .componentArt):hover .artSweep,

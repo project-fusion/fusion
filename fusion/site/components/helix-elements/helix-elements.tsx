@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react'
  * **A path test, which is a sniff, and the structural fix is a root layout of
  * its own.** Next supports one per top-level route group, and that is the
  * version with no condition in it, at the cost of moving every route in the app
- * into a group. `check:spec:specs-isolated` fails if the specs document ever
+ * into a group. `fusion spec`'s `isolated` fails if the specs document ever
  * registers the library again, whichever way it is kept out.
  */
 const SPECS = '/helix/sandbox/specs'

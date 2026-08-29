@@ -33,7 +33,7 @@ knowing before you write:
 - **No em dashes**, in code, docs, comments or copy. Periods, colons, commas or
   parentheses.
 - **American spelling** everywhere, comments and prose alike. `bun run fix:dialect`
-  rewrites and `check:prose:dialect` judges. Comments are in scope because an
+  rewrites and `fusion prose`'s `dialect` judges. Comments are in scope because an
   unwritten convention is learned from the corpus.
 - **Alphabetize** object keys, interface members and exported types, skipping
   where order is semantic: positional arguments, middleware chains, CSS

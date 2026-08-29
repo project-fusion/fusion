@@ -562,9 +562,9 @@ These are the difference between code that looks right and code that passes:
 | Rule | Check |
 |---|---|
 | A dispatched event must be declared | \`helix component --only events\` |
-| A documented part must be rendered | \`check:api:parts\` |
+| A documented part must be rendered | \`helix component\`'s \`parts\` |
 | A documented CSS hook must be read | \`helix component --only hooks\` |
-| A visual property draws from its axis | \`check:css:axes\` |
+| A visual property draws from its axis | \`helix component\`'s \`axes\` |
 | A form control styles with \`:disabled\` | \`helix component --only disabled\` |
 | A component that animates answers reduced motion | \`helix component --only motion\` |
 | No component reads a primitive token | \`helix component\`'s \`tokens\` |
@@ -2245,7 +2245,7 @@ column is what was removed rather than part of what remains.
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
-| \`@fusion.dev/helix\` | 9,587,015 | 717 | 287,236 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,587,095 | 717 | 287,236 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -2626,8 +2626,8 @@ its arrow is \`tooltip-arrow\`.
 \`Command\` forwarded the listbox's \`search-field\` under a name it also rendered
 itself, so \`::part(search-field)\` matched two elements at once.
 
-This is checked in both directions. \`check:api:parts\` holds a published part and a
-rendered one to each other, and \`check:api:exportparts\` holds a composition to
+This is checked in both directions. \`helix component\`'s \`parts\` holds a published part and a
+rendered one to each other, and \`helix component\`'s \`exportparts\` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
 nothing. So every part the color picker publishes is reachable from inside a
 color input, and every part the date picker publishes from inside a date input.

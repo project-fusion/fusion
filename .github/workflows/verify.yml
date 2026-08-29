@@ -273,7 +273,7 @@ jobs:
           # The specs themselves.
           - task: specs
             run: bun run specs:browser
-          # Every example, rendered. `check:prose:examples` reads them and can tell
+          # Every example, rendered. `helix component`'s `examples` reads them and can tell
           # you an attribute no component declares; only running one can tell
           # you it throws on upgrade, names an element registered nowhere, or
           # lays out to nothing.
@@ -292,7 +292,7 @@ jobs:
           # Every example rendered twice, from its HTML and from its TSX, and
           # the two compared. Both are authored now, neither derived from the
           # other, which is the right arrangement and costs exactly one thing:
-          # nothing else notices them drifting. `check:prose:examples-paired` holds
+          # nothing else notices them drifting. `helix component`'s `examples-paired` holds
           # the two files to each other; only a picture can hold the two
           # renders.
           #

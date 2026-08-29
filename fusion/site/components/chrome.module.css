@@ -177,7 +177,7 @@
  *
  * No fallback on `--icon-size`. The footer sets it on the element, and a length
  * written here to cover the case where it does not would be a raw space value
- * that `check:css:tokens` is right to refuse. Without one an unset size makes the
+ * that `helix component`'s `tokens` is right to refuse. Without one an unset size makes the
  * `calc` invalid and the margin drops, which is the correct failure: the mark
  * sits where an unadjusted mark sits.
  *

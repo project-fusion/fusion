@@ -64,7 +64,7 @@
   color: var(--helix-color-foreground);
 }
 
-/* Named one selector at a time, for the reason `check:css:motion` exists: a reduce
+/* Named one selector at a time, for the reason `helix component`'s `motion` exists: a reduce
    rule written looser than the rule it answers loses on specificity. */
 @media (prefers-reduced-motion: reduce) {
   .docsJump {
@@ -276,7 +276,7 @@
 
 /* The row reveals it, and only `opacity` is keyed there.
  *
- * **A document rule reaching in from `helix-tree-item` is one `check:css:overruled`
+ * **A document rule reaching in from `helix-tree-item` is one `helix component`'s `overruled`
  * fails on, and it is right to**: it wins whatever the specificity and whatever
  * the layer, so a property the component sets there is dead. `color` is one of
  * those. `opacity` is not set anywhere in `tree-item.css`, on the host or on

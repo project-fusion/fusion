@@ -58,8 +58,16 @@ static PATH: LazyLock<Regex> = LazyLock::new(|| {
 /// silent half of the failure and the one worth naming here.
 static RUN: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"`bun run ([\w:-]+)`").expect("a literal pattern compiles"));
+/// A check's name, colons included.
+///
+/// **A script name is namespaced and the colon is part of it.** A pattern that
+/// stops at the first one validates the prefix instead of the name: every
+/// `check:prose:*` in a comment resolved to `check:prose`, which exists, so a
+/// group that had never had a member by that name read as correct. Two such
+/// references had been sitting in comments naming rules that live under a
+/// different noun entirely.
 static NAMED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"`(check:[\w-]+)`").expect("a literal pattern compiles"));
+    LazyLock::new(|| Regex::new(r"`(check:[\w:-]+)`").expect("a literal pattern compiles"));
 static SPAN: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"`[^`\n]*`").expect("a literal pattern compiles"));
 static LINK: LazyLock<Regex> =

@@ -1403,7 +1403,7 @@ helix-toggle[disabled]::part(item) {
  * component and on a `<section>`. That is the argument for these existing rather
  * than each page inventing a translucent background: the components are already
  * held to this list, and a document recipe spelling it differently would be a
- * second vocabulary for one idea. `check:css:axes` owns the vocabulary.
+ * second vocabulary for one idea. `helix component`'s `axes` owns the vocabulary.
  *
  * There is no collision with the component attribute. A component takes
  * `material="glass"` as its own attribute and this is `data-material`, which is

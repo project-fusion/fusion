@@ -100,8 +100,8 @@ its arrow is `tooltip-arrow`.
 `Command` forwarded the listbox's `search-field` under a name it also rendered
 itself, so `::part(search-field)` matched two elements at once.
 
-This is checked in both directions. `check:api:parts` holds a published part and a
-rendered one to each other, and `check:api:exportparts` holds a composition to
+This is checked in both directions. `helix component`'s `parts` holds a published part and a
+rendered one to each other, and `helix component`'s `exportparts` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
 nothing. So every part the color picker publishes is reachable from inside a
 color input, and every part the date picker publishes from inside a date input.

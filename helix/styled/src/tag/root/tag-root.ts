@@ -35,7 +35,7 @@ export class HelixTag extends HelixHeadlessTag {
    * Which status the tag reports.
    *
    * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `check:css:axes` holds the vocabulary.
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'

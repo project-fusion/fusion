@@ -1,7 +1,7 @@
 /**
  * Where a component renders another component, and what that costs a consumer.
  *
- * Read by `check:api:exportparts`, which holds a composition to publishing what it
+ * Read by `helix component`'s `exportparts`, which holds a composition to publishing what it
  * renders.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'

@@ -52,7 +52,7 @@ fusion-helix-theme = { path = "helix/theme" }
 # So each crate carries its own, which is three identical lines today and is
 # what makes them able to differ tomorrow. The value is the placeholder every
 # manifest in this repository holds; the release stamps the real number seconds
-# before packing and the tag is the record. `check:pkg:publishable` fails on a crate
+# before packing and the tag is the record. `fusion workspace`'s `publishable` fails on a crate
 # that inherits one, so this cannot quietly come back.
 [workspace.package]
 edition = "2021"

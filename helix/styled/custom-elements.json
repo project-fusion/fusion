@@ -79897,7 +79897,7 @@
               "type": {
                 "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\n`tone` is semantic color, which is what these are and what `helix-text`\nalready calls them. `check:css:axes` holds the vocabulary.",
+              "description": "Which status the tag reports.\n\n`tone` is semantic color, which is what these are and what `helix-text`\nalready calls them. `helix component`'s `axes` holds the vocabulary.",
               "attribute": "tone",
               "reflects": true
             },
@@ -80166,7 +80166,7 @@
               "type": {
                 "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\n`tone` is semantic color, which is what these are and what `helix-text`\nalready calls them. `check:css:axes` holds the vocabulary.",
+              "description": "Which status the tag reports.\n\n`tone` is semantic color, which is what these are and what `helix-text`\nalready calls them. `helix component`'s `axes` holds the vocabulary.",
               "fieldName": "tone"
             },
             {

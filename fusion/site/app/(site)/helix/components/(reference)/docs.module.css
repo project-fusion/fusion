@@ -284,7 +284,7 @@
 /* Through the component's own hook, not a rule of ours. `.apiReference
    helix-icon { block-size }` is a document rule, which beats a shadow one
    whatever the specificity and whatever the layer, so it would have killed
-   `icon-root.css` rather than adjusted it. `check:css:overruled` said so. */
+   `icon-root.css` rather than adjusted it. `helix component`'s `overruled` said so. */
 .apiReference {
   --icon-size: 1em;
 }
@@ -392,7 +392,7 @@
      them, so text alone would run the bar into the value before it. That is
      also what keeps a bar with its member, since a margin is not a break
      opportunity and a space would be.
-     `2xs` rather than an em: `check:css:tokens` refuses a raw value here, and
+     `2xs` rather than an em: `helix component`'s `tokens` refuses a raw value here, and
      the type column is one size, so there is nothing for an em to track that a
      token does not. */
   margin-inline: var(--helix-space-2xs);

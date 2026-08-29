@@ -35,7 +35,7 @@ import { join } from 'node:path'
    generated file by that segment in its name, and one called `faces.ts` is
    caught by none of them.
 
-   `check:prose:dialect` is the one that shows it. Google ships a family called
+   `fusion prose`'s `dialect` is the one that shows it. Google ships a family called
    `Grey Qo`, which the sweep reads as a British color and refuses. dialect:quoted
 
    Hand-writing that marker into a row of the generated file is not the fix: a
@@ -132,7 +132,7 @@ writeFileSync(
    them and this ships to a browser.
 
    A plain block rather than a doc block, because this describes the file and
-   the declarations under it carry their own. \`check:prose:orphans\` caught the first
+   the declarations under it carry their own. \`fusion prose\`'s \`orphans\` caught the first
    version claiming to document the blank line beneath it. */
 
 /**

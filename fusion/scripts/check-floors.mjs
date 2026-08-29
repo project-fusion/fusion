@@ -3,7 +3,7 @@
  * Runs the checks no CLI floors, and refuses a success line that counts nothing.
  *
  * **A check that silently stops checking reads exactly like a check that
- * passes.** `check:prose:art` held the number words in the gallery prose against
+ * passes.** `fusion prose`'s `art` held the number words in the gallery prose against
  * the real family count with a pattern running `forty` through `seventy`, and
  * once the catalog passed seventy-nine it matched nothing while still printing
  * `art: 85 families, every one drawn, and the prose agrees`, because eighty-five
@@ -21,7 +21,7 @@
  *
  * **What it cannot catch, said plainly.** A check whose corpus is intact and
  * whose predicate has gone stale still reports its corpus and still passes.
- * `check:prose:art` would have survived this. The only real defense there is that
+ * `fusion prose`'s `art` would have survived this. The only real defense there is that
  * each check counts its assertions, which is a property of how each one is
  * written and not something another script can impose.
  *

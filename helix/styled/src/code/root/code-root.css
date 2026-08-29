@@ -59,7 +59,7 @@
    *
    * Dividing one rung by another yields a number, and multiplying `1em` by it
    * yields the inherited size scaled by that number. The value names two
-   * tokens, so `check:css:tokens` is satisfied by the thing it was asking for,
+   * tokens, so `helix component`'s `tokens` is satisfied by the thing it was asking for,
    * and the ratio still moves when a theme moves the scale. A raw value inside
    * a fallback is refused, which is what rules out writing the number.
    *

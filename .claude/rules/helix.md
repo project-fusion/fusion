@@ -841,7 +841,7 @@ never edit one.
 **A component that renders another has to publish what it rendered.**
 `::part()` reaches one shadow boundary and stops, so a composition hides its
 child's entire part surface unless it forwards it. Measured before
-`check:api:exportparts` existed: thirty-seven sites across nineteen families
+`helix component`'s `exportparts` existed: thirty-seven sites across nineteen families
 composed another element, eight forwarded anything at all, and 148 published
 child parts were unreachable. `color-input` hid all sixteen of `color-picker`'s
 and `date-input` all thirteen of `date-picker`'s, which are the components a
@@ -861,15 +861,15 @@ least styleable half.
   predate the rule were both written this way, which is the usual sign of the
   right one, and what keeps the collapse safe is that the parent may not then
   render the role itself.
-- **A forwarded part still needs its `@csspart`**, and `check:api:parts` is what
+- **A forwarded part still needs its `@csspart`**, and `helix component`'s `parts` is what
   asks: it counts an `exportparts` name as rendered, so a forward without a
-  declaration fails there rather than in `check:api:exportparts`. The two are one
+  declaration fails there rather than in `helix component`'s `exportparts`. The two are one
   contract read from two ends.
 
 **A `::part()` written from outside is checked too, and nothing checked it
 before.** `helix component`'s `selectors` reads `[part="x"]` inside a component's own sheet and
 stops there, so a selector naming a part nothing publishes was unchecked in every
-example sheet, doc page and app file in the repository. `check:api:exportparts`
+example sheet, doc page and app file in the repository. `helix component`'s `exportparts`
 covers it, and it had eight. `INDICATOR` in `build-headless-examples.mjs` names
 the box its indicator is positioned against, and three of its four families were
 given a part they do not render, so the `position: relative` never landed and
@@ -893,14 +893,14 @@ host applies it and owning no parts of its own.
 **And a `[part="x"]` inside a selector string is not a render.** Harvesting
 `part="x"` without excluding the bracket let a lookup satisfy itself, so the very
 selector under test counted as evidence the part exists. Live across 53 files and
-five checks, including `check:api:parts`, whose whole purpose it defeats. It was
+five checks, including `helix component`'s `parts`, whose whole purpose it defeats. It was
 holding one real failure green: `command` documented `search-field` after that
 name stopped being forwarded, and a `querySelector('[part="search-field"]')` two
 hundred lines away was the only thing making it look rendered. Same shape as this
 file's older note about a JSDoc that quotes markup, and worth assuming of any new
 check that reads a template.
 
-**`check:api:parts` resolves the whole render chain in both directions**, and read
+**`helix component`'s `parts` resolves the whole render chain in both directions**, and read
 the class's own markup in one of them until 24 Aug 2026. One direction inherited
 and the other did not, which leaves exactly one gap and it is the expensive one:
 a part rendered by a *base* that nobody in the chain documents is invisible to
@@ -914,13 +914,13 @@ the ten pairs were published to nobody.
 the mixin does not work.** The analyzer reads `@csspart` off a custom element
 class, so a class-level tag on a mixin reaches the manifest as nothing at all,
 on the mixin's JSDoc and on its inner class alike. Measured both ways, and the
-inner-class version is the dangerous one: `check:api:parts` resolves docs through
+inner-class version is the dangerous one: `helix component`'s `parts` resolves docs through
 `extends` itself, so it goes green while every API page stays exactly as wrong
 as before. Members are the opposite and do inherit, which is what the note above
 about the inner class is about, and the two cases look identical from the source.
 
 **Publishing a part obliges every component that composes it.** These two checks
-are one contract, so documenting the mixin parts made `check:api:exportparts` fail on
+are one contract, so documenting the mixin parts made `helix component`'s `exportparts` fail on
 fourteen compositions that had been forwarding a complete surface the day before.
 That is the contract working rather than a regression, and it is the reason the
 forwarding is generated rather than typed.
@@ -1031,7 +1031,7 @@ looks. `Video` declares 48 parts and had its `captions-menu-*` family in three
 separate runs with the whole `overflow-*` set between them. No line of it was
 wrong, and no reader who did not already know the answer could have found one.
 
-`bun run fix:tag-order` rewrites, `check:prose:tag-order` judges, and `verify` runs it.
+`bun run fix:tag-order` rewrites, `fusion prose`'s `tag-order` judges, and `verify` runs it.
 Only blocks carrying `@summary` are touched: a member's JSDoc uses `@internal`,
 `@param` and `@reference`, whose order is the order of the thing they describe.
 
@@ -1661,7 +1661,7 @@ browser lowercases it to something no component reads.
 
 `htmlToJsx` is deleted. `jsxToHtml` survives for one job, converting a reader's
 live edit in the TSX pane, which by definition has no authored twin.
-`check:prose:examples-paired` holds the two files to each other and
+`helix component`'s `examples-paired` holds the two files to each other and
 `check:spec:visual-parity` holds the two pictures to each other.
 
 **An example shows the component. It never explains it.** Slot content is
@@ -1694,7 +1694,7 @@ the published interface into the library's source tree to find out what a
 component ships. The markup stays on disk: it is the sandbox's payload, it is
 large, and every consumer parses this manifest whether or not it renders one.
 
-A family with an `index.ts` and no `.examples` fails `check:prose:examples`. That is
+A family with an `index.ts` and no `.examples` fails `helix component`'s `examples`. That is
 what makes a directory a family, the same question the package's `exports` map
 asks, which is why `field/` is exempt and why moving the sandbox into
 `helix/styled` obliged it to ship an example.

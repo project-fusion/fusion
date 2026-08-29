@@ -43,7 +43,7 @@ const PUBLIC = join(ROOT, 'fusion/site/public')
  * into the reference and into the nav.
  *
  * A reference documents what a reader can take. The line to draw is whether a
- * package publishes, and `check:pkg:publishable` already holds that flag, so this
+ * package publishes, and `fusion workspace`'s `publishable` already holds that flag, so this
  * reads a list of publishing packages rather than filtering tag names
  * downstream: a name filter would have to be updated every time the private
  * package grew an element, and would be silent when it was not.

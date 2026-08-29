@@ -61,5 +61,5 @@ describe('jsx to html', () => {
 
 /* There is no round-trip property to assert here: each syntax is a file
    somebody wrote rather than a conversion of its twin. What holds the two to
-   each other is `check:prose:examples-paired` for their existence and
+   each other is `helix component`'s `examples-paired` for their existence and
    `check:spec:visual-parity` for their pictures. */

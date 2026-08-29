@@ -17,7 +17,7 @@
  *
  * **Through `--card-align`, never `align-content` on the host.** A document rule
  * on a shadow host outranks the component's own, so the card's value would be
- * the dead one. `check:css:overruled` holds it. */
+ * the dead one. `helix component`'s `overruled` holds it. */
 .insightCard helix-card {
   --card-align: space-between;
 }
@@ -39,7 +39,7 @@
   /* **Through the component's hook, not past it.** `backdrop-filter` written
      here is a document rule on a shadow host, which wins whatever the
      specificity and whatever the layer, so the card's own `material` handling
-     stops meaning anything and `check:css:overruled` says so. `--card-backdrop` is
+     stops meaning anything and `helix component`'s `overruled` says so. `--card-backdrop` is
      the hook `Card` publishes for this, and setting it leaves the component in
      charge of when the blur applies. */
   --card-backdrop: blur(40px) saturate(1.5);

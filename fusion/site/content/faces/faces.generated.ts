@@ -10,7 +10,7 @@
    them and this ships to a browser.
 
    A plain block rather than a doc block, because this describes the file and
-   the declarations under it carry their own. `check:prose:orphans` caught the first
+   the declarations under it carry their own. `fusion prose`'s `orphans` caught the first
    version claiming to document the blank line beneath it. */
 
 /**

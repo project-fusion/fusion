@@ -14674,7 +14674,7 @@ export type HelixTagProps = {
   /** Which status the tag reports.
 
 `tone` is semantic color, which is what these are and what `helix-text`
-already calls them. `check:css:axes` holds the vocabulary. */
+already calls them. `helix component`'s `axes` holds the vocabulary. */
   tone?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
@@ -14714,7 +14714,7 @@ export type HelixTagSolidJsProps = {
   /** Which status the tag reports.
 
 `tone` is semantic color, which is what these are and what `helix-text`
-already calls them. `check:css:axes` holds the vocabulary. */
+already calls them. `helix component`'s `axes` holds the vocabulary. */
   "prop:tone"?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
@@ -31216,7 +31216,7 @@ export type CustomElements = {
    * - `tone`: Which status the tag reports.
    *
    * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `check:css:axes` holds the vocabulary.
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `emphasis`: How much of the tone the tag wears.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -47790,7 +47790,7 @@ export type CustomElementsSolidJs = {
    * - `tone`: Which status the tag reports.
    *
    * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `check:css:axes` holds the vocabulary.
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `emphasis`: How much of the tone the tag wears.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a

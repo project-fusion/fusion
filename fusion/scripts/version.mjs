@@ -31,7 +31,7 @@
  *
  * **One version per domain**, which is the lockstep policy. `helix` and
  * `cortex` move independently, so `helix-v1.4.0` and `cortex-v0.3.0` are
- * separate tags and a release of one leaves the other alone. `check:pkg:publishable`
+ * separate tags and a release of one leaves the other alone. `fusion workspace`'s `publishable`
  * holds the manifests to a single string; this writes it.
  *
  * **`cortex` spans two package managers.** `@fusion.dev/cortex-docs` is npm and the

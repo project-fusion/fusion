@@ -121,7 +121,7 @@ export interface Example {
    * a JSX fragment with a `<script>` in it, which is a syntax error rather
    * than a bad example.
    *
-   * `check:prose:examples-paired` holds the two files to each other and
+   * `helix component`'s `examples-paired` holds the two files to each other and
    * `check:spec:visual-parity` holds the two pictures to each other.
    */
   tsx: string
@@ -158,7 +158,7 @@ export interface Family {
  *
  * An example is up to two files, `<slug>.html` and an optional `<slug>.css`.
  * The HTML is the list: a stylesheet on its own is not an example, and
- * `check:prose:examples` fails on one whose markup is missing rather than showing a
+ * `helix component`'s `examples` fails on one whose markup is missing rather than showing a
  * sandbox with a stylesheet and nothing to style.
  *
  * The pair is what the sandbox already shows, `index.html` beside `styles.css`,

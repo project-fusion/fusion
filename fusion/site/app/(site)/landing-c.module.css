@@ -208,7 +208,7 @@
  *
  * These are user units inside a viewBox that scales with its container, so a
  * `--helix-text-*` token would be the wrong quantity entirely: it would set a
- * page size on something measured in the drawing's own coordinates. `check:css:tokens`
+ * page size on something measured in the drawing's own coordinates. `helix component`'s `tokens`
  * is right that a raw number in page CSS is a smell, and right that this is not
  * page CSS, so the numbers moved to where SVG has always put them.
  */
@@ -781,7 +781,7 @@
 .tDisplay {
   font-family: var(--helix-font-display);
   /* Fluid between two rungs of the ramp rather than between two numbers
-     nobody chose. `check:css:tokens` was right to flag the originals: a page that
+     nobody chose. `helix component`'s `tokens` was right to flag the originals: a page that
      invents its own sizes is how a scale stops being one. */
   font-size: clamp(var(--helix-text-3xl), 5.6vw, calc(var(--helix-text-3xl) * 1.6));
   font-weight: var(--helix-weight-semibold);

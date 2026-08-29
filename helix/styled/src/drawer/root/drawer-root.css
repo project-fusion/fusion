@@ -55,7 +55,7 @@
   }
 }
 
-/* **No `appearance`, which `check:css:axes` fails on outright**, and a drawer is
+/* **No `appearance`, which `helix component`'s `axes` fails on outright**, and a drawer is
  * the clearest case of why. Its `plain` painted the panel the page's own color,
  * which is invisible to half of all readers, `--helix-color-surface-overlay` and
  * `--helix-color-background` both being `neutral-0` in light mode and measuring

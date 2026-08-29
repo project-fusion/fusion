@@ -269,7 +269,7 @@ directions, so the day the flag changes is the day the workflow has to.
   rather than asked for, because an unwritten convention is learned from the
   corpus: prose in the wrong dialect teaches the next contributor to write it,
   which is why comments are in scope and not only copy. `bun run fix:dialect`
-  rewrites; `check:prose:dialect` judges.
+  rewrites; `fusion prose`'s `dialect` judges.
 - **Alphabetize** object keys, interface members, and exported types
   (case-insensitive). Skip where order is semantic: positional arguments,
   middleware chains, CSS box-side shorthand, export conditions.

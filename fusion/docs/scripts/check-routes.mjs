@@ -236,7 +236,7 @@ if (problems.length === 0) {
        with the whole of the diff being one path.
 
        `check` fixes and `verify` judges, which `AGENTS.md` states and
-       `check:prose:dialect` already follows. The record is written under `--write`,
+       `fusion prose`'s `dialect` already follows. The record is written under `--write`,
        which `bun run gen:routes` and `bun run regen` pass; without it the check
        says the file is behind and stops. */
     if (write) {

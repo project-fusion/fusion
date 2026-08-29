@@ -168,7 +168,7 @@ helix-megamenu {
 
 helix-megamenu::part(surface) {
   /* A measure rather than a space, which is why it is named here instead of
-     written into the padding: `check:css:tokens` reads a raw length in
+     written into the padding: `helix component`'s `tokens` reads a raw length in
      `padding-inline` as a spacing token that got away, and it is right to. */
   --site-panel-measure: 52rem;
 
@@ -269,7 +269,7 @@ helix-app-header {
 @media (width < 48rem) {
   /* Width only. The host is already `inline-flex` and setting `display` here
      would overrule it from the document, where a component cannot answer back:
-     `check:css:overruled` fails on exactly that. */
+     `helix component`'s `overruled` fails on exactly that. */
   .pageHeroActions helix-button-group {
     inline-size: 100%;
   }

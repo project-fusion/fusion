@@ -2,7 +2,7 @@
 /**
  * Renders every example in a real browser and reports anything that broke.
  *
- * `check:prose:examples` reads them: it knows an attribute a component does not
+ * `helix component`'s `examples` reads them: it knows an attribute a component does not
  * declare, a slot nothing offers, an inline style. What it cannot know is
  * whether the example *works*, because the only way to find that out is to run
  * it. An example could throw on upgrade, name an element that is registered
@@ -111,7 +111,7 @@ const NETWORK = /Failed to load resource/
  * autoplaying carousel first moves at five seconds and this waits fifty
  * milliseconds. It is here so the trap is already covered the day something
  * does interact. Do not read a green smoke run as saying the examples are all
- * correctly wired: that is what `check:prose:examples` and a reader's console say. */
+ * correctly wired: that is what `helix component`'s `examples` and a reader's console say. */
 const AUDIT = /is controlled: `/
 
 page.on('console', (message) => {
