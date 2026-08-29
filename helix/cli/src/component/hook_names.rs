@@ -199,6 +199,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: feeds.len(),
         findings,
+        notes: Vec::new(),
         unit: "component hooks",
     }
 }

@@ -64,7 +64,7 @@ undefined there.
 - Class `Helix<Family><Part>` extending the base, tag `helix-<family>-<part>`.
 - Presentation only, and the properties are the visual axes: `emphasis`,
   `material`, `separation`, `tone`. **`appearance` is refused outright** by
-  `check:css:axes` and is not a word this library uses; `dense` is not one either,
+  `helix component`'s `axes` and is not a word this library uses; `dense` is not one either,
   since size comes from `data-density` on the region.
 - Styles in the `.css` file, imported as `./​<family>-<part>.css.js`:
 

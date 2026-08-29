@@ -28,6 +28,7 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod axes;
 pub mod cancelable;
 pub mod categories;
 pub mod composed;
@@ -116,6 +117,16 @@ pub struct Settings {
     /// model's source leaves twenty pairs unchecked.
     #[serde(default)]
     pub oracle: Option<String>,
+
+    /// Families whose `width` is a length rather than a policy, each with why.
+    ///
+    /// One axis, two value kinds. `width` asks how much room a thing takes and
+    /// most answer with a policy; a table column answers with a grid track,
+    /// because the question there is not which of three behaviors but exactly
+    /// how wide. The value space is a continuum the registry cannot hold, so
+    /// this says which families are on that side of it.
+    #[serde(default)]
+    pub lengths: BTreeMap<String, String>,
 
     /// The layout modes a preview frame offers an example.
     ///
@@ -249,6 +260,15 @@ pub struct Report {
     /// What was tested, never what was walked past.
     pub checked: usize,
     pub findings: Vec<Finding>,
+    /// Work rather than fault: named, counted, and not part of the verdict.
+    ///
+    /// **The first rule to need this was the one about visual axes**, which
+    /// reports families in a group that disagree about declaring one. Whether a
+    /// component *should* have an axis needs a reading of what it is for, so
+    /// failing would pressure somebody into declaring one to silence a rule.
+    /// A count that does not fall is visible work; a finding is a defect.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub notes: Vec<String>,
     pub unit: &'static str,
 }
 
@@ -304,6 +324,11 @@ pub fn all() -> Vec<Rule> {
             name: "floors",
             run: Runner::Meta(floors::run),
             summary: "every rule counted something",
+        },
+        Rule {
+            name: "axes",
+            run: Runner::Source(axes::run),
+            summary: "every visual value a component declares is drawn from a registered axis",
         },
         Rule {
             name: "cancelable",

@@ -78,6 +78,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings: Vec::new(),
+            notes: Vec::new(),
             unit: "pairs painted in one rule",
         };
     };
@@ -153,6 +154,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: painted.len(),
         findings,
+        notes: Vec::new(),
         unit: "pairs painted in one rule",
     }
 }

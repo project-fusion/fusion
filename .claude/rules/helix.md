@@ -575,7 +575,7 @@ that *is* on an axis.
 and no box to size. `tone` is the exception and a principled one: it says what a
 thing means, and meaning survives having no stylesheet.
 
-**`appearance` is not a property and must not be reintroduced.** `check:css:axes`
+**`appearance` is not a property and must not be reintroduced.** `helix component`'s `axes`
 fails outright on the word, and `visual-axes.mdx` is the page that explains why
 it went.
 
@@ -932,7 +932,7 @@ not.** `helix component`'s `vocabulary` holds the first set to one spelling each
 a `swatch` is that component's own word and no registry should have an opinion
 about it.
 
-This is `check:css:axes` one stage later. That check exists because `appearance` had
+This is `helix component`'s `axes` one stage later. That check exists because `appearance` had
 become one word for four questions; this one exists because the reverse happened
 to parts, nine words meaning "the box in the middle" across 204 names. `drawer`
 used both `panel` and `content`; `accordion` used both `content` and
@@ -949,7 +949,7 @@ accessor reading it, one file over, is called `surface`. The third, `wrapper` to
 `content` both, and they are different boxes: `content` is what the stage holds
 while it is open, `body` is the step's name and its description together.
 Renaming it would have merged two things. It sits in `UNRESOLVED` naming what it
-turns out to be, the way `check:css:axes` names work rather than blocking on it.
+turns out to be, the way `axes` names work rather than blocking on it.
 
 
 ## The manifest

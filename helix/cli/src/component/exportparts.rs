@@ -240,6 +240,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: forwarded + checked,
         findings,
+        notes: Vec::new(),
         unit: "forwarded parts and outside selectors",
     }
 }

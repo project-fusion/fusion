@@ -85,6 +85,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings: Vec::new(),
+            notes: Vec::new(),
             unit: "tokens read by components",
         };
     }
@@ -140,6 +141,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: read.len(),
         findings,
+        notes: Vec::new(),
         unit: "tokens read by components",
     }
 }

@@ -177,6 +177,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings: Vec::new(),
+            notes: Vec::new(),
             unit: "rendered tags",
         };
     };
@@ -207,11 +208,12 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "rendered tags",
     }
 }
 
-/// The two layers a judgement is made against.
+/// The two layers a judgment is made against.
 struct Layers<'a> {
     base: &'a Layer,
     over: &'a Layer,

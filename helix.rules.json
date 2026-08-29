@@ -27,6 +27,9 @@
   "leaves": {
     "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
   },
+  "lengths": {
+    "table": "A column answers with a CSS grid track, 16rem or minmax(0, 2fr), because the question is not which of three behaviours but exactly how wide."
+  },
   "oracle": "helix/theme/rust/oracle.json",
   "outside": [
     "helix/styled/src",

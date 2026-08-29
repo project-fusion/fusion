@@ -91,6 +91,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "families saying what they do on paper",
     }
 }

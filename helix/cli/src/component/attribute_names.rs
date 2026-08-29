@@ -134,6 +134,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "platform-mirroring properties",
     }
 }

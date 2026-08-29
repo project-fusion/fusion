@@ -130,6 +130,7 @@ pub fn run(context: &Context) -> Report {
             .filter(|(word, _)| seen.contains_key(*word))
             .count(),
         findings,
+        notes: Vec::new(),
         unit: "registered role words in use",
     }
 }

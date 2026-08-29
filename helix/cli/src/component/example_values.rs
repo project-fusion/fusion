@@ -178,6 +178,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "attribute values across the examples",
     }
 }

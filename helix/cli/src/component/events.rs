@@ -192,6 +192,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings,
+            notes: Vec::new(),
             unit: "declared events",
         };
     }
@@ -221,6 +222,7 @@ pub fn run(context: &Context) -> Report {
             .map(|one| one.declared.len())
             .sum(),
         findings,
+        notes: Vec::new(),
         unit: "declared events",
     }
 }

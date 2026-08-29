@@ -109,6 +109,7 @@ fn payload(reports: &[(Rule, Report)]) -> serde_json::Value {
         "rules": reports.iter().map(|(rule, report)| serde_json::json!({
             "checked": report.checked,
             "findings": report.findings,
+            "notes": report.notes,
             "name": rule.name,
             "unit": report.unit,
         })).collect::<Vec<_>>(),
@@ -141,6 +142,20 @@ pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
             report.checked,
             report.unit
         );
+    }
+    for (rule, report) in reports
+        .iter()
+        .filter(|(_, report)| !report.notes.is_empty())
+    {
+        println!();
+        println!(
+            "{} {}",
+            paint.bold(rule.name),
+            paint.dim(&format!("{} noted, not failing", report.notes.len()))
+        );
+        for note in &report.notes {
+            println!("  {note}");
+        }
     }
     println!();
     speak(&reports, paint);

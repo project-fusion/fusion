@@ -119,6 +119,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: form_associated.len(),
         findings,
+        notes: Vec::new(),
         unit: "form-associated parts",
     }
 }

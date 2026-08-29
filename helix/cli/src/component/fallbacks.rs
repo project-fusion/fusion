@@ -189,6 +189,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "slot fallbacks drawing markup behind a seam",
     }
 }
