@@ -71,8 +71,18 @@
 }
 
 /* Above the light, which the aura and the lattice both sit in. */
+/* **Centered, because there is nothing beside it to line up with.**
+ *
+ * The insight heads are left aligned and have to be: a title over a paragraph
+ * has to start where the paragraph starts or the page has two left edges. This
+ * head sits over a panel that runs the full shell, so there is no column under
+ * it to agree with, and left aligned it read as a page whose content had slid
+ * to one side. The measure still caps the line length; what changes is where
+ * the capped block sits. */
 .servicesHeroInner {
+  align-items: center;
   position: relative;
+  text-align: center;
   z-index: var(--helix-layer-raised);
 }
 

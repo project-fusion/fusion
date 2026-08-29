@@ -79,9 +79,9 @@ export default async function Page() {
         class={styles.servicesAura}
         data-layer
         gain={1.15}
-        scale={1.5}
+        scale={3}
         speed={0.5}
-        variant="fracture"
+        variant="flow"
       ></helix-aura>
 
       {/* The head on the same lit field the galleries use. The page opened on
