@@ -29,8 +29,10 @@
 
 pub mod attribute_names;
 pub mod floors;
+pub mod reachable;
 pub mod reflected;
 pub mod run;
+pub mod separation;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -175,11 +177,62 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "reachable",
+            run: Runner::Source(reachable::run),
+            summary: "every attribute a stylesheet selects on the host reflects from a property",
+        },
+        Rule {
             name: "reflected",
             run: Runner::Source(reflected::run),
             summary: "no reflected property carries a default",
         },
+        Rule {
+            name: "separation",
+            run: Runner::Source(separation::run),
+            summary: "a surface hooks both its edge and its lift",
+        },
     ]
+}
+
+/// Every stylesheet under `directory`.
+pub fn stylesheets(directory: &Path, found: &mut Vec<PathBuf>) {
+    collect(directory, found, &|path, _| {
+        path.extension()
+            .is_some_and(|one| one.eq_ignore_ascii_case("css"))
+    });
+}
+
+/// The family a file belongs to, which is its first segment under the tier.
+///
+/// **A family is a directory and not a naming convention**, which is what lets
+/// a rule pair a styled stylesheet with the headless property it selects on
+/// without either naming the other.
+pub fn family<'a>(file: &'a Path, tier: &Path) -> Option<&'a str> {
+    file.strip_prefix(tier)
+        .ok()?
+        .components()
+        .next()?
+        .as_os_str()
+        .to_str()
+}
+
+/// Every file under `directory` the predicate accepts, in a stable order.
+fn collect(directory: &Path, found: &mut Vec<PathBuf>, keep: &dyn Fn(&Path, &str) -> bool) {
+    let Ok(entries) = fs::read_dir(directory) else {
+        return;
+    };
+    let mut paths: Vec<PathBuf> = entries.flatten().map(|entry| entry.path()).collect();
+    paths.sort();
+    for path in paths {
+        if path.is_dir() {
+            collect(&path, found, keep);
+            continue;
+        }
+        let name = path.file_name().unwrap_or_default().to_string_lossy();
+        if keep(&path, &name) {
+            found.push(path.clone());
+        }
+    }
 }
 
 /// Every component source file under `directory`, specs and generated
@@ -189,26 +242,10 @@ pub fn all() -> Vec<Rule> {
 /// `.css.ts` is emitted from a stylesheet. Reading either would report faults in
 /// files nobody wrote by hand.
 pub fn sources(directory: &Path, found: &mut Vec<PathBuf>) {
-    let Ok(entries) = fs::read_dir(directory) else {
-        return;
-    };
-    let mut paths: Vec<PathBuf> = entries.flatten().map(|entry| entry.path()).collect();
-    paths.sort();
-    for path in paths {
-        if path.is_dir() {
-            sources(&path, found);
-            continue;
-        }
-        let name = path
-            .file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string();
-        let typescript = path
-            .extension()
-            .is_some_and(|one| one.eq_ignore_ascii_case("ts"));
-        if typescript && !name.contains(".spec.") && !name.ends_with(".css.ts") {
-            found.push(path);
-        }
-    }
+    collect(directory, found, &|path, name| {
+        path.extension()
+            .is_some_and(|one| one.eq_ignore_ascii_case("ts"))
+            && !name.contains(".spec.")
+            && !name.ends_with(".css.ts")
+    });
 }
