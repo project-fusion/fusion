@@ -148,11 +148,17 @@ pub fn run(context: &Context) -> Report {
         message,
     };
 
-    let Some(oracle) = context
-        .settings
-        .oracle
-        .as_ref()
-        .and_then(|path| fs::read_to_string(context.root.join(path)).ok())
+    /* **No oracle configured is not a fault, and an unreadable one is.** A
+    consumer holding components to Helix's conventions may have no theme engine
+    at all, and a rule that fails on a key they never set is a rule they turn
+    off. Configured and missing is the other case entirely: somebody named a
+    file and it is not there. Reporting nothing here is what `floors` exists to
+    make visible. */
+    let Some(named) = context.settings.oracle.as_ref() else {
+        return nothing(Vec::new());
+    };
+    let Some(oracle) = fs::read_to_string(context.root.join(named))
+        .ok()
         .and_then(|raw| serde_json::from_str::<Value>(&raw).ok())
     else {
         return nothing(vec![said(

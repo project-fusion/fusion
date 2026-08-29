@@ -119,7 +119,7 @@ pub fn run(context: &Context) -> Report {
         }
         findings.push(Finding {
             detail: note.clone(),
-            file: "helix.rules.json".to_owned(),
+            file: context.settings.source.clone(),
             message: format!("`{word}` is listed as unresolved and nothing renders it any more"),
         });
     }

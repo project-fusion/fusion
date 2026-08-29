@@ -146,7 +146,7 @@ pub fn run(context: &Context) -> Report {
         }
         findings.push(Finding {
             detail: why.clone(),
-            file: "helix.rules.json".to_owned(),
+            file: context.settings.source.clone(),
             message: format!("`{pair}` is accepted and nothing paints it"),
         });
     }

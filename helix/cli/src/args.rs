@@ -61,7 +61,7 @@ pub enum Noun {
     ///
     /// **The design system saying whether you extended it correctly**, rather
     /// than a linter to be configured into usefulness. Where the source is
-    /// comes from `helix.rules.json`, because a consumer's layout is not this
+    /// comes from configuration, because a consumer's layout is not this
     /// repository's.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Component {

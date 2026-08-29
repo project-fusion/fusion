@@ -14,9 +14,10 @@
 //! cheaper of the two.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
-//! layout is not this repository's. `helix.rules.json` at the workspace root
-//! names the tiers; without it there is nothing to read and the command says so
-//! rather than reporting that it found no faults.
+//! layout is not this repository's. A `helix` key in `fusion.rules.json` names
+//! the tiers, or `helix.rules.json` does where that product is not in use;
+//! without either there is nothing to read and the command says so rather than
+//! reporting that it found no faults.
 //!
 //! **One list of tiers for every rule, which is a deliberate departure from the
 //! scripts these come from.** Those disagree with each other: the reflected-
@@ -83,7 +84,7 @@ pub struct Context {
     pub settings: Settings,
 }
 
-/// `helix.rules.json`, which is the whole configuration surface.
+/// What Helix is told about a workspace, from whichever file carries it.
 ///
 /// **One field, because one field is what is read.** A `tagPrefix` belongs here
 /// the moment a rule asks about element names, and not before: this repository's
@@ -92,6 +93,13 @@ pub struct Context {
 /// promise made to a consumer who has to guess whether setting it does anything.
 #[derive(Debug, Deserialize)]
 pub struct Settings {
+    /// The file these came from, for a rule reporting against the configuration.
+    ///
+    /// Not read from it: set by [`Settings::read`] to whichever of the two
+    /// answered, so a finding names a file the reader actually has.
+    #[serde(skip)]
+    pub source: String,
+
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
 
@@ -223,6 +231,7 @@ pub struct Settings {
     pub floors: bool,
 
     /// The two derivations of the palette, and where each of them is written.
+    #[serde(default)]
     pub seeds: Seeds,
 }
 
@@ -253,18 +262,52 @@ pub struct Seeds {
 }
 
 impl Settings {
-    /// Reads the settings beside the workspace, or says what is missing.
+    /// Reads the settings, from the product's file or from this tool's own.
+    ///
+    /// **Precedence is stated rather than discovered**, the way
+    /// [`crate::config`] states it, because a reader debugging "why did it use
+    /// that" needs an answer they can read:
+    ///
+    /// 1. `fusion.rules.json`, under a `helix` key. Helix is a plugin of that
+    ///    product, and a product's configuration is where its plugins are
+    ///    configured — one file to find, one file to review.
+    /// 2. `helix.rules.json`, for a consumer who has this tool and not that
+    ///    product. Standalone is the constraint every product CLI is built
+    ///    under, and it would be broken by *requiring* a file named for
+    ///    something they never installed.
+    /// 3. Neither, which is an error rather than a default: without `tiers`
+    ///    every rule walks nothing and reports a clean run.
+    ///
+    /// **Which file it came from travels with the settings**, because four
+    /// rules report findings against the configuration itself and a finding
+    /// naming a file the reader does not have is worse than no finding at all.
     pub fn read(root: &Path) -> Result<Self, String> {
+        let product = root.join("fusion.rules.json");
+        if let Ok(raw) = fs::read_to_string(&product) {
+            let held = serde_json::from_str::<serde_json::Value>(&raw)
+                .map_err(|error| format!("{}: {error}", product.display()))?;
+            if let Some(section) = held.get("helix") {
+                let mut settings: Self = serde_json::from_value(section.clone())
+                    .map_err(|error| format!("{}: `helix`: {error}", product.display()))?;
+                "fusion.rules.json".clone_into(&mut settings.source);
+                return Ok(settings);
+            }
+        }
+
         let file = root.join("helix.rules.json");
         let raw = fs::read_to_string(&file).map_err(|_| {
             format!(
-                "no `helix.rules.json` at {}.\n  It names the directories holding component \
-                 source, without which there is nothing to read:\n\n  {{ \"tiers\": \
-                 [\"src/components\"], \"tagPrefix\": \"acme-\" }}",
+                "no configuration at {}.\n  Helix reads a `helix` key in `fusion.rules.json`, or \
+                 `helix.rules.json` when that product is not in use. Either names the directories \
+                 holding component source, without which there is nothing to read:\n\n  \
+                 {{ \"tiers\": [\"src/components\"] }}",
                 root.display()
             )
         })?;
-        serde_json::from_str(&raw).map_err(|error| format!("{}: {error}", file.display()))
+        let mut settings: Self =
+            serde_json::from_str(&raw).map_err(|error| format!("{}: {error}", file.display()))?;
+        "helix.rules.json".clone_into(&mut settings.source);
+        Ok(settings)
     }
 
     /// The tiers as absolute paths, skipping any that are not there.

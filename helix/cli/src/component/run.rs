@@ -42,7 +42,8 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
         return Err(Failure::input(
             "none of the configured tiers exist",
             format!(
-                "`helix.rules.json` names {}, and none of them is a directory under {}",
+                "`{}` names {}, and none of them is a directory under {}",
+                settings.source,
                 missing
                     .iter()
                     .map(|one| format!("`{one}`"))

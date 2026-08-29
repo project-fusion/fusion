@@ -289,7 +289,7 @@ pub fn run(context: &Context) -> Report {
                      entry here is a claim that server-rendered markup is the only path that \
                      matters for one rule."
                 .to_owned(),
-            file: "helix.rules.json".to_owned(),
+            file: context.settings.source.clone(),
             message: format!("`{key}` is accepted and nothing writes it any more"),
         });
     }
