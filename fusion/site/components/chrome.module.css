@@ -631,3 +631,40 @@
     display: none;
   }
 }
+
+/**
+ * The two controls the bar drops on a narrow screen, as rows in the panel.
+ *
+ * Held off the navigation above them by a rule rather than a gap: they are a
+ * different kind of thing from a list of destinations, and a gap alone reads as
+ * the tree having ended untidily rather than as a second group starting.
+ */
+.navExtras {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block-start: var(--helix-space-md);
+  padding-block-start: var(--helix-space-md);
+}
+
+/* A row that matches the tree above it: same height, same inset, same quiet ink
+   until it is pointed at. `all: unset` on the button so the two are one shape
+   whichever element they are, and `box-sizing` back because unsetting takes it
+   with everything else. */
+.navExtra {
+  align-items: center;
+  all: unset;
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding-inline: var(--helix-space-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.navExtra:hover,
+.navExtra:focus-visible {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}

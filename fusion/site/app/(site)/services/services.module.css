@@ -238,3 +238,62 @@
   color: var(--helix-color-foreground-muted);
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
 }
+
+/**
+ * Edge to edge on a narrow screen, and no corner where there is no gap.
+ *
+ * The landing bands do this and the reasoning is theirs: `--site-inset` clamps
+ * to 1.5rem, so a 390px phone spends 48px, an eighth of its width, holding a
+ * card away from an edge it is not competing with. The card is the page there.
+ * The radius goes with it, because a rounded corner says where a surface ends
+ * against something else and flush against the viewport there is nothing on the
+ * other side of it.
+ *
+ * One inset, and it is the hero's: the card carries the whole of it and the
+ * sections inside add none, so the body copy starts on the line the page opens
+ * on rather than 32px inside it.
+ */
+/* **Brighter on a phone, because the field has less room to be seen in.**
+ *
+ * The shape is drawn against the canvas, so a 390px-wide box shows a slice of
+ * the pattern rather than the sweep a desktop window does, and the lit parts
+ * that survive are the edges of it. Measured against the landing page at 390,
+ * which is the comparison that matters since a reader moves between them: mean
+ * screen brightness 27.6 there against 17.7 here, on pages that should read as
+ * one site.
+ *
+ * Opacity rather than `gain`, for the reason the landing's field records: gain
+ * changes what the shader draws, brightening the lit parts and leaving the dark
+ * ones, which flattens the shape. Opacity lifts the whole field and keeps it. */
+@media (max-width: 40rem) {
+  .servicesAura {
+    opacity: 0.78;
+  }
+
+  .fieldBand :global([data-shell]) {
+    padding-inline: 0;
+  }
+
+  .bandCard {
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .bandSection,
+  .offer {
+    padding-inline: var(--site-inset);
+  }
+
+  /* The two closing panels stack with the band's own rhythm between them rather
+     than a gap, now that each is the width of the screen: a gap between two
+     full-bleed panels reads as a seam in one surface. */
+  .closingRow {
+    gap: var(--site-band);
+  }
+
+  /* A button beside another on a phone is two half-width targets and a line
+     break waiting to happen. Full width, stacked, in the order they are read. */
+  .closingRow [data-button] {
+    inline-size: 100%;
+  }
+}

@@ -62,10 +62,20 @@ export const DESTINATIONS = [
  */
 export function SiteMenu({
   onOpenChange,
+  onPreferences,
   open,
   placement = 'end',
 }: {
   onOpenChange: (open: boolean) => void
+  /**
+   * Opens the preferences drawer, where the bar has no room to show its own
+   * control.
+   *
+   * The panel closes first. Two drawers open at once is two scrims and two
+   * things to dismiss, and the second arrives over the first from the same edge,
+   * which reads as the panel having changed rather than as a new surface.
+   */
+  onPreferences?: () => void
   open: boolean
   /**
    * Which edge it arrives from, because a drawer comes from where it was
@@ -175,6 +185,35 @@ export function SiteMenu({
         >
           Get in touch
         </a>
+
+        {/* **What the bar drops on a narrow screen, picked up here.**
+            The masthead had a wordmark, a repository mark, a preferences button
+            and a Menu on a 390px line, which is four targets and a logo in 342
+            usable pixels. The two that are not navigation move into the panel
+            the Menu already opens, so the bar carries the wordmark and one way
+            in.
+
+            Rows rather than the icon buttons they were. In a bar an icon with a
+            tooltip is the whole control; in a panel every other line is a named
+            row, and a lone glyph beside them reads as a thing that did not
+            finish loading. The icon stays as the row's leading mark. */}
+        {onPreferences && (
+          <helix-flex class={styles.navExtras} direction="column" gap="2xs">
+            <button className={styles.navExtra} onClick={onPreferences} type="button">
+              <helix-icon name="gear"></helix-icon>
+              Preferences
+            </button>
+            <a
+              className={styles.navExtra}
+              href="https://github.com/project-fusion"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <helix-icon name="github-logo"></helix-icon>
+              Source on GitHub
+            </a>
+          </helix-flex>
+        )}
       </div>
     </helix-drawer>
   )
@@ -468,7 +507,12 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             real link the same size and weight. Not hidden on a narrow screen
             the way the search is: the search needs a keyboard and this needs a
             tap. */}
-        <helix-tooltip content="Source on GitHub" placement="bottom" slot="end">
+        <helix-tooltip
+          class={styles.wideOnly}
+          content="Source on GitHub"
+          placement="bottom"
+          slot="end"
+        >
           <a
             aria-label="Fusion source on GitHub"
             data-icon-link
@@ -480,7 +524,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           </a>
         </helix-tooltip>
 
-        <helix-tooltip content="Preferences" placement="bottom" slot="end">
+        <helix-tooltip class={styles.wideOnly} content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
             <helix-icon name="gear"></helix-icon>
           </helix-icon-button>
@@ -502,7 +546,14 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           off a word in a row, and there is no row here: the drawer is already
           the disclosure, so nesting another one would be two things to open
           before reading a link. */}
-      <SiteMenu onOpenChange={setOpen} open={open} />
+      <SiteMenu
+        onOpenChange={setOpen}
+        onPreferences={() => {
+          setOpen(false)
+          setPrefsOpen(true)
+        }}
+        open={open}
+      />
     </>
   )
 }

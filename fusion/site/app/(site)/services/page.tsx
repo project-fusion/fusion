@@ -120,17 +120,13 @@ export default async function Page() {
             <helix-text as="h1" data-measure data-section-title>
               {page?.title}
             </helix-text>
-            {/* **The subheading is here rather than in the frontmatter, and the
-                `lede` is not it.** That field is one sentence about where an
-                engagement starts, which belongs over the offers and is where the
-                card head reads it from. This line says what the page is, which
-                is a different job and would be a second meaning for one field.
-
-                It is also the sentence the page used to open with, before the
-                standfirst was four of them: everything else on this site is
-                being built, and this is the part that is not. */}
+            {/* The subheading, and it says what the work is rather than what
+                the rest of the site is not. It read "everything else on this
+                site is being built", which asks a buyer to hold the company's
+                build status in their head before they have been told what is on
+                offer, and answers a question nobody arriving here has. */}
             <helix-text as="p" class={styles.servicesHeroLede} data-measure>
-              Everything else on this site is being built. This is what you can buy today.
+              Interface and intelligence work, shipped into your repository.
             </helix-text>
           </helix-flex>
         </section>
