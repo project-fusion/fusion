@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 /**
- * Writes `fusion/docs/token-reference.md` from the token registry.
+ * Writes `fusion/docs/references/token-reference.md` from the token registry.
  *
  * The tokens are TypeScript and `helix/styles/tokens.json` is what they emit, so
  * this reads that map rather than matching declarations out of `tokens.css` with
@@ -37,7 +37,15 @@ import { join } from 'node:path'
    anywhere but the root, it read nothing and wrote nothing. */
 const ROOT = join(import.meta.dirname, '../../..')
 const SOURCE = 'helix/styles/tokens.json'
-const OUTPUT = 'fusion/docs/token-reference.md'
+const OUTPUT = 'fusion/docs/references/token-reference.md'
+
+/* The climb from the written file back to the root, derived from where it is
+   written rather than counted by hand. A link inside a generated document is
+   followed relative to that document, so a hardcoded `../..` is correct only at
+   the depth it was written at: moving this file one level down left the link one
+   level short, and the `--check` passed the whole time, because the generator
+   and the committed file agreed about the wrong answer. */
+const UP = '../'.repeat(OUTPUT.split('/').length - 1)
 const ROOTS = ['fusion', 'helix']
 
 /** The fifteen, in the order the stylesheet declares them. */
@@ -198,7 +206,7 @@ const unread = declared.filter(([name]) => !reads.has(name))
 const lines = [
   '# Token reference',
   '',
-  '*Generated from [`helix/styles/src/tokens.ts`](../../helix/styles/src/tokens.ts) by',
+  `*Generated from [\`helix/styles/src/tokens.ts\`](${UP}helix/styles/src/tokens.ts) by`,
   '`bun run gen:tokens-reference`. Do not edit.*',
   '',
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,

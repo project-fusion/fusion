@@ -77,7 +77,7 @@ jobs, on a clean checkout, and it is better at every part of that than a laptop
 is.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
-a push. `fusion/docs/token-reference.md is behind helix/styles/tokens.json` is a
+a push. `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a
 red build that stays red until somebody runs `bun run gen:tokens-reference` and
 pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
 the twelve generated-file checks and nothing else: seconds against ten minutes.

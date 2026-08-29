@@ -1,6 +1,6 @@
 # Token reference
 
-*Generated from [`helix/styles/src/tokens.ts`](../../helix/styles/src/tokens.ts) by
+*Generated from [`helix/styles/src/tokens.ts`](../../../helix/styles/src/tokens.ts) by
 `bun run gen:tokens-reference`. Do not edit.*
 
 185 semantic tokens in 15 categories, every one in exactly

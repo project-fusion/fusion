@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Writes `fusion/docs/component-reference.md` from the manifest.
+ * Writes `fusion/docs/references/component-reference.md` from the manifest.
  *
  * **Unnumbered, and that is the point of the name.** A sequence number is a
  * reading order for documents somebody wrote; this one is written by a script
@@ -37,7 +37,7 @@ import { reference, referenceFamilies } from '../../../helix/docs/src/reference.
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const MANIFEST = 'helix/styled/custom-elements.json'
-const OUTPUT = 'fusion/docs/component-reference.md'
+const OUTPUT = 'fusion/docs/references/component-reference.md'
 
 const manifest = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))
 

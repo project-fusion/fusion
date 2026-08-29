@@ -44,8 +44,8 @@ on purpose and are not softened as the company matures.
 
 ## Documents
 
-`fusion/docs/insights/` is the published essays, and the two generated
-references beside it are `component-reference.md` and `token-reference.md`.
+`fusion/docs/insights/` is the published essays, and `fusion/docs/references/`
+holds the two generated ones, `component-reference.md` and `token-reference.md`.
 
 ## Packages
 

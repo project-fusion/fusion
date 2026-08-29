@@ -4,7 +4,7 @@
 # **This is the one class CI cannot fix for you.** `verify.yml` runs everything
 # on every push, sharded, on a clean checkout, and it is better at all of it than
 # a laptop is: types, specs, browsers, Rust. What it cannot do is regenerate.
-# `fusion/docs/token-reference.md is behind helix/styles/tokens.json` is a red build that
+# `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a red build that
 # stays red until somebody runs `bun run gen:tokens-reference` and pushes again, so catching it
 # here saves a round trip rather than duplicating a gate.
 #

@@ -19,6 +19,7 @@ pub mod react_bridge;
 pub mod registration;
 pub mod scoped;
 pub mod scripts;
+pub mod strays;
 pub mod shaders;
 pub mod shipped;
 
@@ -289,6 +290,12 @@ pub fn all() -> Vec<Rule> {
             name: "shaders",
             run: Runner::Source(shaders::run),
             summary: "GLSL written inside a template literal is still GLSL",
+        },
+        Rule {
+            fix: None,
+            name: "strays",
+            run: Runner::Source(strays::run),
+            summary: "no `.js` file sits in a package's source tree",
         },
         Rule {
             fix: None,
