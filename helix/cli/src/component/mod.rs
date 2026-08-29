@@ -15,9 +15,19 @@
 //!
 //! **Where the source is comes from configuration**, because a consumer's
 //! layout is not this repository's. `helix.rules.json` at the workspace root
-//! names the tiers and the tag prefix; without it there is nothing to read and
-//! the command says so rather than reporting that it found no faults.
+//! names the tiers; without it there is nothing to read and the command says so
+//! rather than reporting that it found no faults.
+//!
+//! **One list of tiers for every rule, which is a deliberate departure from the
+//! scripts these come from.** Those disagree with each other: the reflected-
+//! default rule reads two tiers and the platform-spelling rule reads four, and
+//! the difference is where each was written rather than a decision anybody
+//! took. A reflected property carrying a default is wrong wherever it is
+//! declared. So the tiers are the consumer's component source, once, and the
+//! coverage here is a superset: 85 reflected properties against the script's
+//! 80, the extra five clean.
 
+pub mod attribute_names;
 pub mod reflected;
 pub mod run;
 
@@ -100,11 +110,18 @@ pub struct Rule {
 }
 
 pub fn all() -> Vec<Rule> {
-    vec![Rule {
-        name: "reflected",
-        run: reflected::run,
-        summary: "no reflected property carries a default",
-    }]
+    vec![
+        Rule {
+            name: "attribute-names",
+            run: attribute_names::run,
+            summary: "a property mirroring a platform attribute uses the platform's spelling",
+        },
+        Rule {
+            name: "reflected",
+            run: reflected::run,
+            summary: "no reflected property carries a default",
+        },
+    ]
 }
 
 /// Every component source file under `directory`, specs and generated

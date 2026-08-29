@@ -66,7 +66,7 @@ pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
 
     for (rule, report) in &reports {
         println!(
-            "{} {:<15}{} {} checked",
+            "{} {:<18}{} {} checked",
             if report.ok() { " " } else { "x" },
             paint.bold(rule.name),
             report.checked,
