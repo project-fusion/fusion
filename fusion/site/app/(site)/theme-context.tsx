@@ -207,7 +207,7 @@ const applyScope = (
      declarations. */
   node.dataset.helixTheme = ''
   /* Not `--helix-*`: that prefix belongs to the design system, and squatting on
-     it made `check:css:tokens` read this as one of its tokens, renamed or
+     it made the `tokens` rule read this as one of its tokens, renamed or
      mistyped. It is a page-local flag. */
   node.style.setProperty('--preview-color-scheme', scheme)
   for (const token of theme.tokens) {

@@ -30,7 +30,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
           way to say one thing and the component is the one that owns its
           surface: `--card-backdrop` and `--card-background-color` are the hooks
           that tune it, and a document rule reaching past them is what
-          `check:css:overruled` exists to catch. The recipe is for elements that are
+          `helix component`'s `overruled` exists to catch. The recipe is for elements that are
           not components. */}
       <helix-card material="glass" separation="elevated">
         {/* Both facts as tags, and toned the way the post's own page tones them:
