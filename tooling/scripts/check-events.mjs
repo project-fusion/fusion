@@ -10,7 +10,7 @@
  * declared it, so the refusal path was undiscoverable from the docs.
  *
  * Nothing about a missing `@event` fails, warns, or looks wrong, which is why it
- * takes a check. Same shape as `check:css:hooks` and `check:api:parts`.
+ * takes a check. Same shape as `check:css:hooks` and `helix component`'s `parts`.
  *
  * **Declared on the class that dispatches, or on one it extends.** A styled
  * component almost never dispatches anything of its own, and an event announced

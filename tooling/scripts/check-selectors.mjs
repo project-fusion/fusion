@@ -168,7 +168,7 @@ for (const tier of TIERS) {
       }
       /* And the parts a shared `draw…` helper writes on the component's behalf.
        *
-       * `check:api:parts` has the same blind spot and fails the opposite way,
+       * `helix component`'s `parts` has the same blind spot and fails the opposite way,
        * which is why both are needed: there a real part reads as
        * documented-and-never-rendered, here a live stylesheet rule reads as
        * matching nothing. */
@@ -446,7 +446,7 @@ for (const tier of TIERS) {
  * `part="x"` without excluding the leading bracket lets a lookup satisfy itself:
  * the very selector being checked counts as evidence that the part exists, so
  * the rule passes on a name nothing renders. That is why the pattern below
- * carries `(?<!\[)`. It is the same shape as `check:api:parts` counting a JSDoc
+ * carries `(?<!\[)`. It is the same shape as the `parts` rule counting a JSDoc
  * that quotes markup.
  */
 const OWNS_PARTS = (tier) => tier !== SOURCE.core

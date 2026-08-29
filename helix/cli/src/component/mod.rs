@@ -30,13 +30,16 @@
 pub mod attribute_names;
 pub mod cancelable;
 pub mod categories;
+pub mod compositions;
 pub mod disabled;
+pub mod exportparts;
 pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
 pub mod hook_names;
 pub mod leaks;
 pub mod observers;
+pub mod parts;
 pub mod print;
 pub mod reachable;
 pub mod reflected;
@@ -73,6 +76,15 @@ pub struct Context {
 pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
+
+    /// Places a consumer writes `::part()` from outside a component.
+    ///
+    /// **A selector naming a part nothing publishes is dead wherever it is
+    /// written**, and the rules about parts read a component's own sheet and
+    /// stop, so documentation, examples and a marketing site are the places
+    /// nobody looks. Relative to the root; build output is skipped.
+    #[serde(default)]
+    pub outside: Vec<String>,
 
     /// The stylesheets defining the token layer, in cascade order.
     ///
@@ -270,6 +282,11 @@ pub fn all() -> Vec<Rule> {
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
         },
         Rule {
+            name: "exportparts",
+            run: Runner::Source(exportparts::run),
+            summary: "a composed child's parts are forwarded, prefixed and reachable",
+        },
+        Rule {
             name: "fallbacks",
             run: Runner::Source(fallbacks::run),
             summary: "a slot's fallback markup sits behind a seam a tier can move",
@@ -293,6 +310,11 @@ pub fn all() -> Vec<Rule> {
             name: "observers",
             run: Runner::Source(observers::run),
             summary: "an observer torn down on disconnect is registered again on reconnect",
+        },
+        Rule {
+            name: "parts",
+            run: Runner::Source(parts::run),
+            summary: "a documented part is rendered, and a rendered part is documented",
         },
         Rule {
             name: "print",
@@ -350,6 +372,43 @@ pub fn all() -> Vec<Rule> {
             summary: "one spelling for each role a part name can play",
         },
     ]
+}
+
+/// Every file under `directory` a `::part()` could be written in.
+///
+/// Build output is skipped: it is a copy of a source this already reads, so
+/// including it reports every finding twice and names the copy.
+pub fn walk_outside(directory: &Path, found: &mut Vec<PathBuf>) {
+    let Ok(entries) = fs::read_dir(directory) else {
+        return;
+    };
+    let mut paths: Vec<PathBuf> = entries.flatten().map(|entry| entry.path()).collect();
+    paths.sort();
+    for path in paths {
+        let name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+        if path.is_dir() {
+            if !matches!(
+                name.as_str(),
+                ".next" | ".turbo" | "node_modules" | "public"
+            ) {
+                walk_outside(&path, found);
+            }
+            continue;
+        }
+        let readable = matches!(
+            path.extension()
+                .map(|one| one.to_string_lossy().to_string())
+                .as_deref(),
+            Some("css" | "md" | "mdx" | "ts" | "tsx")
+        );
+        if readable && !name.ends_with(".css.ts") {
+            found.push(path);
+        }
+    }
 }
 
 /// Every spec under `directory` whose name ends with `suffix`.
