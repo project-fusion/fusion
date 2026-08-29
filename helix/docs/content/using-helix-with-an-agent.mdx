@@ -146,9 +146,11 @@ Two distinctions worth knowing before searching:
 
 Three doors, in the order to try them.
 
-1. **A token.** `--helix-radii-md: 2px` at `:root` reaches every component,
+1. **A token.** `--helix-seed-radii: 2px` at `:root` reaches every component,
    because custom properties inherit. Most "can I restyle the button" is really
-   "our brand has less rounding".
+   "our brand has less rounding". The seed and not `--helix-radii-md`: the four
+   radii are siblings derived from it, so `md` alone moves neither the buttons
+   nor the cards.
 2. **A per-component hook.** `--card-padding` on `helix-card`. Named after the
    component, documented on its page, defaults to a semantic token.
 3. **A part.** `helix-select::part(trigger)`. The most powerful and the one that

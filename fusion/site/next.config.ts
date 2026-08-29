@@ -32,7 +32,7 @@ const config: NextConfig = {
   /**
    * The preview frame's HTML is never cached; everything it points at is.
    *
-   * `bun run gen:frame` stamps the bundle and the stylesheet with a hash of their
+   * `turbo run frame` stamps the bundle and the stylesheet with a hash of their
    * contents, so `frame.js?v=61ce3e17` is a new URL whenever the code changes,
    * and an old URL can never be served for new code. The one file that cannot
    * be cached is the static document carrying those two URLs: a browser holding

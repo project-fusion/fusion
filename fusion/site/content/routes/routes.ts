@@ -8,8 +8,8 @@ import { INSIGHTS } from '../insights'
  * Every page this site serves, in one module.
  *
  * **Nothing else enumerates routes.** The sitemap, `llms.txt` and the markdown
- * generator all read this, which is what makes `check:gen:routes`
- * possible, and `check:gen:routes` is what stops the markdown surface decaying into
+ * generator all read this, which is what makes `turbo run routes -- --check`
+ * possible, and `turbo run routes -- --check` is what stops the markdown surface decaying into
  * a stale parallel site. That decay is the failure mode of every
  * documentation-for-models project that keeps two lists.
  *
@@ -95,7 +95,7 @@ const PROSE: Route[] = [
     title: 'Contact',
   },
   /* The two legal pages, at a lower priority than anything a reader came for.
-     Listed rather than omitted because `check:gen:routes` holds every address the
+     Listed rather than omitted because `turbo run routes -- --check` holds every address the
      site serves, and an unlisted page is one a sitemap never names and nothing
      notices going missing. */
   {

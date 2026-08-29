@@ -12,7 +12,7 @@ export function Example() {
 
         {/* The frame is the security boundary: `allow-scripts` and never
                `allow-same-origin`, so what runs in it cannot reach this page. `src`
-               is the document it loads, `styles` the sheet to put in it, and
+               is the document it loads, `turbo run styles` the sheet to put in it, and
                `source` is what the root hands over whenever the editor changes. */}
         <helix-sandbox-preview
           label="Live preview"

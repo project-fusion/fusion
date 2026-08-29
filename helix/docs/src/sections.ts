@@ -10,7 +10,7 @@
  *
  * **A section with no pages is not declared.** A navigation entry is the
  * strongest existence claim a site can make, so a section is added with the
- * pages that fill it rather than ahead of them. `bun run check:gen:docs` fails
+ * pages that fill it rather than ahead of them. `turbo run docs -- --check` fails
  * on an empty section rather than rendering a heading with nothing under it.
  */
 

@@ -10,8 +10,8 @@ pub mod dialect;
 pub mod documented;
 pub mod orphans;
 pub mod references;
-pub mod tag_order;
 pub mod repository;
+pub mod tag_order;
 
 use crate::rules::{floor, Rule, Runner};
 

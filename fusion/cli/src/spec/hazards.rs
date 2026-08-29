@@ -40,7 +40,13 @@ use crate::rules::{Context, Finding, Report};
 use crate::workspace::crawl;
 
 /// Array types whose members are DOM nodes, which no deep matcher may walk.
-const NODES: [&str; 5] = ["EventTarget", "HTMLElement", "Element", "Node", "ShadowRoot"];
+const NODES: [&str; 5] = [
+    "EventTarget",
+    "HTMLElement",
+    "Element",
+    "Node",
+    "ShadowRoot",
+];
 const DEEP: [&str; 2] = ["toEqual", "toStrictEqual"];
 
 static HOLDER: LazyLock<Regex> = LazyLock::new(|| {
@@ -184,7 +190,9 @@ pub fn run(context: &Context) -> Report {
                                  path instead."
                             .to_owned(),
                         file: format!("{where_}:{}", at + 1),
-                        message: format!("imports `{name}`, its own package, which resolves to `dist`"),
+                        message: format!(
+                            "imports `{name}`, its own package, which resolves to `dist`"
+                        ),
                     });
                 }
             }

@@ -47,7 +47,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUTPUT = 'helix/docs/content/metrics.mdx'
 
 /**
- * What the other systems measured, from `bun run gen:peers`.
+ * What the other systems measured, from `turbo run peers`.
  *
  * Committed, because measuring them needs a registry and `check:gen:metrics` runs
  * in CI. Our own side of that comparison is not in the file: it is measured
@@ -56,7 +56,7 @@ const OUTPUT = 'helix/docs/content/metrics.mdx'
  */
 const PEERS = 'helix/docs/peers.json'
 
-/** What a component costs in time, from `bun run gen:timings`. */
+/** What a component costs in time, from `turbo run timings`. */
 const TIMINGS = 'helix/docs/timings.json'
 
 /**
@@ -475,7 +475,7 @@ const comparison = () => {
     return [
       '## Against other systems',
       '',
-      'Not measured. `bun run gen:peers` installs the systems and writes',
+      'Not measured. `turbo run peers` installs the systems and writes',
       '`helix/docs/peers.json`, and this section renders whatever is in it.',
       '',
     ]
@@ -515,7 +515,7 @@ const comparison = () => {
   return [
     '## Against other systems',
     '',
-    `Four other libraries of custom elements, pinned and measured on ${peers.measured} by \`bun run gen:peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.`,
+    `Four other libraries of custom elements, pinned and measured on ${peers.measured} by \`turbo run peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.`,
     '',
     `**Every system here is built on Lit**, so the runtime under the comparison is the same library in every column and what is left is the components. A React component library is not in the table, because comparing a custom element with a React component measures the framework.`,
     '',
@@ -551,7 +551,7 @@ const timing = () => {
     return [
       '## What it costs in time',
       '',
-      'Not measured. `bun run gen:timings` drives a real browser against the',
+      'Not measured. `turbo run timings` drives a real browser against the',
       'built packages and writes `helix/docs/timings.json`, and this section',
       'renders whatever is in it.',
       '',
@@ -560,7 +560,7 @@ const timing = () => {
   return [
     '## What it costs in time',
     '',
-    `Measured on ${timings.measured} by \`bun run gen:timings\`, which drives a real browser against the built packages. The median of ${timings.runs} runs each, on one machine.`,
+    `Measured on ${timings.measured} by \`turbo run timings\`, which drives a real browser against the built packages. The median of ${timings.runs} runs each, on one machine.`,
     '',
     "**These never join the comparison above, and that is not a hedge.** Bytes are a fact about a package and can be held against anybody else's. A timing is a fact about a page, a machine and a day, so a column of somebody else's milliseconds would be comparing two laptops rather than two libraries.",
     '',
@@ -727,7 +727,7 @@ lines.push(
   'not say as much as for what it does.',
   '',
   '- **No whole-library comparison, and no fifth component.** The comparison above is five components against four systems. Widening it means naming the equivalent element in each system by hand, which is where a comparison table starts arguing, so each addition is a deliberate one rather than a sweep.',
-  '- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running `bun run gen:peers`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.',
+  '- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running `turbo run peers`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.',
   '- **No first paint.** The timings above are facts about a component: time to upgrade, first render, hydration. First paint is a fact about a whole page, so it belongs to whatever renders one rather than to the library it renders.',
   "- **No per-component stylesheet bytes.** There are none to report: a family's CSS is compiled into its JavaScript, so it is already inside every number above. `elements.css` is the light-DOM layer and is in the stylesheet table.",
   '',

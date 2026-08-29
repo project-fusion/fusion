@@ -19,7 +19,7 @@
  * section: all of them fail the build, so the committed file is only ever a
  * valid one.
  *
- * Run with `bun run gen:docs`, or `bun run check:gen:docs` for the check.
+ * Run with `turbo run docs`, or `turbo run docs -- --check` for the check.
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -429,7 +429,7 @@ const literal = (page) =>
 
 const generated = `/**
  * Every page this package documents, derived from the frontmatter of each MDX
- * file by \`bun run gen:docs\`. Do not edit: \`bun run check:gen:docs\` fails when this
+ * file by \`turbo run docs\`. Do not edit: \`turbo run docs -- --check\` fails when this
  * file and the content disagree, and the content is the source.
  */
 import type { DocPage } from './registry.js'
@@ -457,8 +457,8 @@ if (!check && refilled.length > 0) {
    that traced this repository into a server bundle, and a content package must
    not be the thing that puts it back. */
 const sources = `/**
- * Every page's MDX, inlined by \`bun run gen:docs\`. Do not edit: the files in
- * \`content/\` are the source, and \`bun run check:gen:docs\` fails when this module
+ * Every page's MDX, inlined by \`turbo run docs\`. Do not edit: the files in
+ * \`content/\` are the source, and \`turbo run docs -- --check\` fails when this module
  * and they disagree.
  */
 export const docSources: Record<string, string> = {
@@ -478,16 +478,14 @@ ${slugs
 if (check) {
   const existing = readFileSync(OUT, 'utf8')
   if (refilled.length > 0) {
-    console.error(
-      `docs: a token table is stale in ${refilled.join(', ')}. Run \`bun run gen:docs\``,
-    )
+    console.error(`docs: a token table is stale in ${refilled.join(', ')}. Run \`turbo run docs\``)
     process.exit(1)
   }
   if (
     existing !== formatted(generated, 'pages.generated.ts') ||
     readFileSync(SOURCES, 'utf8') !== formatted(sources, 'sources.generated.ts')
   ) {
-    console.error('docs: pages.generated.ts is stale. Run `bun run gen:docs`')
+    console.error('docs: pages.generated.ts is stale. Run `turbo run docs`')
     process.exit(1)
   }
   console.log(

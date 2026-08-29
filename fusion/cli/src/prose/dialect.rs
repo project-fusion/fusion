@@ -204,7 +204,10 @@ fn survey(context: &Context) -> (usize, Vec<(PathBuf, String, String)>) {
         &context.root,
         &|path: &Path| {
             let where_ = path.to_string_lossy().replace('\\', "/");
-            if OUTPUT.iter().any(|one| where_.contains(&format!("/{one}/"))) {
+            if OUTPUT
+                .iter()
+                .any(|one| where_.contains(&format!("/{one}/")))
+            {
                 return false;
             }
             path.extension()

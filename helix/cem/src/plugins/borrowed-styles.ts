@@ -35,7 +35,7 @@ import type {
  * button and is answered here, and `inheritedFrom` is the field that says so.
  *
  * **Only a direct `X.styles` reference counts.** The initializer is walked for
- * a property access whose property is `styles` and whose target is a plain
+ * a property access whose property is `turbo run styles` and whose target is a plain
  * identifier, which is the shape every borrower in the library uses and is
  * statically decidable. Anything computed is left alone rather than guessed at:
  * a hook wrongly attributed to a component reads as API and is worse than one

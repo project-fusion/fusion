@@ -5,7 +5,7 @@
 # on every push, sharded, on a clean checkout, and it is better at all of it than
 # a laptop is: types, specs, browsers, Rust. What it cannot do is regenerate.
 # `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a red build that
-# stays red until somebody runs `bun run gen:tokens-reference` and pushes again, so catching it
+# stays red until somebody runs `turbo run tokens` and pushes again, so catching it
 # here saves a round trip rather than duplicating a gate.
 #
 # **It judges and never writes.** `bun run fix` rewrites files, and a hook that
@@ -28,6 +28,11 @@
 # runs on `bun install`. Skip once with `git push --no-verify`.
 set -e
 
+# `turbo` is a workspace binary, and `sh -c` below does not get the PATH bun
+# adds. Named once here rather than prefixed onto eleven commands.
+PATH="$PWD/node_modules/.bin:$PATH"
+export PATH
+
 printf 'pre-push: formatting and lint\n'
 bunx biome ci . >/dev/null 2>&1 || {
   printf '\n  biome refuses this tree. Run `bun run fix` and commit the result.\n\n'
@@ -40,7 +45,7 @@ bunx biome ci . >/dev/null 2>&1 || {
 # unchanged by verifying it"* on three shards, which names nothing.
 #
 # `themed-page` was in neither for longer, and its failure is the worse shape:
-# `verify` runs `check:gen:themed-page`, so CI went red naming the file, and `regen`
+# `verify` runs `turbo run themed-page -- --check`, so CI went red naming the file, and `regen`
 # did not write it, so the remedy this repository documents did not produce the
 # fix. A check in `verify` whose writer is not in `regen` is a red build with no
 # published way out of it.
@@ -72,10 +77,24 @@ bun run check:cli >/tmp/pre-push-$$.log 2>&1 || {
 rm -f /tmp/pre-push-$$.log
 
 printf 'pre-push: generated files\n'
-for task in gen:reference gen:element-events gen:tokens-reference gen:tokens-layer \
-            gen:metrics gen:docs gen:samples gen:routes gen:content gen:themed-page \
-            gen:eval; do
-  bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
+# **Written out rather than assembled from a suffix.** This was a loop over
+# `gen:*` names calling `bun run "check:$task"`, and a name a shell builds at run
+# time is a name nothing can check: `fusion workspace`'s `scripts` rule reads
+# literal `bun run` calls, so when those aliases were deleted for the turbo tasks
+# they now name, every one of them still resolved here and failed on the push.
+for check in \
+  "turbo run reference -- --check" \
+  "turbo run tokens -- --check" \
+  "turbo run token-layer -- --check" \
+  "turbo run docs -- --check" \
+  "turbo run samples -- --check" \
+  "turbo run routes -- --check" \
+  "turbo run content -- --check" \
+  "turbo run themed-page -- --check" \
+  "bun run check:gen:element-events" \
+  "bun run check:gen:metrics" \
+  "bun run check:gen:eval"; do
+  sh -c "$check" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'
     printf '\n'

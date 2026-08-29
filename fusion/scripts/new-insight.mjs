@@ -114,4 +114,4 @@ writeFileSync(
 
 console.log(`insight: fusion/docs/insights/content/${slug}.mdx`)
 console.log(`  /insights/${slug}`)
-console.log('  Fill in `description`, `kind` and `topic`, then `bun run gen:content`.')
+console.log('  Fill in `description`, `kind` and `topic`, then `turbo run content`.')

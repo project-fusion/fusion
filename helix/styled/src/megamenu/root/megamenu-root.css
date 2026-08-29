@@ -97,7 +97,12 @@
    * around the panel instead of no box at all. */
   border: var(--megamenu-border-width, var(--helix-border-thin)) solid
     light-dark(transparent, var(--helix-color-border));
-  border-radius: var(--helix-radii-md);
+  /* The house corner, and being the largest panel in the library is not a
+     reason to take a different one. A radius is read against the corner beside
+     it rather than against the area behind it, so a wide panel at `md` next to
+     a menu at `sm` reads as two systems rather than as one panel that happens
+     to be bigger. Every floating panel is `sm`. */
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--megamenu-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   /* The panel expands downward rather than appearing, and the clip is what does

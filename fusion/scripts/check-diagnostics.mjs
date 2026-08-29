@@ -22,7 +22,7 @@
  * libraries in one step, and a module graph on `file://` is blocked by the
  * same-origin rules the bundles' own imports rely on.
  *
- * Run with `bun run check:spec:diagnostics`, after `bun run gen:specs`.
+ * Run with `bun run check:spec:diagnostics`, after `turbo run specs`.
  */
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'

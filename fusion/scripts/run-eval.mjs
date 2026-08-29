@@ -15,7 +15,7 @@
  *
  * So `check:gen:eval` runs the reference and demands 100%. That is not circular and
  * it is not a claim about any agent: it is the corpus checking itself, the same
- * way `check:gen:reference` holds a generated file to its generator. **What it
+ * way `turbo run reference -- --check` holds a generated file to its generator. **What it
  * catches is staleness.** A family rename invalidates forty questions at once,
  * silently, and the reference is what notices.
  *

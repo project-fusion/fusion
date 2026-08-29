@@ -51,7 +51,7 @@ holds the two generated ones, `component-reference.md` and `token-reference.md`.
 
 | Domain | Packages |
 |---|---|
-| **Helix** (`@fusion.dev/helix-*`) | `styles` `core` `headless` `icons` `theme` `docs` `diagnostics`, and `@fusion.dev/helix` for the styled tier. `cem` `gallery` `sandbox` `testing` are build tooling and do not publish |
+| **Helix** (`@fusion.dev/helix-*`) | `turbo run styles` `core` `headless` `icons` `theme` `docs` `diagnostics`, and `@fusion.dev/helix` for the styled tier. `cem` `gallery` `sandbox` `testing` are build tooling and do not publish |
 | **Cortex** | the crates `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram`, which do not publish yet, and `@fusion.dev/cortex-docs` |
 
 Versions are **lockstep within a domain**, independent across domains. See

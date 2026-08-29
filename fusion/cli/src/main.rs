@@ -15,8 +15,8 @@
 //! named.
 
 mod prose;
-mod spec;
 mod rules;
+mod spec;
 mod workspace;
 
 use std::io::IsTerminal;

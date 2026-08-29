@@ -18,18 +18,37 @@ import { execFileSync } from 'node:child_process'
  * reference into the primitive layer: that is the honest answer to "what is
  * this", because the indirection is the point.
  *
+ * **And a color also gets the hex, which answers the other question.** The value
+ * column says what a token *is*: a chain of references ending in OKLCH
+ * arithmetic, and useless to anybody holding a color picker. Both modes, since a
+ * token resolving through `light-dark()` is two colors and printing one of them
+ * would be picking a favorite. Where the two agree the second cell says so
+ * rather than repeating the first, because two identical hexes read as a
+ * distinction the token does not draw.
+ *
+ * **It is the default palette, and the page says so.** Every color here derives
+ * from the four seeds, so a consumer who has set `--helix-seed-brand` has a
+ * different table and no generated file can hold theirs. What is documented is
+ * what ships unthemed.
+ *
+ * **Resolved by arithmetic in Node rather than measured in a browser**, because
+ * this file is committed and `verify` checks it in a job with no browser in it.
+ * `check:css:hexes` holds that arithmetic to what Chromium paints, and is the
+ * reason to believe the column.
+ *
  * **Readers are counted, because a token nothing reads is worth seeing.** Not a
  * fault on its own, a complete scale is part of the product and a consumer can
  * read a rung we do not, but it is the difference between a scale and a
  * leftover, and `helix component`'s `tokens` cannot see it: that check asks that every token
  * *referenced* exists, never that every token *declared* is read.
  *
- * Run `bun run gen:tokens-reference` to write it, and
- * `bun run check:gen:tokens-reference` to fail when it is behind. `verify` runs the check rather than the writer, for the
+ * Run `turbo run tokens` to write it, and
+ * `turbo run tokens -- --check` to fail when it is behind. `verify` runs the check rather than the writer, for the
  * same reason it runs `biome ci`.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { layers, paint } from '@fusion.dev/scripts/paint'
 
 /* From this file rather than from the working directory. Every path below is
    repository-relative, which was true by accident while this lived at the root
@@ -107,7 +126,7 @@ const walk = (dir, found = []) => {
 /**
  * What git ignores, which is this repository's own record of what is generated.
  *
- * **A generated file is the sources counted again.** `bun run styles` writes a
+ * **A generated file is the sources counted again.** `turbo run styles` writes a
  * `.css.ts` beside every `.css` holding the same rules as a template literal,
  * which doubles every stylesheet; `helix/styled/elements.css` and
  * `fusion/site/public/sandbox/frame.css` are the style layers concatenated, and
@@ -178,6 +197,13 @@ for (const root of ROOTS) {
 const registry = JSON.parse(readFileSync(join(ROOT, SOURCE), 'utf8'))
 const declared = registry.tokens.map((token) => [token.name, token.value])
 
+/* Both layers, because a semantic token may reference another: `color-well` is
+   a mix of `color-foreground`, and the primitives alone cannot close it. */
+const palette = layers(
+  readFileSync(join(ROOT, 'helix/styles/src/primitives.css'), 'utf8'),
+  registry.tokens,
+)
+
 const grouped = new Map(CATEGORIES.map((one) => [one, []]))
 const stray = []
 for (const [name, value] of declared) {
@@ -207,7 +233,7 @@ const lines = [
   '# Token reference',
   '',
   `*Generated from [\`helix/styles/src/tokens.ts\`](${UP}helix/styles/src/tokens.ts) by`,
-  '`bun run gen:tokens-reference`. Do not edit.*',
+  '`turbo run tokens`. Do not edit.*',
   '',
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,
   'one. These are the whole of what a component or an app may use. The primitive',
@@ -217,6 +243,13 @@ const lines = [
   'Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are',
   'not here. They are API, they default to a semantic token, and the `hooks` rule',
   'holds them to both directions.',
+  '',
+  '**Light** and **Dark** are the sRGB the default palette paints, with the seeds',
+  'left alone. Set `--helix-seed-brand` or any of the other three and these move;',
+  'the token names and the relationships between them do not, which is the point',
+  'of the indirection. A token holding one color in both schemes says so rather',
+  'than printing the same hex twice. An eight-digit value is a translucent token,',
+  'and the last pair of digits is its alpha.',
   '',
   '**Reads** counts every `var()` of that token across `helix` and',
   '`site`, the sandbox included. Zero is not a fault: a complete scale is part of what is shipped and',
@@ -232,16 +265,27 @@ if (unread.length > 0) {
 
 for (const category of CATEGORIES) {
   const items = grouped.get(category) ?? []
+  /* Only `color` carries the two hex columns. A duration has no hex and an
+     empty cell on every row of fourteen categories is a column that says
+     nothing fourteen times. */
+  const colored = category === 'color'
   lines.push(
     `## ${category}`,
     '',
     PURPOSE[category] ?? '',
     '',
-    '| Token | Value | Reads |',
-    '|---|---|---|',
+    colored ? '| Token | Value | Light | Dark | Reads |' : '| Token | Value | Reads |',
+    colored ? '|---|---|---|---|---|' : '|---|---|---|',
   )
   for (const [name, value] of items) {
-    lines.push(`| \`${name}\` | \`${value}\` | ${reads.get(name) ?? 0} |`)
+    const cells = [`\`${name}\``, `\`${value}\``]
+    if (colored) {
+      const light = paint(value, palette, 'light')
+      const dark = paint(value, palette, 'dark')
+      cells.push(`\`${light}\``, light === dark ? 'as light' : `\`${dark}\``)
+    }
+    cells.push(String(reads.get(name) ?? 0))
+    lines.push(`| ${cells.join(' | ')} |`)
   }
   lines.push('')
 }
@@ -260,9 +304,7 @@ if (process.argv.includes('--check')) {
     existing = ''
   }
   if (existing !== written) {
-    console.error(
-      `${OUTPUT} is behind ${SOURCE}. Run \`bun run gen:tokens-reference\` and commit the result.`,
-    )
+    console.error(`${OUTPUT} is behind ${SOURCE}. Run \`turbo run tokens\` and commit the result.`)
     process.exit(1)
   }
   console.log(`tokens: ${declared.length} tokens in ${CATEGORIES.length} categories, current`)

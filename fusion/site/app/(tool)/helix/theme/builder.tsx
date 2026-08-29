@@ -81,7 +81,7 @@ interface FaceGroup {
 const SYSTEM: Face = { category: 0, family: '', label: 'System default' }
 
 /**
- * Every Google family, from the catalog `bun run gen:faces` writes.
+ * Every Google family, from the catalog `turbo run faces` writes.
  *
  * **A family is asked for the weights it has, not for the three the token layer
  * uses.** It is offered when it can serve at least one of 400, 500 and 600; the
@@ -672,7 +672,7 @@ export function ThemeBuilder({
        head and nowhere else, so choosing Inter renamed the family in the
        artifact while the preview went on drawing the fallback.
 
-       `@import` rather than a `<link>`, because `styles` is a channel that
+       `@import` rather than a `<link>`, because `turbo run styles` is a channel that
        already exists and adding a second one would mean a new field on the
        render message, a new branch in the frame, and a shipped component
        changed to carry the theme tool's fonts. It has to lead the stylesheet:
@@ -710,7 +710,7 @@ export function ThemeBuilder({
   /* **This document's copy.** The effect owns exactly one tag and takes it away
      again, so changing a face replaces the link rather than accumulating one per
      selection for the length of the session. The frame gets the same request
-     through `styles`, because it cannot see this one. */
+     through `turbo run styles`, because it cannot see this one. */
   useEffect(() => {
     if (!fontsHref) {
       return

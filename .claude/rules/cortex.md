@@ -66,7 +66,7 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
 - Cite it from the MDX with `[//]: # (rust:<crate>::<Type>::<method>)`, closed by
   `[//]: # (/rust)`. **The key is the name rustdoc prints**, so a failing
   doc-test names its own region.
-- `bun run gen:samples` fills the regions; `check:gen:samples` fails when a page is
+- `turbo run samples` fills the regions; `turbo run samples -- --check` fails when a page is
   behind its crate, and refuses a fenced `rust` block outside a region.
 
 ## Gotchas that produced bugs

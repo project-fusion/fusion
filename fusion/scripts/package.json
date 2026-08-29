@@ -14,6 +14,7 @@
     "./compositions": "./lib/compositions.mjs",
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",
+    "./paint": "./lib/paint.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
     "./workspace": "./lib/workspace.mjs"

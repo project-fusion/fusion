@@ -123,7 +123,7 @@ export interface Insight {
  * naming a file, two posts cannot silently take the same URL because two files
  * cannot take the same name, and retitling is editing frontmatter rather than
  * moving an address. A deliberate rename is a `git mv`, which is visible in
- * review and is where `check:gen:routes` asks for a redirect.
+ * review and is where `turbo run routes -- --check` asks for a redirect.
  *
  * The copy is drawn from `fusion/docs/`, which is the same rule the landing
  * page follows: the argument on the site and the argument in the plan are the

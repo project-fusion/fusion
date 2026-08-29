@@ -26,7 +26,7 @@ import { spawnSync } from 'node:child_process'
  * prevents drift; this only catches the cases where a source stopped being
  * wired up at all.
  *
- * Run with `bun run check:gen:routes`, after `bun run gen:catalog`.
+ * Run with `turbo run routes -- --check`, after `turbo run catalog`.
  */
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -79,7 +79,7 @@ if (drifted.length > 0) {
   console.error(
     `routes: helix/docs/dist is stale against its content (${drifted.join(' ')}).\n` +
       '  The route registry reads the built package and the catalog reads source.\n' +
-      '  Run `bun run build`, then `bun run gen:catalog`.',
+      '  Run `bun run build`, then `turbo run catalog`.',
   )
   process.exit(1)
 }
@@ -237,7 +237,7 @@ if (problems.length === 0) {
 
        `check` fixes and `verify` judges, which `AGENTS.md` states and
        `fusion prose`'s `dialect` already follows. The record is written under `--write`,
-       which `bun run gen:routes` and `bun run regen` pass; without it the check
+       which `turbo run routes` and `bun run regen` pass; without it the check
        says the file is behind and stops. */
     if (write) {
       writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
@@ -248,7 +248,7 @@ if (problems.length === 0) {
          is the shape of a check that cannot fail. */
       console.error(
         'routes: fusion/docs/insights/published.json is behind the routes that exist. Run ' +
-          '`bun run gen:routes` and commit the result.\n',
+          '`turbo run routes` and commit the result.\n',
       )
       for (const path of merged.filter((one) => !published.paths.includes(one))) {
         console.error(`  ${path}`)

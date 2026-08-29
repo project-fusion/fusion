@@ -98,13 +98,14 @@
       ]
     },
 
+    // **`pages.generated.ts` is written here, not read here**, and declaring it
+    // as an input was the same mistake `docs` carried: a file a task writes and
+    // does not declare is a file a cache hit leaves at whatever the last run put
+    // there, while the generated module beside it is restored fresh. The two
+    // then disagree and only `-- --check` notices.
     "content": {
-      "inputs": [
-        "insights/content/**",
-        "insights/src/pages.generated.ts",
-        "$TURBO_ROOT$/fusion/docs/scripts/build-content.mjs"
-      ],
-      "outputs": ["insights/src/sources.generated.ts"]
+      "inputs": ["insights/content/**", "$TURBO_ROOT$/fusion/docs/scripts/build-content.mjs"],
+      "outputs": ["insights/src/pages.generated.ts", "insights/src/sources.generated.ts"]
     },
 
     "dev": {
@@ -112,16 +113,15 @@
       "persistent": true
     },
 
-    "docs": {
-      "inputs": [
-        "content/**",
-        "src/sections.ts",
-        "$TURBO_ROOT$/helix/styles/tokens.json",
-        "$TURBO_ROOT$/helix/styles/src/primitives.css",
-        "$TURBO_ROOT$/helix/docs/scripts/build-docs.mjs"
-      ],
-      "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
-    },
+    // **Not cached, and it took a stale cache hit to see why.** This writes the
+    // token tables back into the `content/*.mdx` it reads, so its inputs are
+    // also its outputs: a run changes the key it would have been stored under,
+    // and the next hit restores the two generated modules without the mdx edits
+    // that produced them. The tree then holds a generated file and a source that
+    // disagree, and `-- --check` says stale while the plain task reports
+    // success from a replayed log. `samples` has the same shape and the same
+    // answer.
+    "docs": { "cache": false },
 
     // **Four that cannot cache, each for its own reason, said rather than
     // discovered.** `faces` fetches a font list over the network, so a cache hit
@@ -175,7 +175,7 @@
     // Two generators, two outputs. `build-styles.mjs` writes the `.css.ts`
     // mirrors and `build-elements-css.mjs` writes `elements.css` at the package
     // root, and only the first was declared. Measured: delete `elements.css`
-    // with a warm cache and `bun run styles` prints "2 successful, 2 total"
+    // with a warm cache and `turbo run styles` prints "2 successful, 2 total"
     // while the file stays missing, because a cache hit restores what a task
     // claims and nothing else. The next thing to read it fails, which is how
     // this was found: `build-frame.mjs` on ENOENT.

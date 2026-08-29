@@ -12,7 +12,7 @@
  *
  * So the layout stays in TSX and the words live here, which is the pattern
  * `verticals.ts` already is and already feeds several consumers. A page renders
- * it as Helix markup; `bun run gen:catalog` renders the same object as markdown.
+ * it as Helix markup; `turbo run catalog` renders the same object as markdown.
  *
  * **The rule that survives is narrower and still holds**: a component may not
  * appear in content that has a `.md` unless it has a markdown renderer. It

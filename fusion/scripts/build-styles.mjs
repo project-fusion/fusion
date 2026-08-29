@@ -15,7 +15,7 @@
  *
  * Output is gitignored and regenerated. Never edit a `.css.ts` by hand.
  *
- * Run with `bun run styles` (part of `build`).
+ * Run with `turbo run styles` (part of `build`).
  */
 import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -142,7 +142,7 @@ for (const file of walk(root, '.css')) {
 
   const css = readFileSync(file, 'utf8')
   const out = `${file}.ts`
-  const source = `// Generated from ${rel} by \`bun run styles\`. Do not edit.
+  const source = `// Generated from ${rel} by \`turbo run styles\`. Do not edit.
 import { createSheet } from '@fusion.dev/helix-core'
 
 export const styles = createSheet(\`${escapeForTemplate(stripComments(css))}\`)

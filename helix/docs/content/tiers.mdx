@@ -15,7 +15,7 @@ direction never reverses.
 | `@fusion.dev/helix-styles` | Tokens and the base layer. Pure CSS | nothing |
 | `@fusion.dev/helix-core` | Element base class, mixins, decorators | Lit |
 | `@fusion.dev/helix-headless` | Structure, accessibility, state, form participation | `core` |
-| `@fusion.dev/helix` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
+| `@fusion.dev/helix` | Presentation: tokens, parts, and the visual axes | `headless`, `turbo run styles` |
 
 `@fusion.dev/helix-theme` and `@fusion.dev/helix-icons` ship beside the stack rather than in it:
 neither is a tier, and neither is needed to render a component. **There is no
@@ -25,7 +25,7 @@ the bridge that repairs React's hydration of custom events is in
 
 ## Why the split
 
-**`headless` must never depend on `styles`.**
+**`headless` must never depend on `turbo run styles`.**
 
 That single constraint is what makes the headless tier independently
 consumable. Consume it and bring your own

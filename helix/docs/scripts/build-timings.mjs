@@ -48,7 +48,7 @@
  * would fail for reasons nobody caused. `verify` does not run this. It is
  * refreshed by hand, the same as the peer table, and the page says when.
  *
- * Run with `bun run gen:timings`.
+ * Run with `turbo run timings`.
  */
 
 import { execFileSync } from 'node:child_process'

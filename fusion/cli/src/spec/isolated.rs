@@ -112,9 +112,7 @@ pub fn run(context: &Context) -> Report {
 
     let registering: Vec<&PathBuf> = ancestors
         .iter()
-        .filter(|layout| {
-            fs::read_to_string(layout).is_ok_and(|source| RENDERS.is_match(&source))
-        })
+        .filter(|layout| fs::read_to_string(layout).is_ok_and(|source| RENDERS.is_match(&source)))
         .collect();
     let Ok(source) = fs::read_to_string(&registrar) else {
         return nothing(vec![said(

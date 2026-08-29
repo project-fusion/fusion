@@ -214,7 +214,7 @@ const absent = dryRun ? [] : [FRAME, SHEET].filter((one) => !existsSync(one))
 if (absent.length > 0) {
   console.error(
     `parity: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run ` +
-      '`bun run gen:frame` first: the bundle is what defines the tags on both sides.',
+      '`turbo run frame` first: the bundle is what defines the tags on both sides.',
   )
   process.exit(1)
 }
@@ -223,7 +223,7 @@ if (absent.length > 0) {
  * The bundle has to be newer than the components, or a fix looks like a failure.
  *
  * **Both sides render from `frame.js`**, so a change to a component reaches
- * neither of them until `bun run gen:frame` has rebuilt it. That is not a stale
+ * neither of them until `turbo run frame` has rebuilt it. That is not a stale
  * picture, it is a stale *library*, and it reads as the fix not having worked:
  * a repaired example re-run against an older bundle still reports its full pixel
  * count. Checked rather than remembered.
@@ -248,7 +248,7 @@ const sources = dryRun ? 0 : Math.max(...TIERS.map((tier) => newest(tier.source)
 if (sources > bundled) {
   console.error(
     'parity: `frame.js` is older than the components it bundles, so both sides would render the\n' +
-      '  library as it was before your change. Run `bun run gen:frame` and try again.',
+      '  library as it was before your change. Run `turbo run frame` and try again.',
   )
   process.exit(1)
 }
@@ -475,7 +475,7 @@ const shell = (tier, body, script) =>
   `<script defer src="/frame.js"></script>${script}${body}`
 
 /* **Held in memory rather than read per request, because the file moves.**
-   `bun run gen:frame` empties the directory and rewrites the bundle, so a rebuild
+   `turbo run frame` empties the directory and rewrites the bundle, so a rebuild
    running alongside this serves a truncated `frame.js` or none at all. Every
    element then fails to define, every React page renders an empty root, and the
    run reports all 568 examples differing, which reads as a catastrophe in the
@@ -766,7 +766,7 @@ for (const entry of entries) {
     findings.push(
       `${where}: ${missing.map((tag) => `\`<${tag}>\``).join(', ')} never upgraded, so nothing ` +
         'registers them. The example names an element the bundle does not define: check the tag ' +
-        'against the component, and that `bun run gen:frame` has run since it was renamed.',
+        'against the component, and that `turbo run frame` has run since it was renamed.',
     )
     continue
   }

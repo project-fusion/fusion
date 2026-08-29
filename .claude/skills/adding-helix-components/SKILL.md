@@ -104,7 +104,7 @@ expect(scope.getElementById(element.getAttribute('aria-labelledby'))).toBe(title
 bun run fix && bun run verify
 ```
 
-`build` runs `styles` and `analyze`, and `analyze` is what regenerates the
+`build` runs `turbo run styles` and `analyze`, and `analyze` is what regenerates the
 framework typings: `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`, in `helix/styled`,
 emitted by cem plugins. **There are no React wrappers and there is no
 `helix/react`.** Inspect the generated typings and confirm the properties and the

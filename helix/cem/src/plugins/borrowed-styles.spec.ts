@@ -160,7 +160,7 @@ describe('what it deliberately does not follow', () => {
     expect(hooksOf(self)).toEqual([])
   })
 
-  test('ignores a non-static `styles`, which is an instance field and not the sheet', () => {
+  test('ignores a non-static `turbo run styles`, which is an instance field and not the sheet', () => {
     const borrower: HelixDeclaration = { kind: 'class', name: 'HelixCopyButton' }
     const [, copyButton] = scene(
       'class HelixCopyButton extends Base { styles = [HelixIconButton.styles].flat() }',

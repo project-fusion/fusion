@@ -17,12 +17,14 @@ Three doors are open, and they are in the order you should try them.
 
 ```css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 ```
 
 If every card, dialog and button should be squarer, that is a token change and
-you are done. Tokens cross shadow boundaries on their own, because custom
+you are done. The seed rather than `--helix-radii-md`, because the four rungs
+are derived from it: `md` on its own is one step of four, and the buttons and
+dialogs are on a different one. See [Shape and borders](./shape-and-borders). Tokens cross shadow boundaries on their own, because custom
 properties inherit, so one declaration reaches every component at once.
 
 Reach for this first. Most requests that arrive as "can I restyle the button"

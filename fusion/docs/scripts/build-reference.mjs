@@ -25,7 +25,7 @@
  * directly. `verify` runs `typecheck` rather than `build`, so a `dist` this
  * depended on would be whatever the last build left behind.
  *
- * Run `bun run gen:reference` to write it, and `bun run check:gen:reference` to fail
+ * Run `turbo run reference` to write it, and `turbo run reference -- --check` to fail
  * when it is behind. `verify` runs the check rather than the writer, for the
  * same reason it runs `biome ci`: a step that edits your files cannot tell you
  * whether they were right.
@@ -43,8 +43,8 @@ const manifest = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))
 
 const written = reference(manifest, {
   lede: [
-    `*Generated from \`${MANIFEST}\` by \`bun run gen:reference\`. Do`,
-    'not edit: `bun run check:gen:reference` fails when this file and the manifest',
+    `*Generated from \`${MANIFEST}\` by \`turbo run reference\`. Do`,
+    'not edit: `turbo run reference -- --check` fails when this file and the manifest',
     'disagree, and the manifest is regenerated from the source on every build.*',
     '',
     'The styled tier, which is what an application writes. Every styled component',
@@ -63,7 +63,7 @@ const output = join(ROOT, OUTPUT)
 if (process.argv.includes('--check')) {
   if (readFileSync(output, 'utf8') !== written) {
     console.error(
-      `${OUTPUT} is behind the manifest. Run \`bun run gen:reference\` and commit the result.`,
+      `${OUTPUT} is behind the manifest. Run \`turbo run reference\` and commit the result.`,
     )
     process.exit(1)
   }

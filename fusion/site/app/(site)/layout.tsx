@@ -94,7 +94,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
 
           **From `routes()` rather than from hand-picked arrays.** Anything left
           out of such an array is simply unreachable from the palette, on a site
-          whose largest section is documentation, and `check:gen:routes` already
+          whose largest section is documentation, and `turbo run routes -- --check` already
           holds the registry that the sitemap and `llms.txt` are built from. A
           second copy of it here would drift.
 

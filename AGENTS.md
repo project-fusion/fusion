@@ -34,7 +34,7 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 | `bun run check` | Every guard, and nothing else. `check:<group>` for one group |
 | `bun run fix` | Fixes what it can: ordering, formatting, tokens |
 | `bun run regen` | Every generated file, in the one order that works |
-| `bun run build` | Compiles TS. Runs `styles` and `analyze` first |
+| `bun run build` | Compiles TS. Runs `turbo run styles` and `analyze` first |
 | `bun run analyze` | Writes the manifests and framework typings. Untracked, so a fresh clone needs it |
 | `cargo test --workspace` | Rust |
 
@@ -50,12 +50,25 @@ nine megabytes, and nobody reads a manifest in a diff. So a fresh clone has no
 manifests until `bun run analyze` has run, and every rule that reads one says so
 rather than reporting a clean tree it never looked at.
 
-**A name runs a leaf or everything under it, and never both.** `helix component`'s `tokens`
-is one guard, `check:css` is the twenty in that group, `check` is all 78. The
-groups are `api`, `css`, `gen`, `pkg`, `prose` and `spec`, and they sort by what
-a guard reads rather than by what kind of fault it catches, because the useful
-question after an edit is "what covers the thing I just touched" and never "run
-me every consistency check".
+**A name runs a leaf or everything under it, and never both.** `helix component`'s
+`tokens` is one guard, `check:css` is every guard in that group, `check` is all
+of them. The groups are `cli`, `css`, `gen`, `prose` and `spec`, and they sort by
+what a guard reads rather than by what kind of fault it catches, because the
+useful question after an edit is "what covers the thing I just touched" and never
+"run me every consistency check".
+
+**How many there are is not written down, and the absence is the decision.**
+Every count that used to be in the paragraph above had rotted: `check:css` was
+"the twenty in that group" while running four, `check` was "all 78" against a
+real 89, and the groups were listed as `api`, `css`, `gen`, `pkg`, `prose` and
+`spec`, two of which have never existed. A count is derivable and each command
+prints its own, so writing one here is a second source of truth whose copy is
+always the stale one. That is the same argument that makes the reference pages
+generated rather than typed, and it applies to a number in a sentence as much as
+to a table.
+
+The names are worth stating and the arithmetic is not, because the names are the
+vocabulary somebody has to guess right to run the thing.
 
 **A bare name, if it exists, runs everything under it.** A family with no bare
 name is fine: `gen`, `rs`, `smoke`, `probe`, `specs` and `visual` have none,
@@ -63,19 +76,19 @@ because a runner over them would be meaningless or wrong. What to avoid is a
 bare name that is not a runner.
 
 **Never add a bare `gen`.** Eleven generators have a `check:gen:` that judges
-them, and several read what an earlier one wrote: `gen:reference` and
-`gen:element-events` read the manifests `analyze` produces, `gen:tokens-reference`
-reads what `gen:tokens-layer` emits, `gen:metrics` measures the built packages,
-`gen:content` and `gen:catalog` read the pages `gen:docs` filled, and
-`gen:catalog` reads what `gen:content` writes on top of that. Run out of
+them, and several read what an earlier one wrote: `turbo run reference` and
+`gen:element-events` read the manifests `analyze` produces, `turbo run tokens`
+reads what `turbo run token-layer` emits, `gen:metrics` measures the built packages,
+`turbo run content` and `turbo run catalog` read the pages `turbo run docs` filled, and
+`turbo run catalog` reads what `turbo run content` writes on top of that. Run out of
 order they each succeed and disagree with each other, and the failure surfaces in
 CI as *"the tree is unchanged by verifying it"*, which names none of them. So
 `regen` is the hand-written order and `gen:*` are its members: a `gen` assembled
 from its own members would run them in whatever order they sorted in, producing
 that exact failure under a name promising the opposite.
 
-**A writer and its judge share a name.** `gen:reference` writes what
-`check:gen:reference` reads. Add both, or the pair drifts silently: a check in
+**A writer and its judge share a name.** `turbo run reference` writes what
+`turbo run reference -- --check` reads. Add both, or the pair drifts silently: a check in
 `verify` whose writer is not in `regen` is a red build with no published way out
 of it.
 
@@ -86,7 +99,7 @@ is.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a
-red build that stays red until somebody runs `bun run gen:tokens-reference` and
+red build that stays red until somebody runs `turbo run tokens` and
 pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
 the twelve generated-file checks and nothing else: seconds against ten minutes.
 It judges and never writes, because a hook that edits the tree during `git push`

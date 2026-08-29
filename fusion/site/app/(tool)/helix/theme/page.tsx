@@ -78,9 +78,9 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
      one fewer copy of the page in the document, the holder having rendered the
      whole thing a second time to be read and thrown away.
 
-     Rendered by `bun run gen:themed-page` rather than here, because a server
+     Rendered by `turbo run themed-page` rather than here, because a server
      component resolves under the `react-server` condition and `react-dom/server`
-     is not exported there: Next refuses the import outright. `check:gen:themed-page`
+     is not exported there: Next refuses the import outright. `turbo run themed-page -- --check`
      holds the strings and the JSX to each other.
 
      **Sixteen of them, on two axes of four.** A context is whose page it is,

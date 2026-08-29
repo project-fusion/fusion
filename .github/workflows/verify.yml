@@ -270,6 +270,12 @@ jobs:
           # color modes, because the half not on screen is the half that fails.
           - task: contrast
             run: bun run check:css:contrast
+          # The token reference's hex column, against what the browser paints.
+          # The column is arithmetic in Node, because that file is committed and
+          # `verify` checks it in a job with no browser; this is the other half
+          # of that trade and it belongs here, where one is already installed.
+          - task: hexes
+            run: bun run check:css:hexes
           # The specs themselves.
           - task: specs
             run: bun run specs:browser

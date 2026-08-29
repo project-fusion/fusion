@@ -15,7 +15,7 @@ styled     the styled tier. Extends headless, references tokens
 react      generated wrappers over styled and headless
 ```
 
-**`headless` must never depend on `styles`.** That constraint is what makes the
+**`headless` must never depend on `turbo run styles`.** That constraint is what makes the
 headless tier independently consumable. If styling leaks downward, we have
 shipped one package in five files.
 
@@ -697,11 +697,39 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
+**Every panel that floats over the page takes `--helix-radii-sm`, and
+`helix component`'s `corners` holds it.** A radius is read against the corner
+beside it rather than against the area behind it, so a menu at 4px next to a
+dropdown at 8px reads as two design languages and a reader has no way to know
+the second is a larger panel rather than a different kind of thing. Neither a
+panel's size nor what it holds is a reason to round differently. `radii-none`
+passes, being the vocabulary used to say "square" out loud; a different rung or
+a raw length does not.
+
+**A floating panel names itself**, so the rule keeps no list: it is any part
+whose stylesheet reaches for `--helix-shadow-floating`, which is already the
+separation policy for a surface over content, so the set is whatever reaches
+for it and `helix component audit` prints how many that is.
+
+**The check is keyed on the part rather than on the rule**, because a panel
+routinely sets its corner in one rule and its lift in another: Drawer rounds
+`[part="panel"]` and lifts `:host(:state(open)) [part="panel"]`, so a rule-local
+reading checks neither half.
+
+**Three had drifted when this was written, and the third is why prose was not
+enough.** Select's panel took `md` from the commit that created the file,
+against its own trigger's `sm`. Megamenu took `md` with a size argument
+available and never written down. Tour's bubble took `md` under a comment
+reading "which is `Popover`'s panel by another name and is deliberately the same
+shape" — and Popover is `sm`. The convention was recorded, in the right file,
+directly above the declaration that broke it, and it held for exactly as long as
+nobody had to act on it.
+
 **`helix/styles` authors in `src` and ships `dist`, and the comment is the
 difference.** The package exported `./src/*.css` until 24 Aug 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
 `primitives.css` 82, `base.css` 75, and the set was 60,944 bytes gzipped against
-8,219 of declarations. `bun run gen:styles-dist` strips comments into `dist` and
+8,219 of declarations. `turbo run styles-dist` strips comments into `dist` and
 `exports` points there, so a consumer writing `@fusion.dev/helix-styles/tokens.css` is
 unaffected and gets a quarter of the bytes.
 
@@ -832,7 +860,7 @@ Layout components are presentation with no structure or a11y of their own, so
 they ship in `helix/styled` with **no headless tier**. The tier split exists to
 keep behavior separate from styling, and there is no behavior to separate.
 
-Styles are authored in sibling `.css` files. `bun run styles` compiles each into
+Styles are authored in sibling `.css` files. `turbo run styles` compiles each into
 a generated `.css.ts` calling `createSheet`. Generated files are gitignored;
 never edit one.
 
@@ -1025,7 +1053,7 @@ custom properties are what they write CSS against, and the two pairs are worth
 not interleaving.
 
 **Sorting is not tidiness, because the reference page is generated from this
-order.** `bun run gen:reference` writes the tags out as it finds them, so an
+order.** `turbo run reference` writes the tags out as it finds them, so an
 unsorted block is a published API table with a part missing from where a reader
 looks. `Video` declares 48 parts and had its `captions-menu-*` family in three
 separate runs with the whole `overflow-*` set between them. No line of it was
@@ -1542,7 +1570,7 @@ Two copies of the library are on that page and they are not the same build.
 The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
 module graph from `helix/styled/dist`, so `bun run watch` rebuilds it and HMR
 shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
-classic-script IIFE built by `bun run gen:frame` and served from `public/`, which is
+classic-script IIFE built by `turbo run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
 It was 400 kB before the sandbox shell moved into `@fusion.dev/helix`, which the
 frame imports whole: the shell now rides in every preview, which is what lets an
@@ -1569,7 +1597,7 @@ reach a tab that is already open.
   `no-store` from `next.config.ts`, and the assets it names stay immutable.
 
 **If you are ever verifying a fix without `dev:watch` running, it is
-`bun run gen:frame` and a page reload.** Not a hot reload, and not the chrome
+`turbo run frame` and a page reload.** Not a hot reload, and not the chrome
 looking right.
 
 ### The preview runs untrusted code
@@ -1585,7 +1613,7 @@ security boundary and everything about it follows from that.
   opaque origin, and from there every module import and `fetch` back to the site
   is cross-origin without CORS headers, so a framework route's chunks never load
   and the document never comes alive. A classic `<script src>` is not
-  CORS-checked and does run, which is why `bun run gen:frame` emits one IIFE with
+  CORS-checked and does run, which is why `turbo run frame` emits one IIFE with
   the component library inside it and a plain HTML file beside it.
 - **Messages are identified by window, not by origin.** An opaque origin arrives
   as the string `"null"`, which any other sandboxed frame on the page also

@@ -65,7 +65,7 @@ const DEDICATED = new Set([
  * Without one every shard pays the build, which is why the remote cache is a
  * precondition for this split rather than a refinement of it.
  */
-const PREREQUISITES = ['bun run build', 'bun run analyze', 'bun run gen:catalog']
+const PREREQUISITES = ['bun run build', 'bun run analyze', 'turbo run catalog']
 
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))

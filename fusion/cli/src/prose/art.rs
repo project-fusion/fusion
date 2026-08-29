@@ -157,8 +157,8 @@ pub fn run(context: &Context) -> Report {
         .map(|entry| entry.file_name().to_string_lossy().to_string())
         .collect();
 
-    let keyed = Regex::new(r#"(?m)^ {2}['"]?([a-zA-Z-]+)['"]?: \("#)
-        .expect("a literal pattern compiles");
+    let keyed =
+        Regex::new(r#"(?m)^ {2}['"]?([a-zA-Z-]+)['"]?: \("#).expect("a literal pattern compiles");
     let mut drawn: BTreeSet<String> = BTreeSet::new();
     for name in drawings.iter().filter(|one| *one != "index.tsx") {
         let Ok(source) = fs::read_to_string(art.join(name)) else {
@@ -256,7 +256,8 @@ pub fn run(context: &Context) -> Report {
     paint and is not — one that only animates, or one never defined anywhere.
     Read off the stylesheet rather than listed here, so a new paint class works
     the day it is written and a renamed one fails the same day. */
-    let rule = Regex::new(r"(?m)^\.(art[A-Za-z]+)\s*\{([^}]*)\}").expect("a literal pattern compiles");
+    let rule =
+        Regex::new(r"(?m)^\.(art[A-Za-z]+)\s*\{([^}]*)\}").expect("a literal pattern compiles");
     let strokes = Regex::new(r"(^|[\s;])stroke:").expect("a literal pattern compiles");
     let sheet = fs::read_to_string(art.join("gallery.css")).unwrap_or_default();
     let painted: Vec<String> = rule

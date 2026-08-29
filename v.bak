@@ -1,4 +1,4 @@
-// Generated from src/app-header/root/app-header-root.css by `bun run styles`. Do not edit.
+// Generated from src/app-header/root/app-header-root.css by `turbo run styles`. Do not edit.
 import { createSheet } from '@fusion.dev/helix-core'
 
 export const styles = createSheet(`:host {

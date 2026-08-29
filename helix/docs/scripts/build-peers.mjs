@@ -9,7 +9,7 @@
  * installs enters this repository except the numbers.
  *
  * The numbers are committed, which is what lets `check:gen:metrics` run in CI with
- * no registry access. Run `bun run gen:peers` to refresh them, which is a
+ * no registry access. Run `turbo run peers` to refresh them, which is a
  * deliberate act with a date on it rather than something that happens on every
  * build.
  *

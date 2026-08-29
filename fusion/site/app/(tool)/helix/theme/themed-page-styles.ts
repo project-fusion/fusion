@@ -15,7 +15,7 @@
  * its own, renders at 0x0.
  *
  * **Not `themed-page.css.ts`**, which is what it wanted to be called: `*.css.ts`
- * is the name `bun run styles` generates into and `.gitignore` excludes it
+ * is the name `turbo run styles` generates into and `.gitignore` excludes it
  * repo-wide, so that file would have worked on this machine and existed nowhere
  * else.
  */

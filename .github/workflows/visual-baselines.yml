@@ -72,7 +72,7 @@ jobs:
       # `fusion/site/public/sandbox` and writes `frame.js`, `frame.css` and
       # `frame.html` together. The whole directory is gitignored, so a checkout
       # has none of it and this step is the only thing that supplies it.
-      # `check:spec:visual` hard-fails naming `bun run gen:frame` when either the bundle
+      # `check:spec:visual` hard-fails naming `turbo run frame` when either the bundle
       # or the stylesheet is missing, rather than taking eighty-eight styled
       # pictures in which no token resolved.
       - run: bun run build

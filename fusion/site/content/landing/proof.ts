@@ -3,7 +3,7 @@
  *
  * **`CLAIMS` is generated; the comparison below is still by hand.** `bun run
  * gen:metrics` emits `claims.generated.ts`. `BUTTON` has not moved yet: it needs
- * the peer numbers, which come from `bun run gen:peers` and a set of libraries
+ * the peer numbers, which come from `turbo run peers` and a set of libraries
  * installed into `.local`, so it is the same defect one step further from the
  * generator that could fix it.
  *

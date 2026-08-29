@@ -79,8 +79,9 @@ static TAG: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*\*\s*@(\w+)\b").expect("a literal pattern compiles"));
 static HEAD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*\*\s*@\w+\s*").expect("a literal pattern compiles"));
-static TYPED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^(?:\{[^}]*\}\s+)?(\S+)\s+-").expect("a literal pattern compiles"));
+static TYPED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^(?:\{[^}]*\}\s+)?(\S+)\s+-").expect("a literal pattern compiles")
+});
 static PLAIN: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^(\S+)\s+-").expect("a literal pattern compiles"));
 static EMPTY: LazyLock<Regex> =

@@ -23,7 +23,7 @@
  * second harness that rendered examples its own way would be checking a
  * relationship nobody has.
  *
- * Run with `bun run smoke:examples`, after `bun run gen:frame`.
+ * Run with `bun run smoke:examples`, after `turbo run frame`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'

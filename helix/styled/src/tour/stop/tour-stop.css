@@ -4,11 +4,16 @@
 
 /* The panel, which is `Popover`'s panel by another name and is deliberately the
    same shape: a tour bubble that looked like a different kind of surface would
-   be a second answer to a question the library has already answered. */
+   be a second answer to a question the library has already answered.
+
+   *The radius said `md` until 29 Aug 2026 while this comment said Popover, and
+   Popover is `sm`.* Worth keeping as a note rather than a silent correction: the
+   sentence above was right the whole time and nothing read it, which is the
+   failure mode of a convention that lives only in prose. */
 [part="bubble"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
   border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--tour-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--helix-color-foreground);

@@ -196,7 +196,8 @@ fn survey(root: &Path) -> Api {
             .and_then(|one| Some(one.get("modules")?.as_array()?.clone()))
         {
             for module in modules {
-                let Some(declarations) = module.get("declarations").and_then(Value::as_array) else {
+                let Some(declarations) = module.get("declarations").and_then(Value::as_array)
+                else {
                     continue;
                 };
                 for declaration in declarations {
@@ -266,7 +267,10 @@ fn pages(root: &Path) -> Vec<PathBuf> {
         all
     };
 
-    for domain in ordered(root.to_path_buf()).into_iter().filter(|one| one.is_dir()) {
+    for domain in ordered(root.to_path_buf())
+        .into_iter()
+        .filter(|one| one.is_dir())
+    {
         for page in ordered(domain.join("docs/content")) {
             if page.extension().is_some_and(|one| one == "mdx") {
                 found.push(page);
@@ -328,27 +332,32 @@ fn answers(map: &Value, subpath: &str) -> Option<String> {
 
 #[allow(clippy::too_many_lines)]
 pub fn run(context: &Context) -> Report {
-    static MARKUP: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"<(helix-[a-z][a-z0-9-]*)").expect("a literal pattern compiles"));
+    static MARKUP: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"<(helix-[a-z][a-z0-9-]*)").expect("a literal pattern compiles")
+    });
     static SELECTOR: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"\b(helix-[a-z][a-z0-9-]*)(?:::|\s*\{)").expect("a literal pattern compiles")
     });
     static PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"--([a-z][a-z0-9-]*?)-([a-z][a-z0-9-]*)").expect("a literal pattern compiles")
     });
-    static TOKEN: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"--helix-[a-z][a-z0-9-]*").expect("a literal pattern compiles"));
+    static TOKEN: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"--helix-[a-z][a-z0-9-]*").expect("a literal pattern compiles")
+    });
     static BOUND: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"onhelix-([a-z][a-z0-9-]*)").expect("a literal pattern compiles")
     });
     static LISTENED: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"addEventListener\(\s*'(helix-[a-z0-9-]+)'").expect("a literal pattern compiles")
+        Regex::new(r"addEventListener\(\s*'(helix-[a-z0-9-]+)'")
+            .expect("a literal pattern compiles")
     });
     static DISPATCHED: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"dispatch(?:es|ed|ing)?\s+`([A-Za-z][\w-]*)`").expect("a literal pattern compiles")
+        Regex::new(r"dispatch(?:es|ed|ing)?\s+`([A-Za-z][\w-]*)`")
+            .expect("a literal pattern compiles")
     });
     static NAMED: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"`((?:Helix|Mixin|With)[A-Z][A-Za-z0-9]*)`").expect("a literal pattern compiles")
+        Regex::new(r"`((?:Helix|Mixin|With)[A-Z][A-Za-z0-9]*)`")
+            .expect("a literal pattern compiles")
     });
 
     let api = survey(&context.root);
@@ -452,7 +461,8 @@ pub fn run(context: &Context) -> Report {
         declares. Anything else is the consumer's own and not ours to check. */
         for caught in PROPERTY.captures_iter(&text) {
             let name = caught[0].to_owned();
-            if name.starts_with("--helix-") || name.starts_with("--_") || api.hooks.contains(&name) {
+            if name.starts_with("--helix-") || name.starts_with("--_") || api.hooks.contains(&name)
+            {
                 continue;
             }
             let family = caught[1].to_owned();
@@ -532,7 +542,8 @@ pub fn run(context: &Context) -> Report {
                 continue;
             }
             let subpath = format!(".{}", &whole[name.len()..]);
-            let map = read(&package.join("package.json")).and_then(|one| one.get("exports").cloned());
+            let map =
+                read(&package.join("package.json")).and_then(|one| one.get("exports").cloned());
             let Some(map) = map else {
                 continue;
             };

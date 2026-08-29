@@ -15,7 +15,7 @@
  * mechanism npm already provides and the only one that cannot drift.
  *
  * **Nothing about a page is written here.** `pages.generated.ts` is derived
- * from each file's frontmatter by `bun run gen:docs`, because the frontmatter is
+ * from each file's frontmatter by `turbo run docs`, because the frontmatter is
  * what a `.md` consumer receives and a second copy would be a second source of
  * truth. This module is the types and the reading of them; `sections.ts` is the
  * spine that frontmatter has nowhere to live.
@@ -106,7 +106,7 @@ const ordered = (pages: DocPage[], section: DocSection): DocPage[] => {
  * The whole sidebar: every declared section, its pages in render order, and
  * each page's children beneath it.
  *
- * A section with no pages cannot appear, because `bun run check:gen:docs` refuses
+ * A section with no pages cannot appear, because `turbo run docs -- --check` refuses
  * to generate one. Children are alphabetical, because nesting exists for the
  * per-framework installation pages and a reader picking their framework out of
  * a list is looking one up rather than reading a sequence, and then the

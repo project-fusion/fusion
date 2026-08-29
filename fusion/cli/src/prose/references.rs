@@ -66,6 +66,16 @@ static RUN: LazyLock<Regex> =
 /// group that had never had a member by that name read as correct. Two such
 /// references had been sitting in comments naming rules that live under a
 /// different noun entirely.
+/// A turbo task, which is the other way a comment names something runnable.
+///
+/// **The task list moved out of the manifest and the check followed it.** When a
+/// root script was `turbo run docs`, a comment could name the script and this
+/// rule would resolve it; deleting those aliases in favor of the task itself
+/// would have taken 39 references out of reach. `turbo.json` declares the tasks,
+/// so it is as answerable a question as the manifest was.
+static TASK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"`turbo run ([\w:-]+)`").expect("a literal pattern compiles"));
+
 static NAMED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"`(check:[\w:-]+)`").expect("a literal pattern compiles"));
 static SPAN: LazyLock<Regex> =
@@ -112,6 +122,22 @@ fn scripts_for(root: &Path, file: &Path) -> BTreeSet<String> {
 }
 
 #[allow(clippy::too_many_lines)]
+/// Every task `turbo.json` declares, which is what a `turbo run` may name.
+fn tasks(root: &Path) -> BTreeSet<String> {
+    /* Line comments, which the format does not have and this file uses. */
+    let raw = fs::read_to_string(root.join("turbo.json")).unwrap_or_default();
+    let stripped: String = raw
+        .lines()
+        .filter(|line| !line.trim_start().starts_with("//"))
+        .collect::<Vec<&str>>()
+        .join("\n");
+    serde_json::from_str::<Value>(&stripped)
+        .ok()
+        .and_then(|one| Some(one.get("tasks")?.as_object()?.keys().cloned().collect()))
+        .unwrap_or_default()
+}
+
+#[allow(clippy::too_many_lines)]
 pub fn run(context: &Context) -> Report {
     /* The trees a backticked path may be rooted at, read off the workspace
     rather than listed: a directory added or renamed at the top level is exactly
@@ -132,17 +158,28 @@ pub fn run(context: &Context) -> Report {
     let mut all = Vec::new();
     crawl(&context.root, &|_| true, &mut all);
     for file in all {
-        let name = file.file_name().unwrap_or_default().to_string_lossy().to_string();
+        let name = file
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
         if name.ends_with(".css.ts") {
             continue;
         }
-        if [".css", ".mjs", ".ts", ".tsx"].iter().any(|one| name.ends_with(one)) {
+        if [".css", ".mjs", ".ts", ".tsx"]
+            .iter()
+            .any(|one| name.ends_with(one))
+        {
             sources.push(file);
-        } else if file.extension().is_some_and(|one| one == "md" || one == "mdx") {
+        } else if file
+            .extension()
+            .is_some_and(|one| one == "md" || one == "mdx")
+        {
             prose.push(file);
         }
     }
 
+    let declared = tasks(&context.root);
     let mut findings = Vec::new();
     let mut seen = BTreeSet::new();
     let mut fault = |file: &Path, message: String, detail: &str| {
@@ -197,6 +234,17 @@ pub fn run(context: &Context) -> Report {
                         format!("names `bun run {script}`, which no manifest above it has"),
                         "A package names its own scripts, so this asks the nearest manifest and \
                          every one above it.",
+                    );
+                }
+            }
+            for caught in TASK.captures_iter(comment) {
+                let task = caught[1].to_owned();
+                if !declared.contains(&task) {
+                    fault(
+                        file,
+                        format!("names `turbo run {task}`, which `turbo.json` does not declare"),
+                        "A task turbo does not know is one it refuses to run, naming the file it \
+                         could not find it in.",
                     );
                 }
             }

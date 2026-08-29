@@ -34,6 +34,7 @@ pub mod cancelable;
 pub mod categories;
 pub mod composed;
 pub mod compositions;
+pub mod corners;
 pub mod disabled;
 pub mod events;
 pub mod example_values;
@@ -419,6 +420,12 @@ pub fn all() -> Vec<Rule> {
             name: "composed",
             run: Runner::Source(composed::run),
             summary: "a component renders a tag it imports, and never names one literally",
+        },
+        Rule {
+            fix: None,
+            name: "corners",
+            run: Runner::Source(corners::run),
+            summary: "every panel that floats over the page takes the same corner",
         },
         Rule {
             fix: None,

@@ -131,7 +131,7 @@
      well reads as a box drawn around something already separate. The shadow is
      `lg` here rather than `sm` for that reason: it is carrying the separation
      on its own. */
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* The trigger's width, with the content as the floor.
    *

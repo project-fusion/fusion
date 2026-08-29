@@ -43,7 +43,7 @@
  * **Only elements that paint text are read.** An empty box has no ink to judge,
  * and every wrapper in the tree would otherwise arrive as a pair.
  *
- * Run with `bun run check:css:contrast`, after `bun run gen:frame`.
+ * Run with `bun run check:css:contrast`, after `turbo run frame`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'

@@ -135,7 +135,7 @@ const WIDTHS = [
   { suffix: '.narrow', width: 390 },
 ]
 
-/* Both halves of what `bun run gen:frame` writes, and both are required.
+/* Both halves of what `turbo run frame` writes, and both are required.
    `build-frame.mjs` empties the directory and writes the bundle, the stylesheet
    and the document together, so one of them missing means none of them is
    trustworthy. */
@@ -164,7 +164,7 @@ if (process.platform !== 'linux') {
 const absent = [FRAME, SHEET].filter((one) => !existsSync(one))
 if (absent.length > 0) {
   console.error(
-    `visual: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run \`bun run gen:frame\`` +
+    `visual: missing ${absent.map((one) => relative(root, one)).join(', ')}. Run \`turbo run frame\`` +
       ' first: the bundle is what defines the tags, and the stylesheet is what defines every token ' +
       'the styled tier draws with.',
   )

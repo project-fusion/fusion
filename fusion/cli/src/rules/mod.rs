@@ -19,9 +19,9 @@ pub mod react_bridge;
 pub mod registration;
 pub mod scoped;
 pub mod scripts;
-pub mod strays;
 pub mod shaders;
 pub mod shipped;
+pub mod strays;
 
 use std::collections::BTreeMap;
 use std::fs;

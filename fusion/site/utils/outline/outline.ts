@@ -19,7 +19,7 @@ export interface OutlineEntry {
  *
  * **And read from the source rather than from the registry**, which was the
  * other candidate. `DocPage` holds frontmatter, so putting headings there means
- * `bun run gen:docs` extracting them into a generated file and `check:gen:docs` holding
+ * `turbo run docs` extracting them into a generated file and `turbo run docs -- --check` holding
  * the two together: a generator, a type and a staleness check, to derive
  * something already sitting in a string the caller has.
  *

@@ -3,7 +3,7 @@
  *
  * **Stated here as well as in Rust, and the duplication is checked rather than
  * merely tolerated.** `oracle::intent_for` is what the engine derives from and
- * this is what `check:css:wasm` feeds to the browser distribution, and the two are
+ * this is what `turbo run wasm-check` feeds to the browser distribution, and the two are
  * compared against each other every time that check runs: it drives the WASM
  * module with the intent from this file and asserts the result against the
  * oracle theme of the same label, which Rust built from its own. A drift between

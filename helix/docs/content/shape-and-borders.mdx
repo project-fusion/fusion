@@ -25,17 +25,29 @@ square: a percentage radius on a wide element gives an ellipse, and a pill is
 what you wanted.
 
 Rounding is the fastest single change to how a system feels, and it is one
-token:
+token, but it is the **seed** rather than one of the four above:
 
 ```css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 ```
 
-That makes every card, dialog, input and button squarer at once. The theme
+That makes every card, dialog, input and button squarer at once, because `sm`,
+`md` and `lg` are all derived from it: they become 1px, 2px and 3px. The theme
 engine takes a `radius` intent input for exactly this reason. See [Deriving a
 theme](./theming).
+
+**Setting `--helix-radii-md` instead moves only what reads `md`**, which is
+neither the buttons, the inputs and the dialogs (`sm`) nor the cards (`lg`).
+The four rungs are siblings derived from the seed, not a chain, so overriding
+one is how you change a single step on purpose rather than how you reshape a
+system.
+
+**Every floating panel takes `sm`.** A dialog, a drawer, a menu, a popover, a
+tooltip, a toast, and the panel any field opens under itself: all the same
+corner, whatever the panel's size. A radius is read against the corner beside it
+rather than against the area behind it.
 
 **A shape that is round rather than softened does not use these.** An avatar, a
 loader and a radio are circles because of what they are, so they say `50%`

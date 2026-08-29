@@ -46,7 +46,7 @@
  * rendering is final: every change a reader makes to the *theme* reaches it
  * through inherited custom properties rather than through React. Both axes are
  * chosen before the render rather than during it, which is why
- * `bun run gen:themed-page` emits one string per pair and the builder posts
+ * `turbo run themed-page` emits one string per pair and the builder posts
  * whichever is asked for.
  */
 import { type Context, Mark } from './themed-contexts'

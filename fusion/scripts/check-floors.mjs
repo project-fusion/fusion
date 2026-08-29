@@ -52,7 +52,7 @@ const checks = Object.keys(scripts)
      `check:gen:metrics` is the third of the generated-file comparisons and is
      exempt with them, even though its line does carry a real tally. What
      guards a generator is that its output is committed and read, the same
-     defense `check:gen:reference` and `check:gen:tokens-reference` have; running it
+     defense `turbo run reference -- --check` and `turbo run tokens -- --check` have; running it
      here would measure every family a second time for fifteen seconds and
      learn nothing the first run did not. */
 

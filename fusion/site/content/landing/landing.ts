@@ -4,7 +4,7 @@ import { ENGAGEMENT, ENGAGEMENT_COPY } from '@/content/landing/helix-landing'
 /**
  * Everything the landing page says, as data.
  *
- * The page renders it as bands of Helix markup; `bun run gen:catalog` renders the
+ * The page renders it as bands of Helix markup; `turbo run catalog` renders the
  * same object as `/index.md`. Neither is the source: this is.
  *
  * Only the words live here. The reasoning behind each band stays as a comment

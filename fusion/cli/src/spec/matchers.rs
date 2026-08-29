@@ -38,8 +38,9 @@ use crate::workspace::crawl;
 /// It is the declaration the harness has to satisfy, so a name typed there and
 /// never implemented is the type checker's problem rather than this rule's, and
 /// reading one list keeps the two from disagreeing about which is authoritative.
-static DECLARED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?m)^ {2}(to[A-Za-z]+)\??:").expect("a literal pattern compiles"));
+static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?m)^ {2}(to[A-Za-z]+)\??:").expect("a literal pattern compiles")
+});
 
 /// `.not`, `.resolves` and `.rejects` are the modifiers that sit between the
 /// call and the matcher; anything else after the close paren is not ours.
