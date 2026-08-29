@@ -32,7 +32,7 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 
 /** Whether to append to the published record, or to report that it is behind. */
 const write = process.argv.includes('--write')
@@ -43,7 +43,7 @@ const FLOOR = 40
 
 const problems = []
 
-const { routes } = await import('../../fusion/site/content/routes/routes.ts')
+const { routes } = await import('../../../fusion/site/content/routes/routes.ts')
 const all = routes()
 
 if (all.length === 0) {

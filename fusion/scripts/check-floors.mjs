@@ -69,7 +69,9 @@ const checks = Object.keys(scripts)
      the `floors` rule beside it reads that count, so spawning the command here
      to read the same number out of a sentence is the whole suite again for
      nothing. */
-  .filter((name) => !/\b(?:fusion|helix) (?:workspace|component|prose|spec|theme)\b/.test(scripts[name]))
+  .filter(
+    (name) => !/\b(?:fusion|helix) (?:workspace|component|prose|spec|theme)\b/.test(scripts[name]),
+  )
   .filter(
     (name) =>
       ![

@@ -33,7 +33,9 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const corpus = JSON.parse(readFileSync(join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json'), 'utf8'))
+const corpus = JSON.parse(
+  readFileSync(join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json'), 'utf8'),
+)
 
 /**
  * The reference responder: the artifacts, read directly.

@@ -31,6 +31,9 @@
     "wasm-check": "bun scripts/check-wasm.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
+  "devDependencies": {
+    "@fusion.dev/scripts": "workspace:*"
+  },
   "homepage": "https://fusion.dev",
   "keywords": [
     "theming",

@@ -71,14 +71,8 @@
     "whilst": "while",
     "wilful": "willful"
   },
-  "domains": [
-    "cortex",
-    "helix"
-  ],
-  "former": [
-    "former-org/former-repo",
-    "former-org/fusion"
-  ],
+  "domains": ["cortex", "helix"],
+  "former": ["former-org/former-repo", "former-org/fusion"],
   "gallery": {
     "art": "helix/gallery/src",
     "families": "helix/styled/src",
@@ -88,9 +82,7 @@
       "helix/sandbox/custom-elements.json"
     ]
   },
-  "hydrates": [
-    "fusion/site"
-  ],
+  "hydrates": ["fusion/site"],
   "icons": "helix/icons/icons.txt",
   "scope": "@fusion.dev/",
   "spec": {
@@ -103,7 +95,5 @@
       "ssr.spec.ts": "test:ssr"
     }
   },
-  "standalone": [
-    "fusion/site/preview"
-  ]
+  "standalone": ["fusion/site/preview"]
 }

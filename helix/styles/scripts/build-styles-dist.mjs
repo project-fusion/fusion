@@ -27,7 +27,7 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { SOURCE } from '../../../tooling/scripts/lib/workspace.mjs'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 
 /* Resolved from this file rather than from the working directory, because
    turbo runs a package's `build` with the package as its cwd and a contributor

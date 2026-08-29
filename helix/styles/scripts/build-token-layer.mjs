@@ -30,7 +30,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { formatted } from '../../../tooling/scripts/lib/formatted.mjs'
+import { formatted } from '@fusion.dev/scripts/formatted'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CSS = join(ROOT, 'helix/styles/src/tokens.css')

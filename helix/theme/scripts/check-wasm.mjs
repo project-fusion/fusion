@@ -29,7 +29,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { INTENTS } from '@fusion.dev/scripts/theme-intents'
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const WASM = join(ROOT, 'helix/theme/wasm')
 
 /**
