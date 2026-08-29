@@ -28,11 +28,13 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod cancelable;
 pub mod categories;
 pub mod disabled;
 pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
+pub mod leaks;
 pub mod observers;
 pub mod print;
 pub mod reachable;
@@ -238,6 +240,11 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "cancelable",
+            run: Runner::Source(cancelable::run),
+            summary: "an event that can be refused says so, and one that cannot does not",
+        },
+        Rule {
             name: "categories",
             run: Runner::Source(categories::run),
             summary: "both layers give one answer about what a family is for",
@@ -256,6 +263,11 @@ pub fn all() -> Vec<Rule> {
             name: "grounds",
             run: Runner::Source(grounds::run),
             summary: "a component painting the page's color can be corrected",
+        },
+        Rule {
+            name: "leaks",
+            run: Runner::Source(leaks::run),
+            summary: "a subscription an element takes out does not outlive the element",
         },
         Rule {
             name: "observers",
