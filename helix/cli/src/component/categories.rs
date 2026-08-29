@@ -14,7 +14,7 @@
 //!
 //! **Why a check rather than one declaration.** The obvious fix is to write the
 //! category once and have the layer above inherit it, and there is nowhere to
-//! put it: these are JSDoc tags on two classes in two packages, read by an
+//! put it: these are `JSDoc` tags on two classes in two packages, read by an
 //! analyzer that sees one file at a time. A tag existing on only one layer would
 //! leave that layer's manifest unable to say what its own components are for.
 //! Two declarations checked against each other is the honest shape.

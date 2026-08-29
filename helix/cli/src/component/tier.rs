@@ -70,7 +70,7 @@ pub fn run(context: &Context) -> Report {
         checked += 1;
         if OVERRIDE
             .captures(&declared)
-            .is_some_and(|found| &found[1] == over.prefix)
+            .is_some_and(|found| found[1] == over.prefix)
         {
             continue;
         }
