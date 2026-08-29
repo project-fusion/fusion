@@ -26,7 +26,10 @@
    * The same trade the ghost button's hover already makes for the same reason,
    * and unlike a button this one is inline in a sentence, where a surface token
    * is answering a question about planes that a run of text does not have. */
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  background-color: var(
+    --code-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
   border-radius: var(--helix-radii-sm);
   /* The prose's own ink, pulled back towards it, and never a syntax color.
    *
@@ -44,10 +47,9 @@
    * The ramp has nothing between `muted` and the full ink, so this is the two
    * of them mixed: 30% measures 9.98 light and 10.20 dark, which is the same
    * word on both grounds and still visibly a step down from the prose. */
-  color: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 30%,
-    var(--helix-color-foreground-muted)
+  color: var(
+    --code-foreground-color,
+    color-mix(in oklab, var(--helix-color-foreground) 30%, var(--helix-color-foreground-muted))
   );
   font-family: var(--helix-font-mono);
   /* **A ratio of the text it sits in, not a rung of the scale.**
