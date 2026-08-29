@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
+import { HeroField } from '@/components/hero-field/hero-field'
 import { PageOutline } from '@/components/page-outline/page-outline'
 import type { OutlineEntry } from '@/utils/outline/outline'
+import browser from './browser.module.css'
 import styles from './document-page.module.css'
 
 /**
@@ -23,6 +25,7 @@ import styles from './document-page.module.css'
 export function DocumentPage({
   body,
   footer,
+  hero,
   kicker,
   outline,
   lede,
@@ -34,6 +37,22 @@ export function DocumentPage({
   body: ReactNode
   /** Anything after the argument, such as a list of what to read next. */
   footer?: ReactNode
+  /**
+   * The head on a lit band rather than on the page, for a document that is read
+   * as a piece rather than consulted as a reference.
+   *
+   * **Opt-in, because this shell serves six pages and only some of them are
+   * that.** An insight and the thesis are arguments somebody chose to read, and
+   * a hero is the cover of the piece. Terms of use, the privacy notice and the
+   * acceptable use policy are documents a reader arrives at with a question, and
+   * a full-bleed aura over a legal notice reads as marketing wrapped around a
+   * contract. So the band is a prop the two pass and the other four do not,
+   * rather than a change to the shell.
+   *
+   * The body below is the same in both: same measure, same rhythm, same prose
+   * treatment. What changes is the head.
+   */
+  hero?: boolean
   /** The small line above the title, where the page has one. */
   kicker?: string
   /**
@@ -60,43 +79,83 @@ export function DocumentPage({
      so above the cap it is nowhere near an edge and its `6vw` inset eats the
      reading column as the window grows. The shell supplies its own fixed
      one. */
-  return (
-    <helix-flex class={styles.documentShell} direction="column" gap="xl">
-      <helix-flex align="start" class={styles.documentHead} direction="column" gap="lg">
-        {trail}
-        <helix-flex align="start" direction="column" gap="md">
-          {kicker && (
-            <helix-text class={styles.documentKicker} tone="subtle" variant="label">
-              {kicker}
-            </helix-text>
-          )}
-          <helix-text as="h1" class={styles.documentTitle}>
-            {title}
-          </helix-text>
-          {lede && (
-            <helix-text as="p" class={styles.documentLede} tone="muted">
-              {lede}
-            </helix-text>
-          )}
-        </helix-flex>
-        {meta}
-      </helix-flex>
+  /* The head, which is the same content in both arrangements and differs only
+     in what it sits on and in what order the facts come. On the band the filing
+     leads, because a reader arriving at a piece wants to know what it is before
+     they are given its title; in the plain head the title leads, because a
+     reader who came to a policy already knows. */
+  const head = (
+    <helix-flex align="start" direction="column" gap="md">
+      {kicker && (
+        <helix-text class={styles.documentKicker} tone="subtle" variant="label">
+          {kicker}
+        </helix-text>
+      )}
+      <helix-text as="h1" class={hero ? styles.documentHeroTitle : styles.documentTitle}>
+        {title}
+      </helix-text>
+      {lede && (
+        <helix-text as="p" class={styles.documentLede} tone="muted">
+          {lede}
+        </helix-text>
+      )}
+    </helix-flex>
+  )
 
-      {outline && outline.length > 0 && (
-        <nav className={styles.documentContents}>
-          <PageOutline
-            className={styles.documentContentsTitle}
-            entries={outline}
-            label="Contents"
-          />
-        </nav>
+  return (
+    <div className={styles.document}>
+      {hero && (
+        <section className={`${browser.pageHero} ${styles.documentHero}`}>
+          {/* The same light the galleries cast, so a piece and the index it came
+              from are one place. Absolute against the hero, which already
+              isolates and positions itself for the lattice, so the light stays
+              in the band and the head keeps its raised layer above it. */}
+          <helix-aura
+            class={styles.documentAura}
+            gain={1.15}
+            scale={0.45}
+            speed={0.5}
+            variant="rays"
+          ></helix-aura>
+          <HeroField />
+          <helix-flex
+            align="start"
+            class={`${browser.pageHeroInner} ${styles.documentHeroInner}`}
+            direction="column"
+            gap="lg"
+          >
+            {trail}
+            {meta}
+            {head}
+          </helix-flex>
+        </section>
       )}
 
-      <article className={styles.documentBody} data-prose>
-        {body}
-      </article>
+      <helix-flex class={styles.documentShell} direction="column" gap="xl">
+        {!hero && (
+          <helix-flex align="start" class={styles.documentHead} direction="column" gap="lg">
+            {trail}
+            {head}
+            {meta}
+          </helix-flex>
+        )}
 
-      {footer}
-    </helix-flex>
+        {outline && outline.length > 0 && (
+          <nav className={styles.documentContents}>
+            <PageOutline
+              className={styles.documentContentsTitle}
+              entries={outline}
+              label="Contents"
+            />
+          </nav>
+        )}
+
+        <article className={styles.documentBody} data-prose>
+          {body}
+        </article>
+
+        {footer}
+      </helix-flex>
+    </div>
   )
 }

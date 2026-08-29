@@ -31,6 +31,7 @@ export default async function Page() {
   return (
     <DocumentPage
       body={source ? await renderDocument(source) : null}
+      hero
       kicker={page.kicker}
       lede={page.lede}
       title={page.title}

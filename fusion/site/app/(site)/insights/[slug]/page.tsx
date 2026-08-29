@@ -117,6 +117,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </helix-flex>
         </helix-flex>
       }
+      hero
       lede={insight.summary}
       meta={
         <>

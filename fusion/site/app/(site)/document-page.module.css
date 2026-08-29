@@ -1,3 +1,85 @@
+/**
+ * The wrapper the head and the body share, and the only reason it exists.
+ *
+ * `--document-measure` used to sit on the shell, which was fine while the shell
+ * held everything. The hero band is full width and therefore a sibling of the
+ * shell rather than a child, so a measure declared on the shell is out of scope
+ * exactly where the hero needs it: the title over the band has to land on the
+ * same column as the paragraph under it, or the page has two left edges.
+ *
+ * Nothing else is declared here. The wrapper is a scope, not a layout.
+ */
+.document {
+  /* Tuned so a paragraph sets at about seventy characters, which is where the
+     eye keeps the line. Measured rather than picked: the body is 14px here. */
+  --document-measure: 41rem;
+}
+
+/**
+ * The head on a lit band, for a document read as a piece.
+ *
+ * **Shorter than the index heroes, because this one is a head rather than an
+ * arrival.** `/insights` opens on a band a reader lands in and looks around;
+ * this one is the top of something they have already chosen to read, so it is
+ * sized to hold the filing, the title and the standfirst and then get out of the
+ * way. The lattice and its falloff are `.pageHero`'s, unchanged, so the two
+ * bands are the same material at two heights.
+ */
+.documentHero {
+  min-block-size: auto;
+  padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+}
+
+/**
+ * The band's column, aligned to the body's.
+ *
+ * `.pageHeroInner` centers its text and caps at 46rem, which is right for an
+ * index hero standing alone and wrong here: the paragraph below this is capped
+ * at the measure and left aligned, so a centered head over it reads as two
+ * pages stacked. The cap is the measure plus the gutter either side, which is
+ * what the shell resolves to, so the title's left edge and the prose's are the
+ * same edge.
+ */
+.documentHeroInner {
+  max-inline-size: calc(var(--document-measure) + var(--helix-space-lg) * 2);
+  padding-inline: var(--helix-space-lg);
+}
+
+/* Behind the head and inside the band. */
+.documentAura {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* **Stated on the elements rather than inherited from the column**, because the
+   column's own centering comes from `.pageHeroInner` in another module and which
+   of the two lands last is a fact about import order rather than about either
+   rule. The head is left aligned on this page whatever that order turns out to
+   be. */
+.documentHeroInner .documentHeroTitle,
+.documentHeroInner .documentLede,
+.documentHeroInner .documentKicker {
+  text-align: start;
+}
+
+/**
+ * The title on the band, which is a display size rather than a heading size.
+ *
+ * The plain head's title answers to the body under it and steps up from the
+ * heading scale. This one has a band to fill and nothing beside it, so it takes
+ * the display ramp the landing hero uses, capped where a two-line title still
+ * fits the band without pushing the standfirst off it.
+ */
+.documentHeroTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 5.5vw, var(--site-text-section));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
 /* The shell every argued document on this site shares.
  *
  * **Insights, Trust and Thesis are the same kind of page**, which is what 206
@@ -20,9 +102,6 @@
   padding-inline: var(--helix-space-lg);
   margin-inline: auto;
 
-  /* Tuned so a paragraph sets at about seventy characters, which is where the
-     eye keeps the line. Measured rather than picked: the body is 14px here. */
-  --document-measure: 41rem;
   /* **The measure, plus the gutter, rather than a number in `ch` that is not
      about the text it caps.**
    *
