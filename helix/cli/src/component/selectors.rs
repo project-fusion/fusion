@@ -37,7 +37,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -133,7 +133,15 @@ static NOT_A_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
 struct Survey {
     attributes: BTreeMap<String, BTreeSet<String>>,
     bases: BTreeMap<String, Vec<String>>,
+    /// Where each name was found, relative to the root.
+    ///
+    /// **Relative, and the root is here because of it.** Every path in this
+    /// survey is stripped of the root so a finding names something a reader
+    /// recognizes, and one place then read those paths back with no root joined
+    /// on: correct from the workspace directory and wrong from anywhere else, so
+    /// `--root` reported four shared stylesheets as owned by nothing.
     file_of: BTreeMap<String, String>,
+    root: PathBuf,
     in_family: BTreeMap<String, BTreeSet<String>>,
     renders: BTreeMap<String, BTreeSet<String>>,
 }
@@ -173,7 +181,10 @@ fn resolved(
 
 fn survey(context: &Context) -> Survey {
     let tiers = context.settings.roots(&context.root);
-    let mut survey = Survey::default();
+    let mut survey = Survey {
+        root: context.root.clone(),
+        ..Survey::default()
+    };
 
     /* What each shared `draw…` helper writes, read once. */
     let mut helpers: BTreeMap<String, Vec<String>> = BTreeMap::new();
@@ -469,7 +480,13 @@ fn parts_of(
         owners = survey
             .file_of
             .iter()
-            .filter(|(_, path)| fs::read_to_string(path).is_ok_and(|text| text.contains(&wanted)))
+            .filter(|(_, path)| {
+                /* Joined, because these are root-relative: reading one bare is
+                a question about the working directory rather than about the
+                workspace. */
+                fs::read_to_string(survey.root.join(path))
+                    .is_ok_and(|text| text.contains(&wanted))
+            })
             .map(|(name, _)| name.clone())
             .collect();
     }
