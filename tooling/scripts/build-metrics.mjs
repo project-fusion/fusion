@@ -4,11 +4,8 @@
  * `helix/docs/content/metrics.mdx` from the measurement.
  *
  * **Generated, the way the component reference and the token reference are.**
- * [`23-helix-docs.md`](plan/23-helix-docs.md) asks for this directly: a
- * hand-written size table is stale within a month and unfalsifiable the whole
- * time, and this one moves the moment a component gains an import. The prose
- * lives in this file rather than in the MDX for the same reason the token
- * reference's prose does, that a page half generated and half authored has two
+ * The prose lives in this file rather than in the MDX for the same reason the
+ * token reference's prose does: a page half generated and half authored has two
  * owners and no way to tell which half is behind.
  *
  * **Two columns per component, or the table is arguing rather than
@@ -78,12 +75,11 @@ const check = process.argv.includes('--check')
  * Where this page sits in Getting started, which is a path and therefore
  * ordered.
  *
- * **Computed as last rather than written down.** [`23-helix-docs.md`](plan/23-helix-docs.md)
- * puts Metrics at the end of that section, and the end is a position rather
- * than a number: pages were inserted into the path twice while this was being
- * built, and the second time a hardcoded 6 collided with Versioning, which
- * `bun run gen:docs` refuses. Reading the other pages' frontmatter makes the
- * intent survive the next insertion.
+ * **Computed as last rather than written down.** Metrics belongs at the end of
+ * that section, and the end is a position rather than a number: a hardcoded
+ * order collides with the next page inserted into the path, which `bun run
+ * gen:docs` refuses. Reading the other pages' frontmatter makes the intent
+ * survive that insertion.
  */
 const lastInSection = () => {
   const dir = join(ROOT, 'helix/docs/content')
@@ -115,15 +111,14 @@ const lastInSection = () => {
  * `@fusion.dev/helix-headless` is deliberately not in here. It is a tier rather than a
  * runtime: a page with one styled component has some of it and never all of
  * it, so a floor containing it would credit every family with code no page
- * loads. `check:api:barrels` is what keeps that true.
+ * loads. the `barrels` rule in `fusion workspace` is what keeps that true.
  *
  * **`export *`, not a bare import, and the difference is the whole floor.**
  * `@fusion.dev/helix-core` is `sideEffects: false`, so `import '@fusion.dev/helix-core'` for
- * effect compiles to nothing and the first run of this script reported the
- * runtime at 0 raw bytes and the whole icon set at 0 beside it. Re-exporting
- * pins the complete public API in place, which is what a floor has to be for
- * the second column to mean the same thing for every family: a tree-shaken
- * floor would be a different size under each one.
+ * effect compiles to nothing and measures 0 raw bytes. Re-exporting pins the
+ * complete public API in place, which is what a floor has to be for the second
+ * column to mean the same thing for every family: a tree-shaken floor would be
+ * a different size under each one.
  */
 const RUNTIME = ["export * from 'lit'", "export * from '@fusion.dev/helix-core'", ''].join('\n')
 
@@ -165,10 +160,8 @@ const PACKAGES = [
 /**
  * How many semantic tokens there are, read rather than written.
  *
- * The note below said 176 and there are 177, which is the drift this file exists
- * to prevent everywhere else: every byte on this page is measured, and the one
- * number that was typed is the one that went stale. Two documentation pages had
- * the same figure and had drifted the same way.
+ * Every other number on this page is measured, and a typed one is the one that
+ * goes stale.
  */
 const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8'))
   .tokens.length
@@ -177,11 +170,9 @@ const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'token
  * The stylesheets a consumer links, which no bundler is involved in.
  *
  * **`dist` rather than `src`, for the reason this whole page gives about
- * JavaScript: what is measured is what npm ships.** `@fusion.dev/helix-styles` exported
- * its authoring copies until 24 Aug 2026, so these rows counted the reasoning
- * as payload: `tokens.css` was 71 percent comment, `primitives.css` 82 and
- * `base.css` 75, and the three together were 60,944 bytes gzipped against 8,219
- * of declarations.
+ * JavaScript: what is measured is what npm ships.** The authoring copies are
+ * most comment by weight, so pointing these rows at `src` would count the
+ * reasoning as payload.
  */
 const STYLESHEETS = [
   {
@@ -331,13 +322,10 @@ const footprint = (dir) => {
       /* **Maps are counted and then taken off, because they no longer ship.**
          `publish.mjs` opens the packed tarball and removes every `.map` and the
          trailing `sourceMappingURL` comment with it, so `dist` on disk is not
-         what lands in a consumer's `node_modules`. Measuring the directory and
-         reporting the total overstated every row by its own map column: 272,406
-         bytes on `@fusion.dev/helix` alone.
-
-         Still counted rather than skipped, so the row can say how much was
-         removed. A number that used to be part of the total and is now
-         subtracted from it is worth showing rather than quietly dropping. */
+         what lands in a consumer's `node_modules`. Reporting the directory total
+         overstates every row by its own map column, 272,406 bytes on
+         `@fusion.dev/helix` alone. Counted rather than skipped so the row can say
+         how much was removed. */
       if (file.endsWith('.map')) {
         maps += statSync(file).size
         continue
@@ -687,7 +675,7 @@ const lines = [
   '',
   `Across the tier: the cheapest is \`${cheapest.family}\` at ${grouped(cheapest.alone.gzip)} gzipped alone, the dearest \`${dearest.family}\` at ${grouped(dearest.alone.gzip)}, over ${styled.rows.length} components. Every family at once is ${grouped(wholeStyled.gzip)}.`,
   '',
-  `**No family imports a barrel, and \`check:api:barrels\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
+  `**No family imports a barrel, and the \`barrels\` rule in \`fusion workspace\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs ${grouped(wholeHeadless.gzip)} bytes gzipped whatever else the page does, which is ${barrelMultiple} times the median family measured above. ${barrelled.size === 0 ? `The styled tier imports the family it extends instead, all ${styled.rows.length} of them` : `${barrelled.size} families still import the barrel`}, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.`,
   '',
   `The headless tier never had the problem, and it is the control: \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and a headless family is a median of ${grouped(median(headlessGzip))} bytes gzipped alone.`,
   '',
@@ -754,12 +742,9 @@ const output = join(ROOT, OUTPUT)
 /**
  * The four claims the landing page prints, emitted rather than copied.
  *
- * **The page says "every number here was produced, not written" and one of them
- * was written.** `proof.ts` carried them by hand and said so in its own header,
- * predicting the exact failure that arrived: the component count sat at 92
- * while the build measured 93, directly under that heading. A number a
- * generator could produce and a human retypes is a number that goes stale on a
- * day nobody is looking.
+ * The landing page says "every number here was produced, not written", and a
+ * number a generator could produce and a human retypes goes stale on a day
+ * nobody is looking.
  *
  * Emitted from this script rather than a generator of its own because every
  * value is already computed for the MDX above, and measuring them twice is how
@@ -834,10 +819,9 @@ if (check) {
   if (existing !== written) {
     /* **Which lines, not just that some line.** Reporting only staleness costs a
        round trip to find out what moved, and on a runner that round trip is the
-       whole build again: 25 Aug 2026 this failed in CI four times without ever
-       saying by how much, while the same command passed on the machine reading
-       the report. A number that differs by platform and a number that differs
-       because somebody edited a component look identical until you see them. */
+       whole build again. A number that differs by platform and a number that
+       differs because somebody edited a component look identical until you see
+       them. */
     const before = existing.split('\n')
     const after = written.split('\n')
     const moved = after

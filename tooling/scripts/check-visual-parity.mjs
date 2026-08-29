@@ -4,21 +4,16 @@ import { execFileSync } from 'node:child_process'
  * Renders every example twice, from its HTML and from its TSX, and compares.
  *
  * **This is the assertion that makes two authored files safe.** Both syntaxes
- * are written by hand now, neither derived from the other, which is the right
- * arrangement and costs exactly one thing: nothing stops them drifting. The old
- * arrangement could not drift because the React view was a function of the HTML
- * one; it also could not be correct, emitting a `<script>` into a JSX fragment
- * for all 28 script-bearing examples and three separate faults on the rest.
- * `check:prose:examples-paired` holds the two files to each other. This holds the two
- * pictures to each other, which is the only comparison that can see a React
- * example rendering something else.
+ * are written by hand, neither derived from the other, which costs exactly one
+ * thing: nothing stops them drifting. `check:prose:examples-paired` holds the
+ * two files to each other. This holds the two pictures to each other, which is
+ * the only comparison that can see a React example rendering something else.
  *
- * **The bug it was written against**, and the reason it is worth its runtime: a
- * data table given `rows={rows}` drew a correctly labeled, permanently empty
- * grid. React skips object props while hydrating, both halves of it agree to
- * drop them, and nothing warns. Every check in this repository reads source or
- * asserts a fact somebody thought to assert. Two pictures of the same example
- * assert the part nobody thinks to.
+ * **The fault class it exists for**: a data table given `rows={rows}` draws a
+ * correctly labeled, permanently empty grid. React skips object props while
+ * hydrating, both halves of it agree to drop them, and nothing warns. Every
+ * other check in this repository reads source or asserts a fact somebody thought
+ * to assert. Two pictures of the same example assert the part nobody thinks to.
  *
  * **No baseline, and that is the interesting difference from `check:spec:visual`.**
  * That check compares today's render to a committed PNG, so it is Linux-only:
@@ -78,10 +73,9 @@ const dryRun = args.includes('--dry-run')
 const changedAt = args.indexOf('--changed')
 const changedFrom = changedAt === -1 ? undefined : args[changedAt + 1]
 /* **The value of `--changed` is not a family name, and the positional search
-   will take it for one.** The comment above `--throttle` names this trap and it
-   caught this flag too: `--changed HEAD~1` read `HEAD~1` as the family to
-   filter to, matched nothing, and reported a clean scoped run over an empty
-   corpus. Excluding the slot after the flag is what keeps the positional
+   will take it for one.** Unexcluded, `--changed HEAD~1` reads `HEAD~1` as the
+   family to filter to, matches nothing, and reports a clean scoped run over an
+   empty corpus. Excluding the slot after the flag is what keeps the positional
    argument positional. */
 const only = args.find(
   (one, at) => !one.startsWith('--') && !(changedAt !== -1 && at === changedAt + 1),
@@ -120,13 +114,13 @@ const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
  *
  * **Reverse composition, because the arrow points the wrong way for us.**
  * Fifteen families render another inside their own shadow root, named through
- * `this.tag()`, which `check:api:seams` already reads. If `listbox` changes, the
+ * `this.tag()`, which `helix component`'s `seams` already reads. If `listbox` changes, the
  * picture that moves is `select`'s, so the set has to grow from the changed
  * family outward to everything that composes it, and keep growing: a family
  * composing a family that composes the change is just as affected.
  *
  * **Over-inclusion is the safe direction and is chosen on purpose.** The scan
- * does not strip comments the way `check:api:seams` does, so a `this.tag()` inside
+ * does not strip comments the way `helix component`'s `seams` does, so a `this.tag()` inside
  * a comment pulls a family in that did not need to be there. That costs seconds
  * of comparison. The opposite mistake costs a picture nobody looked at, which is
  * the whole failure this check exists to prevent.
@@ -171,13 +165,11 @@ const scopeFor = (ref) => {
       if (!entry.isDirectory()) {
         continue
       }
-      /* Merged across tiers rather than replaced, which is the bug this line
-         is the fix for. A family is one name with a folder in each tier, and
-         `composes.set` per tier meant the styled pass overwrote the headless
-         one: every composition declared only in the headless tier was dropped,
-         so a change to `button` did not reach `color-picker`, `steps` or
-         `tour`. Caught by comparing the graph this builds against the same
-         scan run over both tiers at once. */
+      /* Merged across tiers rather than replaced. A family is one name with a
+         folder in each tier, so a plain `composes.set` per tier lets the styled
+         pass overwrite the headless one, dropping every composition declared
+         only in the headless tier: a change to `button` then fails to reach
+         `color-picker`, `steps` or `tour`. */
       const names = composes.get(entry.name) ?? new Set()
       for (const file of readdirSync(join(tier.source, entry.name), { recursive: true })) {
         if (typeof file !== 'string' || !file.endsWith('.ts')) {
@@ -233,8 +225,8 @@ if (absent.length > 0) {
  * **Both sides render from `frame.js`**, so a change to a component reaches
  * neither of them until `bun run gen:frame` has rebuilt it. That is not a stale
  * picture, it is a stale *library*, and it reads as the fix not having worked:
- * `breadcrumbs/links` was repaired, re-run, and still reported 1,236 pixels,
- * because the bundle predated the repair. Checked rather than remembered.
+ * a repaired example re-run against an older bundle still reports its full pixel
+ * count. Checked rather than remembered.
  */
 const newest = (dir) => {
   let latest = 0
@@ -591,14 +583,13 @@ await tab.route('**/*', (route) =>
   route.request().url().startsWith(origin) ? route.continue() : route.abort(),
 )
 
-/* **Nothing is normalized, and two attempts to were both wrong.**
-   The idea each time was that JSX drops whitespace touching a line break while
-   HTML keeps it, so the HTML side should be adjusted to match. Both versions
-   made the numbers move and neither was right, because the premise is: this
-   compares what the two examples *ship as*, and the HTML one ships with those
-   spaces. Rewriting it to render like the TSX asks the comparison whether the
-   two say the same thing, which is a question `check:prose:examples-paired` already
-   covers and not the one worth a browser.
+/* **Nothing is normalized, and normalizing the whitespace is the wrong fix.**
+   JSX drops whitespace touching a line break where HTML keeps it, which invites
+   adjusting the HTML side to match. The premise is wrong: this compares what the
+   two examples *ship as*, and the HTML one ships with those spaces. Rewriting it
+   to render like the TSX asks the comparison whether the two say the same thing,
+   which is a question `check:prose:examples-paired` already covers and not the
+   one worth a browser.
 
    So the difference is real and it belongs to the TSX. Prose wrapping an inline
    element needs an explicit `{' '}` in JSX, the way `quote/preview` does:
@@ -625,12 +616,11 @@ const picture = async (url) => {
   await tab.goto(url, { waitUntil: 'load' })
   const undefinedTags = await tab.evaluate(async () => {
     /* **Bounded, because `whenDefined` on a tag nothing registers never
-       settles.** An example naming an element the bundle does not define used to
-       hang the run outright: no output, no failure, no way to tell a slow
-       machine from a stuck one, and a full sweep that sat for forty minutes and
-       had to be killed. The wait is the same wait; what is new is that it gives
-       up and says which tags it was waiting for. Five seconds is far past any
-       real upgrade and far short of noticing it by hand. */
+       settles.** Unbounded, an example naming an element the bundle does not
+       define hangs the run outright: no output, no failure, and no way to tell a
+       slow machine from a stuck one. This gives up and says which tags it was
+       waiting for. Five seconds is far past any real upgrade and far short of
+       noticing it by hand. */
     const pending = [...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)
     await Promise.race([
       Promise.all([...new Set(pending)].map((tag) => customElements.whenDefined(tag))),
@@ -782,10 +772,9 @@ for (const entry of entries) {
   })
 
   /* **A listed example is still rendered and still compared; only the verdict is
-     inverted.** An exception nobody re-measures is an exception that outlives its
-     reason, which is the drift this repository writes down about itself more than
-     once. Skipping them would save two page loads and cost the only signal that
-     one has been fixed. */
+     inverted.** An exception nobody re-measures is an exception that outlives
+     its reason. Skipping them would save two page loads and cost the only signal
+     that one has been fixed. */
   const excused = UNCOMPARED.get(where)
   if (excused !== undefined) {
     /* **Confirmed before it is called spent, the same way a difference is

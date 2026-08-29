@@ -8,16 +8,11 @@
  * what it found. So the headless copy is documentation that nothing renders and
  * nothing contradicts, which is the shape a value drifts in.
  *
- * **It had drifted, and the split is what exposed it.** When `charts` came out
- * of `content` on 23 Aug 2026 only `helix/styled` moved. `bar-chart`, `donut-chart`,
- * `line-chart`, `sparkline`, `trend` and `legend` went on saying `content` in
- * `helix/headless` for a day, and nothing failed, because `content` was still a
- * legal word. A vocabulary check cannot catch a stale value that is spelled
- * correctly; only the other tier can.
- *
- * Measured when `content` was retired on 24 Aug: 25 of the 88 families disagreed,
- * every one of them a headless root still holding the drawer the styled root had
- * already left.
+ * **And it drifts silently.** Splitting a category and moving only `helix/styled`
+ * leaves the headless roots naming a category the styled roots have left, and
+ * nothing fails, because the stale value is still a legal word: 25 of the 88
+ * families disagreed the last time one was retired. A vocabulary check cannot
+ * catch a stale value that is spelled correctly; only the other tier can.
  *
  * **Why a check rather than one declaration.** The obvious fix is to write the
  * category once and have the styled tier inherit it, and there is nowhere to put
@@ -68,7 +63,7 @@ for (const family of families) {
   const headless = rootCategory(TIERS.headless, family)
   const styled = rootCategory(TIERS.styled, family)
   /* A family present on one tier only is not this check's business: the tiers
-     are deliberately not a mirror, and `check:css:pairings` and `check:api:seams` are
+     are deliberately not a mirror, and `check:css:pairings` and `helix component`'s `seams` are
      where that question already lives. */
   if (headless === null || styled === null) {
     continue

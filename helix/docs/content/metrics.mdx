@@ -87,7 +87,7 @@ is the whole cost of adopting the base layer on its own.
 
 Across the tier: the cheapest is `code` at 9,057 gzipped alone, the dearest `data-table` at 49,484, over 93 components. Every family at once is 218,278.
 
-**No family imports a barrel, and `check:api:barrels` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 131,052 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
+**No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 131,052 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
 The headless tier never had the problem, and it is the control: `@fusion.dev/helix-core` is `sideEffects: false`, and a headless family is a median of 16,084 bytes gzipped alone.
 

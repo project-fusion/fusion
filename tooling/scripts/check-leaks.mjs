@@ -32,8 +32,7 @@
  * every inline arrow.
  *
  * Both of those are why the fix is a field holding what is currently
- * subscribed, rather than a matching pair of calls, and that shape is what the
- * four fixed here now use.
+ * subscribed, rather than a matching pair of calls.
  *
  * Run with `bun run check:api:leaks` (also part of `bun run verify`).
  */
@@ -66,7 +65,7 @@ const sources = (root) => {
 
 /* Comments stripped, and the newlines kept so a line number still names the
    line it did. Class docs are full of prose about listeners a file does not
-   add, which is the same trap `check:api:composed` and `check:api:seams` both hit. */
+   add, which is the same trap `check:api:composed` and `helix component`'s `seams` both hit. */
 const withoutComments = (text) =>
   text
     .replaceAll(/\/\*[\s\S]*?\*\//g, (match) => match.replaceAll(/[^\n]/g, ' '))
