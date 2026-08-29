@@ -23,7 +23,7 @@
   ],
   "sideEffects": true,
   "scripts": {
-    "build": "node ../../tooling/scripts/build-styles-dist.mjs"
+    "build": "node scripts/build-styles-dist.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "homepage": "https://fusion.dev",

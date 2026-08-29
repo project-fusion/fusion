@@ -36,7 +36,7 @@ import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { brotliCompress, constants, gzip } from 'node:zlib'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const SCRATCH = join(ROOT, '.local/metrics-peers')
 const OUTPUT = join(ROOT, 'helix/docs/peers.json')
 

@@ -1,7 +1,7 @@
 /**
  * The preview document's own script.
  *
- * Bundled to a classic script by `tooling/scripts/build-frame.mjs` and served as
+ * Bundled to a classic script by `fusion/site/scripts/build-frame.mjs` and served as
  * a static file, not rendered by a route. That is a security decision, not a
  * packaging one.
  *

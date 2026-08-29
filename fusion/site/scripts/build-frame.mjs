@@ -21,7 +21,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 

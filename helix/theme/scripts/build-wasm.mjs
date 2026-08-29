@@ -16,7 +16,7 @@ import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const ARTIFACT = 'target/wasm32-unknown-unknown/release/fusion_helix_theme.wasm'
 export const OUT = join(ROOT, 'helix/theme/wasm')
 

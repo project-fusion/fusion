@@ -41,9 +41,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { TIERS } from './lib/workspace.mjs'
+import { TIERS } from '../../../tooling/scripts/lib/workspace.mjs'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 
 /**
  * Both tiers, merged by family.

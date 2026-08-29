@@ -82,7 +82,7 @@
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
-        "$TURBO_ROOT$/tooling/scripts/build-catalog.mjs"
+        "$TURBO_ROOT$/fusion/site/scripts/build-catalog.mjs"
       ],
       "outputs": [
         "content/catalog/catalog.generated.json",
@@ -103,12 +103,12 @@
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
         "$TURBO_ROOT$/helix/styled/elements.css",
-        "$TURBO_ROOT$/tooling/scripts/build-frame.mjs"
+        "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]
     },
     "icons": {
-      "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/tooling/scripts/build-icons.mjs"],
+      "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/helix/icons/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
     },
     // Two generators, two outputs. `build-styles.mjs` writes the `.css.ts`

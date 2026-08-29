@@ -57,7 +57,7 @@ import { createServer } from 'node:http'
 import { join } from 'node:path'
 import { chromium } from 'playwright'
 
-const ROOT = join(import.meta.dirname, '../..')
+const ROOT = join(import.meta.dirname, '../../..')
 const SCRATCH = join(ROOT, '.local/metrics-timing')
 const OUT = join(ROOT, 'helix/docs/timings.json')
 

@@ -45,10 +45,10 @@ import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { CONTEXTS } from '../../fusion/site/app/(tool)/helix/theme/themed-contexts.tsx'
-import { LAYOUTS } from '../../fusion/site/app/(tool)/helix/theme/themed-page.tsx'
+import { CONTEXTS } from '../app/(tool)/helix/theme/themed-contexts.tsx'
+import { LAYOUTS } from '../app/(tool)/helix/theme/themed-page.tsx'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const OUT = join(ROOT, 'fusion/site/app/(tool)/helix/theme/themed-page-markup.generated.ts')
 
 /* Keyed by the pair, because the two axes are independent and the builder holds

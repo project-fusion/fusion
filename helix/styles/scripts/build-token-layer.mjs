@@ -30,9 +30,9 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { formatted } from './lib/formatted.mjs'
+import { formatted } from '../../../tooling/scripts/lib/formatted.mjs'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CSS = join(ROOT, 'helix/styles/src/tokens.css')
 const JSON_OUT = join(ROOT, 'helix/styles/tokens.json')
 
@@ -41,7 +41,7 @@ const JSON_OUT = join(ROOT, 'helix/styles/tokens.json')
 const OPEN = '/* GENERATED from src/tokens.ts by `bun run gen:tokens-layer`. Do not edit below. */'
 const CLOSE = '/* GENERATED end. */'
 
-const { TOKENS, TOKEN_GROUPS } = await import('../../helix/styles/src/tokens.ts')
+const { TOKENS, TOKEN_GROUPS } = await import('../src/tokens.ts')
 
 /* Read back out of the module's own source, because a comment is not a value
    and TypeScript does not hand one to a caller. The file is the source of both

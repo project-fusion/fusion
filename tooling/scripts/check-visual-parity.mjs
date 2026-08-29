@@ -104,7 +104,7 @@ const GLOBAL = [
   'helix/theme/',
   'helix/testing/',
   'tooling/scripts/check-visual-parity.mjs',
-  'tooling/scripts/build-frame.mjs',
+  'fusion/site/scripts/build-frame.mjs',
 ]
 
 const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
