@@ -35,6 +35,7 @@ pub mod compositions;
 pub mod disabled;
 pub mod events;
 pub mod example_values;
+pub mod examples;
 pub mod examples_paired;
 pub mod exportparts;
 pub mod fallbacks;
@@ -115,6 +116,14 @@ pub struct Settings {
     /// model's source leaves twenty pairs unchecked.
     #[serde(default)]
     pub oracle: Option<String>,
+
+    /// The layout modes a preview frame offers an example.
+    ///
+    /// A name matching no rule is silent: the value reaches the frame as an
+    /// attribute, nothing matches, and the example renders unstyled by any mode
+    /// and looks merely wrong.
+    #[serde(default)]
+    pub layouts: Vec<String>,
 
     /// The stylesheets defining the token layer, in cascade order.
     ///
@@ -325,6 +334,11 @@ pub fn all() -> Vec<Rule> {
             name: "example-values",
             run: Runner::Source(example_values::run),
             summary: "every attribute value in an example is one its component states",
+        },
+        Rule {
+            name: "examples",
+            run: Runner::Source(examples::run),
+            summary: "every example is checked against the manifest it documents",
         },
         Rule {
             name: "examples-paired",

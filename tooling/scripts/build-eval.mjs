@@ -42,7 +42,7 @@ const OUT = join(ROOT, 'tooling', 'eval', 'questions.json')
  * That is the one failure a self-checking corpus cannot see, so it is guarded
  * from outside rather than by agreement: every family named in the corpus has to
  * be a directory under `helix/styled/src` with an `index.ts`, which is the same test
- * `check:prose:examples` uses to decide what a family is.
+ * `helix component`'s `examples` uses to decide what a family is.
  */
 const familyOf = (declaration) => declaration.modulePath?.split('/').at(-3) ?? declaration.tagName
 
@@ -201,7 +201,7 @@ const sources = ['helix/styled/custom-elements.json', 'helix/styles/tokens.json'
 /* **The guard the corpus cannot supply for itself.** A family name is derived
    from a path, and a wrong derivation shared by the generator and the reference
    scores a perfect hundred while every answer is wrong. So the names are held
-   against the directories, which is the same test `check:prose:examples` uses. */
+   against the directories, which is the same test `helix component`'s `examples` uses. */
 const directories = new Set(
   readdirSync(join(ROOT, 'helix', 'styled', 'src'), { withFileTypes: true })
     .filter(

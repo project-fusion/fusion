@@ -23,6 +23,7 @@
       "source": "helix/styled/src"
     }
   ],
+  "layouts": ["centered", "fullscreen", "hug", "padded"],
   "leaves": {
     "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
   },

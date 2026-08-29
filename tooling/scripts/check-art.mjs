@@ -177,7 +177,7 @@ const said = wordFor(families.size)
 /* Folders that are *families*, which is the question the prose is answering:
    how many more entries there are than there are components in `helix/styled`. A
    directory with an `index.ts` is what the barrel exports and what
-   `check:prose:examples` already calls a family, and it is the difference that
+   `helix component`'s `examples` already calls a family, and it is the difference that
    matters: `field/` is a directory holding the shared field stylesheets, it
    exports nothing and has no element, and counting it makes this check disagree
    with correct prose. */
