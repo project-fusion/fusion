@@ -283,11 +283,11 @@ const UNCOMPARED = new Map([
   [
     'styled/video/native',
     /* The native control strip is the user agent's own shadow DOM, and nothing
-       here reaches it: `animations: 'disabled'` covers author animations and the
-       settle loop covers author layout. It survives the retry too, which is what
-       separates it from `aura/streaks`: that one paints to a canvas and clears
-       on a second pass, while this differs every time by a different amount.
-       Measured at 22, 34 and 122 pixels, all of it inside the controls. */
+       here reaches it: `animations: 'disabled'` covers author animations, the
+       settle loop covers author layout, and `reducedMotion` covers a canvas that
+       offers a still frame. This offers none: it differs every time by a
+       different amount and survives the retry, measured at 22, 34 and 122
+       pixels, all of it inside the controls. */
     "the user agent's own video controls, which no wait or retry here can settle",
   ],
   [
@@ -572,7 +572,30 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
 const browser = await chromium.launch()
-const tab = await browser.newPage({ viewport: { height: 800, width: WIDTH } })
+/* **`reducedMotion` because a canvas is not an animation Playwright can pause.**
+   `animations: 'disabled'` at capture time cancels CSS animations and
+   fast-forwards transitions, and reaches nothing driven by
+   `requestAnimationFrame`: `aura` paints a shader on every frame, so the two
+   sides were photographed at whatever moment each reached, and the comparison
+   was of two instants rather than of two examples. It failed on roughly two runs
+   in three, twelve of its examples at a time, and passed on the third — which is
+   the worst shape a check can have, because it teaches people to re-run it.
+   Retrying is what the corpus did about it before, and a retry is a coin flipped
+   twice.
+
+   **The component already has a still state and this is how to ask for it.**
+   `aura` honors `prefers-reduced-motion: reduce` by painting one frame rather
+   than an empty box, which is a decision it made for readers and which happens
+   to be exactly what a comparison needs. Both sides render under the same
+   setting, so what is being compared is unchanged: this asks the same question
+   of a page that has stopped moving.
+
+   What it gives up is comparing a moving state, which was never being compared —
+   only sampled. */
+const tab = await browser.newPage({
+  reducedMotion: 'reduce',
+  viewport: { height: 800, width: WIDTH },
+})
 
 /* Nothing leaves this machine, for the reason `check-visual.mjs` gives: three
    examples name assets on other people's servers, and a comparison that let
@@ -707,10 +730,16 @@ for (const entry of entries) {
    *
    * **A real difference reproduces and a flake does not**, which is what makes
    * this honest rather than a way of going green. `chat/command` reported 2,566
-   * pixels on three consecutive runs before it was fixed; `aura/streaks` paints
-   * to a canvas and reported 33 pixels on one run in three, and nothing here can
-   * know when a canvas has finished. The retry costs a second pass only on the
-   * examples that differ, and a difference that survives it is a difference.
+   * pixels on three consecutive runs before it was fixed.
+   *
+   * **The case this was written for is gone, and the retry is worth keeping
+   * anyway.** `aura` painted to a canvas and reported a difference on one run in
+   * three, then on two in three, twelve examples at a time; the retry was what
+   * stood between that and a red build, and a coin flipped twice is a poor
+   * guard. It is held still at the source now, by `reducedMotion` on the page.
+   * What remains here is a second reading for whatever is next: the retry costs
+   * a pass only on the examples that differ, and a difference that survives it
+   * is a difference.
    */
   let first = await picture(`${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`)
   let second = await picture(`${origin}/react/${entry.tier.name}/${entry.family}/${entry.slug}/`)
