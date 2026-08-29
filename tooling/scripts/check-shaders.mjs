@@ -21,11 +21,16 @@
  */
 
 import { globSync, readFileSync } from 'node:fs'
+import { ROOTS } from './lib/workspace.mjs'
 
 const OPENER = '`#version 300 es'
 
-/** Every place a shader can be written today. Widen it when that changes. */
-const FILES = globSync('{site,helix,cortex}/**/*.{ts,tsx,mjs,js}', {
+/* **The roots are named once and this glob spelled them out**, so when `site/`
+   became `fusion/site` the pattern went on matching nothing under that name and
+   the check went on passing: 1,117 files scanned where 1,343 exist, and it only
+   stayed green because both shaders are in `helix/`. A check that silently
+   narrows reads exactly like a check that found nothing. */
+const FILES = globSync(`{${ROOTS.join(',')}}/**/*.{ts,tsx,mjs,js}`, {
   exclude: (path) => path.includes('node_modules') || path.includes('/dist/'),
 })
 
