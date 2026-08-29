@@ -133,7 +133,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    *
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all: hardcoding `off` here means a birthday or a
-   * postal code can never be filled in for a reader. See (295).
+   * postal code can never be filled in for a reader.
    */
   @property()
   autocomplete = ''

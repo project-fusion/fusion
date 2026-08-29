@@ -82,7 +82,7 @@ export class HelixHeadlessTour extends HelixElement {
    * **Moved through `requestChange`, never by assignment from `move`.** That
    * announces first and applies only if nobody refused, and refusing is how a
    * consumer takes the decision; writing the property and then announcing puts
-   * `preventDefault` after the move it is refusing. See (294).
+   * `preventDefault` after the move it is refusing.
    *
    * The shape is `Carousel`'s, which is the nearest thing in the library: a
    * `default-index` for markup that only seeds and a held state that is

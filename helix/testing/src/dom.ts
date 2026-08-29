@@ -131,7 +131,7 @@ const shimElementInternals = (): void => {
       /* Declared, not merely assignable: a component that guards on
          `'ariaDescribedByElements' in internals` skips the link entirely when
          the slot is absent, which is the browser's own feature test.
- 
+
          Both of them. `hostAria` feature-tests each one separately, so a shim
          carrying only the description silently drops every name written by
          reference, which reads as the component failing to name itself. */
@@ -260,7 +260,7 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
  * runner's own `--timeout` does not save the reader either, because a file's
  * output is buffered until the file ends, so the whole suite reports nothing
  * about which test it was. Bounded, the same component fails one test in the
- * ordinary way and names itself. See (299).
+ * ordinary way and names itself.
  *
  * Forty is far past anything real. The most any component in this library takes
  * is three, and a number chosen against a laptop would be the wrong kind of

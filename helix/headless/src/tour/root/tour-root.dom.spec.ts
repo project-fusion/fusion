@@ -188,7 +188,7 @@ describe('moving between stops', () => {
 describe('a tour whose stop the consumer owns', () => {
   /* Declaring `index` seeds the tour rather than claiming it. Control is an
      action: the move applies, and a consumer refuses it by taking the decision.
-     See (294). */
+ */
   test('announces and moves, a declared index being a seed', async () => {
     /* Three stops and starting on the first, because `next()` on the last stop
        is a completion rather than a move and announces nothing at all. */

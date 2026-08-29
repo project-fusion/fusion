@@ -106,7 +106,7 @@ describe('an uncontrolled control', () => {
 
 describe('a control whose consumer declared a value', () => {
   /* A declared property is a seed and a correction, the way `<input value>` is,
-     and a consumer who wants the change for themselves refuses it. See (294). */
+     and a consumer who wants the change for themselves refuses it. */
   test('announces the change and applies it, a declared value being a seed', async () => {
     const host = await mount(`<${tag} value="theirs"></${tag}>`)
     const names = await heard(host, () => {
@@ -137,7 +137,7 @@ describe('a control whose consumer declared a value', () => {
 describe('writing the property', () => {
   /* There is no mode to take over: a write is a write, the way it is on a
      native control, and the element keeps applying its own changes whoever
-     wrote last. See (294). */
+     wrote last. */
   test('is a seed and a correction, and never stops the control responding', async () => {
     const host = await mount(`<${tag} default-value="one"></${tag}>`)
     host.value = 'written by a script'
@@ -162,7 +162,7 @@ describe('the names a change arrives under', () => {
      `announcesInput` picks only which native event reports the result: a
      continuous control sends `input` while a reader is still editing and
      withholds `change`. The request is `helix-before-change` either way, which
-     is the distinction the platform already draws. See (294). */
+     is the distinction the platform already draws. */
   test('is `helix-before-change` and then `input` and `change`, in steps', async () => {
     const host = await mount(`<${tag}></${tag}>`)
     expect(await heard(host, () => host.requestValue('x'))).toEqual([

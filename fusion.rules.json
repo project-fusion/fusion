@@ -1,0 +1,7 @@
+{
+  "domains": ["cortex", "helix"],
+  "hydrates": ["fusion/site"],
+  "icons": "helix/icons/icons.txt",
+  "scope": "@fusion.dev/",
+  "standalone": ["fusion/site/preview"]
+}

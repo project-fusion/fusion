@@ -909,7 +909,7 @@ export const TOKENS: Token[] = [
      `:root` is what every descendant inherits whatever region it is in. This is
      the default for a page in no density region, which is most pages, and losing
      it is not a subtle failure: measured with it absent, a select's caret drew at
-     950px and a menu item at 18. See (321) and (331). */
+     950px and a menu item at 18. */
   ['size-control-tight', 'calc(var(--helix-size-control) * 0.8)'],
   ['size-control-loose', 'calc(var(--helix-size-control) * 1.2)'],
   ['size-icon-tight', 'calc(var(--helix-size-icon) * 0.8)'],
@@ -1049,7 +1049,7 @@ export const TOKENS: Token[] = [
      *child* of the band it lights has to sit behind that band's words, where the
      same field as a sibling of the bands gets the order for free. The ramp began
      at the document with nothing under it, so the only way to write this was a
-     raw -1, which is the thing a token ramp exists to stop. See (251). */
+     raw -1, which is the thing a token ramp exists to stop. */
   ['layer-beneath', '-1'],
   ['layer-base', '0'],
   ['layer-raised', '10'],

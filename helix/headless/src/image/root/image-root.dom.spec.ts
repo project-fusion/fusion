@@ -86,7 +86,7 @@ describe('an image', () => {
     /* `load` and `error` on an `<img>` neither bubble nor compose, so the ones
        fired inside this shadow root reach nobody outside it. Relaying from the
        host is what makes them audible, and it keeps the native name rather than
-       coining a second word for it. See (294). */
+       coining a second word for it. */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
     host.addEventListener('load', () => {
@@ -113,7 +113,7 @@ describe('an image', () => {
        `nonDelegatedEvents`, so no root listener exists, and `bindReactHandler`
        binds only the non-bubbling ones. Matching the native propagation is what
        makes `onLoad` work at all, and a gallery does here what it does for
-       `<img>`. See (294). */
+       `<img>`. */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
     host.parentElement?.addEventListener('load', () => heard.push('heard'))

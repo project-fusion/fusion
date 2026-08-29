@@ -505,7 +505,7 @@ and `MixinControllerActive` all run on it, so a mode would fork the event
 vocabulary across ninety-two families by prop presence: which event a consumer
 binds would depend on whether they passed a property, and an HTML consumer would
 have no ergonomic spelling for the controlled half at all, a prefixed event
-having no inline handler attribute. See (294).
+having no inline handler attribute.
 
 **Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
@@ -1115,8 +1115,7 @@ what one word for four questions did for `appearance`. What they took: Chat
 `helix-before-collapse`, Sandbox `helix-before-split` and
 `helix-before-panel-resize` for its two dividers and `helix-before-edit` for a
 source pane. Pagination Size kept `helix-before-change`, being the one of the
-eleven that really is a value control. See (294), and (306) for the field the
-sandbox's pair was the last caller of.
+eleven that really is a value control.
 
 **`@controlled` is deleted, and so is everything that read it.** A declared
 property is a seed and a correction, the
@@ -1124,8 +1123,8 @@ element always applies, and a consumer takes one decision by refusing the before
 event. With no mode to be silently in there is nothing for a tag to declare,
 nothing for the generated constraint to require, and nothing for a check to
 hold. `helix-controlled`, `helix-controlled-props`, `check:controlled` and its
-fixture were removed together. See (294), and the longer version of the argument
-under the reflected-property rules above.
+fixture were removed together. The longer version of the argument is under the
+reflected-property rules above.
 
 **What survives is the finding underneath it**, which was never about ownership:
 which properties are stateful cannot be inferred from `inheritedFrom`. Eight are

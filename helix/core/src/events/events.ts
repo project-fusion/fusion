@@ -216,7 +216,7 @@ export interface TourAskDetail {
  * **A class rather than a hand-rolled `CustomEvent`.** A dispatch is matched as
  * `new HelixSomethingEvent(`, so a raw `CustomEvent` is not held to being
  * declared and nothing carries it into the manifest: consumers can hear it and
- * cannot find it. See (75).
+ * cannot find it.
  */
 export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
   static readonly eventName = 'helix-tour-ask'
@@ -318,7 +318,7 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
  * **There is no `property` field.** Every verb in this file says by itself which
  * property a request is about, and two families sharing a verb are told apart by
  * the element rather than by a field: `composedPath()[0]` survives the retarget
- * that `event.target` does not. See (306).
+ * that `event.target` does not.
  */
 export interface ChangeDetail {
   /** The value after the change. */
@@ -342,7 +342,7 @@ export interface ChangeDetail {
  * assigned.
  *
  * The shape is the one `MixinControllerOpen` already has, a cancelable request
- * and a plain notification after the state has moved. See (325).
+ * and a plain notification after the state has moved.
  */
 export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-activate'
@@ -419,7 +419,7 @@ export class HelixBeforeResizeEvent extends CustomEvent<ChangeDetail> {
  *
  * Its own verb rather than a `helix-before-resize` carrying which divider moved:
  * a sandbox has two, and they were told apart by a field on a detail every other
- * request in this file also carries. See (306).
+ * request in this file also carries.
  */
 export class HelixBeforeSplitEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-split'
@@ -502,7 +502,7 @@ export class HelixBeforeEditEvent extends CustomEvent<ChangeDetail> {
  *
  * **`announcesInput` picks which native notification fires, not which name this
  * carries.** Granularity is the platform's own distinction, `input` against
- * `change`; the request is always this one event. See (294).
+ * `change`; the request is always this one event.
  */
 export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-change'

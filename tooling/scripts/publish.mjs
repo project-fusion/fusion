@@ -211,7 +211,7 @@ if (promote !== undefined) {
  * and take that with it.
  *
  * Payoff, unpacked: 596K off headless, 261K off web, 135K off core and 47K off
- * theme in a consumer's `node_modules`. See (193).
+ * theme in a consumer's `node_modules`.
  */
 const strip = (directory) => {
   const dist = join(root, directory, 'dist')

@@ -71,7 +71,7 @@ const OUTPUT = join(ROOT, 'helix/docs/peers.json')
  * system and a combobox in another: comparing those compares our reading of
  * somebody else's library rather than the libraries. `tag` fails too, Material
  * shipping a Chip, and `accordion` fails because Material ships none and
- * Shoelace calls its own Details. See (191).
+ * Shoelace calls its own Details.
  *
  * Exact rather than a range, because a caret would silently re-measure on
  * somebody else's machine and the table would say a version it had not read.

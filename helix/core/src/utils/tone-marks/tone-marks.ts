@@ -12,7 +12,7 @@ import {
  * **A subset of `tone` rather than an axis of its own.** A `severity` beside it
  * would be a sixth spelling of the axis for what a thing *means*: `Callout` and
  * `Toast.Item` report a status and never a brand role, so they take four of the
- * seven values and not four values of their own. See (158).
+ * seven values and not four values of their own.
  *
  * `Status` stays in the name because that is the half of `tone` these are: there
  * is no mark for `primary` or `accent`, a brand role having nothing to announce.

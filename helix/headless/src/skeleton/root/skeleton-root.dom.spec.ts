@@ -26,7 +26,7 @@ describe('skeleton', () => {
        class in the run: `customElement` declines a taken tag quietly, so the
        winner is decided by file order and never announced, and after any edit
        to `src` this file registers the previous build for everybody. Nine tests
-       in three other families failed exactly that way. See (298). */
+       in three other families failed exactly that way. */
     const { HelixHeadlessSkeleton } = await import('../index.js')
     expect('shape' in HelixHeadlessSkeleton.prototype).toBe(false)
     const skeleton = await mount(

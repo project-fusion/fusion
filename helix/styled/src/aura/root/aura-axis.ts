@@ -10,7 +10,7 @@
  * That guard is the whole reason this file exists. `terminus` was wrong twice
  * while its docstring said otherwise, the arithmetic living inside a getter
  * beside a sentence describing different arithmetic with nothing comparing the
- * two. See (155).
+ * two.
  *
  * **`exitOf` mirrors the shader step by step rather than stating the closed
  * form**, which is deliberate and is what makes the round trip worth running.

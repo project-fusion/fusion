@@ -122,7 +122,7 @@
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
    the heavier blur is what stops a ground that opaque reading as a smear. The
-   two move together because either without the other does nothing. See (270). */
+   two move together because either without the other does nothing. */
 :host([material="frosted"]) [part="tooltip"],
 :host([material="frosted"]) [part="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, blur(var(--helix-material-blur-lg)));
@@ -220,7 +220,7 @@
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See (165). */
+ * this on a component's behalf. */
 @media print {
   :host {
     display: none;

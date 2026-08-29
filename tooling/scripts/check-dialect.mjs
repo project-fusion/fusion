@@ -50,7 +50,7 @@ import { join } from 'node:path'
  * **`center` renames a public part**, `donut-chart`'s, and that is deliberate
  * rather than collateral. There is no `helix-v` tag, so `::part(center)` has no
  * consumer to break, and this is free today and a deprecation after the first
- * release. The same timing argument as [#215](../../fusion/docs/19-queue.md).
+ * release.
  */
 const PAIRS = [
   ['acknowledgement', 'acknowledgment'],

@@ -611,7 +611,7 @@ export class HelixHeadlessVideo extends HelixElement {
    *
    * **Published because there is no other way in.** The `<video>` is inside
    * this shadow root and `querySelector` does not cross it, so a consumer
-   * asking where the video has reached has nowhere else to ask. See (295).
+   * asking where the video has reached has nowhere else to ask.
    *
    * **Read from the element, with the mirror as the fallback.** The element is
    * the truth and the mirror is a render cache that a media event refreshes, so
@@ -799,7 +799,7 @@ export class HelixHeadlessVideo extends HelixElement {
    *
    * Every family that renders a native control needs this, not only the form
    * controls: a media component with two rails in its chrome is neither a form
-   * control nor exempt from the mechanism. See (308).
+   * control nor exempt from the mechanism.
    */
   private takeScrub(event: Event): void {
     event.stopPropagation()

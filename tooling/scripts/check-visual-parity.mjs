@@ -277,7 +277,7 @@ const UNCOMPARED = new Map([
        within a load and picks a different one on the next; it is not a React
        fault, since the markup side varies just as much; and it is not the brand
        font failing, which a scratch probe suggested and was an artifact of that
-       probe having no `/fonts/` route where this file has one. See (315). */
+       probe having no `/fonts/` route where this file has one. */
     'unstable on both sides across loads: 272, 273 and 275 for the markup twin alone',
   ],
   [

@@ -467,7 +467,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * event: those are requests, announcing what the slider is *about* to do,
    * before anything has moved and while a listener may still refuse it. The
    * native pair fires after the slider applied, so the value is on the element
-   * and cannot disagree with it. See (294).
+   * and cannot disagree with it.
    *
    * Idempotent, so taking both costs nothing: the same value applied twice is
    * the same color.

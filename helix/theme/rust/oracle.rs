@@ -990,7 +990,7 @@ pub fn intent_for(label: &str) -> ThemeIntent {
 ///
 /// A bisection agreeing to the bit across every theme means every branch it took
 /// was the same branch: twenty-four halvings per candidate, four candidates per
-/// ink, both directions tried. See (142).
+/// ink, both directions tried.
 #[test]
 fn the_neutral_inks_land_where_the_typescript_lands() {
     let data = oracle();

@@ -738,7 +738,7 @@
    `Card`'s own doc warns about. And it stays local rather than joining the
    registry: it lives on one family and there it encodes data rather than
    expressing a theme, so promoted it would put an attribute on eighty-eight
-   components that means nothing on eighty-seven. See (156). */
+   components that means nothing on eighty-seven. */
 :host([wash="gradient"]) [part="bar"] {
   fill: var(--chart-bar-wash);
 }
@@ -758,7 +758,7 @@
 /* Print: the fill is the data, so it is forced to print rather than dropped.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

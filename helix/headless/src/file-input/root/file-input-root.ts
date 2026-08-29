@@ -272,7 +272,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        Without the explicit `input`, the only one a consumer receives is the
        inner `<input type="file">`'s own, composed out of this shadow root, so
        the documented event does not exist and an undocumented one arrives in
-       its place. See (308). */
+       its place. */
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }

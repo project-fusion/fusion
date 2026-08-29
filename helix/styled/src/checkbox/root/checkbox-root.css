@@ -134,7 +134,7 @@
   inline-size: var(--_checkbox-size);
   /* The tick by default, and not only when the box is ticked, which is what
      stops the mark flashing on the way out.
- 
+
      `mask-image` does not animate, so it snapped the instant `:state(checked)`
      went, while `scale` still had a transition to run. Measured mid-uncheck:
      mask none, scale 1, background white. For the length of that transition the
@@ -321,7 +321,7 @@
  * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

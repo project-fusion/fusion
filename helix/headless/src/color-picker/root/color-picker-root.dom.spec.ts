@@ -30,7 +30,7 @@ const axis = async (host: Color, which: string, to: number): Promise<void> => {
  * `helix-change` is a *request*, announced before the slider has moved and
  * while a listener may still refuse it, so acting on it would act on a decision
  * not yet taken. The picker reads the applied value off the slider instead,
- * which is what the native pair reports. See (294).
+ * which is what the native pair reports.
  */
 const ramp = async (host: Color, channel: string, to: number): Promise<void> => {
   const slider = host.shadowRoot?.querySelector(`[data-channel="${channel}"]`) as

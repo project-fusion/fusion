@@ -215,7 +215,7 @@ slot[name="footer"]::slotted(*) {
 /* Print: the lift is a shadow, which printers drop into a gray smear; the edge carries it.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

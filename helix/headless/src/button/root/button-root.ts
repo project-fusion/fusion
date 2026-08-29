@@ -247,7 +247,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it and the reader is still told what the control does. See (322).
+   * they served it and the reader is still told what the control does.
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,

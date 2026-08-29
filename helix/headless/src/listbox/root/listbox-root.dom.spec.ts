@@ -131,7 +131,7 @@ describe('listbox filtering ownership', () => {
     expect(host.filter).toBe('gam')
     expect(field(host).value).toBe('gam')
 
-    // And a refusal is what would have held it. See (294).
+    // And a refusal is what would have held it.
     host.filter = 'be'
     await host.updateComplete
     expect(host.filter).toBe('be')

@@ -10,7 +10,7 @@
 //! count, the bisection order and the float arithmetic are not details, they are
 //! the answer: two implementations that merely agree on intent disagree on
 //! output by construction. So the loops below are the TypeScript's loop bounds,
-//! in its order, and every constant is copied rather than rederived. See (142).
+//! in its order, and every constant is copied rather than rederived.
 //!
 //! `f64` throughout, because a JavaScript number is one and a port that reached
 //! for `f32` would differ in the last place at exactly the point a bisection is

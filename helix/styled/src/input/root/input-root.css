@@ -153,7 +153,7 @@ slot[name="end"]::slotted(*) {
  * The resting field is a recess, a percentage of the foreground over whatever
  * is behind it, so read-only is the absence of that recess rather than a second
  * color: no fill, the ground showing through, distinct from the resting state
- * on every ground and needing no token to stay that way. See (154). */
+ * on every ground and needing no token to stay that way. */
 :host([readonly]) [part="field"] {
   background-color: transparent;
 }
@@ -216,7 +216,7 @@ slot[name="end"]::slotted(*) {
  * to survive, or the paper says the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

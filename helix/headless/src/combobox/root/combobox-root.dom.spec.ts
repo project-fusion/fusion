@@ -151,7 +151,7 @@ describe('combobox', () => {
        A deep equality against an array holding a DOM node walks the node, and a
        rendered element is a graph with cycles in it: `toEqual([host])` does not
        fail when it starts failing, it exhausts the machine's memory and takes
-       the runner with it. See (297). */
+       the runner with it. */
     const heard: EventTarget[] = []
     host.addEventListener('helix-before-change', (event) => heard.push(event.target as EventTarget))
     await type(host, 'go')

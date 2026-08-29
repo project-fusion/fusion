@@ -43,7 +43,7 @@ describe('one toast message', () => {
 
   /* Declaring `open` seeds the state and does not claim ownership of it.
      Control is an action: it applies, and a consumer refuses to take the
-     decision. See (294). */
+     decision. */
   test('announces and closes, where the markup only seeded it', async () => {
     const host = await message('dismissible open')
     let heard = 0

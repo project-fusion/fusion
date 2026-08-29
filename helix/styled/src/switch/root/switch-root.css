@@ -63,7 +63,7 @@
 
 /* Traveling rather than appearing, which is the whole of what a switch says:
    the same thing moved rather than a different thing shown.
- 
+
    A hairline rather than a shadow, and the reason is that a shadow is not
    symmetric. `shadow-sm` is offset a pixel downward, which fills the gap under
    the thumb and leaves the one above it empty: measured, the thumb is centered
@@ -95,7 +95,7 @@
      against two above and below, and one pixel at the far end where the travel
      had already been reckoned from the outside. The thumb read as overshooting
      its own track.
- 
+
      The vertical does not need this because it is centered rather than inset,
      and centering is symmetric whichever box it is done in. This is the same
      arithmetic the segmented control's indicator does with `clientTop`. */
@@ -173,7 +173,7 @@
  * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

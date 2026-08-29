@@ -46,7 +46,7 @@ const warned = new WeakSet<Element>()
  * `<button slot="trigger">` has no shadow root to keep the state out of the
  * markup and no property to take it, and a consumer cannot mirror it themselves
  * because the open state belongs to the component. Saying so once is the same
- * answer `Tooltip` gives about the link it will not write for them. See (322).
+ * answer `Tooltip` gives about the link it will not write for them.
  */
 export const tellDisclosure = (trigger: Element | null | undefined, open: boolean): void => {
   if (!trigger) {

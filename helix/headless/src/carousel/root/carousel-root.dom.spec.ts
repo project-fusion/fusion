@@ -235,7 +235,7 @@ describe('carousel, controlled and uncontrolled', () => {
 
   test('an index in the markup is a seed, and the carousel still moves', async () => {
     /* Control is an action: the element always applies, and a consumer takes
-       the decision by refusing. See (294). */
+       the decision by refusing. */
     const host = await carousel('index="1"')
     host.goTo(2)
     await host.updateComplete
@@ -425,7 +425,7 @@ describe('carousel settling', () => {
 
   test('a drag writes the index it settled on, declared or not', async () => {
     /* Control is an action: the element always applies, and a consumer takes
-       the decision by refusing. See (294). */
+       the decision by refusing. */
     const { host, track } = await scrolling('index="0"')
     let asked = ''
     host.addEventListener('helix-select', (event) => {

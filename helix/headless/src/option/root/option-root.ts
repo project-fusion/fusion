@@ -220,7 +220,7 @@ export class HelixHeadlessOption extends HelixElement {
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
    * seeds the property, which is what `<helix-option selected>` in a consumer's
-   * markup means. What stops is the write back. See (302) and (304).
+   * markup means. What stops is the write back.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

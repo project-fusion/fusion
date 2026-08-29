@@ -415,7 +415,7 @@ describe('a branch opening is announced, and can be owned', () => {
   test('open in the markup is a seed, and the branch still closes', async () => {
     /* Declaring the property is not a claim of ownership. Control is an action:
        the element applies, and a consumer refuses to take the decision.
-       See (294). */
+ */
     const item = await branch('open')
     item.toggleOpen()
     await item.updateComplete

@@ -16,7 +16,7 @@ beforeAll(async () => {
  * reader can say which one it is reading.
  *
  * Copying the parent's assertions into a second file would prove nothing the
- * first did not. See (198).
+ * first did not.
  */
 describe('a group of options', () => {
   test('is a group, named by its label, so a reader is told which run this is', async () => {

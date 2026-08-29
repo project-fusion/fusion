@@ -396,7 +396,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      following somebody's link must not re-set your own preference, which is the
      half of the color-mode argument in `url-state.ts` that still applies to a
      tier. Null until the URL is read, which is after mount, so the first paint
-     follows the drawer exactly as it did. See (211). */
+     follows the drawer exactly as it did. */
   /* Whether the address has been read yet.
      **State rather than a ref, and the difference is the whole fix.** A ref set
      inside the reading effect is true before the values it read have landed:
@@ -444,7 +444,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    * already was and the text goes back: the sandbox's own examples were
    * unfilterable that way. The native `input` fires after the element applied,
    * so the target is the answer, which is what every handler ever written
-   * expects. See (294). */
+   * expects. */
   const filterChanged = (event: Event & { currentTarget: HelixInput }) => {
     setFilter(event.currentTarget.value)
   }
@@ -1172,13 +1172,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           wrapping the sandbox conditionally would unmount it at the breakpoint,
           and the preview is an iframe that reloads when it does. */}
       {/* **A floor for the editor, in rem rather than per cent.**
-          
+
           The pane on this side holds source, and source is the thing a
           percentage minimum cannot protect: twenty per cent is 280px on a desk
           and 100px on a laptop split in half, and the number worth picking was
           always about how much of a line fits. 20rem is 320px of it, which is
           where a line stops being cut mid-token.
-          
+
           Only this side has one. The rail closes by being driven to 100, and a
           `min` is a lower bound, so the toggle still shuts it completely. The
           theme builder deliberately has no `min` for the mirror of that reason:

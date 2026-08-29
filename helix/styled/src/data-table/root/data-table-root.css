@@ -119,7 +119,7 @@
 
 /* Print: zebra striping is a fill printers drop unevenly, which is worse than
    none. `@media print` does not cross a shadow boundary, so a page cannot answer
-   this on a component's behalf and every family says it for itself. See (165). */
+   this on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

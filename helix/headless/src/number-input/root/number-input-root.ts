@@ -117,7 +117,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all. Hardcoding `off` here is what stops a reader
    * having a birthday or a postal code filled in for them, with no way for a
-   * consumer to ask for it. See (295).
+   * consumer to ask for it.
    */
   @property()
   autocomplete = ''

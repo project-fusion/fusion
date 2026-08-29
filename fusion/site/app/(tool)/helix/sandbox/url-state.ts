@@ -38,7 +38,7 @@
  * sandboxes at the same address showing different packages is the link failing
  * to say what it is about. So it is carried, and it forces the tier for this
  * page only. Following somebody's link must never re-set your own drawer, which
- * is the half of the color-mode argument that still applies. See (211).
+ * is the half of the color-mode argument that still applies.
  *
  * The site's own color mode is deliberately not here. It is a preference about
  * how someone reads, held in `localStorage` and applying to every page, and

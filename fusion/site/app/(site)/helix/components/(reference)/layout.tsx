@@ -13,7 +13,7 @@ import styles from './docs.module.css'
  * just cannot stay closed, which is why clicking the chevron always looks fine.
  * A layout stays mounted across the routes it wraps, so the tree keeps its
  * identity and nothing has to be stored, which is the version that would need a
- * boot script to avoid a flash of the wrong state. See (119).
+ * boot script to avoid a flash of the wrong state.
  *
  * **Above the dynamic segment, which is the half that matters.** A layout inside
  * `[family]` is keyed by the value of that segment, so a different family is a

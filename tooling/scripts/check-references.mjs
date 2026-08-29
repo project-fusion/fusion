@@ -18,7 +18,7 @@
  * because a false positive is worse than a miss here:
  *
  * - A backticked path rooted at the repository, with a known extension:
- *   `fusion/docs/19-queue.md`, `helix/styles/src/tokens.css`. A path that starts
+ *   `fusion/docs/token-reference.md`, `helix/styles/src/tokens.css`. A path that starts
  *   somewhere else is illustrative rather than a claim and is left alone.
  * - A backticked `bun run <script>`, against the nearest `package.json` and
  *   every one above it, since a package names its own scripts.

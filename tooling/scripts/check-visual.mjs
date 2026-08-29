@@ -7,7 +7,7 @@
  * label: all three shipped, and all three survived a green `verify`, because
  * every check in it reads source or asserts a fact somebody thought to assert.
  * A pixel diff asserts the part nobody thinks to, which is everything that was
- * already right. See (148).
+ * already right.
  *
  * **The headless corpus was built for something else and is better for it.**
  * Each `.examples/preview.html` under `helix/headless/src` renders one family's

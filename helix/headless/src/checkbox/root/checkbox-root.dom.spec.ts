@@ -64,7 +64,7 @@ describe('checkbox', () => {
 
   test('a box whose markup declared `checked` still moves, the property being a seed', async () => {
     /* Control is an action: the element applies, and a consumer takes the
-       decision by refusing it. See (294). */
+       decision by refusing it. */
     const box = await checkbox('checked')
     control(box).click()
     await box.updateComplete

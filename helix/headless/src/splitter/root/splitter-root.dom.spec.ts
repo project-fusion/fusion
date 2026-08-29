@@ -119,7 +119,7 @@ describe('splitter settling', () => {
 
   test('declaring `position` seeds it, and the divider still moves', async () => {
     /* Control is an action: the element applies, and a consumer takes the
-       decision by refusing the before event. See (294). */
+       decision by refusing the before event. */
     const host = await splitter('position="50" step="5"')
     let asked = ''
     host.addEventListener('helix-before-resize', (event) => {
@@ -514,7 +514,7 @@ describe('splitter collapsing', () => {
 
   test('declaring `collapsed` seeds it, and the pane still collapses', async () => {
     /* Control is an action: the element applies, and a consumer takes the
-       decision by refusing the before event. See (294). */
+       decision by refusing the before event. */
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
     host.addEventListener('helix-before-collapse', (event) => {
@@ -556,7 +556,7 @@ describe('splitter under a consumer that owns the position', () => {
   test('a splitter whose markup declared a position can still be dragged', async () => {
     /* A declared `position` is a seed, not a claim of ownership: there is
        nothing to defer to, and the drag applies like any other change.
-       See (294). */
+ */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),

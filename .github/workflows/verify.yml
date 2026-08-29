@@ -286,7 +286,7 @@ jobs:
           # anybody wrote down. Here rather than in `verify` because it wants a
           # browser and a baseline taken on this runner: the comparison never
           # crosses platforms, so on a contributor's Mac it says so and exits
-          # clean. See (148).
+          # clean.
           - task: visual
             run: bun run check:spec:visual
           # Every example rendered twice, from its HTML and from its TSX, and

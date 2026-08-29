@@ -74,7 +74,7 @@ rm -f /tmp/pre-push-$$.log
 printf 'pre-push: generated files\n'
 for task in gen:reference gen:element-events gen:tokens-reference gen:tokens-layer \
             gen:metrics gen:docs gen:samples gen:routes gen:content gen:themed-page \
-            gen:eval prose:queue; do
+            gen:eval; do
   bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'

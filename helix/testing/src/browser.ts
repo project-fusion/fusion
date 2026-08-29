@@ -299,7 +299,7 @@ const build = (actual: unknown, negated: boolean): Matchers => {
        for the wrong reason, and `undefined` in the expectation passes against a
        key that is present and undefined. A reader asking whether a point carries
        no `tone` at all is asking about the shape.
-    
+
        Dot paths, because `bun:test` takes them, and a spec that means one thing
        here and another there is the one thing this harness must never be. */
     toHaveProperty: (path, ...rest) => {
@@ -606,7 +606,6 @@ export const part = (host: HTMLElement, name: string): Element | null =>
  * landed, and an unbounded loop hangs the whole run when a component never
  * settles. Written twice because the two harnesses share no code, which is the
  * arrangement `check:spec:matchers` already exists to police from the other side.
- * See (299).
  */
 export const settle = async (host: Updatable, turns = 40): Promise<void> => {
   let taken = 0

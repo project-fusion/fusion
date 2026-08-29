@@ -51,7 +51,7 @@
    * **A relationship has no general vocabulary yet.** The accent below is one,
    * a rotation off the brand; a status set that leans toward the brand rather
    * than ignoring it is not, and wants a second input and a way to name how it
-   * relates to the first. See (110). */
+   * relates to the first. */
   /* **The default lightness is the engine's answer, not a hand-picked one.**
      At 0.58 this seed is `#2275e8`, which reads 4.395:1 on white and 4.395:1
      under the on-accent ink: under AA on both sides of the one pair the palette
@@ -101,7 +101,7 @@
    *
    * Without it the series take only the brand's hue and state the other two
    * components as literals, so a deliberately monotone brand paints twenty-four
-   * vivid charts. See (141). */
+   * vivid charts. */
   --_helix-seed-chroma-scale: var(--helix-seed-chroma-scale, 1);
   /* Zero, and the ramp is gray.
 
@@ -172,7 +172,7 @@
      quieting it quiets all of it.
 
      **The two ends do not move together, and that is not an oversight.** The
-     light ramp has open space below white; the dark one does not. See (700).
+     light ramp has open space below white; the dark one does not.
 
      **This is decoration, not an affordance, and it is worth being clear which.**
      At 0.91 on white the line is about 1.3:1, nowhere near the 3:1 that

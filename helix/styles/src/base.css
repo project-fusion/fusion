@@ -256,7 +256,7 @@ helix-card > [slot="media"] {
    navigates is a heading containing an anchor rather than a link wearing a
    heading's size. Writing the rules would make that mistake spellable and would
    say, by covering the range, that the library thinks a link can be display
-   type. See (226). */
+   type. */
 [data-link-size="xs"] {
   font-size: var(--helix-text-xs);
 }
@@ -697,7 +697,7 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
 /* **The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
  * Enumerating nine steps of a control ramp that only has three would invent
  * sizes nothing was drawn at, while a multiplier covers every value between them
- * without naming any. See (226) and (227).
+ * without naming any.
  *
  * **A container cannot do this by setting the seed, and that is measured rather
  * than argued.** `--helix-seed-density` is a real `ThemeIntent` knob and it

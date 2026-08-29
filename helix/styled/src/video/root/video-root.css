@@ -152,14 +152,14 @@
 }
 
 /* Gone once the video is playing and the reader has been still for a while.
- 
+
    On `data-idle`, which the element writes after a delay, rather than on
    `:not(:hover)`. The bar used to leave the instant the pointer did, so a
    reader crossing the picture to reach a control watched it vanish under them.
    The element also writes `data-playing`, because CSS cannot ask a video
    whether it is playing: `paused` is a property and never an attribute, so
    `video:not([paused])` matched every video in existence.
- 
+
    Focus still holds it open, which is what keeps the bar reachable without a
    pointer: a control that is only there on hover is one a keyboard cannot
    find. And a paused video keeps its bar, because a reader who stopped it is
@@ -366,7 +366,7 @@
 
 /* The little ground it stands on, so the track is legible over a bright frame
    the way the bar's own controls are.
- 
+
    Sized and offset from the same numbers the slider uses, so the two cannot
    drift: the ground is the track's length plus a pad at each end, and both are
    centered on the speaker below. Written independently they disagree, and a
@@ -672,7 +672,7 @@
 /* Print: a moving picture, and its controls are the only part that would print.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     display: none;

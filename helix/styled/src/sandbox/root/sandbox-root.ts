@@ -408,7 +408,6 @@ export class HelixSandbox extends HelixElement {
    * **A verb each, rather than one `helix-before-resize` naming which of the two
    * moved.** Both dividers are this element's, so `composedPath()[0]` is the same
    * host for either and the event name is the only thing that can separate them.
-   * See (306).
    */
   private splitSettled(): void {
     this.dispatchEvent(new HelixBeforeSplitEvent({ value: String(this.split) }))

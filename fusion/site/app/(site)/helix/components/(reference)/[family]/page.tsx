@@ -538,7 +538,7 @@ function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefin
  * **The picture is drawn too**, by `opengraph-image.tsx` beside this file, from
  * the same `label`, `summary` and `status`. There is deliberately no *shot* of a
  * family: a card is read at thumbnail size, where a name set large is legible
- * and a screenshot of a control is a gray smudge. See (247) and (255).
+ * and a screenshot of a control is a gray smudge.
  */
 export async function generateMetadata({
   params,
@@ -579,7 +579,7 @@ export default async function FamilyDocs({
      It forces the page and never writes storage. Following somebody's link must
      not re-set your own drawer, which is why `preferences.tsx` skips its stored
      value when the address said something. Validated against the two literals
-     before it reaches a script tag. See (211). */
+     before it reaches a script tag. */
   const asked = (await searchParams).tier
   const forced = asked === 'headless' || asked === 'styled' ? asked : undefined
   if (!family) {
@@ -606,7 +606,7 @@ export default async function FamilyDocs({
 
   return (
     /* The shell and the rail are the layout's, so the nav survives a navigation
-       between families and keeps the state a reader set on it. See (119). */
+       between families and keeps the state a reader set on it. */
     <>
       <TierAddress />
       {forced && (

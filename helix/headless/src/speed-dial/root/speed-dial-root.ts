@@ -221,7 +221,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * bare `<button>` is what the headless tier can write: it must not reach for
    * `helix-button`, which lives a tier above and would make `headless` depend
    * on `styled`. So the base draws the plain control and a tier that has buttons
-   * of its own overrides this to use one. See (76). Written inline, the only way
+   * of its own overrides this to use one. Written inline, the only way
    * to change it would be to reimplement the template, panel and all.
    */
   protected renderTrigger(): TemplateResult {

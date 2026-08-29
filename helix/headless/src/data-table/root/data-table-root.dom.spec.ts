@@ -228,7 +228,6 @@ describe('controlled and uncontrolled', () => {
    * An axis declared in markup is a seed and a correction, never a claim of
    * ownership. The element applies it and goes on responding, and a consumer
    * takes the decision by refusing the event, which is the test below this one.
-   * See (294).
    */
   test('a declared `sort` is a seed, and the element still re-sorts', async () => {
     const { element, remove } = await mount(`
@@ -261,7 +260,7 @@ describe('controlled and uncontrolled', () => {
 
   /**
    * Writing always applies: there is no mode a write could move the element
-   * into. See (294).
+   * into.
    */
   test('a script write after mount applies, and the element keeps responding', async () => {
     const { element, remove } = await mount(SCHEMA)
@@ -277,7 +276,7 @@ describe('controlled and uncontrolled', () => {
 
   /**
    * An axis set back to empty means unsorted, and the element goes on sorting
-   * from there. See (294).
+   * from there.
    */
   test('an axis set back to empty is unsorted, and the element still sorts', async () => {
     const { element, remove } = await mount(`

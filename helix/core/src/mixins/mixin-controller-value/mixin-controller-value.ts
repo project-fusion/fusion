@@ -118,7 +118,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * The request event is `helix-before-change` whatever the answer; this
      * decides which native event announces the result, `input` while a reader
      * is editing against `change` when they are done, which is the distinction
-     * the platform already draws. See (294).
+     * the platform already draws.
      *
      * Discrete by default: only a control the reader edits continuously says
      * otherwise.
@@ -154,7 +154,6 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * itself, whether or not a consumer declared `value`: a declared property
      * is a seed and a correction, the way `<input value>` is, and a consumer
      * who wants the change for themselves refuses it and assigns their own.
-     * See (294).
      */
     requestValue(next: string): boolean {
       if (this.value === next) {

@@ -44,7 +44,7 @@ export class HelixHeadlessToggle extends HelixElement {
    * **The deeper half is not this.** State reflecting under the declaration's
    * name is the fault `TreeItem` avoids by mirroring to `data-selected`.
    * Splitting them means moving what every stylesheet selects on, which is a
-   * change of its own rather than a property being added. See (302).
+   * change of its own rather than a property being added.
    */
   get defaultSelected(): boolean {
     return this.seeded
@@ -113,7 +113,7 @@ export class HelixHeadlessToggle extends HelixElement {
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
    * seeds the property, which is what `<helix-toggle selected>` in a consumer's
-   * markup means. There is no write back. See (302) and (304).
+   * markup means. There is no write back.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

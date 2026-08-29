@@ -26,7 +26,7 @@ export interface JsxNativeEventsOptions {
  * `Event`, so `currentTarget` is `EventTarget` or null. The prefixed events
  * have no such problem, being emitted per element with a typed detail. So the
  * ergonomic half of 294 cost a consumer a cast and the advanced half did not,
- * which is exactly backwards. See (300).
+ * which is exactly backwards.
  *
  * `@wc-toolkit/jsx-types` cannot do better and is not wrong to: it emits one
  * shared bag because it has no idea which element a handler will be written on.

@@ -162,7 +162,7 @@ export class HelixHeadlessImage extends HelixElement {
    *
    * **Unprefixed, unlike every other event here.** The prefix exists to stop a
    * collision with a native name, and there is none to collide with: the native
-   * events cannot reach a consumer at all. See (294) and (295).
+   * events cannot reach a consumer at all.
    *
    * **Not bubbling, and that is not a small point.** A bubbling relay of `load`
    * would be the tempting one, letting a gallery count its pictures with one

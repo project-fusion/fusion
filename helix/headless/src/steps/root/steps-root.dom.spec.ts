@@ -209,7 +209,7 @@ describe('the list can hold which step is current', () => {
 
   test('and announces and moves, a declared active being a seed', async () => {
     /* Control is an action: a declared `active` applies, and a consumer refuses
-       to take the decision. See (294). */
+       to take the decision. */
     const host = await seq('active="one"')
     const said: string[] = []
     host.addEventListener('helix-before-activate', (event) => {

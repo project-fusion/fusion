@@ -25,17 +25,6 @@ Rust is `cargo test --workspace`, and `cargo fmt` and `clippy` rather than
 Biome. Workspace lints are `clippy::pedantic` with `unsafe_code` forbidden: fix
 a finding rather than allowing it, and comment any allow at its site.
 
-## What the queue is
-
-[`fusion/docs/19-queue.md`](fusion/docs/19-queue.md) is the issue tracker, in the repository,
-under review, and versioned with the code it describes. Numbers are stable: a
-finished item keeps its number, so a commit naming #49 still means something a
-year from now. `bun run check:prose:queue` prints the next free number and holds the
-ordering.
-
-If you are proposing work rather than doing it, a queue row is often the better
-artifact than an issue, because the reasoning survives next to the code.
-
 ## House style
 
 Most of this is enforced, so `bun run fix` will tell you. The parts worth

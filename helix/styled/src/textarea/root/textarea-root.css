@@ -88,7 +88,7 @@
  * absence of that recess rather than a second color: it stays distinct on every
  * ground and needs no token to do it. An absolute fill is flush only by
  * coincidence, and on a raised panel it comes out lighter than the thing it sits
- * on, which is a field rising out of the surface it belongs to. See (154). */
+ * on, which is a field rising out of the surface it belongs to. */
 :host([readonly]) [part="field"] {
   background-color: transparent;
 }
@@ -104,7 +104,7 @@
  * typed into anything.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

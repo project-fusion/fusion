@@ -123,7 +123,7 @@ describe('input date', () => {
   test('declaring `value` seeds it, and the field still moves', async () => {
     /* Declaring the property is a seed and not a claim of ownership: control is
        an action, so the element applies it and a consumer refuses to take the
-       decision. See (294). */
+       decision. */
     const host = await field('value="2026-01-01"')
     let asked = ''
     host.addEventListener('helix-before-change', (event) => {

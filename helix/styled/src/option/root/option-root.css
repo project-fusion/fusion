@@ -33,7 +33,7 @@
 
      `control-tight` is derived from the unsuffixed `--helix-size-control`, so a
      row in a floating panel does follow the region's density. Whether it should
-     is the open question. See (321). */
+     is the open question. */
   min-block-size: var(--helix-size-control-tight);
   box-sizing: border-box;
   /* Through a hook, for the reason the inline inset above is: a panel that
@@ -153,7 +153,7 @@
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

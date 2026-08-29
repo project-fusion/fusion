@@ -60,7 +60,7 @@ export class HelixHeadlessTabPanel extends HelixElement {
    *
    * The attribute still seeds the property, which is what
    * `<helix-tab-panel selected>` in a consumer's markup means. Only the write
-   * back is gone. See (302) and (304).
+   * back is gone.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

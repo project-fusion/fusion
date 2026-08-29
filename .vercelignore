@@ -11,11 +11,11 @@
 # `fusion/docs/insights` is `@fusion.dev/insights`, a workspace member the site
 # depends on, so the folder itself can never be excluded.
 #
-# So the pattern names the files rather than the folder. The three markdown
-# documents left at the top of `fusion/docs/` are the queue and two generated
-# references, none of them read by anything on the build path and all three
-# repository-internal, which `fusion/site/app/helix/tokens.json/route.ts` says of
-# the token reference in as many words.
+# So the pattern names the files rather than the folder. The two markdown
+# documents left at the top of `fusion/docs/` are generated references, neither
+# read by anything on the build path and both repository-internal, which
+# `fusion/site/app/helix/tokens.json/route.ts` says of the token reference in as
+# many words.
 /fusion/docs/*.md
 
 # Build output and scratch, rebuilt on Vercel anyway.

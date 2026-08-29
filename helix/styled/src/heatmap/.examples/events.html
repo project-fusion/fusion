@@ -61,7 +61,7 @@
 
   /* Not cancelable, and that is the shape rather than an omission: the grid is
      reporting what it can show, and the number is true whether or not anybody
-     wanted it. See (303). */
+     wanted it. */
   grid.addEventListener('helix-resize', (event) => {
     say('helix-resize', `${event.detail.size} cells fit, which is a report`)
   })

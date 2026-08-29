@@ -360,7 +360,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * would fight the first two, and virtualizing a grid means variable row
    * heights, a sticky header and keeping `aria-rowindex` honest against a result
    * the element is no longer holding. `VirtualizeController` exists for the case
-   * where the rows are a flat list and this is not that. See (326).
+   * where the rows are a flat list and this is not that.
    *
    * Warned once per element, in a browser only: a warning during a server render
    * is one nobody can act on and one that would print per request.

@@ -366,7 +366,7 @@ describe('input, controlled and uncontrolled', () => {
   test('a declared value is a seed, and typing still moves it', async () => {
     /* Control is an action, not a mode: a declared `value` is a seed, the
        element always applies, and a consumer takes the decision by refusing the
-       before event. See (294). */
+       before event. */
     const host = (await mount(
       '<helix-input label="Name" value="mine"></helix-input>',
     )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
@@ -402,7 +402,7 @@ describe('input, controlled and uncontrolled', () => {
   test('a refused change is undone, on the host and on the control alike', async () => {
     /* Refusing is how a consumer takes the decision, and the native control has
        already moved by the time the refusal runs, so putting it back is a
-       separate act from not applying the change. See (294). */
+       separate act from not applying the change. */
     const host = (await mount(
       '<helix-input label="Name" value="fixed"></helix-input>',
     )) as HTMLElement & { value: string }

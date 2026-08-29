@@ -68,7 +68,7 @@
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
    the heavier blur is what stops a ground that opaque reading as a smear. The
-   two move together because either without the other does nothing. See (270). */
+   two move together because either without the other does nothing. */
 :host([material="frosted"]) {
   backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--app-header-background-color, var(--helix-material-translucent-strong));
@@ -193,7 +193,7 @@ slot[name="start"]::slotted(*) {
 /* Print: a bar of destinations, and a printed page has no elsewhere to go.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     display: none;

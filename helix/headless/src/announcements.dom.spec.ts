@@ -11,7 +11,7 @@ import { mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
  * Measured on the styled tier before the fix, one choice made on the inner
  * listbox produced `input` twice and `change` three times. The prefixed request
  * never had this, every one of those components already stopping the child's
- * `helix-before-change` and speaking for itself. See (294).
+ * `helix-before-change` and speaking for itself.
  *
  * Across families rather than in each family's own file, because what is being
  * asserted is a property of the composition and the bug was invisible from
@@ -330,7 +330,7 @@ describe('no family lets an inner native control speak in its name', () => {
      control.** Read the narrower way this misses Video, whose scrubber and
      volume rail are `<input type="range">` in a component that declares no
      `input` at all: a media component with two rails in its chrome is neither a
-     form control nor exempt from the leak. See (308).
+     form control nor exempt from the leak.
 
      So every family that renders an `<input>`, `<textarea>` or `<select>` is
      listed here, and the assertion is the one thing true of all of them however

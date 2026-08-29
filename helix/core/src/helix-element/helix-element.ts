@@ -67,7 +67,7 @@ const HIDDEN = css`
  * Measured before deciding: `helix-headless-scroll-area`, the component whose
  * entire purpose is scrolling, computes `overflow-y: visible` on its viewport
  * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div, and
- * the virtual list is worse because it *acts* on the reading. See (174).
+ * the virtual list is worse because it *acts* on the reading.
  *
  * **It goes here rather than in a stylesheet**, beside `BOX_SIZING`, `HIDDEN`
  * and `SETTLED`, which are the token-free structural rules `core` ships into
@@ -199,7 +199,7 @@ const REACT_PROPS = '__reactProps$'
  * a root can mount at any time, and memoizing "this node is not React's" would
  * silently disable the binding for any element that dispatches before React
  * commits, which is the exact failure this whole mechanism exists to repair.
- * It is around half a microsecond and it is filed rather than hidden. See (320).
+ * It is around half a microsecond and it is filed rather than hidden.
  */
 let reactPropsKey: string | undefined
 
@@ -286,7 +286,7 @@ const auditReactProps = (host: EventTarget, props: Record<string, unknown>): voi
        bubbling, but React binds an `on` prop by reading it as the element itself
        dispatches: one merely passing through never calls this host's own
        `dispatchEvent`, so the prop is recorded and never wired.
-    
+
        Silent when nothing registered the tag, which is a component from outside
        this library or a package built before the map existed. */
     const mine = host instanceof Element ? eventsForTag(host.localName) : undefined

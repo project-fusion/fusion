@@ -121,7 +121,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. See (295).
+   * lets autofill work at all.
    */
   @property()
   autocomplete = ''

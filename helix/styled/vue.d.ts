@@ -454,7 +454,7 @@ property writes the attribute onto every host anybody renders.
 against `square`, `arc` against `ring`, and it is registered as one.
 Aurora, braid and caustics are not geometries; they are eleven names for a
 look, which is what `variant` is for by the rule the registry already
-states. See (236). */
+states. */
   variant?: HelixAura["variant"];
   /** How far the settings wander on their own, `0` still and `1` restless.
 
@@ -651,7 +651,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See (270). */
+having the datum rather than by painting it invisibly. */
   material?: HelixBarChart["material"];
   /** How a column's fill is distributed across it.
 
@@ -1076,7 +1076,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See (322).
+they served it and the reader is still told what the control does.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -1155,7 +1155,7 @@ so the stylesheet only describes the departure.
 **The whole axis, not one point of it.** `frosted` is the same pair turned
 up, the heavier ground under the heavier blur, for a card that has to stay
 readable over a busy page; `transparent` drops both, for one that is
-structure and spacing with the page showing through. See (270). */
+structure and spacing with the page showing through. */
   material?: HelixCard["material"];
   /** Whether media sits above the content stack or beside it. */
   orientation?: HelixCard["orientation"];
@@ -2487,7 +2487,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See (322).
+they served it and the reader is still told what the control does.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -2702,7 +2702,7 @@ a reset should return to. */
 
 Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all: hardcoding `off` here means a birthday or a
-postal code can never be filled in for a reader. See (295). */
+postal code can never be filled in for a reader. */
   autocomplete?: HelixDateInput["autocomplete"];
   /** How many dates can be held at once.
 
@@ -3218,7 +3218,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See (270). */
+having the datum rather than by painting it invisibly. */
   material?: HelixDonutChart["material"];
   /** The id of the table to read.
 
@@ -3301,7 +3301,7 @@ so the stylesheet only describes the departure.
 **No `transparent`, deliberately.** A panel floating over arbitrary page
 content is only readable because it has a ground; dropping it makes an
 unreadable drawer rather than a lighter one. `frosted` and `glass` are the
-two honest points here. See (270). */
+two honest points here. */
   material?: HelixDrawer["material"];
   /** Whether the element is open.
 
@@ -3928,7 +3928,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it and the reader is still told what the control does. See (322).
+they served it and the reader is still told what the control does.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -4091,7 +4091,7 @@ against `read-only` it parses to no property at all, and the field stays
 editable with no error anywhere. Measured on the dash-cased form, `readOnly`
 came back `false`.
 
-See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+A part was renamed for
 the same kind of reason: there is no `helix-v` tag, so no consumer is
 holding the old spelling, and this is free today and a deprecation after
 the first release. */
@@ -4106,7 +4106,7 @@ against `read-only` it parses to no property at all, and the field stays
 editable with no error anywhere. Measured on the dash-cased form, `readOnly`
 came back `false`.
 
-See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+A part was renamed for
 the same kind of reason: there is no `helix-v` tag, so no consumer is
 holding the old spelling, and this is free today and a deprecation after
 the first release. */
@@ -4196,7 +4196,7 @@ where the selection is, let alone move it: `querySelector` does not cross
 the boundary. An insert-at-cursor toolbar, a format button, a mask that
 repositions the caret after rewriting the value, all of them need this and
 none of them could be written. Textarea gained the same surface for the same
-reason. See (295).
+reason.
 
 Zero before there is a control, which is where an empty field's caret would
 be anyway. */
@@ -4296,7 +4296,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See (270). */
+having the datum rather than by painting it invisibly. */
   material?: HelixLegend["material"];
   /** Which entries are drawn as an outline rather than a fill, by name.
 
@@ -4369,7 +4369,7 @@ chart and a card mean the same thing by the word.
 
 **`transparent` is where this one stops.** A mark with no ink is not a
 material choice, it is an absent series, and a chart says that by not
-having the datum rather than by painting it invisibly. See (270). */
+having the datum rather than by painting it invisibly. */
   material?: HelixLineChart["material"];
   /** The id of the table to read.
 
@@ -5175,7 +5175,7 @@ a reset should return to. */
 Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all. Hardcoding `off` here is what stops a reader
 having a birthday or a postal code filled in for them, with no way for a
-consumer to ask for it. See (295). */
+consumer to ask for it. */
   autocomplete?: HelixNumberInput["autocomplete"];
   /** Smallest value the reader may reach.
 
@@ -6092,7 +6092,7 @@ attribute later and the listbox's own writes answer instead.
 **The deeper half is not this.** State reflecting under the declaration's
 name is the fault `TreeItem` avoids by mirroring to `data-selected`.
 Splitting them means moving what every stylesheet selects on, which is a
-change of its own rather than a property being added. See (302). */
+change of its own rather than a property being added. */
   defaultSelected?: HelixRadio["defaultSelected"];
 };
 
@@ -7768,7 +7768,7 @@ a reset should return to. */
   /** What the browser may autofill here, as one of the platform's own tokens.
 
 Empty leaves the attribute off, which is the browser's default and is what
-lets autofill work at all. See (295). */
+lets autofill work at all. */
   autocomplete?: HelixTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
@@ -8321,7 +8321,7 @@ attribute later and the listbox's own writes answer instead.
 **The deeper half is not this.** State reflecting under the declaration's
 name is the fault `TreeItem` avoids by mirroring to `data-selected`.
 Splitting them means moving what every stylesheet selects on, which is a
-change of its own rather than a property being added. See (302). */
+change of its own rather than a property being added. */
   defaultSelected?: HelixToggle["defaultSelected"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
@@ -8383,7 +8383,7 @@ it has one answer to that. A quiet tooltip is a tooltip that is not shown.
 **No `transparent`, deliberately.** A bubble floating over arbitrary page
 content is only readable because it has a ground; dropping it makes an
 unreadable tooltip rather than a lighter one. `frosted` and `glass` are the
-two honest points here. See (270). */
+two honest points here. */
   material?: HelixTooltip["material"];
   /** Whether the element is open.
 
@@ -8510,7 +8510,7 @@ export type HelixTourVueProps = {
 **Moved through `requestChange`, never by assignment from `move`.** That
 announces first and applies only if nobody refused, and refusing is how a
 consumer takes the decision; writing the property and then announcing puts
-`preventDefault` after the move it is refusing. See (294).
+`preventDefault` after the move it is refusing.
 
 The shape is `Carousel`'s, which is the nearest thing in the library: a
 `default-index` for markup that only seeds and a held state that is

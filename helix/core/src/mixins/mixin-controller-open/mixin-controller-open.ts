@@ -47,7 +47,7 @@ export declare class MixinControllerOpenInterface {
  * `toggle` announces it afterwards, once the state has actually gone, carrying
  * `newState` and `oldState` the way the platform does on `<details>` and on a
  * popover. The first is how a consumer takes the decision; the second is what
- * they bind when they only want to know. See (294) and (296).
+ * they bind when they only want to know.
  *
  * `open` is a seed and a correction rather than a claim: the element applies
  * its own changes from wherever markup started it, and `defaultOpen` is what a
@@ -132,7 +132,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * element opens or closes itself, whether or not a consumer declared
      * `open`: a declared property is a seed and a correction, and a consumer
      * who wants the decision for themselves refuses it and assigns their own.
-     * See (294).
      */
     requestOpen(next: boolean): boolean {
       if (this.open === next) {

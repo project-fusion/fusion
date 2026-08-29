@@ -117,7 +117,7 @@ describe('toast item', () => {
   test('a declared `open` is a seed, and dismissing closes it', async () => {
     /* The element dismisses itself, and a consumer who wants the decision
        refuses it. Declaring `open` is a seed and not a claim of ownership, so
-       it does not turn that off. See (294). */
+       it does not turn that off. */
     const found = await item('dismissible open')
     let asked = false
     found.addEventListener('helix-dismiss', () => {

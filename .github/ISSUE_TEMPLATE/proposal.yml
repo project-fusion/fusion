@@ -1,11 +1,5 @@
 body:
   - attributes:
-      value:
-        A proposal usually belongs in `fusion/docs/19-queue.md` rather than here, since
-        that is where the reasoning survives next to the code. Open this if you
-        would rather discuss it before writing a row.
-    type: markdown
-  - attributes:
       description:
         The problem, not the solution. What is hard to do today, and what you
         did instead.

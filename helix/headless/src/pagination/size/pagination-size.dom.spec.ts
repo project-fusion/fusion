@@ -128,7 +128,7 @@ describe('pagination size', () => {
   test('declaring `value` seeds it, and the element still moves', async () => {
     /* Control is an action, not a mode: declaring `value` seeds rather than
        claiming ownership, so the element applies and a consumer refuses the
-       before event to take the decision. See (294). */
+       before event to take the decision. */
     const it = (await mount(
       '<helix-headless-pagination-size sizes="10,25" value="10"></helix-headless-pagination-size>',
     )) as Size

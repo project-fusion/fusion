@@ -117,7 +117,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * editable with no error anywhere. Measured on the dash-cased form, `readOnly`
    * came back `false`.
    *
-   * See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+   * A part was renamed for
    * the same kind of reason: there is no `helix-v` tag, so no consumer is
    * holding the old spelling, and this is free today and a deprecation after
    * the first release.
@@ -218,7 +218,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * the boundary. An insert-at-cursor toolbar, a format button, a mask that
    * repositions the caret after rewriting the value, all of them need this and
    * none of them could be written. Textarea gained the same surface for the same
-   * reason. See (295).
+   * reason.
    *
    * Zero before there is a control, which is where an empty field's caret would
    * be anyway.

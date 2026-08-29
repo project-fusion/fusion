@@ -17,7 +17,7 @@ const step = async (attributes = ''): Promise<Step> =>
  * **What the parent already proves is not repeated here.** `Steps` exercises
  * walking a run, which is the only arrangement that means anything for
  * coordination. What is left over is what a single step answers for on its own,
- * and every assertion below is about this element in isolation. See (198).
+ * and every assertion below is about this element in isolation.
  */
 describe('one step', () => {
   /* `complete` and `current` are separate and both may be false, which is the

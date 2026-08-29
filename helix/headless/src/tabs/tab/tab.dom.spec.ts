@@ -47,7 +47,7 @@ describe('one tab', () => {
      bookkeeping: reflected, it writes a choice onto markup a consumer's server
      never sent, which React reconciles and reports. It is an
      `ElementInternals.states` entry, which is not in the DOM at all, and
-     `:host(:state(selected))` is what the stylesheet reads. See (302) and (304).
+     `:host(:state(selected))` is what the stylesheet reads.
 
      **What is asserted is that the attribute does not follow.** A consumer who
      typed `selected` still has it: removing reflection stops the element writing

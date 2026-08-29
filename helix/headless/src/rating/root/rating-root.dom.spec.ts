@@ -303,7 +303,7 @@ if (hasLayout()) {
     })
 
     /* A declared `value` is the native seed rather than a claim of ownership, so
-       the drag applies to it like any other. See (294). */
+       the drag applies to it like any other. */
     test('a drag announces before it acts, whoever declared the value', async () => {
       const host = (await rating('value="1"')) as Rating
       let asked: string | undefined

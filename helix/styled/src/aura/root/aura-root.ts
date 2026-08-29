@@ -106,7 +106,7 @@ export class HelixAura extends HelixElement {
    * against `square`, `arc` against `ring`, and it is registered as one.
    * Aurora, braid and caustics are not geometries; they are eleven names for a
    * look, which is what `variant` is for by the rule the registry already
-   * states. See (236).
+   * states.
    */
   @property({ reflect: true })
   variant?:
@@ -892,7 +892,6 @@ export class HelixAura extends HelixElement {
    * one per transparent run, and with the frame limiter off they drew 2,654
    * times in three seconds against 1,276 for one: each instance draws once per
    * callback. Capping the two that nobody points at is most of that back.
-   * See (252).
    */
   private static readonly CAPPED = 1000 / 30
 
@@ -1001,7 +1000,7 @@ export class HelixAura extends HelixElement {
    *
    * The solve is `tiltFor` in `aura-axis.ts` rather than an expression here, so
    * it is callable and `aura-root.dom.spec.ts` runs it against a model of the
-   * shader in both directions. See (155).
+   * shader in both directions.
    */
   private get bearing(): number {
     if (this.terminus === undefined) {
@@ -1091,7 +1090,7 @@ export class HelixAura extends HelixElement {
 
     /* Every other mark ages a slot's worth on each commit, on top of aging
        with time.
-       
+
        Time alone is not enough, because what has to be spent by the moment the
        ring reuses a slot is a function of *distance traveled*, not of seconds:
        marks commit every gate length, so a brisk gesture laps the ring long

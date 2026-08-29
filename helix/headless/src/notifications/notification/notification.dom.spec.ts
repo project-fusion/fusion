@@ -63,7 +63,7 @@ describe('read state', () => {
   test('a declared `read` is a seed, and the element still marks itself', async () => {
     /* Declaring the property is a seed and not a claim of ownership: control is
        an action, so the element applies it and a consumer refuses to take the
-       decision. See (294). */
+       decision. */
     const element = await item('read')
     element.markRead(false)
     expect(element.read).toBe(false)

@@ -2240,12 +2240,12 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 864,123 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
-| \`@fusion.dev/helix-headless\` | 9,628,307 | 422 | 735,855 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
+| \`@fusion.dev/helix-core\` | 863,643 | 113 | 159,903 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-headless\` | 9,624,377 | 422 | 735,855 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
-| \`@fusion.dev/helix\` | 9,586,886 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,582,615 | 717 | 287,232 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -4620,7 +4620,7 @@ for the API.
 
 | Tool | Where it goes |
 |---|---|
-| Claude Code | \`CLAUDE.md\`, or a skill in \`.claude/skills/\` |
+| Claude Code | \`AGENTS.md\` or \`CLAUDE.md\`, or a skill in \`.claude/skills/\` |
 | Cursor | \`.cursor/rules/\` |
 | GitHub Copilot | \`.github/copilot-instructions.md\` |
 | Anything else | Whatever it reads. The line is the same |

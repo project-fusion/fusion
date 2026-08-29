@@ -21,7 +21,7 @@ const input = async (extra = ''): Promise<Input> =>
  * Control is an action. The element always applies, `value="Ada"` is the native
  * seed it resembles, and a consumer who wants the change for themselves refuses
  * it. There is no mode to be silently in, so there is nothing to audit and no
- * warning to test. See (294).
+ * warning to test.
  */
 describe('a control whose markup declared a value', () => {
   test('still moves, the property being a seed rather than a claim', async () => {

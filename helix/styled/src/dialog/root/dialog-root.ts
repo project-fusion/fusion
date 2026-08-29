@@ -56,7 +56,7 @@ export class HelixDialog extends HelixHeadlessDialog {
    * sit together. One is on screen at a time, in the top layer, and it is the
    * region rather than a control in one, which is the same reason `Avatar` and
    * `Spinner` keep theirs. Not `appearance`, which says how a thing reads
-   * rather than how wide it is. See (158).
+   * rather than how wide it is.
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'

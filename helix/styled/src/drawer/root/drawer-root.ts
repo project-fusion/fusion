@@ -58,7 +58,7 @@ export class HelixDrawer extends HelixHeadlessDrawer {
    * **No `transparent`, deliberately.** A panel floating over arbitrary page
    * content is only readable because it has a ground; dropping it makes an
    * unreadable drawer rather than a lighter one. `frosted` and `glass` are the
-   * two honest points here. See (270).
+   * two honest points here.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'

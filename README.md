@@ -44,9 +44,8 @@ on purpose and are not softened as the company matures.
 
 ## Documents
 
-`fusion/docs/insights/` is the published essays, `fusion/docs/19-queue.md` is the
-work queue, and the two generated references beside them are
-`component-reference.md` and `token-reference.md`.
+`fusion/docs/insights/` is the published essays, and the two generated
+references beside it are `component-reference.md` and `token-reference.md`.
 
 ## Packages
 

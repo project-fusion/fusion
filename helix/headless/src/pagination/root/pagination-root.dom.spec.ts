@@ -175,7 +175,7 @@ describe('pagination state', () => {
   test('declaring `page` seeds it, and the element still moves', async () => {
     /* Control is an action rather than a mode: declaring the property seeds it,
        the element still applies, and a consumer takes the decision by refusing
-       the event. See (294). */
+       the event. */
     const nav = await mount(
       '<helix-headless-pagination page="2" pages="12"></helix-headless-pagination>',
     )

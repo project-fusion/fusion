@@ -71,7 +71,7 @@
 
 /* Whatever is in it is fitted to the room it has, so a consumer's mark of any
    shape lands inside the quiet zone rather than setting its own size.
- 
+
    On the slot, not on the box around it: `::slotted()` only ever attaches to a
    `<slot>`, so written against the wrapper it matches nothing at all. */
 [part="logo"] slot::slotted(*) {
@@ -82,7 +82,7 @@
 
 /* Nothing at all where nobody filled it, rather than a ground-colored square
    over the middle of every code.
- 
+
    On the attribute the element writes, because CSS cannot ask this. `:empty` is
    false for a box holding a slot, and `::slotted()` is not allowed inside
    `:has()`: only the element knows what was assigned, so only the element can
@@ -94,7 +94,7 @@
 /* Print: the one thing on this list that is more useful on paper than on screen.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See (165). */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

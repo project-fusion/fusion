@@ -101,7 +101,7 @@ export class HelixCard extends HelixHeadlessCard {
    * **The whole axis, not one point of it.** `frosted` is the same pair turned
    * up, the heavier ground under the heavier blur, for a card that has to stay
    * readable over a busy page; `transparent` drops both, for one that is
-   * structure and spacing with the page showing through. See (270).
+   * structure and spacing with the page showing through.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'

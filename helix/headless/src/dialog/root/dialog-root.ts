@@ -205,7 +205,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
 
        `cancel` is deliberately not relayed. `handleCancel` prevents it so that
        Escape is a request rather than an act, so the native one never completes:
-       relaying it would announce a dismissal that was refused. See (296). */
+       relaying it would announce a dismissal that was refused. */
     this.relayNativeEvent(event)
   }
 

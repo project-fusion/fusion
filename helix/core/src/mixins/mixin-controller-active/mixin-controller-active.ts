@@ -111,7 +111,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * by the time this runs, so refusing is simply not writing: there is
      * nothing to put back. Nobody refusing means the set updates itself,
      * whether or not a consumer declared `active`, a declared property being a
-     * seed and a correction. See (294).
+     * seed and a correction.
      */
     requestActive(next: string): boolean {
       if (next === this.active) {
@@ -150,7 +150,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * **After `apply`, which is the whole reason it is a second event**, so the
      * state is on the element by the time a handler reads it. Not cancelable:
      * the decision was taken by the event before this one, and two refusable
-     * events for one transition are two answers to one question. See (325).
+     * events for one transition are two answers to one question.
      */
     private announceActivated(value: string): void {
       this.dispatchEvent(new HelixActivateEvent({ value }))
