@@ -28,10 +28,12 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod disabled;
 pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
 pub mod observers;
+pub mod print;
 pub mod reachable;
 pub mod reflected;
 pub mod run;
@@ -221,6 +223,11 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "disabled",
+            run: Runner::Source(disabled::run),
+            summary: "a form control reads `:host(:disabled)` rather than the attribute",
+        },
+        Rule {
             name: "fallbacks",
             run: Runner::Source(fallbacks::run),
             summary: "a slot's fallback markup sits behind a seam a tier can move",
@@ -234,6 +241,11 @@ pub fn all() -> Vec<Rule> {
             name: "observers",
             run: Runner::Source(observers::run),
             summary: "an observer torn down on disconnect is registered again on reconnect",
+        },
+        Rule {
+            name: "print",
+            run: Runner::Source(print::run),
+            summary: "every family with a stylesheet says what it does on paper",
         },
         Rule {
             name: "reachable",

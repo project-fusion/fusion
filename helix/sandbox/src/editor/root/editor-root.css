@@ -54,3 +54,15 @@
 :host([readonly]) [part="editor"] .cm-cursor {
   border-left-color: var(--helix-color-foreground-subtle);
 }
+
+/* A code editor is a development tool and there is no reading it on paper:
+ * every line is a scrollport and the syntax colors print as gray. Chrome hides,
+ * which is the same answer the sandbox shell around it gives.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. See 165. */
+@media print {
+  :host {
+    display: none;
+  }
+}
