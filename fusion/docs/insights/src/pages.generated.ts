@@ -83,18 +83,6 @@ export const generatedEssays: SiteEssay[] = [
   },
   {
     author: 'Ross Sheppard',
-    date: '2026-07-29',
-    description:
-      'Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.',
-    kind: 'Note',
-    minutes: 1,
-    path: '/insights/stage-labels-are-honest',
-    slug: 'stage-labels-are-honest',
-    title: 'Stage labels are honest',
-    topic: 'Business',
-  },
-  {
-    author: 'Ross Sheppard',
     date: '2026-07-14',
     description:
       'Full-repo lockstep would publish a Cortex fix as a new version of the Helix docs. Per-domain keeps the only property that matters.',

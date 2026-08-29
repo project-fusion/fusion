@@ -369,49 +369,6 @@ We are one person, and the stages on this site say exactly where each piece is.
 That is not modesty. It is the same honesty the constraint demands, applied to
 ourselves.
 `,
-  'stage-labels-are-honest': `---
-author: Ross Sheppard
-date: 2026-07-29
-description: Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.
-kicker: Insights
-kind: Note
-path: /insights/stage-labels-are-honest
-title: Stage labels are honest
-topic: Business
----
-
-Three labels, and they mean what they say.
-
-**Active** ships with users. **Building** is real work with nothing shipped.
-**Declared** is committed direction with no work started.
-
-Most of what we have is Building. What is Declared has a thesis and a name and
-no code, and it appears on the site anyway, with the label on it, because a
-roadmap that shows only the parts going well is a brochure.
-
-## The pressure to soften
-
-The instinct while pre-launch is to blur this. Call Declared something like
-Exploring, call Building something like Early access, and the map suddenly reads
-as a company with four things in flight rather than two things being built and
-two things written down.
-
-We are not going to, and the reason is not principle for its own sake. Our
-entire pitch is that a user can trust what we hand them and can leave whenever
-they want. A company that will not tell you which of its products exist has
-already answered the question about whether it will tell you anything else.
-
-Visible honesty about maturity is a product demonstration. It costs a little
-credibility with someone skimming for momentum and buys the only kind of
-credibility that matters with someone deciding whether to depend on us.
-
-## What it does to the roadmap
-
-The useful side effect is internal. A stage label that cannot be softened is a
-label that has to be earned, so moving something from Building to Active is a
-real event with a real precondition rather than a decision made in a planning
-document. It puts a floor under what shipping means.
-`,
   terms: `---
 description: What we offer, what we do not, and the one clause the sandbox makes specific.
 kicker: Terms
