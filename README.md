@@ -52,8 +52,8 @@ work queue, and the two generated references beside them are
 
 | Domain | Packages |
 |---|---|
-| **Helix** (`@fusion.dev/helix-*`) | `styles` `core` `headless` `web` `react` `icons` `theme` `cem` `docs` |
-| **Cortex** (crates, `@fusion.dev/cortex-*`) | `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram` `docs` |
+| **Helix** (`@fusion.dev/helix-*`) | `styles` `core` `headless` `icons` `theme` `docs` `diagnostics`, and `@fusion.dev/helix` for the styled tier. `cem` `gallery` `sandbox` `testing` are build tooling and do not publish |
+| **Cortex** | the crates `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram`, which do not publish yet, and `@fusion.dev/cortex-docs` |
 
 Versions are **lockstep within a domain**, independent across domains. See
 [`AGENTS.md`](AGENTS.md).

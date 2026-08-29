@@ -395,5 +395,5 @@ not say as much as for what it does.
 
 - **No whole-library comparison, and no fifth component.** The comparison above is five components against four systems. Widening it means naming the equivalent element in each system by hand, which is where a comparison table starts arguing, so each addition is a deliberate one rather than a sweep.
 - **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running `bun run gen:peers`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.
-- **No load or rendering timings.** First paint, time to upgrade, and the cost of hydrating a server-rendered tree. These need a browser harness rather than a bundler, and they never join a cross-system table.
+- **No first paint.** The timings above are facts about a component: time to upgrade, first render, hydration. First paint is a fact about a whole page, so it belongs to whatever renders one rather than to the library it renders.
 - **No per-component stylesheet bytes.** There are none to report: a family's CSS is compiled into its JavaScript, so it is already inside every number above. `elements.css` is the light-DOM layer and is in the stylesheet table.
