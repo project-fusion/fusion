@@ -37,7 +37,8 @@
    rule underneath. Anything else and the eye has to re-find the left edge on
    every row. */
 [part="cell"] {
-  border-block-end: var(--helix-border-thin) solid var(--data-table-rule, var(--helix-color-border));
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
   color: var(--data-table-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-sm));
@@ -45,11 +46,30 @@
   padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
 }
 
+/* No rule under the last row, so a table inside a bordered box does not show two
+   lines a pixel apart.
+
+   A consumer cannot do this from outside: structural pseudo-classes are not
+   allowed after `::part`, so `::part(cell):nth-last-child(-n + 5)` matches
+   nothing however many columns it names. The alternative every consumer reaches
+   for instead is dropping their own bottom border and letting this rule stand in
+   for it, which is a different box's border doing this one's job.
+
+   The color rather than the width, so the row keeps the height it had and the
+   table does not shift by a pixel when the last row changes.
+
+   `:last-of-type` and not `:last-child`: `renderStatus` puts a `<p>` after the
+   rows while loading, and the head is the only other `div` in here. */
+[part="row"]:last-of-type [part="cell"] {
+  border-block-end-color: transparent;
+}
+
 /* The heading is the cell's own box, and the column element is what carries it.
    Weight rather than a fill, per the rule that depth comes from a single border:
    a filled header band is elevation spelled differently. */
 ::slotted(helix-table-column) {
-  border-block-end: var(--helix-border-thin) solid var(--data-table-rule, var(--helix-color-border));
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
   color: var(--data-table-heading-color, var(--helix-color-foreground-subtle));
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-sm));
