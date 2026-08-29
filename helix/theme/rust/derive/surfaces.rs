@@ -118,7 +118,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
             lightness: 1.0,
         }
     };
-    let surface_base_lightness = if dark { 0.21 } else { 0.985 };
+    let surface_base_lightness = if dark { 0.182 } else { 0.985 };
 
     /* The step away from the page, scaled by the separation policy. */
     let step =
@@ -130,7 +130,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
         `neutral-0`: a menu on a white page is white, which is what every desktop
         menu does. */
         raw_overlay: if dark {
-            step(0.29)
+            step(0.21)
         } else {
             Oklch {
                 chroma: 0.0,
@@ -138,7 +138,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
                 lightness: 1.0,
             }
         },
-        raw_raised: step(if dark { 0.29 } else { 0.97 }),
+        raw_raised: step(if dark { 0.21 } else { 0.97 }),
         raw_sunken: step(if dark { 0.15 } else { 0.96 }),
         /* Declared after the ladder, since `surface` is on it: it is the ground a
         card uses, so a fill-first theme has to move it too or the one surface the

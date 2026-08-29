@@ -23889,55 +23889,55 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #181818;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #b9b9b9;\n  --helix-color-foreground-muted: #929292;\n  --helix-color-surface-raised: #2b2b2b;\n  --helix-color-surface-overlay: #2b2b2b;\n  --helix-color-surface-sunken: #0b0b0b;\n  --helix-color-primary: #4c8fff;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #68a1ff;\n  --helix-color-primary-active: #84b3ff;\n  --helix-color-primary-subtle: #142643;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #979600;\n  --helix-color-accent-hover: #a7a500;\n  --helix-color-accent-active: #b8b500;\n  --helix-color-accent-subtle: #292800;\n  --helix-color-accent-surface: #787600;\n  --helix-color-danger: #ff564d;\n  --helix-color-info: #009cd5;\n  --helix-color-success: #1fa662;\n  --helix-color-warning: #c48500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #696800;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #007aa9;\n  --helix-color-info-surface-hover: #006b94;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #286fe1;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #4c8fff;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #121212;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #a5a5a5;\n  --helix-color-foreground-muted: #818181;\n  --helix-color-surface-raised: #181818;\n  --helix-color-surface-overlay: #181818;\n  --helix-color-surface-sunken: #0b0b0b;\n  --helix-color-primary: #3b83f7;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5394ff;\n  --helix-color-primary-active: #6fa6ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #8a8c00;\n  --helix-color-accent-hover: #999b00;\n  --helix-color-accent-active: #a9ab00;\n  --helix-color-accent-subtle: #212200;\n  --helix-color-accent-surface: #757600;\n  --helix-color-danger: #eb403a;\n  --helix-color-info: #0088c7;\n  --helix-color-success: #009454;\n  --helix-color-warning: #ae7500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #666800;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b3;\n  --helix-color-info-surface-hover: #006a9e;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #155fcf;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #3b83f7;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "dark",
       "pairings": [
         {
           "background": "color-background",
           "foreground": "color-foreground",
-          "ratio": 10.702998801121408,
+          "ratio": 8.525242459818129,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-foreground",
-          "ratio": 9.049775236144459,
+          "ratio": 7.605191758712874,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-foreground",
-          "ratio": 7.216383835172729,
+          "ratio": 7.208402946556045,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-foreground",
-          "ratio": 7.216383835172729,
+          "ratio": 7.208402946556045,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-foreground",
-          "ratio": 10.031578103300546,
+          "ratio": 7.990436808820263,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-subtle",
           "foreground": "color-foreground",
-          "ratio": 7.710875827806401,
+          "ratio": 6.668908071390021,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-subtle",
           "foreground": "color-foreground",
-          "ratio": 7.6570311696652995,
+          "ratio": 6.590947201354836,
           "status": "pass",
           "target": 4.5
         },
@@ -23956,49 +23956,49 @@
         {
           "background": "color-background",
           "foreground": "color-foreground-muted",
-          "ratio": 6.748816754538349,
+          "ratio": 5.390523994585384,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-foreground-muted",
-          "ratio": 5.706370324184171,
+          "ratio": 4.808774513099225,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-foreground-muted",
-          "ratio": 4.550318377022584,
+          "ratio": 4.5578843334010335,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-foreground-muted",
-          "ratio": 4.550318377022584,
+          "ratio": 4.5578843334010335,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-foreground-muted",
-          "ratio": 6.325449870266393,
+          "ratio": 5.052365554197126,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.504276057517204,
+          "ratio": 4.5480288215224745,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.522184910503656,
+          "ratio": 5.577787760431717,
           "status": "pass",
           "target": 4.5
         },
@@ -24019,14 +24019,14 @@
         {
           "background": "color-info-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.538661713571942,
+          "ratio": 4.508490566900191,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-info-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.600505606091234,
+          "ratio": 5.561697408925543,
           "status": "pass",
           "target": 4.5
         },
@@ -24088,259 +24088,259 @@
         {
           "background": "color-background",
           "foreground": "color-primary",
-          "ratio": 6.680284180812955,
+          "ratio": 5.77556127858321,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-primary",
-          "ratio": 5.64842353748507,
+          "ratio": 5.152258278265937,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-primary",
-          "ratio": 4.504111013422496,
+          "ratio": 4.8834473781573084,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-primary",
-          "ratio": 4.504111013422496,
+          "ratio": 4.8834473781573084,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-primary",
-          "ratio": 6.261216483089478,
+          "ratio": 5.4132486729266365,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-subtle",
           "foreground": "color-primary",
-          "ratio": 4.812748536168298,
+          "ratio": 4.517957982906791,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-accent",
-          "ratio": 6.678400400275699,
+          "ratio": 5.83188811039945,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-accent",
-          "ratio": 5.646830732442935,
+          "ratio": 5.202506275216445,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-accent",
-          "ratio": 4.502840894302549,
+          "ratio": 4.93107376560002,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-accent",
-          "ratio": 4.502840894302549,
+          "ratio": 4.93107376560002,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-accent",
-          "ratio": 6.259450875904042,
+          "ratio": 5.466042008997728,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-subtle",
           "foreground": "color-accent",
-          "ratio": 4.777793679941213,
+          "ratio": 4.508688967031654,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-danger",
-          "ratio": 6.6902797972999535,
+          "ratio": 5.326889525564595,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-danger",
-          "ratio": 5.6568751952152905,
+          "ratio": 4.752007524752797,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-danger",
-          "ratio": 4.510850452207802,
+          "ratio": 4.504079072594203,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-danger",
-          "ratio": 4.510850452207802,
+          "ratio": 4.504079072594203,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-danger",
-          "ratio": 6.270585054397685,
+          "ratio": 4.992723003739471,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-info",
-          "ratio": 6.716206034615349,
+          "ratio": 5.346368030976155,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-info",
-          "ratio": 5.678796772969619,
+          "ratio": 4.76938389492951,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-info",
-          "ratio": 4.528330943736034,
+          "ratio": 4.520548858229624,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-info",
-          "ratio": 4.528330943736034,
+          "ratio": 4.520548858229624,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-info",
-          "ratio": 6.294884886564988,
+          "ratio": 5.0109795832273765,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-success",
-          "ratio": 6.689116911747531,
+          "ratio": 5.363980492095841,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-success",
-          "ratio": 5.65589193313423,
+          "ratio": 4.785095605744706,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-success",
-          "ratio": 4.510066388913151,
+          "ratio": 4.535440835464247,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-success",
-          "ratio": 4.510066388913151,
+          "ratio": 4.535440835464247,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-success",
-          "ratio": 6.269495119000971,
+          "ratio": 5.0274871791447895,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-warning",
-          "ratio": 6.702164006460043,
+          "ratio": 5.3442500350106075,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-warning",
-          "ratio": 5.666923726823728,
+          "ratio": 4.76749447471207,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-warning",
-          "ratio": 4.5188632546447876,
+          "ratio": 4.518758015513912,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-warning",
-          "ratio": 4.5188632546447876,
+          "ratio": 4.518758015513912,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-warning",
-          "ratio": 6.281723743152177,
+          "ratio": 5.0089944534197715,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-focus-ring",
-          "ratio": 4.451247577854256,
+          "ratio": 3.569768277047639,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface",
           "foreground": "color-focus-ring",
-          "ratio": 3.7636919192958165,
+          "ratio": 3.184516148259381,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-focus-ring",
-          "ratio": 3.001206639751622,
+          "ratio": 3.018369071387261,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-focus-ring",
-          "ratio": 3.001206639751622,
+          "ratio": 3.018369071387261,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-focus-ring",
-          "ratio": 4.172011841176123,
+          "ratio": 3.3458295144474817,
           "status": "pass",
           "target": 3.0
         },
@@ -24354,21 +24354,21 @@
         {
           "background": "color-surface",
           "foreground": "color-brand-mark",
-          "ratio": 4.827825428893029,
+          "ratio": 5.093574601273332,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-brand-mark",
-          "ratio": 3.8497576431458875,
+          "ratio": 4.827825428893029,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-brand-mark",
-          "ratio": 3.8497576431458875,
+          "ratio": 4.827825428893029,
           "status": "pass",
           "target": 3.0
         },
@@ -24381,7 +24381,7 @@
         }
       ],
       "seeds": {
-        "seed-brand": "#4c8fff",
+        "seed-brand": "#3b83f7",
         "seed-chroma-scale": "1",
         "seed-density": "1",
         "seed-radii": "0.5rem"
@@ -24400,13 +24400,13 @@
         },
         {
           "chromaReduced": false,
-          "hex": "#181818",
+          "hex": "#121212",
           "name": "color-surface",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.21
+            "lightness": 0.182
           }
         },
         {
@@ -24423,48 +24423,48 @@
         },
         {
           "chromaReduced": false,
-          "contrast": 10.702998801121408,
-          "hex": "#b9b9b9",
+          "contrast": 8.525242459818129,
+          "hex": "#a5a5a5",
           "name": "color-foreground",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.7841841500997544
+            "lightness": 0.7203194445371628
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 6.748816754538349,
-          "hex": "#929292",
+          "contrast": 5.390523994585384,
+          "hex": "#818181",
           "name": "color-foreground-muted",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.6583076417446138
+            "lightness": 0.6015597277879716
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#2b2b2b",
+          "hex": "#181818",
           "name": "color-surface-raised",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.29
+            "lightness": 0.21
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#2b2b2b",
+          "hex": "#181818",
           "name": "color-surface-overlay",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.29
+            "lightness": 0.21
           }
         },
         {
@@ -24479,15 +24479,15 @@
           }
         },
         {
-          "chromaReduced": true,
-          "contrast": 6.680284180812955,
-          "hex": "#4c8fff",
+          "chromaReduced": false,
+          "contrast": 5.77556127858321,
+          "hex": "#3b83f7",
           "name": "color-primary",
           "origin": "derived",
           "value": {
-            "chroma": 0.1796456603883405,
+            "chroma": 0.18801471201981484,
             "hue": 259.8145266738871,
-            "lightness": 0.6626880276203156
+            "lightness": 0.6246477687358856
           }
         },
         {
@@ -24504,35 +24504,35 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#68a1ff",
+          "hex": "#5394ff",
           "name": "color-primary-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.15010178747422376,
+            "chroma": 0.1724847645124714,
             "hue": 259.8145266738871,
-            "lightness": 0.7126880276203157
+            "lightness": 0.6746477687358856
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#84b3ff",
+          "hex": "#6fa6ff",
           "name": "color-primary-active",
           "origin": "derived",
           "value": {
-            "chroma": 0.12159339979142494,
+            "chroma": 0.14318833222505917,
             "hue": 259.8145266738871,
-            "lightness": 0.7626880276203156
+            "lightness": 0.7246477687358855
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#142643",
+          "hex": "#0d1f3c",
           "name": "color-primary-subtle",
           "origin": "derived",
           "value": {
             "chroma": 0.06,
             "hue": 259.8145266738871,
-            "lightness": 0.27
+            "lightness": 0.242
           }
         },
         {
@@ -24548,106 +24548,106 @@
         },
         {
           "chromaReduced": true,
-          "contrast": 6.678400400275699,
-          "hex": "#979600",
+          "contrast": 5.83188811039945,
+          "hex": "#8a8c00",
           "name": "color-accent",
           "origin": "related",
           "value": {
-            "chroma": 0.14128662549547338,
-            "hue": 108.81452667388709,
-            "lightness": 0.6517403638362885
+            "chroma": 0.1353638292771368,
+            "hue": 110.81452667388709,
+            "lightness": 0.6163006592988969
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#a7a500",
+          "hex": "#999b00",
           "name": "color-accent-hover",
           "origin": "related",
           "value": {
-            "chroma": 0.1521107184753815,
-            "hue": 108.81452667388709,
-            "lightness": 0.7017403638362886
+            "chroma": 0.14632760069777156,
+            "hue": 110.81452667388709,
+            "lightness": 0.6663006592988969
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#b8b500",
+          "hex": "#a9ab00",
           "name": "color-accent-active",
           "origin": "related",
           "value": {
-            "chroma": 0.16293642519850726,
-            "hue": 108.81452667388709,
-            "lightness": 0.7517403638362885
+            "chroma": 0.1572937030808319,
+            "hue": 110.81452667388709,
+            "lightness": 0.7163006592988969
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#292800",
+          "hex": "#212200",
           "name": "color-accent-subtle",
           "origin": "related",
           "value": {
-            "chroma": 0.05891801834106444,
-            "hue": 108.81452667388709,
-            "lightness": 0.27
+            "chroma": 0.05364515304565429,
+            "hue": 110.81452667388709,
+            "lightness": 0.242
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#787600",
+          "hex": "#757600",
           "name": "color-accent-surface",
           "origin": "related",
           "value": {
-            "chroma": 0.11945770029528159,
-            "hue": 108.81452667388709,
-            "lightness": 0.5508634257316589
-          }
-        },
-        {
-          "chromaReduced": true,
-          "contrast": 6.6902797972999535,
-          "hex": "#ff564d",
-          "name": "color-danger",
-          "origin": "derived",
-          "value": {
-            "chroma": 0.20695982282728304,
-            "hue": 27.0,
-            "lightness": 0.6815781348943712
-          }
-        },
-        {
-          "chromaReduced": true,
-          "contrast": 6.716206034615349,
-          "hex": "#009cd5",
-          "name": "color-info",
-          "origin": "derived",
-          "value": {
-            "chroma": 0.1363464552692352,
-            "hue": 234.0,
-            "lightness": 0.6512429428100587
+            "chroma": 0.12033557660567686,
+            "hue": 110.81452667388709,
+            "lightness": 0.547739931344986
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 6.689116911747531,
-          "hex": "#1fa662",
-          "name": "color-success",
+          "contrast": 5.326889525564595,
+          "hex": "#eb403a",
+          "name": "color-danger",
           "origin": "derived",
           "value": {
-            "chroma": 0.14921633369203216,
-            "hue": 155.0,
-            "lightness": 0.6391814351081848
+            "chroma": 0.208902867168845,
+            "hue": 27.0,
+            "lightness": 0.6247478151321411
           }
         },
         {
           "chromaReduced": true,
-          "contrast": 6.702164006460043,
-          "hex": "#c48500",
+          "contrast": 5.346368030976155,
+          "hex": "#0088c7",
+          "name": "color-info",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13659630276807258,
+            "hue": 240.0,
+            "lightness": 0.5960045599937438
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.363980492095841,
+          "hex": "#009454",
+          "name": "color-success",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.14445143375407438,
+            "hue": 155.0,
+            "lightness": 0.5839926838874818
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.3442500350106075,
+          "hex": "#ae7500",
           "name": "color-warning",
           "origin": "derived",
           "value": {
-            "chroma": 0.14002958555068937,
+            "chroma": 0.12771032790677,
             "hue": 75.0,
-            "lightness": 0.6634449928998949
+            "lightness": 0.604983048439026
           }
         },
         {
@@ -24663,13 +24663,13 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#696800",
+          "hex": "#666800",
           "name": "color-accent-surface-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.1086449035178969,
-            "hue": 108.81452667388709,
-            "lightness": 0.5008634257316589
+            "chroma": 0.10938166694914979,
+            "hue": 110.81452667388709,
+            "lightness": 0.497739931344986
           }
         },
         {
@@ -24696,24 +24696,24 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#007aa9",
+          "hex": "#0079b3",
           "name": "color-info-surface",
           "origin": "derived",
           "value": {
-            "chroma": 0.11469502924605052,
-            "hue": 234.0,
-            "lightness": 0.547673808336258
+            "chroma": 0.12628333875470174,
+            "hue": 240.0,
+            "lightness": 0.5509259271621704
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#006b94",
+          "hex": "#006a9e",
           "name": "color-info-surface-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.10424788225031503,
-            "hue": 234.0,
-            "lightness": 0.497673808336258
+            "chroma": 0.11484864143853132,
+            "hue": 240.0,
+            "lightness": 0.5009259271621703
           }
         },
         {
@@ -24785,14 +24785,14 @@
         },
         {
           "chromaReduced": false,
-          "contrast": 4.451247577854256,
-          "hex": "#286fe1",
+          "contrast": 3.569768277047639,
+          "hex": "#155fcf",
           "name": "color-focus-ring",
           "origin": "derived",
           "value": {
             "chroma": 0.18801471201981484,
             "hue": 259.8145266738871,
-            "lightness": 0.5618752080202101
+            "lightness": 0.511192981004715
           }
         },
         {
@@ -26657,58 +26657,56 @@
       "violations": []
     },
     {
-      "collisions": [
-        "primary and info are 0.015 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
-      ],
-      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #3c3c3c;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #ffffff;\n  --helix-color-foreground-muted: #dcdcdc;\n  --helix-color-surface-raised: #616161;\n  --helix-color-surface-overlay: #616161;\n  --helix-color-surface-sunken: #232323;\n  --helix-color-primary: #c9ddff;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #e2edff;\n  --helix-color-primary-active: #fcfdff;\n  --helix-color-primary-subtle: #142643;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #ffda24;\n  --helix-color-accent-hover: #ffeca2;\n  --helix-color-accent-active: #fffdf3;\n  --helix-color-accent-subtle: #2f2600;\n  --helix-color-accent-surface: #877100;\n  --helix-color-danger: #ffd2cb;\n  --helix-color-info: #bde0ff;\n  --helix-color-success: #7cf3ab;\n  --helix-color-warning: #ffd68e;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #766300;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #956b00;\n  --helix-color-warning-surface-hover: #835d00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #3b82f7;\n  --helix-color-brand-mark: #89b6ff;\n  --helix-seed-brand: #c9ddff;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
+      "collisions": [],
+      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #303030;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #d1d1d1;\n  --helix-color-foreground-muted: #a6a6a6;\n  --helix-color-surface-raised: #3c3c3c;\n  --helix-color-surface-overlay: #3c3c3c;\n  --helix-color-surface-sunken: #232323;\n  --helix-color-primary: #6fa6ff;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #8ab6ff;\n  --helix-color-primary-active: #a4c7ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #b2a900;\n  --helix-color-accent-hover: #c2b900;\n  --helix-color-accent-active: #d3c900;\n  --helix-color-accent-subtle: #232100;\n  --helix-color-accent-surface: #7b7500;\n  --helix-color-danger: #ff8074;\n  --helix-color-info: #00b3e5;\n  --helix-color-success: #3ebb76;\n  --helix-color-warning: #e09700;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #6c6600;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #007ca0;\n  --helix-color-info-surface-hover: #006d8d;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #3b82f7;\n  --helix-color-brand-mark: #3e85f9;\n  --helix-seed-brand: #6fa6ff;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
       "label": "dark-fill",
       "pairings": [
         {
           "background": "color-background",
           "foreground": "color-foreground",
-          "ratio": 21.0,
+          "ratio": 13.751937479880652,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-foreground",
-          "ratio": 11.031010289533231,
+          "ratio": 8.64283852987566,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-foreground",
-          "ratio": 6.193286162073998,
+          "ratio": 7.223703040075294,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-foreground",
-          "ratio": 6.193286162073998,
+          "ratio": 7.223703040075294,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-foreground",
-          "ratio": 15.716827493476563,
+          "ratio": 10.29222995582662,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-subtle",
           "foreground": "color-foreground",
-          "ratio": 15.129254463428358,
+          "ratio": 10.75751303134005,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-subtle",
           "foreground": "color-foreground",
-          "ratio": 15.020247174092928,
+          "ratio": 10.668624445584337,
           "status": "pass",
           "target": 4.5
         },
@@ -26727,49 +26725,49 @@
         {
           "background": "color-background",
           "foreground": "color-foreground-muted",
-          "ratio": 15.313870010129614,
+          "ratio": 8.626520228650602,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-foreground-muted",
-          "ratio": 8.044164650205435,
+          "ratio": 5.421608520254868,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-foreground-muted",
-          "ratio": 4.516341867692178,
+          "ratio": 4.5313920669100645,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-foreground-muted",
-          "ratio": 4.516341867692178,
+          "ratio": 4.5313920669100645,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-foreground-muted",
-          "ratio": 11.461212057463397,
+          "ratio": 6.456263347747024,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.501975870056579,
+          "ratio": 4.507644607070116,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.562153652673031,
+          "ratio": 5.588672298538359,
           "status": "pass",
           "target": 4.5
         },
@@ -26790,14 +26788,14 @@
         {
           "background": "color-info-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.521199527918738,
+          "ratio": 4.503571842122158,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-info-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.5368938598261055,
+          "ratio": 5.5356409625056076,
           "status": "pass",
           "target": 4.5
         },
@@ -26832,14 +26830,14 @@
         {
           "background": "color-warning-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.513526283722662,
+          "ratio": 4.5004599020905465,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-warning-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.600350917827517,
+          "ratio": 5.55424692976324,
           "status": "pass",
           "target": 4.5
         },
@@ -26859,224 +26857,224 @@
         {
           "background": "color-background",
           "foreground": "color-primary",
-          "ratio": 15.27008199697308,
+          "ratio": 8.574388738209773,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-primary",
-          "ratio": 8.021163410982199,
+          "ratio": 5.3888448420559945,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-primary",
-          "ratio": 4.503427977408984,
+          "ratio": 4.5040081141738035,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-primary",
-          "ratio": 4.503427977408984,
+          "ratio": 4.5040081141738035,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-primary",
-          "ratio": 11.428440217031808,
+          "ratio": 6.417247079069104,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-subtle",
           "foreground": "color-primary",
-          "ratio": 11.001188390934379,
+          "ratio": 6.707352961865524,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-accent",
-          "ratio": 15.306036444490474,
+          "ratio": 8.568182299382366,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-accent",
-          "ratio": 8.040049786245001,
+          "ratio": 5.384944209966203,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-accent",
-          "ratio": 4.514031605136341,
+          "ratio": 4.5007479574801605,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-accent",
-          "ratio": 4.514031605136341,
+          "ratio": 4.5007479574801605,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-accent",
-          "ratio": 11.455349257472482,
+          "ratio": 6.412602053907238,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-subtle",
           "foreground": "color-accent",
-          "ratio": 10.947640507234352,
+          "ratio": 6.647115671311722,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-danger",
-          "ratio": 15.332996753304483,
+          "ratio": 8.591859444507879,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-danger",
-          "ratio": 8.054211664527685,
+          "ratio": 5.3998248580543455,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-danger",
-          "ratio": 4.521982695969819,
+          "ratio": 4.513185235170938,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-danger",
-          "ratio": 4.521982695969819,
+          "ratio": 4.513185235170938,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-danger",
-          "ratio": 11.475526901415371,
+          "ratio": 6.430322511310843,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-info",
-          "ratio": 15.270025189540881,
+          "ratio": 8.579468408681771,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-info",
-          "ratio": 8.021133570821766,
+          "ratio": 5.3920373210604025,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-info",
-          "ratio": 4.503411223852615,
+          "ratio": 4.506676394994948,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-info",
-          "ratio": 4.503411223852615,
+          "ratio": 4.506676394994948,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-info",
-          "ratio": 11.428397701193132,
+          "ratio": 6.421048807856347,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-success",
-          "ratio": 15.26530888778539,
+          "ratio": 8.574557326660221,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-success",
-          "ratio": 8.018656162574462,
+          "ratio": 5.38895079678109,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-success",
-          "ratio": 4.502020299738404,
+          "ratio": 4.5040966713610215,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-success",
-          "ratio": 4.502020299738404,
+          "ratio": 4.5040966713610215,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-success",
-          "ratio": 11.424867924950359,
+          "ratio": 6.417373254097345,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-warning",
-          "ratio": 15.261225727345629,
+          "ratio": 8.596102170947368,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-warning",
-          "ratio": 8.016511334725662,
+          "ratio": 5.402491333203508,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-warning",
-          "ratio": 4.500816100640828,
+          "ratio": 4.515413880838065,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-warning",
-          "ratio": 4.500816100640828,
+          "ratio": 4.515413880838065,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-warning",
-          "ratio": 11.42181200455703,
+          "ratio": 6.433497854146627,
           "status": "pass",
           "target": 4.5
         },
@@ -27090,22 +27088,22 @@
         {
           "background": "color-surface",
           "foreground": "color-focus-ring",
-          "ratio": 3.005737103545807,
+          "ratio": 3.5962303966653355,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-focus-ring",
-          "ratio": 1.68755077926868,
-          "status": "fail",
+          "ratio": 3.005737103545807,
+          "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-focus-ring",
-          "ratio": 1.68755077926868,
-          "status": "fail",
+          "ratio": 3.005737103545807,
+          "status": "pass",
           "target": 3.0
         },
         {
@@ -27118,41 +27116,41 @@
         {
           "background": "color-background",
           "foreground": "color-brand-mark",
-          "ratio": 10.198852446260082,
+          "ratio": 5.927748762886492,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface",
           "foreground": "color-brand-mark",
-          "ratio": 5.35731648933934,
+          "ratio": 3.7254805352520237,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-brand-mark",
-          "ratio": 3.007829129736053,
+          "ratio": 3.1137646474842273,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-brand-mark",
-          "ratio": 3.007829129736053,
+          "ratio": 3.1137646474842273,
           "status": "pass",
           "target": 3.0
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-brand-mark",
-          "ratio": 7.633028787109103,
+          "ratio": 4.4364478443312425,
           "status": "pass",
           "target": 3.0
         }
       ],
       "seeds": {
-        "seed-brand": "#c9ddff",
+        "seed-brand": "#6fa6ff",
         "seed-chroma-scale": "1",
         "seed-density": "1",
         "seed-radii": "0.5rem"
@@ -27171,13 +27169,13 @@
         },
         {
           "chromaReduced": false,
-          "hex": "#3c3c3c",
+          "hex": "#303030",
           "name": "color-surface",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.357
+            "lightness": 0.3094
           }
         },
         {
@@ -27194,48 +27192,48 @@
         },
         {
           "chromaReduced": false,
-          "contrast": 21.0,
-          "hex": "#ffffff",
+          "contrast": 13.751937479880652,
+          "hex": "#d1d1d1",
           "name": "color-foreground",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 1.0
+            "lightness": 0.8591498981714248
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 15.313870010129614,
-          "hex": "#dcdcdc",
+          "contrast": 8.626520228650602,
+          "hex": "#a6a6a6",
           "name": "color-foreground-muted",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.8929612184166908
+            "lightness": 0.7235454850792884
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#616161",
+          "hex": "#3c3c3c",
           "name": "color-surface-raised",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.49299999999999994
+            "lightness": 0.357
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#616161",
+          "hex": "#3c3c3c",
           "name": "color-surface-overlay",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 259.8145266738871,
-            "lightness": 0.49299999999999994
+            "lightness": 0.357
           }
         },
         {
@@ -27251,14 +27249,14 @@
         },
         {
           "chromaReduced": true,
-          "contrast": 15.27008199697308,
-          "hex": "#c9ddff",
+          "contrast": 8.574388738209773,
+          "hex": "#6fa6ff",
           "name": "color-primary",
           "origin": "derived",
           "value": {
-            "chroma": 0.05153417243607236,
+            "chroma": 0.14334522392677398,
             "hue": 259.8145266738871,
-            "lightness": 0.8941217702031137
+            "lightness": 0.7243752383589743
           }
         },
         {
@@ -27275,35 +27273,35 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#e2edff",
+          "hex": "#8ab6ff",
           "name": "color-primary-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.0266794787028087,
+            "chroma": 0.11507889772662094,
             "hue": 259.8145266738871,
-            "lightness": 0.9441217702031137
+            "lightness": 0.7743752383589744
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#fcfdff",
+          "hex": "#a4c7ff",
           "name": "color-primary-active",
           "origin": "derived",
           "value": {
-            "chroma": 0.0027666730942399434,
+            "chroma": 0.08784160178491526,
             "hue": 259.8145266738871,
-            "lightness": 0.9941217702031137
+            "lightness": 0.8243752383589743
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#142643",
+          "hex": "#0d1f3c",
           "name": "color-primary-subtle",
           "origin": "derived",
           "value": {
             "chroma": 0.06,
             "hue": 259.8145266738871,
-            "lightness": 0.27
+            "lightness": 0.242
           }
         },
         {
@@ -27319,106 +27317,106 @@
         },
         {
           "chromaReduced": true,
-          "contrast": 15.306036444490474,
-          "hex": "#ffda24",
+          "contrast": 8.568182299382366,
+          "hex": "#b2a900",
           "name": "color-accent",
           "origin": "related",
           "value": {
-            "chroma": 0.17731021534281388,
-            "hue": 95.81452667388709,
-            "lightness": 0.892404634654522
+            "chroma": 0.1529613404558789,
+            "hue": 105.81452667388709,
+            "lightness": 0.7177346826195716
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#ffeca2",
+          "hex": "#c2b900",
           "name": "color-accent-hover",
           "origin": "related",
           "value": {
-            "chroma": 0.09567686302095527,
-            "hue": 95.81452667388709,
-            "lightness": 0.9424046346545221
+            "chroma": 0.16360577002422327,
+            "hue": 105.81452667388709,
+            "lightness": 0.7677346826195717
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#fffdf3",
+          "hex": "#d3c900",
           "name": "color-accent-active",
           "origin": "related",
           "value": {
-            "chroma": 0.01285579569091481,
-            "hue": 95.81452667388709,
-            "lightness": 0.992404634654522
+            "chroma": 0.17425163403098337,
+            "hue": 105.81452667388709,
+            "lightness": 0.8177346826195716
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#2f2600",
+          "hex": "#232100",
           "name": "color-accent-subtle",
           "origin": "related",
           "value": {
-            "chroma": 0.05592063903808593,
-            "hue": 95.81452667388709,
-            "lightness": 0.27
+            "chroma": 0.052065467834472655,
+            "hue": 105.81452667388709,
+            "lightness": 0.242
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#877100",
+          "hex": "#7b7500",
           "name": "color-accent-surface",
           "origin": "related",
           "value": {
-            "chroma": 0.11408734217178318,
-            "hue": 95.81452667388709,
-            "lightness": 0.5543420100212098
+            "chroma": 0.11740663266566329,
+            "hue": 105.81452667388709,
+            "lightness": 0.5506498110294342
           }
         },
         {
           "chromaReduced": true,
-          "contrast": 15.332996753304483,
-          "hex": "#ffd2cb",
+          "contrast": 8.591859444507879,
+          "hex": "#ff8074",
           "name": "color-danger",
           "origin": "derived",
           "value": {
-            "chroma": 0.052227111369304545,
+            "chroma": 0.1574164754613807,
             "hue": 27.0,
-            "lightness": 0.8996796600818633
+            "lightness": 0.7412848436832427
           }
         },
         {
           "chromaReduced": true,
-          "contrast": 15.270025189540881,
-          "hex": "#bde0ff",
+          "contrast": 8.579468408681771,
+          "hex": "#00b3e5",
           "name": "color-info",
           "origin": "derived",
           "value": {
-            "chroma": 0.056968720921112354,
-            "hue": 245.0,
-            "lightness": 0.8910866994261741
+            "chroma": 0.13781153914455616,
+            "hue": 227.0,
+            "lightness": 0.7135698193907736
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 15.26530888778539,
-          "hex": "#7cf3ab",
+          "contrast": 8.574557326660221,
+          "hex": "#3ebb76",
           "name": "color-success",
           "origin": "derived",
           "value": {
             "chroma": 0.14921633369203216,
             "hue": 155.0,
-            "lightness": 0.8762333651185037
+            "lightness": 0.7048667614459991
           }
         },
         {
           "chromaReduced": true,
-          "contrast": 15.261225727345629,
-          "hex": "#ffd68e",
+          "contrast": 8.596102170947368,
+          "hex": "#e09700",
           "name": "color-warning",
           "origin": "derived",
           "value": {
-            "chroma": 0.10135727495191162,
-            "hue": 81.0,
-            "lightness": 0.8950984964370727
+            "chroma": 0.15425714169532584,
+            "hue": 75.0,
+            "lightness": 0.7309446231126785
           }
         },
         {
@@ -27434,13 +27432,13 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#766300",
+          "hex": "#6c6600",
           "name": "color-accent-surface-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.1038251904412171,
-            "hue": 95.81452667388709,
-            "lightness": 0.5043420100212097
+            "chroma": 0.1067754716526639,
+            "hue": 105.81452667388709,
+            "lightness": 0.5006498110294342
           }
         },
         {
@@ -27467,24 +27465,24 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#0077bd",
+          "hex": "#007ca0",
           "name": "color-info-surface",
           "origin": "derived",
           "value": {
-            "chroma": 0.13897076475125175,
-            "hue": 245.0,
-            "lightness": 0.5517164242267609
+            "chroma": 0.1058465419451845,
+            "hue": 227.0,
+            "lightness": 0.5478562307357787
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#0069a6",
+          "hex": "#006d8d",
           "name": "color-info-surface-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.12640598564355995,
-            "hue": 245.0,
-            "lightness": 0.5017164242267609
+            "chroma": 0.09620813582053378,
+            "hue": 227.0,
+            "lightness": 0.4978562307357787
           }
         },
         {
@@ -27511,24 +27509,24 @@
         },
         {
           "chromaReduced": true,
-          "hex": "#956b00",
+          "hex": "#9c6800",
           "name": "color-warning-surface",
           "origin": "derived",
           "value": {
-            "chroma": 0.11504338891180492,
-            "hue": 81.0,
-            "lightness": 0.556502573490143
+            "chroma": 0.1182213122956442,
+            "hue": 75.0,
+            "lightness": 0.5599379324913023
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#835d00",
+          "hex": "#895b00",
           "name": "color-warning-surface-hover",
           "origin": "derived",
           "value": {
-            "chroma": 0.10473527745750362,
-            "hue": 81.0,
-            "lightness": 0.5065025734901429
+            "chroma": 0.10769311380741495,
+            "hue": 75.0,
+            "lightness": 0.5099379324913023
           }
         },
         {
@@ -27567,22 +27565,19 @@
           }
         },
         {
-          "chromaReduced": true,
-          "contrast": 10.198852446260082,
-          "hex": "#89b6ff",
+          "chromaReduced": false,
+          "contrast": 5.927748762886492,
+          "hex": "#3e85f9",
           "name": "color-brand-mark",
           "origin": "derived",
           "value": {
-            "chroma": 0.11579629623926216,
+            "chroma": 0.18801471201981484,
             "hue": 259.8145266738871,
-            "lightness": 0.7730830295087604
+            "lightness": 0.6330830295087604
           }
         }
       ],
-      "violations": [
-        "color-focus-ring on color-surface-raised: 1.69:1 below target 3:1",
-        "color-focus-ring on color-surface-overlay: 1.69:1 below target 3:1"
-      ]
+      "violations": []
     },
     {
       "collisions": [

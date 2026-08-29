@@ -106,7 +106,7 @@
  *
  * The cost is one extra copy of the block per scoped subtree, which is what a
  * theme scope is. */
-/* GENERATED from src/tokens.ts by `bun run gen:tokens-layer`. Do not edit below. */
+/* GENERATED from src/tokens.ts by `turbo run token-layer`. Do not edit below. */
 :root,
 [data-helix-theme] {
   /* One declaration per token, both modes inside it. Which half resolves is
@@ -189,9 +189,18 @@
      it was designed against, and `surface-sunken` was designed against the page.
      Measured as field-to-ground contrast: in light it is 1.119 on the page, 1.073
      on a card and **1.027** on a raised surface, where a field has all but
-     vanished; in dark the same token runs 1.067, 1.108 and **1.390**, too faint
-     on the page and too heavy on the rung above it. One token, failing in
-     opposite directions in the two modes.
+     vanished; in dark the same token runs 1.067, **1.051** and 1.108, faintest on
+     a card rather than on the page, so the ordering inverts partway up the
+     ladder. One token, failing differently in each mode and never consistently
+     within one.
+
+     *The dark figures were re-measured when 800 and 900 moved, and the fault
+     they record changed shape rather than going away.* Against the old rungs the
+     dark reading was 1.067, 1.108 and **1.390**: too faint on the page and too
+     heavy on the rung above it. A compressed ladder turns that into the opposite
+     complaint. What survives both is that an absolute fill is only right on the
+     one ground it was chosen against, which is the argument rather than any
+     particular number.
 
      A percentage of the foreground mixed toward transparent is a step away from
      whatever is behind it, in either mode, which a fixed neutral cannot be.

@@ -189,9 +189,17 @@
    * Light grounds run 0.96 to 1.0, so any ink above about 0.53 is under 4.5 on
    * one of them: 500 at 0.6 measured 3.53 on `surface-sunken`, 3.62 raised,
    * 3.78 on surface and 3.95 on the page, and it was carrying inactive tab
-   * labels, the pagination summary and an input's own text. Dark is the mirror,
-   * `surface-raised` at 0.29 being the worst ground and 0.67 the floor: 500
-   * measured 3.59 there.
+   * labels, the pagination summary and an input's own text. Dark was the
+   * mirror, `surface-raised` being the worst ground and 0.67 the floor: at the
+   * 0.29 that rung then held, 500 measured 3.59 on it.
+   *
+   * **The dark half of that argument has since been paid off by the ladder
+   * rather than by the ink.** `surface-raised` now sits at 0.21, and 500
+   * measures 4.50 against it: the worst dark ground clears AA with no half step
+   * involved. 450 stays because it is what `foreground-subtle` points at in
+   * dark and because moving an ink is a decision about the ink, not a
+   * consequence of a surface moving under it. What was necessity there is now
+   * margin, and the light half below is untouched and still necessity.
    *
    * 0.53 and 0.67 are those thresholds with nothing to spare, measured rather
    * than picked, and they clear every ground in their own mode at 4.69 and 4.73.
@@ -210,49 +218,64 @@
      floor and the light end does not.
 
      Quieter in dark means nearer the surface it sits on, not nearer white, so a
-     receding border has to come *down*. It cannot come far. Dark runs
-     sunken 0.15, surface 0.21, raised 0.29, and a border has to stay visible on
-     all three, so `surface-raised` is a hard floor four hundredths below where
-     this now sits. Tabs, Icon Button, Toggle Group and the card appearances of
-     Radio and Checkbox all fill with raised *and* draw a border, so a value
-     under about 0.32 does not read as a quieter line on those five, it reads as
-     no line at all. 0.30 was tried and is exactly that: one hundredth off
-     raised, invisible.
+     receding border has to come *down*. It cannot come far. Dark now runs
+     sunken 0.15, surface 0.182, raised 0.21, and a border has to stay visible on
+     all three, so `surface-raised` is the floor. Tabs, Icon Button, Toggle Group
+     and the card appearances of Radio and Checkbox all fill with raised *and*
+     draw a border, so a rung within a hundredth or two of it does not read as a
+     quieter line on those five, it reads as no line at all.
+
+     **Nothing reads this rung today, and the sentence above is why it is kept.**
+     `--helix-color-border` mixes 800 with 900 in dark and 300 with 200 in light,
+     so 700 describes a job rather than holding one. It is the only rung left
+     between the inks and the surfaces, which is where a dark border has to come
+     from if the mix of two surface rungs stops separating from them. After the
+     ladder moved that mix measures 1.019:1 on `surface-raised`, against 1.083
+     before, so the question is now open rather than hypothetical.
 
      Light has no such floor. White is 1.0 with nothing above it competing, so
      300 takes the whole reduction. The asymmetry is the ramps being asymmetric,
      not the border meaning two different things. */
-  /* **These four do not move, and the asymmetry that argues they should is
-     mostly an artifact of which metric is used to see it.**
+  /* **Two of these four moved, and none of it was the metrics asking.**
    *
-   * The surface ramp separates four to fourteen times harder in dark than in
-   * light, measured as OKLab lightness against the page. That number is real and
-   * it is one of four, and they do not agree. Measured in Chromium as painted
-   * sRGB, then converted, for `surface` against the page:
+   * 800 came down from 0.29 to 0.21 and 900 from 0.21 to 0.182, which paints
+   * dark `surface` #121212 and both `surface-raised` and `surface-overlay`
+   * #181818. That was a palette decision and was taken in those terms: the
+   * ladder was asked for particular grays and these are the rungs that render
+   * them. What follows is the separate question of whether the *measurements*
+   * ever argued for moving them, and the answer there is still no.
    *
-   *   OKLab L      light 0.0152  dark 0.2100   dark separates 13.8x more
-   *   sRGB code    light 0.0200  dark 0.0950   dark separates  4.8x more
-   *   WCAG excess  light 0.045   dark 0.185    dark separates  4.2x more
-   *   linear Y     light 0.0449  dark 0.0093   LIGHT separates 4.8x more
+   * The surface ramp separates several times harder in dark than in light,
+   * measured as OKLab lightness against the page. That number is real and it is
+   * one of four, and they do not agree. Measured in Chromium as painted sRGB,
+   * then converted, for `surface` against the page, at the rungs now shipping:
+   *
+   *   OKLab L      light 0.0150  dark 0.1820   dark separates 12.1x more
+   *   sRGB code    light 0.0196  dark 0.0706   dark separates  3.6x more
+   *   WCAG excess  light 0.0438  dark 0.1210   dark separates  2.8x more
+   *   linear Y     light 0.0440  dark 0.0060   LIGHT separates 7.3x more
    *
    * The last line is the one that matters most and it reverses the finding.
    * Linear luminance is what the display emits and what every contrast formula
    * is built on, and by it the light ramp separates its surfaces *more* than the
    * dark one does. `surface-sunken` behaves the same way: light 0.053 against
-   * dark 0.043 in sRGB, and light ahead by 1.9x on WCAG, where OKLab L alone
-   * says dark is 3.7x ahead.
+   * dark 0.043 in sRGB, and light ahead by 1.8x on WCAG, where OKLab L alone
+   * says dark is 3.7x ahead. Those two are unchanged: 950 did not move.
    *
-   * A fault whose magnitude runs from 0.2x to 14x and whose *sign* depends on
+   * A fault whose magnitude runs from 0.1x to 12x and whose *sign* depends on
    * the metric is not a measured fault. OKLab L is perceptually uniform for
    * judging one lightness against another and is not a model of discriminating
    * two large emissive areas near the ends of the range, which is what a surface
    * on a page is. The WCAG ratio understates dark, and OKLab L overstates it.
    *
-   * Moving these would also drag three unrelated roles with them, which is the
-   * second reason. `neutral-900` is dark `surface` *and* light
-   * `surface-inverse` *and* the dark translucent material; `neutral-950` is dark
-   * `surface-sunken` *and* the modal scrim in both modes. There is no rung to
-   * move that moves only a surface.
+   * Moving these drags unrelated roles with them, which is the cost that was
+   * paid rather than avoided. `neutral-900` is dark `surface` *and* light
+   * `surface-inverse` *and* the dark translucent material, so a light tooltip
+   * went to #121212 with the dark page it was named after, and the glass panels
+   * darkened by the same amount. `neutral-950` is dark `surface-sunken` *and*
+   * the modal scrim in both modes, and stayed. There is no rung to move that
+   * moves only a surface, so a request phrased about one surface is always a
+   * request about three or four.
    *
    * **What is left, and it is one thing rather than a ramp.**
    * `surface-overlay` in light is `neutral-0`, the page color exactly, so its
@@ -264,8 +287,14 @@
    * and it buys about seven thousandths of sRGB. That trade is a palette
    * decision and not a contrast one, which is where this now rests. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
-  --_helix-neutral-800: oklch(0.29 var(--_helix-neutral-cast));
-  --_helix-neutral-900: oklch(0.21 var(--_helix-neutral-cast));
+  --_helix-neutral-800: oklch(0.21 var(--_helix-neutral-cast));
+  /* 0.182 and not 0.18, which is the same gray to read and not the same gray
+     to paint. The band that lands on #121212 runs 0.180 to 0.185, so 0.18 is
+     its lower edge and a thousandth of drift anywhere upstream paints #111111
+     instead. 0.182 sits in the middle of the band with two thousandths either
+     side, which is the difference between a value that renders the gray it was
+     chosen for and one that renders it on this machine. */
+  --_helix-neutral-900: oklch(0.182 var(--_helix-neutral-cast));
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
@@ -308,14 +337,21 @@
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
   --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
-  /* **`0.13`, and the tenth of a step is the difference between passing and
-     not.** This rung is `--helix-color-primary` in dark mode, and at `+ 0.12`
-     it measures 4.431:1 against `surface-raised` and `surface-overlay`, the two
-     lightest grounds a dark page has: under AA, on the pair a dark theme uses
-     most. No example puts primary text on either of them, so nothing that reads
-     what the examples render can see this failure. Measured in a browser by
-     walking the lightness: 0.664 gives 4.48 and 0.669 gives 4.572, so the step
-     is 0.13 and the margin is real rather than a rounding away.
+  /* **`0.13`, and it was once the difference between passing and not.** This
+     rung is `--helix-color-primary` in dark mode, and against the 0.29 that
+     `surface-raised` and `surface-overlay` then held, `+ 0.12` measured 4.431:1
+     on the two lightest grounds a dark page has: under AA, on the pair a dark
+     theme uses most. No example puts primary text on either of them, so nothing
+     that reads what the examples render could see it. Measured in a browser by
+     walking the lightness: 0.664 gave 4.48 and 0.669 gave 4.572, so the step
+     became 0.13 and the margin was real rather than a rounding away.
+
+     **Those two grounds have since come down to 0.21, and the margin is now
+     large.** `+ 0.12` measures 5.556:1 there and `+ 0.13` measures 5.733:1, so
+     the rung no longer sits against a threshold. It stays at 0.13 because a
+     shipped color is not re-picked for having got easier, and because the
+     hundredth is what the light side's `- 0.05` and `- 0.10` are measured
+     against below.
 
      Exact for the seed that ships and approximate for any other, which is what
      `tokens.css` already says about this whole path. A theme that wants the
