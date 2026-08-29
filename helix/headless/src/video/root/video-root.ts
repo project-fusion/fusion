@@ -177,7 +177,6 @@ const SKIP_SECONDS = 10
  * @csspart failure - What is said when the source will not play.
  * @csspart forward - The control that goes on ten seconds.
  * @csspart fullscreen - The whole screen, and back.
- * @csspart icon - A glyph this component draws.
  * @csspart loading - What is said while the picture waits for more of itself.
  * @csspart loading-mark - The part of that which spins.
  * @csspart more - The button that opens it.

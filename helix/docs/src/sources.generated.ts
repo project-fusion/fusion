@@ -575,7 +575,7 @@ These are the difference between code that looks right and code that passes:
 | A visual property draws from its axis | \`check:css:axes\` |
 | A form control styles with \`:disabled\` | \`helix component --only disabled\` |
 | A component that animates answers reduced motion | \`helix component --only motion\` |
-| No component reads a primitive token | \`check:css:tokens\` |
+| No component reads a primitive token | \`helix component\`'s \`tokens\` |
 
 If you are generating Helix code, the first two are the ones that produce
 working-looking output that is wrong.
@@ -728,7 +728,7 @@ pairing a reader has to be able to read.
 /* Yours to read. */
 color: var(--helix-color-foreground-muted);
 
-/* Not yours to read, and \`check:css:tokens\` fails the build on it. */
+/* Not yours to read, and the \`tokens\` rule fails the build on it. */
 color: var(--_helix-neutral-500);
 \`\`\`
 
@@ -2254,11 +2254,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | \`@fusion.dev/helix-core\` | 864,073 | 113 | 159,905 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
-| \`@fusion.dev/helix-headless\` | 9,629,496 | 422 | 735,865 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
+| \`@fusion.dev/helix-headless\` | 9,627,976 | 422 | 735,855 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
-| \`@fusion.dev/helix\` | 9,588,366 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,586,485 | 717 | 287,238 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 

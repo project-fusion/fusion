@@ -12722,10 +12722,6 @@
               "name": "grid-saturation"
             },
             {
-              "description": "A glyph this component draws.",
-              "name": "icon"
-            },
-            {
               "description": "The chip of the current color, which copies it when pressed.",
               "name": "sample"
             },
@@ -25051,10 +25047,6 @@
             {
               "description": "Help under the field, while nothing is wrong.",
               "name": "hint"
-            },
-            {
-              "description": "A glyph this component draws.",
-              "name": "icon"
             },
             {
               "description": "What kind of file it is.",
@@ -53557,10 +53549,6 @@
               "name": "actions"
             },
             {
-              "description": "A glyph this component draws.",
-              "name": "icon"
-            },
-            {
               "description": "The default trigger, where none was slotted.",
               "name": "trigger"
             }
@@ -72283,10 +72271,6 @@
               "name": "entry-start"
             },
             {
-              "description": "The glyph on the trigger.",
-              "name": "icon"
-            },
-            {
               "description": "The menu that holds the entries.",
               "name": "menu"
             },
@@ -73298,10 +73282,6 @@
             {
               "description": "The whole screen, and back.",
               "name": "fullscreen"
-            },
-            {
-              "description": "A glyph this component draws.",
-              "name": "icon"
             },
             {
               "description": "What is said while the picture waits for more of itself.",

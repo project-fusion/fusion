@@ -112,7 +112,6 @@ const kind = (file: File): string => {
  * @csspart field - The box that is pressed and dropped on.
  * @csspart file - One chosen file.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart icon - A glyph this component draws.
  * @csspart kind - What kind of file it is.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.

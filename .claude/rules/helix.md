@@ -505,7 +505,7 @@ and `MixinControllerActive` all run on it, so a mode would fork the event
 vocabulary across ninety-two families by prop presence: which event a consumer
 binds would depend on whether they passed a property, and an HTML consumer would
 have no ergonomic spelling for the controlled half at all, a prefixed event
-having no inline handler attribute. See 294.
+having no inline handler attribute. See (294).
 
 **Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
@@ -688,7 +688,7 @@ Fifteen categories, every token in exactly one: `color` `space` `radii` `font`
 `text` `weight` `leading` `tracking` `border` `shadow` `material` `duration`
 `easing` `size` `layer`.
 
-`bun run check:css:tokens` enforces three rules: no raw values where a token exists,
+`helix component --only tokens` enforces three rules: no raw values where a token exists,
 no primitive access from outside `helix/styles`, and **no references to tokens
 that do not exist**. The third earns its keep: a renamed token resolves to
 nothing and the property silently falls back to a browser default, so the code
@@ -804,11 +804,10 @@ which is global by necessity.
 `helix component --only overruled` enforces it, per declaration. It was written against
 the two failures above and fails on both when they are put back.
 
-**Apps use components, not native elements.** *Reversed 13 Aug 2026, and
-narrowed 18 Aug 2026: the base layer styles `h1`–`h6` and `:where(a)` only under
-`[data-prose]` now, for the reason in the section above.* Prose the design system
-never renders (markdown, a CMS) still has to look right, and says so on its
-container. But an app written
+**Apps use components, not native elements.** The base layer styles `h1` to
+`h6` and `:where(a)` only under `[data-prose]`, for the reason in the section
+above: prose the design system never renders (markdown, a CMS) still has to look
+right, and says so on its container. But an app written
 against Helix reaches for `Text`, `Flex` and `Grid` rather than raw tags, so
 dropping a component in works without the app knowing which token to apply.
 
@@ -1116,7 +1115,7 @@ what one word for four questions did for `appearance`. What they took: Chat
 `helix-before-collapse`, Sandbox `helix-before-split` and
 `helix-before-panel-resize` for its two dividers and `helix-before-edit` for a
 source pane. Pagination Size kept `helix-before-change`, being the one of the
-eleven that really is a value control. See 294, and 306 for the field the
+eleven that really is a value control. See (294), and (306) for the field the
 sandbox's pair was the last caller of.
 
 **`@controlled` is deleted, and so is everything that read it.** A declared
@@ -1125,7 +1124,7 @@ element always applies, and a consumer takes one decision by refusing the before
 event. With no mode to be silently in there is nothing for a tag to declare,
 nothing for the generated constraint to require, and nothing for a check to
 hold. `helix-controlled`, `helix-controlled-props`, `check:controlled` and its
-fixture were removed together. See 294, and the longer version of the argument
+fixture were removed together. See (294), and the longer version of the argument
 under the reflected-property rules above.
 
 **What survives is the finding underneath it**, which was never about ownership:
@@ -1150,13 +1149,11 @@ consumer would guess simply does nothing.
 React, and no React package: there is not one.
 
 **Bind Helix events with `onhelix-*`, and the element repairs the rest.**
-*Reversed 19 Aug 2026, which is the day it was written.* This read "bind with
-`addEventListener`, not a prop", because those props do not survive hydration:
-React records them, attaches no listener, and the handler never runs until React
-commits an update for some other reason. Nothing is logged and the element goes
-on doing its own job, which is why it passes every casual check. Before it was
-found, the sandbox's example tree and file tabs were dead on every fresh page
-load.
+**Do not reach for `addEventListener` instead.** The props alone do not survive
+hydration: React records them, attaches no listener, and the handler never runs
+until React commits an update for some other reason. Nothing is logged and the
+element goes on doing its own job, which is why it passes every casual check.
+What repairs it is the element itself, below.
 
 The handler is on the node the whole time, under a key React stashes there, so
 `HelixElement.dispatchEvent` reads it and binds it immediately before
@@ -1616,9 +1613,7 @@ Two page kinds, kept apart on purpose:
 
 - **`/components/<family>` is the whole component**: what it is, how to import
   it, the headline example running, the API, and the list of every other
-  example. *Reversed 19 Aug 2026.* This read "the API, read from the manifest
-  and nothing else. No examples: a reference page that starts collecting
-  pictures stops being complete." What the split actually produced was two
+  example. **Do not split the API off from the examples.** Doing so produced two
   pages a reader had to hold in their head at once, the tables here and the
   pictures elsewhere, and no page that answered "what is this and how do I use
   it" without a navigation in the middle of the answer. Completeness was never

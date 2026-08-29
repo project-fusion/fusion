@@ -54,7 +54,6 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
- * @csspart icon - A glyph this component draws.
  * @csspart trigger - The default trigger, where none was slotted.
  */
 @customElement('helix-headless-speed-dial')
@@ -222,7 +221,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * bare `<button>` is what the headless tier can write: it must not reach for
    * `helix-button`, which lives a tier above and would make `headless` depend
    * on `styled`. So the base draws the plain control and a tier that has buttons
-   * of its own overrides this to use one. See #76. Written inline, the only way
+   * of its own overrides this to use one. See (76). Written inline, the only way
    * to change it would be to reimplement the template, panel and all.
    */
   protected renderTrigger(): TemplateResult {

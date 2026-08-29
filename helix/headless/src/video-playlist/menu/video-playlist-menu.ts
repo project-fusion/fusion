@@ -65,7 +65,6 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @csspart entry-item - The row, which is an `<a>` where `href` is set.
  * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
  * @csspart entry-start - The leading column, which is a slot and is always there.
- * @csspart icon - The glyph on the trigger.
  * @csspart menu - The menu that holds the entries.
  * @csspart menu-back - The control that returns from a submenu.
  * @csspart menu-back-mark - The glyph on the back control of a submenu.

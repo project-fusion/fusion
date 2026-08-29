@@ -61,6 +61,7 @@ pub mod ssr;
 pub mod stable;
 pub mod tier;
 pub mod token_defaults;
+pub mod tokens;
 pub mod vocabulary;
 
 use std::collections::BTreeMap;
@@ -487,6 +488,11 @@ pub fn all() -> Vec<Rule> {
             summary: "a token a component reads resolves on a page matching no state",
         },
         Rule {
+            name: "tokens",
+            run: Runner::Source(tokens::run),
+            summary: "no raw value where a token belongs, and none reached for or dangling",
+        },
+        Rule {
             name: "vocabulary",
             run: Runner::Source(vocabulary::run),
             summary: "one spelling for each role a part name can play",
@@ -494,10 +500,13 @@ pub fn all() -> Vec<Rule> {
     ]
 }
 
-/// Every file under `directory` a `::part()` could be written in.
+/// Every file under `directory` a rule about authored text could read.
 ///
 /// Build output is skipped: it is a copy of a source this already reads, so
-/// including it reports every finding twice and names the copy.
+/// including it reports every finding twice and names the copy. The sandbox
+/// frame's stylesheet is the style layers concatenated, so `public` holds the
+/// primitives by construction and reading it would report the library against
+/// itself.
 pub fn walk_outside(directory: &Path, found: &mut Vec<PathBuf>) {
     let Ok(entries) = fs::read_dir(directory) else {
         return;
@@ -511,10 +520,23 @@ pub fn walk_outside(directory: &Path, found: &mut Vec<PathBuf>) {
             .to_string_lossy()
             .to_string();
         if path.is_dir() {
-            if !matches!(
+            /* Build output, and a directory holding a `.git`, which is another
+            checkout: a worktree under `.claude` is a whole second copy of the
+            repository, and reading it reports every finding twice and names a
+            file on a branch nobody here is editing. */
+            let skip = matches!(
                 name.as_str(),
-                ".next" | ".turbo" | "node_modules" | "public"
-            ) {
+                ".git"
+                    | ".local"
+                    | ".next"
+                    | ".next-dev"
+                    | ".turbo"
+                    | "dist"
+                    | "node_modules"
+                    | "public"
+                    | "target"
+            ) || path.join(".git").exists();
+            if !skip {
                 walk_outside(&path, found);
             }
             continue;

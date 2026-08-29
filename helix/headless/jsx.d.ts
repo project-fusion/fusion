@@ -18288,7 +18288,6 @@ export type CustomElements = {
    * - `grid-brightness`: The range input for its vertical axis.
    * - `grid-handle`: The mark showing where in the square the color sits.
    * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `swatch`: One preset.
    * - `swatches`: The row of presets.
@@ -20733,7 +20732,6 @@ export type CustomElements = {
    * - `field`: The box that is pressed and dropped on.
    * - `file`: One chosen file.
    * - `hint`: Help under the field, while nothing is wrong.
-   * - `icon`: A glyph this component draws.
    * - `kind`: What kind of file it is.
    * - `kind-dismiss`: The remove button, when `dismissible`.
    * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
@@ -26508,7 +26506,6 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `actions`: The region the actions are drawn in.
-   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    */
   "helix-headless-speed-dial": Partial<
@@ -30412,7 +30409,6 @@ export type CustomElements = {
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
    * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
    * - `entry-start`: The leading column, which is a slot and is always there.
-   * - `icon`: The glyph on the trigger.
    * - `menu`: The menu that holds the entries.
    * - `menu-back`: The control that returns from a submenu.
    * - `menu-back-mark`: The glyph on the back control of a submenu.
@@ -30814,7 +30810,6 @@ export type CustomElements = {
    * - `failure`: What is said when the source will not play.
    * - `forward`: The control that goes on ten seconds.
    * - `fullscreen`: The whole screen, and back.
-   * - `icon`: A glyph this component draws.
    * - `loading`: What is said while the picture waits for more of itself.
    * - `loading-mark`: The part of that which spins.
    * - `more`: The button that opens it.
@@ -33988,7 +33983,6 @@ export type CustomElementsSolidJs = {
    * - `grid-brightness`: The range input for its vertical axis.
    * - `grid-handle`: The mark showing where in the square the color sits.
    * - `grid-saturation`: The range input for the square's horizontal axis.
-   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `swatch`: One preset.
    * - `swatches`: The row of presets.
@@ -36465,7 +36459,6 @@ export type CustomElementsSolidJs = {
    * - `field`: The box that is pressed and dropped on.
    * - `file`: One chosen file.
    * - `hint`: Help under the field, while nothing is wrong.
-   * - `icon`: A glyph this component draws.
    * - `kind`: What kind of file it is.
    * - `kind-dismiss`: The remove button, when `dismissible`.
    * - `kind-dismiss-mark`: The glyph on the dismiss control, where none is slotted.
@@ -42340,7 +42333,6 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `actions`: The region the actions are drawn in.
-   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    */
   "helix-headless-speed-dial": Partial<
@@ -46330,7 +46322,6 @@ export type CustomElementsSolidJs = {
    * - `entry-item`: The row, which is an `<a>` where `href` is set.
    * - `entry-mark`: The trailing mark: a tick when checked, a caret when it opens
    * - `entry-start`: The leading column, which is a slot and is always there.
-   * - `icon`: The glyph on the trigger.
    * - `menu`: The menu that holds the entries.
    * - `menu-back`: The control that returns from a submenu.
    * - `menu-back-mark`: The glyph on the back control of a submenu.
@@ -46734,7 +46725,6 @@ export type CustomElementsSolidJs = {
    * - `failure`: What is said when the source will not play.
    * - `forward`: The control that goes on ten seconds.
    * - `fullscreen`: The whole screen, and back.
-   * - `icon`: A glyph this component draws.
    * - `loading`: What is said while the picture waits for more of itself.
    * - `loading-mark`: The part of that which spins.
    * - `more`: The button that opens it.

@@ -124,9 +124,16 @@ fn survey(context: &Context) -> BTreeMap<String, Component> {
         let mut files = Vec::new();
         sources(tier, &mut files);
         for file in files {
-            let Ok(code) = fs::read_to_string(&file) else {
+            let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
+            /* **Comments blanked here as well as on a component**, and the
+            script this comes from read the helper raw. A helper's own docstring
+            explains why it takes no `part` option by *naming* the part a caller
+            has to write out, so the sentence reads as a render and every family
+            calling the helper inherits a part it does not have. Found the hour a
+            prose pass added that sentence. */
+            let code = uncommented(&text);
             let Some(name) = HELPER.captures(&code) else {
                 continue;
             };
