@@ -124,7 +124,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
   cannot load a `.ts` config, falls back to a default one, and writes a manifest
   with every Helix plugin missing while reporting success: measured on 18.16, a
   manifest 69,081 lines shorter. `engines.node` states the floor,
-  `bun run check:pkg:node` enforces it, and CI pins it.
+  `fusion workspace --only node` enforces it, and CI pins it.
 
 ## Layout
 
@@ -133,8 +133,8 @@ helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli
 cortex/    core trace engram docs
 fusion/    docs site: what belongs to the company rather than to a product.
-           `insights` is the published writing, and the queue and two
-           generated references sit above it
+           `insights` is the published writing, and two generated references
+           sit above it
 tooling/   CI and build scripts, and shrinking
 .local/    per-machine scratch, gitignored
 ```
@@ -174,8 +174,8 @@ tooling/   CI and build scripts, and shrinking
 - **`fusion/` is the company tier, and it is a domain like the other two.** It
   holds what belongs to Fusion rather than to Helix or Cortex: the CLI, the
   writing, and the site that renders everything above it. `fusion/docs/insights`
-  is what gets published, and the queue and the two generated references are
-  infrastructure sitting above it.
+  is what gets published, and the two generated references are infrastructure
+  sitting above it.
 
   **The scope already said this.** `@fusion.dev/helix-*` and
   `@fusion.dev/cortex-*` name their domain; `@fusion.dev/*` bare names the

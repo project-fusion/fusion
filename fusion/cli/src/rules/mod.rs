@@ -9,11 +9,14 @@
 pub mod barrels;
 pub mod floors;
 pub mod modules;
+pub mod node;
 pub mod order;
 pub mod prerequisites;
+pub mod react_bridge;
 pub mod scoped;
 pub mod scripts;
 pub mod shaders;
+pub mod shipped;
 
 use std::path::PathBuf;
 
@@ -88,6 +91,13 @@ pub fn all() -> Vec<Rule> {
             summary: "no plain stylesheet selects a class only a CSS module declares",
         },
         Rule {
+            fix: None,
+            meta: false,
+            name: "node",
+            run: node::run,
+            summary: "the Node on this machine, and its types, satisfy the declared floor",
+        },
+        Rule {
             fix: Some(order::fix),
             meta: false,
             name: "order",
@@ -100,6 +110,13 @@ pub fn all() -> Vec<Rule> {
             name: "prerequisites",
             run: prerequisites::run,
             summary: "every typecheck builds what its build builds before compiling",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "react-bridge",
+            run: react_bridge::run,
+            summary: "the key the framework bridge reads still exists in the framework installed",
         },
         Rule {
             fix: None,
@@ -121,6 +138,13 @@ pub fn all() -> Vec<Rule> {
             name: "shaders",
             run: shaders::run,
             summary: "GLSL written inside a template literal is still GLSL",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "shipped",
+            run: shipped::run,
+            summary: "nothing in `dist` outlives the source it was compiled from",
         },
     ]
 }

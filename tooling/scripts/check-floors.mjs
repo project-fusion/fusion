@@ -37,10 +37,6 @@ const checks = Object.keys(scripts)
      group, six times over, inside the one script whose job is to run it once. */
   .filter((name) => name.split(':').length === 3)
   /* Itself; the two that compare generated files rather than counting a corpus;
-     and `check:pkg:node`, which asserts one fact about the runtime and has no corpus
-     at all. That last one is exempt twice over: its success line carries a
-     version, and `22.22.0` reads as a count of zero to the rule below, which is
-     the one shape of number that is never a tally.
 
      `check:gen:metrics` is the third of the generated-file comparisons and is
      exempt with them, even though its line does carry a real tally. What
@@ -65,7 +61,6 @@ const checks = Object.keys(scripts)
         'check:spec:diagnostics',
         'check:spec:floors',
         'check:gen:metrics',
-        'check:pkg:node',
         'check:gen:reference',
         'check:gen:tokens-reference',
         'check:spec:visual',

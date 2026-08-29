@@ -106,7 +106,7 @@ if (!Number.isInteger(shard) || !Number.isInteger(of) || of < 1) {
 
 /* Striped rather than blocked, so a run of expensive neighbors cannot land in
    one shard. `check:css:contrast` renders every example in a browser and
-   `check:pkg:node` reads one file, and nothing here knows which is which. */
+   the node rule reads one file, and nothing here knows which is which. */
 const mine = checks.filter((_, index) => index % of === shard)
 
 const run = (step) => {
