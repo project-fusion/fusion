@@ -50,6 +50,7 @@ pub mod observers;
 pub mod overruled;
 pub mod pairings;
 pub mod parts;
+pub mod platform_fidelity;
 pub mod print;
 pub mod reachable;
 pub mod reflected;
@@ -140,6 +141,15 @@ pub struct Settings {
     /// anything else is a family hook that has drifted.
     #[serde(default)]
     pub shared: Vec<String>,
+
+    /// The vocabulary of what each family stands in for, and what is excused.
+    ///
+    /// **Data rather than rule.** Which native interface a family wraps, which
+    /// property group comes with it, and why each omission is wanted: the rule
+    /// is the argument and this file is the subject it argues about, so a
+    /// consumer with their own components has their own subject.
+    #[serde(default)]
+    pub platform: Option<String>,
 
     /// The layout modes a preview frame offers an example.
     ///
@@ -437,6 +447,11 @@ pub fn all() -> Vec<Rule> {
             name: "parts",
             run: Runner::Source(parts::run),
             summary: "a documented part is rendered, and a rendered part is documented",
+        },
+        Rule {
+            name: "platform-fidelity",
+            run: Runner::Source(platform_fidelity::run),
+            summary: "a component standing in for a native element mirrors what it has",
         },
         Rule {
             name: "print",

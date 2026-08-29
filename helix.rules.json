@@ -38,6 +38,7 @@
     "fusion/site",
     "fusion/docs"
   ],
+  "platform": "tooling/config/platform-fidelity.json",
   "shared": ["chart"],
   "tiers": ["helix/core/src", "helix/headless/src", "helix/sandbox/src", "helix/styled/src"],
   "unresolved": {
