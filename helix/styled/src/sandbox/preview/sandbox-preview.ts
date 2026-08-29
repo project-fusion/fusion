@@ -41,13 +41,31 @@ export interface PreviewConsole {
   type: 'helix-preview-console'
 }
 
+/**
+ * A press inside the frame, which is the one event the page cannot see for
+ * itself.
+ *
+ * Carries nothing. What the page needs to know is that a reader pressed
+ * something here, not where: every overlay outside is dismissed by the fact of
+ * the press, and coordinates in the frame's viewport would not mean anything in
+ * the page's anyway.
+ */
+export interface PreviewPress {
+  type: 'helix-preview-press'
+}
+
 /** How tall the frame says its content is, in CSS pixels. */
 export interface PreviewSize {
   size: number
   type: 'helix-preview-size'
 }
 
-export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | PreviewSize
+export type PreviewMessage =
+  | PreviewConsole
+  | PreviewPress
+  | PreviewReady
+  | PreviewRender
+  | PreviewSize
 
 /**
  * @summary Renders sandbox source in a frame of its own.
@@ -219,6 +237,29 @@ export class HelixSandboxPreview extends HelixElement {
     }
     if (event.data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
+    }
+    /* **A press in the frame, put back into the page as a press.**
+     *
+     * The frame is on an opaque origin, which is the point of it, and a
+     * consequence is that a press inside is invisible outside: the event does
+     * not cross the boundary, the document cannot listen to a document it may
+     * not touch, and in WebKit the press moves no focus and blurs no window
+     * either, so there is nothing at all to infer it from. Measured: with the
+     * sandbox's settings menu open, pressing the component it configures left
+     * the menu standing over it, and the only way out was Escape or the trigger.
+     *
+     * So the frame reports it and this element re-states it where the page can
+     * hear it. A real `pointerdown` rather than a name of our own, because
+     * every light-dismiss in the library — and every one a consumer wrote —
+     * already listens for exactly that, and what happened *was* a press. It
+     * carries no coordinates for the reason the message does not: this element
+     * is where it happened, as far as the page is concerned.
+     *
+     * `composed` so it leaves whatever shadow root this element sits in, which
+     * is how those listeners find it in the path.
+     */
+    if (event.data?.type === 'helix-preview-press') {
+      this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
     }
     /* Relayed rather than acted on. What the frame measured is a fact about the
        example; how much room to give it is a decision, and it belongs to

@@ -69,11 +69,24 @@ const listening = new Set<DismissController>()
  *
  * A press inside a frame is the third case, and it needs its own signal. The
  * frame swallows the event, so the document that owns the overlay never sees a
- * `pointerdown` at all, and where the frame is cross-origin there is nothing to
- * listen to inside it either. What is observable is that the window lost focus
- * and a frame on this page gained it, which is exactly a press the document
- * cannot see. Leaving the browser altogether blurs the window too, so what took
- * focus is the part that distinguishes them.
+ * `pointerdown` at all.
+ *
+ * Where the frame is same-origin there is a document to listen to, and this
+ * listens to it: the same handler, on every reachable frame document, so a
+ * press in there arrives as a press whose path holds nothing of the overlay,
+ * which is what it is.
+ *
+ * **The focus signal alone was not enough, and a browser difference is why.**
+ * A press in a frame moves focus into it in Chromium, so the window blurs and a
+ * frame is what took focus. WebKit does neither: focus stays on the menu item
+ * the reader pressed to open the overlay, the window never blurs, and every
+ * observable thing about that tap says nothing happened. Measured on the
+ * sandbox, whose preview is a frame filling half the tool, the settings menu
+ * could not be dismissed by pressing the component it configures.
+ *
+ * Both signals are kept, because they answer different frames. The listener
+ * only reaches same-origin ones; the blur only fires where the browser moves
+ * focus. A cross-origin frame in Chromium has the second and not the first.
  */
 export class DismissController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -168,6 +181,54 @@ export class DismissController implements ReactiveController {
     }
   }
 
+  /**
+   * Every frame document on the page this one is allowed to read.
+   *
+   * Through the shadow roots as well, because a component that renders a frame
+   * renders it inside itself: the sandbox's preview is one, and
+   * `document.querySelectorAll` cannot see it.
+   *
+   * A cross-origin frame throws on `contentDocument` rather than returning
+   * null in some browsers, so the read is guarded and the frame is simply
+   * skipped. Nothing is lost by skipping it that was not already lost: there is
+   * no listener to add to a document this one may not touch.
+   */
+  private static frameDocuments(): Document[] {
+    const found: Document[] = []
+    const walk = (root: Document | ShadowRoot): void => {
+      for (const element of root.querySelectorAll('*')) {
+        if (element instanceof HTMLIFrameElement) {
+          try {
+            const inner = element.contentDocument
+            if (inner) {
+              found.push(inner)
+            }
+          } catch {
+            // Cross-origin. The blur signal is what covers those.
+          }
+        }
+        if (element.shadowRoot) {
+          walk(element.shadowRoot)
+        }
+      }
+    }
+    walk(document)
+    return found
+  }
+
+  /**
+   * The frame documents being listened to, held so the same ones are released.
+   *
+   * Gathered when the overlay opens rather than watched for: an overlay is open
+   * for as long as a reader is deciding something, and a frame that arrives
+   * inside that window is a page rebuilding itself under a menu, which is not a
+   * case worth a `MutationObserver` on every open surface. Held rather than
+   * re-collected on the way out, because a frame removed while the overlay was
+   * open would otherwise be missed and one navigated elsewhere would be a
+   * different document.
+   */
+  private frames: Document[] = []
+
   /** Starts listening. */
   activate(): void {
     if (this.active) {
@@ -178,6 +239,10 @@ export class DismissController implements ReactiveController {
     document.addEventListener('keydown', this.handleKeydown)
     document.addEventListener('pointerdown', this.handlePointerDown)
     window.addEventListener('blur', this.handleWindowBlur)
+    this.frames = DismissController.frameDocuments()
+    for (const inner of this.frames) {
+      inner.addEventListener('pointerdown', this.handlePointerDown)
+    }
   }
 
   /** Stops listening. */
@@ -190,6 +255,9 @@ export class DismissController implements ReactiveController {
     document.removeEventListener('keydown', this.handleKeydown)
     document.removeEventListener('pointerdown', this.handlePointerDown)
     window.removeEventListener('blur', this.handleWindowBlur)
+    for (const inner of this.frames.splice(0)) {
+      inner.removeEventListener('pointerdown', this.handlePointerDown)
+    }
   }
 
   hostDisconnected(): void {

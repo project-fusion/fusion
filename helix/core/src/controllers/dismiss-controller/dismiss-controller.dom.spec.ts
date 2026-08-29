@@ -249,6 +249,37 @@ describe('a press inside a frame', () => {
     expect(one.asked).toBe(0)
   })
 
+  /* **Focus is not the only signal, because in WebKit there is no focus to
+     read.** A press in a frame moves focus into it in Chromium; in WebKit it
+     moves nothing and blurs nothing, so an overlay watching only for that can
+     never be dismissed by pressing what is inside the frame. Where the frame is
+     same-origin its document can be listened to directly, which is what these
+     two cover. */
+  test('is heard from inside a same-origin frame, with no focus moving at all', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    const frame = document.createElement('iframe')
+    document.body.append(frame)
+    one.dismiss.activate()
+    const inner = frame.contentDocument as Document
+    pointerAt(inner.body ?? inner)
+    expect(one.asked).toBe(1)
+  })
+
+  /* Released with the overlay, or the frame goes on answering for a menu that
+     closed and dismisses whatever opened after it. */
+  test('and not after the overlay has closed', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    const frame = document.createElement('iframe')
+    document.body.append(frame)
+    one.dismiss.activate()
+    const inner = frame.contentDocument as Document
+    one.dismiss.deactivate()
+    pointerAt(inner.body ?? inner)
+    expect(one.asked).toBe(0)
+  })
+
   /* Deferred by a task, because the order of `blur` against focus moving is not
      something every browser agrees on. The guard is for the overlay having
      closed for another reason in between, which would otherwise dismiss

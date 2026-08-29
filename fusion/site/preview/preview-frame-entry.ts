@@ -189,6 +189,23 @@ if (host) {
   new ResizeObserver(measure).observe(host)
 }
 
+/**
+ * **A press in here is invisible out there, so it is reported.**
+ *
+ * The frame is sandboxed onto an opaque origin, so the event does not cross the
+ * boundary and the page cannot listen to this document either. Chromium at
+ * least moves focus into the frame, which the page can notice; WebKit moves
+ * nothing, so an open menu out there had no way of knowing a reader had just
+ * pressed the component underneath it.
+ *
+ * Capturing, so an example that stops the event from propagating cannot stop
+ * this, and passive because nothing here is going to cancel it.
+ */
+document.addEventListener('pointerdown', () => post({ type: 'helix-preview-press' }), {
+  capture: true,
+  passive: true,
+})
+
 post({ type: 'helix-preview-ready' })
 
 /**
