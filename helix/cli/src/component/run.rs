@@ -146,7 +146,11 @@ pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
     speak(&reports, paint);
     let code = verdict(&reports);
     if code == Code::Ok {
-        println!("component: {} rules, every one clean", reports.len());
+        println!(
+            "component: {} rule{}, every one clean",
+            reports.len(),
+            if reports.len() == 1 { "" } else { "s" }
+        );
     }
     Ok(code)
 }

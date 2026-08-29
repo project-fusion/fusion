@@ -55,6 +55,10 @@ static HOST: LazyLock<Regex> = LazyLock::new(|| {
 static ATTRIBUTE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[\s*([a-zA-Z][\w-]*)").expect("a literal pattern compiles"));
 
+/// The attribute a declaration names, when it names one.
+static DECLARED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"attribute:\s*'([^']+)'").expect("a literal pattern compiles"));
+
 /// A property declaration, its options and the member it sits on.
 static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
@@ -120,14 +124,10 @@ pub fn run(context: &Context) -> Report {
                 if options.contains("attribute: false") {
                     continue;
                 }
-                let attribute = Regex::new(r"attribute:\s*'([^']+)'")
-                    .ok()
-                    .and_then(|one| {
-                        one.captures(options)?
-                            .get(1)
-                            .map(|two| two.as_str().to_owned())
-                    })
-                    .unwrap_or_else(|| name.to_lowercase());
+                let attribute = DECLARED
+                    .captures(options)
+                    .and_then(|one| one.get(1))
+                    .map_or_else(|| name.to_lowercase(), |one| one.as_str().to_owned());
                 let held = declared.entry(family.to_owned()).or_default();
                 /* A getter and a setter are two matches for one property, so
                 either of them carrying `reflect` settles it. */
