@@ -14,6 +14,7 @@ pub mod node;
 pub mod order;
 pub mod prerequisites;
 pub mod publishable;
+pub mod reaching;
 pub mod react_bridge;
 pub mod registration;
 pub mod scoped;
@@ -258,6 +259,12 @@ pub fn all() -> Vec<Rule> {
             name: "react-bridge",
             run: Runner::Source(react_bridge::run),
             summary: "the key the framework bridge reads still exists in the framework installed",
+        },
+        Rule {
+            fix: None,
+            name: "reaching",
+            run: Runner::Source(reaching::run),
+            summary: "no package's script names a path inside another package",
         },
         Rule {
             fix: None,

@@ -17,5 +17,9 @@
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
     "./workspace": "./lib/workspace.mjs"
+  },
+  "bin": {
+    "build-elements-css": "./build-elements-css.mjs",
+    "build-styles": "./build-styles.mjs"
   }
 }
