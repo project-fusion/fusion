@@ -71,23 +71,28 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       footer={
         <helix-flex class="insightMore" direction="column" gap="lg">
           {/* **The byline at the foot, where a byline answers a question the
-              reader now has.** At the head it is one of five chips competing
+              reader now has.** At the head it was one of five chips competing
               with the title for the one glance a reader gives a piece before
-              deciding; at the end it is the natural place to ask who wrote this,
-              and the reading time is the same kind of fact, so the two sit
-              together rather than one on each end of the page.
+              deciding; at the end it is the natural place to ask who wrote this.
+
+              **No reading time.** It is a fact for somebody choosing whether to
+              start, which is the gallery's job and where the card still carries
+              it. Printed at the foot it answers a question the reader settled
+              several minutes ago, on the one page where they can see the answer
+              by scrolling.
 
               Above the divider, which then separates the piece and its author
               from what to read next rather than separating the piece from its
-              own byline. */}
-          <helix-flex align="center" class={styles.insightByline} gap="sm">
+              own byline.
+
+              **The face takes `Avatar`'s own size and this sets nothing.** It
+              was overridden to 1.4 of `text-xs` while it sat inside a tag, where
+              it was a qualifier in front of a label; a byline face is what the
+              component's default is already for, and restating that default here
+              would be a number to keep in step with the scale for no gain. */}
+          <helix-flex align="center" gap="sm">
             <helix-avatar name={insight.author}></helix-avatar>
-            <helix-flex direction="column" gap="2xs">
-              <helix-text variant="label">{insight.author}</helix-text>
-              <helix-text tone="muted" variant="caption">
-                {insight.minutes} min read
-              </helix-text>
-            </helix-flex>
+            <helix-text variant="caption">{insight.author}</helix-text>
           </helix-flex>
 
           <helix-divider></helix-divider>
