@@ -63,8 +63,31 @@
   --_card-media: var(--card-media-size, 12rem);
 }
 
+/* **A lift in the light, and a hairline in the dark, because a shadow is a
+   light-mode device.**
+
+   It works by darkening what is behind it, and in the dark what is behind it is
+   already close to the darkest value the theme has. Measured on the insights
+   gallery, which is where this was found: a card on the page's own black had a
+   `shadow-md` of `oklab(0.15 0 0 / 0.1)` painted onto `lab(0 0 0)`, a shadow
+   *darker than its ground*, and no border to fall back on. The separation the
+   variant is named for was not faint, it was absent, and the card was told
+   apart only by the words inside it.
+
+   `megamenu-root.css` reached the same finding from its own side and drew the
+   same conclusion in a hand-written rule: the edge a shadow draws in the light
+   is drawn by a line in the dark. This is that, for the one variant whose whole
+   policy is the lift.
+
+   **The shadow stays in both modes** rather than being swapped out. It is not
+   doing nothing in dark, it is doing very little, and a card that keeps it is
+   one declaration rather than two; what changes is that the line is there when
+   the lift cannot carry the separation alone.
+
+   `light-dark()` rather than a media query, so it follows a theme a consumer
+   sets rather than only the one the system reports. */
 :host([separation="elevated"]) {
-  border-color: transparent;
+  border-color: light-dark(transparent, var(--helix-color-border));
 
   --card-shadow: var(--helix-shadow-md);
 }

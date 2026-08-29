@@ -37,7 +37,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 39 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | `#f5f5f5` | `#181818` | 19 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | `#ffffff` | `#181818` | 24 |
-| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | `#f2f2f2` | `#0b0b0b` | 55 |
+| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | `#f2f2f2` | `#0b0b0b` | 56 |
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | `#0000000d` | `#ffffff0d` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | `#0b0b0b66` | `#0b0b0ba3` | 11 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | `#000000` | `#ffffff` | 194 |
@@ -48,7 +48,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | `#fafafa` | `#121212` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | `#000000` | as light | 3 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | `#ffffff` | as light | 4 |
-| `--helix-color-border` | `light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))` | `#e8e8e8` | `#212121` | 150 |
+| `--helix-color-border` | `light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))` | `#e8e8e8` | `#212121` | 151 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | `#1068da` | `#4192ff` | 110 |
 | `--helix-color-primary-hover` | `light-dark(var(--_helix-brand-600), var(--_helix-brand-300))` | `#0059c8` | `#51a2ff` | 4 |
 | `--helix-color-primary-active` | `light-dark(var(--_helix-brand-700), var(--_helix-brand-200))` | `#0049b8` | `#61b3ff` | 5 |

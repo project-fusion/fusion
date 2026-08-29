@@ -219,6 +219,8 @@
  * and anything typed came out centered, which is not how a search box behaves
  * anywhere. Centering is a property of the layout here, not of the control. */
 .heroSearch {
+  --input-background-color: var(--helix-color-surface-sunken);
+
   inline-size: 100%;
   max-inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
   text-align: start;
@@ -241,11 +243,24 @@
  * A class rather than an element selector, so this is a decision taken per
  * control. A form on this site should still show its labels.
  *
- * No background override, deliberately. `Input` fills with
- * `--helix-color-well`, a percentage of the foreground mixed toward
- * transparent, so it is a step away from whatever is behind it and reads on
- * this band unaided. A consumer override here is how a site stops
- * demonstrating the system it is built from. */
+ * **The hero search takes an opaque ground, and the token it was using says
+ * so.** `Input` fills with `--helix-color-well`, a percentage of the foreground
+ * mixed toward transparent, which is a step away from whatever is behind it and
+ * is the right fill on a surface. This one is not on a surface: it sits on the
+ * aura, which is a moving field of blue, and `color-well`'s own note records
+ * exactly this limit — a translucent fill takes the color of what it sits on,
+ * so a field over a photograph is tinted by the picture rather than legible
+ * against it, and that case wants an opaque ground through the control's own
+ * background hook.
+ *
+ * So this is the documented escape rather than a site overriding its system.
+ * `surface-sunken` and not one of the darker panels: it is the system's word
+ * for a well a value goes into, an input, a track, a groove, which is what this
+ * is. Rendered against the four alternatives on the live band, it was also the
+ * one a reader could actually read.
+ *
+ * The filter bar below keeps `well`. It sits on a plain surface, where the
+ * token does the job it was written for. */
 
 .chromeControl::part(label) {
   block-size: 1px;
