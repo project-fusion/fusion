@@ -55,6 +55,12 @@
 .servicesAura {
   block-size: auto;
   inset: 0;
+  /* Faded out at the bottom, the way the landing field is, and for the reason
+     recorded there: each shape ends with a vertical envelope written against an
+     unscaled box, so `scale` can push the lit region past the edge and the light
+     simply stops where the canvas does. A mask holds for every shape and every
+     scale, including the ones nobody has tried. */
+  mask-image: linear-gradient(to bottom, black 0%, black 94%, transparent 100%);
   opacity: 0.5;
   pointer-events: none;
   position: absolute;

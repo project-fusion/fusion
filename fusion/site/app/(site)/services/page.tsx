@@ -78,9 +78,10 @@ export default async function Page() {
       <helix-aura
         class={styles.servicesAura}
         data-layer
-        gain={1.15}
+        gain={1.05}
         scale={3}
         speed={0.5}
+        terminus={0.5625}
         variant="flow"
       ></helix-aura>
 
