@@ -298,3 +298,20 @@
 .documentHeadCentred .documentKicker {
   text-align: center;
 }
+
+/* **And the boxes take the column, which `text-align` alone cannot do.**
+ *
+ * The head is a flex column, so each child shrinks to its own content and the
+ * column's `align-items` places that box. Centering the *text* inside a box that
+ * is already exactly as wide as the text changes nothing, which is why the title
+ * and the standfirst both still began at the same left edge while every computed
+ * value said `center`: measured, the title box ran 374..874 and the lede
+ * 374..1026, two different widths sharing a left edge.
+ *
+ * Given the full column each one has room to center in, and the two now share a
+ * center line instead. */
+.documentHeadCentred .documentTitle,
+.documentHeadCentred .documentLede,
+.documentHeadCentred .documentKicker {
+  inline-size: 100%;
+}

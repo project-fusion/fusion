@@ -1,5 +1,4 @@
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
-import { HeroField } from '@/components/hero-field/hero-field'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { EMAIL, MAILTO } from '@/utils/site/site'
@@ -52,6 +51,21 @@ const page = findSitePage('/services')
 
 export default async function Page() {
   const source = page ? sitePageSources[page.slug] : undefined
+  /* One string per `##`, with the heading kept at the head of its own half. A
+     document with one section yields one panel and the row collapses to it. */
+  /* Rendered before the markup rather than inside it: `map` takes a plain
+     callback, so an `await` in the middle of the JSX is a syntax error rather
+     than a slow render. */
+  const sections = await Promise.all(
+    (source ?? '')
+      .split(/\n(?=## )/)
+      .map((one) => one.trim())
+      /* Only the sections. The split also yields whatever precedes the first
+         heading, which for these documents is the frontmatter block, and that
+         came through as an empty third panel sitting beside the two real ones. */
+      .filter((one) => one.startsWith('## '))
+      .map(async (one) => ({ body: await renderDocument(one), key: one.slice(0, 40) })),
+  )
   return (
     /* **One field behind the whole page, not one inside the head.**
      *
@@ -90,7 +104,6 @@ export default async function Page() {
           between the standfirst and the first offer: the space was there
           because the section had padding, not because anything filled it. */}
       <section className={`${browser.pageHero} ${styles.servicesHero}`}>
-        <HeroField />
         <helix-flex class={styles.servicesHeroInner} data-shell direction="column" gap="lg">
           <helix-text tone="subtle" variant="label">
             {page?.kicker}
@@ -125,9 +138,12 @@ export default async function Page() {
                 offers under it are the answer to. Nothing new is said. */}
             <helix-flex class={styles.bandSection} direction="column" gap="md">
               <helix-text tone="subtle" variant="label">
-                Three offers
+                What we take on
               </helix-text>
-              <helix-text as="p" data-measure>
+              <helix-text as="h2" data-section-title>
+                Three offers, in the order they usually happen
+              </helix-text>
+              <helix-text as="p" data-measure tone="muted">
                 {page?.lede}
               </helix-text>
             </helix-flex>
@@ -135,19 +151,23 @@ export default async function Page() {
             <div className={styles.offerRow}>
               {SERVICES.map((service) => (
                 <div className={styles.offer} key={service.name}>
-                  <helix-flex direction="column" gap="sm">
-                    {/* **No icon.** Three line glyphs carried nothing the names
-                        did not: a magnifier over "AI capability audit", a cube
-                        over "Design system sprint", a pair of figures over
-                        "Conversational build". A metaphor a reader decodes
-                        before the words beside it is a cost with no return. */}
-                    <helix-text as="h2" variant="title">
-                      {service.name}
-                    </helix-text>
-                    <helix-text as="p" tone="muted">
-                      {service.summary}
-                    </helix-text>
-                  </helix-flex>
+                  {/* **The name, and no summary under it.**
+
+                      Three summaries were the densest block of prose on the
+                      page, and every one of them was answered more usefully by
+                      the four bullets a few lines below it: the summary said
+                      what the engagement is like and the bullets say what
+                      arrives. A reader comparing three offers is reading the
+                      bullets.
+
+                      **No icon either.** Three line glyphs carried nothing the
+                      names did not: a magnifier over "AI capability audit", a
+                      cube over "Design system sprint", a pair of figures over
+                      "Conversational build". A metaphor a reader decodes before
+                      the words beside it is a cost with no return. */}
+                  <helix-text as="h3" variant="title">
+                    {service.name}
+                  </helix-text>
 
                   {/* **How long, in the unit the buyer thinks in.**
                       It reads as the third of four labeled facts rather than as
@@ -197,30 +217,49 @@ export default async function Page() {
         </helix-flex>
       </section>
 
-      {/* The prose, from `@fusion.dev/insights`, on its own panel. The buttons
-          stay here: a call to action is chrome around a document rather than a
-          paragraph in one, and neither belongs in a `.md`. */}
+      {/* **The closing prose as two panels in a row, one per argument.**
+
+          The document has exactly two sections and they do different jobs: one
+          says what you are not signing up for, the other says how to start. On
+          one panel they read as a single wall of text with a rule through it,
+          and the second, which is the one with the way in, arrives after the
+          reader has already decided whether to keep going.
+
+          Split at the source rather than at the render: `renderDocument` takes a
+          string, so the two halves are two strings and each panel holds a whole
+          document. Splitting the rendered tree would mean reaching into React
+          output to find a heading, which is the kind of thing that works until
+          somebody adds a third section. */}
       <section className={styles.fieldBand} data-band data-reveal>
         <helix-flex data-shell direction="column">
-          <div className={styles.bandCard} data-material="glass" data-substrate>
-            <helix-flex class={styles.bandSection} direction="column" gap="lg">
-              {/* The document shell's block rhythm, not just its theming.
-                  `[data-prose]` resets the UA margins and themes what is inside
-                  it, and deliberately says nothing about how far apart the
-                  blocks sit, because that is a fact about the kind of page
-                  rather than about prose. */}
-              <div className={documents.documentBody} data-measure data-prose>
-                {source ? await renderDocument(source) : null}
+          <div className={styles.closingRow}>
+            {sections.map((section, index) => (
+              <div
+                className={styles.bandCard}
+                data-material="glass"
+                data-substrate
+                key={section.key}
+              >
+                <helix-flex class={styles.bandSection} direction="column" gap="lg">
+                  <div className={documents.documentBody} data-prose>
+                    {section.body}
+                  </div>
+                  {/* The way in belongs with the half that describes it, which is
+                      the second. On the first it would be an answer to a question
+                      that panel has not asked yet. */}
+                  {index === sections.length - 1 && (
+                    <helix-flex data-density="lg" gap="sm" wrap>
+                      <a data-button href="/trust">
+                        The trust bar
+                      </a>
+                      <a data-button="solid" data-button-tone="primary" href={MAILTO}>
+                        {EMAIL}
+                      </a>
+                    </helix-flex>
+                  )}
+                </helix-flex>
               </div>
-              <helix-flex data-density="lg" gap="sm" wrap>
-                <a data-button href="/trust">
-                  The trust bar
-                </a>
-                <a data-button="solid" data-button-tone="primary" href={MAILTO}>
-                  {EMAIL}
-                </a>
-              </helix-flex>
-            </helix-flex>
+            ))}
           </div>
         </helix-flex>
       </section>

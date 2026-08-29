@@ -39,6 +39,15 @@
   min-block-size: auto;
 }
 
+/* **No lattice on this one.** `.pageHero` draws a field of dots through its own
+   `::before`, which is the texture the galleries are lit by and is one thing too
+   many here: the page already has a field running its whole height, and a grid
+   of dots over the top of it is a second pattern competing with the first. The
+   band keeps the geometry and drops the texture. */
+.servicesHero::before {
+  background-image: none;
+}
+
 /**
  * The field the whole page is lit by, and the thing its panels blur.
  *
@@ -208,3 +217,26 @@
  * The shared row already starts all three at the same place, which is the
  * alignment that matters: `What you keep` is the thing being compared across
  * the offers, and where the sentence under it happens to end is not. */
+
+/**
+ * The two closing panels, side by side.
+ *
+ * Two rather than a wrap count, because the document has two sections and the
+ * row is a fact about them rather than about how many happen to fit. If a third
+ * is ever written, this is the line that has to be decided again, which is the
+ * right place for that decision to surface.
+ *
+ * They stack where a paragraph stops setting sensibly beside another one, not
+ * at a device width.
+ */
+.closingRow {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (width < 64rem) {
+  .closingRow {
+    grid-template-columns: 1fr;
+  }
+}

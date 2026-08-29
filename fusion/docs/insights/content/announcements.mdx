@@ -1,55 +1,61 @@
 ---
-description: Helix is the first thing Fusion is shipping, and this is what it gives you.
+description: Helix is the first thing Fusion ships, and this is what it is.
 kicker: Announcements
-lede: Helix is the first thing we are shipping. Here is what it is, what you can buy around it, and what follows.
+lede: Helix is first. It is a design system that ships as custom elements, and it is close.
 path: /announcements
 title: Helix is what comes first
 ---
 
-## What Helix is
+Fusion is five layers, and the top one is the only one anybody can use today.
+So that is the one being finished first: the interface layer, shipped as a
+design system rather than as a framework, because a design system is the part
+of an interface that a company can actually own.
 
-A design system that ships as custom elements. Every component is a Lit-based
-element with a manifest, so React, Vue, Svelte and whatever comes next consume
-the same primitive rather than a wrapper written per framework.
+## What it is
 
-It arrives in two tiers. The headless one carries structure, accessibility,
-state and form participation with no stylesheet at all. The styled one extends
-it and adds the presentation. You can take the second, or take the first and
-bring your own.
+Every component is a custom element. Not a React component with a wrapper
+generated for other frameworks, and not a set of primitives a team assembles
+into components themselves. The element is the artifact, and React, Vue and
+Svelte consume the same one.
 
-## What that gives you
+It arrives in two tiers. The headless tier is behavior with no stylesheet at
+all: state, focus, keyboard, form participation, the accessibility contract.
+The styled tier is those components with a derived visual system on top. A team
+that needs different pixels drops a tier rather than copying a file, which is
+the difference between a fork with a supported destination and a fork nobody is
+assigned to.
 
-**One brand color in, a full palette out.** The theme engine derives the whole
-palette from a seed and refuses one it cannot make readable, so contrast is a
-property of the derivation rather than something audited afterwards.
+## What you get out of it
 
-**Components that upgrade in any framework, or none.** A custom element is the
-platform's own extension point, so the same component works in the app you have
-now and in the one you migrate to.
+One brand color goes in and a full palette comes out, and the engine refuses a
+palette it cannot make readable. Contrast stops being an audit somebody
+schedules and becomes a property of the derivation.
 
-**A system an agent can read.** Every tag, property and event is in one manifest
-at a URL, and every page answers as Markdown. What a teammate reads and what a
-model reads are the same document.
+Every tag, property and event is in one manifest at a URL, and every page
+answers as Markdown. That was built for agents before it was fashionable to say
+so: the document a model reads is the document a person reads, and there is no
+second, worse copy of the API written for either of them.
 
-**Your repository, your license.** MIT, and the exit test is the point: if you
-stopped talking to us tomorrow, you would still have it.
+It is MIT, in your repository, and it runs whether or not we are still
+involved. That is the whole of the exit test and it is not a marketing line: if
+the answer were no, it would not be a Fusion product.
 
-## What we take on around it
+## What we do around it
 
-Three offers, in the order they usually happen. An **audit** is two weeks at a
-fixed price to find out what is worth building. A **design system sprint** is
-Helix applied to your product, shipped into your repository rather than drawn in
-a design tool. A **conversational build** is development where the specification
-is a conversation, for work whose shape is still moving.
+Three offers, in the order they usually happen. An audit, two weeks at a fixed
+price, to find out what is worth building at all. A design system sprint, which
+is Helix applied to your product and shipped into your repository rather than
+drawn in a design tool. And a build, for work whose shape is still moving,
+which is most of the work worth doing.
 
-[What each involves](/services) is written out, with what you keep at the end of
-each one.
+[What each one involves](/services) is written out, including what you keep at
+the end of it.
 
-## What follows
+## What comes after
 
-Cortex is next: memory and provenance, so what a company knows is an asset it
-holds rather than something rented back a quarter at a time. It is real work
-with nothing shipped, and it will be listed here when that changes.
+Cortex, which is the layer under this one: memory and provenance, so what a
+company knows is an asset it holds rather than something rented back to it a
+quarter at a time. It is real work with nothing shipped, and it will appear here
+when that stops being true.
 
-Nothing on this page is a forecast. Entries are added as they become true rather
-than when they become likely.
+Nothing on this page is a forecast.
