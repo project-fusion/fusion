@@ -30,10 +30,11 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
+import { SOURCE, TAG_PREFIX } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'fusion/site/public/sandbox')
-const source = join(root, 'helix/styled/src')
+const source = join(root, SOURCE.styled)
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
 
@@ -131,32 +132,35 @@ const failures = []
 
 for (const example of examples) {
   noise.length = 0
-  const result = await page.evaluate(async ({ html, styles }) => {
-    window.postMessage(
-      { layout: 'padded', source: html, styles, type: 'helix-preview-render' },
-      '*',
-    )
-    /* Two frames and a tick. One is not enough: an element upgrades, renders,
+  const result = await page.evaluate(
+    async ({ html, prefix, styles }) => {
+      window.postMessage(
+        { layout: 'padded', source: html, styles, type: 'helix-preview-render' },
+        '*',
+      )
+      /* Two frames and a tick. One is not enough: an element upgrades, renders,
        and several of these place themselves in a `requestAnimationFrame` after
        that. */
-    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-    await new Promise((done) => setTimeout(done, 50))
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+      await new Promise((done) => setTimeout(done, 50))
 
-    const host = document.getElementById('preview-root')
-    const tags = [...host.querySelectorAll('*')].filter((element) =>
-      element.tagName.toLowerCase().startsWith('helix-'),
-    )
-    return {
-      painted: host.getBoundingClientRect().height,
-      unupgraded: [
-        ...new Set(
-          tags
-            .filter((element) => !customElements.get(element.tagName.toLowerCase()))
-            .map((element) => element.tagName.toLowerCase()),
-        ),
-      ],
-    }
-  }, example)
+      const host = document.getElementById('preview-root')
+      const tags = [...host.querySelectorAll('*')].filter((element) =>
+        element.tagName.toLowerCase().startsWith(prefix),
+      )
+      return {
+        painted: host.getBoundingClientRect().height,
+        unupgraded: [
+          ...new Set(
+            tags
+              .filter((element) => !customElements.get(element.tagName.toLowerCase()))
+              .map((element) => element.tagName.toLowerCase()),
+          ),
+        ],
+      }
+    },
+    { ...example, prefix: TAG_PREFIX },
+  )
 
   const problems = [...noise]
   if (result.unupgraded.length > 0) {

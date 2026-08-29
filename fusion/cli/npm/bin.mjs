@@ -39,8 +39,7 @@ const built = () =>
   [join(target, 'release', NAME), join(target, 'debug', NAME)].find((path) => existsSync(path))
 
 /** Whether cargo is on the path, asked once and cheaply. */
-const hasCargo = () =>
-  spawnSync('cargo', ['--version'], { stdio: 'ignore' }).status === 0
+const hasCargo = () => spawnSync('cargo', ['--version'], { stdio: 'ignore' }).status === 0
 
 const run = (binary) => {
   const { status, error } = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' })

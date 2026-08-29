@@ -51,10 +51,11 @@ import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
 
 import { pairs } from './lib/theme-facts.mjs'
+import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'fusion/site/public/sandbox')
-const source = join(root, 'helix/styled/src')
+const source = join(root, SOURCE.styled)
 
 /** WCAG 2.1 AA: body text, and what the European Accessibility Act points at. */
 const TARGET = 4.5

@@ -30,6 +30,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /** Every family folder in a tier, by the same test `check:prose:examples` uses. */
 const families = (tier) =>
@@ -62,9 +63,9 @@ const declares = (dir, status) => {
 const problems = []
 let stable = 0
 
-for (const family of families('helix/styled/src')) {
-  const web = join('helix/styled/src', family)
-  const headless = join('helix/headless/src', family)
+for (const family of families(SOURCE.styled)) {
+  const web = join(SOURCE.styled, family)
+  const headless = join(SOURCE.headless, family)
   if (!declares(web, 'stable') && !declares(headless, 'stable')) {
     continue
   }

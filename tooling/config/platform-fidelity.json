@@ -1,0 +1,264 @@
+{
+  "excused": {
+    "helix-date-picker": {
+      "autocomplete": "Renders a calendar of `<button>`s and no text entry, so there is nothing for a browser to fill. A property the platform cannot act on is worse than an absent one."
+    },
+    "helix-dialog": {
+      "cancel": "Intercepted rather than relayed. `handleCancel` prevents the native one so Escape is a request the element can refuse, so it never completes: relaying it would announce a dismissal that was refused. `helix-close` carries the ask. See 296."
+    },
+    "helix-drawer": {
+      "cancel": "Intercepted rather than relayed, as on `helix-dialog`."
+    },
+    "helix-file-input": {
+      "value": "The native `value` is `C:\\fakepath\\name`, a lie the platform tells for privacy. `files` is the real surface."
+    },
+    "helix-image": {
+      "x": "Where the `<img>` sits relative to the root, which is the inner element's position inside this shadow root and answers a question nobody asked. A consumer measuring the picture on the page calls `getBoundingClientRect()` on the host, which is the box they wrote.",
+      "y": "The other half of `x`, and the same answer."
+    },
+    "helix-list": {
+      "reversed": "The other half of `start`, and the same answer.",
+      "start": "This renders no `<ol>`: the rows are slotted and numbered by the CSS `list-item` counter, and that counter is not author-resettable. Measured in Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a `<ul>`, or even on a real `<ol>`, while `<ol start=\"5\">` does and a named counter with explicit `::before` content does. Gaining a start means rebuilding the markers out of generated content, which is a different component. `type` is only `list-style-type` and is implemented."
+    },
+    "helix-option": {
+      "index": "Derived from position among siblings, which the parent owns."
+    },
+    "helix-pin-input": {
+      "maxLength": "A code is exactly `length` characters and the cells are what enforce it, so a maximum would be a second answer to a question `length` already settles, free to contradict it.",
+      "minLength": "The other half of `maxLength`, and the same answer.",
+      "pattern": "The filter is `type`, and it runs on arrival rather than on validation: a character the cells refuse never reaches the value, so there is nothing left for a pattern over the joined string to reject. One that disagreed with `type` would accept characters the boxes will not take.",
+      "selectionDirection": "The other two, and the same answer.",
+      "selectionEnd": "See `selectionStart`.",
+      "selectionStart": "The caret lives in one of `length` single-character boxes rather than in one text run, so there is no field for an offset to be an offset into. A consumer places the caret by focusing the component and the cells handle the rest, which is the whole reason this is not one `<input>`."
+    },
+    "helix-progress": {
+      "position": "Derived from `value` and `max`, and readonly on the native element."
+    },
+    "helix-radio": {
+      "index": "Derived from position among siblings, which the group owns.",
+      "label": "The visible text is slotted, so the component renders whatever is given rather than a string it holds.",
+      "text": "Slotted, as `label` is."
+    },
+    "helix-select": {
+      "autocomplete": "Renders a `<button>` and a listbox rather than a `<select>`, so autofill has no control to write into. Real capability the platform has and this cannot offer. See 295."
+    },
+    "helix-switch": {
+      "indeterminate": "A switch is binary by definition. A third state is a checkbox."
+    },
+    "helix-time-picker": {
+      "autocomplete": "Renders no control of its own, composing `helix-time-input`, which carries the property. Setting it here would be a second place to say one thing."
+    },
+    "helix-toggle": {
+      "index": "Derived from position among siblings, which the group owns.",
+      "label": "The visible text is slotted, as it is on `helix-radio`.",
+      "text": "Slotted, as `label` is."
+    },
+    "helix-video": {
+      "onencrypted": "Encrypted Media Extensions, which this component does not implement.",
+      "onenterpictureinpicture": "Picture in picture is not implemented. See `disablePictureInPicture`.",
+      "onleavepictureinpicture": "Picture in picture is not implemented.",
+      "onwaitingforkey": "Encrypted Media Extensions, which this component does not implement."
+    }
+  },
+  "excusedEvents": {
+    "helix-copy": "A copy button announcing that it copied, which is not the clipboard `copy` event that fires when a selection is copied.",
+    "helix-resize": "A component reporting its own new size, which no native element event means: `resize` fires on the window and on an iframe, and `ResizeObserver` is not an event at all. `helix-before-resize` on Splitter is the request to move a divider and is a different fact again.",
+    "helix-select": "Native `select` is text selection inside an editable control, which is a different fact about a different thing. 294 measured the cost of taking it: `HTMLElementEventMap` is global, our classes extend `Event`, so an entry named `select` silently retypes every `textarea.addEventListener('select')` in a consumer's application as carrying our detail, which at runtime is undefined. Web Awesome keeps theirs prefixed for the same reason."
+  },
+  "expectedEvents": {
+    "helix-accordion-item": ["toggle"],
+    "helix-checkbox": ["change", "input"],
+    "helix-checkbox-group": ["change", "input"],
+    "helix-color-input": ["change", "input"],
+    "helix-color-picker": ["change", "input"],
+    "helix-combobox": ["change", "input"],
+    "helix-date-input": ["change", "input"],
+    "helix-date-picker": ["change", "input"],
+    "helix-dialog": ["close"],
+    "helix-drawer": ["close"],
+    "helix-file-input": ["change", "input"],
+    "helix-image": ["error", "load"],
+    "helix-input": ["change", "input"],
+    "helix-listbox": ["change", "input"],
+    "helix-number-input": ["change", "input"],
+    "helix-pin-input": ["change", "input"],
+    "helix-radio-group": ["change", "input"],
+    "helix-rating": ["change", "input"],
+    "helix-select": ["change", "input"],
+    "helix-slider": ["change", "input"],
+    "helix-switch": ["change", "input"],
+    "helix-textarea": ["change", "input"],
+    "helix-time-input": ["change", "input"],
+    "helix-time-picker": ["change", "input"],
+    "helix-toggle-group": ["change", "input"],
+    "helix-video": ["ended", "pause", "play"]
+  },
+  "native": {
+    "helix-accordion-item": {
+      "interface": "HTMLDetailsElement"
+    },
+    "helix-button": {
+      "interface": "HTMLButtonElement"
+    },
+    "helix-checkbox": {
+      "interface": "HTMLInputElement",
+      "properties": "checked"
+    },
+    "helix-color-input": {
+      "interface": "HTMLInputElement",
+      "properties": "color"
+    },
+    "helix-color-picker": {
+      "interface": "HTMLInputElement",
+      "properties": "color"
+    },
+    "helix-combobox": {
+      "interface": "HTMLSelectElement"
+    },
+    "helix-copy-button": {
+      "interface": "HTMLButtonElement"
+    },
+    "helix-date-input": {
+      "interface": "HTMLInputElement",
+      "properties": "temporal"
+    },
+    "helix-date-picker": {
+      "interface": "HTMLInputElement",
+      "properties": "temporal"
+    },
+    "helix-dialog": {
+      "interface": "HTMLDialogElement"
+    },
+    "helix-drawer": {
+      "interface": "HTMLDialogElement"
+    },
+    "helix-file-input": {
+      "interface": "HTMLInputElement",
+      "properties": "file"
+    },
+    "helix-icon-button": {
+      "interface": "HTMLButtonElement"
+    },
+    "helix-image": {
+      "interface": "HTMLImageElement"
+    },
+    "helix-input": {
+      "interface": "HTMLInputElement",
+      "properties": "text"
+    },
+    "helix-list": {
+      "interface": "HTMLOListElement"
+    },
+    "helix-listbox": {
+      "interface": "HTMLSelectElement"
+    },
+    "helix-meter": {
+      "interface": "HTMLMeterElement"
+    },
+    "helix-number-input": {
+      "interface": "HTMLInputElement",
+      "properties": "numeric"
+    },
+    "helix-option": {
+      "interface": "HTMLOptionElement"
+    },
+    "helix-pin-input": {
+      "interface": "HTMLInputElement",
+      "properties": "text"
+    },
+    "helix-progress": {
+      "interface": "HTMLProgressElement"
+    },
+    "helix-radio": {
+      "interface": "HTMLOptionElement"
+    },
+    "helix-rating": {
+      "interface": "HTMLInputElement",
+      "properties": "range"
+    },
+    "helix-select": {
+      "interface": "HTMLSelectElement"
+    },
+    "helix-slider": {
+      "interface": "HTMLInputElement",
+      "properties": "range"
+    },
+    "helix-switch": {
+      "interface": "HTMLInputElement",
+      "properties": "checked"
+    },
+    "helix-table": {
+      "interface": "HTMLTableElement"
+    },
+    "helix-textarea": {
+      "interface": "HTMLTextAreaElement"
+    },
+    "helix-time-input": {
+      "interface": "HTMLInputElement",
+      "properties": "temporal"
+    },
+    "helix-time-picker": {
+      "interface": "HTMLInputElement",
+      "properties": "temporal"
+    },
+    "helix-toggle": {
+      "interface": "HTMLOptionElement"
+    },
+    "helix-video": {
+      "also": "HTMLMediaElement",
+      "interface": "HTMLVideoElement"
+    }
+  },
+  "propertyGroups": {
+    "checked": ["checked", "defaultChecked", "required", "value", "indeterminate"],
+    "color": ["list", "autocomplete", "value", "defaultValue"],
+    "file": ["accept", "capture", "multiple", "required", "files", "value"],
+    "numeric": [
+      "max",
+      "min",
+      "step",
+      "placeholder",
+      "readOnly",
+      "required",
+      "autocomplete",
+      "list",
+      "valueAsNumber",
+      "defaultValue",
+      "value"
+    ],
+    "range": ["max", "min", "step", "list", "valueAsNumber", "value"],
+    "temporal": [
+      "max",
+      "min",
+      "step",
+      "readOnly",
+      "required",
+      "autocomplete",
+      "list",
+      "valueAsDate",
+      "valueAsNumber",
+      "defaultValue",
+      "value"
+    ],
+    "text": [
+      "maxLength",
+      "minLength",
+      "pattern",
+      "placeholder",
+      "readOnly",
+      "required",
+      "autocomplete",
+      "list",
+      "selectionStart",
+      "selectionEnd",
+      "selectionDirection",
+      "defaultValue",
+      "value"
+    ]
+  },
+  "tags": {
+    "HTMLImageElement": "img",
+    "HTMLMediaElement": "video> or <audio",
+    "HTMLOListElement": "ol"
+  }
+}

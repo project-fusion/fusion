@@ -31,12 +31,13 @@
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 
 const TIERS = [
-  { manifest: 'helix/headless/custom-elements.json', source: 'helix/headless/src' },
-  { manifest: 'helix/styled/custom-elements.json', source: 'helix/styled/src' },
+  { manifest: 'helix/headless/custom-elements.json', source: SOURCE.headless },
+  { manifest: 'helix/styled/custom-elements.json', source: SOURCE.styled },
 ]
 
 /** Every literal in a union type, or nothing where the type is not one. */

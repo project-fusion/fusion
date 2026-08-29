@@ -54,6 +54,7 @@
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE, TAG_PREFIX } from './lib/workspace.mjs'
 
 /**
  * TypeScript's DOM library, wherever this platform's binary put it.
@@ -139,51 +140,6 @@ const ownMembers = (source, name) => {
 
 /* The attribute table from the HTML specification, by input type. `value` and
    `defaultValue` are in every scope because every input has them. */
-const TEXT = [
-  'maxLength',
-  'minLength',
-  'pattern',
-  'placeholder',
-  'readOnly',
-  'required',
-  'autocomplete',
-  'list',
-  'selectionStart',
-  'selectionEnd',
-  'selectionDirection',
-  'defaultValue',
-  'value',
-]
-const NUMERIC = [
-  'max',
-  'min',
-  'step',
-  'placeholder',
-  'readOnly',
-  'required',
-  'autocomplete',
-  'list',
-  'valueAsNumber',
-  'defaultValue',
-  'value',
-]
-const RANGE = ['max', 'min', 'step', 'list', 'valueAsNumber', 'value']
-const CHECKED = ['checked', 'defaultChecked', 'required', 'value', 'indeterminate']
-const TEMPORAL = [
-  'max',
-  'min',
-  'step',
-  'readOnly',
-  'required',
-  'autocomplete',
-  'list',
-  'valueAsDate',
-  'valueAsNumber',
-  'defaultValue',
-  'value',
-]
-const COLOR = ['list', 'autocomplete', 'value', 'defaultValue']
-const FILE = ['accept', 'capture', 'multiple', 'required', 'files', 'value']
 
 /**
  * What to call an interface in a message, where stripping the name gets it wrong.
@@ -197,11 +153,6 @@ const FILE = ['accept', 'capture', 'multiple', 'required', 'files', 'value']
  * all, being the base `<video>` and `<audio>` share, and saying so is more use
  * than inventing `<media>` for it.
  */
-const TAGS = {
-  HTMLImageElement: 'img',
-  HTMLMediaElement: 'video> or <audio',
-  HTMLOListElement: 'ol',
-}
 
 /**
  * The native element each family stands in for, and the scope to read of it.
@@ -214,41 +165,6 @@ const TAGS = {
  * `<option selected>`, and `checked` would have been the divergence. A mapping
  * is a claim about what a component *is*, and a wrong one reads as a finding.
  */
-const NATIVE = {
-  'helix-accordion-item': ['HTMLDetailsElement'],
-  'helix-button': ['HTMLButtonElement'],
-  'helix-checkbox': ['HTMLInputElement', CHECKED],
-  'helix-color-input': ['HTMLInputElement', COLOR],
-  'helix-color-picker': ['HTMLInputElement', COLOR],
-  'helix-combobox': ['HTMLSelectElement'],
-  'helix-copy-button': ['HTMLButtonElement'],
-  'helix-date-input': ['HTMLInputElement', TEMPORAL],
-  'helix-date-picker': ['HTMLInputElement', TEMPORAL],
-  'helix-dialog': ['HTMLDialogElement'],
-  'helix-drawer': ['HTMLDialogElement'],
-  'helix-file-input': ['HTMLInputElement', FILE],
-  'helix-icon-button': ['HTMLButtonElement'],
-  'helix-image': ['HTMLImageElement'],
-  'helix-input': ['HTMLInputElement', TEXT],
-  'helix-list': ['HTMLOListElement'],
-  'helix-listbox': ['HTMLSelectElement'],
-  'helix-meter': ['HTMLMeterElement'],
-  'helix-number-input': ['HTMLInputElement', NUMERIC],
-  'helix-option': ['HTMLOptionElement'],
-  'helix-pin-input': ['HTMLInputElement', TEXT],
-  'helix-progress': ['HTMLProgressElement'],
-  'helix-radio': ['HTMLOptionElement'],
-  'helix-rating': ['HTMLInputElement', RANGE],
-  'helix-select': ['HTMLSelectElement'],
-  'helix-slider': ['HTMLInputElement', RANGE],
-  'helix-switch': ['HTMLInputElement', CHECKED],
-  'helix-table': ['HTMLTableElement'],
-  'helix-textarea': ['HTMLTextAreaElement'],
-  'helix-time-input': ['HTMLInputElement', TEMPORAL],
-  'helix-time-picker': ['HTMLInputElement', TEMPORAL],
-  'helix-toggle': ['HTMLOptionElement'],
-  'helix-video': ['HTMLVideoElement', undefined, 'HTMLMediaElement'],
-}
 
 /**
  * What a shadow component cannot mirror, whatever the element.
@@ -335,78 +251,6 @@ const DEPRECATED = new Set([
  * an allowlist nobody can read the argument for is where a real finding goes to
  * be forgotten.
  */
-const EXCUSED = {
-  'helix-date-picker': {
-    autocomplete:
-      'Renders a calendar of `<button>`s and no text entry, so there is nothing for a browser to fill. A property the platform cannot act on is worse than an absent one.',
-  },
-  'helix-dialog': {
-    cancel:
-      'Intercepted rather than relayed. `handleCancel` prevents the native one so Escape is a request the element can refuse, so it never completes: relaying it would announce a dismissal that was refused. `helix-close` carries the ask. See 296.',
-  },
-  'helix-drawer': {
-    cancel: 'Intercepted rather than relayed, as on `helix-dialog`.',
-  },
-  'helix-file-input': {
-    value:
-      'The native `value` is `C:\\fakepath\\name`, a lie the platform tells for privacy. `files` is the real surface.',
-  },
-  'helix-image': {
-    x: "Where the `<img>` sits relative to the root, which is the inner element's position inside this shadow root and answers a question nobody asked. A consumer measuring the picture on the page calls `getBoundingClientRect()` on the host, which is the box they wrote.",
-    y: 'The other half of `x`, and the same answer.',
-  },
-  'helix-list': {
-    reversed: 'The other half of `start`, and the same answer.',
-    start:
-      'This renders no `<ol>`: the rows are slotted and numbered by the CSS `list-item` counter, and that counter is not author-resettable. Measured in Chrome 148, `counter-reset: list-item 4` moves nothing on a `<div>`, on a `<ul>`, or even on a real `<ol>`, while `<ol start="5">` does and a named counter with explicit `::before` content does. Gaining a start means rebuilding the markers out of generated content, which is a different component. `type` is only `list-style-type` and is implemented.',
-  },
-  'helix-option': {
-    index: 'Derived from position among siblings, which the parent owns.',
-  },
-  'helix-pin-input': {
-    maxLength:
-      'A code is exactly `length` characters and the cells are what enforce it, so a maximum would be a second answer to a question `length` already settles, free to contradict it.',
-    minLength: 'The other half of `maxLength`, and the same answer.',
-    pattern:
-      'The filter is `type`, and it runs on arrival rather than on validation: a character the cells refuse never reaches the value, so there is nothing left for a pattern over the joined string to reject. One that disagreed with `type` would accept characters the boxes will not take.',
-    selectionDirection: 'The other two, and the same answer.',
-    selectionEnd: 'See `selectionStart`.',
-    selectionStart:
-      'The caret lives in one of `length` single-character boxes rather than in one text run, so there is no field for an offset to be an offset into. A consumer places the caret by focusing the component and the cells handle the rest, which is the whole reason this is not one `<input>`.',
-  },
-  'helix-progress': {
-    position: 'Derived from `value` and `max`, and readonly on the native element.',
-  },
-  'helix-radio': {
-    index: 'Derived from position among siblings, which the group owns.',
-    label:
-      'The visible text is slotted, so the component renders whatever is given rather than a string it holds.',
-    text: 'Slotted, as `label` is.',
-  },
-  'helix-select': {
-    autocomplete:
-      'Renders a `<button>` and a listbox rather than a `<select>`, so autofill has no control to write into. Real capability the platform has and this cannot offer. See 295.',
-  },
-  'helix-switch': {
-    indeterminate: 'A switch is binary by definition. A third state is a checkbox.',
-  },
-  'helix-time-picker': {
-    autocomplete:
-      'Renders no control of its own, composing `helix-time-input`, which carries the property. Setting it here would be a second place to say one thing.',
-  },
-  'helix-toggle': {
-    index: 'Derived from position among siblings, which the group owns.',
-    label: 'The visible text is slotted, as it is on `helix-radio`.',
-    text: 'Slotted, as `label` is.',
-  },
-  'helix-video': {
-    onencrypted: 'Encrypted Media Extensions, which this component does not implement.',
-    onenterpictureinpicture:
-      'Picture in picture is not implemented. See `disablePictureInPicture`.',
-    onleavepictureinpicture: 'Picture in picture is not implemented.',
-    onwaitingforkey: 'Encrypted Media Extensions, which this component does not implement.',
-  },
-}
 
 /** Where a family's headless source lives, for the hardcoded check below. */
 const headlessSource = (tag) => {
@@ -414,7 +258,7 @@ const headlessSource = (tag) => {
   for (const folder of [family, family.replace(/-([a-z]+)$/, '/$1')]) {
     for (const file of [`${family}-root.ts`, `${family}.ts`]) {
       try {
-        return readFileSync(join('helix/headless/src', folder, 'root', file), 'utf8')
+        return readFileSync(join(SOURCE.headless, folder, 'root', file), 'utf8')
       } catch {
         /* Next shape. */
       }
@@ -464,49 +308,11 @@ const nativeEventNames = (source) => {
  * element fires them. Deliberately short: the events a consumer reaches for
  * first, not every event the element can possibly send.
  */
-const VALUE_EVENTS = ['change', 'input']
-const EXPECTED_EVENTS = {
-  'helix-accordion-item': ['toggle'],
-  'helix-checkbox': VALUE_EVENTS,
-  'helix-checkbox-group': VALUE_EVENTS,
-  'helix-color-input': VALUE_EVENTS,
-  'helix-color-picker': VALUE_EVENTS,
-  'helix-combobox': VALUE_EVENTS,
-  'helix-date-input': VALUE_EVENTS,
-  'helix-date-picker': VALUE_EVENTS,
-  'helix-dialog': ['close'],
-  'helix-drawer': ['close'],
-  'helix-file-input': VALUE_EVENTS,
-  'helix-image': ['error', 'load'],
-  'helix-input': VALUE_EVENTS,
-  'helix-listbox': VALUE_EVENTS,
-  'helix-number-input': VALUE_EVENTS,
-  'helix-pin-input': VALUE_EVENTS,
-  'helix-radio-group': VALUE_EVENTS,
-  'helix-rating': VALUE_EVENTS,
-  'helix-select': VALUE_EVENTS,
-  'helix-slider': VALUE_EVENTS,
-  'helix-switch': VALUE_EVENTS,
-  'helix-textarea': VALUE_EVENTS,
-  'helix-time-input': VALUE_EVENTS,
-  'helix-time-picker': VALUE_EVENTS,
-  'helix-toggle-group': VALUE_EVENTS,
-  'helix-video': ['ended', 'pause', 'play'],
-}
-
 /**
  * Prefixed events whose verb matches a native name for a reason.
  *
  * The bar is that the two mean different things, not that ours is nicer.
  */
-const EXCUSED_EVENTS = {
-  'helix-copy':
-    'A copy button announcing that it copied, which is not the clipboard `copy` event that fires when a selection is copied.',
-  'helix-resize':
-    'A component reporting its own new size, which no native element event means: `resize` fires on the window and on an iframe, and `ResizeObserver` is not an event at all. `helix-before-resize` on Splitter is the request to move a divider and is a different fact again.',
-  'helix-select':
-    "Native `select` is text selection inside an editable control, which is a different fact about a different thing. 294 measured the cost of taking it: `HTMLElementEventMap` is global, our classes extend `Event`, so an entry named `select` silently retypes every `textarea.addEventListener('select')` in a consumer's application as carrying our detail, which at runtime is undefined. Web Awesome keeps theirs prefixed for the same reason.",
-}
 
 const library = domLibrary()
 if (!library) {
@@ -567,6 +373,40 @@ const problems = []
 const shadowed = new Map()
 let compared = 0
 let events = 0
+
+/**
+ * The vocabulary, lifted out of this file on 28 Aug 2026.
+ *
+ * **Seventy-seven element names lived here, 92% of every specific name in
+ * `tooling/scripts`.** They are data: which native interface each family wraps,
+ * which property group comes with it, what is excused and why. The rule is the
+ * argument; this is the subject it argues about, and a consumer with their own
+ * components has their own subject.
+ *
+ * `properties` names a group rather than inlining one, because six families
+ * share `temporal` and four share `color`, and a list written four times is
+ * four places to forget.
+ *
+ * **Read back into the shape the checks already expect**, `[interface,
+ * properties, also]`, so lifting the data changed no logic. The measurement
+ * either side of the move is identical: 265 native properties and 50 native
+ * events across 33 families.
+ */
+const VOCABULARY = JSON.parse(
+  readFileSync(join(import.meta.dirname, '../config/platform-fidelity.json'), 'utf8'),
+)
+const {
+  excused: EXCUSED,
+  excusedEvents: EXCUSED_EVENTS,
+  expectedEvents: EXPECTED_EVENTS,
+} = VOCABULARY
+const TAGS = VOCABULARY.tags
+const NATIVE = Object.fromEntries(
+  Object.entries(VOCABULARY.native).map(([tag, one]) => [
+    tag,
+    [one.interface, one.properties && VOCABULARY.propertyGroups[one.properties], one.also],
+  ]),
+)
 
 for (const [tag, [name, scope, extra]] of Object.entries(NATIVE)) {
   const ours = declared.get(tag)
@@ -652,10 +492,10 @@ for (const [tag, expected] of Object.entries(EXPECTED_EVENTS)) {
 const knownEvents = nativeEventNames(library.source)
 for (const [tag, sends] of dispatched) {
   for (const event of sends) {
-    if (!event.startsWith('helix-')) {
+    if (!event.startsWith(TAG_PREFIX)) {
       continue
     }
-    const verb = event.slice('helix-'.length)
+    const verb = event.slice(TAG_PREFIX.length)
     if (!knownEvents.has(verb) || EXCUSED_EVENTS[event]) {
       continue
     }
@@ -664,7 +504,7 @@ for (const [tag, sends] of dispatched) {
 }
 
 for (const [event, tags] of [...shadowed].sort()) {
-  const verb = event.slice('helix-'.length)
+  const verb = event.slice(TAG_PREFIX.length)
   const named = tags.sort().slice(0, 3).join(', ')
   problems.push(
     `\`${event}\` says what the platform already says with \`${verb}\`, on ${tags.length} ` +

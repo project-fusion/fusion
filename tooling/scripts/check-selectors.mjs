@@ -470,7 +470,7 @@ for (const tier of TIERS) {
  * and the `querySelector('[part="search-field"]')` three hundred lines away had
  * been holding `check:api:parts` green over it.
  */
-const OWNS_PARTS = (tier) => tier !== 'helix/core/src'
+const OWNS_PARTS = (tier) => tier !== SOURCE.core
 
 /**
  * A `[part=]` lookup on the component's *own* root, and only that.

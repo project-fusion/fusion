@@ -103,6 +103,7 @@ import { dirname, join, relative, resolve } from 'node:path'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
+import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 
@@ -120,8 +121,8 @@ const root = resolve(import.meta.dirname, '../..')
  * repository that defines them for a document this harness assembles.
  */
 const TIERS = [
-  { name: 'headless', sheet: false, source: join(root, 'helix/headless/src') },
-  { name: 'styled', sheet: true, source: join(root, 'helix/styled/src') },
+  { name: 'headless', sheet: false, source: join(root, SOURCE.headless) },
+  { name: 'styled', sheet: true, source: join(root, SOURCE.styled) },
 ]
 
 /**

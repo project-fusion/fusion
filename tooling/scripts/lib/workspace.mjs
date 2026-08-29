@@ -35,6 +35,24 @@ export const SCOPE = '@fusion.dev/'
 export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
 
 /**
+ * What the design system prefixes its public names with.
+ *
+ * **These are the parameters a consumer would have to change and this
+ * repository never will.** A library built on Helix registers its own elements
+ * and declares its own tokens, so a rule asking "is this one of ours" is asking
+ * about a prefix rather than about the word `helix`. Named here so the rules
+ * ask a question rather than assert an answer, which is the difference between
+ * a rule that ships and a rule that only ever runs here.
+ *
+ * Eleven sites, which is the whole of it: the rest of what looks like prefix
+ * coupling is either a specific element name, which is vocabulary, or a package
+ * name, which is a dependency. Measured 28 Aug 2026 after the source paths
+ * moved behind `SOURCE`.
+ */
+export const TAG_PREFIX = 'helix-'
+export const TOKEN_PREFIX = '--helix-'
+
+/**
  * Where source lives, named once because a folder rename found every copy the
  * hard way.
  *

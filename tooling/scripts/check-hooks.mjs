@@ -78,7 +78,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
-import { SOURCE } from './lib/workspace.mjs'
+import { SOURCE, TOKEN_PREFIX } from './lib/workspace.mjs'
 
 /* Every tier that ships CSS or documents a component. `helix/styles` reads
    hooks without declaring any, which is exactly the pairing that made Button's
@@ -103,7 +103,7 @@ const walk = (dir, found = []) => {
    from was deleted. */
 const isSource = (path) => !path.endsWith('.css.ts') && !path.includes('.spec.')
 
-const ours = (name) => !name.startsWith('--_') && !name.startsWith('--helix-')
+const ours = (name) => !name.startsWith('--_') && !name.startsWith(TOKEN_PREFIX)
 
 /* Where the private rule applies: the component tiers, and not the base
    examples inside them. See the header for why `helix/styles` is not here. */
@@ -398,7 +398,7 @@ for (const folder of sharedFolders()) {
   }
   for (const sheet of sheets) {
     const readers = new Set()
-    for (const path of walk('helix/styled/src')) {
+    for (const path of walk(SOURCE.styled)) {
       if (!path.endsWith('.ts') || path.endsWith('.css.ts') || path.includes('/shared/')) {
         continue
       }

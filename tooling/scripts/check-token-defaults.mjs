@@ -42,6 +42,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const LAYER = [
@@ -49,7 +50,7 @@ const LAYER = [
   'helix/styles/src/tokens.css',
   'helix/styles/src/base.css',
 ]
-const SHEETS = ['helix/styled/src', 'helix/sandbox/src']
+const SHEETS = [SOURCE.styled, SOURCE.sandbox]
 
 /** Comments hold braces, and an uncounted one ends a block early. */
 const strip = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '')

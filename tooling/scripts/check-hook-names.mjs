@@ -34,9 +34,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE, TOKEN_PREFIX } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const SHEETS = ['helix/styled/src', 'helix/sandbox/src']
+const SHEETS = [SOURCE.styled, SOURCE.sandbox]
 
 /**
  * One idea, one spelling. The key is refused and the value is what to write.
@@ -93,7 +94,7 @@ for (const dir of SHEETS) {
       }
       const [, property, value] = declaration
       for (const [, hook] of value.matchAll(/var\((--[a-z0-9-]+)/g)) {
-        if (hook.startsWith('--helix-')) {
+        if (hook.startsWith(TOKEN_PREFIX)) {
           continue
         }
         reads.push({ file: relative(ROOT, file), hook, property })

@@ -32,6 +32,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { catalog } from '../../helix/docs/src/catalog.ts'
 import { reference } from '../../helix/docs/src/reference.ts'
+import { SOURCE } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUT = join(ROOT, 'fusion/site/content/catalog/catalog.generated.json')
@@ -71,7 +72,7 @@ const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-e
  * headline and `catalog()` takes the first it is handed, so a reader with no
  * preference set sees the tier almost everyone consumes.
  */
-const EXAMPLES = ['helix/styled/src', 'helix/headless/src'].map((tier) => join(ROOT, tier))
+const EXAMPLES = [SOURCE.styled, SOURCE.headless].map((tier) => join(ROOT, tier))
 
 const manifests = MANIFESTS.map((path) => {
   const file = join(ROOT, path)

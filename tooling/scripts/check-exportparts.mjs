@@ -70,6 +70,7 @@ import {
   walk,
   withoutComments,
 } from './lib/compositions.mjs'
+import { SOURCE } from './lib/workspace.mjs'
 
 const docs = partDocsByTag()
 const sites = compositions()
@@ -157,13 +158,7 @@ for (const site of sites) {
  * Generated output under `fusion/site/public` is skipped, being a copy of a source
  * this already reads.
  */
-const OUTSIDE = [
-  'helix/styled/src',
-  'helix/headless/src',
-  'helix/docs/content',
-  'fusion/site',
-  'fusion/docs',
-]
+const OUTSIDE = [SOURCE.styled, SOURCE.headless, 'helix/docs/content', 'fusion/site', 'fusion/docs']
 const SKIP = new Set(['.next', '.turbo', 'node_modules', 'public'])
 
 const everyFile = (dir, found = []) => {

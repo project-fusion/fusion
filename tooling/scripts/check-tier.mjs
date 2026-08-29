@@ -34,7 +34,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SOURCE } from './lib/workspace.mjs'
+import { SOURCE, TAG_PREFIX } from './lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const HEADLESS = join(ROOT, SOURCE.headless)
@@ -70,7 +70,11 @@ for (const file of sources(HEADLESS)) {
     continue
   }
   checked += 1
-  if (!/static\s+override\s+tier\s*=\s*'helix-'/.test(readFileSync(twin, 'utf8'))) {
+  if (
+    !new RegExp(`static\\s+override\\s+tier\\s*=\\s*'${TAG_PREFIX}'`).test(
+      readFileSync(twin, 'utf8'),
+    )
+  ) {
     problems.push(relative(ROOT, twin))
   }
 }
@@ -79,7 +83,7 @@ if (problems.length > 0) {
   console.error(
     'tier: these styled components inherit a `this.tag()` call and do not override `tier`,\n' +
       'so they render headless children into their own shadow root. Add\n' +
-      "  static override tier = 'helix-'\n" +
+      `  static override tier = '${TAG_PREFIX}'\n` +
       'to each class:\n' +
       problems.map((one) => `  ${one}`).join('\n'),
   )

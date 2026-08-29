@@ -47,6 +47,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* **The base layer and the site, because both are document stylesheets.**
  *
@@ -64,7 +65,7 @@ import { join } from 'node:path'
  * `:host([interactive])`, so an aura asked for the pointer and reported that it
  * refused it. None of the three errored, and the check that exists for exactly
  * this was not looking. */
-const STYLES = ['helix/styles/src', 'fusion/site/app']
+const STYLES = [SOURCE.styles, 'fusion/site/app']
 /** Every `.css` under a directory, skipping the generated `.css.ts` beside it. */
 const stylesheets = (dir) => {
   const found = []
@@ -143,7 +144,7 @@ for (const path of STYLES.flatMap((dir) => stylesheets(dir))) {
 }
 
 /* The component side: what each stylesheet declares for its host and its slots. */
-for (const path of stylesheets('helix/styled/src')) {
+for (const path of stylesheets(SOURCE.styled)) {
   /* **The element this file styles, not the family it lives in.**
    *
    * This read the family from the directory and compared every stylesheet in it

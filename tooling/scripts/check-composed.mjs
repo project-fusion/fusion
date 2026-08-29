@@ -72,7 +72,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { TIERS } from './lib/workspace.mjs'
+import { SOURCE, TAG_PREFIX, TIERS } from './lib/workspace.mjs'
 
 /* **Where a tag can be written by something that is not a component.**
  *
@@ -87,7 +87,7 @@ import { TIERS } from './lib/workspace.mjs'
  *
  * A free function takes the tag as an argument instead, which is what every
  * component already does one level up. */
-const SHARED = ['helix/core/src']
+const SHARED = [SOURCE.core]
 
 /** Every `.ts` under a directory that is a component rather than a spec. */
 const sources = (dir) => {
@@ -165,8 +165,8 @@ for (const [path, code] of read) {
 
   /* A styled component inherits its base's template, so it inherits every tag in
      it. Matched by the path the two tiers share. */
-  const inherited = path.startsWith('helix/styled/src')
-    ? read.get(path.replace('helix/styled/src', 'helix/headless/src'))
+  const inherited = path.startsWith(SOURCE.styled)
+    ? read.get(path.replace(SOURCE.styled, SOURCE.headless))
     : undefined
   if (inherited) {
     for (const tag of renders(inherited)) {
@@ -180,7 +180,7 @@ for (const [path, code] of read) {
      the headless tier. A styled component with a tier below it is under the same
      obligation, since that template is the one its base wrote. A styled-only
      component has no tier to be agnostic for and may name what it renders. */
-  const twin = path.startsWith('helix/headless/src') || inherited !== undefined
+  const twin = path.startsWith(SOURCE.headless) || inherited !== undefined
   for (const tag of literals(code)) {
     checked += 1
     if (twin) {
@@ -200,11 +200,15 @@ for (const [path, code] of read) {
   /* The styled tier renders the styled family only if it says so, and the
      default says the opposite. A styled file inheriting an interpolating
      template and no `tier` renders base children into a styled shadow root. */
-  if (inherited && renders(inherited).size > 0 && !/static override tier = 'helix-'/.test(code)) {
+  if (
+    inherited &&
+    renders(inherited).size > 0 &&
+    !new RegExp(`static override tier = '${TAG_PREFIX}'`).test(code)
+  ) {
     problems.push(
       `${path}: inherits a template that interpolates its children's tags, and never ` +
         `overrides \`tier\`, so it renders \`helix-headless-…\` children inside a styled ` +
-        `shadow root. Add \`static override tier = 'helix-'\`.`,
+        `shadow root. Add \`static override tier = '${TAG_PREFIX}'\`.`,
     )
   }
 

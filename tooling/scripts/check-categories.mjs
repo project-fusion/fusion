@@ -31,8 +31,9 @@
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
-const TIERS = { headless: 'helix/headless/src', styled: 'helix/styled/src' }
+const TIERS = { headless: SOURCE.headless, styled: SOURCE.styled }
 const CATEGORY = /@category ([a-z-]+)/
 
 /** The category on a family's root element, or null where there is no root. */

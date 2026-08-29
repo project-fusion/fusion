@@ -28,6 +28,7 @@ import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
+import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const specs = join(root, 'fusion/site/public/specs')
@@ -50,7 +51,7 @@ const entry = join(root, '.local/diagnostics-entry.ts')
 await Bun.write(
   entry,
   [
-    `import '${join(root, 'helix/styled/src', FAMILY, 'index.ts')}'`,
+    `import '${join(root, SOURCE.styled, FAMILY, 'index.ts')}'`,
     /* The false-positive case, with the real components: a copy button renders
        an icon button, so `--icon-button-*` set on the outer element inherits
        through the shadow boundary and works. The manifest says copy button

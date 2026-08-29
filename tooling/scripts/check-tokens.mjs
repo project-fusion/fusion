@@ -25,6 +25,7 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { SOURCE } from './lib/workspace.mjs'
 
 /* A git worktree is a second checkout of this repository, and a check that
      walks into one is reading another branch. `.claude/worktrees/*` holds the
@@ -391,7 +392,7 @@ for (const file of walk(root)) {
  * the honest treatment of the rest.
  */
 const FAMILIES = new Set(
-  readdirSync('helix/styled/src', { withFileTypes: true })
+  readdirSync(SOURCE.styled, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name),
 )

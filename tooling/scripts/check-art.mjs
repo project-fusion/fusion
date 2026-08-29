@@ -195,8 +195,8 @@ const said = wordFor(families.size)
    matters: `field/` is a directory holding the shared field stylesheets, it
    exports nothing and has no element, so counting it made this check disagree
    with correct prose on its first run. */
-const folders = readdirSync('helix/styled/src', { withFileTypes: true }).filter(
-  (one) => one.isDirectory() && existsSync(join('helix/styled/src', one.name, 'index.ts')),
+const folders = readdirSync(SOURCE.styled, { withFileTypes: true }).filter(
+  (one) => one.isDirectory() && existsSync(join(SOURCE.styled, one.name, 'index.ts')),
 ).length
 const foldersSaid = wordFor(folders)
 
