@@ -58,7 +58,8 @@ bare name that is not a runner.
 them, and several read what an earlier one wrote: `gen:reference` and
 `gen:element-events` read the manifests `analyze` produces, `gen:tokens-reference`
 reads what `gen:tokens-layer` emits, `gen:metrics` measures the built packages,
-and `gen:content` and `gen:catalog` read the pages `gen:docs` filled. Run out of
+`gen:content` and `gen:catalog` read the pages `gen:docs` filled, and
+`gen:catalog` reads what `gen:content` writes on top of that. Run out of
 order they each succeed and disagree with each other, and the failure surfaces in
 CI as *"the tree is unchanged by verifying it"*, which names none of them. So
 `regen` is the hand-written order and `gen:*` are its members: a `gen` assembled
