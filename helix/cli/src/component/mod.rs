@@ -42,6 +42,7 @@ pub mod examples_paired;
 pub mod exportparts;
 pub mod fallbacks;
 pub mod floors;
+pub mod glyphs;
 pub mod grounds;
 pub mod hook_names;
 pub mod hooks;
@@ -408,6 +409,11 @@ pub fn all() -> Vec<Rule> {
             name: "fallbacks",
             run: Runner::Source(fallbacks::run),
             summary: "a slot's fallback markup sits behind a seam a tier can move",
+        },
+        Rule {
+            name: "glyphs",
+            run: Runner::Source(glyphs::run),
+            summary: "no component renders the icon element for itself",
         },
         Rule {
             name: "grounds",

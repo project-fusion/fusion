@@ -8,6 +8,7 @@
 
 pub mod barrels;
 pub mod floors;
+pub mod icons;
 pub mod modules;
 pub mod node;
 pub mod order;
@@ -122,6 +123,13 @@ pub fn all() -> Vec<Rule> {
             name: "floors",
             run: floors::run,
             summary: "every rule counted something",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "icons",
+            run: icons::run,
+            summary: "every icon named in markup is one the set actually has",
         },
         Rule {
             fix: None,
