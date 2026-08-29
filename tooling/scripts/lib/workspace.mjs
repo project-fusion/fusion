@@ -57,7 +57,7 @@ export const TOKEN_PREFIX = '--helix-'
  * that fails, so nothing in the message says what was going unchecked.
  *
  * **Named places rather than one list**, because the lists are not the same
- * question and collapsing them would lose that: `check:css:motion` reads the
+ * question and collapsing them would lose that: `helix component`'s `motion` reads the
  * styles, the styled tier, the sandbox and the gallery, while `check:api:parts`
  * reads core, both tiers and the sandbox. Each script still says what it looks
  * at. What it no longer says is where those things are.

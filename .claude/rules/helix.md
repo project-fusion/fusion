@@ -801,7 +801,7 @@ a document rule using one is the mechanism rather than a collision. And a rule
 undoing the *reset* stays: `helix-card > [slot="media"]` lifts the image clamp,
 which is global by necessity.
 
-`bun run check:css:overruled` enforces it, per declaration. It was written against
+`helix component --only overruled` enforces it, per declaration. It was written against
 the two failures above and fails on both when they are put back.
 
 **Apps use components, not native elements.** *Reversed 13 Aug 2026, and

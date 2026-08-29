@@ -40,7 +40,9 @@ pub mod floors;
 pub mod grounds;
 pub mod hook_names;
 pub mod leaks;
+pub mod motion;
 pub mod observers;
+pub mod overruled;
 pub mod parts;
 pub mod print;
 pub mod reachable;
@@ -87,6 +89,13 @@ pub struct Settings {
     /// nobody looks. Relative to the root; build output is skipped.
     #[serde(default)]
     pub outside: Vec<String>,
+
+    /// Roots holding document stylesheets, which beat a component's own.
+    ///
+    /// A base layer and an application alike: both write rules outside every
+    /// shadow root, and a rule written there wins whatever the specificity.
+    #[serde(default)]
+    pub documents: Vec<String>,
 
     /// The stylesheets defining the token layer, in cascade order.
     ///
@@ -319,9 +328,19 @@ pub fn all() -> Vec<Rule> {
             summary: "a subscription an element takes out does not outlive the element",
         },
         Rule {
+            name: "motion",
+            run: Runner::Source(motion::run),
+            summary: "a stylesheet that moves answers `prefers-reduced-motion`",
+        },
+        Rule {
             name: "observers",
             run: Runner::Source(observers::run),
             summary: "an observer torn down on disconnect is registered again on reconnect",
+        },
+        Rule {
+            name: "overruled",
+            run: Runner::Source(overruled::run),
+            summary: "a component's own CSS is not silently beaten by a document rule",
         },
         Rule {
             name: "parts",
