@@ -208,12 +208,9 @@ export function InsightBrowser({
             ref={searchField}
             type="search"
           >
-            <helix-kbd
-              keys="/"
-              onhelix-shortcut={focusSearch}
-              slot="end"
-              within="document"
-            ></helix-kbd>
+            <span className={browser.keysOnly} slot="end">
+              <helix-kbd keys="/" onhelix-shortcut={focusSearch} within="document"></helix-kbd>
+            </span>
             <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           </helix-input>
         </helix-flex>

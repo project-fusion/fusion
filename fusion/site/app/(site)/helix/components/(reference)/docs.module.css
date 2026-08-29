@@ -20,8 +20,17 @@
   /* The header's inset, not the page's clamp. The chrome runs the width of the
      window and sits at a fixed distance from its edge; the gallery already
      matches it, and a reference page that did not would read as a different
-     site one navigation away. */
-  --site-inset: var(--helix-space-2xl);
+     site one navigation away.
+
+     **Through the variable rather than through its value.** Written out as
+     `space-2xl` this said "the same as the header" and meant "48px", which stops
+     being the same thing below 48rem: the header takes its inset down to
+     `space-md` there and this went on spending 48 a side. On a 375px phone that
+     is 96px of padding around a 279px measure — a quarter of the screen held
+     empty to match a header that had already stopped matching. `--site-chrome-inset`
+     is the number the header actually uses, at every width, which is what the
+     paragraph above was claiming all along. */
+  --site-inset: var(--site-chrome-inset);
 
   /* Both rails the same width, which is what centers the column between them.
      Unequal rails put the middle track off center and the prose inside it

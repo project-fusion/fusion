@@ -10,6 +10,7 @@ import { Wordmark } from '@/components/wordmark/wordmark'
 import { PRODUCTS } from '@/content/products/products'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { MAILTO } from '@/utils/site/site'
+import chrome from '../chrome.module.css'
 import styles from '../chrome.module.css'
 
 /**
@@ -90,6 +91,7 @@ export function SiteMenu({
 
   return (
     <helix-drawer
+      class={chrome.siteDrawer}
       label="Site navigation"
       material="glass"
       onhelix-before-close={() => onOpenChange(false)}

@@ -42,6 +42,33 @@
   --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
   --site-glass-backdrop: blur(40px) saturate(1.5);
 
+  /* **The same glass, at the coverage a light page needs.**
+   *
+   * Thirty percent is one number doing two jobs, and it is only right for one of
+   * them. Over a dark page the ink behind the panel is dim, forty pixels of blur
+   * smears what is left, and what comes through reads as depth. Over a light
+   * page the ink behind is black on near-white at full strength, and the fill is
+   * near-white too: blurred or not, the page's own words go on being words under
+   * the panel's words. Measured on the palette over the services hero, the
+   * heading was readable straight through the list.
+   *
+   * So the light arm admits less and the dark arm is `--site-glass` itself,
+   * unchanged, rather than a second number that would have to be kept level with
+   * the first. Seventy-eight was found by looking: sixty still let the services
+   * hero read through the middle of the palette, and the scale's
+   * `translucent-strong` at eighty-eight leaves the blur nothing to work on,
+   * which was tried on the palette before and reads as a panel rather than as
+   * glass.
+   *
+   * For the surfaces that cover most of what is behind them — the palette, and a
+   * drawer on a phone. The bands and the masthead keep `--site-glass`: they are
+   * strips over a page rather than panels over a paragraph, and they were tuned
+   * as they are. */
+  --site-glass-dense: light-dark(
+    color-mix(in oklab, var(--helix-color-surface) 78%, transparent),
+    var(--site-glass)
+  );
+
   /* The page runs edge to edge and the inset is what holds it off the sides.
      It scales with the viewport rather than stepping at a breakpoint, so the
      margin reads as deliberate at every width instead of only at three. */

@@ -463,7 +463,9 @@
      out, so the palette is the same glass as the landing bands and the masthead
      rather than a third one that happened to agree. */
   backdrop-filter: var(--site-glass-backdrop);
-  background-color: var(--site-glass);
+  /* Dense, which is only a departure in light: over a pale page at the ordinary
+     coverage the reader's own paragraph went on being legible under the list. */
+  background-color: var(--site-glass-dense);
   border: var(--helix-border-thin) solid var(--helix-material-border);
   border-radius: var(--helix-radii-lg);
   /* The largest the scale has. A palette arrives over a page the reader was
@@ -667,4 +669,56 @@
 .navExtra:focus-visible {
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
+}
+
+/**
+ * **A glass panel on a phone in daylight has to admit less.**
+ *
+ * `--helix-material-translucent` is 30 percent, which is right for a pane over a
+ * dark page where the ink behind it is dim and the blur has room to work. In
+ * light mode the ground behind it is near-white and so is the fill, so what
+ * reads through is the page's own text at close to full strength, under the
+ * panel's own text. On a phone the panel covers most of the screen, so most of
+ * the screen is two documents at once.
+ *
+ * `translucent-strong` is the scale's own answer for a ground that admits less,
+ * and it is what `frosted` already uses. Only the light arm moves: dark was
+ * never the problem, and taking it up there would trade a material for a slab.
+ *
+ * Set through `--drawer-background-color`, which `Drawer` publishes for exactly
+ * this, so the component stays in charge of when its material applies.
+ */
+@media (max-width: 40rem) {
+  .siteDrawer {
+    --drawer-background-color: light-dark(
+      var(--helix-material-translucent-strong),
+      var(--site-glass)
+    );
+  }
+}
+
+/**
+ * **Nothing to press them with.**
+ *
+ * The chip on the search button and the four hints in the palette's footer are
+ * teaching: they exist so a reader with a keyboard finds out there is a faster
+ * way in than the button they just used. On a phone there is no faster way, and
+ * the row of hints is four groups of a key nobody can press and the word for
+ * what pressing it would do — a legend for a machine that is not there.
+ *
+ * The hotkeys are not touched. They are listened for on the document, and a
+ * phone with a keyboard attached still gets them; what goes is only the
+ * instruction, which is the part that was wrong on this width.
+ *
+ * **On a wrapper of ours rather than on the key itself.** `Kbd` sets `display`
+ * on its own host, and a document rule setting it again wins whatever the
+ * specificity — which is a component quietly overruled from outside, and
+ * `helix component`'s `overruled` rule says so. The span is ours to hide, and
+ * the component goes on deciding how a key lays itself out.
+ */
+@media (max-width: 40rem) {
+  .keysOnly,
+  .siteCommandHints {
+    display: none;
+  }
 }

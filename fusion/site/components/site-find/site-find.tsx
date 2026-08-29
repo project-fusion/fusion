@@ -212,7 +212,9 @@ export function SiteFind({
         >
           <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           Search
-          <helix-kbd keys="mod+k" slot="end"></helix-kbd>
+          <span className={styles.keysOnly} slot="end">
+            <helix-kbd keys="mod+k"></helix-kbd>
+          </span>
         </helix-button>
       )}
 

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { ApiTier } from '@/hooks/use-api-tier/use-api-tier'
+import chrome from '../chrome.module.css'
 
 /* Re-exported, because the preview's theme toolbar writes the same preference
    and two components holding the same string is how they drift. The value
@@ -133,6 +134,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
   return (
     <helix-drawer
+      class={chrome.siteDrawer}
       label="Preferences"
       material="glass"
       onhelix-before-close={() => onOpenChange(false)}

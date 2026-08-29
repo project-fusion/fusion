@@ -311,7 +311,20 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setSyntax(url.syntax)
     setPreviewTheme(url.colorMode)
     setForcedTier(url.tier)
-    setShowEditor(url.panes.includes('editor'))
+    /* **Shut on a phone unless the address opened it.**
+     *
+     * The editor and the preview share the width, so at 375px the default split
+     * gives each of them about 180px: a column of wrapped markup beside a
+     * component too narrow to be the component. What a reader followed a link
+     * to a sandbox for is the thing running, and that is what a phone has room
+     * for. The toggle in the settings menu still says otherwise.
+     *
+     * `panes` in the query is a statement about what to show, so a link that
+     * names its panes is honored at every width — the same reasoning the stored
+     * syntax carries below. Only the default gives way. */
+    const cramped = window.matchMedia('(max-width: 60rem)').matches
+    const listed = new URLSearchParams(window.location.search).has('panes')
+    setShowEditor(url.panes.includes('editor') && (listed || !cramped))
     setShowPanel(url.panes.includes('panel'))
     setShowStatus(url.panes.includes('status'))
     setShowRail(url.panes.includes('rail'))
@@ -348,7 +361,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
        taking that as the new resting place would lose the size to come back
        to. */
     if (showEditor) {
-      setSplit(element.split)
+      // Back into the source's own terms, which is what the number is held in.
+      setSplit(narrow ? 100 - element.split : element.split)
     }
     window.localStorage.setItem(
       ARRANGEMENT,
@@ -378,6 +392,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     query.addEventListener('change', sync)
     return () => query.removeEventListener('change', sync)
   }, [])
+
+  /* The stored split is the source pane's share, because that is what it means
+     everywhere else it is read: in the URL, in the arrangement, and in the drag
+     that produced it. Stacked, the preview leads, so what the element wants is
+     the other side of the same divider. */
+  const paneShare = narrow ? 100 - split : split
 
   /* The reader's tier decides which examples exist here, not which ones are
      painted over. The reference pages render both tiers and let CSS hide one,
@@ -1206,7 +1226,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             onhelix-before-split={sandboxChanged}
             orientation={narrow ? 'vertical' : 'horizontal'}
             ref={sandbox}
-            split={showEditor ? split : 0}
+            /* **The share belongs to whichever pane leads, and the lead
+               changes above.** `split` is documented as the lead pane's share
+               precisely so that `30` means the same thing in both directions,
+               which means the number has to be turned around when the lead is.
+               Stacked with the preview leading, `0` was giving the *preview*
+               nothing: the editor toggle blanked the thing it was meant to
+               leave behind, and the same zero that hides the editor across a
+               desk hid the component on a phone. */
+            split={showEditor ? paneShare : narrow ? 100 : 0}
           >
             <helix-sandbox-toolbar slot="toolbar">
               {/* A toggle group, not a tab list. A tab in the toolbar would carry
@@ -1214,15 +1242,21 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-              <helix-toggle-group
-                aria-label="Files"
-                onChange={paneChosen}
-                separation="plain"
-                value={pane}
-              >
-                <helix-toggle value="source">{current.file}</helix-toggle>
-                <helix-toggle value="css">styles.css</helix-toggle>
-              </helix-toggle-group>
+              {/* Only where there is an editor to switch. A choice among files
+                  with the pane holding them shut is a control that appears to do
+                  nothing, which is what a phone showed as soon as the editor
+                  stopped opening by default there. */}
+              {showEditor && (
+                <helix-toggle-group
+                  aria-label="Files"
+                  onChange={paneChosen}
+                  separation="plain"
+                  value={pane}
+                >
+                  <helix-toggle value="source">{current.file}</helix-toggle>
+                  <helix-toggle value="css">styles.css</helix-toggle>
+                </helix-toggle-group>
+              )}
 
               <helix-toolbar label="Sandbox actions" slot="end">
                 <helix-tooltip

@@ -371,3 +371,17 @@
   --kbd-background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   --kbd-border-color: color-mix(in oklab, var(--helix-color-border) 45%, transparent);
 }
+
+/* And gone on a phone, for the reason the palette's hints are: the chip says
+   "press slash to get here", and the reader who is reading it has already
+   tapped the field. The listener stays — it is on the document, so a keyboard
+   attached to a phone still works — only the instruction goes.
+
+   On a wrapper rather than on the key: `Kbd` sets `display` on its own host,
+   and a document rule setting it again would beat the component's own
+   declaration from outside it. */
+@media (max-width: 40rem) {
+  .keysOnly {
+    display: none;
+  }
+}
