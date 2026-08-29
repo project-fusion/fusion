@@ -90,7 +90,7 @@ pub fn run(context: &Context) -> Report {
                 if code[..whole.start()].ends_with('[') {
                     continue;
                 }
-                let line = code[..whole.start()].lines().count();
+                let line = code[..whole.start()].matches('\n').count() + 1;
                 for word in found[1].split_whitespace() {
                     seen.entry(word.to_owned())
                         .or_insert_with(|| format!("{where_}:{line}"));

@@ -35,7 +35,7 @@
 //! three quarters of its subject. A root list is a thing that goes stale
 //! silently; there is nothing to keep current here.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::sync::LazyLock;
 
@@ -114,7 +114,7 @@ pub fn run(context: &Context) -> Report {
         },
         &mut markup,
     );
-    let mut literal: BTreeMap<String, ()> = BTreeMap::new();
+    let mut literal: BTreeSet<String> = BTreeSet::new();
     for file in &markup {
         let Ok(code) = fs::read_to_string(file) else {
             continue;
@@ -125,7 +125,7 @@ pub fn run(context: &Context) -> Report {
                 .or_else(|| found.get(2))
                 .map_or("", |one| one.as_str());
             for name in value.split_whitespace() {
-                literal.insert(name.to_owned(), ());
+                literal.insert(name.to_owned());
             }
         }
     }
@@ -146,7 +146,7 @@ pub fn run(context: &Context) -> Report {
             .replace('\\', "/");
         for name in declares(&text) {
             checked += 1;
-            if literal.contains_key(&name) {
+            if literal.contains(&name) {
                 continue;
             }
             let Some(owner) = rewritten.get(&name) else {

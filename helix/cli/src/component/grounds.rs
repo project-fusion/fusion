@@ -127,7 +127,7 @@ pub fn run(context: &Context) -> Report {
                     checked += 1;
                     continue;
                 }
-                let line = text[..found.start()].lines().count();
+                let line = text[..found.start()].matches('\n').count() + 1;
                 findings.push(Finding {
                     detail: "A component is not the page, so this is a guess about what it was \
                              put on, and it is wrong on a card, a drawer or a photograph. Put it \
