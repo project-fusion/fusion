@@ -376,9 +376,9 @@ crumb, `code-block.noCopy` dropped the button and kept the 40px it stood in, and
 `helix component`'s `reachable` holds it now, and the three checks on this one rule
 are worth naming together because each sees a different half: `reachable` asks
 whether a selected-on property reflects, `reflected` bans a default on one that
-does, and `check:api:reflected-defaults` bans a default that writes an
-attribute. The first two are rules in `helix component`, which is why they are
-spelled without a `check:` prefix; the third is still a script. Three of the four above were found by `check:spec:visual-parity` rendering
+does, and `reflected-defaults` bans a default that writes an
+attribute. All three are rules in `helix component`, which is why they are spelled
+without a `check:` prefix. Three of the four above were found by `check:spec:visual-parity` rendering
 a React twin, not by reading, which is the argument for all of them.
 
 **And a reflected property takes no default.** The two together are what write
@@ -1231,7 +1231,7 @@ direction: React writes the property and no attribute appears, so `:host([max])`
 the component works while looking wrong. Four had drifted, three of them found by
 rendering pictures rather than by reading. `helix component`'s `reachable` reads
 every host-attribute selector against whether its property reflects, and it is the
-third check on that one rule: `reflected` and `check:api:reflected-defaults`
+third check on that one rule: `reflected` and `reflected-defaults`
 both ask about properties that already reflect, and neither notices one that
 should and does not.
 

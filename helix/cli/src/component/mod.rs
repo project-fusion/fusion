@@ -34,11 +34,13 @@ pub mod disabled;
 pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
+pub mod hook_names;
 pub mod leaks;
 pub mod observers;
 pub mod print;
 pub mod reachable;
 pub mod reflected;
+pub mod reflected_defaults;
 pub mod run;
 pub mod seams;
 pub mod separation;
@@ -236,6 +238,10 @@ pub struct Measured {
     pub unit: &'static str,
 }
 
+/* A table rather than a function: four lines per rule, no branches, and it grows
+by one entry per port. Splitting it would put half the rules somewhere else and
+make the set harder to read, which is the opposite of what the lint is for. */
+#[allow(clippy::too_many_lines)]
 pub fn all() -> Vec<Rule> {
     vec![
         Rule {
@@ -274,6 +280,11 @@ pub fn all() -> Vec<Rule> {
             summary: "a component painting the page's color can be corrected",
         },
         Rule {
+            name: "hook-names",
+            run: Runner::Source(hook_names::run),
+            summary: "a component hook spells one idea one way",
+        },
+        Rule {
             name: "leaks",
             run: Runner::Source(leaks::run),
             summary: "a subscription an element takes out does not outlive the element",
@@ -297,6 +308,11 @@ pub fn all() -> Vec<Rule> {
             name: "reflected",
             run: Runner::Source(reflected::run),
             summary: "no reflected property carries a default",
+        },
+        Rule {
+            name: "reflected-defaults",
+            run: Runner::Source(reflected_defaults::run),
+            summary: "a reflected property is silent until something sets it",
         },
         Rule {
             name: "seams",
