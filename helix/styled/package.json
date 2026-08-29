@@ -32,6 +32,7 @@
     "custom-elements.json",
     "dist",
     "elements.css",
+    "helix.css",
     "jsx.d.ts",
     "svelte.d.ts",
     "vue.d.ts"

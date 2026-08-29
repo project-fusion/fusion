@@ -19,6 +19,12 @@
 //! that cannot be seen from inside the package: it resolves here because the
 //! manager links it from disk, and 404s on install anywhere else.
 //!
+//! **A path `exports` promises and `files` does not pack**, which fails the same
+//! way and is quieter still: the specifier resolves in this repository, where
+//! the package is a directory, and there is no such file in the tarball. Nothing
+//! in a build says so, because every build here has the file. `helix.css` was
+//! exported and unpacked, and the console found it by installing.
+//!
 //! **One visibility for everything, because a release is all of it or none.** A
 //! product half public and half restricted installs for nobody, and the failure
 //! names the dependency rather than the setting that caused it. A registry also
@@ -95,6 +101,56 @@ fn conditions(node: &Value, trail: &[String], found: &mut Vec<(Vec<String>, Vec<
         deeper.push(key.clone());
         conditions(&object[&key], &deeper, found);
     }
+}
+
+/// Every string leaf in an exports tree, which is every path it promises.
+///
+/// A `null` target blocks a subpath rather than naming one, so it is not a path
+/// and is skipped with everything else that is not a string.
+fn targets(node: &Value, found: &mut BTreeSet<String>) {
+    match node {
+        Value::String(one) => {
+            found.insert(one.clone());
+        }
+        Value::Array(list) => {
+            for value in list {
+                targets(value, found);
+            }
+        }
+        Value::Object(map) => {
+            for value in map.values() {
+                targets(value, found);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// What npm packs whatever `files` says, so a target naming one is not a fault.
+///
+/// The root's own, and not a file of the same name anywhere below it.
+fn always(path: &str) -> bool {
+    if path.contains('/') {
+        return false;
+    }
+    let lower = path.to_ascii_lowercase();
+    lower == "package.json"
+        || ["readme", "license", "license", "changelog"]
+            .iter()
+            .any(|one| lower.starts_with(one))
+}
+
+/// Whether some `files` entry puts a path in the tarball.
+///
+/// A directory entry carries everything under it, which is what makes `dist`
+/// cover `./dist/index.js` and every subpath pattern below it: a `*` in the
+/// target is inside a segment this never has to expand.
+fn packed(files: &[String], target: &str) -> bool {
+    let path = target.trim_start_matches("./");
+    files.iter().any(|entry| {
+        let entry = entry.trim_start_matches("./").trim_end_matches('/');
+        path == entry || path.starts_with(&format!("{entry}/"))
+    })
 }
 
 pub fn run(context: &Context) -> Report {
@@ -349,7 +405,52 @@ fn judge(
             });
         }
     }
+
+    unpacked(manifest, findings);
     let _ = context;
+}
+
+/// A path `exports` promises that `files` does not pack.
+///
+/// Its own function because `judge` is already at the length clippy allows, and
+/// because this is the one check here that reads two fields against each other
+/// rather than judging one on its own.
+fn unpacked(manifest: &Manifest, findings: &mut Vec<Finding>) {
+    let (name, at) = (&manifest.name, manifest.directory.clone());
+    let listed: Vec<String> = manifest
+        .value
+        .get("files")
+        .and_then(Value::as_array)
+        .map(|all| {
+            all.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
+    /* A glob in `files` leaves the package unjudged rather than reported against
+    a pattern this does not expand. Nothing in this workspace writes one, and
+    a wrong finding here costs more than a missed one: it names a file that is
+    in the tarball. */
+    if listed.iter().any(|one| one.contains('*')) {
+        return;
+    }
+    let mut promised = BTreeSet::new();
+    if let Some(exports) = manifest.value.get("exports") {
+        targets(exports, &mut promised);
+    }
+    for target in promised {
+        if always(target.trim_start_matches("./")) || packed(&listed, &target) {
+            continue;
+        }
+        findings.push(Finding {
+            detail: "Resolves from a checkout, where the package is a directory on disk, and is \
+                 absent from the tarball everyone else installs."
+                .to_owned(),
+            file: at.clone(),
+            message: format!("`{name}` exports `{target}`, which `files` does not pack"),
+        });
+    }
 }
 
 /// The Rust half: what the workspace says it publishes, and what a release does.
