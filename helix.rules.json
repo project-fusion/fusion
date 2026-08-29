@@ -6,7 +6,7 @@
     "app-header": "The bar across the top of the page, which is page chrome by definition.",
     "sandbox": "A development tool that owns its whole window, not a component put on a page."
   },
-  "documents": ["helix/styles/src", "fusion/site/app"],
+  "documents": ["helix/styles/src", "fusion/site"],
   "floors": true,
   "layer": [
     "helix/styles/src/primitives.css",

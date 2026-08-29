@@ -28,6 +28,7 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod attributes;
 pub mod axes;
 pub mod cancelable;
 pub mod categories;
@@ -347,6 +348,11 @@ pub fn all() -> Vec<Rule> {
             name: "floors",
             run: Runner::Meta(floors::run),
             summary: "every rule counted something",
+        },
+        Rule {
+            name: "attributes",
+            run: Runner::Source(attributes::run),
+            summary: "a document rule selects a component only by an attribute it reflects",
         },
         Rule {
             name: "axes",

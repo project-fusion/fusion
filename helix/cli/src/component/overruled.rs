@@ -32,7 +32,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::{stylesheets, Context, Finding, Report};
+use crate::component::{stylesheets, walk_outside, Context, Finding, Report};
 
 static COMMENT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
@@ -104,8 +104,15 @@ struct Document {
 fn reaching(context: &Context, prefix: &str) -> Vec<Document> {
     let mut documents = Vec::new();
     for root in &context.settings.documents {
+        /* `walk_outside` rather than `stylesheets`, because a document root is a
+        whole application: build output under it is a copy of a source this
+        already reads, and reporting both names a file nobody edits. */
         let mut sheets = Vec::new();
-        stylesheets(&context.root.join(root), &mut sheets);
+        walk_outside(&context.root.join(root), &mut sheets);
+        sheets.retain(|one| {
+            one.extension()
+                .is_some_and(|two| two.eq_ignore_ascii_case("css"))
+        });
         for sheet in sheets {
             let Ok(css) = fs::read_to_string(&sheet) else {
                 continue;
