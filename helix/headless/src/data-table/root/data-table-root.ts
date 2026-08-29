@@ -587,6 +587,33 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     super.updated(changed)
     this.markEmpty()
     this.assign()
+    this.announceSort()
+  }
+
+  /**
+   * Tells each column which way it is ordered, if it is the one.
+   *
+   * **The table owns the sort and the column carries the semantics**, which is
+   * the only arrangement that can be right: `role="columnheader"` is on the
+   * column, so `aria-sort` has to be there too, and the value is a fact about
+   * the table's `sort` rather than about any column. Pushed down here rather
+   * than pulled up there, because a column asking its parent would have to know
+   * what kind of parent it has, and it is slotted into two.
+   *
+   * In `updated` and after `assign`, so the order announced is the order the
+   * rows are already in. Announced before the rows moved is the sort a reader is
+   * told about being one they cannot see yet.
+   */
+  private announceSort(): void {
+    const current = parse(this.sort)
+    for (const column of this.tableColumns) {
+      column.sorted =
+        current && column.canSort && column.field === current.field
+          ? current.direction === 'asc'
+            ? 'ascending'
+            : 'descending'
+          : undefined
+    }
   }
 
   /** Columns arrive from the light DOM, which changes no property here. */
