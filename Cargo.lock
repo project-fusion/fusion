@@ -585,6 +585,7 @@ dependencies = [
  "clap",
  "fusion-helix-theme",
  "ratatui",
+ "regex",
  "serde",
  "serde_json",
 ]

@@ -57,6 +57,18 @@ pub enum Noun {
     /// serve` would be a word a reader types to no effect.
     Mcp,
 
+    /// Hold components to the conventions Helix is built on.
+    ///
+    /// **The design system saying whether you extended it correctly**, rather
+    /// than a linter to be configured into usefulness. Where the source is
+    /// comes from `helix.rules.json`, because a consumer's layout is not this
+    /// repository's.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Component {
+        #[command(subcommand)]
+        verb: Component,
+    },
+
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Theme {
@@ -155,4 +167,25 @@ pub struct Init {
     /// Overwrite an existing file.
     #[arg(long)]
     pub force: bool,
+}
+
+/// What can be asked of the component rules.
+#[derive(Debug, Subcommand)]
+pub enum Component {
+    /// Report every rule and what it found, and exit 1 on a finding.
+    Audit(Rules),
+    /// The CI shape of `audit`: same measurement, nothing printed on success.
+    Check(Rules),
+}
+
+/// What both component verbs take.
+#[derive(Args, Debug)]
+pub struct Rules {
+    /// Run just these rules.
+    #[arg(long, value_delimiter = ',')]
+    pub only: Vec<String>,
+
+    /// The workspace to read. Defaults to the current directory.
+    #[arg(long)]
+    pub root: Option<PathBuf>,
 }

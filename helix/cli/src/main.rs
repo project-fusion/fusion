@@ -15,6 +15,7 @@
 //! nothing, so it is deliberately not built yet.
 
 mod args;
+mod component;
 mod config;
 mod error;
 mod exit;
@@ -26,7 +27,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use crate::args::{Cli, Noun, Theme};
+use crate::args::{Cli, Component, Noun, Theme};
 use crate::error::Failure;
 use crate::exit::Code;
 use crate::style::Paint;
@@ -45,6 +46,10 @@ fn main() {
         a server that honored a flag about human output would be a server whose
         stream a client could not parse. */
         Noun::Mcp => mcp::run(),
+        Noun::Component { verb } => match verb {
+            Component::Audit(args) => component::run::audit(args, &from, cli.json, paint),
+            Component::Check(args) => component::run::check(args, &from, cli.json, paint),
+        },
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),

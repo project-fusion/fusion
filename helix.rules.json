@@ -1,0 +1,6 @@
+{
+  "tiers": [
+    "helix/headless/src",
+    "helix/styled/src"
+  ]
+}
