@@ -748,9 +748,9 @@ stylesheet, no \`.dark\` class to toggle, and nothing to remember to update twic
 
 Every token is written once, with both halves in a \`light-dark()\`. Which half
 resolves is decided by \`color-scheme\` and nothing else, so the mode is a single
-inherited property and no token is restated to honor it. That is 761
-declarations across the library, 135 of them in the token layer, expressing two
-modes without a second copy of anything.
+inherited property and no token is restated to honor it. That is 156
+declarations across the shipped stylesheets, 71 of them in the token layer,
+expressing two modes without a second copy of anything.
 
 ## Setting the mode
 
