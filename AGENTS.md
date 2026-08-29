@@ -200,7 +200,7 @@ that `@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`.
 `[workspace.package]` holds the edition, the license and the toolchain floor,
 which are facts about the workspace; a version is a fact about a domain.
 `release.yml` computes `helix` and `cortex` from separate tags, so a shared field
-would take two numbers and keep whichever stamped last. `check:pkg:publishable`
+would take two numbers and keep whichever stamped last. `fusion workspace`'s `publishable`
 fails both on a crate taking `version.workspace = true` and on
 `[workspace.package]` declaring a version at all.
 
@@ -217,7 +217,7 @@ There is no private mode: a private Cargo release needs an alternate registry,
 declared as `publish = ["name"]`. Until there is a consumer worth standing one up
 for, `publish = false` is the honest setting, and anything needing a crate takes
 it as a git dependency pinned to the `cortex-v*` tag the release already pushes.
-`check:pkg:publishable` holds `publish` and `release.yml` to each other in both
+The `publishable` rule holds `publish` and `release.yml` to each other in both
 directions, so the day the flag changes is the day the workflow has to.
 
 ## Naming
@@ -236,7 +236,7 @@ directions, so the day the flag changes is the day the workflow has to.
   configuration and `@fusion.dev/helix-sandbox` the editor and spec runner, both
   Helix byproducts and both build tooling for this repository. Naming them
   `@fusion.dev/*` to say "does not publish" would claim they are general Fusion
-  tooling, which is the one thing they are not. `bun run check:pkg:publishable`
+  tooling, which is the one thing they are not. `fusion workspace --only publishable`
   enforces the rest: `@fusion.dev/*` is always private, a published package may
   never depend on an unpublished one, and every published package agrees on
   visibility.

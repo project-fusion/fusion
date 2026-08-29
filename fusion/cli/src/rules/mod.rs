@@ -13,6 +13,7 @@ pub mod modules;
 pub mod node;
 pub mod order;
 pub mod prerequisites;
+pub mod publishable;
 pub mod react_bridge;
 pub mod registration;
 pub mod scoped;
@@ -158,6 +159,13 @@ pub fn all() -> Vec<Rule> {
             name: "prerequisites",
             run: prerequisites::run,
             summary: "every typecheck builds what its build builds before compiling",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "publishable",
+            run: publishable::run,
+            summary: "what may leave the repository, and what a package must be to do it",
         },
         Rule {
             fix: None,
