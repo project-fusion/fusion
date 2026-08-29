@@ -7,21 +7,16 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* The judgment colors the arrow and the number both, which is a correction to
- * a correction and the second one is the interesting half.
+/* The judgment colors the arrow and the number both.
  *
- * Coloring the metric is the dashboard convention and it was the first version
- * here. It was taken out because `--helix-color-success` painted 3.8:1 on the
- * light surface, fine for a glyph under 1.4.11 and short of the 4.5:1 that 13px
- * text needs, and there was no darker green in the ramp to reach for.
- *
- * **The ramp was the fault, not the component.** Success, warning and info all
- * stopped at a 500 and only danger had ever been extended, so three of the four
- * semantic status colors could be a fill and could not be a word. Extending
- * them was #97; measured now, the worst of the four is 4.87 in the light and
- * 4.53 in the dark, so the number can carry the color as it always should
- * have. Working around a token in a component would have left the same hole for
- * the next component to fall into. */
+ * **The ramp is what makes that legal, and fixing the ramp was the fix.**
+ * Success, warning and info all stopped at a 500 and only danger had ever been
+ * extended, so three of the four semantic status colors could be a fill and
+ * could not be a word: `--helix-color-success` painted 3.8:1 on the light
+ * surface, fine for a glyph under 1.4.11 and short of the 4.5:1 that 13px text
+ * needs. Extending them was #97, and measured now the worst of the four is 4.87
+ * in the light and 4.53 in the dark. Working around a token in a component would
+ * have left the same hole for the next component to fall into. */
 :host {
   color: var(--trend-color, var(--_trend-color));
 

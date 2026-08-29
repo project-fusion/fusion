@@ -5,18 +5,18 @@
 
 /* **A row per page, with its description, which is the whole reason this page
    exists.** The sidebar beside it already lists every section and every title,
-   so an index that showed the same names in boxes was a second copy of the
-   navigation with a border around it: measured before the change, 3,838px of
-   page for 42 links and not one word a reader could not already see.
-   The description is in the frontmatter of every page and was rendered nowhere.
+   so an index showing the same names in boxes is a second copy of the
+   navigation with a border around it: 3,838px of page for 42 links and not one
+   word a reader could not already see. The description is in the frontmatter of
+   every page and is rendered nowhere else.
  */
 .section {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   /* **More below the last row than above the next heading**, which is not
      symmetry for its own sake: the rule belongs to the section that follows it,
      so it should sit nearer the heading it introduces than the rows it closes
-     off. Measured before this, the gap was zero, and a row's hover rectangle
-     landed exactly on the rule. */
+     off. With no end padding a row's hover rectangle lands exactly on the
+     rule. */
   padding-block-end: var(--helix-space-2xl);
   padding-block-start: var(--helix-space-lg);
 }
@@ -80,17 +80,17 @@
 
 /* The standfirst, at the size the product pages set for one.
  *
- * Carried here rather than imported from `vertical-page.module.css`, which is
- * where it was: that module also holds the marketing band inset, and taking one
- * class from it meant wearing the other. See the note on `docsMain` in the page.
+ * Carried here rather than imported from `vertical-page.module.css`: that module
+ * also holds the marketing band inset, and taking one class from it means
+ * wearing the other. See the note on `docsMain` in the page.
  */
 .lede {
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
   max-inline-size: 68ch;
 }
 
-/* The rhythm the flex wrapper used to supply. `main` is not a flex container, so
-   the space between the standfirst and the first section has to be said. */
+/* `main` is not a flex container, so the space between the standfirst and the
+   first section has to be said rather than left to a gap. */
 .head {
   margin-block-end: var(--helix-space-2xl);
 }

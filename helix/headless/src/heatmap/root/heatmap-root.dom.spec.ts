@@ -143,12 +143,11 @@ describe('tones', () => {
   })
 
   /**
-   * **The bubble is one element that moves, not one per cell.** This asserted a
-   * `title` attribute until 27 Aug 2026, which was the whole of what a pointer
-   * used to get: the platform's own box, after a second of delay, carrying the
-   * two values this component happens to hold rather than the row the table
-   * holds. Every other chart here anchors a single `Tooltip` to an invisible
-   * mark, so this does too.
+   * **The bubble is one element that moves, not one per cell.** Every other
+   * chart here anchors a single `Tooltip` to an invisible mark, so this does
+   * too, rather than leaving a pointer the platform's own `title` box: that
+   * arrives after a second of delay and carries the two values this component
+   * happens to hold rather than the row the table holds.
    */
   test('a pointer resting on a cell summons one bubble, over that cell', async () => {
     const element = await strip('', [

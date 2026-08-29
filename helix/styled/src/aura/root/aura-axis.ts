@@ -8,11 +8,9 @@
  * output is a uniform, and what that uniform does is a WebGL draw.
  *
  * That guard is the whole reason this file exists. `terminus` was wrong twice
- * while its docstring said otherwise, out by a factor of two and by the aspect
- * correction, so `0.5` exited at 81.3% of the width on the landing page's own
- * box and `0` was the only value that reached the middle. Both times the
- * arithmetic lived inside a getter, beside a sentence describing different
- * arithmetic, and nothing compared them. See 155.
+ * while its docstring said otherwise, the arithmetic living inside a getter
+ * beside a sentence describing different arithmetic with nothing comparing the
+ * two. See (155).
  *
  * **`exitOf` mirrors the shader step by step rather than stating the closed
  * form**, which is deliberate and is what makes the round trip worth running.
@@ -61,8 +59,8 @@ export const exitOf = (tilt: number, aspect: number): number => {
  * steps gives `terminus = 0.5 + tan(tilt) / (2 * aspect^2)`, and rearranging
  * for the tilt gives what is below.
  *
- * This is the contract `terminus` has always claimed and twice failed to keep:
- * `0` is the left edge, `0.5` the middle and `1` the right edge, in every box.
+ * The contract `terminus` claims: `0` is the left edge, `0.5` the middle and
+ * `1` the right edge, in every box.
  *
  * @param terminus - The crossing wanted, as a fraction of the width.
  * @param aspect - The box's width over its height.

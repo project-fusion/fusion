@@ -10,7 +10,7 @@ import { styles } from './icon-button-root.css.js'
  *
  * @description
  * Top-level rather than `Button.Icon`, because a namespace means composition:
- * `Card.Header` is part of a card, and an icon-only button is not part of a
+ * `Tabs.Tab` is part of a tab set, and an icon-only button is not part of a
  * button. It is a button with different content and a different shape, which
  * makes it its own component.
  *

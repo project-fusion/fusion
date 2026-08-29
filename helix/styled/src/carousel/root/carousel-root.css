@@ -9,9 +9,7 @@
 /* A frame around the track, and each group of chrome placed on a side of it.
  *
  * Three rows and three columns with the slides in the middle, so `indicators`
- * and `controls` each name an edge rather than a position in a shared bar. It
- * was `start | center | end`, which answered "where along the bar" when the
- * question was "which side of the content", and could not say "above" at all.
+ * and `controls` each name an edge rather than a position in a shared bar.
  *
  * The middle cell takes all the room and the eight around it take none, so the
  * frame costs nothing on the sides nothing is placed.
@@ -40,18 +38,16 @@
 /* The block end is the default for both, so they share the row under the
    slides. Two items in one cell overlap by default, which is what
    `justify-self` is for: the dots take the start of the row and the arrows the
-   end, and neither is placed relative to the other. */
-/* **The bleed insets the chrome too, because it is what the content column
+   end, and neither is placed relative to the other.
+
+   **The bleed insets the chrome too, because it is what the content column
    is.** The track takes `--carousel-bleed` as padding, so a slide's leading
    edge sits that far in from the component's own edge; the dots and arrows
-   share the track's column and were taking none of it, so they sat flush
-   against the component while the slides they belong to started further in.
-
-   At the default bleed that is a `space-md` disagreement nobody reads as a
-   mistake. It stops being invisible the moment a consumer bleeds the carousel
-   to the viewport: the insights carousel on the landing page sets the bleed to
-   the page inset so the track runs edge to edge with its slides still in the
-   text column, and the arrows and dots went to the screen edges on their own.
+   share the track's column, so without this they sit flush against the
+   component while the slides they belong to start further in. At the default
+   bleed that is a `space-md` disagreement nobody reads as a mistake, and it
+   becomes the screen edges the moment a consumer bleeds the carousel to the
+   viewport.
 
    Only on the inline axis, and only here. These two rules are the block-start
    and block-end placements, where the chrome is a row in the track's column and
@@ -118,13 +114,14 @@
  * Written among the defaults and not after them, so `indicator-align` still
  * beats it. The two are equal specificity, so this is source order deciding. */
 @media (hover: none) and (pointer: coarse) {
-  /* The dots sat at `start` to be opposite controls that are no longer there,
-     which leaves them on one edge with the rest of the row empty beside them.
-   
-     This half stays here, among the defaults, because `indicator-align` is the
-     same specificity and has to keep winning on source order. The half that
-     hides the controls has no such requirement and sits further down, after the
-     rules that draw them, so specificity ascends the way biome asks. */
+  /* The default `start` is there to be opposite controls that are no longer
+     drawn here, which would leave the dots on one edge with the rest of the row
+     empty beside them.
+
+     This half stays among the defaults, because `indicator-align` is the same
+     specificity and has to keep winning on source order. The half that hides the
+     controls has no such requirement and sits further down, after the rules that
+     draw them, so specificity ascends the way biome asks. */
   :host(:not([controls="always"])) [part="indicators"] {
     --_carousel-indicators-along: center;
   }
@@ -179,9 +176,8 @@
    belongs to, and that placement is the whole of whether it works. Every one of
    these selectors is `:host([attr]) [part]`, so they are all the same
    specificity and source order is the entire cascade: written down there it
-   came after the attribute and pinned the arrows to the middle whatever
-   `controls-align` said. Measured across all twelve combinations, which is how
-   the one that did not move was found. */
+   follows the attribute and pins the arrows to the middle whatever
+   `controls-align` says. */
 :host([controls-placement="inline-start"]) [part="controls"],
 :host([controls-placement="inline-end"]) [part="controls"],
 :host([controls-placement="overlay"]) [part="controls"] {
@@ -276,10 +272,11 @@
 }
 
 /* A scroller with snap points, so a drag, a trackpad swipe, and the browser's
-   own momentum all work without any of them being reimplemented. The scrollbar
-   is hidden because the controls are the affordance, and the track still
-   scrolls by every other means. */
-/* **Room inside the scroller, so a slide's own edge is not shaved by it.**
+ * own momentum all work without any of them being reimplemented. The scrollbar
+ * is hidden because the controls are the affordance, and the track still
+ * scrolls by every other means.
+ *
+ * **Room inside the scroller, so a slide's own edge is not shaved by it.**
  *
  * `overflow-x: auto` makes the other axis `auto` too, and a scroll container
  * clips at its padding box on both. A slide flush against that edge loses
@@ -287,20 +284,18 @@
  * and a focus ring on any of them came out a pixel short down one side, which
  * reads as a rendering fault rather than as a clip.
  *
- * **Sized to clear a shadow rather than a hairline**, which is what it was and
- * what was not enough. `--helix-shadow-md` is `0 4px 12px`, so it reaches 16px
- * below the box it is on, and the 4px this held clipped every slide that
- * carried one on all four sides at once. `--helix-space-md` is that 16px
- * exactly. A slide on `--helix-shadow-lg` reaches 44px and wants
+ * **Sized to clear a shadow rather than a hairline.** `--helix-shadow-md` is
+ * `0 4px 12px`, so it reaches 16px below the box it is on, and 4px here clips
+ * every slide carrying one on all four sides at once. `--helix-space-md` is that
+ * 16px exactly. A slide on `--helix-shadow-lg` reaches 44px and wants
  * `--carousel-bleed` raised, which is what the hook is for.
  *
  * **`scroll-padding` as well, or snapping takes the room straight back.** A
  * snap position aligns a slide to the *snapport*, which is the scrollport inset
  * by `scroll-padding` and, with none set, is the padding box: the leading slide
- * snapped its own edge onto the clip edge and the first and last slides were
- * shaved at rest no matter how much padding was here. Measured on the insights
- * carousel, the track sat at `scrollLeft: 4` with 0px of leading room, which is
- * the whole bleed scrolled away.
+ * snaps its own edge onto the clip edge and the first and last slides are shaved
+ * at rest no matter how much padding is here. Measured without it, the track sat
+ * at `scrollLeft: 4` with 0px of leading room, the whole bleed scrolled away.
  *
  * Padding rather than a margin on the slides, because `flex-basis` is a
  * percentage of the *content* box: the track gives the step away and the slides
@@ -312,12 +307,11 @@
   /* **Inline only, because that is the axis the bleed is about.**
 
      The bleed gives back the room a negative margin took when the track was
-     pulled out to the viewport's edges, which is a horizontal manoeuvre; it was
-     applied as `padding` on all four sides, so setting it also pushed the
-     slides down off the top of the track and lifted the chrome off their
-     bottom. At the shipped default that is `space-md` and reads as ordinary
-     breathing room. On the landing page, where the bleed is the page inset,
-     it measured 72px of dead space between the cards and the dots under them.
+     pulled out to the viewport's edges, which is a horizontal maneuver. Applied
+     as `padding` on all four sides it also pushes the slides down off the top of
+     the track and lifts the chrome off their bottom: ordinary breathing room at
+     the shipped `space-md` default, and 72px of dead space between the cards and
+     the dots where the bleed is a page inset.
 
      The block axis keeps `space-md` on its own. It is not zero because the
      track is a scroll container on one axis and therefore clips on the other,
@@ -333,8 +327,6 @@
   display: none;
 }
 
-/* Each slide is a share of the track, less its share of the gaps. Sized here
-   rather than on the slide, which is the consumer's own element. */
 /* Vertical: the same track turned, and the one thing it needs that the
  * horizontal one does not is a height.
  *
@@ -354,19 +346,16 @@
   scroll-snap-type: y mandatory;
 }
 
-/* The pane, not the slotted slide.
+/* The pane, not the slotted slide. Each is a share of the track, less its share
+ * of the gaps, sized here rather than on the slide, which is the consumer's own
+ * element.
  *
  * The component wraps each slide in a `[part="slide"]` and assigns it there, so
  * the consumer's element carries no attribute of ours: see `assign` in the
  * headless root. The pane is therefore the flex item and the box that snaps, and
  * the sizing had to move onto it with the layout. `display: flex` is what
  * passes the size through, the slide below being a lone flex child told to grow
- * into both axes, so it still fills the space it used to occupy directly.
- *
- * *The word was `grid` here until 28 Aug 2026 and the rule has always said
- * `flex`.* A comment describing a different implementation from the one under it
- * is the kind this repository treats as a defect rather than a typo: it is read
- * by whoever changes the rule next. */
+ * into both axes, so it still fills the space it used to occupy directly. */
 [part="slide"] {
   display: flex;
   flex: 0 0
@@ -420,33 +409,26 @@
   --_carousel-per-view: 5;
 }
 
-/* The track is not what moves.
- *
- * This block asserted `scroll-behavior: auto` on the scroller, which restates
- * the initial value and does nothing, while the scroll that animates is issued
- * from JavaScript with `behavior: 'smooth'` named outright, which overrides the
- * property whatever it says. The component reads the preference at that call
- * now, so nothing about the scroll is answered here.
- *
- * What is left that moves is the indicator, and its reduce block is at the foot
- * of this file rather than here. The selectors it has to repeat are the ones
- * declared below, and at equal specificity source order is the whole of the
- * cascade: written above them it would lose to every one. */
+/* **No `scroll-behavior` here, and the track is not what moves.** The scroll
+   that animates is issued from JavaScript with `behavior: 'smooth'` named
+   outright, which overrides the property whatever it says, and the component
+   reads the reduced-motion preference at that call.
+
+   What is left that moves is the indicator, and its reduce block is at the foot
+   of this file rather than here. The selectors it has to repeat are the ones
+   declared below, and at equal specificity source order is the whole of the
+   cascade: written above them it would lose to every one. */
 
 /* Where the reader is, and a way to get anywhere. Dots rather than numbers,
    because the count is rarely the point and a row of numerals reads as data.
-   Placed by the frame at the top of this file; only the dots themselves are
-   described here. */
+   `space-xs` across on a `space-2xs` gap, so the run is tight and reads as one
+   object. Placed by the frame at the top of this file.
 
-/* The dots, at the spacing they have always had: `space-xs` across on a
-   `space-2xs` gap, so the run is tight and reads as one object.
-
-   A traveling mark was tried here instead, on the argument that one thing
-   moving is more legible than two things resizing, and it is not: the pill is
-   three times a dot's width, so a mark that does not take room in the row has to
-   sit over its neighbors, and the pitch had to go from 12 to 20 to make space
-   for it. The run stopped being a run. What the reader wants is the growth
-   itself, so the growth is what this animates. */
+   **Not a traveling mark.** The pill is three times a dot's width, so a mark
+   that does not take room in the row has to sit over its neighbors and the pitch
+   has to go from 12 to 20 to make space for it, at which point the run stops
+   being a run. What the reader wants is the growth itself, so the growth is what
+   this animates. */
 [part="indicator"] {
   all: unset;
   background-color: var(--helix-color-border);
@@ -461,13 +443,12 @@
 
   /* **One duration and one curve for both, which is the whole of the fix.**
    *
-   * Color ran over `fast` and size over `normal`, 120ms against 200ms, so the
-   * two halves of one change finished 80ms apart: the arriving dot was fully
-   * blue while still four fifths grown, and the leaving one fully gray while
-   * still a fifth wide. Measured across the handoff, the middle of every move
-   * was a fat gray stub beside a short blue one, and the color arriving ahead
-   * of the shape is what read as a jump rather than as a glide. Stated once so
-   * they cannot drift apart again.
+   * Color over `fast` and size over `normal` is 120ms against 200ms, so the two
+   * halves of one change finish 80ms apart: the arriving dot fully blue while
+   * still four fifths grown, the leaving one fully gray while still a fifth
+   * wide, and the middle of every move a fat gray stub beside a short blue one.
+   * The color arriving ahead of the shape is what reads as a jump rather than as
+   * a glide. Stated once so they cannot drift apart.
    *
    * `slow` rather than `normal`, because this is the one transition in the
    * component a reader is meant to watch: at 200ms the pill had arrived before
@@ -484,11 +465,11 @@
 
 /* The current dot stretches along the run, whichever way the run goes.
  *
- * It grew on the inline axis wherever it was, so a column of dots beside the
- * slides had one lying on its side across the column: an oval pointing the way
- * the reader is not traveling. Beside the track it lengthens on the block axis
- * instead, and the transition follows it, or the growth is instant on the one
- * axis and animated on the other. */
+ * Growing on the inline axis wherever it is leaves a column of dots with one
+ * lying on its side across the column: an oval pointing the way the reader is
+ * not traveling. Beside the track it lengthens on the block axis instead, and
+ * the transition has to follow it, or the growth is instant on the one axis and
+ * animated on the other. */
 :host([indicator-placement="inline-start"]) [part="indicator"],
 :host([indicator-placement="inline-end"]) [part="indicator"] {
   transition:
@@ -515,27 +496,20 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Hero. The two arrows leave the controls bar and sit against the track's own
-   edges, over the content, which is what a full-bleed carousel wants: the
-   slide is the page and the controls are on it rather than under it.
- *
- * The host becomes the containing block, and the buttons are centered on the
- * track rather than on the host, because the host also holds the indicators
- * underneath: centering on it would put the arrows low by half that row. */
-/* A grid, so the controls and the track share one cell and the arrows can be
-   centered on the slides rather than on the whole component. Positioning them
-   against the host does not work: the host holds the indicator row too, so its
-   middle is half that row below the track's, and the arrows came out high. */
 /* On the slides, which is the fifth place the chrome can go: the four edges and
- * the middle.
+ * the middle. The arrows leave the controls bar and sit against the track's own
+ * edges, over the content, which is what a full-bleed carousel wants.
  *
- * This was `appearance="hero"`, a third axis for something the two placement
- * axes already describe. What `hero` meant was "the controls are over the
- * content", and everything else it did followed from that: arrows at the
- * track's own edges, a surface under each of them because a glyph drawn
- * straight onto a photograph is legible against about half of one, and a bar
- * that catches no presses so the slide underneath still does. None of that is a
- * separate decision a consumer makes, so none of it needed a separate word.
+ * The controls and the track share one grid cell, so the arrows are centered on
+ * the slides. Positioning them against the host does not work: the host holds
+ * the indicator row too, so its middle is half that row below the track's and
+ * the arrows come out high.
+ *
+ * Everything else this placement does follows from "the controls are over the
+ * content": a surface under each arrow, because a glyph drawn straight onto a
+ * photograph is legible against about half of one, and a bar that catches no
+ * presses so the slide underneath still does. None of that is a separate
+ * decision a consumer makes, so none of it needs a separate word.
  *
  * Only the controls take this value. Dots over a photograph are a different
  * argument and nobody has made it. */
@@ -545,8 +519,9 @@
 }
 
 /* The bar itself catches nothing, so a press between the arrows reaches the
-   slide under it. The buttons take pointer events back. */
-/* `controls-align` still means "along the edge", and here the edge is the whole
+   slide under it. The buttons take pointer events back.
+
+   `controls-align` still means "along the edge", and here the edge is the whole
    slide: the bar is stretched across it, so the word moves the arrows up and
    down within it rather than moving the bar. `align-items` on the flex line
    rather than `align-self` on the grid item, for that reason. */
@@ -554,8 +529,8 @@
   align-items: var(--_carousel-controls-along);
   /* `flex-start` with the forward arrow pushed over, not `space-between`.
      Spreading three items puts one of them in the middle of the slide: with
-     `autoplay` the set is previous, next and the rotation toggle, and the next
-     arrow landed halfway across the picture. Pushing `next` to the far edge and
+     `autoplay` the set is previous, next and the rotation toggle, so the next
+     arrow lands halfway across the picture. Pushing `next` to the far edge and
      letting the toggle follow it groups the two that belong together and leaves
      `previous` alone at the near edge. */
   justify-content: flex-start;
@@ -578,10 +553,10 @@
  * two more pixels to sit in and move it. Changing the geometry to change the
  * color is how a rule ends up blamed for something it did not do.
  *
- * All three, not the two arrows. The rotation toggle is over the same slide
- * and had neither surface nor shadow, so on a light photograph it was a
- * bordered box with nothing behind it. It is only visible with `autoplay`,
- * which is why it stayed wrong. */
+ * All three, not the two arrows. The rotation toggle is over the same slide, so
+ * without a surface and a shadow it is a bordered box with nothing behind it on
+ * a light photograph. It is only visible with `autoplay`, which is why it is the
+ * one that gets forgotten. */
 :host([controls-placement="overlay"]) [part="previous"],
 :host([controls-placement="overlay"]) [part="next"],
 :host([controls-placement="overlay"]) [part="rotation"] {
@@ -591,7 +566,8 @@
   pointer-events: auto;
 }
 
-/* The rotation toggle stays at the trailing edge, beside the next arrow. */
+/* The forward arrow goes to the trailing edge, `previous` staying at the near
+   one. */
 :host([controls-placement="overlay"]) [part="next"] {
   margin-inline-start: auto;
 }

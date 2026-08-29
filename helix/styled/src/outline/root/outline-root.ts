@@ -11,7 +11,7 @@ import { styles } from './outline-root.css.js'
  * the shape a table of contents has taken since printed marginalia: the line
  * says the list is one thing, and the lit segment says where in it you are.
  *
- * Nesting is the consumer's, expressed as `data-level` on a link. A outline
+ * Nesting is the consumer's, expressed as `data-level` on a link. An outline
  * that read heading levels itself would have to look at the document, and the
  * document is not always where the headings are.
  *

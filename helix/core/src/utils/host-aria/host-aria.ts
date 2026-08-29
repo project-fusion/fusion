@@ -21,8 +21,8 @@ export interface HostAria {
  * **Empty means absent, and that is the trap this exists for.** Assigning `''`
  * to `ariaLabel` is not the same as not naming the element: it is a name of no
  * characters, which a screen reader announces as an unnamed control while every
- * check for "is it labeled" passes. Every caller had written
- * `this.label === '' ? null : this.label` and one of them would eventually not.
+ * check for "is it labeled" passes. Clearing is `null`, and this is the one
+ * place that has to remember it.
  *
  * **Element references are feature-tested rather than assumed.** They are the
  * only way a host in the light DOM can point at a node in its own shadow root,

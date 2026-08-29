@@ -26,17 +26,11 @@ import { TierAddress } from './tier-address'
 /**
  * One component family, in full.
  *
- * *Changed 19 Aug 2026.* This page used to be the API and nothing else, on the
- * grounds that a reference which starts collecting pictures stops being the
- * place you can trust to be complete. What that split actually produced was two
- * pages a reader had to hold in their head at once: the tables here, the
- * pictures somewhere else, and no page that answered "what is this and how do I
- * use it" without a navigation in the middle of the answer. The sandbox is
- * still where an example is *edited*; this is where it is *seen*, alongside the
- * API it demonstrates.
+ * The sandbox is where an example is *edited*; this is where it is *seen*,
+ * alongside the API it demonstrates.
  *
- * Every section carries an `id`, because the rail is a real `Outline` now
- * rather than a hand-rolled list, and it reads the anchors the page gives it.
+ * Every section carries an `id`, because the rail is a real `Outline` and it
+ * reads the anchors the page gives it.
  *
  * Tables are `helix-table`, a grid rather than a `<table>`: every column lines
  * up across rows while each row stays a real element. The heading cell is what
@@ -86,11 +80,11 @@ const NAME = 'minmax(min-content, auto)'
 /**
  * The type column, floored at the widest thing in it that cannot break.
  *
- * It was `minmax(8rem, 1fr)`, and a fixed floor is a guess about content: 8rem
- * is 128px and Accordion's `"single-collapsible"` needs 159, so the member
- * overflowed the track by 31px and printed over the column beside it. A union's
- * members are deliberately unbreakable, so the track has to be at least one
- * member wide or there is nowhere for it to go.
+ * A fixed floor is a guess about content: at `minmax(8rem, 1fr)`, 8rem is 128px
+ * and Accordion's `"single-collapsible"` needs 159, so the member overflowed the
+ * track by 31px and printed over the column beside it. A union's members are
+ * deliberately unbreakable, so the track has to be at least one member wide or
+ * there is nowhere for it to go.
  *
  * `min-content` is that width and is never more than it needs. A signature is
  * one member and breaks at its spaces, so its `min-content` is a word rather
@@ -152,7 +146,7 @@ function Code({ children }: { children: string }) {
  * The palette is the library's own `syntax-*` tokens, so a type here is the
  * color the same word would be in the sandbox's editor. That is the reason
  * strings are not green: this set is GitHub-derived, where a string is navy and
- * green is the tag color. Recolouring them would make the reference page
+ * green is the tag color. Recoloring them would make the reference page
  * disagree with the editor two panes away, which is worse than either choice.
  */
 /**
@@ -315,8 +309,7 @@ function tokens(member: string) {
  * the explanation rather than the word "info".
  *
  * Only `Read` has one today. `Prop`, `Type`, `Slot` and `Event` are words a
- * reader arrives already knowing; `Read` is ours, and it is what somebody asked
- * about.
+ * reader arrives already knowing; `Read` is ours.
  */
 function ColumnHint({ hint, label }: { hint: string; label: string }) {
   return (
@@ -382,21 +375,18 @@ function MemberTable({
  * Written into each `@reference` it would be the same sentence in five places
  * and a rewording would be five edits in two packages.
  *
- * One string for both surfaces. It used to be `Invoker Commands. Opens the
- * specification.` in the bubble and `command: Invoker Commands` as the
- * accessible name, which is two phrasings of one thing and neither of them an
- * instruction. The row's own name is already the header of the row a reader is
- * in, so repeating it in the link only makes the announcement longer.
+ * One string for both surfaces, and it does not repeat the member's name: that
+ * name is already the header of the row a reader is in, so carrying it in the
+ * link only makes the announcement longer.
  */
 const opens = (label: string): string => `Open the ${label} specification`
 
 /**
  * A description, and the marks for whatever it is built on.
  *
- * One component for both tables, because both need it and only one had it.
- * `form` and `labels` are read-only, so they live in the Read table, and their
- * rows carried a reference in the manifest that nothing rendered: 96 of the 110
- * marks in the library were on members this cell was not being used for.
+ * One component for both tables, because both need it. `form` and `labels` are
+ * read-only, so they live in the Read table, and a Read table without this cell
+ * drops 96 of the library's 110 reference marks.
  */
 function Described({
   description,
@@ -468,9 +458,8 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
 function ElementApi({ element }: { element: Element }) {
   return (
     <helix-flex data-tier={element.tier} direction="column" gap="md" id={element.tagName}>
-      {/* The part, not the family and the part: every heading under Avatar's
-          API Reference began with the word Avatar, which the page has already
-          said twice above.
+      {/* The part, not the family and the part: the page has already said the
+          family name twice above.
 
           And the tag beside the heading rather than under it. `Root` and
           `helix-accordion` are one fact stated twice, a role and the name it
@@ -540,19 +529,16 @@ function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefin
 /**
  * A title and a card for each of the eighty-eight families.
  *
- * This route is most of the site by count, and every one of it shared the root
- * title and the root description: a link to `Accordion` and a link to
- * `VirtualList` unfurled identically, which is 247's complaint in its purest
- * form. The family already carries both facts, `label` and `summary`, and the
- * summary is written as the one sentence that says what the component is, which
- * is exactly what a card wants.
+ * This route is most of the site by count, so a shared root title and
+ * description would have `Accordion` and `VirtualList` unfurling identically.
+ * The family already carries both facts, `label` and `summary`, and the summary
+ * is written as the one sentence that says what the component is, which is
+ * exactly what a card wants.
  *
- * **The picture is drawn now too**, by `opengraph-image.tsx` beside this file,
- * from the same `label`, `summary` and `status`. It used to fall back to the
- * site's own card, so most of the site by count unfurled as though every page
- * were the front page. There is still no *shot* of a family, and 255 decided
- * there should not be: a card is read at thumbnail size, where a name set large
- * is legible and a screenshot of a control is a gray smudge. See 247 and 255.
+ * **The picture is drawn too**, by `opengraph-image.tsx` beside this file, from
+ * the same `label`, `summary` and `status`. There is deliberately no *shot* of a
+ * family: a card is read at thumbnail size, where a name set large is legible
+ * and a screenshot of a control is a gray smudge. See (247) and (255).
  */
 export async function generateMetadata({
   params,
@@ -566,9 +552,8 @@ export async function generateMetadata({
   return pageMetadata({
     description: family.summary,
     /* Stands aside for `opengraph-image.tsx` beside this file. `pageMetadata`
-       otherwise sets `images` to the site card, and a set `images` is what
-       stops Next reading the convention at all: measured before this, `og:image`
-       on both Accordion and Table was the site's own picture. */
+       otherwise sets `images` to the site card, and a set `images` is what stops
+       Next reading the convention at all, silently. */
     image: false,
     path: `/helix/components/${family.slug}`,
     title: family.label,
@@ -594,7 +579,7 @@ export default async function FamilyDocs({
      It forces the page and never writes storage. Following somebody's link must
      not re-set your own drawer, which is why `preferences.tsx` skips its stored
      value when the address said something. Validated against the two literals
-     before it reaches a script tag. See 211. */
+     before it reaches a script tag. See (211). */
   const asked = (await searchParams).tier
   const forced = asked === 'headless' || asked === 'styled' ? asked : undefined
   if (!family) {
@@ -637,10 +622,10 @@ export default async function FamilyDocs({
       )}
       <article className={styles.docsMain}>
         {/* `3xl`, the top of the scale, because a section break should be the
-            largest space on the page: at `2xl` Usage sat as far from Preview as
-            Root sat from Group, so the page had one rhythm and no hierarchy.
-            Said on the element rather than in `site.css`, which was overriding
-            this very attribute from the document and winning silently. */}
+            largest space on the page: at `2xl` Usage sits as far from Preview as
+            Root sits from Group, so the page has one rhythm and no hierarchy.
+            Said on the element rather than in `site.css`, which overrides this
+            very attribute from the document and wins silently. */}
         <helix-flex direction="column" gap="3xl">
           <helix-flex direction="column" gap="md">
             {/* Title and its actions on one line. The ellipsis holds everything
@@ -665,10 +650,9 @@ export default async function FamilyDocs({
               {first(prose)}
             </helix-text>
 
-            {/* Three facts about the component, in the same register. Status was
-                already a tag and Since and Category were loose text beside it,
-                so a reader had to notice that one of the three was a different
-                kind of thing for no reason a reader could see. */}
+            {/* Three facts about the component, in the same register: a tag
+                each, so none of the three reads as a different kind of thing
+                from the other two. */}
             <helix-flex align="center" data-density="sm" gap="xs" wrap>
               {family.status && <helix-tag>{startCase(family.status)}</helix-tag>}
               {family.since && <helix-tag>Since {family.since}</helix-tag>}
@@ -678,14 +662,12 @@ export default async function FamilyDocs({
 
           <helix-flex direction="column" gap="md" id="usage">
             <helix-text as="h2">Usage</helix-text>
-            {/* The import, and only the import. There was a second block
-                holding `<helix-accordion></helix-accordion>`, which is the tag
-                the heading two lines above already says: a line of code that
-                teaches nothing is still a line of code a reader has to read.
-                And deliberately no CDN script tag: every package here is
-                `private: true` and nothing is published, so a `<script src>`
-                would be the one instruction on this page that cannot be
-                followed. */}
+            {/* The import, and only the import: a block holding the tag the
+                heading two lines above already says teaches nothing and is
+                still a line a reader has to read. And deliberately no CDN
+                script tag, since nothing here has been released yet: a
+                `<script src>` would be the one instruction on this page that
+                cannot be followed. */}
             {family.elements.some((entry) => entry.tier === 'styled') && (
               <helix-code-block data-tier="styled">
                 <span
@@ -742,14 +724,11 @@ export default async function FamilyDocs({
             )}
           </helix-flex>
 
-          {/* Wide between one element and the next, tight inside each. The two
-              were `xl` and `lg`, near enough that a heading sat about as far
-              from the table under it as from the whole section above it, so the
-              page had no seam between one element's API and another's.
-              `2xl` because that is the top of `Flex`'s scale: the token
-              `space-3xl` exists but the component does not offer it, which is
-              the component being right about how far apart two things in one
-              flow should ever be. */}
+          {/* Wide between one element and the next, tight inside each, or there
+              is no seam between one element's API and another's. `2xl` because
+              that is the top of `Flex`'s scale: the token `space-3xl` exists but
+              the component does not offer it, which is the component being right
+              about how far apart two things in one flow should ever be. */}
           <helix-flex direction="column" gap="2xl" id="api">
             <helix-text as="h2">API Reference</helix-text>
             {family.elements.map((element) => (
@@ -774,10 +753,9 @@ export default async function FamilyDocs({
               <helix-table label="Examples">
                 <helix-table-column>Name</helix-table-column>
                 <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-                {/* Rows are keyed on the tier as well as the slug. Both
-                    tiers name their canonical example `preview.html`, so the
-                    slug alone collided the moment the catalog began reading
-                    both, and React was handed two children called `preview`. */}
+                {/* Rows are keyed on the tier as well as the slug. Both tiers
+                    name their canonical example `preview.html`, so the slug
+                    alone hands React two children called `preview`. */}
                 {byExample(family.examples).map((example) => (
                   <helix-table-row data-tier={example.tier} key={`${example.tier}.${example.slug}`}>
                     <helix-table-cell header>
@@ -811,13 +789,14 @@ export default async function FamilyDocs({
       </article>
 
       <aside className={styles.docsRail}>
-        {/* The real component, which computes what is current from where the
-            headings actually are and writes `aria-current` onto these anchors.
-            The list it replaced marked nothing at all, so the rail said where
-            you could go and never where you were. */}
-        {/* A visible heading, not only the accessible one. `label` names the
-            navigation for a screen reader and paints nothing, so the rail was
-            a column of links with no word saying what they were. */}
+        {/* `Outline` rather than a hand-rolled list: it computes what is current
+            from where the headings actually are and writes `aria-current` onto
+            these anchors, so the rail says where you are and not only where you
+            could go.
+
+            The heading is visible as well as accessible. `label` names the
+            navigation for a screen reader and paints nothing, which leaves a
+            column of links with no word saying what they are. */}
         <helix-text class={styles.docsRailTitle} tone="subtle" variant="label">
           On this page
         </helix-text>

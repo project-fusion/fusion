@@ -14,18 +14,13 @@
   display: block;
 }
 
-/* The ramps live here now, and the `data-text` recipe for a plain element stays
-   in the base layer.
- 
-   They were all three in the document, on the reasoning that one declaration
-   cannot drift. What that cost is worse than the drift: a document rule reaches
-   inside every component that slots a `helix-text`, and beats that component's
-   own stylesheet whatever the specificity and whatever the layer, both measured.
-   A dialog asking for a smaller title got the ramp's heading size instead, and
-   nothing said why.
- 
-   Split, the mapping is written twice and the values once, since both sides
-   reference the same tokens. Base keeps the helper; the component keeps itself.
+/* The ramps live here, and the `data-text` recipe for a plain element stays in
+   the base layer. Never move these to the document: a document rule reaches
+   inside every component that slots a `helix-text` and beats that component's
+   own stylesheet whatever the specificity and whatever the layer, both measured,
+   so a dialog asking for a smaller title gets the ramp's heading size instead
+   and nothing says why. Split, the mapping is written twice and the values once,
+   since both sides reference the same tokens.
 
    Those rules match the host, and this element takes them by inheritance:
    font, color, and tracking all cross a shadow boundary. `font: inherit` is
@@ -37,7 +32,7 @@
    to look like anything, and it is not alone in that. `Button`'s entire box
    lives in the base layer too, paired with the `data-button` recipe, and so do
    the link, list-item, card and navigation-item recipes. The base layer is not
-   optional for this library; the sentence here used to imply it was. */
+   optional for this library. */
 :host([variant="display"]),
 :host(:not([variant])[as="h1"]) {
   font-family: var(--helix-font-display);

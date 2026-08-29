@@ -7,11 +7,10 @@ import styles from '@/components/trouble/trouble.module.css'
 /**
  * What a reader gets when a page under the site chrome throws.
  *
- * **`retry` rather than `reset`, which is the rename this version made.** The
- * prop re-fetches and re-renders the boundary's children, and if that succeeds
- * the fallback is replaced by the real page. Written against
- * `node_modules/next/dist/docs`, because the local guide is the one that
- * matches the installed version and the shape from memory is a version behind.
+ * **The prop is `retry`, not the `reset` earlier Next versions named.** It
+ * re-fetches and re-renders the boundary's children, and if that succeeds the
+ * fallback is replaced by the real page. Check `node_modules/next/dist/docs`
+ * rather than memory, which is a version behind.
  *
  * **It sits inside `(site)`, so the nav and the footer survive the error.** An
  * `error` file does not wrap the layout in its own segment, which is exactly

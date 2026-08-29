@@ -69,18 +69,17 @@ export class HelixHeatmap extends HelixHeadlessHeatmap {
   /**
    * The first guess at what this sheet draws, before it has been measured.
    *
-   * **Not a contract any more, and it was a bad one.** `fits()` works against a
-   * measured width and a cell size it has to be told, and being told by hand
-   * meant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:
-   * the arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety
-   * day strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into
-   * 342 at 390, overflowing the document both times while `visible` reported 59
-   * and 34. The number a summary is told to trust was the number that was wrong.
+   * **Not a contract.** `fits()` reads the strip back rather than being told a
+   * cell size by hand, so nothing has to be kept in step and
+   * `--heatmap-cell-inline-size` on its own is enough. Told by hand, these sat
+   * at the base tier's 8 and 2 against a sheet drawing 12 and 4, and the
+   * arithmetic believed a cell cost 10 pixels where it cost 16: a ninety day
+   * strip drew 940 pixels of cells into a 592 pixel box while `visible`
+   * reported 59.
    *
-   * The strip is read back now, so nothing has to be kept in step and
-   * `--heatmap-cell-inline-size` on its own is enough. These two remain because a
-   * measurement arrives one frame after the first paint, and a first paint from
-   * numbers that match the sheet is one that does not move.
+   * These two remain because a measurement arrives one frame after the first
+   * paint, and a first paint from numbers that match the sheet is one that does
+   * not move.
    */
   override gap = 4
 

@@ -19,7 +19,7 @@ import type { Route } from '../../content/routes/routes'
  * is authoritative and neither can drift, because there is one set of words and
  * both read it.
  *
- * This is what `12-ai-native-web.md` chose instead of a component protocol. A
+ * This was chosen instead of a component protocol. A
  * page in MDX would need `<Statement>`, `<Verticals />` and `<Questions>`, and
  * every one of those would need a markdown renderer of its own or leave a hole
  * in the output. Here there is one renderer for one shape, and the shape is
@@ -121,7 +121,7 @@ const insightsCopy = (): PageCopy => ({
  *
  * The same shape as `insightsCopy` and for the same reason: the page is a
  * registry rendered, so its document is that registry rendered too. Writing a
- * copy module for it would be a second list of 89 families that could disagree
+ * copy module for it would be a second list of families that could disagree
  * with the manifest, which is the whole thing this arrangement exists to
  * prevent.
  *

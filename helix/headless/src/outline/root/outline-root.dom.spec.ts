@@ -51,10 +51,10 @@ describe('outline scrolling', () => {
   }
 
   test('offset reaches the sections, not only the marker', async () => {
-    /* It described where the top of the readable area is and exactly one thing
-       read it. Click a link and the browser put the heading against the very
-       top of the window, under the masthead whose height the consumer had just
-       measured for us. */
+    /* `offset` describes where the top of the readable area is, so the sections
+       have to carry it. Read by the marker alone, a fragment click puts the
+       heading against the very top of the window, under the masthead whose
+       height the consumer just measured for us. */
     const { outline, root } = await page('offset="64"')
     await outline.updateComplete
     expect((root.querySelector('#two') as HTMLElement).style.scrollMarginBlockStart).toBe('64px')

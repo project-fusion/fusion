@@ -180,25 +180,6 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.requestOpen(false)
   }
 
-  /*
-   * Keeps an option's own announcement inside the palette.
-   *
-   * Every option says `helix-select` when it is chosen, which is how the list
-   * hears it, and the list does not stop it: the options are light DOM children
-   * of this element, so it carried straight on out to the consumer. They then
-   * heard two selections for one command, an option's and the palette's, under
-   * one event name and distinguishable only by looking at the target.
-   *
-   * The one this element dispatches has itself as the target and is let past.
-   * Combobox stops the listbox's `helix-before-change` for the same reason.
-   *
-   * `stopImmediatePropagation`, not `stopPropagation`. The consumer's listener
-   * is on this same element, and stopping propagation only keeps an event off
-   * the *next* node: every other listener already bound here still runs, so the
-   * option's selection reached the consumer anyway. The listbox hears it well
-   * before this, from inside the shadow root, so nothing this element needs is
-   * lost by ending it here.
-   */
   /**
    * The row under the keyboard, read from the attribute the listbox writes.
    *
@@ -255,6 +236,21 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /*
+   * Keeps an option's own announcement inside the palette.
+   *
+   * Every option says `helix-select` when it is chosen, which is how the list
+   * hears it, and the options are light DOM children of this element, so it
+   * carries straight on out to the consumer: two selections for one command
+   * under one event name, told apart only by the target. The one this element
+   * dispatches has itself as the target and is let past.
+   *
+   * `stopImmediatePropagation`, not `stopPropagation`. The consumer's listener
+   * is on this same element, and stopping propagation only keeps an event off
+   * the *next* node, so every other listener already bound here still runs. The
+   * listbox hears it well before this, from inside the shadow root, so nothing
+   * this element needs is lost by ending it here.
+   */
   private readonly swallowOptionSelect = (event: Event): void => {
     if (event.target !== this) {
       event.stopImmediatePropagation()

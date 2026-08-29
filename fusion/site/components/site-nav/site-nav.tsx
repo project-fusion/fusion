@@ -15,11 +15,11 @@ import styles from '../chrome.module.css'
 /**
  * The other two sections of the site, beside the Products panel.
  *
- * **Products, not the verticals, and that is the whole change.** A vertical is
- * how the company is organized and a product is what a reader uses: nobody uses
- * Fusion Design, they use Helix. A menu labeled Products that listed divisions
- * would promise one thing and hand over another, and `AGENTS.md` already draws
- * that line by giving verticals descriptive names and products evocative ones.
+ * **Products, not the verticals.** A vertical is how the company is organized
+ * and a product is what a reader uses: nobody uses Fusion Design, they use
+ * Helix. A menu labeled Products that listed divisions would promise one thing
+ * and hand over another, and `AGENTS.md` already draws that line by giving
+ * verticals descriptive names and products evocative ones.
  *
  * The verticals are still one click away, in the panel's third column, because
  * dropping Energy and Capital to keep the column count tidy would be softening
@@ -36,16 +36,11 @@ const SECTIONS = [
 /**
  * The top level, with every destination in it exactly once.
  *
- * Products and Verticals used to be two taxonomies over one set of pages, so
- * `/helix` was in the menu as both Helix and Fusion Design, `/cortex` as both
- * Cortex and Fusion Mind, and `/services` as both Services and Fusion Studio.
- * Nine rows, six destinations, and nothing telling a reader which pairs were the
- * same page.
- *
- * A vertical is the company's map rather than a place to go. `VerticalPage`
- * says so already, titling a page with the product and demoting the vertical to
- * an eyebrow over it, and the landing page said so when it dropped its
- * verticals band. The menu says it now too.
+ * A vertical is the company's map rather than a place to go, so it is not a row
+ * here: listing both taxonomies puts `/helix` in the menu as Helix and as
+ * Fusion Design with nothing telling a reader they are one page. `VerticalPage`
+ * draws the same line, titling a page with the product and demoting the
+ * vertical to an eyebrow over it.
  */
 export const DESTINATIONS = [
   ...PRODUCTS.map((product) => ({ href: product.href, label: product.name })),
@@ -93,25 +88,17 @@ export function SiteMenu({
       placement={placement}
     >
       <div className={styles.navMenu}>
-        {/* A tree, because the depth is real and was being hidden.
-            
-            The menu listed four destinations and stopped, so everything a
-            reader actually goes to inside Helix, the docs, the component
-            reference, the sandbox, the theme builder, could be reached only by
-            landing on `/helix` first and looking for it. That is a fair top
-            level and a poor menu: the four are what the site *is*, and the rows
-            under them are where the work is.
+        {/* A tree, because the depth is real. A flat list of four destinations
+            leaves everything a reader actually goes to inside Helix, the docs,
+            the component reference, the sandbox, the theme builder, reachable
+            only by landing on `/helix` first and looking for it.
 
             `helix-tree-item` with an `href` rather than a tree of buttons that
             navigate. The component's own docstring is explicit that this is the
             navigation flavor of the pattern: given an `href` the row is an
             `<a>`, so a middle click opens a tab and the platform provides
             everything a link provides. A tree of handlers would have taken all
-            of that away to look the same.
-
-            Not the duplication the top level had. Products and Verticals were
-            two names for one page; these are pages inside a page, which is what
-            depth is for. */}
+            of that away to look the same. */}
         <helix-tree active={pathname} label="Site navigation">
           {PRODUCTS.map((product) => (
             <helix-tree-item
@@ -126,15 +113,15 @@ export function SiteMenu({
             >
               {product.name}
               {/* The product's own page as a row of its own, because the row
-                  above it is no longer a link.
+                  above it is not a link.
 
                   `helix-tree-item` does support both at once and says so: a
                   branch that is also a link goes where it points and its chevron
                   is what opens it. Two targets in one row is still two targets,
                   and on a touch screen the chevron is the smaller of them by
                   some margin. A parent that only discloses has one meaning
-                  everywhere in the row, and the page it used to link to is the
-                  first thing inside it.
+                  everywhere in the row, and the page it would have linked to is
+                  the first thing inside it.
 
                   Only where nothing else already points there. Cortex's `Docs`
                   is `/cortex`, so Cortex needs no second row saying the same. */}
@@ -242,12 +229,12 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
     if (!header) {
       return
     }
-    /* **The header says so, rather than being watched.** It carried the
-       threshold as `data-scrolled` and this read it with a `MutationObserver`,
-       which worked and cost every server-rendered consumer a hydration error:
-       an attribute the element writes onto itself is markup the server never
-       sent. It is a custom state now, which is not in the DOM and so cannot be
-       observed, and the header announces crossings instead.
+    /* **The header says so, rather than being watched.** An attribute the
+       element writes onto itself is markup the server never sent, so reading a
+       `data-scrolled` with a `MutationObserver` costs every server-rendered
+       consumer a hydration error. The threshold is a custom state, which is not
+       in the DOM and so cannot be observed, and the header announces crossings
+       instead.
 
        `matches` for the state it is already in, since a listener only hears the
        next change and a reload part-way down the page has already crossed. */
@@ -276,13 +263,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [panelBottom, setPanelBottom] = useState(0)
 
   useEffect(() => {
-    /* `surface`, which is what the part is called. It was `panel`, and when the
-       component renamed it this measurement went on asking for the old name,
-       found nothing, and returned early: the sheet stayed at the bar's own
-       height while the panel opened over the page with no glass behind it at
-       all. Nothing failed, because a query that matches nothing is not an
-       error, and the only symptom was a navigation panel you could read the
-       hero through. */
+    /* `surface`, which is what the part is called, and it has to track the
+       component's own name. A query that matches nothing is not an error: this
+       returns early, the sheet stays at the bar's own height, and the only
+       symptom is a navigation panel you can read the hero through. */
     const panel = panelRef.current?.shadowRoot?.querySelector('[part="surface"]')
     if (!panelDown || !panel) {
       return
@@ -306,8 +290,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const onHero = pathname === '/' || pathname === '/helix' || pathname === '/insights'
 
   /* Products is current wherever a product is, which is the whole of what the
-     panel contains now. This read the verticals instead, deliberately, back
-     when the panel listed those too and they were the wider set. */
+     panel contains. */
   const onProducts = PRODUCTS.some((product) => within(product.href))
 
   return (
@@ -441,18 +424,16 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                       href={destination.href}
                       key={destination.href}
                     >
-                      {/* Two rows, and the second is one line. The sentence
-                          earns its place, but a sentence that wraps turns a row
-                          of names into a paragraph to read before choosing, and
-                          the wrap is what made the panel long. Kept short
-                          enough to fit, and held to one line so a narrow panel
+                      {/* Two rows, and the second is held to one line. A
+                          summary that wraps turns a row of names into a
+                          paragraph to read before choosing, so a narrow panel
                           truncates rather than reflows.
-                       
-                          No mark down the side. One is on the column's heading
-                          now, and a glyph on every row under it made the panel
-                          read as a set of icons rather than a set of places to
-                          go. The row grid leaves that column at `auto`, so
-                          these start where the heading does. */}
+
+                          No mark down the side: one is on the column's heading,
+                          and a glyph on every row under it reads as a set of
+                          icons rather than a set of places to go. The row grid
+                          leaves that column at `auto`, so these start where the
+                          heading does. */}
                       <strong>{destination.title}</strong>
                       <span>{destination.summary}</span>
                     </Link>

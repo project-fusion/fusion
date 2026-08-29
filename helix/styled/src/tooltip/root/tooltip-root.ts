@@ -40,9 +40,9 @@ export class HelixTooltip extends HelixHeadlessTooltip {
    * has to do.** A card is already the page's surface, so glass swaps one ground
    * for another; this one starts inverse, and `--helix-material-translucent` is
    * the page's ground, so taking it without the foreground would put light ink on
-   * a light bubble. An inverse bubble is told from the page by being its
-   * opposite and a glass one has to be told from what is behind it, which is why
-   * the border arrives with the material rather than being there all along.
+   * a light bubble. The border arrives with the material rather than being there
+   * all along, because a glass bubble has to be told from what is behind it while
+   * an inverse one is told from the page by being its opposite.
    *
    * The strength is the theme's: `--helix-material-translucent` and
    * `--helix-material-backdrop` are what the policy moves.
@@ -52,11 +52,10 @@ export class HelixTooltip extends HelixHeadlessTooltip {
    * it ends, which is `separation`, and a bubble in the top layer with a point on
    * it has one answer to that. A quiet tooltip is a tooltip that is not shown.
    *
-   * **`transparent` is where this one stops, and that is the statement 270
-   * asks for rather than an omission.** A panel that floats over arbitrary page
-   * content is only readable because it has a ground; dropping it does not make
-   * a lighter tooltip, it makes an unreadable one. `frosted` and `glass` are the
-   * two honest points here.
+   * **No `transparent`, deliberately.** A bubble floating over arbitrary page
+   * content is only readable because it has a ground; dropping it makes an
+   * unreadable tooltip rather than a lighter one. `frosted` and `glass` are the
+   * two honest points here. See (270).
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'

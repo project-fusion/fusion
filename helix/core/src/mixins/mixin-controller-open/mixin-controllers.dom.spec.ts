@@ -16,8 +16,8 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * kind and stays out of this table, because it adds `announcesInput` and the
  * form callbacks on top of the contract asked here.
  *
- * **They are not all booleans, which the row calling them four of a kind did
- * not say.** `open` and `checked` carry a boolean; `active` carries a string
+ * **They are not all booleans.** `open` and `checked` carry a boolean; `active`
+ * carries a string
  * naming which child is active, as `value` does. So the table moves between two
  * declared states rather than between true and false, and the shape difference
  * is a field here instead of an assumption spread through the assertions.
@@ -152,10 +152,9 @@ for (const kind of KINDS) {
       expect(host[kind.state]).toBe(kind.resting)
     })
 
-    /* This asserted the opposite until 26 Aug 2026, that a declared property was
-       a claim of ownership and the element announced without moving. Control is
-       an action now: the element always applies, and a consumer takes the
-       decision by refusing it. See 294. */
+    /* Control is an action rather than a mode: the element always applies, and
+       a consumer takes the decision by refusing the event. A declared property
+       is a seed, never a claim of ownership. See 294. */
     test('a declared property is a seed, so the element announces and still moves', async () => {
       const host = await mount(`<${kind.tag} ${claimed(kind)}></${kind.tag}>`)
       let heard = 0
@@ -184,11 +183,9 @@ for (const kind of KINDS) {
       expect(host[kind.state]).toBe(kind.resting)
     })
 
-    /* The mode is read once, at the first update, where markup, a hydrating
-       server's attributes and a framework's initial properties have all landed.
-       Continuously would mean a script assigning the property handed the element
-       to a consumer who never asked for it, and it would stop answering its own
-       reader from then on. */
+    /* Assigning the property is a correction, not a handover: an element that
+       read a later assignment as one would stop answering its own reader from
+       then on, for a consumer who never asked to own it. */
     test('which mode it is in is decided once, so a later assignment does not take it over', async () => {
       const host = await mount(`<${kind.tag}></${kind.tag}>`)
       host[kind.state] = kind.moved

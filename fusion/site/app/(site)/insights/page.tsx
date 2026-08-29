@@ -30,14 +30,7 @@ const SORTS: Record<string, (a: Insight, b: Insight) => number> = {
  * The same shape as the Helix gallery, and deliberately: they are the two
  * places on the site where a reader is looking for one of a set, so they should
  * not be two different pages to learn. The cards differ, being text rather than
- * drawings, and as of 25 Aug 2026 the hero does not: it wears the same lit
- * lattice, from `HeroField`.
- *
- * This said the opposite until then, that the hero took the structure and none
- * of the lattice because the cards are not drawn on it. That is a fact about the
- * cards which was extended to the hero without anything holding it up, and the
- * insights stylesheet had already written the argument against it and never the
- * rule.
+ * drawings; the hero does not, and wears the same lit lattice from `HeroField`.
  *
  * A server component. The sort is applied here, for the reading-order reason
  * `InsightBrowser` sets out.

@@ -15,12 +15,12 @@ const row = async (): Promise<HTMLElement> =>
  * One row, and the contract that is the row's rather than the table's.
  *
  * **The table already proves the layout**, which is the row's cells becoming
- * items of the table's own grid so every column lines up: the row is named 19
- * times in this family's specs. What the row owns alone is the thing that layout
- * takes away. `display: contents` removes the row's box, and a spec that reads
- * the grid cannot tell a table with rows from a table with only cells, because
- * they lay out identically. That is the whole failure this asserts against: a
- * table with cells and no rows is broken rather than plain.
+ * items of the table's own grid so every column lines up. What the row owns
+ * alone is the thing that layout takes away. `display: contents` removes the
+ * row's box, and a spec that reads the grid cannot tell a table with rows from
+ * a table with only cells, because they lay out identically. That is the whole
+ * failure this asserts against: a table with cells and no rows is broken rather
+ * than plain.
  */
 describe('one table row', () => {
   test('is still a row after its box is gone', async () => {

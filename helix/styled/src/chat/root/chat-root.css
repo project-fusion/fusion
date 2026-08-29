@@ -81,12 +81,12 @@
 }
 
 /* **A region the consumer left empty is not laid out, and `hidden` is how it
-   says so.** This tested `:not(:has(> slot:has(*)))`, which is the rule the
-   rest of the library hides an empty region with and is inert here: the slots
-   are assigned by hand, so a filled region's slot has no more children than an
-   empty one's and the test never matched. A chat with nothing slotted drew a
-   hairline under an empty header and another over an empty composer, 25 pixels
-   of chrome each, measured.
+   says so.** Never `:not(:has(> slot:has(*)))`, which is how the rest of the
+   library hides an empty region and is inert here: the slots are assigned by
+   hand, so a filled region's slot has no more children than an empty one's and
+   the test never matches. Measured with it in place, a chat with nothing
+   slotted drew a hairline under an empty header and another over an empty
+   composer, 25 pixels of chrome each.
 
    `display: none` has to be said rather than left to the platform. A `[hidden]`
    rule in the UA stylesheet loses to any author rule that sets `display`, and
@@ -162,21 +162,22 @@
    full-width band and a shadow on that is a line across the transcript. */
 [part="resume"] slot::slotted(*) {
   /* **The edge that goes with the lift.** The separation policy pairs
-     `--helix-border-floating` with `--helix-shadow-floating`, and this hooked the
-     lift and left the edge to whatever the slotted control already had:
-     themeable in one direction and fixed in the other, which is half-converted. Written the way `Drawer`, `Toast` and the two
-     inputs write it, so the width is a hook and the default is the policy's. */
+     `--helix-border-floating` with `--helix-shadow-floating`, so hooking the
+     lift and leaving the edge to whatever the slotted control already had would
+     be themeable in one direction and fixed in the other. Written the way
+     `Drawer`, `Toast` and the two inputs write it: the width is a hook and the
+     default is the policy's. */
   border: var(--chat-resume-border-width, var(--helix-border-floating)) solid
     var(--chat-resume-border-color, var(--helix-color-border));
   box-shadow: var(--chat-resume-shadow, var(--helix-shadow-floating));
 }
 
-/* The status band sits between the transcript and the composer and had no block
-   padding at all, so "somebody is typing" was jammed against the composer's rule
-   with nothing either side of it: measured at 18 pixels tall against a 65 pixel
-   composer, reading as a stray line of text rather than as a band. The space
-   above is smaller than the space below, because it belongs to the composer it
-   is announcing rather than to the transcript it is under. */
+/* The status band sits between the transcript and the composer, and needs block
+   padding of its own or "somebody is typing" jams against the composer's rule:
+   measured without it, 18 pixels tall against a 65 pixel composer, reading as a
+   stray line of text rather than as a band. The space above is smaller than the
+   space below, because the band belongs to the composer it is announcing rather
+   than to the transcript it is under. */
 [part="status"] {
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
@@ -186,9 +187,9 @@
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }
 
-/* **No rule above it, and there was one.** The composer draws its own edge now,
-   so a hairline twelve pixels above that edge is a second line separating the
-   same two things, and the pair reads as one badly drawn border. The header
+/* **No rule above it.** The composer draws its own edge, so a hairline twelve
+   pixels above that edge is a second line separating the same two things, and
+   the pair reads as one badly drawn border. The header
    keeps its rule because a header is a band of chrome with nothing else to bound
    it; a composer is a control and a control's own edge is its boundary. */
 [part="composer"] {

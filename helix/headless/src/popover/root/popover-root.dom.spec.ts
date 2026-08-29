@@ -25,14 +25,9 @@ const popover = async (extra = ''): Promise<Popover> =>
 
 describe('popover', () => {
   test('the name is on the panel, which is the thing it names', async () => {
-    /* This asserted the name was on the *host*, through internals, and that is
-       where it was: on an element carrying no role at all, while the panel it
-       is documented to name rendered with neither a role nor a name. A name
-       needs something to be the name of.
-
-       Nothing is written onto the host either way, which is what the old test
-       was really protecting: the panel is inside this shadow root and is not
-       part of the tree a consumer rendered. */
+    /* A name needs something to be the name of, and the host carries no role.
+       Nothing is written onto the host either way: the panel is inside this
+       shadow root and is not part of the tree a consumer rendered. */
     const host = await popover()
     expect(host.hasAttribute('aria-label')).toBe(false)
     const panel = part(host, 'popover')
@@ -103,9 +98,8 @@ if (hasLayout()) {
          element: zero hits on a slot listener for a click on its assigned
          button, where every real browser reports one.
 
-         Worth knowing beyond this file. `Menu` binds its trigger the same way,
-         and its own specs open it by calling `show()`, so nothing anywhere was
-         covering the path a reader actually takes. */
+         `Menu` binds its trigger the same way and its own specs open it by
+         calling `show()`, so nothing there covers the path a reader takes. */
       const host = await popover()
       const trigger = host.querySelector('button') as HTMLElement
 

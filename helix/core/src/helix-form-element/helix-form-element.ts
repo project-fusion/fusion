@@ -33,10 +33,8 @@ export class HelixFormElement extends HelixElement {
    * `aria-disabled` rather than removing the element from the accessibility
    * tree, so a screen reader can still announce that the control exists.
    *
-   * The mirror is below and was for a while only a sentence: this paragraph
-   * described it, four components had their own copies of it, and the class
-   * itself did nothing. Here is where it belongs, because here is where
-   * `disabled` is.
+   * The mirror itself is in `willUpdate` below, here rather than in each
+   * control, because here is where `disabled` is.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -45,15 +43,13 @@ export class HelixFormElement extends HelixElement {
    * Whether an ancestor `<fieldset disabled>` has switched this control off.
    *
    * The platform tells a form-associated element through `formDisabledCallback`
-   * and nothing here implemented it, so a control inside a disabled fieldset
-   * stayed fully typeable and announced itself as enabled. Measured: a
-   * `helix-input` in one accepted text, reported `disabled` as false, and
-   * carried no `aria-disabled`.
+   * and nothing else does, so without this a control inside a disabled fieldset
+   * stays fully typeable and announces itself as enabled.
    *
-   * What the platform already did on its own is the submission half. The same
-   * measurement showed the fieldset's controls absent from the form's entry
-   * list and the host matching `:disabled`, so the value never went anywhere.
-   * What was missing is everything a reader can see or touch.
+   * The submission half is already the platform's: measured, the fieldset's
+   * controls are absent from the form's entry list and the host matches
+   * `:disabled`, so the value never goes anywhere. What is missing without this
+   * is everything a reader can see or touch.
    *
    * State rather than the `disabled` property. Writing that would reflect an
    * attribute the consumer's server markup does not have, which React reports
@@ -70,10 +66,9 @@ export class HelixFormElement extends HelixElement {
    * half of it the consumer wrote.
    *
    * @internal Read by the component itself and by nothing outside it: every
-   * call in the library is `this.isDisabled`. Public, it printed a row on
+   * call in the library is `this.isDisabled`. Public, it prints a row on
    * twenty-four families in both tiers, forty-eight in all, on every form
-   * control's reference page, and it is the largest single entry in those
-   * tables.
+   * control's reference page.
    *
    * **A consumer loses nothing, which was measured rather than assumed.**
    * `element.matches(':disabled')` answers the same question, is the platform's
@@ -151,16 +146,15 @@ export class HelixFormElement extends HelixElement {
    * there. It is only a change to the markup when a consumer assigns it
    * imperatively later, and nothing is hydrating by then.
    *
-   * Here rather than on each control, where it was declared eight times and
-   * reflected none of them.
+   * Here rather than on each control.
    */
   @property({
     /* Empty means absent, which plain reflection cannot say. `name = ''` is the
        default and Lit reflects it as `name=""`, so every button, switch and
-       calendar in the library shipped an empty name attribute the consumer
-       never wrote, and six SSR specs said so. Returning `null` removes the
-       attribute instead. Same trap `hostAria` exists for: a name of no
-       characters is not the absence of one. */
+       calendar in the library would ship an empty name attribute the consumer
+       never wrote. Returning `null` removes the attribute instead. Same trap
+       `hostAria` exists for: a name of no characters is not the absence of
+       one. */
     converter: {
       fromAttribute: (value: string | null): string => value ?? '',
       toAttribute: (value: string): string | null => (value === '' ? null : value),

@@ -10,20 +10,20 @@
 
 :host([shape="circle"]) {
   aspect-ratio: 1 / 1;
-  /* The control step, which is the number this was: `2.5rem` is
+  /* The control step, not the bare `2.5rem` it works out to: that is
      `--helix-size-control-md` undensified, so a circle skeleton standing in for
-     an avatar kept its size inside a `data-density` region while the thing it
-     was standing in for shrank. */
+     an avatar keeps its size inside a `data-density` region while the thing it
+     stands in for shrinks. */
   inline-size: var(--skeleton-size, var(--helix-size-control));
 }
 
 /* The base fill, and nothing animated on this element at all.
  *
- * The sweep was `background-position` on a gradient, which repaints the element
- * every frame rather than compositing, forever, once per skeleton. A loading
- * state is by definition many of them at once and on a page already busy doing
- * the thing they are standing in for, which makes it the worst place in the
- * library to repaint on a timer. */
+ * `background-position` on a gradient is the obvious sweep and repaints the
+ * element every frame rather than compositing, forever, once per skeleton. A
+ * loading state is by definition many of them at once and on a page already busy
+ * doing the thing they are standing in for, which makes it the worst place in
+ * the library to repaint on a timer. */
 [part="skeleton"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   block-size: 100%;
@@ -65,9 +65,8 @@
 }
 
 :host([shape="circle"]) [part="skeleton"] {
-  /* The full radius token, not a bare 50%. It was the only raw border-radius
-     in the styled tier, and `radii-full` is what every other circle in the
-     library names. */
+  /* The full radius token, not a bare 50%: `radii-full` is what every other
+     circle in the library names. */
   border-radius: var(--helix-radii-full);
 }
 

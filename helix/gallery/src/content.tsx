@@ -13,43 +13,33 @@ import type { CSSProperties, ReactNode } from 'react'
  * is.** A second body line teaches nothing the first did not, and a card that
  * has to be read rather than recognized has already failed at thumbnail size.
  * Where a count carries meaning it stays: Divider needs something either side of
- * the rule, Quote needs to wrap. Where it was only filling space it is gone.
+ * the rule, Quote needs to wrap.
  *
  * Loader is drawn at `loader-lg` rather than `md`, because at `md` its eight
  * marks would be under two pixels each.
  *
- * **Most of this group declares no archetype, and still moves.** Avatar,
- * Blockquote, Flex, Grid, Icon, Quote, Stat and Text have no runtime behavior
- * to replay: a type scale is not climbed one line at a time. Each of them briefly carried an
- * `artRow` anyway, and a stagger that means nothing is worse than no stagger,
- * because it teaches a reader that the stagger means nothing.
+ * **Most of this group declares no archetype, and still moves.** A component
+ * with no runtime behavior has nothing to replay: a type scale is not climbed
+ * one line at a time, and a stagger that means nothing teaches a reader that
+ * the stagger means nothing.
  *
- * They take the baseline in `site.css` instead, which is selected with `:has()`
- * rather than opted into: a drawing that declares no archetype gets it, and one
- * that declares an archetype does not. So the way to say "this component does
- * nothing at runtime" is to write no motion at all, which is also the way to
- * say nothing, and the two cannot drift apart.
- *
- * Callout, Divider, Empty, List, Loader, Progress, Skeleton and Splitter do
- * have something of their own. Divider is the one that moved off the baseline
- * after the fact: it has a single dimension worth animating, and the baseline
- * was scaling the whole drawing instead of the rule that is its subject.
+ * Those take the baseline in `gallery.css` instead, which is selected with
+ * `:has()` rather than opted into: a drawing that declares no archetype gets
+ * it, and one that declares an archetype does not. So the way to say "this
+ * component does nothing at runtime" is to write no motion at all, which is
+ * also the way to say nothing, and the two cannot drift apart.
  */
 export const contentArt: Record<string, ReactNode> = {
-  /* Rows read as a set, divided by a rule and nothing else. */
   /**
    * Shafts of light fanning from a source above the frame.
    *
-   * **Contours, not a gradient, and that is the only thing the first pass got
-   * wrong.** It drew this composition with two `linearGradient`s, which is a
-   * better picture and an illegal one: ink here is a percentage of foreground
-   * at `0.12`, `0.28` or `0.55`, and a ramp is every step there is. Redrawn as
-   * a bloom, two shafts and a core at exactly those three, the fan survives and
-   * the ink is countable.
-   *
-   * The correction after that went too far the other way, into flat bands and a
-   * serpentine, which obeyed every rule and stopped looking like light. A card
-   * has to be legible as its component first.
+   * **Contours, not a gradient.** A `linearGradient` is the better picture and
+   * an illegal one: ink here is a percentage of foreground at `0.12`, `0.28` or
+   * `0.55`, and a ramp is every step there is. Drawn as a bloom, three shafts
+   * and a core at exactly those three, the fan survives and the ink is
+   * countable. Flat bands obey the same rule and stop looking like light, which
+   * is the other way to get this wrong: a card has to be legible as its
+   * component first.
    *
    * The apex sits far above and to the right, well outside the clip. Distance
    * is what stops it reading as a road: brought close, the shafts converge hard
@@ -94,10 +84,9 @@ export const contentArt: Record<string, ReactNode> = {
   /**
    * One avatar, and what is in it when there is no image.
    *
-   * Three of them at three radii once, on the grounds that Avatar is one of the
-   * two components that keeps a `size`. That is true and it is not a picture:
-   * a size ladder is a fact about the API, and the card only has to say
-   * *avatar*. One does that, and at 64 the silhouette is actually legible.
+   * One rather than a ladder of three radii: a size ladder is a fact about the
+   * API rather than a picture, the card only has to say *avatar*, and at 64 the
+   * silhouette is actually legible.
    */
   avatar: (
     <>
@@ -107,21 +96,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /* A passage set off by a rule and an indent. Two lines is a passage. */
-  /**
-   * Four columns standing on a rule, at four different heights.
-   *
-   * The rule is the subject as much as the columns are. What separates this
-   * from a row of bars is that a bar chart is measured *from* somewhere, and
-   * that somewhere is zero: a card with columns floating free would be drawing
-   * the mistake the component refuses to ship a switch for.
-   *
-   * Heights in a 4:2:7:5 ratio off the baseline, so no two are close enough to
-   * read as the same and the tallest is not the last. A card whose columns
-   * ascend evenly reads as a diagram of a bar chart rather than as one.
-   *
-   * Still, like the other charts. Columns do not move.
-   */
+  /** A passage set off by a rule and an indent. Two lines is a passage. */
   blockquote: (
     <>
       <rect className="artInk" fillOpacity="0.55" height="36" width="2" x="48" y="82" />
@@ -154,6 +129,11 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * `</>`, which is what a fragment of code looks like when it is small enough
+   * to be a mark. A single caret beside a rule reads as a list item pointing
+   * the wrong way: a caret and a line, not a picture of anything.
+   */
   code: (
     <>
       <path
@@ -164,14 +144,12 @@ export const contentArt: Record<string, ReactNode> = {
         strokeLinejoin="round"
         strokeWidth="2.5"
       />
-      {/* Only the slash moves, and it is written rather than pressed.
-       *
-       * Lifting the whole glyph moved the two chevrons that hold it, which
-       * reads as the card breathing rather than as the one mark that makes this
-       * a fragment of code. `artMark` fixed the subject and not the verb: a
-       * scale is a mark being pressed, and this mark is a stroke. It is drawn
-       * now, upper left to lower right, which is both the order the `d` states
-       * and the order a hand writes it in. */}
+      {/* Only the slash moves, and it is written rather than pressed. Lifting
+          the whole glyph takes the two chevrons that hold it with it, which
+          reads as the card breathing rather than as the one mark that makes
+          this a fragment of code, and a scale is a mark being pressed where
+          this mark is a stroke. Drawn upper left to lower right, which is both
+          the order the `d` states and the order a hand writes it in. */}
       <path
         className="artStroke artMotion artDraw"
         d="M154 86l12 28"
@@ -191,6 +169,10 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * Bars rather than glyphs. A block of code drawn as real glyphs would be
+   * unreadable at this size and would be a different language per card.
+   */
   'code-block': (
     <>
       <rect className="artEdge" fill="none" height="72" rx="5" width="112" x="104" y="64" />
@@ -273,13 +255,18 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * One rule, and the two groups it makes.
+   *
+   * One line either side, not two. The subject is the rule; the lines are only
+   * there to be separated by it, and a second line on each side says nothing
+   * the first did not while making the rule the smallest thing in the frame.
+   */
   divider: (
     <>
-      {/* Centered, all three. They were flush left at 48 while the rule ran 48 to
-          272, so the one element already centered was the only one that looked
-          wrong: two lines hanging left under a rule reaching further right than
-          either of them. Each is centered on 160 now, and the only ragged thing
-          left is the line lengths, which is what a line length is for. */}
+      {/* Centered on 160, all three, so the only ragged thing left is the line
+          lengths, which is what a line length is for. Flush left, two lines
+          hang under a rule reaching further right than either of them. */}
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="160" x="80" y="84" />
       {/* The rule draws itself out, from the middle, and 224 is where it ends
           rather than where it starts.
@@ -293,9 +280,9 @@ export const contentArt: Record<string, ReactNode> = {
        * picked to be visible.
        *
        * `artFill` rather than the baseline swell, because a divider has exactly
-       * one dimension worth moving and the baseline was scaling the whole
-       * drawing, the two lines included. Those hold still now: the rule is the
-       * component and the lines are only there to be divided.
+       * one dimension worth moving and the baseline scales the whole drawing,
+       * the two lines included. Those hold still: the rule is the component and
+       * the lines are only there to be divided.
        *
        * `transform-origin` overridden to `center`. `artFill` pivots at `left
        * center`, which is right for a value growing out of a track's start and
@@ -313,24 +300,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /*
-   * One rule, and the two groups it makes.
-   *
-   * One line either side, not two. The subject is the rule; the lines are only
-   * there to be separated by it, and a second line on each side says nothing
-   * the first did not while making the rule the smallest thing in the frame.
-   */
-  /**
-   * A ring of three unequal arcs, drawn the way the component draws it.
-   *
-   * Unequal because a ring cut into equal parts reads as a diagram of a donut
-   * rather than as one, the same reason the bar chart's columns are not a
-   * staircase. Dashes rather than arc paths, for the reason the component
-   * records: an arc command needs a sweep flag and a large-arc flag, both of
-   * which flip at values a reader never sees coming.
-   *
-   * Still, like the other charts. The shares do not move.
-   */
+  /** Nothing here, said once, with the one action that fills it. */
   empty: (
     <>
       <rect className="artInk" fillOpacity="0.28" height="20" rx="4" width="20" x="150" y="56" />
@@ -435,17 +405,12 @@ export const contentArt: Record<string, ReactNode> = {
   /**
    * Three glyphs from the set, all at the twenty pixel icon size.
    *
-   * Rebuilt because the three were not a set. They were 22, 16 and 16 across,
-   * at two different alphas, in three different constructions: a solid wedge, a
-   * pair of bars and a filled disc with a hole punched through it. That reads
-   * as three unrelated marks rather than as one icon set, which is the only
-   * thing the card has to say.
-   *
-   * Now: one 20 unit box each, one 2 unit weight each, one alpha, and every one
-   * of them an outline rather than a solid, because that is what the icons in
-   * `@fusion.dev/helix-icons` are. The disc is a ring for the same reason, and the ring
-   * is `artPage` through the middle rather than a lighter ink, so it is a hole
-   * and not a paler circle.
+   * They have to read as one set, which is the only thing the card has to say,
+   * so it is one 20 unit box each, one 2 unit weight each, one alpha, and every
+   * one an outline rather than a solid, because that is what the icons in
+   * `@fusion.dev/helix-icons` are. The disc is a ring for the same reason, and
+   * the ring is `artPage` through the middle rather than a lighter ink, so it
+   * is a hole and not a paler circle.
    */
   icon: (
     <>
@@ -497,27 +462,7 @@ export const contentArt: Record<string, ReactNode> = {
       <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
     </>
   ),
-  /* Two lines and a caret. A block of code drawn as real glyphs would be
-     unreadable at this size and would be a different language per card. */
-  /* `</>`, which is what a fragment of code looks like when it is small enough
-     to be a mark. The first drawing was a single caret beside a rule, which
-     read as a list item pointing the wrong way: it was a caret and a line, not
-     a picture of anything. */
-  /**
-   * Three rows, each a filled patch and the name it stands for.
-   *
-   * The patch is the whole subject. Take it away and this is `list`, and every
-   * other way of saying "legend" draws the chart instead, which the system
-   * forbids for the reason `tree` records: a drawing depicts what the component
-   * is, not what it sits next to.
-   *
-   * Solid and edgeless, so they read as color rather than as controls. An
-   * outlined square in a column of three is a checkbox list. The weights
-   * descend because the grid is monotone and has no accent, and three series
-   * that differ is the fact the card has to carry.
-   *
-   * Still, like `stat` and `trend`. A legend does not move.
-   */
+  /** Rows read as a set, divided by a rule and nothing else. */
   list: (
     <>
       {[
@@ -570,11 +515,6 @@ export const contentArt: Record<string, ReactNode> = {
     </g>
   ),
 
-  /*
-   * A track and how far along it something is, at the eight pixel progress
-   * height. Two shapes, and the second is the point: `progress` is `slider`
-   * with the thumb taken off. One reports, the other takes a value.
-   */
   /**
    * The bar `Progress` draws, with the two marks that make it a meter.
    *
@@ -614,6 +554,11 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A track and how far along it something is, at the eight pixel progress
+   * height. Two shapes, and the second is the point: `progress` is `slider`
+   * with the thumb taken off. One reports, the other takes a value.
+   */
   progress: (
     <>
       <rect className="artInk" fillOpacity="0.28" height="6" rx="3" width="64" x="48" y="76" />
@@ -702,6 +647,19 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A bounded box with rows running past its bottom edge, and the edge saying so.
+   *
+   * The subject is the fade rather than the scrolling. What this component adds
+   * over `overflow: auto` is the one fact CSS cannot work out, which is that
+   * there is more below, so the drawing is a stack of rows cut off by a band
+   * that dissolves into the ground.
+   *
+   * `artTravel` on the rows, downward, because the reader scrolls and the
+   * content is what moves. The clip is on a group outside the one that travels,
+   * for the reason `image` records: a clip on the moving group resolves in the
+   * space the transform just changed and grows along with it.
+   */
   'scroll-area': (
     <>
       <defs>
@@ -761,24 +719,16 @@ export const contentArt: Record<string, ReactNode> = {
   ),
 
   /**
-   * A line and the dot on its last value, with nothing else on the card.
+   * Two panes and the divider between them, which is the whole component.
    *
-   * The nothing else is half the drawing. What separates a sparkline from a
-   * line chart is that it has no axis, no ticks and no grid, so the card that
-   * says so is the one where those are conspicuously absent; adding a baseline
-   * to give the line something to sit on would turn it into the chart it is
-   * not. The empty band above and below carries the other half, that this is a
-   * mark at the scale of the type beside it rather than a figure of its own.
+   * The panes are surfaces rather than the ink bars the rest of this group uses
+   * for text, because what a splitter arranges is regions and not sentences:
+   * filling them with lines would make this a card about content and it is a
+   * card about the boundary.
    *
-   * `artSolid` on the dot and ink on the line, because where the series ended
-   * is the one point a reader looks for, and it is the only thing here worth
-   * emphasising.
-   *
-   * Stroked rather than built from rects, which is the exception `code-block`
-   * already makes: a rule stays a filled rect so it never half-renders at one
-   * unit, and a path that changes direction six times cannot be rects at all.
-   *
-   * Still, like `stat`, `trend` and `legend`. A sparkline does not move.
+   * The divider is a rule at one unit, which is the vocabulary this file fixes
+   * for a rule, and it is the only mark that has to survive at thumbnail size:
+   * two panes with nothing between them is `grid`.
    */
   splitter: (
     <>
@@ -792,9 +742,9 @@ export const contentArt: Record<string, ReactNode> = {
        * Each pane keeps its outer edge nailed down and gives way at the seam,
        * which is what `transform-origin` is doing on both.
        *
-       * `artFill` takes a scale under one, which it had never been asked for
-       * before: the sustain interpolates the delta rather than the scale, so a
-       * value below one shrinks toward the hold exactly as one above it grows. */}
+       * `artFill` takes a scale under one here: the sustain interpolates the
+       * delta rather than the scale, so a value below one shrinks toward the
+       * hold exactly as one above it grows. */}
       <g
         className="artMotion artFill"
         style={{ '--art-grow': 1.231, transformOrigin: 'left center' } as CSSProperties}
@@ -818,6 +768,11 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * One measurement at `text-3xl`, and the `text-xs` word for what it measures.
+   * The pair behind a rule is the group, which is what stops one bar over
+   * another from reading as `text`.
+   */
   stat: (
     <>
       <rect className="artInk" fillOpacity="0.28" height="6" rx="3" width="56" x="48" y="76" />
@@ -874,8 +829,8 @@ export const contentArt: Record<string, ReactNode> = {
    * What element it is, and what it looks like: the scale in one picture.
    *
    * One line per step, which is the whole scale and the fewest marks that can
-   * carry it. The three extra body lines were a paragraph, and a paragraph is
-   * a picture of prose rather than of a type scale.
+   * carry it. Extra body lines make a paragraph, and a paragraph is a picture
+   * of prose rather than of a type scale.
    */
   text: (
     <>
@@ -923,7 +878,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /*
+  /**
    * A frame with a bar across the bottom of it, which is the whole of what this
    * component replaces: the picture is the platform's and the controls are
    * ours. So the card draws the bar, and leaves the picture as a field.
@@ -931,24 +886,6 @@ export const contentArt: Record<string, ReactNode> = {
    * The played part of the scrubber grows on hover. It is the one thing on the
    * card that is about time passing, and a still card of a video player says
    * nothing that a still card of a card does not.
-   */
-  /**
-   * Two movements of equal weight, one up and one down, and no clue which is
-   * the good news.
-   *
-   * That is the component's whole argument drawn rather than stated. A card
-   * that emphasized the rising one, with `artSolid` or with more ink, would
-   * say up is the one that matters, which is the default this component exists
-   * to refuse: the judgment is `good`, the consumer sets it, and the picture
-   * has no business guessing.
-   *
-   * The arrow is the subject and the bars are what it qualifies, which is what
-   * separates this from `stat`. There the number is the drawing; here the
-   * number is a bar the same size twice, and the only difference between the
-   * two rows is which way the glyph points.
-   *
-   * Still, like `stat`. A trend does not move, and the archetypes are for
-   * components whose motion is part of what they are.
    */
   video: (
     <>
@@ -997,38 +934,6 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /*
-   * One measurement at `text-3xl`, and the `text-xs` word for what it measures.
-   * The pair behind a rule is the group, which is what stops one bar over
-   * another from reading as `text`.
-   */
-  /*
-   * Two panes and the divider between them, which is the whole component.
-   *
-   * The panes are surfaces rather than the ink bars the rest of this group uses
-   * for text, because what a splitter arranges is regions and not sentences:
-   * filling them with lines would make this a card about content and it is a
-   * card about the boundary.
-   *
-   * The divider is a rule at one unit, which is the vocabulary this file fixes
-   * for a rule, and it is the only mark that has to survive at thumbnail size:
-   * two panes with nothing between them is `grid`.
-   *
-   * It moves on hover, because that is the one thing a splitter does.
-   */
-  /*
-   * A bounded box with rows running past its bottom edge, and the edge saying so.
-   *
-   * The subject is the fade rather than the scrolling. What this component adds
-   * over `overflow: auto` is the one fact CSS cannot work out, which is that
-   * there is more below, so the drawing is a stack of rows cut off by a band
-   * that dissolves into the ground.
-   *
-   * `artTravel` on the rows, downward, because the reader scrolls and the
-   * content is what moves. The clip is on a group outside the one that travels,
-   * for the reason `image` records: a clip on the moving group resolves in the
-   * space the transform just changed and grows along with it.
-   */
   /**
    * A window over a set most of which is not there.
    *

@@ -64,9 +64,8 @@ export class HelixRadio extends HelixHeadlessRadio {
    * reported to a screen reader, and still the thing a form submits.
    *
    * Safe because the card already carries the answer in its surface, a raised
-   * fill inside a primary edge and a three-pixel ring of it. That ring is
-   * recent, and before it there was nothing left saying which card was chosen,
-   * which is why this is a property now and could not have been one then.
+   * fill inside a primary edge and a three-pixel ring of it. Without that ring
+   * nothing would be left saying which card was chosen.
    *
    * Not on `Checkbox`, deliberately. A radio card with no circle is still
    * unmistakably one-of-many because its siblings behave that way; a checkbox

@@ -166,12 +166,12 @@ describe('the way back being rebuilt from the tree', () => {
     expect(ids(one.drill.rows)).toEqual(['file', 'color', 'quit'])
   })
 
-  /* The half the walk alone did not catch, and the likelier one: a consumer
+  /* The likelier half, and the one walking up alone does not catch: a consumer
      removing a whole section rather than the row a reader happens to be on.
      The subtree comes away intact, so the child still has a parent and the
-     parent still has a parent. Measured before the fix: `depth` answered 2,
-     `rows` listed a page nobody could see, and `back()` walked to a second
-     detached row before reaching the top. */
+     parent still has a parent: a walk that only asks about parents answers
+     `depth` 2 on this markup, and has `rows` and `back()` describing a page
+     nobody can see. */
   test('and so does one whose ancestor was removed, subtree and all', () => {
     const one = scene()
     one.drill.enter(one.row('color'))

@@ -1,10 +1,8 @@
 //! Defaults, validation and the chroma policy: everything that happens before a
 //! color is solved.
 //!
-//! This was the first forty lines of `deriveTheme` and three helpers beside it.
-//! Pulling it out makes one thing explicit that the closure hid: the policy is
-//! captured by almost every phase downstream, so it is a value passed along
-//! rather than a function that happens to be in scope.
+//! The chroma policy is a value passed along rather than a function in scope,
+//! because almost every phase downstream applies it.
 
 use crate::derive::Cast;
 use crate::intent::{
@@ -110,10 +108,10 @@ pub struct Resolved {
 
 /// The pairs a theme is checked against, derived from the surface model.
 ///
-/// **This replaced ten hand-written pairs, which were a claim about ten pairs
-/// rather than about a theme.** A tag on a raised card, a hovered filled button,
-/// every status fill and the focus ring were all unmeasured, and none of them
-/// was ever going to be noticed by reading a list that did not mention them.
+/// **A hand-written list is a claim about the pairs on it rather than about a
+/// theme.** A tag on a raised card, a hovered filled button, every status fill
+/// and the focus ring go unmeasured, and an omission is not something reading
+/// the list can show.
 ///
 /// Derived, so adding a ground to an ink in the model adds its pairs everywhere
 /// at once and there is no second place to remember.
@@ -250,10 +248,9 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
         }
     }
     /* **A pinned status that cannot be read is refused here rather than ignored
-    later.** The TypeScript carried the `NaN` triple into the palette; the port
-    would have fallen through and derived the status instead, which is quieter
-    and no better: a consumer who pinned a color and got a computed one back was
-    never told. The brand is validated for the same reason two dozen lines up. */
+    later.** Falling through and deriving the status instead is quieter and no
+    better: a consumer who pinned a color and got a computed one back is never
+    told. The brand is validated for the same reason two dozen lines up. */
     for name in STATUS_NAMES {
         if let Some(StatusSeed::Color(color)) = resolved.status.seed(name) {
             if to_oklch(color).is_none() {
@@ -265,12 +262,11 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
         }
     }
 
-    /* And a pinned accent, for the same reason and by the same reading: the
-    TypeScript carries the `NaN` triple, `violations` compares against it and
-    every comparison is false, so the theme reports clean. Three seeds can be
-    handed a color and all three are checked here, which is what makes the
-    `expect` in each phase downstream a statement about this function rather
-    than an assumption about its caller. */
+    /* And a pinned accent, for the same reason: an unreadable color carries a
+    `NaN` triple that `violations` compares against, every comparison is false,
+    and the theme reports clean. Three seeds can be handed a color and all three
+    are checked here, which is what makes the `expect` in each phase downstream a
+    statement about this function rather than an assumption about its caller. */
     if let Seed::Color(color) = &resolved.accent {
         if to_oklch(color).is_none() {
             return Err(IntentError::Unreadable {
@@ -310,10 +306,9 @@ pub fn brand_and_neutral(resolved: &Resolved, policy: Policy) -> (Oklch, Oklch, 
         chroma: policy.apply(raw.chroma),
         ..raw
     };
-    /* Chroma 0 by default, which is what `primitives.css` settled on and wrote
-    down: a fixed chroma is a rising saturation as a surface darkens, so the
-    0.008 this engine used to hardcode read navy across a dark page. The two
-    files disagreed on the value and nothing compared them. */
+    /* Chroma 0 by default, which is what `primitives.css` settled on: a fixed
+    chroma is a rising saturation as a surface darkens, and 0.008 reads navy
+    across a dark page. */
     let neutral = Cast {
         chroma: policy.apply(resolved.neutral.chroma.unwrap_or(0.0)),
         hue: resolved.neutral.hue.unwrap_or(brand.hue),

@@ -42,7 +42,7 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 that edits your files cannot tell you whether they were correct. `fix` writes;
 `check` and `verify` judge.
 
-**A name runs a leaf or everything under it, and never both.** `check:css:tokens`
+**A name runs a leaf or everything under it, and never both.** `helix component`'s `tokens`
 is one guard, `check:css` is the twenty in that group, `check` is all 78. The
 groups are `api`, `css`, `gen`, `pkg`, `prose` and `spec`, and they sort by what
 a guard reads rather than by what kind of fault it catches, because the useful

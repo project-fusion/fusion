@@ -1,9 +1,9 @@
 /* A grid rather than a stack, so the unit sits on the value's baseline and the
    label spans the full width above it.
 
-   This named a `detail` slot below the number as well, and there is not one and
-   deliberately: a change beside a figure is a second fact, and the spec that
-   pins it says so. `helix-trend` is that fact and it goes beside the stat. */
+   There is no `detail` slot below the number, deliberately: a change beside a
+   figure is a second fact, and the spec that pins it says so. `helix-trend` is
+   that fact and it goes beside the stat. */
 :host {
   /* Rows that line up across a group.
    *
@@ -15,42 +15,37 @@
   align-content: start;
   /* The unit on the number's baseline, which takes both of them saying so.
    *
-   * `align-self: baseline` on the unit alone did nothing, and it was on the
-   * unit alone for a long time. Baseline alignment is relative: an item is
-   * aligned against the others in its baseline-sharing group, and one item is
-   * not a group, so it fell back to start and the unit rendered at the top of
-   * the number like a superscript. Measured at 14px: the unit's bottom sat
-   * 32.5px above the number's, and 5.5px after this, which is the descender.
+   * `align-self: baseline` on the unit alone does nothing. Baseline alignment is
+   * relative: an item is aligned against the others in its baseline-sharing
+   * group, and one item is not a group, so it falls back to start and the unit
+   * renders at the top of the number like a superscript. Measured at 14px: the
+   * unit's bottom sat 32.5px above the number's, and 5.5px after this, which is
+   * the descender.
    *
    * Both readings of the value are fixed by the same line. A value written as
    * bare text becomes an anonymous grid item, which has no element to carry
-   * `align-self` at all; one wrapped in a span was broken too, and looked like
-   * it should have worked, which is why this went unnoticed. */
+   * `align-self` at all, and one wrapped in a span looks like it should have
+   * worked. */
   align-items: baseline;
   display: grid;
   gap: var(--helix-space-2xs);
   grid-template-columns: auto 1fr;
 }
 
-/* The three sizes are relative to whatever the figure is set in.
+/* The three sizes below are relative to whatever the figure is set in, never
+ * absolute off the type ramp, because a figure is one of the few things that
+ * legitimately has to scale with its surroundings. A `Stat` in a donut's hole is
+ * the case: the hole is a proportion of the chart and grows with the ring, while
+ * a 44px number does not, so the same markup that fits at one chart size paints
+ * across the slices at every other.
  *
- * **They were absolute, off the type ramp, and a figure is one of the few
- * things that legitimately has to scale with its surroundings.** A `Stat` in a
- * donut's hole is the case that found it: the hole is a proportion of the
- * chart, so it grows with the ring, while a 44px number does not, and the same
- * markup that fits at one chart size paints across the slices at every other.
- * Making the ring bigger moved which size it happened to fit at and fixed
- * nothing.
+ * Each is its own step of the ramp divided by the base, which is the multiplier
+ * that reproduces the intended size and says where it came from. Divide the ramp
+ * again and the figures follow, which a hand-written `3.143em` would not, and a
+ * raw value is refused anyway.
  *
- * Each is its own step of the ramp divided by the base, which is exactly the
- * multiplier that reproduces today's size and says where it came from: a raw
- * `3.143em` would be the same number with the reasoning thrown away, and is
- * refused anyway. Divide the ramp again and the figures
- * follow, which a hand-written multiplier would not.
- *
- * So a `Stat` on a page is the size it always was, and a `Stat` in a container
- * that sets a font size is that container's size. `--stat-value-size` still
- * overrides, for a figure that wants a size of its own regardless.
+ * `--stat-value-size` still overrides, for a figure that wants a size of its own
+ * regardless.
  */
 /* **`muted`, not `subtle`, because a label is content.** `subtle` is
    `neutral-500` in both modes, which paints `#808080` and reads 3.95 against a

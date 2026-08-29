@@ -1,15 +1,10 @@
-/**
+/*
  * A date or time control's string value, read as the platform reads it.
  *
- * **Six families needed this and none of them could have it alone.** `Date
- * Input` and `Date Picker` both hold `YYYY-MM-DD`, `Time Input` and `Time
- * Picker` both hold `HH:mm`, and `Number Input` and `Rating` both hold a
- * number, so `valueAsDate` and `valueAsNumber` would have been four
- * implementations of two conversions with four chances to disagree about what
- * an invalid value returns. Here rather than in a shared folder under
- * `helix/headless`, because there is no such folder and this is a pure function
- * of a string: it sits beside `formatNumbers` and `relativeTime`, which are the
- * same kind of thing.
+ * Shared, because six families hold three formats between them and separate
+ * implementations of one conversion are chances to disagree about what an
+ * invalid value returns. A pure function of a string, so it sits here beside
+ * `formatNumbers` and `relativeTime` rather than under `helix/headless`.
  *
  * **UTC throughout, which is the platform's own choice and looks wrong until it
  * is explained.** `<input type="date">.valueAsDate` returns midnight UTC rather

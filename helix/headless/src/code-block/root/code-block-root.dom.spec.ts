@@ -41,10 +41,9 @@ describe('code block', () => {
  *
  * **The property alone is half the feature.** `render` reads it and leaves the
  * copy button off, which is visible and looks like the whole job done; the
- * styled tier reserves that button's width with `:host(:not([no-copy]))`, so a
- * block told from script to drop the button kept paying 40px for it. Found by a
- * sweep of every host-attribute selector against whether its property reflects,
- * after the same fault turned up in `avatar-group` and `breadcrumb` by picture.
+ * styled tier reserves that button's width with `:host(:not([no-copy]))`, so
+ * without the reflection a block told from script to drop the button still pays
+ * 40px for it.
  */
 describe('the no-copy attribute follows the property', () => {
   test('a property write reflects, which is the only way the gutter rule hears it', async () => {

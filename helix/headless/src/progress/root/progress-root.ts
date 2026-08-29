@@ -16,10 +16,13 @@ import { property } from 'lit/decorators.js'
  * says work is happening and claims no proportion at all. `aria-valuenow` is
  * omitted with it, which is the platform's own signal for the same thing.
  *
- * **The fill is a percentage of the track, written as a custom property.** It
- * is derived from `value` and `max` rather than measured, so it renders on a
- * server with no layout and needs nothing after upgrade. That is what keeps it
- * out of the class of geometry this library writes only on the client.
+ * **The fill is a fraction of the track, written as a custom property.**
+ * `--progress-fraction` is derived from `value` and `max` rather than measured,
+ * so it renders on a server with no layout and needs nothing after upgrade. That
+ * is what keeps it out of the class of geometry this library writes only on the
+ * client. A consumer never sets it: it carries a number this element computed
+ * and CSS cannot, which is what lets a stylesheet draw the thing without
+ * measuring anything itself.
  *
  * **`value` is clamped, and out-of-range input is not an error.** A count that
  * runs past its own total is ordinary in real applications, and a bar that
@@ -30,11 +33,6 @@ import { property } from 'lit/decorators.js'
  * else: a `role` in the shadow root announces correctly and leaves the host
  * anonymous to anything walking the light DOM, and a `role` written onto the
  * host as an attribute is one a server's markup never had.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @since 0.1.0
  * @status stable
@@ -47,7 +45,7 @@ import { property } from 'lit/decorators.js'
  * @csspart track - The full length the work is measured against.
  * @csspart value - The reading beside the bar, under `show-value`.
  *
- * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Absent while indeterminate.
+ * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate.
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
@@ -153,18 +151,17 @@ export class HelixHeadlessProgress extends HelixElement {
        type were checked. */
     this.internals.ariaValueMin = '0'
     this.internals.ariaValueMax = String(this.max > 0 ? this.max : 100)
-    /* Absent, not zero. An omitted `aria-valuenow` is the platform's own signal
-       for indeterminate, and it is the only one: `aria-busy` says the element
-       is being updated, which is a different claim. Reporting 0 would announce
-       "0 percent" for work that is running, which is worse than saying nothing
-       because it is wrong rather than unknown. */
-    /* The clamped value itself, not the fraction multiplied back up.
+    /* Absent while indeterminate, not zero. An omitted `aria-valuenow` is the
+     * platform's own signal for indeterminate, and it is the only one:
+     * `aria-busy` says the element is being updated, which is a different claim.
+     * Reporting 0 would announce "0 percent" for work that is running, which is
+     * worse than saying nothing because it is wrong rather than unknown.
      *
+     * Otherwise the clamped value itself, never the fraction multiplied back up.
      * Dividing by `max` and then multiplying by it is a round trip through a
      * float, and for roughly one integer pair in sixteen it does not come back:
      * `1/3*3` is `0.9999999999999998`, which is what the accessibility tree
-     * carried and what a screen reader read out. Clamping the value directly
-     * says the same thing without the detour. */
+     * carried and what a screen reader read out. */
     const ceiling = this.max > 0 ? this.max : 100
     this.internals.ariaValueNow = this.indeterminate
       ? null

@@ -70,31 +70,24 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | Pre
  * consumer's document rather than something guessed at here.
  *
  * **The source is not trusted, and the frame is what makes that safe.**
- * `fullscreen` is granted for the same reason and found the same way: a video
- * in the preview offered a fullscreen button that did nothing at all, because
- * the policy default is `self`, this frame is not `self`, and a denied request
- * rejects a promise nobody was watching. Two capabilities now, both explicit,
- * both starred.
- *
- * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
- * policy defaults to `self` and this frame has an opaque origin, so it is not
- * `self` and the default denies it. A component inside the preview that copies
- * to the clipboard is otherwise a control that silently does nothing, which is
- * how this was found. Nothing else is granted, and a copy still needs the
- * reader's own gesture.
- *
  * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
  * an opaque origin: script in an example cannot reach this page, its storage,
  * its cookies, or the editor the source was typed into. Without it they could,
  * measured, through an `onerror` handler on an image that fails to load, which
- * `innerHTML` does not strip the way it refuses a `<script>` tag.
- *
- * That is what lets a sandbox hold markup a reader pasted from somewhere, or
- * one day arrived in a shared link, rather than only what its owner typed.
+ * `innerHTML` does not strip the way it refuses a `<script>` tag. That is what
+ * lets a sandbox hold markup a reader pasted from somewhere, or one day arrived
+ * in a shared link, rather than only what its owner typed.
  *
  * `allow-forms` is granted because examples have forms in them and a submit
  * that silently does nothing is a worse lie than one that navigates a frame
  * nobody is looking at. Top-level navigation, popups and modals are not.
+ *
+ * **`allow="clipboard-write *; fullscreen *"`, and the stars matter.** Both
+ * policies default to `self`, and a frame on an opaque origin is not `self`, so
+ * the default denies both: a component that copies to the clipboard and a video
+ * offering a fullscreen button each become a control that silently does nothing,
+ * a denied request rejecting a promise nobody was watching. Nothing else is
+ * granted, and a copy still needs the reader's own gesture.
  *
  * @since 0.1.0
  * @status experimental
@@ -172,14 +165,14 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * The frame's document has finished loading, so its listener exists.
    *
-   * **The announcement is one shot and the parent can miss it.** The frame
-   * posts `helix-preview-ready` at the end of its own module evaluation and
-   * never repeats it, and `handleMessage` drops anything whose `source` is not
+   * **The announcement is one shot and the parent can miss it.** The frame posts
+   * `helix-preview-ready` at the end of its own module evaluation and never
+   * repeats it, and `handleMessage` drops anything whose `source` is not
    * `this.frame?.contentWindow`. That getter reads the render root, so it is
-   * null until this element has rendered once. A frame that loads before that
-   * render commits therefore announces into a guard that refuses it, `ready`
-   * stays false, and `send` returns early forever: the source is set, the
-   * markup is correct, and the preview is blank with nothing logged.
+   * null until this element has rendered once: a frame that loads before that
+   * render commits announces into a guard that refuses it, `ready` stays false,
+   * and `send` returns early forever, leaving the source set, the markup
+   * correct, and the preview blank with nothing logged.
    *
    * **It is a race, so it hides in the one place nobody looks.** The frame is
    * only fast enough to win when its document and its bundle are already in the
@@ -255,12 +248,11 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * Sends once the typing stops, replacing anything already waiting.
    *
-   * A frame was tried first and is the wrong unit. Keystrokes arrive fifty to a
-   * hundred and fifty milliseconds apart, so each one lands in a frame of its
-   * own and coalescing by frame coalesces nothing: the example was still being
-   * rebuilt per character. The delay has to be longer than the gap between
-   * keystrokes to catch a burst, and short enough to read as immediate when the
-   * typing stops.
+   * A frame is the wrong unit. Keystrokes arrive fifty to a hundred and fifty
+   * milliseconds apart, so each one lands in a frame of its own and coalescing
+   * by frame coalesces nothing, leaving the example rebuilt per character. The
+   * delay has to be longer than the gap between keystrokes to catch a burst, and
+   * short enough to read as immediate when the typing stops.
    */
   private scheduleSend(): void {
     clearTimeout(this.pending)
@@ -332,12 +324,10 @@ export class HelixSandboxPreview extends HelixElement {
      *
      * The frame renders by assigning `innerHTML`, which throws away the example
      * and builds it again, and every custom element in it disconnects and
-     * upgrades a second time. Sent on each update, that happened once per
-     * keystroke: an example of any size was being torn down and rebuilt for
-     * every character, and the work grows with the example while the typing
-     * does not.
+     * upgrades a second time. Sent on each update that is once per keystroke,
+     * and the work grows with the example while the typing does not.
      *
-     * A frame is short enough to feel immediate and long enough that a burst of
+     * `SETTLE` is short enough to feel immediate and long enough that a burst of
      * keystrokes is one render. Layout, direction and the color mode go
      * straight out: they arrive one at a time from a menu, there is nothing to
      * coalesce, and a delay there is a delay a reader can see. */

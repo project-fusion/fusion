@@ -14,9 +14,9 @@ import { styles } from './legend-root.css.js'
  * `--legend-direction` to `column` where it sits beside one instead.
  *
  * The eight series colors are mapped here rather than in the tier below, which
- * carries the index and holds no tokens. Written as eight rules for the reason
- * `Avatar.Group` writes twelve: an index in markup cannot select a token, and a
- * custom property set inline would be the headless tier naming a color.
+ * carries the index and holds no tokens. Eight rules, because an index in
+ * markup cannot select a token and a custom property set inline would be the
+ * headless tier naming a color.
  *
  * @since 0.1.0
  * @status experimental
@@ -44,14 +44,13 @@ export class HelixLegend extends HelixHeadlessLegend {
    * **This says which way the entries run and not where the element is**, which
    * is the honest limit of a component that is a sibling of the chart rather
    * than part of it. A legend cannot place itself relative to something it is
-   * not inside, so the consumer still puts it above, below or beside; this
-   * makes it lay out correctly once it is there, which was the part that
-   * previously took a custom property nobody would guess at.
+   * not inside, so the consumer still puts it above, below or beside and this
+   * makes it lay out correctly once it is there.
    *
-   * The alternative was a `legend` slot on every chart, so a chart could place
-   * its own. That is worse: it makes the legend's position a fact about the
-   * chart, so two charts sharing one legend becomes impossible, and it puts a
-   * list inside a drawing that is `aria-hidden`.
+   * A `legend` slot on every chart is the obvious alternative and is worse: it
+   * makes the legend's position a fact about the chart, so two charts sharing
+   * one legend becomes impossible, and it puts a list inside a drawing that is
+   * `aria-hidden`.
    */
   @property({ reflect: true })
   placement?: 'end' | 'start'
@@ -67,14 +66,12 @@ export class HelixLegend extends HelixHeadlessLegend {
    * toward the page, `subtle` is that edge over a wash, and absent is the filled
    * patch, per the rule that a reflected property takes no default.
    *
-   * **The legend declares it rather than reading it off the chart, and that is a
-   * decision rather than a shortcut.** A legend has no reference to a chart: it
-   * points at a *table* through `for`, which is what lets two charts share one,
-   * and the chart points at the same table independently. Giving it a chart to
-   * read would make a list of names depend on a drawing it is deliberately not
-   * part of, and would still not answer the per-series case, where `outlined` is
-   * a set of names rather than one value. Two attributes carrying the same word
-   * is the honest cost of the legend being a sibling.
+   * **The legend declares it rather than reading it off the chart.** A legend
+   * has no reference to a chart: it points at a *table* through `for`, which is
+   * what lets two charts share one, and the chart points at the same table
+   * independently. Giving it a chart to read would make a list of names depend
+   * on a drawing it is deliberately not part of, and would still not answer the
+   * per-series case, where `outlined` is a set of names rather than one value.
    */
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'

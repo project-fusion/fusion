@@ -77,13 +77,13 @@ export const words = (source: string): string[] =>
  * cannot show, which is why the element reflects the number and announces it.
  *
  * **What crosses the width is a column, and `rows` is how many cells are in
- * one.** This counted cells until 27 Aug 2026, which is the same number only
- * while `rows` is 1. At `rows="7"` a ten week graph came out at fifty-nine
+ * one.** Counting cells is the same number only while `rows` is 1. Divide by
+ * the wrong thing at `rows="7"` and a ten week graph comes back as fifty-nine
  * readings in a 592px box: eleven days dropped to fit a strip that wanted 156
- * pixels, and the fifty-nine were not a multiple of seven, so every column after
- * the cut was offset by a day and the day-of-week rows stopped meaning anything.
- * A calendar heatmap that silently rotates its own weekdays is worse than one
- * that drops a week, and both came from dividing by the wrong thing.
+ * pixels, and fifty-nine is not a multiple of seven, so every column after the
+ * cut is offset by a day and the day-of-week rows stop meaning anything. A
+ * calendar heatmap that silently rotates its own weekdays is worse than one
+ * that drops a week.
  *
  * The count is therefore always a whole number of columns, which is what keeps
  * the tail slice aligned.

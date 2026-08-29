@@ -132,9 +132,9 @@ describe('input number', () => {
   })
 
   test('text that is not a number is kept, and marked wrong rather than erased', async () => {
-    /* This cleared the field at first. A reader who typed "12e" and tabbed away
-       looked back to nothing, with no word about why, and the likeliest cause is
-       a fat finger on a number they had almost finished. The field is already
+    /* Clearing the field instead leaves a reader who typed "12e" and tabbed
+       away looking at nothing, with no word about why, over what is likeliest a
+       fat finger on a number they had almost finished. The field is already
        `badInput`, so it shows as wrong and the form refuses it: destroying the
        evidence of a mistake is not the same as preventing one. */
     const host = await field()

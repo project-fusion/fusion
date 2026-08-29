@@ -21,9 +21,9 @@
  * has no theming and this is the cheapest honest substitute.
  *
  * A part with no rule below is one the platform already renders acceptably. A
- * wrong rule is worse than none: the first checkbox sheet painted a box and left
- * the input at `appearance: auto`, so the browser drew its own control and
- * nothing written for it was ever visible. */
+ * wrong rule is worse than none: a sheet that paints a box while leaving the
+ * input at `appearance: auto` gets the browser's own control drawn over
+ * everything written for it. */
 
 :root {
   color-scheme: light dark;
@@ -86,12 +86,10 @@ helix-headless-tree-item::part(item):focus-visible {
   outline-offset: 2px;
 }
 
-/* Down and indented, which is what nesting means.
-   
-   Both tree and group matched the branch that lays a group out along a line, so
-   a parent and its children ran across the page: Item One, then Item Two and
-   Item Three beside it, then Item Four, with nothing saying which contained
-   which. A tree that reads left to right is a breadcrumb. */
+/* Down and indented, which is what nesting means. Both tree and group need the
+   column: laid out along a line a parent and its children run across the page
+   with nothing saying which contains which, and a tree that reads left to right
+   is a breadcrumb. */
 helix-headless-tree::part(tree),
 helix-headless-tree-item::part(group) {
   align-items: stretch;
@@ -104,19 +102,17 @@ helix-headless-tree-item::part(group) {
 }
 
 /* And closed still means closed.
-   
+
    A group carries the hidden attribute when its item is shut, and that rule is
-   the UA's own: an author display outranks it, so giving the group a column
-   took the collapse away and every branch stood open with no way to shut it.
-   The area notes say this outright, that a sheet setting display
-   unconditionally is what costs a component its hidden, and this is that
-   mistake made in a stylesheet whose whole job is to demonstrate the tier.
-   
+   the UA's own: an author display outranks it, so setting display
+   unconditionally takes the collapse away and every branch stands open with no
+   way to shut it.
+
    Keyed off `:state(open)` rather than the hidden attribute, because ::part()
    takes a pseudo-class after it and not a compound: ::part(group)[hidden] is
-   not a selector, so the first attempt at this matched nothing and the branch
-   stayed open while reporting itself shut. MixinControllerOpen records the
-   resolved state for exactly this, open itself not reflecting. */
+   not a selector, so it matches nothing and the branch stays open while
+   reporting itself shut. MixinControllerOpen records the resolved state for
+   exactly this, open itself not reflecting. */
 helix-headless-tree-item:not(:state(open))::part(group) {
   display: none;
 }

@@ -60,9 +60,8 @@
  * markup, and it is styled by the `data-megamenu-*` recipes in the base layer
  * rather than from here, for the reason `Outline` records against exactly this
  * mistake: a `::slotted()` rule loses to any document rule whatever its
- * specificity, so a rule here naming the anchors would have lost to the base
- * layer's own and the panel would have gone on drawing prose links in a box.
- * Which is what it did. */
+ * specificity, so a rule here naming the anchors loses to the base layer's own
+ * and the panel goes on drawing prose links in a box. */
 [part="surface"] {
   /* The page's own ground, not a raised surface. White in the light and black in
      the dark: a navigation panel is the site continuing, and `surface-overlay`
@@ -118,15 +117,14 @@
      the outside of a rounded corner is already transparent, so the radius is
      still the element's to draw.
    
-     **The overshoot is one space step, and it used to be `100vmax`, which is
-     what made the reveal look like a snap.** The clip travels from `100%` of
-     the panel's height to the overshoot, and the panel is fully revealed the
-     moment the bottom inset reaches zero. At `-100vmax` on a 267 pixel band
-     that is 267 of 1547 pixels of travel: the reveal finished in the first 17%
-     of the duration and the remaining 83% moved a clip edge that was already
-     past the shadow. Lengthening the duration only lengthened the part nobody
-     can see. One step clears the shadow and nothing more, so nearly all of the
-     travel is the part that shows.
+     **The overshoot is one space step, and must not be `100vmax`, which reads
+     as a snap.** The clip travels from `100%` of the panel's height to the
+     overshoot, and the panel is fully revealed the moment the bottom inset
+     reaches zero. At `-100vmax` on a 267 pixel band that is 267 of 1547 pixels
+     of travel: the reveal finishes in the first 17% of the duration and the
+     remaining 83% moves a clip edge already past the shadow, so lengthening the
+     duration only lengthens the part nobody can see. One step clears the shadow
+     and nothing more, so nearly all of the travel is the part that shows.
    
      **Collapsed is the resting value and open is the departure, keyed on
      `:popover-open`.** Written the other way round, with the closed value on
@@ -218,8 +216,8 @@
  * Placed here rather than by the controller, which is told not to measure: a
  * band spans the viewport, so there is nothing to place it against.
  *
- * **Both edges rather than a width**, which is the whole of the overflow bug
- * that was here. `100vw` is the viewport including the scrollbar's gutter, and
+ * **Both edges rather than a width**, or the band overflows.
+ * `100vw` is the viewport including the scrollbar's gutter, and
  * `100dvw` is the same measurement taken when retractable browser chrome is out
  * of the way: the `d` is about phone toolbars, not scrollbars, so swapping one
  * for the other fixed nothing. A band that wide on a page with a classic
@@ -378,7 +376,9 @@
 
 /* Not printed, being chrome.
  *
- * It is how a reader moves around a document rather than any of the document: a printed page has no elsewhere to go to, so a bar of destinations is ink spent on navigation that cannot happen.
+ * It is how a reader moves around a document rather than any of the document: a
+ * printed page has no elsewhere to go to, so a bar of destinations is ink spent
+ * on navigation that cannot happen.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow

@@ -104,29 +104,19 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     return this.copied ? this.copiedLabel : this.label
   }
 
-  /*
-   * Whether the confirmation is showing.
-   *
-   * `@state`, so it is the component's and not API: a consumer setting this
-   * would be claiming a copy happened, which is the one thing this element
-   * exists to be honest about.
-   */
   /**
    * The write, the confirmation, the timer and the event, all of them shared.
    *
-   * **This was a second implementation of `CopyController` with the hard half
-   * left out.** It reached straight for `navigator.clipboard.writeText` and had
-   * no `execCommand` fallback, so it was inert in a sandboxed iframe without
-   * `allow-same-origin`, which is the sandbox every example on the docs site
-   * runs in: the guard on the API existing does not help there, because the
-   * object exists and the write rejects. A copy button that does nothing is
-   * indistinguishable from a broken one, and this one was doing nothing in the
-   * one place a reader is most likely to try it.
+   * **Never reach for `navigator.clipboard.writeText` directly.** It is inert in
+   * a sandboxed iframe without `allow-same-origin`, which is the sandbox every
+   * example on the docs site runs in, and guarding on the API existing does not
+   * help there: the object exists and the write rejects. A copy button that does
+   * nothing is indistinguishable from a broken one.
    *
-   * The controller also carries the two things this had wrong on its own terms:
-   * it checks the host is still connected after the await, because writing is
-   * asynchronous and `hostDisconnected` clears a timer that does not exist yet,
-   * and it registers itself so the timer is released without an override here.
+   * The controller carries the `execCommand` fallback, checks the host is still
+   * connected after the await (writing is asynchronous, so `hostDisconnected`
+   * can run before there is a timer to clear), and registers itself so the timer
+   * is released without an override here.
    */
   private readonly clipboard = new CopyController(this, { after: CONFIRM })
 

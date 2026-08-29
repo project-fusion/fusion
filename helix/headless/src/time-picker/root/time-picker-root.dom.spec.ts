@@ -243,10 +243,10 @@ describe('time is off', () => {
   }
 
   test('a disabled picker takes nothing, and says so to the list it renders', async () => {
-    /* `disabled` reached the value at submit time and nothing else: rows still
-       took a click and the keyboard still moved through them. Both halves are
-       asserted, because either alone leaves the other broken. Told, so the list
-       grays and leaves the tab order; refused, so no path writes a value. */
+    /* Both halves, because either alone leaves the other broken: told, so the
+       list grays and leaves the tab order; refused, so no path writes a value.
+       A `disabled` that reaches only the submitted value leaves rows taking a
+       click and the keyboard moving through them. */
     const host = await picker('default-value="09:00" disabled')
     const list = part(host, 'list') as HTMLElement
     expect(list.hasAttribute('disabled')).toBe(true)

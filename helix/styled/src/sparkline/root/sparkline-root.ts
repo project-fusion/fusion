@@ -23,10 +23,10 @@ import { styles } from './sparkline-root.css.js'
  * disagreeing.
  *
  * The line's weight is set in `em` rather than pixels, so it grows with the
- * drawing the way the drawing grows with its type. A fixed 1.5px was the first
- * version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
- * keeps a stroke out of the view box's stretch, which is the point, and it also
- * keeps it out of every other reason it might want to be bigger.
+ * drawing the way the drawing grows with its type. A fixed pixel width leaves a
+ * 200 pixel sparkline wearing a hairline: `vector-effect` keeps a stroke out of
+ * the view box's stretch, and it also keeps it out of every other reason it
+ * might want to be bigger.
  *
  * @since 0.1.0
  * @status experimental
@@ -64,14 +64,12 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    * `BarChart`, an `area` or `line` plot like `LineChart`. `solid` on bars is the
    * resting column and selects nothing.
    *
-   * **`outlined` was refused here until 25 Aug 2026**, on the grounds that it
-   * needs a fill to remove and this is a stroke. That is true of the line and not
-   * of the other two plots, which is what the argument missed: a bar has an area
-   * and an area plot is one.
+   * `outlined` needs a fill to remove, so it applies to `bar` and `area` and
+   * says nothing about a bare line.
    *
-   * `ghost` is still an empty cell, and there is still no `material`. Glass
-   * exists so what is behind a mark reads through it, and at the size a sparkline
-   * draws there is nothing behind it a reader could resolve.
+   * `ghost` is an empty cell and there is no `material`. Glass exists so what is
+   * behind a mark reads through it, and at the size a sparkline draws there is
+   * nothing behind it a reader could resolve.
    */
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'

@@ -64,10 +64,8 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   get tableColumns(): HelixHeadlessTableColumn[] {
     /* `?? []` is the server. Lit's element shim carries attributes and not a
        tree, so `children` is undefined there, and this getter is reached from
-       `template`, which is read during `render`: spreading it threw and the
-       whole SSR suite died on an unhandled error. The same fault the menu item
-       had, in code written after it was fixed there, which is the argument for
-       the SSR specs existing at all. */
+       `template`, which is read during `render`: spreading it throws and takes
+       the whole SSR render down with it. */
     return [...(this.children ?? [])].filter(
       (child): child is HelixHeadlessTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
@@ -99,12 +97,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /**
    * Nothing is assigned by name, so the columns can be put in a row.
    *
-   * `role="columnheader"` was landing directly under `role="table"` with no
-   * owning `row`, which is invalid: the table pattern is `table > row >
-   * columnheader`, and a header cell with no row is a cell belonging to
-   * nothing. The columns are ordinary children the consumer writes with no
-   * `slot`, so the only way to put a wrapper around them without changing what
-   * a consumer writes is to assign them here.
+   * The table pattern is `table > row > columnheader`, and a header cell
+   * landing directly under `role="table"` with no owning row is invalid: it is
+   * a cell belonging to nothing. The columns are ordinary children the consumer
+   * writes with no `slot`, so the only way to put a wrapper around them without
+   * changing what a consumer writes is to assign them here.
    *
    * Manual rather than a `slot` attribute this element would set on the
    * consumer's own markup, which is the change a React consumer's hydration

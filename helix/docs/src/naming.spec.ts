@@ -8,9 +8,8 @@ describe('naming', () => {
   })
 
   test('an initialism stays an initialism', () => {
-    /* `qr` capitalised at the first letter gives `Qr`, which is a word nobody
-       says. The slug is lower case because a URL is, so what the name came from
-       has to be put back by name. */
+    /* A slug is lower case because a URL is, so the initialism it came from is
+       lost by the time this sees it and has to be put back by name. */
     expect(startCase('qr-code')).toBe('QR Code')
     expect(startCase('api-key')).toBe('API Key')
   })

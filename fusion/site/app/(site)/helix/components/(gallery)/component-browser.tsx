@@ -35,10 +35,10 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * The gallery's hero, its filter bar, and the grid under both.
  *
  * **The cards arrive as `children`, already rendered on the server.** They are
- * not built here and could not be: `ComponentArt` is sixty-five hand-authored
- * SVG drawings across five modules, and rendering them from a client component
- * would send every one of them to the browser to support a text box. What
- * crosses the boundary instead is `index`, which is four strings per family.
+ * not built here and could not be: `ComponentArt` is hand-authored SVG drawings
+ * across five modules, and rendering them from a client component would send
+ * every one of them to the browser to support a text box. What crosses the
+ * boundary instead is `index`, which is the handful of fields above.
  *
  * So the filtering cannot remove children it never had. It writes a stylesheet
  * naming the slugs that did not match, which the grid's own `data-slug`
@@ -51,20 +51,13 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * a value interpolated into CSS is a value interpolated into CSS.
  *
  * **The rule is scoped by an attribute this component writes, never by a class
- * the page does.** It said `.familyGrid`, which is a CSS module identifier: the
- * page renders that grid as `gallery-module__uieGra__familyGrid`, so the
- * emitted selector matched nothing and every card stayed on screen. Everything
- * else worked, which is what made it invisible. The URL took `?q=`, the live
- * region announced "1 of 89 components", the empty state stood ready, and the
- * one line that does the hiding was addressed to a class that has never existed
- * in the document. Measured on the running page:
- * `document.querySelectorAll('.familyGrid > [data-slug]')` returned 0 while the
- * grid held 89 of them.
- *
+ * the page does.** A CSS module identifier is hashed at build
+ * (`gallery-module__uieGra__familyGrid`), so a rule naming `.familyGrid` matches
+ * nothing, every card stays on screen, and nothing anywhere reports a fault.
  * `data-filtered-grid` sits on the band below, four lines from the rule that
- * reads it, and both are written here. That is the whole of the fix: a
- * generated class name cannot be named from a template string, and the only way
- * not to want to is to have nothing outside this file to name.
+ * reads it, and both are written here: a generated class name cannot be named
+ * from a template string, and the way not to want to is to have nothing outside
+ * this file to name.
  */
 export function ComponentBrowser({
   children,
@@ -100,16 +93,12 @@ export function ComponentBrowser({
   stageTone: ReturnType<typeof stageAppearance>
   title: string
 }) {
-  /* Seeded with `default-value` rather than `value`, because what this wants to
-     say is where the controls start. The filtering already worked from the URL
-     before this: what was missing was the controls saying so, so a shared link
-     filtered the grid while both selects read "All". */
+  /* Seeded from the URL, and written onto the controls as `default-value`
+     rather than `value`: the point is where they start, so a shared link shows
+     its filters in the controls and not only in the grid. */
   const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] = useState(initialCategory || ALL)
   const [status, setStatus] = useState(initialStatus || ALL)
-  /* Typed to the elements rather than to `HTMLElement`, which is what the JSX
-     definitions expect and what makes `ref.current.value` reachable without a
-     cast. Type-only imports, so nothing is added to the bundle. */
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -141,16 +130,6 @@ export function ComponentBrowser({
     window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
   }
 
-  /* Read off the families and nothing else.
-   *
-   * A declared list was wrong twice over. `beta` is not a value `@status` may
-   * take, so the option could never match a component; and a hardcoded pair
-   * would go stale against `metadata.ts`, which is where the vocabulary
-   * actually lives (`deprecated`, `experimental`, `stable`).
-   *
-   * All sixty-five are `experimental` today, so this comes back with one entry
-   * and the select is not rendered at all. It appears the day a second stage
-   * exists, which is the day it can do something. */
   /* The categories present, read off the families exactly as the statuses are.
      A closed list lives in `metadata.ts`, which is where the vocabulary is
      checked; repeating it here would be a second copy to keep in step. */
@@ -159,12 +138,17 @@ export function ComponentBrowser({
     [index],
   )
 
+  /* Read off the families for the same reason: the vocabulary lives in
+     `metadata.ts` (`deprecated`, `experimental`, `stable`), and a list written
+     here can name a status no component may take. While one status covers the
+     library this comes back with a single entry and the select is not rendered
+     at all. */
   const statuses = useMemo(
     () => [...new Set(index.map((family) => family.status))].filter(Boolean).sort(),
     [index],
   )
 
-  // Still a ref: the search is focused on mount, which no prop can do.
+  // A ref: the search is focused on mount, which no prop can do.
   const search = useRef<HelixInput>(null)
   const focusSearch = useSearchKey(search)
 
@@ -183,8 +167,8 @@ export function ComponentBrowser({
    * Worth knowing: focus on load means a screen reader starts at the search
    * rather than at the top of the document, so the heading above it is skipped
    * unless the reader goes back for it. That is the accepted trade on a page
-   * whose whole purpose is finding one of sixty-five things, and it is a trade
-   * rather than a free win. */
+   * whose whole purpose is finding one component out of the library, and it is
+   * a trade rather than a free win. */
   useFocusOnLoad(search)
 
   /* A navigation rather than state, because the server owns the order. `scroll:
@@ -227,26 +211,20 @@ export function ComponentBrowser({
       <section className={`${browser.pageHero} ${styles.designHero}`}>
         <HeroField />
         <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
-          {/* Eyebrow, title and lede are one block, and the lede was not in it.
+          {/* Eyebrow, title and lede are one block, and the lede belongs inside
+           * it. At `sm` the block reads 12 / 12 internally against 24 to
+           * whatever follows: a clean two to one. Left as a sibling of the
+           * block it takes the outer `lg`, so a line describing the heading
+           * immediately above it is spaced as the next unrelated thing on the
+           * page.
            *
-           * It sat as a sibling of the block in a column gapped `lg`, so the
-           * space under the heading was 24, which is exactly the space from the
-           * lede to the search. A line that describes the heading immediately
-           * above it was spaced as though it were the next unrelated thing on
-           * the page.
-           *
-           * Inside, at `sm`, the block reads 12 / 12 internally against 24 to
-           * whatever follows it: a clean two to one, and the eyebrow keeps the
-           * spacing it already had.
-           *
-           * The tag is over the name rather than beside it. Alongside, it read
-           * as part of the title and pushed it off center. */}
+           * The tag is over the name rather than beside it. Alongside, it reads
+           * as part of the title and pushes it off center. */}
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
-            {/* Two marks, not one. The eyebrow was asked to name the vertical,
-                and it was already carrying the stage, which is the one label on
-                this page that has to stay legible: `Building` means real work
-                with nothing shipped, and dropping it from the front of the
-                gallery would soften it by omission. So the vertical names
+            {/* Two marks, not one. The stage is the one label on this page that
+                has to stay legible: `Building` means real work with nothing
+                shipped, and folding it into an eyebrow that also names the
+                vertical would soften it by omission. So the vertical names
                 itself and the stage sits beside it, still in its own tone. */}
             <helix-flex align="center" gap="xs">
               <helix-tag>{eyebrow}</helix-tag>
@@ -257,16 +235,13 @@ export function ComponentBrowser({
               {lede}
             </helix-text>
           </helix-flex>
-          {/* "Components" rather than "families", deliberately, and the number is
-              the catalog's rather than the library's.
-            
-              Eighty-nine is what this box searches and what a reader is looking
-              at: one card each. It is not the count of custom elements, which is
-              a hundred and eighteen in the styled tier, because Tabs is one card
-              and two elements. The library says "family" everywhere it has to
-              tell a family from its parts, and that is an authoring concern; a
-              reader browsing meets the word nowhere else on the site, the route
-              being `/helix/components` and the label above saying the same. */}
+          {/* "Components" rather than "families", and the count is the
+              catalog's rather than the library's: one card each, not the number
+              of custom elements, since Tabs is one card and two elements. The
+              library says "family" wherever it has to tell a family from its
+              parts, which is an authoring concern; a reader browsing meets the
+              word nowhere else on the site, the route being `/helix/components`
+              and the label above saying the same. */}
           <helix-input
             className={`${browser.heroSearch} ${browser.chromeControl}`}
             default-value={initialQuery}
@@ -298,11 +273,10 @@ export function ComponentBrowser({
                 `--helix-size-button`, so the halves are equal rather than sized
                 by how long their words happen to be.
 
-                One word each, and the second is a noun rather than a verb. A
-                button group is two links, and links get read out of context: a
-                reader listing the page's links hears the label alone, with no
-                hero around it to say what `Explore` would have meant. `Sandbox`
-                survives that because it names the place it goes. */}
+                One word each, and a noun rather than a verb. These are links,
+                and links get read out of context: a reader listing the page's
+                links hears the label alone, with no hero around it to say what
+                `Explore` would have meant. */}
             <helix-button-group>
               {/* An icon each, and neither of them an arrow. An arrow says
                   "onward" and nothing else, which is what the button's own
@@ -387,11 +361,11 @@ export function ComponentBrowser({
             )}
           </helix-flex>
           <helix-flex align="center" className={browser.filterSort} gap="sm">
-            {/* The count is still announced and no longer shown. Filtering is a
-                change nothing else reports, so a reader who cannot see the grid
-                shrink needs to be told; a reader who can see it is being told
-                twice. `chromeControl` is the same visually-hidden treatment the
-                labels take. */}
+            {/* The count is announced and not shown. Filtering is a change
+                nothing else reports, so a reader who cannot see the grid shrink
+                needs to be told; a reader who can see it is being told twice.
+                `visuallyHidden` is the same treatment the control labels
+                take. */}
             <helix-text aria-live="polite" className={browser.visuallyHidden}>
               {shown} of {index.length} components
             </helix-text>

@@ -169,13 +169,11 @@ export class HelixHeadlessChatComposer extends HelixElement {
    *
    * **A glyph with the label as its accessible name, rather than the label as
    * text.** The word "Send" beside a field is the widest thing in the row and
-   * says nothing a return key does not, and every composer a reader has used in
-   * the last five years marks it rather than spells it. The return glyph is the
-   * mark because Enter is what actually sends, which `submit-on` says out loud:
-   * the control and the key are one affordance and should look like it.
-   *
-   * `send-label` is unchanged and is now the accessible name rather than the
-   * visible one, so a screen reader hears the same word it always did.
+   * says nothing a return key does not. The return glyph is the mark because
+   * Enter is what actually sends, which `submit-on` says out loud: the control
+   * and the key are one affordance and should look like it. `send-label` is the
+   * accessible name rather than a visible one, so a screen reader still hears
+   * the word.
    */
   protected renderSend(): TemplateResult {
     return html`<button
@@ -199,12 +197,10 @@ export class HelixHeadlessChatComposer extends HelixElement {
   /**
    * The field, and a row of tools under it.
    *
-   * **One row was the wrong shape and it got worse the more a composer had to
-   * carry.** Everything sat on a single line: an attachment control, the field,
-   * a stop control and a send button, so the field was squeezed from both sides
-   * and every tool a consumer added took width away from the thing being typed
-   * into. Under it, the field spans the whole composer at every width and the
-   * tools have a line of their own to grow along.
+   * **The tools take a line of their own rather than sharing the field's.** On
+   * one line every tool a consumer adds takes width away from the thing being
+   * typed into; under it, the field spans the whole composer at every width and
+   * the tools have room to grow along.
    *
    * Send is at the trailing end of that line rather than in the field, which is
    * the same corner and costs no overlay: a control positioned inside a

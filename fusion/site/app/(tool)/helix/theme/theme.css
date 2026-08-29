@@ -19,10 +19,6 @@
   padding: var(--helix-space-lg);
 }
 
-/* A channel slider: the track is the value rather than a measure of it, which
-   is the same call `ColorPicker` makes on its own hue and alpha channels, and
-   through the same hook. A filled half would be a second reading of something
-   the ramp already says. */
 /* What the brand became.
  *
  * **A caption under the field, not a callout.** A callout carries a severity
@@ -44,15 +40,15 @@
   gap: var(--helix-space-xs);
 }
 
-/* Drawn rather than iconised: an arrow glyph at this size is a component, a
-   focusable-looking mark and a name in the accessibility tree, for something
-   that is punctuation between two swatches. */
+/* Drawn rather than set as an icon: an arrow glyph at this size is a
+   component, a focusable-looking mark and a name in the accessibility tree,
+   for something that is punctuation between two swatches. */
 .themeShiftArrow {
   background-color: var(--helix-color-foreground-muted);
   /* The box the clip-path draws inside, so it needs the arrowhead's height and
      not the shaft's: at `--helix-border-thin` the polygon had one pixel to put
      a head in and the whole mark disappeared. The shaft's thinness is the 40 to
-     60 per cent band in the polygon instead. */
+     60 percent band in the polygon instead. */
   block-size: var(--helix-space-sm);
   clip-path: polygon(0 40%, 62% 40%, 62% 0, 100% 50%, 62% 100%, 62% 60%, 0 60%);
   inline-size: var(--helix-space-md);
@@ -67,10 +63,6 @@
   inline-size: var(--helix-size-control-sm);
 }
 
-/* A channel slider: the track is the value rather than a measure of it, which
-   is the same call `ColorPicker` makes on its own hue and alpha channels, and
-   through the same hook. A filled half would be a second reading of something
-   the ramp already says. */
 /* The two swatches beside the brand: what was asked for, and what the solver
    produced from it. */
 .themeSwatch {
@@ -82,11 +74,10 @@
   inline-size: var(--helix-size-icon-md);
 }
 
-/* The two colored tracks are not routed from here any more. They set
-   `--slider-track-image` inline, because these rules selected on a `label`
-   attribute that only exists when a server wrote the element: after a
-   client-side navigation React assigns `label` as a property, Lit does not
-   reflect it, and the selector matched nothing. */
+/* Do not route the two colored slider tracks from here. A rule selecting on a
+   `label` attribute only matches markup a server wrote: after a client-side
+   navigation React assigns `label` as a property, Lit does not reflect it, and
+   the selector matches nothing. They set `--slider-track-image` inline. */
 
 /* The stage is `helix-sandbox` and nothing else: the component owns the split,
    the panel, the toolbar row and the separators. */
@@ -113,7 +104,7 @@ helix-sandbox-editor {
 }
 
 /* **It transitions in, because it appears in response to something the reader
-   just did.** A notice that materialises with no motion reads as having always
+   just did.** A notice that arrives with no motion reads as having always
    been there, and the thing it is reporting, that the brand moved, is a
    consequence of the color they typed a moment ago.
 
@@ -166,16 +157,8 @@ helix-sandbox-editor {
  *
  * Subtle on purpose: the name is what a reader is scanning and the sample is
  * what they check once they have found it, so it sits back a step in the ink
- * ramp and does not compete for the row.
- *
- * A fixed inline size, because the whole column has to line up: `Ag` set in
- * Playfair Display is wider than in Inter, and a ragged right edge down a
- * thousand rows reads as a list that is broken rather than as type that varies.
- * The sample is centered in that width so each face sits on one vertical.
- *
- * Not scaled to the option's text. A sample smaller than the name it describes
- * cannot show a terminal or a bowl, which is the only thing it is here for, so
- * it takes a step up rather than down. */
+ * ramp and does not compete for the row. Centered in the column's fixed width,
+ * so each face sits on one vertical. */
 .themeFaceSample {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-lg);

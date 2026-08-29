@@ -65,10 +65,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    *
    * **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
    * reserves the copy button's width with `:host(:not([no-copy]))`, so the
-   * attribute is what decides whether the block pays for a control. Set from
-   * script the button went away, `render` reading the property, and the 40px it
-   * stood in stayed reserved: the exact waste that rule was written to stop,
-   * arrived at from the other side.
+   * attribute is what decides whether the block pays for a control. Unreflected,
+   * setting it from script takes the button away (`render` reads the property)
+   * and leaves the 40px it stood in reserved.
    *
    * A false boolean reflects as the attribute's absence, so this costs no
    * `no-copy=""` on hosts that never asked for one, and the rule about a
@@ -108,14 +107,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The copy button sits beside the code, not in a bar above it.
-     *
-     * It was in the header, which meant a block with nothing to call itself
-     * still drew a full-width bar to hold one button: an empty strip above
-     * every snippet, which is what a `Usage` section of one-line imports looked
-     * like. Beside the code it needs no bar at all, so a block with no `label`
-     * is just the code and a way to take it, and the header exists only when
-     * there is a name to put in it. One less appearance to choose between. */
+    /* The copy button sits beside the code, not in a bar above it. In the
+       header, a block with nothing to call itself still draws a full-width bar
+       to hold one button, so a `Usage` section of one-line imports is a run of
+       empty strips. Beside the code, the header exists only when there is a
+       name to put in it. */
     return html`${
       this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
     }

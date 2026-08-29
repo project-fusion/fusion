@@ -50,13 +50,10 @@ describe('tabs selection', () => {
   })
 
   test('the panel is named by its tab, since an IDREF cannot reach one', async () => {
-    /* This spec used to assert the two IDREFs existed, and they did: `tab-one`
-       and `panel-one`, derived from the value so they would survive server
-       rendering. What it never asserted is that either one *reached* anything,
-       and neither did. Both ids were rendered inside their own element's shadow
-       root, an IDREF resolves only in the tree it is written in, and a sibling
-       shadow tree is not that tree. So the panel had no accessible name at all
-       and the tab controlled nothing, on every set, while this passed.
+    /* An IDREF resolves only in the tree it is written in, and a tab's id and
+       its panel's id are each rendered inside their own element's shadow root,
+       which are sibling trees. Asserting that the two IDREFs exist says nothing
+       about either one reaching anything, and neither does.
 
        No element reference can fix it either: a reference is valid into the
        same tree or a shadow-including ancestor, and these are siblings. A name
@@ -81,12 +78,9 @@ describe('tabs selection', () => {
 describe('tabs keyboard', () => {
   /* From a named element, not from "whichever is selected".
    *
-   * The helper used to find the selected tab and press from there, which made
-   * the manual-mode spec below pass without touching what it is about: in
-   * `manual` focus and selection diverge after the first press, so pressing
-   * from the selection every time re-runs the first press forever. Traversal
-   * being impossible in `manual` was a real bug, and this is the only shape of
-   * helper that can see it. */
+   * In `manual` focus and selection diverge after the first press, so a helper
+   * that presses from the selection re-runs the first press forever, and the
+   * manual-mode spec below passes without touching what it is about. */
   const pressFrom = (from: HTMLElement, key: string) => {
     const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
     from.dispatchEvent(event)
@@ -108,10 +102,9 @@ describe('tabs keyboard', () => {
   })
 
   test('both axes move the row, not only the one it is laid out on', async () => {
-    /* The tab list bound Left and Right alone until it moved onto
-       `KeyboardNavigationController`, which binds both axes on purpose: a
-       reader who guesses the wrong axis gets nothing, and `variant` is
-       presentation. Down reads as Right, Up as Left. */
+    /* `KeyboardNavigationController` binds both axes on purpose: a reader who
+       guesses the wrong axis gets nothing, and `variant` is presentation. Down
+       reads as Right, Up as Left. */
     const host = (await mount(markup)) as Updatable
     press(host, 'ArrowDown')
     await host.updateComplete
@@ -175,9 +168,9 @@ describe('tabs keyboard', () => {
 
   test('an arrow pressed while reading a panel leaves the tabs alone', async () => {
     /* A panel is its own tab stop and the listener is on the whole component,
-       so a press from inside one used to move the row out from under the
-       reader. `origin: 'focus'` is what makes it identifiable: the press came
-       from no tab, so there is nothing to move. */
+       so a press from inside one would move the row out from under the reader.
+       `origin: 'focus'` is what makes it identifiable: the press came from no
+       tab, so there is nothing to move. */
     const host = (await mount(markup)) as Updatable
     const event = pressFrom(panels(host)[0] as HTMLElement, 'ArrowRight')
     await host.updateComplete
@@ -194,10 +187,8 @@ describe('tabs keyboard', () => {
 
 describe('tabs selection can be refused', () => {
   test('a listener that refuses keeps the tab where it was', async () => {
-    /* It could not be refused before: the value was written straight from the
-       item's event, so `helix-change` was an announcement nobody could answer,
-       while `Radio.Group` two folders away could be. Whether a selection can be
-       refused should not depend on which component is being looked at. */
+    /* Whether a selection can be refused should not depend on which component
+       is being looked at: `Radio.Group` two folders away can be. */
     const host = (await mount(markup)) as Updatable & { active: string }
     await host.updateComplete
     const started = host.active
@@ -219,9 +210,8 @@ describe('tabs selection can be refused', () => {
   })
 
   test('a disabled first tab is not made current by default', async () => {
-    // The hand-written fallback was `?? tabs[0]`, which took whatever was
-    // first, so a set opening on a disabled tab showed it as current and
-    // brought its panel with it.
+    // A fallback of `?? tabs[0]` takes whatever is first, so a set opening on
+    // a disabled tab shows it as current and brings its panel with it.
     document.body.innerHTML = `<helix-headless-tabs label="Set">
       <helix-headless-tab disabled value="a">A</helix-headless-tab>
       <helix-headless-tab value="b">B</helix-headless-tab>
@@ -240,9 +230,6 @@ describe('tabs selection can be refused', () => {
 })
 
 describe('tabs, controlled and uncontrolled', () => {
-  /* The reason all four mixins changed shape. A consumer who wrote `value="one"`
-     and then clicked another tab read back "two": the set overwrote them, so a
-     tab strip could not be owned by the thing rendering it. */
   test('writing active seeds the set, and selecting still moves it', async () => {
     const host = (await mount(
       `<helix-headless-tabs active="one">

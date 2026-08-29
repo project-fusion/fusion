@@ -13,10 +13,10 @@ import { DOCUMENT_COMPONENTS, PROSE_COMPONENTS } from '../../components/prose/pr
  * `next build` and never in a request. That is what makes compiling here rather
  * than through a bundler plugin the cheap option: there is no runtime.
  *
- * **The source arrives as a string, never as a path.** Reading it would be the
- * filesystem access that traced this app's whole repository into the server
- * bundle and was removed two days ago, so `@fusion.dev/insights` generates
- * its files into a module and this compiles what it is handed.
+ * **The source arrives as a string, never as a path.** Reading one is the
+ * filesystem access that traces this app's whole repository into the server
+ * bundle, so `@fusion.dev/insights` generates its files into a module and this
+ * compiles what it is handed.
  *
  * **Not `@next/mdx`.** Its file convention wants `.mdx` inside `app/`, and all
  * three content packages are deliberately outside it, so that documentation is
@@ -28,14 +28,12 @@ import { DOCUMENT_COMPONENTS, PROSE_COMPONENTS } from '../../components/prose/pr
  * than reading it; the registry beside the content carries the same fields in a
  * typed form.
  *
- * `remark-gfm` is here for tables. The thesis stack is one, and a table is the
- * shape that data always had: it was a grid of components before, which is the
- * same table with more machinery around it.
+ * `remark-gfm` is here for tables. The thesis stack is one.
  *
  * **The component map is passed here rather than per call site**, so that every
- * MDX surface renders the same way. It shipped without one, which meant a fenced
- * block came out as an unhighlighted `<pre>` on all five of them; that module
- * says which elements map and, at more length, which deliberately do not.
+ * MDX surface renders the same way. Without one a fenced block comes out as an
+ * unhighlighted `<pre>` on every surface; that module says which elements map
+ * and, at more length, which deliberately do not.
  *
  * **Two entry points and one map, which is not a walk back from that.** What the
  * central pass protects is that no surface renders with fewer components than

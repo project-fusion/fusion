@@ -338,11 +338,9 @@ if (hasLayout()) {
 if (hasLayout()) {
   describe('choosing an option with a pointer', () => {
     test('a click on an option chooses it', async () => {
-      /* Nothing anywhere listened for a click on an option: not the option,
-         which only had a `select()` method, and not the listbox, which listened
-         for `helix-select` and for keys. So a list could be operated with a
-         keyboard and not with a mouse, for as long as it has existed. Every
-         spec for it chose by key or by method, which is exactly why. */
+      /* With nothing listening for a click on an option, a list is operable by
+         keyboard and not by mouse, and every other spec here chooses by key or
+         by method, so nothing else would catch it. */
       const host = (await mount(
         `<helix-headless-listbox label="Owner">
           <helix-headless-option value="one">One</helix-headless-option>

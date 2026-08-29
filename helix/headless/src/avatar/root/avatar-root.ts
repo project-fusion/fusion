@@ -88,21 +88,20 @@ export class HelixHeadlessAvatar extends HelixElement {
     super.willUpdate(changed)
     /* A new source is a new attempt.
      *
-     * `failed` is an observation about the image that was loading, and it
-     * outlived the image: it latched on the first error and nothing ever
-     * cleared it, so an avatar that failed once fell back to initials for the
-     * life of the element. A consumer swapping a broken URL for a good one, or
-     * a list reusing an avatar for the next person, got the initials forever
-     * and no error to say why. */
+     * `failed` is an observation about the image that was loading, so it has to
+     * be cleared with the source. Latched, an avatar that failed once falls back
+     * to initials for the life of the element, and a consumer swapping a broken
+     * URL for a good one, or a list reusing an avatar for the next person, gets
+     * the initials forever with no error to say why. */
     if (changed.has('src')) {
       this.failed = false
     }
     /* A role only where there is a name to carry.
      *
-     * `role="img"` was asserted unconditionally, so an avatar with no `name`
-     * was an unnamed image: a screen reader announces "image" and stops, which
-     * is worse than announcing nothing, because nothing is what a decorative
-     * mark should be. With a name it is content and needs the role to hold it. */
+     * An unconditional `role="img"` makes an avatar with no `name` an unnamed
+     * image: a screen reader announces "image" and stops, which is worse than
+     * announcing nothing, because nothing is what a decorative mark should be.
+     * With a name it is content and needs the role to hold it. */
     hostAria(this.internals, {
       label: this.name,
       role: this.name === '' ? '' : 'img',
@@ -128,8 +127,8 @@ export class HelixHeadlessAvatar extends HelixElement {
    *
    * A consumer replaces it by slotting something; a tier above replaces it by
    * overriding this, and those answer different people. Written inline it
-   * answered only the first, and a styled tier wanting initials drawn its own
-   * way had to reimplement the whole template to reach three elements.
+   * answers only the first, and a styled tier wanting initials drawn its own way
+   * has to reimplement the whole template to reach three elements.
    */
   protected renderInitials(): TemplateResult {
     return html`<slot>

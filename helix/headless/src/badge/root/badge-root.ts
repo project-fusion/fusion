@@ -77,11 +77,11 @@ export class HelixHeadlessBadge extends HelixElement {
     /* A mark with text is content and is announced; a dot is decoration and is
        not.
      *
-     * This asked for a `label` as well, so a badge showing a count and no label
-     * was `aria-hidden` and the number it exists to show reached nobody using a
-     * screen reader. The number is its own name where none is given, which is
-     * why `aria-label` is now conditional on the label rather than on this: a
-     * `4` announces as "4" from the text, and `label="4 unread"` says the
+     * It must not ask for a `label` as well, or a badge showing a count and no
+     * label is `aria-hidden` and the number it exists to show reaches nobody
+     * using a screen reader. The number is its own name where none is given,
+     * which is why `aria-label` is conditional on the label rather than on this:
+     * a `4` announces as "4" from the text, and `label="4 unread"` says the
      * better thing.
      *
      * A dot with no label still says nothing, which is the deliberate half: a

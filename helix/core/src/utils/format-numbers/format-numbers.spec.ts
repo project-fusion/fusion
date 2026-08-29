@@ -7,8 +7,7 @@ import { formatNumbers } from './format-numbers.js'
  *
  * `Intl.NumberFormat` is expensive to build and cheap to call, and a pagination
  * renders its count on every update, so a formatter per render is the component's
- * whole cost. Three files in one family had each worked that out and kept their
- * own two-line cache.
+ * whole cost.
  */
 describe('a formatter for a locale', () => {
   test('formats in that locale, which is the thing it is for', () => {

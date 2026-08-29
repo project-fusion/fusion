@@ -40,8 +40,7 @@ export interface Vertical {
 }
 
 /**
- * The verticals, in the order the company is organized. Design leads, because
- * it is the one with something to show.
+ * The verticals, in the order the company is organized.
  *
  * One list, read by the navigation, the landing page, the megamenu's third
  * column, and each vertical's own page. Stage labels are the honest ones:
@@ -49,18 +48,16 @@ export interface Vertical {
  * Declared is committed direction with no work started. Nothing here softens
  * them.
  *
- * **Studio leads, because it is the only one that can be bought.** The order
- * used to run Design first on the grounds that it was the one with something to
- * show. It still is, but a reader meeting this list wants to know what is for
- * sale before what is being built, and the practice was the one thing on the
- * site belonging to no vertical at all.
+ * **Studio leads, because it is the only one that can be bought.** A reader
+ * meeting this list wants to know what is for sale before what is being built,
+ * and the practice is the one thing on the site belonging to no vertical at all.
  *
  * **Design and Mind point at their product's route, and that is the collapse
  * rather than an oversight.** A vertical is how the company is organized and a
  * product is what a reader uses, and where exactly one product fills a
- * vertical, shipping two pages for it would be padding: `/helix` has titled
- * itself Helix and worn Fusion Design as an eyebrow since it was written.
- * Energy and Capital have no product, so their pages are the vertical.
+ * vertical, shipping two pages for it would be padding: `/helix` titles itself
+ * Helix and wears Fusion Design as an eyebrow. A vertical with no product would
+ * need a page of its own.
  */
 export const VERTICALS: Vertical[] = [
   {

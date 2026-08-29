@@ -4,19 +4,15 @@ import { getFamilies } from '../catalog/catalog'
 /*
  * The Helix documentation sidebar: prose and reference in one tree.
  *
- * **There were two of these, and a reader in either one could not see the
- * other.** `/helix/docs/*` rendered five sections of MDX and `/helix/components/*`
- * rendered a flat list of families, from two components with the same name, the
- * same `helix-tree`, and the same link handling. So a reader partway through
- * Theming had no way to reach Card without going back up to the masthead, and a
- * reader on Card's page could not see that Forms and validation existed. The
- * navigation was answering "where am I" and never "what else is there", which is
- * the half a sidebar is actually for.
+ * **One tree, not two.** Split into separate navigations, a reader partway
+ * through Theming has no way to reach Card without going back up to the
+ * masthead, and a reader on Card's page cannot see that Forms and validation
+ * exists. A sidebar has to answer "what else is there" and not only "where am
+ * I".
  *
- * Components has been a section of this navigation from the start. It was the
- * one section nobody built, and the
- * masthead had been compensating by hoisting Components to a product-level
- * destination beside Guides, which said the two were different kinds of thing.
+ * Components is a section of this navigation rather than a product-level
+ * destination beside Guides, which would say the two are different kinds of
+ * thing.
  *
  * **The join is here rather than in `@fusion.dev/helix-docs`, and that is deliberate.**
  * A section of prose comes from the frontmatter of an MDX file in that package.

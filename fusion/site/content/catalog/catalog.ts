@@ -11,11 +11,11 @@ import generated from './catalog.generated.json'
  * file imported above. `fusion/site` runs it before `next build` and `next dev`,
  * the same way it already builds the frame and the specs.
  *
- * This used to reach out of the project with `fs` to find those sources, which
- * Turbopack warned about on every build: a path it cannot statically scope
- * traces the whole repository into the server bundle, public folder included.
- * An import inside the project reads nothing at runtime and has nothing to
- * trace.
+ * **Never reach out of the project with `fs` to read those sources instead.**
+ * Turbopack cannot statically scope such a path, so it traces the whole
+ * repository into the server bundle, public folder included, and warns on every
+ * build. An import inside the project reads nothing at runtime and has nothing
+ * to trace.
  */
 export type {
   ApiMember,

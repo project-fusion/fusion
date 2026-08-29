@@ -1,15 +1,11 @@
 /**
  * The shapes a consumer writes and the shapes they get back.
  *
- * **Declarations only, and that is what is left of the TypeScript engine.** The
- * derivation is Rust now, reached through WebAssembly, so what a JavaScript
- * consumer needs from this package is the vocabulary rather than the solver. A
- * type is erased at build time, so nothing here is a second implementation of
- * anything: it cannot drift into disagreeing with the engine about an *answer*,
- * only about a *field name*, which is what is compared.
- *
- * The prose is kept whole from the files it came from. It is the argument for
- * why each field exists, and it was never about how any of them was computed.
+ * **Declarations only.** The derivation is Rust, reached through WebAssembly, so
+ * what a JavaScript consumer needs from this package is the vocabulary rather
+ * than the solver. A type is erased at build time, so nothing here is a second
+ * implementation of anything: it cannot drift into disagreeing with the engine
+ * about an *answer*, only about a *field name*, which is what is compared.
  */
 
 /** A color in OKLCH. Lightness 0 to 1, chroma from 0, hue in degrees. */
@@ -131,10 +127,6 @@ export interface ThemeIntent {
    * **The one material choice that can invalidate the guarantee.** Contrast is
    * measured against a known ground and a translucent surface does not have
    * one, so a pair over it comes back `unverifiable` rather than measured.
-   *
-   * The audit found this half nearly done already: six declarations across two
-   * families, both already behind hooks, so material needed a policy token to
-   * default to and nothing else.
    */
   material?: {
     blur?: number
@@ -143,12 +135,8 @@ export interface ThemeIntent {
   /**
    * The faces the theme is set in.
    *
-   * **Type is part of a theme and had no input at all.** Twenty tokens across
-   * five categories, families, sizes, weights, leading and tracking, were
-   * unreachable from intent while every color in the palette was one field
-   * away. Families are the half a consumer actually chooses; the size scale,
-   * the weights and the spacing are the half that is a system, and they are
-   * still fixed.
+   * **Families are the half a consumer chooses**; the size scale, the weights
+   * and the spacing are the half that is a system, and they stay fixed.
    *
    * `display` falls back to `body`, which is what the stylesheet already does:
    * a theme with one face is the common case and should not have to say so
@@ -195,12 +183,7 @@ export interface ThemeIntent {
    */
   namespace?: string
   /**
-   * How the theme's motion feels.
-   *
-   * **The other axis with no input at all**, alongside the half of type that is
-   * a system: nine tokens, four durations and five curves, and a brand with a
-   * snappy voice and one with a gentle one reached them the same way, which is
-   * to say not at all.
+   * How the theme's motion feels: nine tokens, four durations and five curves.
    *
    * `character` sets the curve every component reaches for by default and
    * carries a duration multiplier with it, because the two are one decision: a
@@ -209,8 +192,7 @@ export interface ThemeIntent {
    *
    * `instant` is not scaled. It is 0 and means "do not animate", which is a
    * statement rather than a duration, and it emits no curves at all: three
-   * easings for transitions of zero length is a contradiction the type used to
-   * allow through `scale: 0`.
+   * easings for transitions of zero length is a contradiction.
    *
    * `precise` is the one character that is not physical. The other three
    * accelerate, settle or overshoot; linear reads as moved by a mechanism, and
@@ -227,8 +209,7 @@ export interface ThemeIntent {
    * Chroma 0 is a dead gray and is the default, matching `primitives.css`,
    * which records why: a fixed chroma is a rising *saturation* as a surface
    * darkens, so a trace that looks right on a light page reads navy across a
-   * dark one. The engine used to hardcode 0.008, the exact value the
-   * stylesheet had already rejected for that reason.
+   * dark one.
    */
   neutral?: {
     chroma?: number
@@ -251,8 +232,7 @@ export interface ThemeIntent {
    *
    * `fill` and `space` produce the same edge and lift, which is none of
    * either: the difference between them lives in the surface colors and in
-   * `density`, not here. Said out loud because two values with one output
-   * looks like a bug until it is explained.
+   * `density`, not here. Two values with one output reads as a bug and is not.
    */
   separation?: {
     floating?: 'border' | 'fill' | 'shadow'
@@ -359,10 +339,10 @@ export interface Pairing {
    * measured and passed. Folding the two together is how a guarantee decays
    * into a claim about the pairs that happened to be easy.
    *
-   * One producer today: a pairing naming a token this theme does not emit,
-   * which a caller supplying their own `pairings` will legitimately do.
-   * Translucent grounds are the second, when `material` lands: what sits
-   * behind a glass surface is whatever the reader scrolled under it.
+   * Two producers: a pairing naming a token this theme does not emit, which a
+   * caller supplying their own `pairings` will legitimately do, and a ground
+   * the model marks unbounded, where what sits behind the surface is whatever
+   * the reader scrolled under it.
    */
   status: 'fail' | 'pass' | 'unverifiable'
   /**
@@ -377,13 +357,9 @@ export interface Pairing {
 /**
  * What a derivation produced.
  *
- * **No `intent`, which the TypeScript engine carried and nothing read.** It held
- * the resolved intent so a consumer could see what they got rather than what
- * they asked for, which is a real thing to want and was never used, never dumped
- * by the oracle, and therefore never checked. Serialising it across the boundary
- * means a `Serialize` on every shape in the vocabulary including three unions
- * with hand-written readers, which is a day of work for a field with no caller.
- * It goes back the moment one appears.
+ * **No resolved `intent` field.** Carrying one across the WebAssembly boundary
+ * means a `Serialize` on every shape in the vocabulary, three hand-read unions
+ * included, and no consumer has asked for it. It goes back when one does.
  */
 export interface DerivedTheme {
   /**
@@ -420,14 +396,13 @@ export interface DerivedTheme {
    * **Data rather than only a line of CSS**, because the two consumers apply it
    * differently. `toCss` renders a block; a page theming one panel writes the
    * properties onto that element. Both read this, so neither can hold a
-   * different opinion about what the seed is, which is exactly what the
-   * marketing site's hand-written bridge had become.
+   * different opinion about what the seed is.
    */
   seeds: Record<string, string>
   tokens: DerivedToken[]
   /**
    * Pairings that failed their contrast target, pinned values included.
-   * Rendered from `pairings`, and no longer the only record of a result.
+   * Rendered from `pairings`.
    */
   violations: string[]
 }

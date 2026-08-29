@@ -115,9 +115,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. This used to be hardcoded `off`, so a reader
-   * could never have a birthday or a postal code filled in for them and a
-   * consumer had no way to ask for it. See 295.
+   * lets autofill work at all. Hardcoding `off` here is what stops a reader
+   * having a birthday or a postal code filled in for them, with no way for a
+   * consumer to ask for it. See (295).
    */
   @property()
   autocomplete = ''
@@ -226,9 +226,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const stepped = anchor + Math.round((value - anchor) / step) * step
     const floored = this.min === undefined ? stepped : Math.max(this.min, stepped)
     const capped = this.max === undefined ? floored : Math.min(this.max, floored)
-    /* Decimal places from the step and the anchor together: a step of 0.25 from
-       an anchor of 0.1 lands on 0.35, which needs two rather than the two the
-       step alone would give by luck. */
+    /* Decimal places from the step and the anchor together: a step of 0.5 from
+       an anchor of 0.25 lands on 0.75, which needs two rather than the one the
+       step alone would give. */
     const places = Math.max(decimals(step), decimals(anchor))
     return Number(capped.toFixed(places))
   }
@@ -273,17 +273,15 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /**
    * The label is the surface, which is where the convention already is.
    *
-   * A grip was drawn first, an icon of its own at the leading edge, and it was
-   * a second control in a field that already has three. Every tool that does
+   * Not a grip of its own at the leading edge, which is the obvious answer and
+   * is a second control in a field that already has three. Every tool that does
    * this well drags the *name* of the value: the label is present on every
    * field, costs no chrome, and a reader who wants to know what they are
    * dragging is already looking at it.
    *
    * Overridden rather than handled on the host, because the handlers have to
    * sit on the element that takes the capture. The markup is the mixin's, said
-   * again here, which is the duplication #76 exists to remove: when base
-   * renders break into methods a styled tier can extend, this becomes a call to
-   * `super` with three listeners added.
+   * again here, which is the duplication #76 exists to remove.
    *
    * A label with nothing in it is still nothing. `scrub` on a field whose label
    * is empty leaves no surface, which is honest: there is nowhere to put the
@@ -396,13 +394,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * and filling it with `min` would put a number in a form the reader never
    * gave.
    *
-   * **And text that is not a number is left alone, which this cleared at
-   * first.** Typing `2.7e` and tabbing away emptied the field: the reader looks
-   * back and their entry is gone with nothing saying why, and the likeliest
-   * cause is a fat finger on a number they had almost finished. Nothing is lost
-   * by keeping it, because `sync` has already marked it `badInput`, so the field
-   * shows as wrong and the form refuses to submit. Destroying the evidence of a
-   * mistake is not the same as preventing one.
+   * **And text that is not a number is left alone.** Clearing it means typing
+   * `2.7e` and tabbing away empties the field: the reader looks back and their
+   * entry is gone with nothing saying why, and the likeliest cause is a fat
+   * finger on a number they had almost finished. Nothing is lost by keeping it,
+   * because `sync` has already marked it `badInput`, so the field shows as wrong
+   * and the form refuses to submit. Destroying the evidence of a mistake is not
+   * the same as preventing one.
    */
   private readonly handleBlur = (): void => {
     const control = this.control
@@ -437,8 +435,8 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     } else if (event.key === 'PageDown') {
       this.stepDown(true)
       /* Guarded the way `nudge` is. A read-only field still receives keydown,
-         so Home on one with a `min` silently rewrote the value that the arrows
-         beside it correctly refused to touch. */
+         so an unguarded Home on one with a `min` silently rewrites the value
+         that the arrows beside it correctly refuse to touch. */
     } else if (
       event.key === 'Home' &&
       this.min !== undefined &&

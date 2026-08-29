@@ -91,11 +91,6 @@ export interface Insight {
   kind: Kind
   /**
    * Reading time in minutes, counted from the body at build.
-   *
-   * It used to be authored, on the reasoning that the bodies were JSX and
-   * counting their words would mean walking a React tree to save an integer.
-   * They are markdown now, so the reason went and so did the number nobody was
-   * maintaining.
    */
   minutes: number
   /**
@@ -130,9 +125,9 @@ export interface Insight {
  * moving an address. A deliberate rename is a `git mv`, which is visible in
  * review and is where `check:gen:routes` asks for a redirect.
  *
- * The copy is drawn from `docs/`, which is the same rule the landing page
- * follows: the argument on the site and the argument in the plan are the same
- * argument, so neither can drift into being marketing for the other.
+ * The copy is drawn from `fusion/docs/`, which is the same rule the landing
+ * page follows: the argument on the site and the argument in the plan are the
+ * same argument, so neither can drift into being marketing for the other.
  *
  * Shaped here rather than consumed raw, because a card wants an `image` object
  * and frontmatter is flat.

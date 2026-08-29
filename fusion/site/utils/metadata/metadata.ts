@@ -4,12 +4,6 @@ import { absolute, SITE } from '@/utils/site/site'
 /**
  * One shape for a page's title, its description, and everything that follows.
  *
- * **Eighty-nine routes shared one title and none of them said anything else.**
- * Measured for 247: zero `og:` tags across the site, no `metadataBase`, no
- * favicon. A link to any page of it, pasted anywhere a link gets unfurled,
- * produced the domain and nothing more, and a component family that has a name,
- * a summary and a stage looked identical to the contact form.
- *
  * **The point of a helper rather than a convention is that the second half is
  * derived.** A page states the two things only it knows, what it is called and
  * what it is about, and the canonical URL, the Open Graph block and the Twitter

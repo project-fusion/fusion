@@ -4,32 +4,26 @@
    **`--grid-columns` is the consumer's, and it is read first because an explicit
    track list is the most specific thing anyone can say about a grid.** `columns`
    and `min` both produce *equal* tracks, so a layout of two unequal ones, a
-   narrow rail beside a prose measure, could not be said through this element at
-   all: the first consumer outside this repository wrote a plain `<div>` instead,
-   in a page otherwise built from Helix elements. A constraint that pushes a
-   layout out of the system is not protecting the space scale, it is losing the
-   element.
-
-   `helix-table` and `helix-data-table` already do exactly this, `--table-columns`
-   over `--table-template`, so the naming here follows theirs: `-columns` is what
-   a consumer sets and the derived value keeps its own name. Precedence is
-   consumer, then `min`, then `columns`, then a single column.
+   narrow rail beside a prose measure, cannot be said through the attributes at
+   all. The naming follows `helix-table` and `helix-data-table`, `--table-columns`
+   over `--table-template`: `-columns` is what a consumer sets and the derived
+   value keeps its own name. Precedence is consumer, then `min`, then `columns`,
+   then a single column.
 
    A property rather than an attribute, because a property can be redefined in a
    media query and an attribute needs JavaScript watching a breakpoint to rewrite
-   markup, which is the `data-min` failure this file already records and rejects
-   two comments below. `applyTemplate` sets the property from
-   a `<style>` in the shadow root; declaring the track list here directly would
-   beat it, because a shadow root's adopted stylesheets cascade after its own
-   `<style>` elements, and `static styles` is adopted. A property nothing else
-   declares cannot lose that fight. */
+   markup, which is the `data-min` failure the next comment rejects.
+   `applyTemplate` sets the property from a `<style>` in the shadow root;
+   declaring the track list here directly would beat it, because a shadow root's
+   adopted stylesheets cascade after its own `<style>` elements, and
+   `static styles` is adopted. A property nothing else declares cannot lose that
+   fight. */
 :host {
   display: grid;
-  /* `none`, which is what `Flex` has always had. The two layout primitives
-     disagreed with no reason written down, so the same `gap="sm"` meant "less
-     than the default" in one and "more than nothing" in the other, and a grid
-     put space between things nobody had asked for. A layout primitive that adds
-     space you did not ask for is the surprising one. */
+  /* `none`, which is what `Flex` has. A layout primitive that adds space
+     nobody asked for is the surprising one, and where the two disagree the same
+     `gap="sm"` means "less than the default" in one and "more than nothing" in
+     the other. */
   gap: var(--helix-space-none);
   grid-template-columns: var(--grid-columns, var(--_grid-template, minmax(0, 1fr)));
 }
@@ -38,16 +32,14 @@
    JavaScript. Only `min` needs measuring, and it is applied on upgrade.
 
    Each branch reads the floor first, which is what makes `min` beat `columns`
-   as the documentation has always said it does. These rules set the template
-   outright and the floor arrives as a custom property read by the plain `:host`
-   rule at lower specificity, so an element given both got the fixed count, the
-   exact opposite.
+   as the documentation says it does. These rules set the template outright and
+   the floor arrives as a custom property read by the plain `:host` rule at
+   lower specificity, so a branch that does not name `--_grid-template` gives an
+   element with both the fixed count, the exact opposite.
 
-   Through the property rather than a marker attribute on the host. A
-   `data-min` written in `updated()` did win the cascade and was a change to
-   markup React rendered, which it reports on hydration and does not patch up.
-   The template is already a custom property; asking for it here costs nothing
-   and writes nothing. */
+   Through the property rather than a marker attribute on the host. A `data-min`
+   written in `updated()` wins the cascade and is a change to markup React
+   rendered, which it reports on hydration and does not patch up. */
 :host([columns="2"]) {
   grid-template-columns: var(--grid-columns, var(--_grid-template, repeat(2, minmax(0, 1fr))));
 }
@@ -76,12 +68,9 @@
 :host([gap="sm"]) {
   gap: var(--helix-space-sm);
 }
-/* `md` was the one step with no rule, because it used to be the `:host`
-   default and so had never needed one. Changing that default to `none` turned
-   every `gap="md"` in the codebase into a grid with no gap at all: valid
-   markup, a documented value, matching nothing, falling through to zero. The
-   gallery of fifty-four component cards went flush. Flex has always carried all
-   seven steps, which is what the two being consistent is worth. */
+/* `md` needs a rule of its own like every other step, even though it was once
+   the `:host` default. Without one, `gap="md"` is valid markup and a documented
+   value matching nothing, falling through to the `none` default. */
 :host([gap="md"]) {
   gap: var(--helix-space-md);
 }
@@ -97,16 +86,15 @@
 
 /* `3xl` is the top of the space scale, and the pair stops where it does.
  *
- * A layout could reach it only by a document rule setting `gap` on the element,
- * which is a document rule against a shadow one: it wins outright, the `gap`
- * attribute beside it becomes dead text. The
- * docs column had exactly that, `gap="2xl"` written on the element and `3xl`
- * applied over it, so the markup said one thing and the page did another.
+ * Without a rule here a layout reaches it only through a document rule setting
+ * `gap` on the element, and a document rule beats a shadow one outright: the
+ * `gap` attribute beside it becomes dead text, so the markup says one thing and
+ * the page does another.
  *
- * `Grid` takes it in the same commit, unasked. A pair of layout components whose
- * scales differ by one step is a worse arrangement than either of them alone:
- * the difference is invisible until somebody writes the value on the wrong one
- * and gets nothing. */
+ * `Grid` and `Flex` carry the same steps. A pair of layout components whose
+ * scales differ by one is a worse arrangement than either alone: the difference
+ * is invisible until somebody writes the value on the wrong one and gets
+ * nothing. */
 :host([gap="3xl"]) {
   gap: var(--helix-space-3xl);
 }

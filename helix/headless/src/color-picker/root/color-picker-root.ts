@@ -138,9 +138,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
-   * point.** The field filters a list rather than collecting a value, so a
-   * browser offering to fill it with a saved address is competing for the same
-   * keystrokes as the listbox. A consumer who wants autofill can still ask.
+   * point.** The field holds a color, so a browser offering to fill it with a
+   * saved address is competing for the same keystrokes as the square and the
+   * ramps. A consumer who wants autofill can still ask.
    */
   @property()
   autocomplete = 'off'
@@ -148,12 +148,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /**
    * Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Date Picker already drew and
-   * these two now follow. A flat picker has no room of its own for a sentence:
-   * the field that wraps one owns the label, the hint and the feedback, and a
-   * second message inside the panel would be the same error said twice. What is
-   * left for the picker is the one thing the field cannot draw from outside, the
-   * mark on the answer itself.
+   * A flag rather than a message, the split Date Picker also draws. A flat
+   * picker has no room of its own for a sentence: the field that wraps one owns
+   * the label, the hint and the feedback, and a second message inside the panel
+   * would be the same error said twice. What is left for the picker is the one
+   * thing the field cannot draw from outside, the mark on the answer itself.
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
@@ -186,10 +185,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    *
    * Color Input sets this, because its field is that input. Two editable fields
    * for one value is the outcome worth avoiding: two places to type, and no
-   * answer to which one is authoritative or which has the caret. The other way
-   * round was considered, Color Input dropping its own field and letting this be
-   * the only one, and it is worse for a form: the value cannot be read or pasted
-   * without opening a panel.
+   * answer to which one is authoritative or which has the caret. Do not close it
+   * the other way round, with Color Input dropping its own field: the value
+   * would then be unreadable and unpasteable without opening a panel.
    */
   @property({ attribute: 'no-value', type: Boolean })
   noValue = false
@@ -304,12 +302,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    *
    * A reader who has just built a color wants it in a stylesheet, and the
    * alternative is selecting text out of a field that may not be on screen. The
-   * chip is the obvious target: it is the color, at the size of a control, and
-   * it had no job at all before this.
+   * chip is the obvious target: it is the color, at the size of a control.
    *
-   * The controller rather than the four lines it replaces, because a copy button
-   * is coming and the two share everything that is easy to get wrong: the write,
-   * the confirmation, the timer that ends it, the event, and a failure that is
+   * The controller rather than four lines here, because Copy Button shares
+   * everything about this that is easy to get wrong: the write, the
+   * confirmation, the timer that ends it, the event, and a failure that is
    * correctly silent.
    */
   private readonly copier = new CopyController(this)
@@ -414,9 +411,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.renderRoot?.querySelector<HTMLElement>('[part="grid-saturation"]')?.focus(options)
   }
 
-  /** One of the ramps under the square. */
-  /* `protected` rather than `private`: the method was already the seam and a
-     tier above simply could not reach it. */
+  /**
+   * One of the ramps under the square.
+   *
+   * `protected` rather than `private`, the method being the seam a tier above
+   * renders its own ramp through.
+   */
   protected renderChannel(
     channel: 'alpha' | 'hue',
     label: string,
@@ -442,13 +442,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /**
    * One axis of the area, taken the way `takeChannel` takes a rail.
    *
-   * **Named rather than inline because of the first line.** These were two arrow
-   * functions that moved the color and stopped nothing, so the `<input
-   * type="range">` behind each axis sent its own composed `input` straight past
-   * this element to whoever was listening on it: a consumer dragging the area
-   * received the range's event and not this component's. `takeChannel` beside it
-   * has stopped its own since it was written, which is what made the omission
-   * hard to see. Found by sweeping every family that renders a native control.
+   * **Named rather than inline because of the first line.** The `<input
+   * type="range">` behind each axis sends its own composed `input`, which
+   * reaches a consumer listening on this element beside this element's own
+   * unless it is stopped: a consumer dragging the area receives the range's
+   * event and not this component's.
    */
   private takeArea(axis: 'brightness' | 'saturation', event: Event): void {
     event.stopPropagation()
@@ -462,15 +460,15 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * **Both native events, because a slider sends both and at different
    * moments.** It is one of the controls a reader edits continuously, so it
    * announces `input` all the way through a drag and `change` when the drag
-   * ends. Listening only for the commit meant the picker heard nothing while a
-   * handle moved and the hue and alpha handles did not move at all.
+   * ends. Listening only for the commit leaves the picker deaf while a handle
+   * moves, and the hue and alpha handles do not move at all.
    *
-   * **Read off the target rather than out of a detail**, which is what changed
-   * on 26 Aug 2026. This bound `helix-input` and `helix-change` and took the
-   * proposed value out of the event. Those are requests: they announce what the
-   * slider is *about* to do, before anything has moved and while a listener may
-   * still refuse it. The native pair fires after the slider applied, so the
-   * value is on the element and cannot disagree with it. See 294.
+   * **Read off the target rather than out of a detail.** Do not bind
+   * `helix-input` and `helix-change` and take the proposed value out of the
+   * event: those are requests, announcing what the slider is *about* to do,
+   * before anything has moved and while a listener may still refuse it. The
+   * native pair fires after the slider applied, so the value is on the element
+   * and cannot disagree with it. See (294).
    *
    * Idempotent, so taking both costs nothing: the same value applied twice is
    * the same color.
@@ -495,10 +493,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * out, without reimplementing the whole template. The tag is interpolated
+   * rather than written, so `tier` resolves it and one template serves both
+   * tiers.
    */
   protected renderTools(): TemplateResult {
     return html`<${this.tag('button-group')} part="actions" label="Color tools">

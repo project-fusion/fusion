@@ -36,7 +36,7 @@
  * **It rewrites open tags and nothing else.** Text, comments and closing tags
  * are copied through untouched, and an attribute value is never re-quoted.
  *
- * `bun run fix` writes; `bun run check:prose:examples` judges. Same split as
+ * `bun run fix` writes; `bun run check:cli:component` judges. Same split as
  * `biome check --write` against `biome ci`, for the same reason: a step that
  * edits your files cannot tell you whether they were right.
  */
@@ -46,7 +46,7 @@ import { join } from 'node:path'
 const ROOTS = [SOURCE.styled, SOURCE.sandbox]
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
-   is. `check:prose:examples` holds these fences to the rules about inline styles
+   is. `check:cli:component` holds these fences to the rules about inline styles
    and declared state and leaves the shape of the markup alone, so a code fence
    is the one place a six-attribute one-liner could otherwise survive. */
 const DOCS = ['helix/docs/content', 'cortex/docs/content']

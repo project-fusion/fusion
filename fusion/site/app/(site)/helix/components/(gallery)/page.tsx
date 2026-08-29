@@ -10,11 +10,10 @@ import styles from './gallery.module.css'
 const vertical = findVertical('/helix')
 const product = PRODUCTS.find((entry) => entry.href === '/helix')
 
-/* `Components`, because this is the index and no longer the product page.
-   `/helix` was both at once and every awkward route below it was downstream of
-   that: the masthead's Components row pointed at a page titled Helix, and
-   `/helix/components` existed only as a `[family]` segment with no index above
-   it, which is the one URL a reader would guess. See 189. */
+/* `Components`, because this is the index and not the product page. `/helix`
+   is the product page; `/helix/components` is the URL a reader guesses for the
+   list, so it needs an index of its own above the `[family]` segment.
+   See (189). */
 export const metadata = pageMetadata({
   description:
     'Every family Helix ships, with its status, its category and the tier it is documented at.',
@@ -22,13 +21,6 @@ export const metadata = pageMetadata({
   title: 'Components',
 })
 
-/*
- * Every family Helix ships, and both surfaces for each.
- *
- * The API says what a component can do and the sandbox says what it looks like.
- * The eyebrow is still the vertical, so a reader arriving here from anywhere
- * knows which part of the company this belongs to.
- */
 /**
  * How the grid may be ordered, and what each one compares.
  *

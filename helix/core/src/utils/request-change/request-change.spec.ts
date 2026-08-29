@@ -11,10 +11,8 @@ import { requestChange } from './request-change.js'
  * The four controller mixins are its callers, so a fault here is a fault in
  * every stateful component at once.
  *
- * **The audit's seven cases went with the audit.** They asserted that a
- * controlled element nothing answered warned on its second unanswered request,
- * which was machinery for making an invisible mode audible. There is no mode
- * now: the element applies, and a consumer refuses here to take over. See 294.
+ * There is no controlled mode: the element applies, and a consumer refuses here
+ * to take over.
  */
 const target = () => {
   const host = new EventTarget()

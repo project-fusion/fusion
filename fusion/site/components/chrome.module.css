@@ -46,23 +46,15 @@
   }
 }
 
-/* Full bleed, and a rule that is always there.
- *
- * The component centers its row in a text column and keeps its hairline
- * transparent until the page scrolls under it, both right for a marketing page
- * and neither right here: a tool runs to the window, and nothing under this
- * header scrolls the document, so the border would never arrive. Set from the
- * outer tree on the host, which the cascade lets win in both scroll states. */
 /* The mark takes the brand.
  *
- * Its gradients were declared against `--logo-color-*` with gray literals as
- * fallbacks, exactly so a theme could retint it without the SVG being touched.
+ * Its gradients are declared against `--logo-color-*` with gray literals as
+ * fallbacks, exactly so a theme can retint it without the SVG being touched.
  * `primary` is the brand blue and follows the color mode on its own.
  *
- * It was briefly the foreground, on a misreading: the mark is not what needed
- * to change color, the wordmark beside it was. The mark is the one thing here
- * that carries the brand without words, so it is the one thing that keeps the
- * brand's color. */
+ * Not the foreground: the mark is the one thing here that carries the brand
+ * without words, so it is the one thing that keeps the brand's color. The
+ * wordmark beside it is what takes the ink. */
 /**
  * **The stops are computed from `primary`, not borrowed from hover and active.**
  *
@@ -90,34 +82,18 @@
  *
  * Header and footer are the two pieces of chrome bracketing every page, and a
  * reader sees their left edges as one line whether or not they are on screen
- * together. The footer took `--site-inset`, which is a clamp opening to seven
- * rem, while the header is pinned to `space-2xl`: at 1600 that put the wordmark
- * at 48 and the copyright at 96, and the layout's own note claimed they started
- * on the same line.
+ * together. Not `--site-inset`, which is a clamp opening to seven rem: at 1600
+ * that puts the wordmark at 48 and the copyright at 96.
  *
  * The content column keeps the clamp. That is the split: chrome sits at a fixed
  * inset because it runs the width of the window, and a column of prose gets air
  * beside it because it is a measure. */
-/* No rule above it, and the space is what separates it.
- *
- * The hairline was the second boundary in a row on the landing page, where the
- * closing band's own ground already ends the page and the footer's line sat a
- * few pixels under it. Removing the band's rule left this one doing the same
- * job twice over.
- *
- * On every other route it was drawing an edge nobody asked for. A footer is a
- * wordmark and two quiet lines after `space-xl` of air, at a weight and a size
- * that already read as chrome rather than as content; a rule across the window
- * announces it, which is the opposite of what the last thing on a page should
- * do. What separates it is the space above it and the fact that nothing in it
- * is the page. */
 .siteFooter {
   /* The chrome's inset, not the page's, which is what keeps the logo here on the
-     same line down the left edge as the wordmark in the header. `2xl` was written
-     in place, so the footer stayed at 48 a side while the header narrowed to 16
-     below 48rem: at 320 that left 224 for three link groups needing 231, and
-     Legal wrapped alone onto a second row. One variable, so the two edges cannot
-     disagree again. */
+     same line down the left edge as the wordmark in the header. One variable and
+     never `2xl` written in place: written in place the footer stays at 48 a side
+     while the header narrows to 16 below 48rem, and at 320 that leaves 224 for
+     three link groups needing 231, so Legal wraps alone onto a second row. */
   --site-inset: var(--site-chrome-inset);
 
   /* A rule, because the footer now holds links rather than one quiet line and
@@ -140,9 +116,9 @@
 /**
  * The lockup: a mark in its own column, and both lines of type in the other.
  *
- * **Two left edges was the fault.** As a row with a line beneath it, the mark
- * and the tagline both started at the block's edge while the name began past
- * the mark, so a three-line lockup had a step in it and read as two things
+ * **Not a row with a line beneath it**, which gives the block two left edges:
+ * the mark and the tagline start at the block's edge while the name begins past
+ * the mark, so a three-line lockup has a step in it and reads as two things
  * stacked rather than one object.
  *
  * A grid puts the mark in a column of its own and gives the name and the
@@ -162,9 +138,8 @@
   align-items: start;
   /* **Rows sized to their content, not to the space around them.** This is a
      stretched item of the footer's own flex row, so it inherits the height of
-     the tallest column beside it, and a grid hands that surplus to its rows: two
-     lines of type came out 66px apart. The flex column this replaced left the
-     slack below its children instead, which is the behavior to keep. */
+     the tallest column beside it, and a grid hands that surplus to its rows:
+     without this, two lines of type come out 66px apart. */
   align-content: start;
   column-gap: var(--helix-space-xs);
   display: grid;
@@ -172,15 +147,11 @@
   row-gap: var(--helix-space-2xs);
 }
 
-/* The tagline is the third child and belongs under the second, not beside the
-   mark. Named by position because there are exactly three and their order is
-   the lockup. */
-/* **Everything after the mark, not only the last thing.** This was
-   `> :last-child`, which held while the brand was a mark, a name and a tagline:
-   the tagline was last and the rule put it under the name. Adding the social row
-   made *it* last, so the tagline fell back to auto-placement and landed in the
-   mark's column. Stated as "every child after the first" it does not depend on
-   how many there are. */
+/* **Everything after the mark, not only the last thing.** `> :last-child` holds
+   only while the lockup is a mark, a name and a tagline; add a fourth child and
+   the tagline falls back to auto-placement and lands in the mark's column.
+   Stated as "every child after the first" it does not depend on how many there
+   are. */
 .footerBrand > * + * {
   grid-column: 2;
 }
@@ -304,12 +275,10 @@
   }
 }
 
-/* Quiet, because a legal link is something a reader finds when they go looking
-   rather than something the page offers them. `label` is the same scale the line
-   beside it takes, so the row reads as one thing at one weight. */
-/* Quiet at rest and plainly a link on hover. No underline by default, because a
-   column of underlined rows reads as a document's table of contents rather than
-   as navigation, which is the same fault the drawer had. */
+/* Quiet at rest and plainly a link on hover. A legal link is something a reader
+   finds when they go looking rather than something the page offers them. No
+   underline by default, because a column of underlined rows reads as a
+   document's table of contents rather than as navigation. */
 .siteFooterLink {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-sm);
@@ -326,14 +295,12 @@
 
 /* Mixed case, and large enough to be worth setting.
  *
- * It was capitals, on the reasoning that a wordmark is read as a shape rather
- * than as letters. That reasoning is fine and it was defeating the whole point
- * here: everything that identifies Funnel Display lives in its lowercase, the
- * angled cut on the `F` and the wide round `u`, and `text-transform: uppercase`
- * throws all of it away. Set side by side in caps, Funnel Display and Geist are
- * the same picture. That is what "the display face is not being applied" turned
- * out to be, twice: it was applied, the weight axis drives, and there was
- * nothing left of the face to see.
+ * **Never `text-transform: uppercase` here**, however much a wordmark is read
+ * as a shape rather than as letters: everything that identifies Funnel Display
+ * lives in its lowercase, the angled cut on the `F` and the wide round `u`. Set
+ * side by side in caps, Funnel Display and Geist are the same picture, which is
+ * what a report that "the display face is not being applied" turns out to be.
+ * It is applied, and there is nothing left of the face to see.
  *
  * Size is the other half. Below about twenty pixels the two faces are within a
  * hair of each other whatever the case, so this sits just under the mark beside
@@ -394,11 +361,8 @@
 
 /* **The palette, dressed as ours.**
  *
- * The component already decides everything about how a palette behaves and most
- * of how it looks: pinned near the top so the field does not walk up the screen
- * as the list narrows, one text column down the panel, rows at a reading inset.
- * What is left for the site is the part a design system should not decide for
- * anybody, which is what the surface says about whose product it is.
+ * The component decides how a palette behaves and most of how it looks. What is
+ * left for the site is what the surface says about whose product it is.
  *
  * Through `::part()`, which is the published door into a component and the one
  * mechanism a document rule may use on one. Everything here is a departure the
@@ -450,20 +414,13 @@
    * The tokens are the ones the design system already keeps for this, a
    * translucent fill over a blur, rather than an opacity invented here.
    *
-   * **And the scrim is the other half of why this reads flat.** `Dialog` paints
-   * `::backdrop` at 64% black in the dark theme, between this panel and the
-   * page, so what the blur samples is a darkened near-uniform field rather than
-   * the content: blurring it produces almost no visible difference whatever the
-   * panel's own alpha. That value is a literal in the dialog's stylesheet,
-   * which its own comment explains at length: `::backdrop` is in the top layer
-   * and cannot see a custom property declared outside the shadow tree, so the
-   * scrim cannot be themed the way everything else is. Making a palette's scrim
-   * lighter than a modal's is a change to that component, not to this file.
+   * **The panel's own alpha is only half of it.** What the blur samples is
+   * whatever the scrim leaves of the page, so a modal's 64% black would make
+   * this flat whatever is set here. `--dialog-scrim` above is the other half.
    *
-   * The border is the material's own, not the brand's. A blue hairline was the
-   * first version and it read as a focus ring on a panel that was not focused:
-   * the eye takes a saturated outline as a state, and a palette that always
-   * looks selected has nothing left to say when a row actually is. */
+   * The border is the material's own, not the brand's. A saturated hairline
+   * reads as a focus ring on a panel that is not focused, and a palette that
+   * always looks selected has nothing left to say when a row actually is. */
   /* `translucent`, not `-strong`. At 88% the panel let 12% of the page through
      and the blur had almost nothing to work on: the effect was in the computed
      styles and invisible on the screen. 72% is more than twice as much. */
@@ -508,9 +465,8 @@
  *
  * A row of them, each holding its keys and the word for what they do. The gap
  * between groups is the larger of the two so the grouping is visible before any
- * of it is read: `sm` inside a hint, `lg` between hints. Read as one sentence
- * with commas, three hints and six words needed punctuation to be told apart,
- * which is work a layout can do for free.
+ * of it is read: `sm` inside a hint, `lg` between hints. At one gap, three
+ * hints and six words read as one sentence needing commas.
  *
  * The keys keep their own `Kbd` margin against the word beside them, which the
  * trigger in the masthead already sets, so a key and its label are one object
@@ -543,13 +499,11 @@
   --option-radius: var(--helix-radii-sm);
 }
 
-/* The navigation drawer, which was reading as prose and is a menu.
+/* The navigation drawer is a menu, not prose.
  *
- * Every link in here carried `data-link`, and that recipe is the *prose* one:
- * primary color, underlined, sized to sit inside a sentence. Applied to a menu
- * it produced eleven blue underlined phrases stacked down a panel, which is
- * what a page of links looked like before anybody styled navigation. The
- * recipe was not wrong, it was answering a different question.
+ * **`data-link` is the prose recipe and must not be applied to these rows**:
+ * primary color, underlined, sized to sit inside a sentence. On a menu it gives
+ * eleven blue underlined phrases stacked down a panel.
  *
  * What a menu wants instead is a row: foreground color so the destination is
  * the content rather than the fact that it is a link, no underline because

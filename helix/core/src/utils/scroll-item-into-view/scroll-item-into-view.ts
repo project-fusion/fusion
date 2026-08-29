@@ -33,13 +33,12 @@ export interface ScrollItemOptions {
 /**
  * The nearest ancestor that actually scrolls, crossing shadow boundaries.
  *
- * This was `item.offsetParent`, which is the nearest *positioned* ancestor and
+ * **Not `item.offsetParent`**, which is the nearest *positioned* ancestor and
  * has nothing whatever to do with overflow. The two coincide often enough to
  * look right, because a scroller frequently is positioned, and they come apart
  * exactly where it matters: put anything `position: relative` between the item
- * and the box that scrolls, and the util scrolled the thing in between, which
- * does not scroll, and reported nothing. `Tree` passes no scroller at all, so
- * it had the default on every keypress.
+ * and the box that scrolls, and the util scrolls the thing in between, which
+ * does not scroll, and reports nothing.
  *
  * The walk crosses shadow boundaries through the host, because the item is
  * almost always in one and `parentElement` is null at the root. Without that
@@ -98,7 +97,7 @@ export const scrollItemIntoView = (item: HTMLElement, options: ScrollItemOptions
 
   /* Whichever edge it is past, and nothing when it is past neither. A scroll of
      zero still fires a `scroll` event and still cancels a smooth one already
-     running, so the early return is behavior rather than an optimisation. */
+     running, so the early return is behavior rather than an optimization. */
   const inline = before.inline > 0 ? -before.inline : after.inline > 0 ? after.inline : 0
   const block = before.block > 0 ? -before.block : after.block > 0 ? after.block : 0
   if (inline === 0 && block === 0) {

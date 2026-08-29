@@ -15,9 +15,9 @@
 
   /* **Room for the masthead, or following the link hides what it points at.**
      A fragment scrolls its target to the top of the viewport, and the top of
-     this viewport is under a `position: sticky` header, so clicking a heading's
-     own link put that heading behind the bar. The reader arrives at the right
-     place and cannot see it, which is worse than not moving at all.
+     this viewport is under a `position: sticky` header, so without this a
+     heading's own link puts that heading behind the bar. The reader arrives at
+     the right place and cannot see it, which is worse than not moving at all.
 
      `scroll-margin` rather than padding or a negative margin: it changes where
      scrolling stops and nothing about the layout, so the heading sits where it
@@ -38,14 +38,14 @@
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   translate: 0 -50%;
 
-  /* **Its own size, because a heading's is not a size for a mark.** The glyph
-     was a `#` inheriting the heading, so it came out at the h1's own scale and
-     read as part of the title rather than as an affordance beside it. An icon
-     sized here is the same mark at every level. */
+  /* **Its own size, because a heading's is not a size for a mark.** A glyph
+     inheriting the heading comes out at the h1's own scale and reads as part of
+     the title rather than as an affordance beside it. An icon sized here is the
+     same mark at every level. */
   --icon-size: var(--helix-size-icon-sm);
 
-  /* Further out than a word space. At `xs` the mark sat against the first
-     letter and read as punctuation; a step of its own puts it in the margin,
+  /* Further out than a word space. At `xs` the mark sits against the first
+     letter and reads as punctuation; a step of its own puts it in the margin,
      which is where a thing that is not part of the sentence belongs. */
   padding-inline-end: var(--helix-space-md);
 }
@@ -68,9 +68,8 @@
 /* No margin to hide in on a narrow screen, so it sits after the words instead
    of off the edge of the page.
  *
- * After rather than before, which is the correction: inline and leading, the
- * mark reads as the first character of the title, and at a heading's own weight
- * that is what it looked like. Trailing, it is plainly an affordance the heading
+ * After rather than before: inline and leading, the mark reads as the first
+ * character of the title. Trailing, it is plainly an affordance the heading
  * carries. Shown at rest here too, there being no hover on a touch screen to
  * reveal it with. */
 @media (width < 48rem) {

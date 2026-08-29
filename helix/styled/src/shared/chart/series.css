@@ -7,21 +7,20 @@
  * var(--chart-series-3)` onto the rectangle and the rule below is one line
  * rather than twenty-four.
  *
- * It replaced twenty-four rules per chart keyed on `[data-series]`, which
- * worked and could not be reached from outside: `::part()` takes no attribute
- * selector, so a consumer with the index right in front of them, written on the
- * part, had no selector that could use it. Measured in Chrome 148, of three
- * rules written against one chart `::part(bar)` applied and both
- * `::part(bar)[data-series="2"]` and `::part(bar):nth-child(2)` were dropped at
- * parse time, leaving four bars one color.
+ * Rules keyed on `[data-series]` are the alternative and cannot be reached from
+ * outside: `::part()` takes no attribute selector, so a consumer with the index
+ * right in front of them, written on the part, has no selector that can use it.
+ * Measured in Chrome 148, of three rules written against one chart
+ * `::part(bar)` applied and both `::part(bar)[data-series="2"]` and
+ * `::part(bar):nth-child(2)` were dropped at parse time, leaving four bars one
+ * color.
  *
  * **The names are the seam between the tiers.** This sheet points each at a
  * semantic token, which is a decision and therefore belongs to the styled tier.
  * A consumer on `headless` has no tokens and sets the same twenty-four to
- * whatever they like, which is what the headless examples do with a ramp of grays.
- * Before this, the headless bar chart named `--helix-color-series-*` directly:
- * correct here, and a reference to nothing on the tier that is meant to stand
- * alone.
+ * whatever they like, which is what the headless examples do with a ramp of
+ * grays. The headless tier naming `--helix-color-series-*` directly would be a
+ * reference to nothing on the tier that is meant to stand alone.
  *
  * Twenty-four because that is where `seriesIndex` wraps, and the legend maps
  * the same twenty-four so a swatch and its line agree by construction.

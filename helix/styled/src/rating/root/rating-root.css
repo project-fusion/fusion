@@ -177,12 +177,6 @@
   mask-image: none;
 }
 
-/* Chips: each position its own drawing, in its own target.
- *
- * The row stops being two layers over a strip of invisible buttons and becomes
- * a row of buttons with a mark in each, so the pitch arithmetic above is undone
- * here: nothing is being positioned over anything. */
-
 /* Print: the filled marks are the score.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

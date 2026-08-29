@@ -24,13 +24,12 @@ import { property } from 'lit/decorators.js'
  * value rather than the value itself. `valueAsNumber` is there for anything
  * doing arithmetic on it.
  *
- * **Marks are drawn rather than left to `<datalist>`**, which was the first
- * answer and is the wrong one. A datalist's ticks cannot be styled at all, and
- * Firefox does not render them for a range at all, so the platform's version is
- * a mark that looks like someone else's design where it appears and no mark
- * where it does not. Drawing them costs the semantics nothing, because a mark
- * is decoration: what a reader can actually land on is `step`, which the input
- * enforces whether or not anything is drawn.
+ * **Marks are drawn rather than left to `<datalist>`.** A datalist's ticks
+ * cannot be styled at all, and Firefox does not render them for a range at all,
+ * so the platform's version is a mark that looks like someone else's design
+ * where it appears and no mark where it does not. Drawing them costs the
+ * semantics nothing, because a mark is decoration: what a reader can actually
+ * land on is `step`, which the input enforces whether or not anything is drawn.
  *
  * `markers` is a count rather than a flag tied to `step`. A flag reads well
  * until a slider from zero to a hundred stepping by one asks for a hundred and
@@ -38,11 +37,10 @@ import { property } from 'lit/decorators.js'
  * is what the reader sees, so it cannot surprise anyone.
  *
  * **A range is two of them, not a hand-built one.** There is no native
- * two-thumb range, and the answer is not to stop using the platform's: it is to
- * stack two of them on one track, so each thumb keeps its own drag, its own
- * arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding
- * would throw away every argument this component is made of, to gain a second
- * handle.
+ * two-thumb range, so two are stacked on one track and each thumb keeps its own
+ * drag, its own arrow keys, its own Home and End and its own finger-sized hit
+ * area. Rebuilding would throw away every argument this component is made of,
+ * to gain a second handle.
  *
  * Crossing is stopped in the handler rather than by the bounds, and that is not
  * the obvious way round. Giving the lower input `max` of the upper reads well
@@ -188,7 +186,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   }
 
   /**
-   * How far one press of an arrow key moves it.
+   * The values the marks stand at, evenly spaced, each snapped to a step.
    */
   private get markerValues(): number[] {
     const span = this.max - this.min
@@ -308,18 +306,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * Arithmetic rather than a measurement, because the browser already knows
    * where it drew the handle and measuring it would be a guess at that.
    *
-   * **Sanitized here, not read back off the control.** This asked the input for
-   * its value, on the reasoning that a range clamps and snaps whatever it is
-   * given, so the control is the truth about where the thumb is. The reasoning
-   * is right and the timing is not: `fraction` is evaluated inside `render()`,
-   * and the `style` binding carrying it is committed *before* the `.value`
-   * binding below it, so it read the value this very render was about to
-   * replace. The fill was a render behind the thumb, and on the first pass it
-   * read the seeded midpoint and stayed there.
-   *
-   * Measured on a slider from 0 to 1: after dragging to either end, the host's
-   * `value` was `1`, the control's was `1`, and `--slider-fraction` was still
-   * `0.5`. Off by half a track, and stable, which is what made it look like a
+   * **Sanitized here, never read back off the control.** Asking the input for
+   * its value reads well, a range clamping and snapping whatever it is given,
+   * and the timing defeats it: `fraction` is evaluated inside `render()` and the
+   * `style` binding carrying it is committed *before* the `.value` binding below
+   * it, so it reads the value this very render is about to replace. The fill
+   * ends up a render behind the thumb, and on the first pass it reads the seeded
+   * midpoint and stays there: stable and off by half a track, which reads as a
    * drawing bug rather than a timing one.
    *
    * So the same two operations a range performs are done here: snap to the step
@@ -358,11 +351,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
        here so the value the form would submit matches the thumb from the first
        render rather than from the first drag. */
     if (!this.hasUpdated && this.value === '') {
-      /* Onto `defaultValue`, never onto `value`. Writing `value` is how a
-         consumer says they own it, so seeding through it would have made every
-         range with no value controlled on its first render and frozen the thumb
-         where it started. `defaultValue` is where the markup's intent lives,
-         and "no value given" is exactly a fact about the markup. */
+      /* Onto `defaultValue`, never onto `value`. `defaultValue` is where the
+         markup's intent lives and where a reset returns to, and "no value given"
+         is exactly a fact about the markup. Writing `value` would record the
+         midpoint as something the reader chose, so a form reset would return to
+         it rather than clearing it. */
       this.defaultValue = String(this.min + (this.max - this.min) / 2)
     }
   }
@@ -394,13 +387,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
        bounds it holds at that moment: with the value first, a slider from 0 to
        360 given 225 took the default max of 100, clamped to 100, and drew its
        handle at 100/360.
-   *
-   * Found on Color Input's hue channel, where the handle sat at 28 per cent of a
-   * track whose fill said 62.5. The two disagreed because they are computed from
-   * different things: the fill is arithmetic on this element's property, and the
-   * handle is the platform's reading of the input's own clamped value. Every
-   * slider with a max above 100 had it, and the fill being right is what made it
-   * read as a drawing bug rather than a value one. */
+
+       The symptom is the fill and the handle disagreeing, because they are
+       computed from different things: the fill is arithmetic on this element's
+       property, and the handle is the platform's reading of the input's own
+       clamped value. It appears on any slider with a max above 100, and the
+       fill being right is what makes it read as a drawing bug rather than a
+       value one. */
     const [start, end] = this.bounds
 
     /* One input per thumb, each spanning the whole range so both read against
@@ -408,12 +401,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
        is transparent, because two stacked tracks would paint the ramp twice. */
     /* **The lower thumb answers to `control`, and it has to answer to
        something.** `MixinField.renderLabel` writes `<label for="control">` for
-       every field in the library, and only the single-thumb branch below ever
-       rendered that id: a range slider therefore shipped a label pointing at
-       nothing, so pressing the words focused no thumb and the `<output for>`
-       beside it named a missing element too. It was the only unresolved IDREF
-       in the whole corpus, which is the shape this class of fault takes, valid
-       markup that reaches nothing and says nothing.
+       every field in the library, so a range branch that does not render that id
+       ships a label pointing at nothing: pressing the words focuses no thumb and
+       the `<output for>` beside it names a missing element too. Valid markup
+       that reaches nothing and says nothing.
 
        The lower one, because a label forwards a press to the first control it
        names and the reader expects the start of the range. The upper takes
@@ -437,10 +428,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
 
     /* `data-markers` mirrors "there are marks" for the stylesheet.
      *
-     * The whole marker layout hung off `:host([markers])` and `markers` does
-     * not reflect, so `slider.markers = 5` drew nothing at all: only the
-     * attribute written in the markup ever worked, and the property that is the
-     * documented API silently did not.
+     * `markers` does not reflect, so a marker layout hung off `:host([markers])`
+     * draws nothing for `slider.markers = 5`: only the attribute written in the
+     * markup works, and the property that is the documented API silently does
+     * not.
      *
      * Reflecting the count instead would put `markers="0"` on every slider, an
      * attribute the server's markup does not have and one that selector would
@@ -451,10 +442,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
      * already draws the line.
      *
      * A `/*` and written here, because it describes this binding and not a
-     * member. As a `/**` above `markerLabels` it never closed, so it swallowed
-     * that property's one-line description and the manifest shipped this whole
-     * argument as the text for "whether each mark says which value it stands
-     * at". Nothing catches an unclosed block, only one sitting on another. */
+     * member. Nothing catches an unclosed block, only one sitting on another,
+     * so a `/**` that swallows the member below it ships as that member's
+     * description. */
     return html`${this.renderLabel()}
     <div
       part="field"

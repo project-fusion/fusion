@@ -23,10 +23,8 @@ const isFinder = (x: number, y: number, size: number): boolean => {
  * tree walks, and every one of them is a one-unit square.
  *
  * **`square` joins runs and the other styles cannot.** A row of eight square
- * modules is one `h8`, which is what keeps the node count down; a row of eight
- * *rounded* ones is eight shapes, because the corners are what is being drawn
- * and a joined run has no corners in the middle of it. So the cost of the other
- * styles is real and is paid only by the codes that ask for them.
+ * modules is one `h8`; a row of eight *rounded* ones is eight shapes, because
+ * the corners are what is being drawn and a joined run has none in the middle.
  *
  * `only` splits the drawing in two without walking the matrix twice: the finder
  * squares are structural, at three known corners, so a caller can ask for them

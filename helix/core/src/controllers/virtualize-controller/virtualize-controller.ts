@@ -31,11 +31,11 @@ export interface Window {
 /**
  * How many times an update this asked for may change the answer again.
  *
- * **A measurement that its own render moves has no fixed point, and nothing
- * here could previously stop looking for one.** `clientHeight` is meant to be a
- * fact about the box, true of any real scroller, and false of a box with no
- * height: there it is a function of the rows just drawn, so `measure` renders,
- * the render changes the height, and the next measurement disagrees.
+ * **A measurement that its own render moves has no fixed point, so something
+ * has to stop looking for one.** `clientHeight` is meant to be a fact about the
+ * box, true of any real scroller, and false of a box with no height: there it
+ * is a function of the rows just drawn, so `measure` renders, the render
+ * changes the height, and the next measurement disagrees.
  *
  * It does not even diverge, which is what made it hard to see. Measured on the
  * headless tier with 500 rows and no height on the viewport, it converged
@@ -82,7 +82,7 @@ const UNSTABLE = 10
  * and the note in the rules that objects and functions have that bug and are
  * not fixed).
  *
- * **A third is open, and this said otherwise until 21 Aug 2026.** Data as *text*
+ * **A third channel is open.** Data as *text*
  * in the markup, a `<script type="application/json">` child or an attribute, is
  * neither a property nor a node per row: React's hydration bug cannot touch text
  * it renders as a child, a server emits it, and the node count is one. The
@@ -139,15 +139,15 @@ export class VirtualizeController implements ReactiveController {
     /* Nothing is observed here, and that is deliberate. `hostConnected` runs
        before the first render, so the container query returns null and an
        observer attached to nothing observes nothing for the life of the
-       element. `CollapseController` shipped exactly that bug and it was
-       invisible: the first measurement was right, so the only symptom was a
-       window that never moved again. */
-    /* **The count is deliberately not cleared here, and clearing it was the
-       first attempt.** A resize looks like an outside cause and is not one when
-       the box has no height of its own: the render this controller asked for is
-       what changed the size, so the observer fires on every pass and resets the
-       very counter meant to notice that. Measured: the guard made no difference
-       at all, 7776 passes in twenty-five seconds, identical to having none.
+       element. It is an invisible failure: the first measurement is right, so
+       the only symptom is a window that never moves again. */
+    /* **The count is deliberately not cleared here**, which is the obvious
+       thing to do and does not work. A resize looks like an outside cause and
+       is not one when the box has no height of its own: the render this
+       controller asked for is what changed the size, so the observer fires on
+       every pass and resets the very counter meant to notice that. Measured:
+       the guard made no difference at all, 7776 passes in twenty-five seconds,
+       identical to having none.
 
        Nothing is lost by leaving it. A genuine resize changes the window once
        and the next measurement agrees, which clears the count through `same`. A

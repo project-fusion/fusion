@@ -9,8 +9,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * inherits whatever it does, so a fault here is a fault six times over, and
  * every component spec that covers it does so by coincidence: a component
  * asserts the component, and passes for the wrong reason whenever the mixin is
- * wrong in a way that component never reaches. The repository has been bitten
- * by this contract twice.
+ * wrong in a way that component never reaches.
  *
  * A real element rather than a stub host, because the parts most worth testing
  * are the ones Lit's machinery drives: `@property` on an accessor pair,
@@ -106,10 +105,8 @@ describe('an uncontrolled control', () => {
 })
 
 describe('a control whose consumer declared a value', () => {
-  /* This asserted the opposite until 26 Aug 2026, that declaring `value` made
-     the control announce and apply nothing. A declared property is a seed and a
-     correction now, the way `<input value>` is, and a consumer who wants the
-     change for themselves refuses it. See 294. */
+  /* A declared property is a seed and a correction, the way `<input value>` is,
+     and a consumer who wants the change for themselves refuses it. See 294. */
   test('announces the change and applies it, a declared value being a seed', async () => {
     const host = await mount(`<${tag} value="theirs"></${tag}>`)
     const names = await heard(host, () => {
@@ -138,9 +135,7 @@ describe('a control whose consumer declared a value', () => {
 })
 
 describe('writing the property', () => {
-  /* There is no mode to take over any more. This block asserted one until
-     26 Aug 2026: that ownership was decided at the first update and a later
-     assignment could not claim it. A write is now a write, the way it is on a
+  /* There is no mode to take over: a write is a write, the way it is on a
      native control, and the element keeps applying its own changes whoever
      wrote last. See 294. */
   test('is a seed and a correction, and never stops the control responding', async () => {
@@ -164,10 +159,10 @@ describe('writing the property', () => {
 
 describe('the names a change arrives under', () => {
   /* One request event whatever the control, and the native pair after it.
-     `announcesInput` used to pick between `helix-change` and `helix-input`,
-     which was one mechanism under two names: the name said *phase* and the flag
-     meant *granularity*. It now picks which native event reports the result,
-     which is the distinction the platform already draws. See 294. */
+     `announcesInput` picks only which native event reports the result: a
+     continuous control sends `input` while a reader is still editing and
+     withholds `change`. The request is `helix-before-change` either way, which
+     is the distinction the platform already draws. See 294. */
   test('is `helix-before-change` and then `input` and `change`, in steps', async () => {
     const host = await mount(`<${tag}></${tag}>`)
     expect(await heard(host, () => host.requestValue('x'))).toEqual([

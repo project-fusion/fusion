@@ -49,16 +49,13 @@ const escapeHtml = (text: string): string =>
  * on a server with no DOM at all, which is what lets a static page ship
  * highlighted code with no client JavaScript spent on it.
  *
- * **Here rather than in `helix/styled`, and that is the whole point.** A code block
- * is a component and must not carry a parser: CodeMirror is about 4 MB
- * installed, and a `dependencies` entry is paid by every consumer whether or
- * not they import it. This package already carries those grammars for the
- * editor, so highlighting costs nothing new. `CodeBlock` renders a `<slot>`,
- * so the output of this drops straight into one and the component stays
- * dependency-free while its content is highlighted by the same grammars the
- * editor uses. A snippet on a reference page and the same snippet open in the
- * sandbox are then colored by one source rather than two that agree by
- * coincidence.
+ * **Here rather than in `helix/styled`.** A code block must not carry a parser:
+ * CodeMirror is about 4 MB installed, and a `dependencies` entry is paid by
+ * every consumer whether or not they import it. This package already carries
+ * those grammars for the editor, and `CodeBlock` renders a `<slot>`, so the
+ * output of this drops straight into one. A snippet on a reference page and the
+ * same snippet open in the sandbox are then colored by one source rather than
+ * two that agree by coincidence.
  *
  * `classHighlighter` emits Lezer's own `tok-` class names. Mapping those to
  * colors is the consumer's, because the classes are stable and the palette is

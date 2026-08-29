@@ -7,9 +7,9 @@ import { styles } from './callout-root.css.js'
  * @summary Sets a passage apart as information, a warning, or an error.
  *
  * @description
- * Tinted from the severity's status color with `color-mix`, and marked with a
- * bar on the inline start so the severity survives being read in grayscale or
- * by anyone who does not distinguish the hues.
+ * Tinted from the tone's status color with `color-mix`, and marked with a bar
+ * on the inline start so the tone survives being read in grayscale or by anyone
+ * who does not distinguish the hues.
  *
  * There is no treatment axis here. `tone` carries the meaning and lives on the
  * headless tier; this tier only decides what that meaning looks like.
@@ -21,7 +21,7 @@ import { styles } from './callout-root.css.js'
  * @documentation https://helix.fusion.dev/components/callout
  *
  * @slot - The callout's content.
- * @slot icon - Replaces the icon chosen by `severity`.
+ * @slot icon - Replaces the icon chosen by `tone`.
  *
  * @csspart content - The content region.
  * @csspart icon - The icon region.

@@ -23,19 +23,14 @@
   /* Space between one idea and the next. Large on purpose: the page is a
      sequence of single statements, and what separates them is emptiness.
 
-     **Keyed to width, not height, which is what it was and is why a phone got
-     a desktop's rhythm.** `12vh` of an 812px phone is 97px, against 108px on a
-     1440 by 900 desktop, so the narrow screen paid almost the full band while
-     having a third of the room and stacking every section vertically instead of
-     beside each other. Measured 25 Aug 2026 at 375 wide: seven sections at 195px
-     of padding each, 1,365px, seventeen per cent of a 7,778px page, spent on
-     emptiness between statements a reader has to scroll through.
-
-     `7.5vw` holds the desktop figure it already had, 108px at 1440, and lets a
-     phone fall to the 3rem floor. The inset above has always scaled on width for
-     the same reason: horizontal room and vertical rhythm are both facts about how
-     wide the page is, because that is what decides whether things sit beside each
-     other or under one another. */
+     **Keyed to width, not height.** `12vh` of an 812px phone is 97px against
+     108px on a 1440 by 900 desktop, so a narrow screen pays almost the full
+     band while having a third of the room and stacking every section vertically
+     instead of beside each other. `7.5vw` holds the desktop figure, 108px at
+     1440, and lets a phone fall to the 3rem floor. The inset above scales on
+     width for the same reason: horizontal room and vertical rhythm are both
+     facts about how wide the page is, because that is what decides whether
+     things sit beside each other or under one another. */
   --site-band: clamp(var(--helix-space-2xl), 7.5vw, 9rem);
 
   /* Display type past the component scale's top step.
@@ -77,8 +72,8 @@
   --site-lattice-pitch: var(--helix-space-md);
 }
 
-/* Full width, held off the edges by the inset. Nothing is centered in a measure
-   any more; text that needs a measure asks for one. */
+/* Full width, held off the edges by the inset. Text that needs a measure asks
+   for one. */
 [data-shell] {
   inline-size: 100%;
   padding-inline: var(--site-inset);
@@ -94,30 +89,19 @@
   padding-block: var(--site-band);
 }
 
-/* The header spans the viewport, so its own centering is turned off and it
-   takes the page's inset instead. */
-/* The masthead holds a fixed inset rather than the page's fluid one.
- *
- * `--site-inset` is a clamp that opens up to seven rem on a wide screen, which
- * is right for a column of prose: the measure wants air beside it. A masthead
- * is not a column. Its contents are a mark at one edge and controls at the
- * other, and pushing those inward on a wide screen moves them away from the
- * corners the eye goes to and leaves the bar looking loosely packed.
- *
- * So it is `space-2xl`, which is forty eight, at every width. */
-/* One sheet of glass under the masthead and the panel together.
- *
- * Sized by the app, because neither component can measure the other, and laid
- * at `raised` so it sits over the page and under the bar: the masthead is
- * sticky at a higher layer and the panel is in the top layer, so both keep
- * their content above a single continuous blur. */
 /* The panel is a window onto the sheet, never a surface of its own.
  *
- * Unconditional. Keyed to the open state it came off on the frame the collapse
- * started, since `helix-before-close` fires before the panel moves, and the panel
- * finished collapsing as an opaque rectangle of the page's color. It is only
- * ever on screen while open or collapsing, and the sheet covers both, so it
- * never needs a ground here.
+ * The app paints one sheet of glass under the masthead and the panel together,
+ * because neither component can measure the other, laid at `raised` so it sits
+ * over the page and under the bar: the masthead is sticky at a higher layer and
+ * the panel is in the top layer, so both keep their content above a single
+ * continuous blur.
+ *
+ * **Unconditional, and never keyed to the open state.** `helix-before-close`
+ * fires before the panel moves, so a state-keyed rule came off on the frame the
+ * collapse started and the panel finished collapsing as an opaque rectangle of
+ * the page's color. It is only ever on screen while open or collapsing, and the
+ * sheet covers both, so it never needs a ground here.
  *
  * Both hooks, because a second blur would be a blur of the sheet that is
  * already blurring, which is the disagreement the sheet exists to prevent. */
@@ -126,28 +110,22 @@ helix-megamenu {
   --megamenu-background-color: transparent;
 }
 
-/* **The band runs the width of the window and its contents no longer should.**
+/* **The band runs the width of the window and its contents do not.**
  *
- * `variant="full"` is the band, and it is the right shape: a sheet the whole
- * masthead sits on rather than a card hanging off one word. What changed under
- * it is what it holds. The panel used to carry the products *and* the five
- * verticals, which filled a full-width grid; with the verticals gone it holds
- * two columns, and a grid with room for four spread them to opposite edges,
- * 592px each with the whole middle empty and Cortex's single row stranded
- * against the right rim.
+ * `variant="full"` is the band: a sheet the whole masthead sits on rather than a
+ * card hanging off one word. It holds two columns, and a grid with room for four
+ * spreads them to opposite edges, 592px each with the whole middle empty and
+ * Cortex's single row stranded against the right rim. So the sheet keeps its
+ * width and the content takes a measure. Centered rather than aligned to the
+ * wordmark, because the trigger that opens it is centered: the panel drops from
+ * `Products` and should look like it came from there.
  *
- * So the sheet keeps its width and the content takes a measure. Centered rather
- * than aligned to the wordmark, because the trigger that opens it is centered:
- * the panel drops from `Products` and should look like it came from there.
- *
- * **Padding and not a maximum, which is the version of this that worked.**
- * Capping the surface with `max-inline-size` and centering it with an auto
- * margin reads as the obvious way to say it and breaks the band: the tracks are
- * `repeat(auto-fit, minmax(15rem, 1fr))`, and `auto-fit` can only count columns
- * against a width it knows. The component says so where the band is written,
- * that the card cannot use `auto-fit` because it is as wide as its own contents.
- * Measured at 2000: capped, the track list came out as a single 240px column
- * with Cortex stacked under Helix; padded, it is two columns as it should be.
+ * **Padding and not a maximum.** Capping the surface with `max-inline-size` and
+ * centering it with an auto margin reads as the obvious way to say it and breaks
+ * the band: the tracks are `repeat(auto-fit, minmax(15rem, 1fr))`, and
+ * `auto-fit` can only count columns against a width it knows. Measured at 2000:
+ * capped, the track list came out as a single 240px column with Cortex stacked
+ * under Helix; padded, it is two columns as it should be.
  *
  * So the surface keeps the full width it needs to do the arithmetic, and the
  * padding brings the content to a measure. `max()` rather than a plain
@@ -228,11 +206,10 @@ helix-megamenu::part(surface) {
    * about what the reader is looking at. The letter alone still tells Helix from
    * Cortex at a glance, which is the whole job here.
    *
-   * **And it turns over for free.** The tile version had to be reasoned into
-   * `surface-inverse` so a light letter always had a dark ground: `surface-media`
-   * measured 1.00 against the dark panel and the tile vanished, leaving a bare
-   * letter and a mark that changed silhouette between modes. With no tile there
-   * is no pairing to hold, `currentColor` is the heading's color in both modes,
+   * **And it turns over for free.** A tile has to be reasoned into a ground that
+   * works in both modes: `surface-media` measures 1.00 against the dark panel, so
+   * the tile vanishes and the mark changes silhouette between modes. With no tile
+   * there is no pairing to hold, `currentColor` is the heading's color in both,
    * and the contrast is whatever the heading already passes. */
   --logo-color-from: transparent;
   --logo-color-knockout: currentColor;
@@ -254,11 +231,9 @@ helix-megamenu::part(surface) {
    responsiveness policy in `.claude/rules/helix.md` and the half a component
    may not have.
 
-   **Written as one variable after the header alone took the sixteen.** It did,
-   and the grid kept the forty-eight, so the wordmark sat at 16 with the first
-   card at 48: the same two edges disagreeing that the grid's own comment
-   records fixing at 48 and 96. One declaration is what stops the next change to
-   either one reopening it. */
+   **One variable, because the header and the grid have to move together.**
+   Where the header alone took the sixteen and the grid kept the forty-eight,
+   the wordmark sat at 16 with the first card at 48. */
 :root {
   --site-chrome-inset: var(--helix-space-2xl);
 }
@@ -273,13 +248,8 @@ helix-app-header {
   --app-header-padding: var(--site-chrome-inset);
   --app-header-max-inline-size: none;
 }
-/* **Sixteen on a phone, because forty-eight is a desktop's margin.** The inset
-   is `2xl` at every width, which on a 375px screen is a quarter of the bar spent
-   on air either side: measured there, the wordmark and the search field ran into
-   each other with room to spare outside them both. A media query rather than a
-   clamp, and legitimately: this is the site's own chrome deciding what a device
-   gets, which is the consumer's half of the responsiveness policy in
-   `.claude/rules/helix.md` and the half a component may not have. */
+/* The header's own copy of the phone inset above, which `--site-chrome-inset`
+   already carries at this width. */
 @media (width < 48rem) {
   helix-app-header {
     --app-header-padding: var(--helix-space-md);
@@ -314,13 +284,11 @@ helix-app-header {
 
 /* **The masthead never paints. One sheet does, for both of its jobs.**
  *
- * Why one sheet rather than two is not this site's to explain, and no longer
- * does: a `backdrop-filter` is clipped to its own box so two of them sharing an
- * edge cannot agree, and two translucent layers cannot hand over by fading.
- * Both are facts about glass rather than about a masthead, and both are written
- * beside `--helix-material-blur-*` in `helix/styles`, where a consumer meets
- * them before reaching for a blur. This comment used to carry them, which put
- * the library's findings in the one place no other consumer would look.
+ * Why one sheet rather than two is a fact about glass rather than about a
+ * masthead, and is written beside `--helix-material-blur-*` in `helix/styles`,
+ * where a consumer meets it before reaching for a blur: a `backdrop-filter` is
+ * clipped to its own box so two of them sharing an edge cannot agree, and two
+ * translucent layers cannot hand over by fading.
  *
  * What is this site's is the arrangement. A single element cannot span the two
  * from inside either component: the panel is a popover in the top layer so it
@@ -330,23 +298,15 @@ helix-app-header {
  * it in the top layer, and one blur serves the pair.
  *
  * The sheet does the scrolled state too, and that is the same fact applied
- * rather than a second decision: painted only while a panel was down, it had to
- * trade places with the bar's own glass twice per interaction. Give the sheet
- * both jobs and the bar has nothing to hand over, because it never had
+ * rather than a second decision: painted only while a panel was down, it would
+ * have to trade places with the bar's own glass twice per interaction. Give the
+ * sheet both jobs and the bar has nothing to hand over, because it never had
  * anything. */
 helix-app-header {
   --app-header-backdrop: none;
   --app-header-background-color: transparent;
 }
 
-/* Every drawer here runs under that header. A drawer is `position: fixed` with
-   `inset-block: 0`, so it spans the strip the header occupies and its first
-   line of content would land behind one.
-
-   Stated here rather than defaulted in the component, because whether there is
-   a masthead and how tall it is are facts about this page. The drawer's own
-   default is a plain inset, which is what an app with no header wants and what
-   the component's examples render with. */
 /* Fusion's sliders take a thick track and a capsule handle.
  *
  * **A house preference, stated by the consumer, which is why it is here.** The
@@ -354,13 +314,6 @@ helix-app-header {
  * right default for a design system: it is the plainest reading of the control
  * and it costs a consumer nothing to leave alone. Whether this app's sliders
  * should look like that is taste, and taste belongs to the app.
- *
- * Reachable at all only because Slider follows Switch: the track, the thumb's
- * thickness, the thumb's length along the track and its radius are four
- * published hooks rather than four private variables. Before that the thumb
- * bound both dimensions to one value with `border-radius: full` written in
- * place, so a capsule was unreachable by construction and this rule could not
- * have been written. See 236.
  *
  * `thumb-size` is the thickness across the track and `thumb-length` is the
  * distance along it, so a handle taller than it is wide is the capsule, and the
@@ -375,15 +328,14 @@ helix-slider {
 }
 
 helix-drawer {
-  /* The header, plus the drawer's own inset. This is the whole top padding
-     rather than something added to one, which is what makes it safe to write:
-     it was the header plus a space *and* the panel added its own on top, so
-     the first line sat ninety six pixels down while the sides sat at twenty
-     four, clearing the chrome twice.
+  /* The header, plus the drawer's own inset, and this is the *whole* top
+     padding rather than something added to one. Written as an addition it
+     clears the chrome twice: the first line sits ninety six pixels down while
+     the sides sit at twenty four.
 
-     The other three sides are the drawer's now, and so is this one's default.
-     What this says is the one thing the drawer cannot know: that there is a
-     masthead above it and how tall it is. */
+     The other three sides are the drawer's, and so is this one's default. What
+     this says is the one thing the drawer cannot know: that there is a masthead
+     above it and how tall it is. */
   --drawer-padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
@@ -405,19 +357,13 @@ helix-drawer {
 /* The two substrates, side by side and given room. Not cards: they are the
    whole point of the section, so they are set as panels with air rather than
    as two of something. */
-/* **A panel, where this was a column with a rule on top.**
- *
- * The recipe is shared by three bands, the substrates, the services and the
- * reasons, so all three read the same way and all three were the same problem: a
- * hairline over bare text, against a page that had meanwhile grown an aura, a
- * glass call to action and glass cards. They were the only surfaces left with no
- * surface.
+/* A panel, and the recipe is shared by three bands: the substrates, the
+ * services and the reasons.
  *
  * The ground and the edge come from `data-material="glass"` in the markup rather
  * than from here, so these panels speak the same optical language as the rest of
  * the page and one word governs all of it. What is here is the box that language
- * needs: a panel wants padding on four sides and a radius, where a column with a
- * top rule wanted neither.
+ * needs: padding on four sides and a radius.
  *
  * **This is not the argument the verticals rule makes below**, and the two do not
  * collide. That one refuses cards for a *stacked list* of four, where four boxes
@@ -543,17 +489,14 @@ helix-drawer {
 
 /* **No hover fill, because nothing here responds to a pointer.**
  *
- * Settled with 221, which asked for a hover accent on the substrate blocks and
- * found the same problem in both places: neither is a target. The substrate
- * blocks carry their own button, and this row's only use, on `/contact`, is a
- * `helix-flex` listing what to put in a first message. A fill that arrives under
- * the pointer says "this does something", and when nothing does, a reader has
- * been told something untrue and finds out by clicking.
+ * Neither this row nor the substrate blocks is a target: the blocks carry their
+ * own button, and this row's only use, on `/contact`, is a `helix-flex` listing
+ * what to put in a first message. A fill that arrives under the pointer says
+ * "this does something", and when nothing does, a reader has been told something
+ * untrue and finds out by clicking.
  *
  * So the site's rule is one sentence: **a hover response means the thing
- * responds.** That refuses the accent 221 asked for and takes this one away,
- * which is the half that made the site inconsistent with itself. The row offered
- * the other resolution, declaring decorative hover allowed, and it is the wrong
+ * responds.** Decorative hover is the other available answer and it is the wrong
  * one for a page whose whole argument is that its surfaces mean something.
  *
  * The transition above stays: it costs nothing while no property animates, and
@@ -566,42 +509,34 @@ helix-drawer {
 
 /* **The page opens in light and closes in it.**
  *
- * The last band was the sixth in a row on the page's own color, so a reader
- * scrolling reached the one thing they are being asked to do and it looked like
- * another section. Nothing said the page had ended, and an ending is most of
- * what a closing call is for.
+ * The last band is otherwise the sixth in a row on the page's own color, so a
+ * reader scrolling reaches the one thing they are being asked to do and it looks
+ * like another section. Nothing says the page has ended, and an ending is most
+ * of what a closing call is for.
  *
- * A ground, and this is the only band on the site whose fill is the whole of
- * the cue. The hairline this paragraph used to credit is gone, taken out as an
- * edge the call did not need, and `[data-band]` never drew one: measured on the
- * landing page the section has no border on either side and no shadow, so
- * nothing but the color says the page has ended.
+ * The ground and the edge that answer that are the card's, in
+ * `landing-c.module.css`, which is also where the argument for the fill lives.
+ * What is here is the centering.
  *
- * **Which is why the two tokens are paired here and nowhere else.** 145 says a
- * consumer writing `light-dark()` across two surface tokens is compensating for
- * the neutral ramp by hand, and of a surface that is true: a card is told apart
- * by its edge in both modes, measured at 1.31 light and 1.71 dark against fills
- * of 1.04 and 1.18, so its fill is the quieter half of a cue and is allowed to
- * stay quiet. A band with no edge has only the loud half. `surface` alone is
- * five values off white across the 352 pixels this one stands, and five values
- * with no boundary anywhere is not a band. `/insights` reached the same rule
- * from the other side and landed on the other token: its hero took `surface`
- * because the filter bar's hairline sits under it, and `surface-sunken` at
- * thirteen values read as a panel dropped on the page. Two grounds, one rule,
- * that a fill carries as much as it is left alone to carry.
+ * **The ground alone, with no light rising into it.** A radial wash of the brand
+ * coming up from below the bottom edge, echoing the hero's aura as a gradient,
+ * reads as a shadow: 26% of primary over a near-white band is a soft gray-blue
+ * smudge along the bottom, and a smudge under a call to action looks like a drop
+ * shadow that failed rather than like a horizon. The band is the ground and the
+ * button is the bright object, which is one idea instead of two.
  *
- * **The ground alone, with no light rising into it.** A radial wash of the
- * brand came up from below the bottom edge here, echoing the hero's aura as a
- * gradient rather than a second WebGL context. It read as a shadow: 26% of
- * primary over a near-white band is a soft gray-blue smudge along the bottom,
- * and a smudge under a call to action looks like a drop shadow that failed
- * rather than like a horizon. The band is the ground and the button is the
- * bright object, which is one idea instead of two. */
+ * **The fill is decided in `landing-c.module.css`**, on `.closingCard` and the
+ * `[data-closing][data-closing][data-closing]` glass override, not here. The
+ * measurement that settled it: a card is told apart by its edge in both modes,
+ * at 1.31 light and 1.71 dark against fills of 1.04 and 1.18, so a card's fill
+ * is the quieter half of a cue and may stay quiet. A band has no edge and so
+ * has only the loud half. `surface` alone is five values off white across the
+ * 352 pixels this band stands, and five values with no boundary is not a band;
+ * `surface-sunken` at thirteen values reads as a panel dropped on the page. */
 [data-closing] {
   text-align: center;
 }
 
-/* An absence, not an identifier. */
 /* Lezer's token classes, painted from the library's syntax tokens.
  *
  * The classes are the highlighter's and are stable; the palette is ours. These
@@ -653,7 +588,7 @@ helix-code-block .tok-operator {
 helix-sandbox [slot="panel"]::part(tabs) {
   /* Centered in a stated height, the same figure the toolbar and the rail header
      take, rather than however tall the padding around a tab makes it. Derived,
-     it came out at fifty-seven against their forty-eight: eight of padding
+     it comes out at fifty-seven against their forty-eight: eight of padding
      either side of a forty pixel tab, plus the rule. Three bars across one tool
      and no two the same height.
 
@@ -688,8 +623,6 @@ helix-drawer helix-tree {
   --helix-size-icon: var(--helix-size-icon-sm);
 }
 
-/* The nav drawer's own inset. The drawer places the panel; what goes in it is
-   the site's business. */
 /* ============================================================ motion ===== */
 
 /* Sections arrive as they are scrolled to, once, and never on the way back up.
@@ -707,17 +640,14 @@ helix-drawer helix-tree {
  * thing that would have is the script that failed.
  *
  * The motion query still guards it, and the script checks the same thing, so
- * reduced motion is answered twice and neither answer depends on the other. */
-/* **A rise and no fade, because a fade breaks the glass on the way in.**
+ * reduced motion is answered twice and neither answer depends on the other.
  *
- * This animated `opacity` from 0 to 1, and an element at less than full opacity
- * is a backdrop root: every card inside the section stopped being able to sample
- * the field behind it and rendered as a flat 30 percent tint. The blur returned
- * the instant the value reached exactly 1, which put a visible snap from *more
- * transparent* to *less* at the end of every reveal, at the moment the card is
- * fully opaque and being looked at. Reported off a screen recording, and the
- * note in `reveal-on-scroll.tsx` had claimed this was the one moment nobody
- * could see. It is the moment everybody sees.
+ * **A rise and no fade, because a fade breaks the glass on the way in.** An
+ * element at less than full opacity is a backdrop root: every card inside a
+ * fading section stops being able to sample the field behind it and renders as a
+ * flat 30 percent tint, and the blur returns the instant the value reaches
+ * exactly 1, which puts a visible snap from *more transparent* to *less* at the
+ * end of the reveal, at the moment the card is fully opaque and being looked at.
  *
  * `transform` does not form a backdrop root. Measured against hard stripes: a
  * `translateZ(0)` ancestor passed the backdrop through and only `opacity: .99`
@@ -725,19 +655,12 @@ helix-drawer helix-tree {
  * and there is nothing left to snap.
  *
  * **Bigger, slower and sprung, because a rise has to earn its own visibility.**
- *
- * A fade does this work for free and is the one thing this cannot use. What is
- * left is distance, time and shape, and the first two passes under-spent all
- * three. 24px in 320ms fired as the section's top crossed the bottom edge of the
- * window, so the whole animation played while the section was a sliver at the
- * foot of the screen: reported as no motion at all, which was fair. Then 64px in
- * 640ms, which was visible and still read as nothing much, because a decelerate
- * into a stop is the least noticeable shape a movement can have.
- *
- * 96px, three times `slow`, and `easing-spring`: a `linear()` curve that carries
- * past its target to 1.043 and settles back. The overshoot is what makes it
- * read. An element that arrives, passes the mark and comes back has moved; one
- * that eases to a halt has merely stopped.
+ * A fade does that work for free and is the one thing this cannot use, so what
+ * is left is distance, time and shape, and all three have to be spent. 96px,
+ * three times `slow`, and `easing-spring`: a `linear()` curve that carries past
+ * its target to 1.043 and settles back. The overshoot is what makes it read. An
+ * element that arrives, passes the mark and comes back has moved; one that eases
+ * to a halt has merely stopped.
  *
  * **And a scale, which is the second thing a transform can say.** A rise alone
  * is one axis of one property, and at a glance it is hard to separate from the
@@ -745,10 +668,7 @@ helix-drawer helix-tree {
  * nothing else on the page is changing size: the section reads as arriving under
  * its own power rather than being pushed. It composes into the same `transform`,
  * so it stays off the backdrop-root path that the fade fell into and the cards
- * keep their blur the whole way.
- *
- * Settling on `transform: none` rather than an explicit identity, which
- * interpolates the same and says the resting state is *nothing applied*. */
+ * keep their blur the whole way. */
 [data-reveal="armed"] {
   transform: translateY(calc(var(--helix-space-3xl) * 1.5)) scale(0.97);
 }

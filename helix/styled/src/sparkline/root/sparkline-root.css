@@ -43,8 +43,8 @@
   stroke-linejoin: round;
   /* In `em`, so the line grows with the drawing.
    *
-   * A fixed `1.5px` was the first version, and it left a 200 pixel sparkline
-   * wearing a hairline. `vector-effect` below keeps the stroke out of the view
+   * A fixed `1.5px` leaves a 200 pixel sparkline wearing a hairline.
+   * `vector-effect` below keeps the stroke out of the view
    * box's stretch, which is what it is for, and it also keeps it out of every
    * other reason the stroke might want to be bigger. `0.11em` is 1.54px at the
    * 14px base, so the default weight is where it was and now moves. */
@@ -60,7 +60,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Nothing until `appearance` says otherwise. The region is always drawn, since
+/* Nothing until `plot` says otherwise. The region is always drawn, since
  * the shape is the tier below's business; whether it is painted is this one's.
  *
  * A ramp rather than a flat wash, so the fill reads as belonging to the line
@@ -83,11 +83,7 @@
  * consumer cannot end up with a fill that disagrees with what it sits under.
  *
  * Decorative, and stated as such: the line carries the series and the wash says
- * only which side of it is under. There is no contrast floor for it to clear,
- * so the number was measured against the surface it sits on. The flat fill this
- * replaced was 20%, reading 1.39 in the dark and 1.33 in the light; a ramp from
- * 32 to nothing averages about the same weight over the height while being
- * present where it matters, which is at the line. */
+ * only which side of it is under. There is no contrast floor for it to clear. */
 [part="area"] {
   fill: none;
 }
@@ -109,14 +105,11 @@
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) * var(--helix-material-opacity));
 }
 
-/* The far stop does not reach nothing.
- *
- * At zero the ramp had spent itself well before the floor and the lower half of
- * the region was doing no work: the fill read as a smudge under the peak rather
- * than as a filled area. A quarter held at the bottom fixed that and went too
- * far the other way, reading as a slab with a gradient on it rather than as a
- * fade. A ninth is the third number and the one that holds: the floor is still
- * present, and the falloff is most of the height rather than a hint. */
+/* The far stop does not reach nothing. At zero the ramp spends itself well
+ * before the floor and the lower half of the region does no work: the fill
+ * reads as a smudge under the peak rather than as a filled area. A quarter held
+ * at the bottom reads as a slab with a gradient on it rather than as a fade. A
+ * ninth keeps the floor present with the falloff over most of the height. */
 :host(:not([plot="bar"]):not([plot="line"])) [part="wash-end"] {
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9 * var(--helix-material-opacity));
 }
@@ -147,10 +140,10 @@
  *
  * A `ring` terminus is a window onto whatever the chart is drawn over, and the
  * line ends at the reading, which is the window's center. Something has to give
- * way, and until 21 Aug 2026 it was the window: the middle was painted with the
- * page's surface, which hid the stroke and also hid the card, the photograph or
- * the panel the chart was actually sitting on. Measured on a purple card, the
- * mark came out a disc of the page color.
+ * way. Never the window: painting the middle with the page's surface hides the
+ * stroke and also hides the card, the photograph or the panel the chart is
+ * sitting on, and measured on a purple card the mark came out a disc of the
+ * page color.
  *
  * So the drawing gives way instead. `mask-image` on the `<svg>` takes out a
  * disc of exactly the radius the ring leaves open, centered on the same two
@@ -204,15 +197,15 @@
    difference nobody can see. `BarChart` earns it with gridlines to read through
    and a donut with a card under it; a sparkline has neither.
 
-   **On the host's `color` and not on the parts, which is the whole trick and was
-   the first version's bug.** Every mark in this file is `currentColor`: the line
-   strokes it, both gradient stops take it so the wash is the line's own color,
-   and the terminus fills it. Quietening the line alone left the wash and the
-   terminus at full strength, which measured as no visible change at all, three
-   sparklines rendering identically. One declaration at the top moves all five.
+   **On the host's `color` and not on the parts, which is the whole trick.**
+   Every mark in this file is `currentColor`: the line strokes it, both gradient
+   stops take it so the wash is the line's own color, and the terminus fills it.
+   Quietening the line alone leaves the wash and the terminus at full strength,
+   which measures as no visible change at all, three sparklines rendering
+   identically. One declaration at the top moves all five.
 
-   **`currentColor` cannot be used here, and it is the trap this rule was written
-   into twice.** In a declaration that sets `color` on the same element,
+   **`currentColor` cannot be used here.** In a declaration that sets `color` on
+   the same element,
    `currentColor` is the *inherited* value, not the one the element's other rule
    computed: `:host` and `:host([emphasis="subtle"])` both match this host, so
    `currentColor` resolved to whatever the page's text color was rather than to
@@ -221,8 +214,7 @@
    the same intention until the loud one beside it is blue.
 
    So the source value is named on `:host` and mixed by name. A consumer's
-   `--sparkline-color` is then quietened rather than replaced, which is the
-   behavior the wrong version only appeared to have. */
+   `--sparkline-color` is then quietened rather than replaced. */
 :host([emphasis="subtle"]) {
   color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
 }

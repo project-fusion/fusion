@@ -21,9 +21,9 @@
  * has no theming and this is the cheapest honest substitute.
  *
  * A part with no rule below is one the platform already renders acceptably. A
- * wrong rule is worse than none: the first checkbox sheet painted a box and left
- * the input at `appearance: auto`, so the browser drew its own control and
- * nothing written for it was ever visible. */
+ * wrong rule is worse than none: a sheet that paints a box while leaving the
+ * input at `appearance: auto` gets the browser's own control drawn over it, and
+ * nothing written for it is ever visible. */
 
 :root {
   color-scheme: light dark;

@@ -121,9 +121,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. This used to be hardcoded `off`, so a reader
-   * could never have a birthday or a postal code filled in for them and a
-   * consumer had no way to ask for it. See 295.
+   * lets autofill work at all. See (295).
    */
   @property()
   autocomplete = ''
@@ -231,13 +229,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
      * part of it, and a press on it is not a press outside. Scoped to the
      * surface alone, `pointerdown` on the trigger closed the panel and the
      * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it. Measured
-     * across all five popover-bearing components: Menu, Popover and Tooltip
-     * already named their invoker; this one and its three siblings did not, and
-     * all four stayed open on a second press where Menu closed.
-     *
-     * `DismissController` documents this exact failure and takes a list for it.
-     * The list was the fix; using it was the part that did not happen here. */
+     * the panel could never be closed by the button that opened it.
+     * `DismissController` documents this failure and takes a list for it. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
@@ -392,10 +385,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * the focus and it is the only thing that can know so. Cleared synchronously,
    * since `focus()` dispatches before it returns.
    *
-   * Reasoned rather than measured, and Date Input carries the long version of
-   * why: `focus()` dispatches no event in an unfocused document, which is what
-   * both the test runtime and the browser pane here are, so the path cannot be
-   * exercised from either.
+   * The path cannot be exercised from a spec: `focus()` dispatches no event in
+   * an unfocused document, which is what both the test runtime and the browser
+   * pane here are.
    */
   private returning = false
 
@@ -514,7 +506,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`, and the fifteen controls that already did this.
+    // `ColorInput.updated`.
     this.sync()
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The
@@ -545,12 +537,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   /**
    * The clock the field opens, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * A method rather than an inline fragment, so a tier above can replace or
+   * wrap it without reimplementing the template. The tag is interpolated rather
+   * than written, so `tier` resolves it to this tier's own element.
    */
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('time-picker')}
@@ -586,12 +575,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   /**
    * One chosen time, as a tag, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * A method rather than an inline fragment, so a tier above can replace or
+   * wrap it without reimplementing the template. The tag is interpolated rather
+   * than written, so `tier` resolves it to this tier's own element.
    */
   protected renderTag(at: string): TemplateResult {
     return html`<${this.tag('tag')}
@@ -614,15 +600,14 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding.
    *
-   * **A named import rather than `<helix-icon>`, and that is a reversal.** The
-   * element looked like the tidier of the two and loses on three counts.
+   * **A named import rather than `<helix-icon>`**, on three counts.
    * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
    * no bundler can shake a runtime lookup, so every consumer of any component
    * that renders one ships all 50kB of path data; a named import ships one
    * path. The import is checked when the package compiles, where a `name`
    * string is checked only by a later name lookup. And `helix-icon` is not
    * registered on the headless tier at all, which registers `helix-headless-icon`,
-   * so a headless consumer got an inert unknown element and no mark whatsoever.
+   * so a headless consumer gets an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${clock.viewBox}>

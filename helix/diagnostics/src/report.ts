@@ -18,8 +18,8 @@ export interface Origin {
    *
    * **There is no line number and there cannot be one.** CSSOM exposes
    * `cssText` and an index within the sheet; the byte offset in the authored
-   * file is not in the object model at any level. `24-diagnostics.md` asks for a
-   * line, and this is the honest substitute: the text of the rule is what a
+   * file is not in the object model at any level. A line was asked for, and
+   * this is the honest substitute: the text of the rule is what a
    * reader searches for, and it survives minification and bundling in a way a
    * line number would not.
    */

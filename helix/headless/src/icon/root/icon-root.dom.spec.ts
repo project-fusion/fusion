@@ -38,14 +38,11 @@ describe('icon rendering', () => {
   })
 
   test('takes its color from the text around it', async () => {
-    // On the wrapping svg, which is where it has to be. This read the glyph's
-    // own markup for `currentColor` and passed while the set was hand-kept
-    // stroked outlines, every shape carrying its own `stroke="currentColor"`.
-    // The set comes from `@phosphor-icons/core` now and its regular weight is
-    // one filled path with no paint of its own, so the only thing painting it
-    // is the `fill` on the element the component renders around it. The old
-    // assertion was true of the technique rather than of the behavior, and the
-    // behavior is what has to hold across both.
+    // On the wrapping svg, which is where it has to be. The regular weight of
+    // `@phosphor-icons/core` is one filled path with no paint of its own, so
+    // the `fill` on the element the component renders around it is the only
+    // thing painting the glyph. Asserting `currentColor` inside the glyph's own
+    // markup instead tests the technique rather than the behavior.
     const icon = await mount('<helix-headless-icon name="check"></helix-headless-icon>')
     expect(svg(icon)?.getAttribute('fill')).toBe('currentColor')
     // And nothing inside overrides it with a color of its own, which is the

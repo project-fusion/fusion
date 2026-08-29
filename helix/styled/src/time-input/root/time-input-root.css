@@ -84,17 +84,12 @@
   flex-wrap: nowrap;
 }
 
-/* **The mark the button is made of, which had no size at all.**
+/* **The mark the button is made of, and the rule that reads `--icon-size`.**
  *
- * `--icon-size` was declared on the trigger above and nothing ever read it: the
- * glyph is a bare `<svg>` rather than a `helix-icon`, so no component rule sized
- * it and an inline SVG with a `viewBox` and no dimensions collapsed. Measured at
- * six widths from 420 down to 220, the svg was 0 by 0 and the button around it
- * 0 wide, so the field showed a placeholder and no way to open the clock.
- *
- * Reported as the button wrapping and leaving a gap, which is the right thing to
- * notice and the wrong cause: the field is 40px tall at every one of those
- * widths, so nothing wraps. There was simply nothing there. */
+ * The glyph is a bare `<svg>` rather than a `helix-icon`, so nothing else sizes
+ * it, and an inline SVG with a `viewBox` and no dimensions collapses: measured
+ * at six widths from 420 down to 220, the svg was 0 by 0 and the button around
+ * it 0 wide, so the field showed a placeholder and no way to open the clock. */
 [part="trigger-icon"] {
   block-size: var(--icon-size);
   inline-size: var(--icon-size);
@@ -228,28 +223,17 @@
 /* The count of what is not shown, reading as a note rather than as another tag:
    a reader who cannot tell them apart has been told there are nine times and
    shown six. */
-/* At the end of the row, after the field rather than between the tags and it.
- *
- * Between them it read as a third tag with the placeholder running on after it:
- * "August 4, August 11, 2 more YYYY-MM-DD" is four things where a reader sees
- * one sentence. At the end it is what it is, a note about the row, and the caret
- * sits directly after the last tag where typing continues the list. */
 [part="rest"] {
   color: var(--helix-color-foreground-subtle);
   flex: none;
   align-self: center;
-  /* Beside the tags it counts, not at the far end of the row.
-   *
-   * It sat there, pushed by `margin-inline-start: auto`, on the reasoning that
-   * at the end it is a note about the row and the caret then follows the last
-   * tag directly. Rendered against the combobox, which counts beside its chips:
-   * pushed right the count lands against the trigger with the whole width of the
-   * field between it and the tags, so it reads as part of the trigger cluster
-   * and what it counts has to be worked out. Beside them it reads as "and two
-   * more of these" with nothing to work out.
-   *
-   * The caret still follows the set. The set is now the tags and their count,
-   * which is the thing the caret should follow. */
+  /* Beside the tags it counts, never pushed to the far end of the row with
+   * `margin-inline-start: auto`. Pushed right, the count lands against the
+   * trigger with the whole width of the field between it and the tags, so it
+   * reads as part of the trigger cluster and what it counts has to be worked
+   * out. Beside them it reads as "and two more of these" with nothing to work
+   * out, and the caret still follows the set, which is the tags and their count
+   * together. */
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -262,11 +246,7 @@
  * length: the focus rule owns the `outline` and nothing here was changing its
  * color, so a focused field with an error came out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do.
- *
- * This was missing on every field added after Input, which is what a sweep of
- * all sixteen form controls turned up: `:state(invalid)` reached the host and
- * only the message underneath answered it. */
+ * and the ring are one edge, so when one turns they both do. */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -275,7 +255,8 @@
   outline-color: var(--helix-color-danger);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and a state carried by a fill has
+ * to survive, or the paper says the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

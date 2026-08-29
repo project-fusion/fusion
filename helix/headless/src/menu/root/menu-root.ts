@@ -91,12 +91,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   /**
    * Which page is showing, and what is on it.
    *
-   * This was a `page` field, a title getter and an items getter written here.
-   * None of them were about menus: a settings panel or a navigation tree wants
-   * the same thing, and could not have it without being a menu. The controller
-   * holds the same shape, so the port is a rename rather than a rewrite, and it
-   * adds a real stack: `back()` returns one level instead of to the root, which
-   * this could not do because it only ever went two deep.
+   * A controller rather than fields here, because none of this is about menus:
+   * a settings panel or a navigation tree wants the same shape. It holds a real
+   * stack, so `back()` returns one level rather than to the root.
    */
   private readonly drilldown = new DrilldownController<HelixHeadlessMenuItem>(this, {
     isRow: (element: Element): boolean => 'isMenuItem' in element && element.isMenuItem === true,
@@ -104,10 +101,6 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     slot: 'submenu',
   })
 
-  /* One controller where there were two and a hand-written sequence between
-     them. It is the same three things in the same order; what it is not is a
-     third copy of them, and the second copy is how `Select` ended up never
-     reaching the top layer at all. */
   /**
    * Moving between rows, which is not this element's own business any more.
    *
@@ -115,14 +108,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * choosing are one act in a radio group and two acts here, which is the
    * distinction the controller was already drawing for `Tabs`.
    *
-   * The origin is the selection, which took a wrong turn first and is worth
-   * recording. `focus` looks like the right reading, since a menu's current row
-   * is the focused one, but that origin also carries a rule a menu must not
-   * follow: a press that did not come from the set moves nothing. That rule is
-   * there for a tab panel, which is a tab stop beside the tabs; a menu's panel
-   * holds the rows and nothing else, and Down on a menu that has just opened is
-   * how a reader gets to the first row at all. It moved nothing, and the specs
-   * written alongside this are what said so.
+   * The origin is the selection, and `focus` is the wrong reading however right
+   * it looks: that origin also carries a rule a menu must not follow, that a
+   * press which did not come from the set moves nothing. That rule is there for
+   * a tab panel, which is a tab stop beside the tabs; a menu's panel holds the
+   * rows and nothing else, and Down on a menu that has just opened is how a
+   * reader gets to the first row at all.
    *
    * The horizontal pair is reserved rather than released. Right opens a
    * submenu and left comes back, which are the platform's own bindings for a
@@ -149,11 +140,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   /**
    * Tells a slotted trigger the disclosure state, by property.
    *
-   * This menu wrote nothing onto its trigger, which was the right call and cost
-   * a reader the one thing they needed: a control that opens a menu and never
-   * says so. The class note above already gives the mechanism for the way out,
-   * that items are "told by property, not by attribute", and `tellDisclosure`
-   * is that argument applied one level up. See #322.
+   * A control that opens a menu has to say so. By property rather than by
+   * attribute, which is the class note's rule about items applied one level up:
+   * an attribute written onto a consumer's element after it upgrades is a
+   * hydration mismatch waiting to happen. See #322.
    */
   private tellTrigger(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
@@ -173,9 +163,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* Disabled rows are not there for the keyboard.
      *
      * A disabled row renders no `tabindex` and cannot take focus, so leaving it
-     * in the list meant the arrow keys computed a move onto it, called `focus()`
-     * on something unfocusable, and stopped: the keyboard was stuck one row
-     * above every disabled item in the menu. `Drilldown` filters for the same
+     * in the list has the arrow keys compute a move onto it, call `focus()` on
+     * something unfocusable, and stop: the keyboard is then stuck one row above
+     * every disabled item in the menu. `Drilldown` filters for the same
      * reason. */
     return this.drilldown.rows.filter((row) => !row.disabled)
   }
@@ -248,30 +238,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.hide()
   }
 
-  /*
-   * Moves over the page, in the direction the key points.
-   *
-   * The arrows wrap, because a menu is a ring rather than a list with ends:
-   * pressing down on the last item to reach the first is what every menu on
-   * every platform does.
-   */
-  /*
-   * Focuses an item and brings it into the surface, which is not the same act.
-   *
-   * A menu long enough to scroll had the tree's problem: the arrow keys moved
-   * focus past the bottom of the panel and the panel stayed where it was.
-   * Scrolled here rather than by the browser, because `scrollIntoView` would
-   * take the page behind the menu with it.
-   */
   /**
    * Keeps whatever has focus in sight, however it got there.
    *
-   * This was done in the arrow branches, which meant it was true of the arrow
-   * keys and of nothing else: a row reached by Tab, or focused by the drilldown
-   * on the way into a page, could sit below the fold of a scrolled panel. On
-   * `focusin` it is one rule about focus rather than a line repeated in every
-   * branch that moves it, and it survived the arrow keys moving out to a shared
-   * controller that knows nothing about this panel.
+   * On `focusin` rather than in the branches that move focus: a row reached by
+   * Tab, or focused by the drilldown on the way into a page, can otherwise sit
+   * below the fold of a scrolled panel.
    */
   private readonly handleFocusIn = (event: FocusEvent): void => {
     const item = this.items.find((row) => row.contains(event.target as Node))
@@ -303,9 +275,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     } else if (event.key === 'Tab') {
       /* Out, and the panel goes with it.
        *
-       * Nothing closed the menu when focus left it, so tabbing out of an open
-       * one left a shadowed panel in the top layer sitting over whatever the
-       * reader had tabbed to. Deliberately not prevented: focus should carry on
+       * Nothing else closes the menu when focus leaves it, so tabbing out of an
+       * open one would leave a shadowed panel in the top layer sitting over
+       * whatever the reader tabbed to. Deliberately not prevented: focus carries on
        * outward, which is what the reader asked for. And deliberately not a
        * focus trap, because a menu is not a modal and Tab is a way out of one. */
       this.hide()
@@ -347,10 +319,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     super.updated(changed)
     // Every update, so a trigger slotted after the first render is told too.
     this.tellTrigger()
-    /* Put the panel where `open` says, however it got there. `show()` and
-       `hide()` raised and lowered it and nothing else did, so a menu opened by
-       declaring `open` rendered visible, out of the top layer and unanchored:
-       every imperative path worked and every declarative one was half-open. */
+    /* Put the panel where `open` says, however it got there. Raising it in
+       `show()` and lowering it in `hide()` alone leaves a menu opened by
+       declaring `open` visible, out of the top layer and unanchored: every
+       imperative path works and every declarative one is half-open. */
     if (changed.has('open')) {
       /* Here rather than a microtask later: `updated()` runs after the render,
          so the panel is no longer `display: none` and `showPopover` is safe. */
@@ -375,11 +347,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   /**
    * Walks the tree marking which rows are on the page showing.
    *
-   * Two levels were marked by hand and nothing wrote `showingSubmenu` on a
-   * nested row, so drilling into a third-level submenu rendered the header over
-   * an empty panel: the page existed, its rows were still marked as belonging
-   * to the level above, and none of them rendered. `Drilldown.mark()` is the
-   * same walk and was already recursive.
+   * Recursive rather than two levels by hand: without `showingSubmenu` on a
+   * nested row, drilling into a third-level submenu renders the header over an
+   * empty panel, the page existing while its rows are still marked as belonging
+   * to the level above. `Drilldown.mark()` is the same walk.
    *
    * `slot === 'submenu'` rather than every child, because a row's other
    * children are its label and its icons.

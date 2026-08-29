@@ -1,16 +1,8 @@
 /**
  * The site's own prose, as MDX with a typed registry.
  *
- * **Prose is written flat, in one file per page, top to bottom.** It used to be
- * a `PageCopy` object of titles and body arrays, which reads as data and writes
- * as neither: `thesis.ts` carried a 358 character unbroken line, so an edit
- * anywhere rewrote the whole line in the diff, and `trust.ts` had to switch
- * quote style because one sentence contains an apostrophe. Before that it was
- * JSX, which asks for a `<p>` around every paragraph.
- *
- * MDX is here because it is what a writer wants to type. That is the whole
- * reason, and it is a better one than the rendering argument that first put
- * these files in this shape.
+ * **Prose is written flat, in one file per page, top to bottom.** MDX is here
+ * because it is what a writer wants to type, and that is the whole reason.
  *
  * **A page is the file.** No component appears in any of this content, which is
  * what lets `/thesis.md` be the source served verbatim rather than a
@@ -32,11 +24,10 @@ import { generatedEssays, generatedPages } from './pages.generated'
 /**
  * One essay.
  *
- * **Every field is frontmatter.** There is no hand-written registry any more:
- * a post is one file, its slug is that file's name, and everything a card or a
- * byline needs is at the top of it. `minutes` is the exception in the other
- * direction, counted from the body rather than typed, which only became
- * possible when the bodies stopped being JSX.
+ * **Every field is frontmatter.** There is no hand-written registry: a post is
+ * one file, its slug is that file's name, and everything a card or a byline
+ * needs is at the top of it. `minutes` is the exception, counted from the body
+ * rather than typed.
  */
 export interface SiteEssay {
   author: string
@@ -73,9 +64,6 @@ export interface SitePage {
    * page and by the landing page, so they stay in `services.ts` where several
    * consumers already find them. Writing them into the MDX would be a second
    * copy of a price list, which is the worst possible thing to have two of.
-   *
-   * So the document is the file plus the registry, which is not a third way of
-   * producing markdown: it is the two that already exist, one after the other.
    */
   appends?: 'services'
   /** One-line summary, for the route registry and the document's frontmatter. */

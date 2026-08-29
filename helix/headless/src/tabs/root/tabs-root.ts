@@ -15,8 +15,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *
  * @description
  * Selection is coordinated by event, the same shape the accordion and the tree
- * use: a tab dispatches `SelectionChange` and the root pairs it with the panel
- * of the same value. Nothing registers with anything, so tabs added later work
+ * use: a tab dispatches `helix-select` and the root pairs it with the panel of
+ * the same value. Nothing registers with anything, so tabs added later work
  * without the root being told.
  *
  * The tab list is a single tab stop, moved with the arrow keys through
@@ -44,13 +44,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
 @customElement('helix-headless-tabs')
 export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /* Arrow keys, Home and End. Same controller as the radio group and the toggle
-     group, which is what the audit asked for once the indicator controller had
-     landed, and this is the traversal that had to grow it: `origin: 'focus'`
-     because `manual` lets focus and selection diverge, and `selects` because
-     `manual` is what decides whether arriving chooses.
-
-     Roughly thirty lines of index arithmetic went, and with them the last copy
-     of a wrap that had to be right in four places. */
+     group: `origin: 'focus'` because `manual` lets focus and selection diverge,
+     and `selects` because `manual` is what decides whether arriving chooses. */
   protected readonly keys = new KeyboardNavigationController(this, {
     items: () => this.tabs,
     origin: 'focus',
@@ -73,18 +68,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    * heads a page. `segmented` puts the pill in a framed, sunken track, which
    * reads as one control rather than as a row.
    *
-   * `segmented` and not `toggle`, which is what this was called. An appearance
-   * value that is another component's name says "it looks like that one", which
-   * a reader can only act on if they already know what that one looks like, and
-   * every other appearance in the library describes itself: `outlined`,
-   * `spaced`, `plain`. This component's own comments called it segmented in
-   * both places it explained itself, which is the name that was doing the work.
-   *
-   * `underlined` and not `underline` for the shape of the word rather than the
-   * sense: the two values sit in one list and read as a pair, and `segmented`
-   * is a participle. `outlined` on Accordion is the same word doing the same
-   * job. The example file was already `underlined.html`, which is what a reader
-   * meets first.
+   * A value describes itself rather than naming another component: `segmented`
+   * and `underlined` are participles reading as a pair, the way `outlined` on
+   * Accordion does.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
@@ -123,9 +109,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     )
   }
 
-  /* Through the mixin, so a consumer can refuse the change. It was written
-     straight from the event, which meant `helix-before-activate` was an announcement
-     nobody could answer, while `Radio.Group` two folders away could be. */
+  /* Through the mixin, so a consumer can refuse the change. Moving `active`
+     straight from the event leaves `helix-before-activate` an announcement
+     nobody can answer. */
   private readonly handleSelection = (event: Event): void => {
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
@@ -133,9 +119,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /** Pushes the current value down to whichever tab and panel own it. */
   private sync(): void {
     const tabs = this.tabs
-    /* Through the mixin, which also skips a disabled first tab. The
-       hand-written fallback did not, so a set opening on a disabled tab showed
-       it as current and its panel with it. */
+    /* Through the mixin, which also skips a disabled first tab. A hand-written
+       fallback to the first child shows a disabled tab as current and opens its
+       panel with it. */
     const value = this.resolveActive(tabs)?.value ?? ''
     for (const tab of tabs) {
       tab.selected = tab.value === value
@@ -218,17 +204,17 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /**
    * The set changed: pair it up, watch it, and measure it.
    *
-   * All three, where this used to be `sync()` alone, and the missing `place()`
-   * is why an indicator could stay unplaced for the life of the page. The order
-   * of events is what does it: the host renders and measures before its tabs
-   * have upgraded, so there is no selected tab to measure and `place` refuses;
-   * the ResizeObserver's one initial callback lands in that same gap; and then
-   * the tabs upgrade, `slotchange` pairs them, nothing measures, and nothing
-   * ever will again, because the host's size never changes.
+   * All three, and dropping `place()` leaves an indicator unplaced for the life
+   * of the page. The order of events is what does it: the host renders and
+   * measures before its tabs have upgraded, so there is no selected tab to
+   * measure and `place` refuses; the ResizeObserver's one initial callback
+   * lands in that same gap; and then the tabs upgrade, `slotchange` pairs them,
+   * nothing measures, and nothing ever will again, because the host's size
+   * never changes.
    *
    * Invisible in every example, because a tab strip that is only tabs is
    * exactly as tall as its tabs, so a mark at the top of the strip is a mark on
-   * the tab. It showed up where something gives the strip a height of its own.
+   * the tab. It shows only where something gives the strip a height of its own.
    */
   private readonly handleSlotChange = (): void => {
     this.sync()

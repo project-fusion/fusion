@@ -13,14 +13,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One node in a tree.
  *
  * @description
- * **`open`, on `MixinControllerOpen`, where it was a bare `expanded` boolean.**
- * A branch showing its children is the same state a disclosure holds, and
- * `AccordionItem` has been on that mixin all along. Written here by hand it had
- * neither half of what the mixin gives: `this.expanded = !this.expanded`
- * announced nothing, so a consumer could not know a branch had opened, and
- * could not own the state either. `aria-expanded` is still what the row
- * renders, because that is the attribute a tree uses; the property is what
- * changed, not the semantics.
+ * **`open`, on `MixinControllerOpen`, rather than a bare boolean of its own.** A
+ * branch showing its children is the same state a disclosure holds, and
+ * `AccordionItem` is on that mixin too. A hand-written toggle announces nothing,
+ * so a consumer can neither know a branch opened nor own the state.
+ * `aria-expanded` is still what the row renders, because that is the attribute a
+ * tree uses; the property is what differs, not the semantics.
  *
  * An element rather than a slot because it owns state: whether it is open,
  * whether it is selected, and whether it is the one holding focus.
@@ -118,14 +116,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    *
    * Not reflected, for the reason `level` below gives in full: the tree assigns
    * this after it upgrades, so the attribute would be a change to markup the
-   * consumer rendered and hydration would report it. It reflected, one line
-   * from the paragraph saying why it must not.
+   * consumer rendered and hydration would report it. Mirroring to
+   * `data-selected` on the host instead is the same fault under another name.
    *
-   * The stylesheet reads it from the row inside this shadow root, which is the
-   * answer `level` gives one paragraph down: the indent it drives is written
-   * onto the row rather than onto the host, because the row is not part of the
-   * tree React hydrates. Mirroring to `data-selected` on the host instead was
-   * the same fault with a different name, and React said so.
+   * The stylesheet reads it from the row inside this shadow root, because the
+   * row is not part of the tree React hydrates.
    */
   @property({ type: Boolean })
   selected = false
@@ -185,10 +180,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        every scrollable ancestor and reveal the element, which is
        `scrollIntoView` by another route and takes the page with it. The root
        calls `scrollItemIntoView` on the next line precisely to avoid that, and
-       without this the careful call was arriving after the thing it exists to
-       prevent had already happened. It was also hiding whether that util worked
-       at all: measured in Chrome, a tree in a scroller scrolled either way, so
-       the util could have been scrolling nothing and nobody would have seen. */
+       without this the careful call arrives after the thing it exists to
+       prevent has already happened. */
     this.renderRoot
       .querySelector<HTMLElement>(this.href === '' ? '[part="item"]' : '[part="row"]')
       ?.focus({ preventScroll: true })
@@ -204,9 +197,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    *
    * Selecting and following are two things and this is where they meet, so the
    * pointer and the keyboard take one path to the same end. The tree calls this
-   * rather than `select` for the keyboard, which is what fixes Enter: a nav
-   * tree whose rows are links could be walked with the arrows and not entered,
-   * because choosing announced a value and nothing listened for it.
+   * rather than `select` for the keyboard, or a nav tree whose rows are links
+   * could be walked with the arrows and never entered: choosing announces a
+   * value and nothing listens for it.
    */
   activate(): void {
     this.select()
@@ -268,14 +261,10 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
 
   private readonly handleRowClick = (event: MouseEvent): void => {
     /* A press that landed on a link is that link's, whichever branch of this
-       runs. It was asked on one side and not the other, and the missing half
-       cost a feature: a row can hold a link in its `end` slot, which is what
-       the documentation sidebar puts there to get back to the index, and
-       pressing it collapsed the branch on the way out. Measured in Chrome,
-       `open` false and the route changed from the one press.
-
-       "There is nowhere else for the press to mean" was true of a row holding
-       a label, and a slot is somewhere else. */
+       runs, and the test has to be made on both sides. A row can hold a link in
+       its `end` slot, and asked on one side only, pressing that link collapses
+       the branch on the way out: one press, `open` false and the route
+       changed. */
     const onLink = event.composedPath().some((node) => node instanceof HTMLAnchorElement)
 
     /* A branch that is also a link goes where it points, and its chevron is
@@ -317,9 +306,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
    * Mirrors the chosen state where a stylesheet can select on it.
    *
-   * **A custom state and not the `selected` attribute it used to reflect.** The
-   * parent writes this: a listbox choosing a row, a tab strip moving the tab, a
-   * radio group answering for its set. Reflected, that put the element's own
+   * **A custom state, never a reflected `selected` attribute.** The parent
+   * writes this: a listbox choosing a row, a tab strip moving the tab, a radio
+   * group answering for its set. Reflected, that puts the element's own
    * bookkeeping onto markup a consumer wrote and a consumer's server never sent,
    * which React reconciles and reports as a mismatch, and which a serialized
    * element pasted back declares as a choice nobody made. `ElementInternals`
@@ -327,7 +316,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
    * seeds the property, which is what `<helix-tree-item selected>` in a consumer's
-   * markup means. What stops is the write back. See 302 and 304.
+   * markup means. What stops is the write back. See (302) and (304).
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -344,8 +333,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
      * sibling, which is the navigation flavor of the pattern.
      *
      * Without one, nothing changes: the wrapper is the `treeitem` and holds the
-     * group, which is what an `<li>` holding a `<ul>` is, and what this was
-     * fixed to be when the group rendered outside the node it belonged to. */
+     * group, which is what an `<li>` holding a `<ul>` is. */
     const linked = this.href !== ''
     const level = this.level ?? 1
     const expanded = this.branch ? (this.open ? 'true' : 'false') : nothing
@@ -380,10 +368,10 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
                 @click=${this.handleRowClick}
               >${this.renderRow()}</div>`
         }
-        <!-- Inside the treeitem, not beside it. It rendered as a sibling, so
-             the row's \`aria-expanded\` described a group the row did not own and
-             the branch reported children it had no relationship to. The pattern
-             is \`treeitem\` containing \`group\`, which is also what an \`<li>\`
+        <!-- Inside the treeitem, not beside it. As a sibling, the row's
+             \`aria-expanded\` describes a group the row does not own and the
+             branch reports children it has no relationship to. The pattern is
+             \`treeitem\` containing \`group\`, which is also what an \`<li>\`
              holding a \`<ul>\` is. -->
         <div part="group" role="group" ?hidden=${!this.open}>
           <slot name="children"></slot>

@@ -167,8 +167,8 @@ for (const file of files) {
 for (const file of prose) {
   const from = dirname(file)
   /* Inline code spans are stripped first, because a link inside one is an
-     illustration of the shape rather than a link: `12-ai-native-web.md`
-     describes the format of an `llms.txt` line as `- [Title](url.md)`, and
+     illustration of the shape rather than a link: the format of an `llms.txt`
+     line is `- [Title](url.md)`, and
      `url.md` is not a file anybody meant to exist. */
   const text = readFileSync(file, 'utf8').replace(/`[^`\n]*`/g, '')
   for (const [, target] of text.matchAll(/\]\(([^)\s]+)\)/g)) {

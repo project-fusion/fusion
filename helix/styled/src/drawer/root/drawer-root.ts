@@ -52,17 +52,13 @@ export class HelixDrawer extends HelixHeadlessDrawer {
    * translucent ground with no filter is a tint, so a consumer says what it
    * wants rather than assembling it out of two hooks.
    *
-   * A drawer is the case where the pair earns the most, because there is already
-   * something behind it worth seeing: the page it covers, under its own scrim.
-   *
    * Absent is opaque, per the rule that a reflected property takes no default,
    * so the stylesheet only describes the departure.
    *
-   * **`transparent` is where this one stops, and that is the statement 270
-   * asks for rather than an omission.** A panel that floats over arbitrary page
-   * content is only readable because it has a ground; dropping it does not make
-   * a lighter drawer, it makes an unreadable one. `frosted` and `glass` are the
-   * two honest points here.
+   * **No `transparent`, deliberately.** A panel floating over arbitrary page
+   * content is only readable because it has a ground; dropping it makes an
+   * unreadable drawer rather than a lighter one. `frosted` and `glass` are the
+   * two honest points here. See (270).
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'

@@ -98,12 +98,9 @@ describe('an id that resolves to nothing', () => {
   /* Null rather than an empty array, so a reference this controller established
      is cleared rather than left holding the last good value. An
      `aria-describedby` naming a heading that has been removed is a stale
-     reference, not an unchanged one.
-
-     Established through the controller rather than by hand, which is the whole
-     of what these two assert now. Assigning the property directly and expecting
-     it to be cleared is a test for clearing what this controller did not write,
-     and that is the fault below. */
+     reference, not an unchanged one. The reference has to be established
+     through the controller: clearing one assigned by hand is the case below,
+     and the opposite answer. */
   test('and clears the property when none of them resolve', () => {
     const { control, forward, host } = scene('aria-describedby="tip"')
     forward.forward()

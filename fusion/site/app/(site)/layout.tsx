@@ -48,11 +48,9 @@ const FOOTER_GROUPS = [
 /**
  * Where to find us, under the mark.
  *
- * **An empty `href` renders nothing**, which is how this shipped while only the
- * repository was known: a guessed `linkedin.com/company/...` is a link to
- * whoever does own that slug, so the entry sat here rendering nothing until
- * there was a real address for it. All three have one now, and the guard stays
- * for the next account that is named before it exists.
+ * **An empty `href` renders nothing**, so an account named before it exists can
+ * sit here. Never guess the slug: a guessed `linkedin.com/company/...` is a link
+ * to whoever does own it.
  */
 const SOCIALS = [
   { href: 'https://github.com/project-fusion', icon: 'github-logo', label: 'Fusion on GitHub' },
@@ -77,8 +75,8 @@ const findable = (kind: RouteKind) =>
  * `space-2xl` rather than by the page's own `--site-inset`, so the wordmark and
  * the copyright start on the same line down the left edge. That clamp opens to
  * seven rem on a wide screen, which is right for a column of prose and wrong
- * for chrome: the two edges disagreed by 48 pixels at 1600 while this note said
- * they did not. The content column between them keeps the clamp.
+ * for chrome: taking it here puts the two edges 48 pixels apart at 1600. The
+ * content column between them keeps the clamp.
  *
  * `view-transition-name` on the content is what makes a route change a
  * cross-fade of the middle of the page while the header and its indicator stay
@@ -94,22 +92,16 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           manifest into the client bundle to display a list of names. What
           crosses is the list.
 
-          **From `routes()` rather than from three hand-picked arrays**, which
-          is why the documentation is in here at all. This passed the families
-          and the insights and nothing else, so all 43 documentation pages were
-          unreachable from the palette: a reader who typed "installation" got
-          nothing, on a site whose largest section is documentation. The
-          registry already knew about them, `check:gen:routes` counting 89
-          component, 43 doc, 6 insight and 15 page, and it is the same list the
-          sitemap and `llms.txt` are built from. A fourth copy of it here would
-          have drifted the same way the third one did.
+          **From `routes()` rather than from hand-picked arrays.** Anything left
+          out of such an array is simply unreachable from the palette, on a site
+          whose largest section is documentation, and `check:gen:routes` already
+          holds the registry that the sitemap and `llms.txt` are built from. A
+          second copy of it here would drift.
 
-          **`Route.description` is now the caption**, which is what its own
-          comment always said it was for: `llms.txt` *and a search result*. It
-          waited on `Findable` having somewhere to put it, and `Option` having
-          somewhere to draw it, and as of 25 Aug 2026 both are true. Matching is
-          still on the title, so what somebody types is measured against the
-          name rather than against prose about it. */}
+          **`Route.description` is the caption**, which is what its own comment
+          says it is for: `llms.txt` *and a search result*. Matching is still on
+          the title, so what somebody types is measured against the name rather
+          than against prose about it. */}
       <SiteNav
         findable={[
           { group: 'Components', items: findable('component') },
@@ -137,12 +129,11 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               name="fusion"
               style={{ '--icon-size': '1.25rem' }}
             />
-            {/* **The name leads and the line under it recedes**, which is the
-                opposite of what these two were doing. The name was `caption`
-                at regular weight and the tagline `label`, and `label` is the
-                small-and-firm variant meant for a field's name: 500 against
-                the name's 400, one pixel smaller, and a step quieter in tone.
-                So the company read as the caption of its own slogan. */}
+            {/* **The name leads and the line under it recedes.** Not `caption`
+                for the name and `label` for the tagline: `label` is the
+                small-and-firm variant meant for a field's name, 500 against a
+                caption's 400 and one pixel smaller, so that pairing reads as the
+                company being the caption of its own slogan. */}
             <helix-text variant="body-strong">Fusion Development Group</helix-text>
             <helix-text tone="subtle" variant="caption">
               Developing for humanity.

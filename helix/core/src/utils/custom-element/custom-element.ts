@@ -1,4 +1,4 @@
-/**
+/*
  * Registers a custom element, once.
  *
  * A drop-in replacement for Lit's `@customElement` that does not throw when the

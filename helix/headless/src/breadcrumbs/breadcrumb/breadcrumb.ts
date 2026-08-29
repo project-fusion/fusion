@@ -11,12 +11,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * Contributes the separator, the list-item role, and the link itself where one
  * is wanted.
  *
- * **`href` makes the crumb the link.** *Added 19 Aug 2026, reversing the note
- * that said an anchor could not be rendered here.* That note was right that a
- * router cannot reach an anchor inside a shadow root, and wrong that this
- * settles it: the consumer restores the soft navigation by intercepting the
- * click on the way out, which is what `Tree.Item` and `List.Item` both do.
- * What the anchor buys is the whole crumb as a target, Enter, middle click, the
+ * **`href` makes the crumb the link.** A router cannot reach an anchor inside a
+ * shadow root, and the consumer restores the soft navigation by intercepting the
+ * click on the way out, which is what `Tree.Item` and `List.Item` both do. What
+ * the anchor buys is the whole crumb as a target, Enter, middle click, the
  * status bar, and a trail that works before any JavaScript runs.
  *
  * **And the parent needs it.** A trail that collapses has to rebuild its hidden
@@ -69,15 +67,11 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * the property, rendered the anchor, and left the host looking unlinked: the
    * crumb drew at 20px where a markup twin drew at 28.
    *
-   * *This said the opposite until 27 Aug 2026*, and named the reason as
-   * "nothing selects on it", which was not true when it was written. The
-   * paragraph is worth keeping because the rest of it is right and is what makes
-   * this optional rather than defaulted: an `href` written onto every host would
-   * be a link to the current page on every crumb nobody asked to be one. That is
-   * the general rule as well, that a reflected property takes no default, so the
-   * two agree.
+   * Optional rather than defaulted, which is the general rule that a reflected
+   * property takes no default: an `href` written onto every host would be a link
+   * to the current page on every crumb nobody asked to be one.
    *
-   * Found by the picture comparison rather than by reading: React assigns a
+   * Reading cannot catch this and the picture comparison can. React assigns a
    * matching property instead of an attribute, so every crumb in the React twin
    * of `breadcrumbs/links` lost its padding at once.
    */
@@ -128,10 +122,9 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
        not it is a link. Built once so the two branches below cannot drift. */
     const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
 
-    /* The current page is text, not a link, whatever it was given: linking a
-       page to itself is a known screen-reader annoyance and `aria-current` is
-       what conveys position. So `current` wins over `href` rather than the two
-       contradicting each other in the markup. */
+    /* The current page is text, not a link, whatever it was given, so `current`
+       wins over `href` rather than the two contradicting each other in the
+       markup. */
     const linked = (this.href ?? '') !== '' && !this.current
 
     return html`<span part="separator" aria-hidden="true"

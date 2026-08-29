@@ -5,7 +5,7 @@
 /* `all: unset` first, and `box-sizing` straight back: shadow roots get
    `border-box` from `HelixElement.finalizeStyles`, and a rule that unsets
    everything outranks it, so the row would quietly revert to `content-box` and
-   overflow itself by its own padding. Four components were caught by this. */
+   overflow itself by its own padding. */
 [part="item"] {
   all: unset;
   box-sizing: border-box;
@@ -47,10 +47,8 @@
  * whatever a consumer slotted; here it is the visible list and the rows are the
  * component's own, so the component can simply draw its ring where it fits. It
  * is also what a full bleed row wants regardless of clipping: a ring outside a
- * row that touches the list's edge is a ring on top of the edge.
- *
- * Five families already answer it this way, `menu-item` and `tree-item` among
- * them. This one was the outlier. */
+ * row that touches the list's edge is a ring on top of the edge. `menu-item`
+ * and `tree-item` answer it the same way. */
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
@@ -71,8 +69,8 @@
  * on a rounded rectangle is not a bar: the shadow is the padding box moved over,
  * so what shows through is the leading edge plus a hook of it curling around
  * each corner, and at any size worth looking at it reads as a border that has
- * been clipped wrong. Reported, and the picture was of the curl. A box with its
- * own radius, inset from the row's ends, is the shape that was wanted. */
+ * been clipped wrong. A box with its own radius, inset from the row's ends, is
+ * the shape that was wanted. */
 [part="item"][aria-current="true"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   color: var(--helix-color-foreground);

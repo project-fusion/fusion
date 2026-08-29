@@ -10,12 +10,7 @@ type TextControl = HTMLInputElement | HTMLTextAreaElement
  * how that is done, and per spec assigning a *different* string moves the text
  * entry cursor to the end. Measured: caret at index three in `abcdef`, assign
  * `abcXdef`, caret at seven. Assigning the same string leaves it alone, which
- * is why this was invisible until a consumer was slow.
- *
- * So a React consumer holding the value in state, which commits after the
- * event, put the caret at the end of the field after every single keystroke.
- * Typing in the middle of a word was impossible, and the class JSDoc claimed
- * the caret was the platform's business.
+ * is why this only shows against a consumer that is slow to answer.
  *
  * The offset is adjusted by the length difference rather than clamped, because
  * the common case is exactly one character wide: the reader typed, the element

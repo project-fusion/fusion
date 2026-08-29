@@ -52,13 +52,13 @@ interface Props {
  * One file, not three: the syntaxes are the same tree said differently, and
  * showing all of them at once invites a reader to edit one and wonder why the
  * others disagree. What is on screen is what runs.
+ *
+ * Two entries and not three, because JSX and TSX produce the same bytes: an
+ * example is Helix elements with attributes, so there is no annotation, no
+ * generic, and nothing else for TypeScript to hold. TSX is the one kept, because
+ * a consumer scaffolding a React app gets TypeScript by default and that is the
+ * file they will be pasting into.
  */
-/* Two files, not three. `index.jsx` was here and produced the same bytes as
-   `index.tsx`: an example is Helix elements with attributes, so there is no
-   annotation, no generic, and nothing else for TypeScript to hold. It was one
-   more row in the menu, one more file name, and no difference on screen. TSX is
-   the one kept, because a consumer scaffolding a React app gets TypeScript by
-   default and that is the file they will be pasting into. */
 const SYNTAXES = [
   { file: 'index.html', label: 'HTML', language: 'html', value: 'html' },
   { file: 'index.tsx', label: 'TSX', language: 'tsx', value: 'tsx' },
@@ -98,7 +98,7 @@ type Pane = 'source' | 'css'
  */
 const ARRANGEMENT = 'fusion-sandbox-arrangement'
 
-/** How wide the examples rail opens to, in pixels. The 17rem it always was. */
+/** How wide the examples rail opens to, in pixels. */
 const RAIL_OPEN = 272
 
 interface Arrangement {
@@ -130,17 +130,16 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   const preview = useRef<HelixSandboxPreview>(null)
   const _files = useRef<HelixToggleGroup>(null)
+  const scroller = useRef<HTMLDivElement>(null)
   /* Held as state, not as a ref: an effect observes the splitter's width and a
      memo reads the tree's rows, and both have to run when the element arrives,
      which a `RefObject` cannot announce. */
-  const scroller = useRef<HTMLDivElement>(null)
   const [tree, setTree] = useElementRef<HelixTree>()
   const [railSplitter, setRailSplitter] = useElementRef<HelixSplitter>()
 
-  /* Handlers are props now. An element rendered in two places, which the
-     examples tree is, gets the prop in both, and React binds whichever one it
-     rendered. The ref dance this used to need existed because a `RefObject`
-     cannot say that its `.current` moved. */
+  /* Handlers are props. An element rendered in two places, which the examples
+     tree is, gets the prop in both, and React binds whichever one it rendered,
+     which no ref can do: a `RefObject` cannot say that its `.current` moved. */
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const _settings = useRef<HelixMenu>(null)
@@ -157,18 +156,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
   const [pane, setPane] = useState<Pane>('source')
   const [syntax, setSyntax] = useState<Syntax>('html')
-  /* The text as it is on screen, in whichever syntax is showing, and not a
-     canonical form the editor is a rendering of. It was HTML, and the JSX view
-     was a conversion of it while every keystroke was converted back: a round
-     trip through two converters on every character, which never reproduces
-     half-typed markup, so the editor was handed a different document than the
-     one being typed into and replaced it. Held as-is, what the editor emits is
-     exactly what comes back.
-
-     There is one converter now rather than two, and it runs in one place. Each
-     syntax is an authored file, so showing one is reading it; only a live edit
-     in the TSX pane has no HTML twin to preview, and that is the single call
-     left. */
   /* What is in the editor now, and in which language, so the effect below can
      tell "a new example arrived" from "the same one, asked for differently". */
   const seeded = useRef<{ example: string; syntax: Syntax } | null>(null)
@@ -194,11 +181,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    *
    * The pairing is the whole of it. The workbench seeds a default example one
    * render before the query's `e=` has been resolved into state, so an edit
-   * consumed on the first seed lands on the wrong component entirely: traced,
-   * a fragment arriving for `card.default` was spent on `accordion/default`,
-   * and by the time the card was seeded there was nothing left to give it.
-   * Which is why the first attempt at this looked like the fragment being
-   * ignored, when it was being applied to something nobody was looking at.
+   * consumed on the first seed lands on the wrong component entirely: traced, a
+   * fragment arriving for `card.default` was spent on `accordion/default`, and
+   * by the time the card was seeded there was nothing left to give it. Unpaired,
+   * that looks like the fragment being ignored rather than applied to something
+   * nobody is looking at.
    *
    * Null on the server, where there is no address to read. */
   const arrived = useRef(
@@ -270,20 +257,21 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     return () => watch.disconnect()
   }, [railSplitter])
 
-  /* A hundred is the rail shut, which puts the divider on the trailing edge
-     where the splitter draws no line: a boundary needs two sides, and it takes
-     that away itself rather than needing the border switched off here. */
   /** Whether the examples are on screen, as a pane on a wide viewport and as a
    * drawer on a narrow one. The toggle reads this rather than either state, so
    * it says the same thing at both widths. */
   const railShown = narrow ? railOpen : showRail
 
-  /* **Always shut on a narrow viewport, because the rail is not in the splitter
+  /* A hundred is the rail shut, which puts the divider on the trailing edge
+     where the splitter draws no line: a boundary needs two sides, and it takes
+     that away itself rather than needing the border switched off here.
+
+     **Always shut on a narrow viewport, because the rail is not in the splitter
      there.** It moves to a drawer below, and the `slot="end"` pane is not
-     rendered at all, so a position under a hundred left the divider partway
+     rendered at all, so a position under a hundred leaves the divider partway
      across with nothing on the far side: measured at 375, the whole workbench
-     was squeezed into a 103px start pane with the preview stranded beneath it,
-     which is what 279 was reported as. `showRail` still governs the drawer. */
+     was squeezed into a 103px start pane with the preview stranded beneath it.
+     `showRail` still governs the drawer. */
   const railPosition =
     !narrow && showRail && bodyWidth > 0 ? Math.max(0, 100 - (railSize / bodyWidth) * 100) : 100
 
@@ -347,10 +335,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   // stream of positions and only the one it ends at is a preference.
   const sandboxChanged = () => {
     /* Bound to both of the sandbox's dividers, and asked which one moved by
-       neither: this has always taken the numbers off the element below, so two
-       verbs bind to one function and the detail is never read. It was one
-       `arrangement` event carrying a JSON blob nothing read, then one
-       `helix-before-resize` naming which property settled. */
+       neither: the numbers come off the element below, so two verbs bind to one
+       function and the detail is never read. */
     const element = sandbox.current
     if (!element) {
       return
@@ -432,8 +418,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     }))
     /* A floor, not a feature. `resolve` has to come back with an example for
        the panes to have anything to show, so a tier nothing has written an
-       example for yet would leave the workbench with nothing to open. Three
-       families carry headless examples today and #135 is about the rest. */
+       example for yet would leave the workbench with nothing to open. Not every
+       family carries a headless example; #135 is about the rest. */
     return kept.some((entry) => entry.examples.length > 0) ? kept : families
   }, [families, wanted])
 
@@ -478,8 +464,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   /**
    * Switches the language the example is written in.
    *
-   * Split out because two callers reach it now: the menu, where there is nothing
-   * to lose, and the confirmation below, where the reader has said to go ahead.
+   * Split out because two callers reach it: the menu, where there is nothing to
+   * lose, and the confirmation below, where the reader has said to go ahead.
    */
   const applySyntax = (next: Syntax) => {
     setSyntax(next)
@@ -537,16 +523,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      panel off is not somewhere to go Back to, and a settings menu that filled
      the history would make the browser's own Back button useless for leaving.
 
-     Guarded on whether the address has been read, which is a different question
-     from whether an example is open and used to be answered with the same
-     value. `familySlug` is null before the first effect runs, so testing it did
-     stop the empty write that would have replaced a real query on load. It is
-     also null for as long as nobody has chosen an example, and at a bare
-     `/helix/sandbox` that is forever: every setting a reader changed there,
-     tier and layout and direction and panes and syntax alike, went unrecorded,
-     while the same sandbox reached from a component's preview worked because
-     that link always carries `?e=`. One symptom, two paths, and the difference
-     was a proxy standing in for a fact. `read` is the fact. */
+     Guarded on whether the address has been *read*, which is a different
+     question from whether an example is open. `familySlug` is null before the
+     first effect runs, so testing it does stop the empty write that would
+     replace a real query on load; it is also null for as long as nobody has
+     chosen an example, and at a bare `/helix/sandbox` that is forever, so every
+     setting a reader changed there, tier and layout and direction and panes and
+     syntax alike, went unrecorded, while the same sandbox reached from a
+     component's preview worked because that link always carries `?e=`. `read`
+     is the fact the proxy stood in for. */
   useEffect(() => {
     if (!read) {
       return
@@ -611,7 +596,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     familySlug,
     forcedTier,
     layout,
-    /* The effect reads it now, so it has to rerun when the drawer moves it. */
+    /* The effect reads it, so it has to rerun when the drawer moves it. */
     preferredTier,
     previewTheme,
     showEditor,
@@ -626,11 +611,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   /* Seeding and converting are one effect, because they are the same question
      asked of two inputs: what should be in the editor for this example in this
-     language. Split across an effect and a menu handler they disagreed on
-     mount, where an address naming `x=tsx` sets the syntax in a state update
-     the seeding effect's closure cannot see yet, so the example was seeded as
-     HTML and then shown under a TSX tab. Comparing against what was last put
-     there settles it on the following render instead of needing the two to be
+     language. Split across an effect and a menu handler they disagree on mount,
+     where an address naming `x=tsx` sets the syntax in a state update the
+     seeding effect's closure cannot see yet, so the example is seeded as HTML
+     and then shown under a TSX tab. Comparing against what was last put there
+     settles it on the following render instead of needing the two to be
      ordered. */
   /**
    * Reloads the preview when its bundle changes, in development only.
@@ -640,8 +625,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    * import a module from this site. That script is outside the module graph, so
    * nothing about it hot-reloads: the sandbox around the preview updates on
    * every component change and the preview keeps running whatever it loaded
-   * when the tab was opened. It looks exactly like a fix that did not work, and
-   * it cost most of two days before anyone looked at the file in the middle.
+   * when the tab was opened. It looks exactly like a fix that did not work.
    *
    * `frame.html` is tiny and served `no-store`, and it names both stamped URLs,
    * so its text *is* the version. Compared rather than its `ETag`, which is
@@ -828,20 +812,18 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     [tree],
   )
 
-  /* Driven, not owned, and the second half of that took two goes to get right.
+  /* Driven, not owned, and both of the obvious spellings are wrong.
    *
-   * It was a prop on each row, re-set on every render, so a reader opening a
-   * branch had it closed again by the next one and the chevrons read as dead.
-   * So it became an effect writing the elements, which fixed the chevrons and
-   * broke something worse. The effect
-   * had no dependency array, so it ran after *every* render and put every
-   * branch back to what this file thought it should be. Opening a branch
-   * re-rendered the page, the effect ran, and the branch shut again before the
-   * reader's hand left the mouse.
+   * A prop on each row is re-set on every render, so a reader opening a branch
+   * has it closed again by the next one and the chevrons read as dead. An effect
+   * writing the elements fixes the chevrons and breaks something worse if it
+   * carries no dependency array: it runs after *every* render and puts every
+   * branch back to what this file thinks it should be, so opening a branch
+   * re-renders the page and the branch shuts again before the reader's hand
+   * leaves the mouse.
    *
-   * The rule that was missing: only write when the *reason* to write has
-   * changed. Two effects, because there are two reasons and they are not the
-   * same kind of thing.
+   * The rule: only write when the *reason* to write has changed. Two effects,
+   * because there are two reasons and they are not the same kind of thing.
    */
 
   /* A command about every branch at once. Filtering is a request to see what
@@ -866,9 +848,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
    * *property* on a custom element when the element declares one, so a
    * `<helix-tree-item value={slug}>` written in JSX carries no attributes at
    * all: measured, `element.attributes` is empty and `element.value` is the
-   * slug. The attribute form read `null` for every row, so this matched
-   * nothing and the current family never opened itself either. Two bugs in one
-   * effect, and only the loud one was reported. */
+   * slug. The attribute form reads `null` for every row, so this matches
+   * nothing and the current family never opens itself either. */
   useEffect(() => {
     for (const item of branches()) {
       if (item.value === family.slug) {
@@ -1130,23 +1111,20 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             asked twice.
 
             The name is the accessible one, so the mark beside it is decoration
-            rather than a second reading of the same word. */}
-        {/* `/`, because the mark reads "Fusion". It pointed at `/helix` on the
-            reasoning that the sandbox sits under Helix and the wordmark is the
-            way up, and that is a breadcrumb's job rather than a brand mark's: a
-            lockup that says one thing and goes to another is a link nobody can
-            predict. The site's header has always sent it to `/` and this is the
-            same mark. Helix is one row down in the palette either way. */}
-        {/* **The way out, and the sandbox had none.** The wordmark went home
-            and nothing else went anywhere, so a reader who opened the sandbox
-            from the components page could reach the rest of the site only by
-            going back the way they came. A tool is still a page on this site.
+            rather than a second reading of the same word.
 
-            A button rather than the row of destinations the site's header
-            carries, and ahead of the mark rather than after it. A tool's header
-            is already full of the tool, so what belongs in it is one way out
-            rather than four; and the menu is the outermost thing on the page,
-            so it sits outside the mark that names the page. */}
+            The mark goes to `/`, because it reads "Fusion". Pointing it at
+            `/helix` on the reasoning that the sandbox sits under Helix is a
+            breadcrumb's job rather than a brand mark's: a lockup that says one
+            thing and goes to another is a link nobody can predict. Helix is one
+            row down in the palette either way.
+
+            **A tool is still a page on this site, so it needs a way out.** A
+            button rather than the row of destinations the site's header carries,
+            and ahead of the mark rather than after it. A tool's header is
+            already full of the tool, so what belongs in it is one way out rather
+            than four; and the menu is the outermost thing on the page, so it
+            sits outside the mark that names the page. */}
         <helix-flex align="center" gap="2xs" slot="start">
           <helix-tooltip content="Menu" placement="bottom">
             <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
@@ -1166,16 +1144,14 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               A reader in the sandbox could reach nothing without going back to
               the site first, which is the request that opened #128.
 
-              **With its trigger, which this header refused once and should not
-              have.** The argument was chrome economy: a tool's header has no
-              room for a button the site's has room for, and the hotkey still
-              works because the palette listens on the document. `SiteFind`
-              answers that in its own comment, written for the site and just as
-              true here: a shortcut nobody is told about is a feature for
-              whoever wrote it, and the button is the only thing on the page
-              that says which keys it answers to. Hidden, the palette was
-              something you had to already know about, which is the state #128
-              set out to end rather than to move. */}
+              **With its trigger.** Chrome economy argues for hiding it, a tool's
+              header having no room for a button the site's has room for and the
+              hotkey working anyway because the palette listens on the document.
+              `SiteFind` answers that in its own comment, written for the site
+              and just as true here: a shortcut nobody is told about is a feature
+              for whoever wrote it, and the button is the only thing on the page
+              that says which keys it answers to. Hidden, the palette is
+              something you have to already know about. */}
           <SiteFind findable={findable} />
 
           <helix-tooltip content="Preferences" placement="bottom">
@@ -1363,11 +1339,9 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
                   **And it is the only control for the rail at either width.**
                   On a narrow viewport the rail is a drawer rather than a pane,
-                  and this used to go on calling `setShowRail`, which positions
-                  a pane that is not rendered there: a button that did nothing,
-                  while a second one in the masthead did the work. One control
-                  in one place, saying the same thing at both widths, and the
-                  masthead gets its room back. */}
+                  so `setShowRail` there positions a pane that is not rendered
+                  and the button does nothing. One control in one place, saying
+                  the same thing at both widths. */}
                 <helix-tooltip
                   content={railShown ? 'Hide examples' : 'Show examples'}
                   placement="bottom"
@@ -1434,9 +1408,9 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               that behavior already exists.
 
               Dense, like the toolbar. A bar of the tool says so once and the
-              controls in it follow; this one did not, so its tabs took the
-              default control height and stood eight pixels taller than the file
-              tabs across the split from them. */}
+              controls in it follow; without it these tabs take the default
+              control height and stand eight pixels taller than the file tabs
+              across the split from them. */}
             {showPanel && (
               <helix-tabs
                 data-density="sm"
@@ -1472,15 +1446,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             )}
           </helix-sandbox>
 
-          {/* Asked because the switch discards, which is a stronger reason than
-            the one this used to give.
- 
-            It read that changing the environment runs the text through a
-            converter and that a document with work in it can come back altered.
-            Both syntaxes are authored files now, so the switch loads the other
-            one and whatever was typed here is simply gone. Untouched, there is
-            nothing to lose and the switch is silent.
- 
+          {/* Asked because the switch discards. Both syntaxes are authored
+            files, so it loads the other one and whatever was typed here is
+            simply gone. Untouched, there is nothing to lose and the switch is
+            silent.
+
             Rendered always rather than gated on `pendingSyntax`, because a
             dialog that unmounts cannot animate out, and `open` is what drives
             `showModal()`. */}

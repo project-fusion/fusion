@@ -213,12 +213,10 @@ export interface TourAskDetail {
  * Composed and bubbling, because a stop is slotted into the root and the root
  * has to hear it across that boundary.
  *
- * **A class rather than the raw `CustomEvent` this was.** It dispatched, it
- * bubbled, and it was invisible: a dispatch is matched as
- * `new HelixSomethingEvent(`, so a hand-rolled `CustomEvent` was not held to
- * being declared, and nothing
- * carried it into the manifest. Consumers could hear it and could not find it,
- * which is the trap #75 is about, in its purest form.
+ * **A class rather than a hand-rolled `CustomEvent`.** A dispatch is matched as
+ * `new HelixSomethingEvent(`, so a raw `CustomEvent` is not held to being
+ * declared and nothing carries it into the manifest: consumers can hear it and
+ * cannot find it. See (75).
  */
 export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
   static readonly eventName = 'helix-tour-ask'
@@ -226,24 +224,19 @@ export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
   constructor(detail: TourAskDetail) {
     super(HelixTourAskEvent.eventName, {
       bubbles: true,
-      /* Not cancelable, and this is the one of the four where that was a real
-         promise rather than an idle flag. The name says *ask*, so a consumer had
-         every reason to think refusing it held the tour, and the root's
-         `handleAsk` never read `defaultPrevented`: the tour moved anyway.
-         Honoring it there would not have worked either, and the reason is
-         ordering. The root registers its listener in `connectedCallback` and a
-         consumer registers later, so on a bubbling event both are on the same
-         target and the root's runs first: it would read `defaultPrevented`
-         before the consumer had a chance to set it. `helix-shortcut` gets this
-         right by reading the flag on the element that dispatched, where every
-         listener has already run.
+      /* Not cancelable. The name says *ask*, so refusing it looks like it should
+         hold the tour, and honoring it here could not work: the root registers
+         its listener in `connectedCallback` and a consumer registers later, so on
+         a bubbling event both are on the same target and the root's runs first,
+         reading `defaultPrevented` before the consumer has had a chance to set
+         it. `helix-shortcut` gets this right by reading the flag on the element
+         that dispatched, where every listener has already run.
 
-         **The veto exists and is elsewhere**, which is why this is a
-         downgrade rather than a gap. Moving between stops goes through
+         **The veto exists and is elsewhere.** Moving between stops goes through
          `requestChange` and announces `helix-before-activate`; leaving early
          dispatches `helix-before-close` and reads the flag before writing
-         `open`. Both are honored. This event is the stop telling the root a
-         button was pressed, and the decision is taken one step later. */
+         `open`. This event is the stop telling the root a button was pressed,
+         and the decision is taken one step later. */
       cancelable: false,
       composed: true,
       detail,
@@ -259,10 +252,9 @@ export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
  * way for the sample and come back afterwards, and those are two moments with
  * different work in each.
  *
- * **A class rather than the bare `Event` these were.** They dispatched, they
- * bubbled, `ColorInput` bound both, and neither was held to being declared: two pieces of
- * public API that a consumer could hear and could not find. The check reads
- * `new Event(` now as well.
+ * **A class rather than a bare `Event`.** The check that holds an event to being
+ * declared reads `new Event(` as well as `new HelixSomethingEvent(`, so a
+ * hand-rolled one is public API a consumer can hear and cannot find.
  *
  * No detail, because there is nothing to say beyond that it happened.
  */
@@ -323,18 +315,10 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
  * whose state is a boolean wants an event with a typed detail, not a `String()`
  * call here.
  *
- * **There is no `property` field, and there was one until 27 Aug 2026.** It named
- * which property a request was about, which every verb in this file now says by
- * itself: `helix-before-pin` carried `'pinned'`, `helix-before-collapse` carried
- * `'collapsed'`, the active mixin carried `'active'`. Two families sharing a verb
- * are told apart by the element rather than by a field, `composedPath()[0]`
- * surviving the retarget that `event.target` does not.
- *
- * The one element that sent one verb for two facts was the sandbox root, whose
- * split and whose panel both settled through `helix-before-resize`. They have a
- * verb each now, `helix-before-split` and `helix-before-panel-resize`, which is
- * 294's argument one level down: a name says what moved, and a field that repeats
- * the name is eleven dispatch sites paying for one that needed it. See 306.
+ * **There is no `property` field.** Every verb in this file says by itself which
+ * property a request is about, and two families sharing a verb are told apart by
+ * the element rather than by a field: `composedPath()[0]` survives the retarget
+ * that `event.target` does not. See (306).
  */
 export interface ChangeDetail {
   /** The value after the change. */
@@ -344,35 +328,21 @@ export interface ChangeDetail {
 /**
  * A set is about to make a different child current, and can be refused.
  *
- * **The generic `helix-change` covered this and should not have.** Eleven
- * families that are not form controls announced their state under the word the
- * platform uses for a committed value, which is 294's whole complaint read from
- * the other end: `Tabs` moving to another tab, `Tree` marking another row and
- * `Steps` advancing are not a value changing, they are a set choosing. One word
- * for four questions is what `appearance` was.
+ * **Not a generic `helix-change`.** `Tabs` moving to another tab, `Tree` marking
+ * another row and `Steps` advancing are not a value changing, they are a set
+ * choosing, and the platform's word for a committed value would say the wrong
+ * thing. `active` names which child is current, so `activate` is the verb, and
+ * unlike `change` the platform has no claim on it.
  *
- * `active` names which child is current, so `activate` is the verb, and unlike
- * `change` the platform has no claim on it.
+ * **This fires before the state moves.** Inside a handler `currentTarget.active`
+ * still holds the previous value, and `detail.value` is a proposal another
+ * listener may refuse, so a consumer who only wants to know which child is
+ * current listens for `helix-activate` instead. `helix-select` is not that
+ * notification either: it fires when an item is *chosen*, not when `active` is
+ * assigned.
  *
- * **It has a notification half now, and this said it did not.** *Reversed 28 Aug
- * 2026.* The paragraph here read "there is no notification half: a native
- * `change` would be a lie about what moved, and no other native event means
- * this. The before event is the whole channel." The first half of that is still
- * exactly right, which is why the pair is `helix-activate` and not `change`. The
- * conclusion did not follow: that no *native* word fits is an argument against
- * borrowing one, not an argument against having a notification at all.
- *
- * What the missing half cost is the thing 294 fixed for values and left here.
- * A consumer who only wants to know which child is current now had one channel,
- * and it fires *before* `apply`: `currentTarget.active` still holds the previous
- * value inside the handler, and `detail.value` is a proposal another listener may
- * refuse. Measured across the four families taking this mixin, nothing at all was
- * announced afterwards. `Tabs` and `Tree` looked covered because `helix-select`
- * bubbles up from a child, which fires when an item is *chosen* and not when
- * `active` is assigned; `Steps` and `Video Playlist` had nothing.
- *
- * So the shape is the one `MixinControllerOpen` already has, a cancelable
- * request and a plain notification after the state has moved. See #325.
+ * The shape is the one `MixinControllerOpen` already has, a cancelable request
+ * and a plain notification after the state has moved. See (325).
  */
 export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-activate'
@@ -401,8 +371,7 @@ export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
  * **Prefixed, and it has to be.** `activate` unprefixed is not in any
  * `*EventMap` in the DOM library, checked rather than assumed, but the prefix is
  * what stops an event dispatched inside a shadow root and retargeted to the host
- * being mistaken for something the host's own contents sent. That is the same
- * argument `helix-select` and `helix-resize` are excused under.
+ * being mistaken for something the host's own contents sent.
  */
 export class HelixActivateEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-activate'
@@ -531,13 +500,9 @@ export class HelixBeforeEditEvent extends CustomEvent<ChangeDetail> {
  * carries the detail because at the moment it fires the value is not on the
  * element yet.
  *
- * **It replaced `helix-change` and `helix-input` on the value controls**, which
- * were one mechanism under two names chosen by `announcesInput`. The name said
- * *phase* and the flag meant *granularity*, so a consumer reading "change" as
- * "the reader is done" wired a request to `onhelix-change` and got one per
- * character. Granularity is now what the platform already says it is, `input`
- * against `change`, and `announcesInput` picks which native one fires rather
- * than which name this carries. See 294.
+ * **`announcesInput` picks which native notification fires, not which name this
+ * carries.** Granularity is the platform's own distinction, `input` against
+ * `change`; the request is always this one event. See (294).
  */
 export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-change'
@@ -555,22 +520,20 @@ export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
 /**
  * A checked state is about to change, and the change can be refused.
  *
- * **Its own event rather than a `helix-before-change` carrying a boolean**, and
- * the reason is recorded rather than aesthetic. Reported through the value
- * event the state arrived as `String(checked)`, so a consumer received the
- * string `"false"`, which is truthy, and this library's own checkbox group
- * decoded it with `detail.value === 'true'`. A test asserting the value would
- * have passed on that bug. A control whose state is a boolean wants an event
- * with a typed boolean in it.
+ * **Its own event rather than a `helix-before-change` carrying a boolean.**
+ * Through the value event the state arrives as `String(checked)`, so a consumer
+ * receives the string `"false"`, which is truthy, and a test asserting the value
+ * passes on that bug. A control whose state is a boolean wants an event with a
+ * typed boolean in it.
  *
  * The notification is native, as it is for a value: the control relays `change`
  * from the inner input and announces `input` beside it, so `onChange` reads
  * `currentTarget.checked` and gets a boolean from the platform.
  *
- * It also ends a collision. Checkbox Group listened for its boxes' change and
- * dispatched its own under the same name from the same host, so it had to call
- * `stopImmediatePropagation` to keep a consumer from receiving one box's
- * boolean alongside the whole set. Two names, two facts.
+ * It also ends a collision: Checkbox Group listened for its boxes' change and
+ * dispatched its own under the same name from the same host, so it needed
+ * `stopImmediatePropagation` to keep a consumer from receiving one box's boolean
+ * alongside the whole set. Two names, two facts.
  */
 export class HelixBeforeToggleEvent extends CustomEvent<ToggleDetail> {
   static readonly eventName = 'helix-before-toggle'
@@ -681,9 +644,8 @@ export class HelixConsoleEvent extends CustomEvent<ConsoleDetail> {
     super(HelixConsoleEvent.eventName, {
       bubbles: true,
       /* Not cancelable, for the reason `helix-resize` is not: a log line the
-         frame already wrote is a fact being relayed, and this element's own
-         comment at the dispatch says "relayed rather than acted on". Nothing
-         read the result. */
+         frame already wrote is a fact being relayed rather than a proposal, and
+         nothing reads the result. */
       cancelable: false,
       composed: true,
       detail,
@@ -718,12 +680,11 @@ export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
   constructor(detail: ResizeDetail) {
     super(HelixResizeEvent.eventName, {
       bubbles: true,
-      /* Not cancelable, and it was until 27 Aug 2026. A measurement is not a
-         proposal: the content is that tall whether or not anybody wants it to
-         be, and neither dispatcher, `Heatmap` nor `Sandbox.Preview`, ever read
-         the result. So `preventDefault()` on it was accepted and ignored, which
-         is worse than refusing the call: a consumer had every reason to believe
-         they had stopped something. */
+      /* Not cancelable. A measurement is not a proposal: the content is that
+         tall whether or not anybody wants it to be, and neither dispatcher,
+         `Heatmap` nor `Sandbox.Preview`, reads the result. Accepting
+         `preventDefault()` and ignoring it is worse than refusing the call, a
+         consumer having every reason to believe they had stopped something. */
       cancelable: false,
       composed: true,
       detail,
@@ -735,15 +696,14 @@ export class HelixResizeEvent extends CustomEvent<ResizeDetail> {
  * Fired when a header crosses the threshold between resting at the top of the
  * page and floating over it.
  *
- * **State a consumer used to read off an attribute, said out loud instead.**
- * The header reflected this as `data-scrolled` on its own host, which is an
- * attribute nobody rendered: a server sends the element without it and the
- * element adds it on upgrade, so a framework hydrating the page finds markup
- * that no longer matches what it sent. The threshold now lives in a custom
- * state, which is deliberately not in the DOM and therefore not something a
+ * **The threshold lives in a custom state, and is announced rather than
+ * reflected.** A `data-scrolled` on the host is an attribute nobody rendered: a
+ * server sends the element without it and the element adds it on upgrade, so a
+ * framework hydrating the page finds markup that no longer matches what it sent.
+ * A custom state is deliberately not in the DOM and therefore not something a
  * hydration pass can disagree with.
  *
- * That closes the observability the attribute accidentally provided. A
+ * That closes the observability an attribute would accidentally provide. A
  * `MutationObserver` can watch an attribute and there is no equivalent for
  * `ElementInternals.states`, so a component holding a boolean nothing can read
  * is a component with a private opinion its consumers demonstrably need: the
@@ -940,8 +900,8 @@ export class HelixReadEvent extends CustomEvent<ReadDetail> {
  *
  * Cancelable, and refusing it leaves the order alone, which is what makes a
  * server-side sort expressible: the consumer refuses the local reorder, fetches,
- * and hands back a new set. In controlled mode nothing is written whatever the
- * answer, and this is the element reporting that a heading was clicked.
+ * and hands back a new set. This is the element reporting that a heading was
+ * clicked, before it acts on it.
  *
  * Not `helix-change`: nothing about the data changed, only the order it is read
  * in, and a consumer listening for changes to a value should not hear a sort.
@@ -1035,18 +995,13 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
 /**
  * Every event this file publishes, and the one place a new one is added.
  *
- * The map below is derived from this rather than written beside it. Kept by
- * hand, the two drifted: `helix-filter` and `helix-navigate` were dispatched by
- * the calendar, the listbox and the pagination and were missing from the map
- * for weeks, so the one thing the augmentation exists to do was not done for
- * them and a consumer writing `addEventListener('helix-navigate', …)` got
- * `Event` and had to reach into `detail` through a cast. Nothing failed, which
- * is why two of the nine went missing.
- *
- * Derived, a class that is in here is typed and a class that is not is absent
- * from both halves at once, so the two cannot disagree. The build fails
- * on an exported event class left out of this object, which is the
- * only step left that can be forgotten.
+ * The map below is derived from this rather than written beside it, so a class
+ * that is in here is typed and one that is not is absent from both halves at
+ * once. Kept by hand the two drifted, and nothing failed when they did: a
+ * consumer writing `addEventListener('helix-navigate', …)` got `Event` and had
+ * to reach into `detail` through a cast. The build fails on an exported event
+ * class left out of this object, which is the only step left that can be
+ * forgotten.
  */
 const registry = {
   HelixActivateEvent,

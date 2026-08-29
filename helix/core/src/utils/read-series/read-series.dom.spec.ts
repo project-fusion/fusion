@@ -210,7 +210,7 @@ describe('reading a grid built from roles', () => {
   })
 
   test('a document table still takes the table path', () => {
-    // The two shapes stay separate; adding one did not change the other.
+    // The two shapes stay separate.
     const series = readSeries(
       table(`<table><tbody><tr><th scope="row">A</th><td>7</td></tr></tbody></table>`),
     )

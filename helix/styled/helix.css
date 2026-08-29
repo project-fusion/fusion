@@ -1,11 +1,9 @@
 /*
  * Every layer Helix needs, in one import.
  *
- * **Four files in a required order is a list somebody writes three of**, which
- * is not a prediction: `installation.mdx`, `introduction.mdx` and the agent
- * page each listed three and omitted `primitives.css`, under a line reading
- * "each one needs what is above it". `tokens.css` refers to a primitive 235
- * times, so a consumer who followed the steps got all 177 semantic tokens
+ * **Four files in a required order is a list somebody writes three of**, and
+ * `primitives.css` is the one left out: `tokens.css` refers to a primitive 235
+ * times, so a consumer who lists the other three gets all 177 semantic tokens
  * declared and every one resolving to `rgba(0, 0, 0, 0)`, and no theming at
  * all, every public `--helix-seed-*` being read in that file and nowhere else.
  *

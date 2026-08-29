@@ -3,7 +3,7 @@
   /* An inline grid rather than an inline flex, and one cell: both children take
      `grid-area: 1 / 1`, so a mark is centered over the circles with no offsets
      to keep in step with the size. Still inline, so a loader beside text sits
-     on the line the way it did. */
+     on the line with it. */
   display: inline-grid;
   flex-shrink: 0;
   place-items: center;
@@ -103,11 +103,6 @@
   }
 }
 
-/* Reduced motion still needs the work to read as outstanding, so the turn slows
-   to a crawl rather than stopping: a frozen loader reads as broken rather than
-   as busy. Scaled from a token instead of a raw duration, and it has to be
-   declared here at all because the base layer's blanket rule is a document rule
-   and does not reach into a shadow root. */
 /* The swell is the first thing to go: it says nothing the turn does not, and a
    reader who asked not to be moved should not be given two motions where one
    was already a concession. */
@@ -118,6 +113,11 @@
   }
 }
 
+/* Reduced motion still needs the work to read as outstanding, so the turn slows
+   to a crawl rather than stopping: a frozen loader reads as broken rather than
+   as busy. Scaled from a token instead of a raw duration, and it has to be
+   declared here at all because the base layer's blanket rule is a document rule
+   and does not reach into a shadow root. */
 @media (prefers-reduced-motion: reduce) {
   [part="svg"] {
     animation-duration: calc(var(--helix-duration-slow) * 12);
@@ -148,12 +148,6 @@
   justify-content: center;
 }
 
-/* The mark is already still, and this rule used to claim credit for it.
- *
- * `rotate: none` is the initial value, so it does nothing, and the mark is a
- * *sibling* of the animated element rather than a descendant of it: it was
- * never going to turn. A comment explaining why an inert declaration is
- * necessary is worse than the declaration, because the next reader believes it. */
 [part="mark"] ::slotted(*) {
   block-size: 100%;
   inline-size: 100%;
@@ -164,15 +158,7 @@
  * The turning rim is the one thing this component was named for, and it is
  * wrong around a wordmark: a logo with something orbiting it reads as chrome
  * bolted to the brand rather than as the brand waiting. Take the arc away and
- * what is left is already the shape, because the ring and the mark have been
- * breathing under the turn since the day the turn was written. This appearance
- * is those two, uncovered.
- *
- * The ring takes the mark's amplitude rather than its own. Its shallow swell was
- * tuned to sit under a moving arc, where it only had to keep the middle from
- * being dead; with nothing over it, 0.12 to 0.24 is a circle that appears not to
- * move. And it has to carry the whole thing on its own whenever nothing is
- * slotted, which is the case every consumer gets before they add their logo. */
+ * what is left is the mark, already breathing under the turn. */
 :host([variant="pulse"]) [part="indicator"] {
   display: none;
 }
@@ -181,15 +167,7 @@
   animation: none;
 }
 
-/* The ring goes too.
- *
- * It was carrying the pulse whenever nothing was slotted, which made this
- * appearance a circle that breathed with a logo inside it: two things moving,
- * and the outer one is the chrome this appearance exists to remove. What is
- * left is the mark, which is what a reader is waiting on. A pulse with nothing
- * slotted therefore shows nothing, and that is the honest reading of asking for
- * a mark that pulses and giving it no mark. */
-/* And bigger, because the mark is now the whole of it.
+/* Bigger, because the mark is the whole of it.
  *
  * The sizes are drawn for a ring with something small in the middle: at
  * `loader-md` the mark is 40% of 24 pixels, which is under ten. On its own,
@@ -208,6 +186,10 @@
   --_loader-size: calc(var(--helix-size-loader-lg) * 3);
 }
 
+/* The ring goes too: a circle breathing around a breathing logo is two things
+ * moving, and the outer one is the chrome this appearance exists to remove. A
+ * pulse with nothing slotted therefore shows nothing, which is the honest
+ * reading of asking for a mark that pulses and giving it no mark. */
 :host([variant="pulse"]) [part="track"] {
   display: none;
 }
@@ -246,19 +228,19 @@
  * state is on the host through `ElementInternals` and is what actually
  * announces the wait, so nothing is lost by going still. */
 @media (prefers-reduced-motion: reduce) {
-  /* The mark, because the mark is the whole of this appearance now. The rule
-     that was here answered for the ring, which no longer draws, so a reader who
-     asked for less motion still got a fading logo. */
+  /* The mark, because the mark is the whole of this appearance: the ring no
+     longer draws, so a rule answering for it would leave a fading logo. */
   :host([variant="pulse"]) [part="mark"] {
     animation: none;
     opacity: 1;
   }
 }
 
-/* Print: a spinner is a promise that something is coming, which on paper it is not.
+/* Print: a spinner is a promise that something is coming, which on paper it is
+ * not.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. See (165). */
 @media print {
   :host {
     display: none;

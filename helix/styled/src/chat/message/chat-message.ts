@@ -42,13 +42,10 @@ export class HelixChatMessage extends HelixHeadlessChatMessage {
   /**
    * Where the turn's surface ends.
    *
-   * **A bubble is one answer and not the only one, and the category has moved.**
-   * Two people messaging read as two columns of bubbles, which is what the form
-   * has looked like since it existed. An assistant answering does not: the reply
-   * is a paragraph, often a long one with code and lists in it, and every AI
-   * surface worth copying sets it as prose with the reader's own turns in
-   * bubbles beside it. A component that can only draw bubbles cannot render the
-   * conversation most people are now building.
+   * **A bubble is one answer and not the only one.** Two people messaging read
+   * as two columns of bubbles; an assistant answering does not, the reply being
+   * a paragraph with code and lists in it, set as prose with the reader's own
+   * turns in bubbles beside it.
    *
    * - `filled` is the default and is told apart by its own ground, which is the
    *   bubble.
@@ -57,12 +54,10 @@ export class HelixChatMessage extends HelixHeadlessChatMessage {
    *   assistant's side of a conversation, and for any turn long enough that a
    *   fill reads as a wall.
    *
-   * **On this tier, because it is where the surface ends and nothing else.**
-   * `separation` stays off the headless tier for the reason every painted axis
-   * does: that tier has no ground to end. The two
-   * values are a subset of the registry's four; `elevated` and `outlined` are
-   * available and neither is a thing a turn should be, a lifted message reading
-   * as a card and an outlined one as an input.
+   * **On this tier**, because `separation` is paint and the headless tier has
+   * no ground to end. The two values are a subset of the registry's four:
+   * `elevated` reads as a card and `outlined` as an input, so neither is a
+   * thing a turn should be.
    */
   @property({ reflect: true })
   separation?: 'filled' | 'plain'

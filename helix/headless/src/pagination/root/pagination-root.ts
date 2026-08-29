@@ -105,13 +105,12 @@ const fill = (
  * result that has not changed. A consumer driving the view has to be able to
  * hear that without being told an answer changed.
  *
- * **The count and the page-size control are their own elements.** They were
- * briefly a part and a pair of slots in here, and a slot can only offer one
- * place: at one end of one row, in one order, on one axis. `Pagination.Summary`
- * and `Pagination.Size` sit beside this one instead, so the direction and the
- * order of a footer are the consumer's, which is what they were always going to
- * want. `total` and `page-size` stay here for the arithmetic below and nothing
- * else.
+ * **The count and the page-size control are their own elements.** A slot can
+ * only offer one place: at one end of one row, in one order, on one axis.
+ * `Pagination.Summary` and `Pagination.Size` sit beside this one instead, so
+ * the direction and the order of a footer are the consumer's, which is what
+ * they were always going to want. `total` and `page-size` stay here for the
+ * arithmetic below and nothing else.
  *
  * **A single page renders nothing.** A control offering one page offers no
  * navigation, and the row it sits in should close over it rather than hold a
@@ -121,16 +120,16 @@ const fill = (
  * framework reports the difference; a custom state carries the same fact to a
  * stylesheet and none of that to the DOM.
  *
- * **And a page change is announced.** Nothing did: moving the page moves
- * `aria-current` onto a different element, and a screen reader does not announce
- * that, so a reader who pressed 5 heard the word "5" from the button they were
- * on and nothing at all about having arrived. A polite live region says where
- * they now are. It ships empty and is filled only on a change, because a region
- * populated as it enters the document announces itself on arrival.
+ * **And a page change is announced.** Moving the page moves `aria-current` onto
+ * a different element, which a screen reader does not announce, so a reader who
+ * pressed 5 hears the word "5" from the button they were on and nothing at all
+ * about having arrived. A polite live region says where they now are. It ships
+ * empty and is filled only on a change, because a region populated as it enters
+ * the document announces itself on arrival.
  *
- * `page` is the controlled property and `default-page` seeds one the element
- * owns. Naming `page` is a claim of ownership: the element announces and waits
- * to be told, which is what a consumer paging through a router already wants.
+ * `page` is what the element holds and `default-page` seeds it. A consumer
+ * paging through a router refuses `helix-navigate` and assigns their own, which
+ * is how they take the decision.
  *
  * @since 0.1.0
  * @status experimental
@@ -216,19 +215,17 @@ export class HelixHeadlessPagination extends HelixElement {
    * The page on show, one-based.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
-   * the page on show; writing declares it the consumer's, and `default-page`
-   * seeds one the element owns.
+   * the page on show; writing sets it, and `default-page` seeds one the element
+   * keeps until somebody does.
    *
    * **Clamped on the way out, because "the page on show" is what it says it
-   * gives.** It returned whatever had been written, so `default-page="99"` on a
-   * ten-page result rendered page 10, marked page 10 with `aria-current`, and
-   * reported 99. A consumer syncing their query from this read a page that does
-   * not exist while the control in front of them said otherwise. Not a
+   * gives.** Returning whatever was written means `default-page="99"` on a
+   * ten-page result renders page 10, marks page 10 with `aria-current`, and
+   * reports 99, so a consumer syncing their query from this reads a page that
+   * does not exist while the control in front of them says otherwise. Not a
    * far-fetched value: it is a bookmarked link after the result shrank.
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
-   *
-   *
    */
   @property({ type: Number })
   get page(): number {
@@ -315,10 +312,10 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * The reading shown in `compact`, with `{page}` and `{pages}` filled in.
    *
-   * The word went: it read "Page 7 of 24" and the landmark it sits in is
-   * already named "Pagination", so the noun was said twice to a screen reader
-   * and took a third of the width from a control whose whole reason for
-   * existing is that the row is narrow. The numbers are the reading.
+   * No noun: the landmark this sits in is already named "Pagination", so
+   * "Page 7 of 24" says it twice to a screen reader and takes a third of the
+   * width from a control whose whole reason for existing is that the row is
+   * narrow. The numbers are the reading.
    */
   @property({ attribute: 'status-label' })
   statusLabel = '{page} of {pages}'
@@ -393,7 +390,7 @@ export class HelixHeadlessPagination extends HelixElement {
     return 1
   }
 
-  /** The page on show. `page` does the clamping now; this is the older name. */
+  /** The page on show, which `page` has already clamped. */
   private get current(): number {
     return this.page
   }
@@ -458,9 +455,8 @@ export class HelixHeadlessPagination extends HelixElement {
    * Asks to move, and reports whether the request stood.
    *
    * Announced before it is applied, so `preventDefault()` is a refusal and
-   * nothing moves. In controlled mode nothing is written whatever the answer:
-   * the consumer holds the page and this is the element telling them a reader
-   * asked for another one.
+   * nothing moves. A consumer who holds the page refuses it and assigns their
+   * own.
    */
   private request(next: number): boolean {
     if (next === this.current || next < 1 || next > this.count) {
@@ -501,11 +497,9 @@ export class HelixHeadlessPagination extends HelixElement {
        beats internals, so naming it here costs them nothing. */
     hostAria(this.internals, { label: this.label, role: 'navigation' })
 
-    /* Through `toggleState`, which carries the feature test this wrote out
-       itself until every state in the library came through one door. An engine
-       without `CustomStateSet` gets a control that renders its one page instead
-       of disappearing, which is the behavior this had before and is not
-       broken. */
+    /* Through `toggleState`, which carries the feature test: an engine without
+       `CustomStateSet` gets a control that renders its one page instead of
+       disappearing, which is degraded rather than broken. */
     this.toggleState('empty', this.count <= 1)
   }
 
@@ -581,9 +575,9 @@ export class HelixHeadlessPagination extends HelixElement {
    * at which it stops being possible. It would also make `Pagination` depend on
    * `Menu` and `Popover` for a case a button already covers.
    *
-   * So it is announced rather than hidden, which is the change from when it was
-   * a decoration: a control a reader can reach has to be in the tree, and the
-   * label naming its destination is the whole affordance.
+   * So it is announced rather than hidden: a control a reader can reach has to
+   * be in the tree, and the label naming its destination is the whole
+   * affordance.
    */
   private renderGap(hidden: Hidden): TemplateResult {
     const to = Math.round((hidden.from + hidden.to) / 2)

@@ -10,7 +10,7 @@ type Constructor<T> = new (...args: any[]) => T
 /**
  * How much ink a control claims and what it means, for the three that are buttons.
  *
- * **The first mixin in `helix/styled`, and it belongs here rather than in core.**
+ * **It belongs here rather than in `core`.**
  * `helix/core` is consumed by the headless tier, which must never take styling,
  * and these two properties are purely presentational: they carry no behavior,
  * no ARIA and no form participation, only which rules a stylesheet applies.
@@ -40,12 +40,8 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
     /**
      * How filled it is drawn.
      *
-     * **This was `appearance`, and the docstring above it always said what it
-     * really was.** "How filled it is drawn", sitting beside `tone`, "What it
-     * means": the axis was named correctly in prose and filed under the word
-     * four axes shared. A Card's `outlined` says where a surface ends and this
-     * one says how much ink a control claims, and one word cannot keep saying
-     * both.
+     * Not `separation`: a Card's `outlined` says where a surface ends, and this
+     * one says how much ink a control claims. One word cannot say both.
      *
      * Reflected because the stylesheet selects on it, and undefaulted because
      * it reflects: a reflected property with a default writes its attribute

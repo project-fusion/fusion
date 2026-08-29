@@ -1,7 +1,7 @@
 /* The Helix gallery: the lattice its hero is drawn on, and the grid of families.
  *
  * The lattice is here rather than in the shared hero because it is a fact about
- * *this* gallery: sixty-five cards are drawn on that field, so repeating it
+ * *this* gallery: the cards below are drawn on that field, so repeating it
  * behind the heading makes the hero the top of the same sheet. Insights takes
  * the same hero structure and none of the texture, which is why the structure
  * is global and this is not.
@@ -44,15 +44,15 @@
  *  light 12%    224      215     224
  * ```
  *
- * So in light the two forms agreed to within five levels and the claim looked
- * true, while in dark the rest state painted one level above the page and the
- * hover painted six. Two buttons that were, correctly, reported as having no
- * visible hover at all: the step was five levels where light mode's is twenty.
- * It is the same shape as #145, a step that is symmetric in the measure and not
- * in the eye, and the fix is to stop measuring in the wrong space rather than to
- * tune a percentage until dark looks right.
- * It is not the page's own color, which was tried here once and removed: the
- * page color is a hole cut through the band, and these are recesses in it.
+ * In light the two forms agree to within five levels, so the claim looks true
+ * there; in dark, oklab puts the rest state one level above the page and the
+ * hover six, a step of five where light mode's is twenty, which is a hover
+ * nobody can see. Same shape as #145, a step symmetric in the measure and not
+ * in the eye: the fix is to mix in the right space rather than to tune a
+ * percentage until dark looks right.
+ *
+ * Not the page's own color: the page color is a hole cut through the band, and
+ * these are recesses in it.
  *
  * Scoped to this section, and it has to stay scoped. A background hook set on a
  * container reaches every control inside it, so a solid button put in this hero
@@ -68,8 +68,8 @@
   /* And the hover, because setting the fill takes the hover with it.
    *
    * Every state's rule reads `--button-background-color`, which is what makes it
-   * a fill rather than a resting color, so a hero that set one had two controls
-   * that did not move under the pointer at all. Measured: rest and hover both
+   * a fill rather than a resting color, so setting one alone leaves a control
+   * that does not move under the pointer at all. Measured: rest and hover both
    * `oklab(0.94 0 0)`, the same value to the last digit.
    *
    * The step is the same one the library takes for a resting wash of six, twice

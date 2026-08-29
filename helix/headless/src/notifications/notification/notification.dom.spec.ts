@@ -38,10 +38,9 @@ describe('read state', () => {
   })
 
   test('the state is recorded, since unread is a visual state a stylesheet must see', async () => {
-    /* And recorded rather than reflected. `read` was a reflected property until
-       27 Aug 2026, so an item served `default-read` grew the attribute on its
-       first update: a hydration mismatch, and an attribute a copy-paste then
-       re-reads as a declaration. */
+    /* And recorded rather than reflected: reflecting it grows an attribute on
+       an item served `default-read` at its first update, which is a hydration
+       mismatch and a declaration a copy-paste then re-reads. */
     const element = await item()
     element.markRead(true)
     await element.updateComplete
@@ -62,10 +61,9 @@ describe('read state', () => {
   })
 
   test('a declared `read` is a seed, and the element still marks itself', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Declaring the property is a seed and not a claim of ownership: control is
+       an action, so the element applies it and a consumer refuses to take the
+       decision. See (294). */
     const element = await item('read')
     element.markRead(false)
     expect(element.read).toBe(false)
@@ -94,12 +92,10 @@ describe('read state', () => {
 /**
  * The timestamp is delegated whole, so what is asserted here is the delegation.
  *
- * **These tests read the child rather than a `time` part, and two of them passed
- * for the wrong reason before they were rewritten.** "an item with no `at` shows
- * no time" asked `part(element, 'time')` for null, and once the timestamp moved
- * into `helix-format-date` that lookup answers null for every item, timestamped
- * or not: an assertion that cannot fail. What the reading itself does, and when
- * it expires, is `format-date-root.dom.spec.ts` and `elapsed-time.pure.spec.ts`.
+ * **Read the child, never a `time` part.** `part(element, 'time')` answers null
+ * for every item since the timestamp moved into `helix-format-date`, so a spec
+ * asserting null there cannot fail. What the reading itself does, and when it
+ * expires, is `format-date-root.dom.spec.ts` and `elapsed-time.pure.spec.ts`.
  */
 describe('the timestamp', () => {
   const stamp = (element: HTMLElement) =>

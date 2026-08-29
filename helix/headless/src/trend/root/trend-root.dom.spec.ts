@@ -16,11 +16,10 @@ const word = (host: HTMLElement): string => part(host, 'direction')?.textContent
 
 /* The glyph, by its path rather than by a name.
  *
- * The mark was a `<helix-headless-icon name="arrow-up">` and is now an inlined `<svg>`
- * from a named import, so there is no name to read: the element indexed the
- * whole icon set at runtime and shipped all of it to every consumer. What
- * identifies a glyph now is the path it draws, which is what the import
- * carries. */
+ * The mark is an inlined `<svg>` from a named import rather than a
+ * `<helix-headless-icon name="arrow-up">`, which indexed the whole icon set at
+ * runtime and shipped all of it to every consumer. So there is no name to read,
+ * and what identifies a glyph is the path it draws. */
 const arrow = (host: HTMLElement): string =>
   Object.entries({ 'arrow-down': arrowDown, 'arrow-up': arrowUp, minus }).find(([, icon]) =>
     part(host, 'icon')?.innerHTML.includes(icon.content.slice(0, 40)),
@@ -45,7 +44,7 @@ describe('trend', () => {
 
   test('nothing to report is neutral, and so is a word nobody recognizes', async () => {
     // An attribute is a string and a consumer can write anything into it, so an
-    // unrecognised direction has to draw something rather than throw in render.
+    // unrecognized direction has to draw something rather than throw in render.
     expect(word(await trend(''))).toBe('Unchanged')
     expect(word(await trend('direction="neutral"'))).toBe('Unchanged')
     expect(word(await trend('direction="sideways"'))).toBe('Unchanged')

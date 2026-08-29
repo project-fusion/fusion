@@ -1,8 +1,7 @@
 /* **A panel, not a hero, and the reason is a contract rather than a taste.** A
    chart's own inks (its ticks, its labels, its gridlines) are solved against the
    page surfaces, so standing one on an accent band puts every one of them on a
-   ground nothing measured them for: the first version of this file did exactly
-   that and the axis labels came out as gray on blue.
+   ground nothing measured them for: axis labels come out gray on blue.
 
    Which leaves the materials to show themselves, which is the honest test
    anyway. Glass is not a tint here: what it is for is the gridlines reading

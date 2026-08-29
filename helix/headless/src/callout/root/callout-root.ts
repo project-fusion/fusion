@@ -48,11 +48,10 @@ export class HelixHeadlessCallout extends HelixElement {
   /**
    * What kind of attention the passage needs.
    *
-   * **`severity` was a sixth spelling of `tone`**, which is the axis for what a
-   * thing means, and a subset of it: a callout reports a status and never a
-   * brand role, so it takes four of the seven. One word per axis is the whole
-   * of the registry, and two words for one axis is how `tone` had drifted into
-   * five incompatible value sets before anything held it.
+   * `tone` is the axis for what a thing means, and this is a subset of it: a
+   * callout reports a status and never a brand role, so it takes four of the
+   * seven values. One word per axis is the whole of the registry, which is why
+   * there is no `severity` beside it.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'success' | 'warning'

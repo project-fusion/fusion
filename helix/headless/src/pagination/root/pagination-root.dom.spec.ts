@@ -118,7 +118,7 @@ describe('pagination', () => {
   })
 
   test('a gap is announced, because a reader can reach it', async () => {
-    // It was `aria-hidden` while it was a decoration. A control cannot be.
+    // A gap is a control, and a control cannot be `aria-hidden`.
     const nav = await mount(
       '<helix-headless-pagination default-page="7" pages="12"></helix-headless-pagination>',
     )
@@ -173,10 +173,9 @@ describe('pagination state', () => {
   })
 
   test('declaring `page` seeds it, and the element still moves', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action rather than a mode: declaring the property seeds it,
+       the element still applies, and a consumer takes the decision by refusing
+       the event. See (294). */
     const nav = await mount(
       '<helix-headless-pagination page="2" pages="12"></helix-headless-pagination>',
     )
@@ -371,9 +370,9 @@ describe('pagination ends', () => {
 })
 
 describe('pagination count', () => {
-  /* The count itself moved to `Pagination.Summary`, so what is left to hold the
-     root to is the arithmetic it kept: `total` and `page-size` are still how a
-     consumer who holds a result set states the page total. */
+  /* The count itself is `Pagination.Summary`'s. What the root keeps is the
+     arithmetic: `total` and `page-size` are how a consumer who holds a result
+     set states the page total. */
   test('the page count falls back to the two, so `pages` need not be given', async () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="1" page-size="25" total="248"></helix-headless-pagination>',
@@ -391,18 +390,15 @@ describe('pagination count', () => {
   })
 
   test('the root reads nothing out, because that is the summary’s job', async () => {
-    // It was a part in here and a pair of slots, and a slot can only offer one
-    // place: at one end of one row, in one order, on one axis.
+    // A slot can only offer one place: at one end of one row, in one order, on
+    // one axis.
     const nav = await mount(
       '<helix-headless-pagination default-page="4" page-size="25" total="248"></helix-headless-pagination>',
     )
     expect(part(nav, 'count')).toBeNull()
-    /* Narrowed 26 Aug 2026, when the four end controls gained icon slots. This
-       read `querySelector('slot')` and meant "nothing here offers a place for
-       content", which is the decision the comment above records: a summary
-       slotted into this row can sit at one end of one axis and nowhere else. A
-       slot standing in for a caret offers no such place, so what the assertion
-       is about is an unnamed slot and a slot holding content, not the element. */
+    /* An unnamed slot, not any slot: the four end controls carry icon slots, and
+       a slot standing in for a caret offers no place for content the way a slot
+       for a summary would. */
     expect(nav.shadowRoot?.querySelector('slot:not([name])')).toBeNull()
     const named = [...(nav.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) =>
       one.getAttribute('name'),
@@ -413,10 +409,10 @@ describe('pagination count', () => {
 
 describe('pagination out of range', () => {
   test('`page` reports the page on show, not the one it was handed', async () => {
-    /* It returned whatever had been written, so a ten-page result rendered page
-       10, marked page 10, and reported 99: a consumer syncing their query from
-       it read a page that does not exist while the control said otherwise. Not
-       a far-fetched value, either. It is a bookmarked link after the result
+    /* Returning whatever was written means a ten-page result renders page 10,
+       marks page 10, and reports 99, so a consumer syncing their query from it
+       reads a page that does not exist while the control says otherwise. Not a
+       far-fetched value, either: it is a bookmarked link after the result
        shrank. */
     const nav = await mount(
       '<helix-headless-pagination default-page="99" page-size="25" total="248"></helix-headless-pagination>',
@@ -483,9 +479,9 @@ describe('pagination announcements', () => {
   })
 
   test('says where the reader now is, once they have moved', async () => {
-    /* Nothing did: moving the page moves `aria-current` onto a different
-       element, and a screen reader does not announce that, so a reader who
-       pressed 5 heard the word from the button they were on and nothing about
+    /* Moving the page moves `aria-current` onto a different element, and a
+       screen reader does not announce that: without the live region a reader who
+       pressed 5 hears the word from the button they were on and nothing about
        having arrived. */
     const nav = await mount(
       '<helix-headless-pagination default-page="4" pages="12"></helix-headless-pagination>',

@@ -73,8 +73,8 @@ describe('a megamenu taking a destination', () => {
   }
 
   test('shuts, rather than following the reader onto the page they chose', async () => {
-    /* Nothing closed it before. With a router that navigates in place the panel
-       stayed up, covering the page it had just been asked to go to. */
+    /* With a router that navigates in place, a panel nothing closes stays up
+       over the page it was just asked to go to. */
     const host = await opened()
     await clickItem(host)
     expect(host.open).toBe(false)
@@ -139,8 +139,7 @@ describe('a megamenu opening on hover', () => {
        thing that clears it is `disconnectedCallback`. A test that leaves its
        panel up hands the next one a page where another megamenu is the one
        showing, which changes the open delay from 120ms to 0 for whoever comes
-       next. That is the cross-test coupling that made the touch test below
-       fail on a runner and pass on every desk. */
+       next: cross-test coupling that fails on a runner and passes on a desk. */
     host.dispatchEvent(pointer('pointerleave', 'mouse'))
     await settle(300)
     await host.updateComplete
@@ -148,7 +147,7 @@ describe('a megamenu opening on hover', () => {
   })
 
   test('and a touch does not open it, because a tap has to', async () => {
-    /* A touch screen synthesises an enter on tap. Acting on it would open the
+    /* A touch screen synthesizes an enter on tap. Acting on it would open the
        panel and let the click behind it close the panel again, so a tap would
        do nothing at all: the commonest way a hover nav is unusable on a phone. */
     const host = await section()
@@ -158,12 +157,11 @@ describe('a megamenu opening on hover', () => {
     expect(host.open).toBe(false)
 
     /* The `pointerType` a listener on this host actually receives, folded into
-       the assertion because bun prints the compared value and nothing else.
-       This failed on runners and nowhere else, reporting `expected true to be
-       false`, which cannot say whether the guard ran and let a touch through
-       or the synthetic `pointerType` did not survive dispatch in that browser.
-       `Object.defineProperty` on a plain `Event` is what carries it, and that
-       is a browser behavior rather than a component one. */
+       the assertion because bun prints the compared value and nothing else. A
+       bare `expected true to be false` cannot say whether the guard ran and let
+       a touch through or the synthetic `pointerType` did not survive dispatch
+       in that browser. `Object.defineProperty` on a plain `Event` is what
+       carries it, and that is a browser behavior rather than a component one. */
     let carried: unknown
     host.addEventListener('pointerenter', (event) => {
       carried = (event as PointerEvent).pointerType
@@ -350,14 +348,9 @@ describe('a megamenu whose trigger the consumer slotted', () => {
   test('the trigger is light DOM, which is the reason to slot one at all', async () => {
     /* Not asserted by looking for the default button's absence: slot fallback
        content lives in the shadow root whether or not the slot is filled, and
-       the platform simply stops rendering it.
-     
-       What matters is that the word is in the consumer's own tree. No
-       declarative shadow DOM ships here, so a `label` on the host renders
-       nothing until the element upgrades, and a server-rendered navigation had
-       a hole where its first item should be. A slotted trigger arrives with the
-       HTML.
-     
+       the platform simply stops rendering it. What matters is that the word is
+       in the consumer's own tree.
+
        That the click reaches the panel is not asserted here and cannot be:
        happy-dom does not retarget events through a slot, so a press on this
        button never reaches the `@click` on the slot in the shadow root. It does
@@ -369,17 +362,17 @@ describe('a megamenu whose trigger the consumer slotted', () => {
 
   test('the disclosure state reaches it, by property rather than by attribute', async () => {
     /* `render` writes `aria-expanded` onto the button it renders itself, and a
-       slotted trigger replaces that button. Without this the panel opened and
-       closed and nothing announced it: a reader was told the control was a
-       plain button forever, and the failure was audible only.
+       slotted trigger replaces that button. Without this the panel opens and
+       closes and nothing announces it: a reader is told the control is a plain
+       button forever, and the failure is audible only.
 
-       **The attribute is what this asserted until 28 Aug 2026**, and writing it
-       onto the consumer's element is a hydration mismatch React reports and does
-       not patch up: measured against 19.2.8, this family and `SpeedDial` both
-       produced one in either load order while `Popover` and `Menu`, which wrote
-       nothing, were clean. The property never reaches the markup, so there is
-       nothing for React to compare, and a Helix trigger renders the attribute
-       inside its own shadow root. See `tellDisclosure` and #322. */
+       By property, never by attribute: writing the attribute onto the consumer's
+       element is a hydration mismatch React reports and does not patch up.
+       Measured against 19.2.8, this family and `SpeedDial` both produced one in
+       either load order while `Popover` and `Menu`, which wrote nothing, were
+       clean. The property never reaches the markup, so there is nothing for
+       React to compare, and a Helix trigger renders the attribute inside its own
+       shadow root. See `tellDisclosure` and (322). */
     const host = await slottedHelixTrigger()
     const trigger = host.querySelector('helix-headless-button') as HTMLElement & {
       expanded?: boolean
@@ -416,12 +409,12 @@ describe('a megamenu whose trigger the consumer slotted', () => {
   })
 
   test('and it is not given an `aria-controls` that could never resolve', async () => {
-    /* It was, until 28 Aug 2026: `aria-controls="panel"` naming an id inside
-       this component's own shadow root, written onto an element in the light
-       DOM. An IDREF resolves only within the tree that holds it, so the
-       reference was to nothing at all, and an inert one is worse than none
-       because an audit reports it as satisfied. Asserted here rather than left
-       to a reader noticing, since nothing about the markup looks wrong. */
+    /* `aria-controls="panel"` on a slotted trigger names an id inside this
+       component's own shadow root from an element in the light DOM. An IDREF
+       resolves only within the tree that holds it, so the reference is to
+       nothing at all, and an inert one is worse than none because an audit
+       reports it as satisfied. Asserted here rather than left to a reader
+       noticing, since nothing about the markup looks wrong. */
     const host = await slotted()
     expect(own(host).hasAttribute('aria-controls')).toBe(false)
   })

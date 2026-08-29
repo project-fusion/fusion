@@ -48,12 +48,11 @@ export class ChartPointerController implements ReactiveController {
    * Which axis the readings are laid out along.
    *
    * **An axis and not a boolean, because two of the four charts do not use x.**
-   * This was `tracks = true`, and every reading was resolved from the pointer's
-   * x whatever the chart was doing. A horizontal bar chart runs its categories
-   * *down* the box, so moving the pointer from the first row to the last never
-   * changed the answer: measured on four rows, all four reported the third,
-   * which is the slot the middle of the box falls in. It looked like a tooltip
-   * that would not follow and was a tooltip reading the wrong axis.
+   * A horizontal bar chart runs its categories *down* the box, so resolving
+   * every reading from the pointer's x leaves a move from the first row to the
+   * last never changing the answer: measured on four rows, all four reported
+   * the third, which is the slot the middle of the box falls in. It looks like
+   * a tooltip that will not follow and is a tooltip reading the wrong axis.
    *
    * `none` is the ring. Its slices are real elements at every angle, so the
    * reading under the pointer is the one the pointer is over, and arithmetic on

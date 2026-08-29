@@ -182,12 +182,11 @@ describe('sandbox coordination', () => {
   })
 
   test('the frame is answered at a wildcard, because a sandbox has no origin to name', async () => {
-    // This asserted the opposite until the frame was sandboxed, and naming the
-    // origin was right while there was one. There is not: `postMessage` has no
-    // target string for an opaque origin, so `'*'` is the only thing that
-    // delivers. It costs nothing, because what is sent is the example's own
-    // source going to the document about to render it. What guards the other
-    // direction is the origin check on the way back in.
+    // A sandboxed frame has an opaque origin, and `postMessage` has no target
+    // string that names one, so `'*'` is the only thing that delivers. It costs
+    // nothing, because what is sent is the example's own source going to the
+    // document about to render it. What guards the other direction is the
+    // origin check on the way back in.
     const sandbox = await mount(wired)
     const preview = sandbox.querySelector('helix-sandbox-preview') as Updatable
     const frame = preview.shadowRoot?.querySelector('iframe') as HTMLIFrameElement
@@ -297,9 +296,8 @@ describe('sandbox dividers', () => {
   })
 
   test('a split that is not a number falls back rather than breaking the layout', async () => {
-    // A consumer passing `undefined` to mean "the default" is what found this
-    // when the number went into `grid-template-columns`: one bad value threw the
-    // whole template away. The grid is gone and the guard is not.
+    // A consumer passes `undefined` to mean "the default", and a split that is
+    // not a number has to fall back rather than reach the layout.
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     sandbox.split = undefined as unknown as number
     await sandbox.updateComplete
@@ -315,11 +313,10 @@ describe('sandbox dividers', () => {
   })
 
   test('a reset goes to the declared home, not to wherever it opened', async () => {
-    /* The bug this guards was in the sandbox after `Splitter` had already fixed
-       it one level down. Home was captured from `split` on the first render,
-       which is the arrangement the consumer declared only when nobody owns the
-       property. The workbench owns it and restores it from storage, so home was
-       the reader's last session and a double click reset the sandbox to the
+    /* Home is never captured from `split` on the first render. That is the
+       arrangement the consumer declared only when nobody owns the property, and
+       the workbench owns it and restores it from storage, so home would be the
+       reader's last session and a double click would reset the sandbox to the
        size it already had. */
     /* Opened at 30, which is what restoring a session looks like from in here:
        the value is there on the first render, and it is not a declaration. */
@@ -381,14 +378,10 @@ describe('sandbox dividers', () => {
 
   test('the arrangement is announced once, and the splitters inside are not', async () => {
     /* A consumer stores one arrangement. What the two elements inside said to
-       each other on the way there is not their business.
-
-       Each divider has its own verb, where this was one `helix-before-resize`
-       naming the property that settled, and that was one `arrangement` carrying
-       both numbers as JSON every consumer ignored in favor of reading the
-       element. `helix-before-resize` is listened for here precisely because the
-       sandbox must never send one: a splitter inside it that got out would land
-       under that name. */
+       each other on the way there is not their business, so each divider has
+       its own verb. `helix-before-resize` is listened for here precisely
+       because the sandbox must never send one: a splitter inside it that got
+       out would land under that name. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const named: string[] = []
     for (const name of ['helix-before-panel-resize', 'helix-before-resize', 'helix-before-split']) {
@@ -439,10 +432,10 @@ describe('sandbox source editing', () => {
 
   describe('sandbox panes', () => {
     test('a pane the preview does not know about drives nothing', async () => {
-      // The rule was that `css` is the stylesheet and anything else is markup,
-      // which held while there were two panes. A third one showing the example as
-      // JSX announced itself the same way, and the preview rendered the text of a
-      // React component as though it were markup.
+      // Not "`css` is the stylesheet and anything else is markup", which held
+      // only while there were two panes: a third one showing the example as JSX
+      // announces itself the same way, and the preview would render the text of
+      // a React component as though it were markup.
       const sandbox = (await mount(`
       <helix-sandbox>
         <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>

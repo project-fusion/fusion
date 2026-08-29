@@ -59,9 +59,7 @@ describe('jsx to html', () => {
   })
 })
 
-/* **The round-trip suite is gone with the second converter, and so is the
-   property it asserted.** It ran `jsxToHtml(htmlToJsx(markup))` over six
-   examples and expected the markup back, which is a guarantee about a pair.
-   There is no pair now: each syntax is a file somebody wrote, `htmlToJsx` is
-   deleted, and what holds the two to each other is `check:prose:examples-paired` for
-   their existence and `check:spec:visual` for their pictures. */
+/* There is no round-trip property to assert here: each syntax is a file
+   somebody wrote rather than a conversion of its twin. What holds the two to
+   each other is `check:prose:examples-paired` for their existence and
+   `check:spec:visual-parity` for their pictures. */

@@ -24,37 +24,26 @@ import '../../select/index.js'
  * consumer's, and a control that can only sit at one end of one row has taken
  * that decision for them.
  *
- * **`Select`, not a native `<select>`.** It was native first, on the argument
- * that the platform's own menu is a wheel on a phone and the widget a
- * screen-reader user already knows. What that argument leaves out is that the
- * library then has two dropdowns that are identical closed and different open,
- * and a reader meets both in the same footer as a table's filters. Consistency
- * is the whole product here, and it wins.
+ * **`Select`, not a native `<select>`.** Two dropdowns identical closed and
+ * different open meet each other in the same footer as a table's filters. The
+ * caret is `Select`'s rather than a color literal baked into a data URI,
+ * because a background image cannot read `currentColor`, and the label is a
+ * real `<label for>` against the trigger's own id.
  *
- * What it takes back with it: the caret is `Select`'s again rather than a color
- * literal baked into a data URI, because a background image cannot read
- * `currentColor`, and the label is a real `<label for>` against the trigger's
- * own id, which `Select` already renders and already tests.
+ * **The label sits on the row, not above it.** `Select`'s host is a column, and
+ * an outer-tree rule beats a `:host` rule, so turning it into a row needs no
+ * property on `Select` and nothing written into the consumer's markup.
  *
- * **The label sits on the row, not above it.** Every other field in the library
- * stacks its label because it stands in a column of fields; this one stands in a
- * footer beside a run of page numbers, and a two-line control there makes the
- * whole row two lines tall. `Select`'s host is a column, and an outer-tree rule
- * beats a `:host` rule, so turning it into a row needs no property on `Select`
- * and nothing written into the consumer's markup.
+ * **An empty `sizes` renders nothing**, rather than falling back to the
+ * built-in list, which would be a component overruling a consumer who said
+ * "none". Same rule as `Pagination` over a single page, and reported the same
+ * way, through `ElementInternals.states` rather than an attribute the server
+ * never wrote.
  *
- * **An empty `sizes` renders nothing.** A chooser with nothing to choose from
- * is a control a reader can operate and cannot use, which is worse than an
- * absence. Falling back to the built-in list was the other answer and it is a
- * component overruling a consumer who said "none". Same rule as `Pagination`
- * over a single page, and reported the same way, through
- * `ElementInternals.states` rather than an attribute the server never wrote.
- *
- * `value` is the controlled property and `default-value` seeds one this owns,
- * the same contract every other stateful element here carries. Changing it
- * announces `helix-before-change`; what a consumer does with that is re-query and move
- * back to page one, which is theirs to decide because only they know whether
- * the reader's position should survive it.
+ * `value` is the controlled property and `default-value` seeds one this owns.
+ * Changing it announces `helix-before-change`; re-querying and moving back to
+ * page one is the consumer's, because only they know whether the reader's
+ * position should survive it.
  *
  * @since 0.1.0
  * @status experimental
@@ -86,8 +75,6 @@ export class HelixHeadlessPaginationSize extends HelixElement {
    * Reading gives the real one; writing declares it the consumer's, and
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
-   *
-   *
    */
   @property({ type: Number })
   get value(): number {
@@ -183,8 +170,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Through `toggleState`, like `Pagination`'s: an engine without
-       `CustomStateSet` gets an empty select rather than no element, which is the
-       behavior this had before. */
+       `CustomStateSet` gets an empty select rather than no element. */
     this.toggleState('empty', this.options.length === 0)
   }
 
@@ -195,16 +181,10 @@ export class HelixHeadlessPaginationSize extends HelixElement {
    * wrap this one, pass it a property the base does not know about, or leave it
    * out, without reimplementing the whole template to do any of them.
    *
-   * **The tags are interpolated, so each tier renders its own.** They were
-   * written out as `<helix-select>` on the argument that each tier imports its
-   * own element under that name, which works and costs more than it looks: the
-   * name means two different things depending on what a consumer imported, this
-   * tier composes an element it does not ship, and the composition cannot be
-   * tested here at all, since there is no `helix-select` on this tier to test it
-   * against. `tier` resolves the name instead, and the styled subclass changes
-   * it in one line rather than reimplementing this method. A tier that renders
-   * its own elements is a tier that stands alone, which is the claim the package
-   * makes.
+   * **The tags are interpolated, so each tier renders its own.** Writing
+   * `<helix-select>` out would make this tier compose an element it does not
+   * ship and cannot test against, there being no `helix-select` here. `tier`
+   * resolves the name instead, and the styled subclass changes it in one line.
    */
   protected renderSelect(): TemplateResult {
     const select = this.tag('select')

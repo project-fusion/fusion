@@ -55,7 +55,7 @@ const INTERACTIONS = ['native', 'light', 'shadow', 'ripple', 'none'] as const
 const KNOBS = [
   /* A full turn, because a shape has a direction and half a turn cannot
      reverse it: streaks traveling down the frame only come from the top at
-     180, which the old range could not reach. */
+     180. */
   { key: 'tilt', label: 'Tilt', max: 180, min: -180, step: 1 },
   /* A fraction of the width, which is the property's own unit. It replaces
      `tilt` rather than joining it, so the bar offers one or the other and the
@@ -77,8 +77,8 @@ const KNOBS = [
 /**
  * Which shapes read `variance`, so the bench can say so rather than offering a
  * control that silently does nothing. The shapes made of many similar things,
- * counted or continuous: lanes, motes, a fan, bundles, bands. The four left out
- * are the three with a single subject and `threads`, which is even on purpose.
+ * counted or continuous: lanes, motes, a fan, bands. The ones left out have a
+ * single subject, and `threads`, which is even on purpose.
  */
 const VARIES = new Set(['aurora', 'particles', 'rays', 'streaks'])
 
@@ -99,17 +99,14 @@ const RESTING: Record<Knob, number> = {
 }
 
 /**
- * The bench, now driving `helix-aura` rather than a second copy of it.
+ * The bench, driving the published `helix-aura` rather than a second copy of
+ * it, so the knobs are the component's own properties: tuning happens against
+ * the published surface, and anything awkward here is awkward for everyone.
  *
- * The shader moved into `helix/styled`, so this page is a consumer like any other
- * and the knobs are the component's own properties. That is the point of moving
- * it: tuning happens against the published surface, and anything awkward here
- * is awkward for everyone.
- *
- * **The new value comes from `event.detail`, never from the element.** Every
- * control declares `value` or `checked`, which is a claim of ownership: the
- * element announces and applies nothing until answered, so at dispatch its own
- * property still holds the old value.
+ * The new value is read off the element. A control applies before it announces,
+ * so `event.currentTarget` already holds the applied value at dispatch, and a
+ * declared `value` or `checked` is a seed and a correction rather than a claim
+ * of ownership.
  *
  * Slider sends `input` alone rather than `input` and `change` together, being
  * one of the five continuous controls, so the field moves under the thumb.
@@ -120,9 +117,8 @@ export function AuraLab(): React.ReactElement {
   const [knobs, setKnobs] = useState(RESTING)
   const [interaction, setInteraction] = useState<(typeof INTERACTIONS)[number]>('native')
   /* Which of the two aiming properties is live. `terminus` overrides `tilt` on
-     the element, so the bar has to choose as well: a slider for the one being
-     ignored is a control that does nothing, which is the worst thing a bench
-     can show. */
+     the element, so the bar has to choose as well: a slider for the ignored one
+     is a control that does nothing. */
   const [aim, setAim] = useState<(typeof AIMS)[number]>('tilt')
   const [open, setOpen] = useState(true)
   const current = SHAPES[shape]
@@ -156,14 +152,11 @@ export function AuraLab(): React.ReactElement {
         </helix-flex>
       </helix-flex>
 
-      {/* One drawer, fixed to the bottom, and it collapses.
-
-          The controls used to sit in the flow directly under the copy, which
-          put nine sliders across the middle of the thing they were adjusting:
-          a reader tuning bloom could not see most of what bloom was doing. A
-          bar leaves the field whole. Collapsing leaves it entirely whole, which
-          is what somebody looking rather than tuning wants, and the material
-          stays either way so the light still reads through the strip. */}
+      {/* One drawer, fixed to the bottom, and it collapses. Sliders in the flow
+          sit across the middle of the thing they adjust, so a bar leaves the
+          field whole and collapsing leaves it entirely whole, which is what
+          somebody looking rather than tuning wants. The material stays either
+          way so the light still reads through the strip. */}
       <div className="auraBar" data-open={open ? '' : undefined}>
         <helix-flex
           align="center"
@@ -173,20 +166,11 @@ export function AuraLab(): React.ReactElement {
           justify="between"
           wrap
         >
-          {/* The pair does not split. Together they are 1029 wide against the
-              bar's 1184, so they fit; what does not fit is the pair plus the
-              switch and the reset, which need another 246. Wrapping the pair
-              put Shape on one line and Pointer on the next with a gap beside
-              each, which reads as a mistake. Wrapping the row instead drops the
-              switch and the reset to a line of their own until there is room,
-              and they are still the first row of controls. */}
-          {/* Wrapping, now that there are three groups rather than two.
-              Measured at 1184 of bar: Shape is 781 and Pointer 375, which is
-              1180 with the gap and fits by four pixels, and Aim's 177 does not.
-              Dropping the smallest to its own line is what wrapping does here,
-              and it is not the case the comment below rejects: that was a pair
-              splitting so each half sat beside a gap, which reads as a mistake,
-              where a third group on a line of its own reads as a third group. */}
+          {/* Wrapping the row, not the pair. Measured at 1184 of bar: Shape is
+              781 and Pointer 375, which is 1180 with the gap and fits by four
+              pixels, and Aim's 177 does not. A third group dropping to a line of
+              its own reads as a third group; splitting the pair so each half
+              sits beside a gap reads as a mistake. */}
           <helix-flex align="center" gap="lg" wrap>
             {/* Shape and pointer share a line. Nine toggles and five are two
                 short rows rather than one long one, and the shape group is

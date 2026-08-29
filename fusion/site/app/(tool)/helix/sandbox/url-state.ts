@@ -18,10 +18,10 @@
  * one address rather than two settings and a reader should be able to edit it
  * by hand.
  *
- * `tier` is the second word and it is one for a different reason: the reference
- * pages already took `?tier=`, and one concept with two spellings is worse than
- * a long key. It was `t` for a day, which failed the rule anyway, since `base`
- * and `styled` do not say "tier" the way `centered` says "layout".
+ * `tier` is the second word for a different reason: the reference pages already
+ * took `?tier=`, and one concept with two spellings is worse than a long key. A
+ * one-letter key would fail the rule anyway, since `headless` and `styled` do
+ * not say "tier" the way `centered` says "layout".
  *
  * `panes` lists what is rendered rather than what is not. Naming the absences
  * reads better right up until a region is off by default, and the status bar
@@ -176,8 +176,7 @@ export const writeUrlState = (state: SandboxUrlState): string => {
   if (state.tier) {
     params.set('tier', state.tier)
   }
-  // In the order the regions appear, not the order they were switched on, and
-  // only when the set differs from the one a fresh sandbox has.
+  // In the order the regions appear, not the order they were switched on.
   const panes = SECTIONS.filter((section) => state.panes.includes(section))
   if (panes.join(',') !== DEFAULTS.panes.join(',')) {
     params.set('panes', panes.join(','))

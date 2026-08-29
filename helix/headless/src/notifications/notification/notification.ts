@@ -16,8 +16,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    shifts every attribute after it by one. See `renderTime`. */
 import { html } from 'lit/static-html.js'
 /* Side-effect import, because this template interpolates the family's tag and a
-   custom element registers on import. Both tiers import it, each resolving to
-   its own; */
+   custom element registers on import. Both tiers import it, the relative path
+   resolving to each tier's own element. */
 import '../../format-date/index.js'
 
 /**
@@ -95,18 +95,13 @@ export class HelixHeadlessNotification extends HelixElement {
    * changes nothing until a new value arrives. `default-read` seeds a state
    * this element then owns.
    *
-   * **Not reflected, and it was until 27 Aug 2026.** The reason given was that
-   * unread is a visual state and a stylesheet has no other way to know, which
-   * is the same reason the four mixins mirror theirs, and the mirror may not be
-   * the property's own attribute: `<helix-notification default-read>`
-   * came back from a server without `read` and gained it on the first update,
-   * which React reports as a hydration mismatch, and a copy of the serialized
-   * element re-parses that attribute as a declaration. `:state(read)` is what
-   * the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
-   * learned to mount an element a consumer had configured rather than a bare
-   * one.
-   *
-   *
+   * **Not reflected.** Unread is a visual state, which is why the four mixins
+   * mirror theirs, but the mirror may not be the property's own attribute:
+   * `<helix-notification default-read>` comes back from a server without `read`
+   * and would gain it on the first update, which React reports as a hydration
+   * mismatch, and which a copy of the serialized element re-parses as a
+   * declaration. `:state(read)` is what the stylesheet reads.
+   * `hydration.dom.spec.ts` holds it.
    */
   @property({ type: Boolean })
   get read(): boolean {
@@ -212,11 +207,11 @@ export class HelixHeadlessNotification extends HelixElement {
    * it.** A fallback answers a consumer and a seam answers the tier above, which
    * are different people: the styled tier wants an icon here, and with the slot
    * written inline the only way to change it is to reimplement the whole
-   * template. That is the rule, and moving only the fallback out was not
-   * enough, which is right: the slot is the thing a tier redraws.
+   * template. Moving only the fallback out is not enough: the slot is the thing
+   * a tier redraws.
    *
-   * **The mark is drawn rather than typed, which is what lets it align.** It was
-   * `&times;`, and a character is placed by its font rather than by its box:
+   * **The mark is drawn rather than typed, which is what lets it align.** A
+   * character such as `&times;` is placed by its font rather than by its box:
    * measured against the ghost button beside it at 8x, the cross carried 6
    * pixels of ink to the label's 9.5 and sat 1.5 pixels below its center, in two
    * boxes whose own centers agreed to a tenth of a pixel. No stylesheet can

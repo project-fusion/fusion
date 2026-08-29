@@ -170,10 +170,10 @@ Extends `HelixHeadlessAppHeader`.
 
 Flat, opaque, and in the flow. Both of the interesting things a banner can do
 are opt-in: `sticky` because following the reader is a decision about the
-page rather than about the bar, and `appearance="material"` because a
-backdrop filter makes the header a containing block for `position: fixed`
-descendants, so an overlay rendered inside a material header is placed
-against the header rather than the viewport.
+page rather than about the bar, and `material` because a backdrop filter
+makes the header a containing block for `position: fixed` descendants, so an
+overlay rendered inside a material header is placed against the header rather
+than the viewport.
 
 The separating rule appears only once the page has scrolled, which keeps the
 banner flat against a hero and lifts it off the content afterwards. There is
@@ -646,9 +646,9 @@ Four appearances, all drawn on one control so a link styled as a button and a
 real button are indistinguishable to a reader. There are no sizes: a control
 takes its height from the region it is in, through `data-density`, which is
 the one size axis in the library and the reason a row of controls cannot come
-out ragged. The focus
-ring is declared here rather than inherited, because the base layer's
-`:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+out ragged. The focus ring is declared here rather than inherited, because the
+base layer's `:focus-visible` rule is a light-DOM rule and stops at the shadow
+boundary.
 
 #### Properties
 
@@ -761,9 +761,9 @@ Sets a passage apart as information, a warning, or an error.
 
 Extends `HelixHeadlessCallout`.
 
-Tinted from the severity's status color with `color-mix`, and marked with a
-bar on the inline start so the severity survives being read in grayscale or
-by anyone who does not distinguish the hues.
+Tinted from the tone's status color with `color-mix`, and marked with a bar
+on the inline start so the tone survives being read in grayscale or by anyone
+who does not distinguish the hues.
 
 There is no treatment axis here. `tone` carries the meaning and lives on the
 headless tier; this tier only decides what that meaning looks like.
@@ -779,7 +779,7 @@ headless tier; this tier only decides what that meaning looks like.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The callout's content. |
-| `icon` | Replaces the icon chosen by `severity`. |
+| `icon` | Replaces the icon chosen by `tone`. |
 | `title` | A heading above the content. |
 
 #### Parts
@@ -805,20 +805,17 @@ Groups related content and actions into a single surface.
 
 Extends `HelixHeadlessCard`.
 
-Regions are slots: `media`, `header`, the default slot for content, and
-`footer`. An omitted region takes no space, so a card with only content needs
-no wrapper markup at all.
+Regions are bare slots with no wrapper element: `media`, `header`, the default
+slot for content, and `footer`. An omitted one occupies no space without the
+card having to detect that it is missing, so a card with only content needs no
+wrapper markup at all. Style slotted content directly rather than reaching for
+a part: a header is whatever element you slotted, not a wrapper around it.
 
 `media` runs edge to edge and clips to the card's corners, so an image needs
 no inset correction. Set `orientation="horizontal"` to move it alongside the
 header, content, and footer stack rather than above it, or
 `media-placement="end"` to put it under the content instead of over it, which
 is what a chart concluding a card wants.
-
-Regions are bare slots with no wrapper element, so an omitted one occupies no
-space without the card having to detect that it is missing. Style slotted
-content directly rather than reaching for a part: a header is whatever
-element you slotted, not a wrapper around it.
 
 #### Properties
 
@@ -1186,7 +1183,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `formResetCallback()` | `HelixHeadlessCheckbox` | Returns the box to the state its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
-| `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
+| `resetChecked()` | `MixinControllerChecked` | Drops the recorded state, so the control reads `defaultChecked` again. |
 | `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |
 
 #### Events
@@ -1729,7 +1726,7 @@ Input, Color Input and Date Input all take.
 | `listbox-hint` | Help under the list. |
 | `listbox-items` | The list itself. |
 | `listbox-label` | The question, over the list. |
-| `listbox-loading` | Shown while the options are still on their way. from the listbox. |
+| `listbox-loading` | Shown while the options are still on their way. |
 | `listbox-search` | The region holding the field that narrows the list. |
 | `listbox-search-field` | The field itself. |
 | `rest` | The count of choices held beyond `max-tags`. |
@@ -2251,7 +2248,7 @@ dialog rather than being a div somebody positioned.
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixHeadlessDialog` | Accessible name for the dialog. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `persistent` | `persistent` | `boolean` | `false` | `HelixHeadlessDialog` | Whether Escape can close it. |
+| `persistent` | `persistent` | `boolean` | `false` | `HelixHeadlessDialog` | Whether Escape or a press on the backdrop can close it. |
 | `returnValue` | - | `string` | - | `HelixHeadlessDialog` | What the dialog closed with, the way `<dialog>` reports it. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| 'full' \| undefined` | - | - | How wide the panel is allowed to be. |
 
@@ -2363,13 +2360,12 @@ is a fact about the picture, not about the numbers.
 A track is drawn under the slices, so a ring whose values do not fill it
 still reads as a ring with a gap rather than as a broken arc.
 
-**How thick the ring is drawn is `hole`, not a CSS hook.** It was
-`--donut-chart-thickness`, and the stroke's width and the ring's radius have
-to agree: the outer edge is `r + width / 2`, so setting one in CSS and
-deriving the other in markup gives a drawing that is wrong in both. Measured
-with the hook still in place, every ring came out twelve units thick whatever
-its `hole`, so a pie was a small ring with a hole in it and `large` was drawn
-larger than the default.
+**How thick the ring is drawn is `hole`, not a CSS hook.** The stroke's width
+and the ring's radius have to agree: the outer edge is `r + width / 2`, so
+setting one in CSS and deriving the other in markup gives a drawing that is
+wrong in both. Measured with such a hook in place, every ring came out twelve
+units thick whatever its `hole`, so a pie was a small ring with a hole in it
+and `large` was drawn larger than the default.
 
 #### Properties
 
@@ -2998,7 +2994,7 @@ A square button whose content is an icon.
 Extends `HelixHeadlessIconButton`.
 
 Top-level rather than `Button.Icon`, because a namespace means composition:
-`Card.Header` is part of a card, and an icon-only button is not part of a
+`Tabs.Tab` is part of a tab set, and an icon-only button is not part of a
 button. It is a button with different content and a different shape, which
 makes it its own component.
 
@@ -3213,7 +3209,6 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `feedback` | What is wrong with it. |
 | `field` | The box holding everything. |
 | `hint` | Help under the field, while nothing is wrong. |
-| `icon` | A glyph this component draws. |
 | `label` | The question, over the field. |
 | `reveal` | The button that shows and hides a password. |
 
@@ -3284,9 +3279,9 @@ and there is no arrangement of eight names that fits every width. Set
 `--legend-direction` to `column` where it sits beside one instead.
 
 The eight series colors are mapped here rather than in the tier below, which
-carries the index and holds no tokens. Written as eight rules for the reason
-`Avatar.Group` writes twelve: an index in markup cannot select a token, and a
-custom property set inline would be the headless tier naming a color.
+carries the index and holds no tokens. Eight rules, because an index in
+markup cannot select a token and a custom property set inline would be the
+headless tier naming a color.
 
 #### Properties
 
@@ -3807,7 +3802,7 @@ than as a ragged list.
 | Part | Description |
 | --- | --- |
 | `item` | The row, which is an `<a>` where `href` is set. |
-| `mark` | The trailing mark: a tick when checked, a caret when it opens. a page. One column, because a row is never both. |
+| `mark` | The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both. |
 | `start` | The leading column, which is a slot and is always there. |
 
 #### Custom properties
@@ -3828,17 +3823,15 @@ Extends `HelixHeadlessMeter`.
 The bar `Progress` draws, at twice the height and on the house corner rather
 than its pill.
 
-It shipped at the progress height, on the argument that the two stand beside
-each other in a panel. Rendered side by side that turned out backwards: they
-*are* two unrelated controls, and a reader telling a level from a task at a
-glance is the point rather than the cost. A meter also carries more, a fill
-and a mark at each threshold, and at eight pixels those marks are hairlines.
-At sixteen they are unmistakable.
+Taller than a progress bar rather than matched to it. The two are unrelated
+controls, and a reader telling a level from a task at a glance is the point
+rather than the cost. A meter also carries more, a fill and a mark at each
+threshold, and at eight pixels those marks are hairlines. At sixteen they are
+unmistakable.
 
 The corner is the ticks' doing: they cut the fill into segments, and a
 pill-ended bar comes out as a run whose outer ends are round and whose inner
-ends are square. `radii-full` on an eight pixel bar was a four pixel pill
-anyway, so this is only a change at all because the bar grew.
+ends are square.
 
 What else differs is what the color means. A progress bar is one color because
 there is one thing to say; a meter's fill takes the success, warning or danger
@@ -4297,7 +4290,7 @@ A rule down the leading edge with the current section lit along it, which is
 the shape a table of contents has taken since printed marginalia: the line
 says the list is one thing, and the lit segment says where in it you are.
 
-Nesting is the consumer's, expressed as `data-level` on a link. A outline
+Nesting is the consumer's, expressed as `data-level` on a link. An outline
 that read heading levels itself would have to look at the document, and the
 document is not always where the headings are.
 
@@ -4689,7 +4682,7 @@ thing advancing.
 | `--progress-color` | - | Fill of the part that is done. |
 | `--progress-ring-size` | - | Diameter of the ring appearance. |
 | `--progress-ring-width` | - | Thickness of its stroke. |
-| `--progress-fraction` | `HelixHeadlessProgress` | The value as a fraction of the range, 0 to 1. Absent while indeterminate. |
+| `--progress-fraction` | `HelixHeadlessProgress` | The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate. |
 
 ## QR Code
 
@@ -5025,12 +5018,9 @@ a pane rendering the example as JSX, and guessing would have put the text of
 a React component into the preview.
 
 **The dividers are two nested `helix-splitter`s, not a grid this element
-drags itself.** It had its own: a five row grid, a stylesheet written to on
-every pointer move, three pointer handlers, a keyboard handler reading which
-axes each divider was allowed to move, and a corner placed by hand into the
-cell where two tracks met. All of it is the splitter's now, including the
-corner, which arrives on its own wherever a nested splitter crosses the one it
-is in.
+drags itself.** The pointer handling, the keyboard handling and the corner are
+all the splitter's, and the corner arrives on its own wherever a nested
+splitter crosses the one it is in.
 
 The panes are the inner splitter and the panel is the outer one, which is the
 order that makes the panel span the full width: the outer divider runs edge to
@@ -5125,31 +5115,24 @@ has its own custom element registry, so `src` has to load them. That is the
 consumer's document rather than something guessed at here.
 
 **The source is not trusted, and the frame is what makes that safe.**
-`fullscreen` is granted for the same reason and found the same way: a video
-in the preview offered a fullscreen button that did nothing at all, because
-the policy default is `self`, this frame is not `self`, and a denied request
-rejects a promise nobody was watching. Two capabilities now, both explicit,
-both starred.
-
-`allow="clipboard-write *"` is granted explicitly, and the star matters: the
-policy defaults to `self` and this frame has an opaque origin, so it is not
-`self` and the default denies it. A component inside the preview that copies
-to the clipboard is otherwise a control that silently does nothing, which is
-how this was found. Nothing else is granted, and a copy still needs the
-reader's own gesture.
-
 `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
 an opaque origin: script in an example cannot reach this page, its storage,
 its cookies, or the editor the source was typed into. Without it they could,
 measured, through an `onerror` handler on an image that fails to load, which
-`innerHTML` does not strip the way it refuses a `<script>` tag.
-
-That is what lets a sandbox hold markup a reader pasted from somewhere, or
-one day arrived in a shared link, rather than only what its owner typed.
+`innerHTML` does not strip the way it refuses a `<script>` tag. That is what
+lets a sandbox hold markup a reader pasted from somewhere, or one day arrived
+in a shared link, rather than only what its owner typed.
 
 `allow-forms` is granted because examples have forms in them and a submit
 that silently does nothing is a worse lie than one that navigates a frame
 nobody is looking at. Top-level navigation, popups and modals are not.
+
+**`allow="clipboard-write *; fullscreen *"`, and the stars matter.** Both
+policies default to `self`, and a frame on an opaque origin is not `self`, so
+the default denies both: a component that copies to the clipboard and a video
+offering a fullscreen button each become a control that silently does nothing,
+a denied request rejecting a promise nobody was watching. Nothing else is
+granted, and a copy still needs the reader's own gesture.
 
 #### Properties
 
@@ -5654,10 +5637,10 @@ alike, so moving `--sparkline-color` cannot leave parts of one drawing
 disagreeing.
 
 The line's weight is set in `em` rather than pixels, so it grows with the
-drawing the way the drawing grows with its type. A fixed 1.5px was the first
-version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
-keeps a stroke out of the view box's stretch, which is the point, and it also
-keeps it out of every other reason it might want to be bigger.
+drawing the way the drawing grows with its type. A fixed pixel width leaves a
+200 pixel sparkline wearing a hairline: `vector-effect` keeps a stroke out of
+the view box's stretch, and it also keeps it out of every other reason it
+might want to be bigger.
 
 #### Properties
 
@@ -6129,7 +6112,7 @@ consumer has to keep.
 | `formResetCallback()` | `HelixHeadlessSwitch` | Returns the switch to the state its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerChecked` | Restores the control when the browser brings a form back. |
 | `requestChecked()` | `MixinControllerChecked` | Requests a checked change, and reports whether it was applied. |
-| `resetChecked()` | `MixinControllerChecked` | Drops the uncontrolled state, so the control reads `defaultChecked` again. |
+| `resetChecked()` | `MixinControllerChecked` | Drops the recorded state, so the control reads `defaultChecked` again. |
 | `toggleChecked()` | `MixinControllerChecked` | Requests the opposite of the current state. |
 
 #### Events
@@ -6425,7 +6408,7 @@ Labels content with a short piece of metadata.
 
 Extends `HelixHeadlessTag`.
 
-Five tones. The fill is a tint of the status color, mixed with
+Seven tones. The fill is a tint of the status color, mixed with
 `color-mix` rather than held as a token per status, so a theme that changes
 the status colors gets the tints with them.
 
@@ -6494,10 +6477,10 @@ common case is `as="h2"` and nothing else.
 
 The pairing is resolved in CSS rather than by computing an attribute, so the
 element writes nothing to its own host: `as="h2"` picks up the heading ramp
-through a selector, and setting `variant` takes the pairing rule out of
-play. Deriving it in `willUpdate` worked, but it put an attribute on the host
-that the server's markup did not have, which is a hydration mismatch in every
-React consumer.
+through a selector, and setting `variant` takes the pairing rule out of play.
+Deriving it in `willUpdate` works and must not be done: it puts an attribute
+on the host that the server's markup does not have, which is a hydration
+mismatch in every React consumer.
 
 **Size, weight, and leading are not properties.** Exposing them separately
 offers a few hundred combinations of which a handful are right, and every
@@ -6908,7 +6891,7 @@ arrives at this entry from the one before.
 | Slot | Description |
 | --- | --- |
 | *(default)* | What happened. |
-| `marker` | The mark on the line. Falls back to a dot, which is the slot's own fallback content rather than anything this element works out: whether a consumer slotted a mark is a question only the platform can answer, and it answers it by rendering what is inside the slot when nothing replaced it. |
+| `marker` | The mark on the line. Falls back to a dot, which is the slot's own fallback content: whether a consumer slotted a mark is a question only the platform can answer, and it answers it at assignment time. |
 | `time` | When it happened, as a reader should see it written. |
 
 #### Parts
@@ -7563,13 +7546,10 @@ legible thing here, which is right anyway, since the number is what a reader
 reads and the judgment is a gloss on it.
 
 **No visual axis applies here, and that is the answer rather than a gap.**
-This family carries `@groups charts`, so it sits beside eight that do
-declare one. Each of the three was asked and each refuses for a reason
-about what this is rather than about the axis. `emphasis` is how much ink a
-mark claims, and there is no mark: an arrow glyph and two runs of text, whose
-weight is `Text`'s business and whose size is the region's. `material` is what
-reads through a surface, and a 13px glyph has nothing behind it. `wash` is a
-gradient across an area, and there is no area.
+`emphasis` is how much ink a mark claims, and there is no mark: an arrow glyph
+and two runs of text, whose weight is `Text`'s business and whose size is the
+region's. `material` is what reads through a surface, and a 13px glyph has
+nothing behind it. `wash` is a gradient across an area, and there is no area.
 
 The meaning axis is here and is *derived*, which is the more interesting half:
 `direction` and `good` together resolve to success, danger or muted, so a
@@ -7664,7 +7644,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `separation` | `separation` | `'filled' \| 'plain' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
 | `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixHeadlessVideo` | The speeds offered, slowest first, as multipliers of normal. |
 | `src` | `src` | `string` | `''` | `HelixHeadlessVideo` | Where the video is, for the common case of one file. |
-| `startControl` | `start-control` | `'none' \| undefined` | - | `HelixHeadlessVideo` | The big mark over the picture before anything has played, or `none`. |
+| `startControl` | `start-control` | `'none' \| undefined` | - | `HelixHeadlessVideo` | The big mark over the picture whenever it is not playing, or `none`. |
 | `videoHeight` | - | `number` | - | `HelixHeadlessVideo` | The media's own height in pixels, and zero until the metadata has loaded. |
 | `videoWidth` | - | `number` | - | `HelixHeadlessVideo` | The media's own width in pixels, and zero until the metadata has loaded. |
 | `volume` | - | `number` | - | `HelixHeadlessVideo` | How loud it plays, 0 to 1. |
@@ -7682,11 +7662,11 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `ended` | `Event` | Relayed for the same reason. |
+| `ended` | `Event` | Relayed, because it does not cross a shadow boundary. |
 | `helix-next` | `HelixNextEvent` | Fired when the reader asks for the next item. |
 | `helix-previous` | `HelixPreviousEvent` | Fired when they ask for the previous one. |
 | `pause` | `Event` | Relayed for the same reason. |
-| `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
+| `play` | `Event` | Relayed for the same reason. |
 
 #### Slots
 

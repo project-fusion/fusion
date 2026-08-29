@@ -107,10 +107,10 @@ if (hasLayout()) {
     })
 
     test('the reading line moves down with offset, which is what chrome needs', async () => {
-      /* The direction is worth stating, because it reads backwards at first and
-         this spec asserted the opposite before it was run. `offset` is where the
-         top of the *readable* area is, so a larger one means a heading counts as
-         reached while it is still further down the window. That is exactly what
+      /* The direction is worth stating, because it reads backwards at first.
+         `offset` is where the top of the *readable* area is, so a larger one
+         means a heading counts as reached while it is still further down the
+         window. That is exactly what
          a sticky masthead wants: a heading sliding under 64px of chrome has
          arrived, and waiting for it to reach y=0 leaves the previous section
          marked while its own heading is out of sight.

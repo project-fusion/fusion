@@ -27,28 +27,6 @@ export interface Series {
   points: SeriesPoint[]
 }
 
-/**
- * Reads a table as series, one per data column.
- *
- * **The table is the chart's accessible representation, not a fallback for
- * one.** Every chart here takes its numbers from real markup rather than from a
- * property, so the page is readable with no script at all, sortable by anything
- * that sorts tables, and correct in a screen reader without a parallel
- * description that has to be kept in step by hand. A `values` array would be
- * easier to pass and would make the accessible version the thing nobody
- * maintains.
- *
- * The shape is the ordinary one: a header row naming the series, a first column
- * of row headers, and numbers in the rest. A single-column table has one series
- * and takes its name from the caption, since a header row of one is usually
- * absent.
- *
- * `data-value` wins over the cell's text, because `$1.2k` is what a reader
- * should see and is not a number. `Number()` rather than `parseFloat`, because
- * the second reads `12abc` as 12: a value that is nearly a number is a mistake
- * worth dropping rather than rounding off, and a dropped point is visible where
- * a silently truncated one is not.
- */
 /* A grid's own rows and cells, by role and by tag.
  *
  * **Both, because `helix-table` sets its roles through `ElementInternals`.**
@@ -119,15 +97,34 @@ const readGrid = (grid: Element): Series[] => {
 /* A column with no numbers in it is not a series.
  *
  * Both readers build one entry per data column and then drop the rows whose
- * cells will not parse, so a column of notes came back as a series with a name
- * and no points. Nothing drew it, which is why it went unseen, and `Legend`
- * named it anyway: a swatch in the palette against a column no chart plotted,
- * and every series after it shifted a color.
- *
- * Found the moment tables grew columns a tooltip wanted and a drawing did not,
- * which is the arrangement `readRows` exists for. */
+ * cells will not parse, so a column of notes arrives here as a series with a
+ * name and no points. Nothing draws it, so it is invisible until `Legend` names
+ * it anyway: a swatch in the palette against a column no chart plotted, and
+ * every series after it shifted a color. */
 const plotted = (series: Series[]): Series[] => series.filter((one) => one.points.length > 0)
 
+/**
+ * Reads a table as series, one per data column.
+ *
+ * **The table is the chart's accessible representation, not a fallback for
+ * one.** Every chart here takes its numbers from real markup rather than from a
+ * property, so the page is readable with no script at all, sortable by anything
+ * that sorts tables, and correct in a screen reader without a parallel
+ * description that has to be kept in step by hand. A `values` array would be
+ * easier to pass and would make the accessible version the thing nobody
+ * maintains.
+ *
+ * The shape is the ordinary one: a header row naming the series, a first column
+ * of row headers, and numbers in the rest. A single-column table has one series
+ * and takes its name from the caption, since a header row of one is usually
+ * absent.
+ *
+ * `data-value` wins over the cell's text, because `$1.2k` is what a reader
+ * should see and is not a number. `Number()` rather than `parseFloat`, because
+ * the second reads `12abc` as 12: a value that is nearly a number is a mistake
+ * worth dropping rather than rounding off, and a dropped point is visible where
+ * a silently truncated one is not.
+ */
 export const readSeries = (table: Element): Series[] => {
   if (isGrid(table)) {
     return plotted(readGrid(table))

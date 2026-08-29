@@ -10,30 +10,19 @@
  * anything moves. A component that mutated itself and then announced it would
  * leave a consumer reacting to a decision already made.
  *
- * **Control is an action, not a mode.** This used to decide whether to apply by
- * asking if the consumer had declared ownership, which meant an element that
- * had been handed a `value` applied nothing and waited to be told. That is
- * gone: the element always owns its state and always applies it, and a consumer
- * takes over for one interaction by refusing here and assigning their own. See
- * 294 for the argument, which is that a mode forks the event vocabulary by prop
- * presence, has no ergonomic spelling in HTML, and is invisible enough to need
- * an audit to make it audible.
- *
- * **The audit went with it, and that is not a loss.** It existed to warn that
- * `value="Ada"` looks like the native seed and was not one. It is one now, so
- * the trap it detected cannot happen and the machinery to detect it, two
- * `WeakMap`s and a warning judged on the second request, has nothing to do.
+ * **Control is an action, not a mode.** The element always owns its state and
+ * always applies it, and a consumer takes over for one interaction by refusing
+ * here and assigning their own. See 294 for the argument, which is that a mode
+ * forks the event vocabulary by prop presence, has no ergonomic spelling in
+ * HTML, and is invisible enough to need an audit to make it audible.
  *
  * Returns whether the change was applied, so a caller that needs to know (a key
  * handler deciding whether to also move focus) can ask.
  *
- * **There is one channel, and it is the event.** `onCheckedChange`,
- * `onOpenChange`, `onValueChange` and `onActiveChange` were a second one,
- * invoked from here once the state had been applied. They were removed on
- * 19 Aug 2026, for working in fewer places than the thing they duplicated:
- * React takes any `on[A-Z]` prop into its own branch and calls
- * `addEventListener('CheckedChange', …)` with it, an event nothing dispatches,
- * so no consumer writing JSX could reach one.
+ * **There is one channel, and it is the event.** A callback property beside it
+ * (`onCheckedChange` and its kind) is unreachable from JSX: React takes any
+ * `on[A-Z]` prop into its own branch and calls
+ * `addEventListener('CheckedChange', …)` with it, an event nothing dispatches.
  */
 export interface ChangeRequestOptions<T> {
   /** Applies the change. Called only if no listener refused it. */

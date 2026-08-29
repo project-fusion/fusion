@@ -11,11 +11,10 @@ type Constructor<T> = new (...args: any[]) => T
 /**
  * How many colors the series palette has, and so where it starts over.
  *
- * Here rather than in each chart, which is what it was. Four families held the
- * same `const PALETTE = 24` and the legend held a fifth: when the palette went
- * from eight to twenty-four, one of them was missed and drew every ninth series
- * in the first color again while the legend beside it named the ninth. A
- * number two files have to agree on is a number that will stop agreeing.
+ * Here rather than in each chart, because a number two files have to agree on
+ * is a number that will stop agreeing: when the palette went from eight to
+ * twenty-four, one of five copies was missed and drew every ninth series in the
+ * first color while the legend beside it named the ninth.
  */
 export const PALETTE = 24
 
@@ -49,8 +48,7 @@ export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
  *
  * Declared here because this is where `seriesIndex` and `PALETTE` live, and
  * because a hook repeated on four families is a hook four families have to keep
- * agreeing about, which is the mistake the `PALETTE` comment above already
- * records somebody making.
+ * agreeing about.
  *
  * The numbered twenty-four are the seam between the tiers: `chart/series.css`
  * points each at a semantic token, which is a decision and so belongs to the
@@ -127,12 +125,6 @@ export declare class MixinChartSourceInterface {
 /**
  * The half of a chart that is about finding its numbers rather than drawing.
  *
- * Four families had written this out separately, and the row that asked for it
- * set the bar: two copies is a coincidence and three is a pattern. There were
- * five copies of `for`, four of `label` and three of the caption fallback by the
- * time the line and donut charts landed, which is why this arrives now and not
- * when the second chart did.
- *
  * **A mixin rather than a controller**, by the rule the tier notes give: it
  * introduces `for` and `label`, which a consumer writes. `SourceController` is
  * the other half and stays a controller, because resolving an id and watching
@@ -185,11 +177,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * Re-resolves when the chart is pointed at a different table.
      *
      * `SourceController` watches whatever it resolved on connect, and nothing
-     * tells it the id changed. `BarChart` had this and `LineChart` and
-     * `DonutChart` did not, which is the kind of difference that survives
-     * precisely because each file looked complete on its own: pointing a bar
-     * chart at a second table worked and pointing a line chart at one left it
-     * drawing the first. Extracting the four found it.
+     * tells it the id changed. Without this, pointing a chart at a second table
+     * leaves it drawing the first, silently.
      */
     protected override willUpdate(changed: PropertyValues<this>): void {
       super.willUpdate(changed)
@@ -224,14 +213,11 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * what the table says, which is `$128k` and not `128000`, and often wants
      * the column beside it that nothing plotted at all.
      *
-     * **Not `rows`, and the rename is the whole point of this paragraph.** It
-     * is the source table's rows, and `rows` on a chart is a name a chart
-     * wants for itself: `helix-heatmap` takes `rows="7"` to mean a calendar
-     * week, and declaring that against a base class whose `rows` is a `Row[]`
-     * getter is a type error at best. The same fault `MixinCollection` had,
-     * where a slot counter called `rows` would have shared one field with a
-     * consumer's data property. Name the member for what it holds rather than
-     * for the shortest word available.
+     * **Not `rows`.** It is the source table's rows, and `rows` on a chart is a
+     * name a chart wants for itself: `helix-heatmap` takes `rows="7"` to mean a
+     * calendar week, and declaring that against a base class whose `rows` is a
+     * `Row[]` getter is a type error at best. Name the member for what it holds
+     * rather than for the shortest word available.
      */
     get sourceRows(): Row[] {
       const element = this.source.element

@@ -1,16 +1,12 @@
 /**
  * What a fresh builder starts as, stated once.
  *
- * **It was stated three times in `builder.tsx` and is now needed in a fourth
- * place**, which is what forced this out. The nineteen values appeared as
- * `useState` initialisers, again in the `pristine` comparison that decides
- * whether the reset control is live, and again in `reset` itself. A default
- * changed in two of the three is a builder whose reset goes somewhere the reader
- * never was, and nothing would have said so.
- *
- * The fourth place is the server. The page derives this intent before it renders
- * so the first paint carries a real palette, which is what the engine being
- * synchronous used to buy for free.
+ * **Four readers, and a default that differs between two of them is a builder
+ * whose reset goes somewhere the reader never was, with nothing to say so.**
+ * `builder.tsx` needs these as its `useState` initializers, in the `pristine`
+ * comparison that decides whether the reset control is live, and in `reset`
+ * itself. The fourth is the server, which derives this intent before it renders
+ * so the first paint carries a real palette.
  *
  * **Chosen to be what already ships**, not what this file would prefer: the
  * sliders start where the stylesheet already is, so moving one is a departure a
@@ -31,8 +27,7 @@ import type { ThemeIntent } from '@fusion.dev/helix-theme'
  * **The preview is styled by exactly the CSS the page is showing**, which is
  * the one property a builder has to have: what you copy is what you saw. The
  * alternative, setting properties on the node and rendering a separate string,
- * is two derivations of the same answer, and this session spent most of its
- * time finding bugs of exactly that shape.
+ * is two derivations of the same answer that can disagree.
  */
 export const SCOPE = '[data-theme="preview"]'
 
@@ -140,12 +135,11 @@ export function intentFrom(settings: Settings): ThemeIntent {
 /**
  * The bounds every numeric control answers to, stated once.
  *
- * **They were stated in the JSX and are now needed twice**, which is the same
- * pressure that produced this file. A URL carries whatever somebody puts in it,
- * so a value arriving that way has to be clamped to the range the slider offers
- * or the builder shows a control sitting outside its own track, unable to
- * return to the value it is displaying. Clamping against a copy of the numbers
- * would drift from the sliders the first time one moved.
+ * A URL carries whatever somebody puts in it, so a value arriving that way has
+ * to be clamped to the range the slider offers or the builder shows a control
+ * sitting outside its own track, unable to return to the value it is
+ * displaying. The sliders read these same numbers: clamping against a second
+ * copy would drift from them the first time one moved.
  *
  * The step is here for the same reason: a value is snapped to it on the way in,
  * so a URL saying `density=97` produces the 95 a reader could have reached
@@ -261,11 +255,9 @@ const face = (
   if (value === undefined || value === '') {
     return fallback
   }
-  /* **`!== 1` rather than `=== 0`**, the third field having become a category
-     rather than a monospace flag. Monospace kept the 1 it had, so the mono test
-     is unchanged and the proportional one is every other category rather than
-     the single value that used to mean "not mono". Written the old way, a serif
-     arriving in a link would have been refused as though it were mono. */
+  /* **`!== 1` rather than `=== 0`.** The catalog's third field is a category,
+     not a monospace flag: 1 is monospace and every other value is proportional,
+     so a serif tested with `=== 0` would be refused as though it were mono. */
   return catalog.some((row) => row[0] === value && (mono ? row[2] === 1 : row[2] !== 1))
     ? value
     : fallback

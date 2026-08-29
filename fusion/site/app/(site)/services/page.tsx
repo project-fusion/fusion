@@ -20,11 +20,11 @@ export const metadata = pageMetadata({
  * plainly and why every number is stated rather than gated behind a call. An
  * offer whose cost appears only after a conversation cannot be compared.
  *
- * The constraint is stated here as terms rather than as a principle. Quoted at
- * a buyer mid-page it asked them to care about a governance rule at the moment
- * they were working out what they were committing to; said as what they keep
- * and what they are not signing up for, it is the thing they wanted to know.
- * The rule itself lives on `/trust`.
+ * The constraint appears here as terms rather than as a principle. Quoted at a
+ * buyer mid-page it asks them to care about a governance rule while they are
+ * working out what they are committing to; said as what they keep and what they
+ * are not signing up for, it is the thing they wanted to know. The rule itself
+ * lives on `/trust`.
  *
  * Copy lives in `services.ts` rather than here, so this page and the offer
  * cannot drift on what is actually sold or for how much. That file is also
@@ -77,9 +77,7 @@ export default async function Page() {
                   not: a magnifier over "AI capability audit", a cube over "Design
                   system sprint", a pair of figures over "Conversational build".
                   A metaphor a reader decodes before the words beside it is a cost
-                  with no return, and the landing band dropped them first. The
-                  wrapping flex went with it, having existed only to sit a glyph
-                  beside a heading. */}
+                  with no return. */}
               <helix-flex align="center" gap="md" justify="between" slot="header" wrap>
                 <helix-text as="h2" variant="title">
                   {service.name}
@@ -87,13 +85,12 @@ export default async function Page() {
               </helix-flex>
 
               {/* **One column, and what you keep is the card's bottom line.**
-                  This was two columns beside each other, and it did not work in
-                  either arrangement it was tried in. `What you keep` is one
-                  sentence and `What is in it` is four bullets under a summary
-                  and a price, so a column apiece is 500px of content against 60,
-                  and the right side of every card is a void whichever end the
-                  sentence is pinned to. Measured on the audit card: 1136px wide,
-                  a 611px summary, and 210px of nothing beside it.
+                  `What you keep` is one sentence and `What is in it` is four
+                  bullets under a summary and a price, so a column apiece is 500px
+                  of content against 60, and the right side of every card is a void
+                  whichever end the sentence is pinned to. Measured on the audit
+                  card: 1136px wide, a 611px summary, and 210px of nothing beside
+                  it.
 
                   A footer is the honest shape. It spans the card, so nothing is
                   empty, and it puts the takeaway where a reader arrives at it
@@ -106,17 +103,14 @@ export default async function Page() {
                   {service.summary}
                 </helix-text>
 
-                {/* The number comes after the sentence that says what this is,
-                    and it used to come before it.
-                    
-                    The cost of the old order is specific: a reader anchored on
-                    a component library in a design tool is
-                    comparing the sprint against a different kind of purchase and
-                    will not reach the second sentence. What is being sold is
-                    shipped software in their repository, and the price only
-                    reads correctly once that has landed. So the summary is
-                    first and the figure is under it, still in full and still
-                    the largest thing in this row. */}
+                {/* The number comes after the sentence that says what this is.
+                    Above it, a reader anchored on a component library in a design
+                    tool compares the sprint against a different kind of purchase
+                    and does not reach the second sentence. What is being sold is
+                    shipped software in their repository, and the price only reads
+                    correctly once that has landed. So the summary is first and the
+                    figure is under it, still in full and still the largest thing
+                    in this row. */}
                 <helix-flex align="baseline" gap="sm" wrap>
                   <helix-text variant="title">{service.price}</helix-text>
                   <helix-text tone="subtle" variant="caption">
@@ -156,11 +150,9 @@ export default async function Page() {
         </helix-grid>
       </section>
 
-      {/* The prose, from `@fusion.dev/insights`.
-          
-          Two sections that used to be JSX with their sentences inside it. The
-          buttons stay here: a call to action is chrome around a document rather
-          than a paragraph in one, and neither belongs in a `.md`. */}
+      {/* The prose, from `@fusion.dev/insights`. The buttons stay here: a call
+          to action is chrome around a document rather than a paragraph in one,
+          and neither belongs in a `.md`. */}
       <section data-band data-reveal>
         <helix-flex data-shell direction="column" gap="lg">
           {/* The document shell's block rhythm, not just its theming.

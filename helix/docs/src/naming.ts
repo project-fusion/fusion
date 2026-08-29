@@ -10,7 +10,7 @@
 /**
  * Words a slug spells in lower case that are read as letters.
  *
- * Capitalising the first letter of `qr` gives `Qr`, which is a word nobody says.
+ * Capitalizing the first letter of `qr` gives `Qr`, which is a word nobody says.
  * A slug is lower case because a URL is, and the initialism it came from is
  * lost by the time this sees it, so it has to be put back by name. Kept small
  * and explicit rather than guessed at from length: `ui`, `id` and `api` are

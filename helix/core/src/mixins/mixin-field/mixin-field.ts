@@ -26,7 +26,7 @@ export declare class MixinFieldInterface {
   hint: string
 
   /**
-   * Ids of the description nodes, for `aria-describedby` on the control.
+   * Id of the description node, for `aria-describedby` on the control.
    *
    * `undefined` when there is nothing to point at, so the attribute is absent
    * rather than pointing at an id that renders nothing.
@@ -88,7 +88,7 @@ export declare class MixinFieldInterface {
    *
    * `empty` is the control's own answer to whether it holds nothing, `message`
    * is what to say about it, and `anchor` names the part the browser should
-   * point its bubble at. Seven families wrote this out by hand.
+   * point its bubble at.
    */
   protected reportRequired(empty: boolean, message: string, anchor: string): void
 
@@ -151,17 +151,15 @@ export declare class MixinFieldInterface {
  * uses. Measured the same way, and the failure is silent either way: the
  * description simply never reaches the accessibility tree.
  *
- *
  * **The label, the hint and the feedback are documented on each component that
- * applies this, rather than here.** Eight of the eighteen did and ten did not,
- * which is now refused in both directions. Declaring them
- * once on this mixin is the obvious fix and does not work: the analyzer reads
- * `@csspart` off a custom element class, so a class-level tag here reaches the
- * manifest as nothing at all, on this JSDoc and on the inner class alike.
- * Measured both ways, and the inner-class version is the dangerous one, since
- * it satisfies the rule while every API page stays exactly as wrong as
- * before. Members are different and do inherit, which is what the note about
- * the inner class in the area rules is about.
+ * applies this, rather than here.** Declaring them once on this mixin is the
+ * obvious fix and does not work: the analyzer reads `@csspart` off a custom
+ * element class, so a class-level tag here reaches the manifest as nothing at
+ * all, on this JSDoc and on the inner class alike. Measured both ways, and the
+ * inner-class version is the dangerous one, since it satisfies the rule while
+ * every API page stays exactly as wrong as before. Members are different and
+ * do inherit, which is what the note about the inner class in the area rules
+ * is about.
  */
 export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinFieldInterface deliberately. The interface is
@@ -195,15 +193,14 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     /**
      * Whether the reader has had a go at the field yet.
      *
-     * This was `:user-invalid`, which is the platform's own answer to "is this
-     * field wrong *yet*" and is the right idea. It does not work here, and the
-     * reason is structural rather than a browser bug: `:user-invalid` tracks
-     * interaction with the element it is on, and nobody interacts with this
-     * element. The reader types into an `<input>` inside its shadow root, so
-     * the host's interaction flag is never set and the selector never matches.
-     * Measured after submitting an invalid required field and again after
-     * editing one and leaving it: false both times, while `:invalid` matched
-     * both times.
+     * **Not `:user-invalid`**, which is the platform's own answer to "is this
+     * field wrong *yet*" and cannot work here, for a structural reason rather
+     * than a browser bug: it tracks interaction with the element it is on, and
+     * nobody interacts with this element. The reader types into an `<input>`
+     * inside its shadow root, so the host's interaction flag is never set and
+     * the selector never matches. Measured after submitting an invalid required
+     * field and again after editing one and leaving it: false both times, while
+     * `:invalid` matched both times.
      *
      * So the moments are listened for instead, and both of them demonstrably
      * reach the host: `invalid` when a form is submitted with this control
@@ -214,10 +211,10 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * **A composite control has to construct its own `change`, and this mixin
      * deliberately does not do it for them.** A native `change` is
      * `composed: false`, so a control built from several inner inputs never
-     * relays one to its host: `Input` gets this free from its one control, and
-     * `PinInput` had four boxes, none of whose `change` means the code is
-     * entered, so a half-entered code was never `touched` and could never say
-     * what was wrong with it. See 311.
+     * relays one to its host: `Input` gets this free from its one control,
+     * while a `PinInput` of four boxes has no inner `change` that means the
+     * code is entered, so a half-entered code is never `touched` and can never
+     * say what is wrong with it. See 311.
      *
      * **The obvious shared fix is for `touched` to take a `focusout`, and it is
      * the wrong one**, because it is the paragraph above undone: a `focusout`
@@ -226,15 +223,15 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * focus moment, it is the native meaning of `change`, "edited, then left",
      * and the editing half is the part a mixin up here cannot see.
      *
-     * **Nor is there one shape to extract yet.** The two composites in the
-     * library solve it differently and both are right: `PinInput` is
-     * focus-driven, taking a baseline when focus arrives from outside the row
-     * and announcing on the way out if it moved, and `DateInput` is
-     * value-driven, stopping its inner `change` and announcing once the date
-     * itself moves. Generalizing from those two would be generalizing from one,
-     * since only one of them has a leaving moment at all. The trigger for
-     * lifting it is a third control that needs the focus-driven shape, at which
-     * point what moves up is the baseline-and-commit pair rather than `touched`.
+     * **Nor is there one shape to extract yet.** The two composites solve it
+     * differently and both are right: `PinInput` is focus-driven, taking a
+     * baseline when focus arrives from outside the row and announcing on the
+     * way out if it moved, and `DateInput` is value-driven, stopping its inner
+     * `change` and announcing once the date itself moves. Only one of them has
+     * a leaving moment at all, so generalizing from the pair is generalizing
+     * from one. The trigger for lifting it is a third control that needs the
+     * focus-driven shape, at which point what moves up is the
+     * baseline-and-commit pair rather than `touched`.
      */
     @state()
     private touched = false
@@ -325,10 +322,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * that the label is rendered and clipped, so the name arrives through the
      * same `<label for>` a visible one does.
      *
-     * This replaced `hide-label`, which was a second attribute to say what the
-     * absence of the first should have said. The rule is now `label` means a
-     * label, `aria-label` means a name, and neither means an unnamed field a
-     * screen reader announces as "edit text"
+     * The rule is that `label` means a label, `aria-label` means a name, and
+     * neither means an unnamed field a screen reader announces as "edit text".
      */
     protected renderLabel(): TemplateResult | typeof nothing {
       const hidden = this.label === '' ? this.getAttribute('aria-label') : null
@@ -426,17 +421,10 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     /**
      * Reports "required and empty" and refreshes the message, or clears both.
      *
-     * Seven families had this written out: the same `valueMissing`, the same
-     * anchor lookup, the same `refreshFeedback` under the same comment about
-     * validity moving without a property moving. Seven copies of a five-line
-     * shape is the threshold at which this mixin itself was extracted, and two
-     * of them had already drifted, `checkbox-group` having no validity at all
-     * until yesterday.
-     *
-     * What differs between them is exactly two things, so those are the
+     * Two things differ between the controls that call this, so those are the
      * arguments: whether the control is empty, which only it can say, and the
      * sentence to say about it, which is different for a box, a switch and a
-     * set. The anchor is looked up here because every one of them anchored on a
+     * set. The anchor is looked up here because every one of them anchors on a
      * rendered part and the browser needs somewhere to point the bubble.
      *
      * The message is not derived from the control's kind, deliberately. "Tick
@@ -461,13 +449,12 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * Records "wrong, and the reader knows it" as the custom state `invalid`.
      *
      * The styled tier selects on this rather than on `:host(:user-invalid)`,
-     * which cannot match for the reason above, so the invalid border never
-     * arrived either. One state, and the message and the border agree by
-     * construction.
+     * which cannot match for the reason above. One state, and the message and
+     * the border agree by construction.
      *
-     * **A state and not `data-invalid`, since 27 Aug 2026.** A field served
-     * with a `feedback` message already failing was written invalid on its
-     * first update, which is an attribute the consumer's server never sent.
+     * **A state and not `data-invalid`.** A field served with a `feedback`
+     * message already failing is written invalid on its first update, which
+     * would be an attribute the consumer's server never sent.
      * `HelixElement.toggleState` carries the argument.
      *
      * In `willUpdate`, which is where the resolved message is first known.
@@ -476,11 +463,9 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       super.willUpdate(changed)
       this.shownFeedback = this.resolvedFeedback
       this.toggleState('invalid', this.shownFeedback !== '')
-      /* And say it to the accessibility tree, which nothing did.
-       *
-       * A field carrying a `feedback` message painted red, and was described by
-       * that message through `aria-describedby`, and was never announced as
-       * being *wrong*: a reader heard the message as though it were help text.
+      /* And say it to the accessibility tree. Describing a field with its
+       * `feedback` message through `aria-describedby` never announces it as
+       * being *wrong*: a reader hears the message as though it were help text.
        * `aria-invalid` is the one word for it, and this is the one place that
        * knows, so every field in the library gets it from here. */
       this.internals.ariaInvalid = this.shownFeedback === '' ? null : 'true'
@@ -511,7 +496,6 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
 
      The contract is enforced by use rather than by the cast. Every helper is
      called from `Input` or `Checkbox`, so an interface that drifts from the
-     class fails their builds, which is exactly how the missing declarations
-     were found. */
+     class fails their builds. */
   return FieldElement as unknown as Constructor<MixinFieldInterface> & T
 }

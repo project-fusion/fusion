@@ -4,7 +4,7 @@ import type { ApiTier } from '@/hooks/use-api-tier/use-api-tier'
 
 /* Re-exported, because the preview's theme toolbar writes the same preference
    and two components holding the same string is how they drift. The value
-   itself lives in a plain module now: the root layout needs it on the server to
+   itself lives in a plain module: the root layout needs it on the server to
    build its pre-paint script, and a `'use client'` file cannot hand a server
    component a string. */
 export { COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
@@ -98,11 +98,9 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
   /**
    * Follows the attribute, because this panel is not the only thing that sets it.
    *
-   * **It read `localStorage` once at mount and never again**, so a scheme
-   * chosen anywhere else left this showing the old answer: change it in the
-   * landing page's theme bar, open preferences, and the radio still pointed at
-   * what you had before. The panel was not wrong about what it had been told,
-   * it had just stopped listening.
+   * Reading `localStorage` once at mount instead leaves this showing a stale
+   * answer whenever a scheme is chosen elsewhere, such as the landing page's
+   * theme bar.
    *
    * `data-color-mode` is the one thing every control agrees on, so watching it
    * needs no coordination between them. Its absence is the system default,
@@ -142,22 +140,19 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
       open={open}
       placement="end"
     >
-      {/* No `align="start"`. It shrink wrapped every child to its own content,
-          so each toggle group was as wide as its three words and the drawer had
-          a column of ragged little controls in it. Stretch is the default and
-          is what a column of fields wants: they share an edge, and a group that
-          fills its column has segments wide enough to read. */}
+      {/* No `align="start"`. It shrink wraps every child to its own content, so
+          each toggle group comes out as wide as its three words. Stretch is the
+          default and is what a column of fields wants: they share an edge, and a
+          group that fills its column has segments wide enough to read. */}
       <helix-flex direction="column" gap="lg">
         <helix-text as="h2" variant="subheading">
           Preferences
         </helix-text>
 
-        {/* The label and the line under it are the control's own now. They were
-            two `Text` elements hand-placed around it, which is exactly the
-            arrangement `MixinField` exists to stop being hand-placed: the
-            spacing was this file's guess at what every other field does, and
-            the group was named twice, once visibly and once through
-            `aria-label`. */}
+        {/* The label and the line under it are the control's own, not `Text`
+            elements placed around it: `MixinField` exists so the spacing is not
+            a guess at what every other field does, and so the group is named
+            once rather than visibly and again through `aria-label`. */}
         <helix-toggle-group
           label="Color mode"
           onChange={(event) => choose(event.currentTarget.value as ColorMode)}
@@ -170,9 +165,9 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
         {/* Headless first, styled second, which is the order the tiers are in:
             styled extends headless, so reading left to right is reading
-            outward. The default is unchanged and is still styled, that being
-            the tier almost everyone consumes; where a control sits in a row and
-            which of its values is the resting one are different questions. */}
+            outward. The default is still styled, that being the tier almost
+            everyone consumes; where a control sits in a row and which of its
+            values is the resting one are different questions. */}
         <helix-toggle-group
           hint="Styled extends headless, so it shows more."
           label="API reference"

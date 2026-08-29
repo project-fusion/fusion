@@ -15,17 +15,17 @@ const rows = Array.from({ length: 2000 }, (_, index) => ({
   note: `the ${index + 1}th of two thousand`,
 }))
 
-/* Byte for byte what the HTML example's `<template>` holds, indentation
-   included. The whitespace is not decoration: `<strong>` and `<span>` are
-   inline, so the newline between them is the space separating a row's name from
-   its note. Written without it the two words run together, which the picture
-   comparison caught as 10,470 pixels on an example that otherwise matched. */
 /* The example's own stylesheet, which the HTML file carries as a `<style>`
    block. `dangerouslySetInnerHTML` because CSS is full of braces and JSX reads a
    brace in children as an expression: written as a child it is a syntax error,
    and there is no `.css` file beside this example to import instead. */
 const SHEET = `\n  .virtualRow {\n    align-items: baseline;\n    block-size: 32px;\n    display: flex;\n    gap: 0.5rem;\n    padding-inline: 0.5rem;\n  }\n`
 
+/* Byte for byte what the HTML example's `<template>` holds, indentation
+   included. The whitespace is not decoration: `<strong>` and `<span>` are
+   inline, so the newline between them is the space separating a row's name from
+   its note. Written without it the two words run together, which the picture
+   comparison catches as 10,470 pixels on an example that otherwise matches. */
 const ROW = `
     <div class="virtualRow">
       <strong data-field="name"></strong>

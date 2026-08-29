@@ -14,9 +14,8 @@
  * set to, so a value stays in the shape the consumer asked for however it was
  * entered.
  *
- * **What is written is the comma form.** Both are valid and the space-separated
- * one is newer, which was the reason it was chosen first; the commas are what a
- * reader recognizes, what most code around them holds, and what pastes into
+ * **What is written is the comma form.** Both are valid, and the commas are what
+ * a reader recognizes, what most code around them holds, and what pastes into
  * anything without a second thought. A syntax a value is handed *out* in is not
  * the place to be early. `rgba` and `hsla` come with them, since a comma form
  * with a fourth argument is spelled that way.
@@ -127,11 +126,11 @@ const toHsl = (color: Color): { hue: number; lightness: number; saturation: numb
 /**
  * Splits a comma-separated list of colors, ignoring the commas inside them.
  *
- * A plain `split(',')` is what this was, and it cannot hold the legacy syntaxes:
- * `#ef4444, rgb(249 115 22), rgba(34,197,94,.5)` came apart into six fragments,
- * four of them not colors, and the row quietly rendered three swatches instead
- * of four. The modern space-separated forms survived it, which is what made the
- * list look like it worked.
+ * A plain `split(',')` cannot hold the legacy syntaxes:
+ * `#ef4444, rgb(249 115 22), rgba(34,197,94,.5)` comes apart into six fragments,
+ * four of them not colors, and the row quietly renders three swatches instead of
+ * four. The modern space-separated forms survive it, which is what makes such a
+ * list look like it works.
  *
  * Depth rather than a regular expression, because the thing that matters is
  * whether a comma is inside a function call and that is exactly what a counter

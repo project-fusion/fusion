@@ -82,14 +82,12 @@ export interface CommandOptions {
  * for a click, for Enter, for Space, and for anything else the platform decides
  * counts as activation later.
  *
- * The alternative was a `data-` recipe of our own with a delegated listener on
- * the document, and it is worse in every direction: a global listener a
- * consumer cannot see, an id lookup we would write ourselves, activation
- * semantics we would have to guess at, and a convention that is ours to
- * document and theirs to learn.
+ * A `data-` recipe of our own would mean a delegated document listener a
+ * consumer cannot see, an id lookup and activation semantics we would write
+ * ourselves, and a convention that is ours to document and theirs to learn.
  *
- * **Only custom commands reach a custom element.** The built-in ones —
- * `show-modal`, `close`, `toggle-popover` — are defined against native elements
+ * **Only custom commands reach a custom element.** The built-in ones
+ * (`show-modal`, `close`, `toggle-popover`) are defined against native elements
  * and the browser applies them itself; pointed at a custom element they do
  * nothing. So the names here start with `--`, which is the platform's marker
  * for "the target decides what this means", and the target deciding is exactly

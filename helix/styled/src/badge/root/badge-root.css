@@ -3,11 +3,11 @@
   position: relative;
   vertical-align: middle;
 
-  /* Tokens, like every other component's sizing. These were `em`, on the
-     premise that the mark would scale with what it decorates. It does not: the
-     badge inherits `font-size` from the page, and an avatar sizes itself from
-     `size`, so the mark measured the same beside a 32px avatar and a 48px one.
-     The only way to move it was to write `font-size` on the badge by hand. */
+  /* Tokens, like every other component's sizing, and never `em`. The mark does
+     not scale with what it decorates: the badge inherits `font-size` from the
+     page and an avatar sizes itself from `size`, so an em-sized mark measures
+     the same beside a 32px avatar and a 48px one, movable only by writing
+     `font-size` onto the badge by hand. */
   --_badge-size: var(--helix-size-badge);
   --_badge-text: var(--helix-text-xs);
   --_badge-inset: var(--helix-space-2xs);
@@ -25,10 +25,9 @@
   block-size: var(--_badge-size);
   border-radius: var(--helix-radii-full);
   /* A ring in the page's own color, so the mark stays separate from whatever it
-     overlaps rather than merging into it. */
-  /* `border-thick`, not a literal 2. The separating ring is a rule like any
-     other and a theme that thickens its rules should thicken this with them;
-     it was the only place in the file naming a length outright. */
+     overlaps rather than merging into it. `border-thick`, not a literal 2: the
+     separating ring is a rule like any other and a theme that thickens its
+     rules should thicken this with them. */
   box-shadow: 0 0 0 var(--helix-border-thick) var(--badge-ring-color, var(--helix-color-background));
   color: var(--helix-color-foreground-on-accent);
   display: inline-flex;
@@ -40,24 +39,19 @@
    * mark's center sits on the corner of the box, which is only right when the
    * thing being marked fills its box: on a circle, which is most of what
    * carries a badge, the corner is outside the shape and the mark floats off
-   * it. There was an example whose whole subject was setting this by hand; it
-   * is gone, because the value it demonstrated is now what you get. */
-  /* The pullback, as a proportion of the mark rather than a number.
+   * it.
    *
-   * It was a bare `9px`, the one unexplained length in a file that explains
-   * every other number, and it was absolute where the thing it positions is
-   * not: a badge whose size followed the density stayed pinned nine pixels in
-   * whatever it had become. A quarter of the mark keeps the overlap looking the
-   * same at every size, which is what the number was reaching for.
+   * A proportion of the mark rather than a length, because an absolute inset
+   * positions something that is not absolute: a badge whose size follows the
+   * density stays pinned the same number of pixels in whatever it has become. A
+   * quarter of the mark keeps the overlap looking the same at every size.
    *
-   * **And it was the wrong sign, so the pullback pushed out.** A negative inset
-   * moves the mark away from the corner, which is the opposite of what the
-   * paragraph above asks for and what a reader sees: measured on an avatar, a
-   * button and an icon button, the mark's center landed 4px *outside* the
-   * corner in both axes, and on a 32px circle that is well clear of the shape,
-   * so the badge floated beside the avatar rather than sitting on it. Positive
-   * now: the center sits 4px inside the corner, which on that circle is within
-   * a pixel of where its edge crosses the diagonal. */
+   * **And the sign is positive, or the pullback pushes out.** A negative inset
+   * moves the mark *away* from the corner: measured on an avatar, a button and
+   * an icon button, its center landed 4px outside the corner in both axes,
+   * which on a 32px circle is well clear of the shape. Positive, the center
+   * sits 4px inside the corner, within a pixel of where that circle's edge
+   * crosses the diagonal. */
   inset-block-start: var(--badge-offset, calc(var(--_badge-size) / 4));
   inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / 4));
   justify-content: center;
@@ -120,8 +114,8 @@
 
 /* The alarming one, which is the exception rather than the default. A badge is
    usually a count of things waiting, and a count is news rather than a warning:
-   red on everything that has unread anything is a page that is always shouting.
-   `primary` is gone, having become the default and so a second name for it. */
+   red on everything that has unread anything is a page that is always
+   shouting. */
 :host([tone="danger"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-danger-surface));
 }

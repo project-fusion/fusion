@@ -1,9 +1,8 @@
 :host {
-  /* Dense by nature, and it says so itself. The comment below has claimed this
-     bar "declares itself dense" since it was written, and it was the workbench
-     that declared it, on the tag: one consumer holding a fact about the
-     component, which the next consumer has to know to repeat. App Header sets
-     the same four for the same reason. */
+  /* Dense by nature, and it says so itself rather than leaving a consumer to
+     declare it on the tag: a fact about the component held by one consumer is a
+     fact the next consumer has to know to repeat. App Header sets the same four
+     for the same reason. */
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
@@ -11,20 +10,17 @@
 
   align-items: center;
   background-color: var(--helix-color-background);
-  /* Said, not left to fall out of the padding. The bar was four pixels of space
-     around whatever it held, so its height was a consequence of its contents
-     and any bar beside it with different contents stood at a different height.
-     Stated once, two bars either side of a split line up and stay lined up.
+  /* Said, not left to fall out of the padding: four pixels of space around
+     whatever it holds makes the height a consequence of the contents, so a bar
+     beside it holding something else stands at a different height. Stated once,
+     two bars either side of a split line up and stay lined up.
 
      A fixed step rather than `control`, because this bar declares itself dense
      and the controls in it are the small size: taking the current step would
      make the bar the height of one of its own buttons with nothing around it,
      and would shrink whenever the density did.
 
-     `control-lg`, so forty-eight. The comment said `control-md` and "forty is
-     the figure" for as long as the rule said `control-lg`: `2eea9ff` raised the
-     bars to 48 on purpose and left the sentence describing the value before
-     it. */
+     `control-loose`, so forty-eight. */
   block-size: var(--sandbox-toolbar-size, var(--helix-size-control-loose));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */

@@ -27,12 +27,10 @@ const axis = async (host: Color, which: string, to: number): Promise<void> => {
 /**
  * Moves a channel the way its slider does: apply, then announce natively.
  *
- * This dispatched `helix-change` carrying the value in a detail until 26 Aug
- * 2026, which is what the picker read. That event is a *request* now, announced
- * before the slider has moved and while a listener may still refuse it, so
- * acting on it would act on a decision not yet taken. The picker reads the
- * applied value off the slider instead, which is what the native pair reports.
- * See 294.
+ * `helix-change` is a *request*, announced before the slider has moved and
+ * while a listener may still refuse it, so acting on it would act on a decision
+ * not yet taken. The picker reads the applied value off the slider instead,
+ * which is what the native pair reports. See (294).
  */
 const ramp = async (host: Color, channel: string, to: number): Promise<void> => {
   const slider = host.shadowRoot?.querySelector(`[data-channel="${channel}"]`) as
@@ -290,11 +288,10 @@ describe('color picker', () => {
     /* An empty box still takes its padding, which is a band of nothing under the
        ramps on a picker with no value, no tools and no presets.
      *
-     * `no-eyedropper` as well, which this did not say. The eyedropper is offered
-     * where the platform has one, so on a browser with `EyeDropper` the tools
-     * group rendered and the footer held it: the spec asserted "holds nothing"
-     * while naming only two of the three things it can hold, and passed under
-     * happy-dom because nothing there implements the API. */
+     * `no-eyedropper` as well: the eyedropper is offered where the platform has
+     * one, so a browser with `EyeDropper` renders the tools group and the footer
+     * holds it. Naming only two of the three things it can hold still passes
+     * under happy-dom, which implements none of that API. */
     const host = await picker('no-eyedropper no-format no-value')
     expect(part(host, 'footer')?.childElementCount).toBe(0)
   })

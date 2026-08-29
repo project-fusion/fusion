@@ -21,9 +21,9 @@ export declare class MixinControllerOpenInterface {
   /**
    * Whether the element is open.
    *
-   * Reading gives the real state, in either mode. Writing hands ownership to
-   * the consumer: from then on the element announces changes and applies none
-   * of them, and waits to be told.
+   * Reading gives the real state. Writing always applies, and is a seed and a
+   * correction rather than a claim of ownership: a consumer who wants the
+   * decision refuses the `helix-before-open` or `helix-before-close`.
    */
   open: boolean
 
@@ -64,27 +64,16 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     /**
      * Whether the element is open.
      *
-     * One property, not two. Reading gives the real state whichever mode the
-     * element is in, so `dialog.open` answers the question anyone asking it
-     * meant. Writing hands ownership to the consumer, which is what the
-     * attribute in `<helix-dialog open>` does as well: from then on the element
-     * announces changes and applies none of them.
-     *
-     * It reads as an accessor pair rather than a field because those are two
-     * different questions sharing one name, and the alternative was a second
-     * property answering the first. That worked for a boolean, where `isOpen`
-     * reads well; there is no such word for a value or an active item, so all
-     * four of these mixins now have this shape instead of two shapes.
+     * One property, not two, so `dialog.open` answers the question anyone
+     * asking it meant. Writing always applies; `<helix-dialog open>` is the
+     * same statement in markup.
      *
      * **Not reflected, and that is required rather than tidy.** Reflection
-     * writes the resolved state back as an attribute, and writing the attribute
-     * is how a consumer says they own it. So an uncontrolled element that
-     * opened itself would put `open` on its own host and, from the next thing
-     * that read it, be indistinguishable from one the consumer controls:
-     * cloned, serialised for hydration, or diffed by a framework, it would come
-     * back holding whatever the last reader did rather than what the author
-     * wrote. `:state(open)` carries the resolved state for stylesheets, which
-     * is what the mirror has always been for.
+     * writes the resolved state back as an attribute, so an element that opened
+     * itself would put `open` on its own host: cloned, serialized for
+     * hydration, or diffed by a framework, it comes back holding whatever the
+     * last reader did rather than what the author wrote. `:state(open)` carries
+     * the resolved state for stylesheets, which is what the mirror is for.
      */
     @property({ type: Boolean })
     get open(): boolean {
@@ -113,24 +102,22 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * silently overwrites the first. Measured, as a select whose `value` came
      * back holding its `open` boolean.
      *
-     * One field and not two. Writing always applies, which is what a native
-     * control does when a script assigns to it, and is the behavior an
-     * imperative `element.open = true` should have whatever mode the element is
-     * in. What the write does *not* do is change which mode that is.
+     * One field and not two. Writing always applies, the way a native control
+     * does when a script assigns to it.
      */
     private openState: boolean | undefined = undefined
 
     /**
      * Records the resolved state as the custom state `open`.
      *
-     * **A state and not `data-open`, which is what this wrote until 27 Aug
-     * 2026.** An `<helix-accordion-item default-open>` was served without the
-     * attribute and gained it on upgrade, which is a hydration mismatch a React
-     * consumer reports. See `HelixElement.toggleState`, and see `Toast.Item`
-     * for the other answer to the same fault: inverting the hook so the write
-     * falls on the side that only happens after somebody acts. Inversion works
-     * where the resting state is the loud one and cannot help here, `checked`
-     * and `open` being true only because a consumer asked for them.
+     * **A custom state and never `data-open`.** An attribute mirror is in the
+     * DOM, so an `<helix-accordion-item default-open>` served without it gains
+     * it on upgrade, which is a hydration mismatch a React consumer reports.
+     * See `HelixElement.toggleState`, and see `Toast.Item` for the other answer
+     * to the same fault: inverting the hook so the write falls on the side that
+     * only happens after somebody acts. Inversion works where the resting state
+     * is the loud one and cannot help here, `checked` and `open` being true
+     * only because a consumer asked for them.
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
@@ -170,19 +157,17 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     /**
      * Says the state moved, under the platform's own name and in its shape.
      *
-     * **`<details>` fires `toggle` and a popover fires `toggle`, and sixteen
-     * families here fired neither.** Two of them render a real `<dialog>` and
-     * ten show a `popover="manual"` panel, so the browser was already firing
-     * something on an element inside a shadow root, where `toggle` neither
-     * bubbles nor composes and so reaches nobody. The rest, the disclosures,
-     * have no native element to fire anything at all: `AccordionItem` and
-     * `TreeItem` are `aria-expanded` and `hidden` written by hand, which is
-     * `<details>`'s job done manually.
+     * **A native `toggle` from inside a shadow root reaches nobody**, because
+     * it neither bubbles nor composes, so the ten families showing a
+     * `popover="manual"` panel and the two rendering a real `<dialog>` announce
+     * nothing to a consumer. The disclosures have no native element to fire
+     * anything at all: `AccordionItem` and `TreeItem` are `aria-expanded` and
+     * `hidden` written by hand, which is `<details>`'s job done manually.
      *
-     * **From here rather than from `PopoverController`, which had it first.**
-     * The controller covers eleven families and the mixin covers sixteen, and
-     * the overlap is ten that would have announced twice. What `toggle` reports
-     * is the *state*, and the state is this mixin's; the controller is a way of
+     * **From here rather than from `PopoverController`.** The controller covers
+     * eleven families and the mixin covers sixteen, so announcing from both
+     * would announce twice on the ten they share. What `toggle` reports is the
+     * *state*, and the state is this mixin's; the controller is a way of
      * putting a panel on the screen.
      *
      * **`newState` and `oldState`, because that is the platform's shape**, so a

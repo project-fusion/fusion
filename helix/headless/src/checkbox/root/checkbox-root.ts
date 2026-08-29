@@ -83,18 +83,15 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
 
   private readonly handleChange = (event: Event): void => {
     const input = event.target as HTMLInputElement
-    // The input has already flipped itself. Where the change is refused, or the
-    // element is controlled, it is put back to whatever the element resolves
-    // to, so the box never shows a state the element does not hold.
+    // The input has already flipped itself. Where the change is refused it is
+    // put back to whatever the element resolves to, so the box never shows a
+    // state the element does not hold.
     const next = input.checked
-    /* The dash goes only where the change is taken.
-     *
-     * It was cleared first and unconditionally, so a consumer calling
-     * `preventDefault()` on the change kept the checked state and lost the
-     * third one: the box came back neither ticked nor dashed, which is a state
-     * nobody asked for and the element did not hold. Refusing a change should
-     * leave everything as it was, which is the argument the line below already
-     * makes for `checked`. */
+    /* The dash goes only where the change is taken. Clearing it
+     * unconditionally leaves a refused change holding the checked state and
+     * losing the third one: a box neither ticked nor dashed, which is a state
+     * nobody asked for. Refusing leaves everything as it was, which is the
+     * argument the line below already makes for `checked`. */
     if (this.requestChecked(next)) {
       this.indeterminate = false
     }
@@ -111,8 +108,8 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   /** Returns the box to the state its markup declared. */
   formResetCallback(): void {
     this.indeterminate = false
-    // `resetChecked` drops both halves now, the consumer's and the element's,
-    // so there is nothing to clear before it.
+    // `resetChecked` drops both halves, the consumer's and the element's, so
+    // there is nothing to clear before it.
     this.resetChecked()
   }
 
@@ -153,15 +150,13 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    *
    * Called on `slotchange` and after every update, and the second is not
    * belt-and-braces: **`slotchange` does not fire when nothing is assigned.**
-   * So a checkbox labeled only by its property, which is most of them, never
-   * heard about its own label and rendered without one. Caught by the spec that
-   * asks a labeled row to be wider than a bare one.
+   * Without it a checkbox labeled only by its property, which is most of them,
+   * never hears about its own label and renders without one.
    *
-   * **`:state(has-label)` and not `data-has-label`, since 27 Aug 2026.** This
-   * one could never have been in server output whatever it was called, the
-   * answer coming from `assignedNodes` and a server having no tree to ask, so
-   * it was an attribute that appeared on every labeled checkbox the instant it
-   * upgraded and on none that any server sent. See `HelixElement.toggleState`.
+   * **`:state(has-label)` and not `data-has-label`.** The answer comes from
+   * `assignedNodes` and a server has no tree to ask, so an attribute would
+   * appear on every labeled checkbox the instant it upgraded and on none that
+   * any server sent. See `HelixElement.toggleState`.
    */
   private syncLabelPresence(): void {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="label"] slot')
@@ -170,23 +165,22 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
     )
     this.toggleState('has-label', filled)
     /* And `hidden` on the region itself, because the state is on the host and
-       this tier has no sheet to turn one into the other: a checkbox with no
-       label kept an empty label box beside it. The styled rule stays, since it
-       hides through a descendant selector this cannot replace. */
+       this tier has no sheet to turn one into the other, so a checkbox with no
+       label would keep an empty label box beside it. The styled rule stays,
+       since it hides through a descendant selector this cannot replace. */
     this.renderRoot.querySelector<HTMLElement>('[part="label"]')?.toggleAttribute('hidden', !filled)
   }
 
   protected override render(): TemplateResult {
     /* A real `<label>` around both, which is the whole of what makes the text a
-       target. It was a `<span>` beside the input, so pressing the words did
-       nothing: the styled tier's own description claimed the pair behaved like
-       a native label wrapping a checkbox, and nothing was doing that work.
+       target. A `<span>` beside the input leaves pressing the words doing
+       nothing.
 
        Labeling is behavior, which is what earns an element here rather than a
        bare slot: the wrapper is not decoration and there is no other way to get
        it. The browser handles the forwarding, so there is no click handler to
        write and none to get wrong.
- 
+
        The one line of description goes under that row, which is where a field
        puts it too. */
     return html`<label part="field">

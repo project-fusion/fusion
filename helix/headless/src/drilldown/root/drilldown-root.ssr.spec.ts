@@ -4,7 +4,7 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('drilldown server output', () => {
-  test('the top page is served, because it is the consumer"s own markup', () => {
+  test("the top page is served, because it is the consumer's own markup", () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-drilldown label="Settings"
         ><helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item></helix-headless-drilldown

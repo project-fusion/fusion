@@ -38,8 +38,6 @@ export class HelixTree extends HelixHeadlessTree {
    *
    * Styled tier, because it is presentation and nothing else: it moves paint
    * and leaves the markup, the ARIA and the reading order exactly as they were.
-   * It was written on the base class first, which the tier rule forbids for
-   * precisely this kind of property.
    *
    * On the tree rather than on the item, because it is a fact about the list. A
    * navigation puts every chevron on the same side, and a per-item version

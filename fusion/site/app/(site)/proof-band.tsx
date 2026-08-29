@@ -14,10 +14,6 @@ import styles from './landing-c.module.css'
  * script blocked gets the figures, and the drawing is an enhancement over data
  * that was already correct. A chart taking an array prop would have made the
  * numbers unreadable to half of that list.
- *
- * The same argument the showcase makes one band above, applied to the numbers
- * rather than to the controls: the chart is the library drawing its own
- * measurements.
  */
 export const ProofBand = () => (
   <helix-flex data-shell direction="column">
@@ -26,16 +22,9 @@ export const ProofBand = () => (
         <p className={styles.tLabel}>Measured, not claimed</p>
         {/* **Not "fast" and not "small".** Both are adjectives a reader has been
           promised by every library they have ever evaluated, and neither is
-          checkable.
-
-          **And not a second run at the kicker either.** This read "Every number
-          here was produced, not written", directly under "Measured, not
-          claimed": the same sentence twice, in the same `X, not Y` shape, with
-          the lede under it saying it a third time. Three lines to establish
-          where numbers come from and none of them saying what the numbers are
-          about. The kicker already carries the epistemics, which frees the
-          heading to name the subject the way every other band on this page
-          does. */}
+          checkable. The kicker above carries the epistemics, so this heading
+          names the subject rather than restating where the numbers came
+          from. */}
         <helix-text as="h2" data-measure data-section-title>
           What Helix costs a page
         </helix-text>
@@ -74,11 +63,10 @@ export const ProofBand = () => (
           </helix-text>
         </helix-flex>
 
-        {/* **Two columns, because "ours" is a fact about the data.** One series
-          painted every bar the same, in a chart whose entire job is the
-          comparison: a reader had to find Helix by reading labels. Splitting the
-          measurement into `Helix` and `Others` gives the chart two series to
-          color and the legend something true to say, and each row still carries
+        {/* **Two columns, because "ours" is a fact about the data.** A single
+          series paints every bar the same, leaving a reader to find Helix by
+          reading labels. `Helix` and `Others` give the chart two series to color
+          and the legend something true to say, and each row still carries
           exactly one number. */}
         <table data-hidden-visually id="proof-button">
           <caption>One button and its runtime, brotli bytes, by design system</caption>
@@ -113,13 +101,6 @@ export const ProofBand = () => (
         <helix-legend class={styles.proofLegend} for="proof-button"></helix-legend>
 
         <helix-flex data-density="lg">
-          {/* The workaround here is gone, because the fault it worked around
-            is fixed. `standard` set a fixed `inline-size` while the note beside
-            it called the value a floor, so a label wider than the standard
-            width filled the box and ate its own padding, and this button opted
-            out rather than do that. It is `min-inline-size` now and behaves as
-            documented, so this takes the width every other button on the page
-            takes. The shorter label stays: it was the better label anyway. */}
           <a data-button="subtle" data-button-width="standard" href={METRICS_HREF}>
             The method
           </a>

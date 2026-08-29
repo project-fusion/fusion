@@ -1,12 +1,11 @@
 /**
- * What the preview shows: a page somebody would ship, at three sizes of page.
+ * What the preview shows: a page somebody would ship, at four sizes of page.
  *
- * **A palette is judged in composition, not in isolation.** An earlier version
- * was a card, a callout and a row of tags, which answers "what color is a tag"
- * and not "would I ship this". Contrast between an ink and its ground is
- * measured by the engine and reported in the audit; what a reader is here to
- * judge is the thing the audit cannot see, which is whether the palette holds
- * together across real hierarchy.
+ * **A palette is judged in composition, not in isolation.** A card, a callout
+ * and a row of tags answers "what color is a tag" and not "would I ship this".
+ * Contrast between an ink and its ground is measured by the engine and reported
+ * in the audit; what a reader is here to judge is the thing the audit cannot
+ * see, which is whether the palette holds together across real hierarchy.
  *
  * **Two axes, because two of the answers can be true at once.** A context is
  * whose page this is and lives in `themed-contexts.tsx`; a layout is how much
@@ -14,12 +13,11 @@
  * storefront are both real arrangements, which is the area rules' own test for
  * whether something is one question or two.
  *
- * **A layout is its own markup and not the full page with parts hidden**, which
- * was the first design and the wrong one. Hiding sections from a superset makes
- * every layout carry the densest one's structure, so "minimal" would be a
- * workspace wearing `display: none` and a reader inspecting it would find an app
- * shell underneath. These are three pages. They share a vocabulary of copy and
- * nothing else.
+ * **A layout is its own markup and not the full page with parts hidden.**
+ * Hiding sections from a superset makes every layout carry the densest one's
+ * structure, so "minimal" would be a workspace wearing `display: none` and a
+ * reader inspecting it would find an app shell underneath. These are four
+ * separate pages. They share a vocabulary of copy and nothing else.
  *
  * **What each is for:**
  *
@@ -29,6 +27,8 @@
  *   model on screen at once rather than one at a time.
  * - `minimal` is four surfaces and a dialog. A page with room in it, where a
  *   palette has nowhere to hide behind density.
+ * - `editorial` is a rail, a measure and prose. The one layout whose organizing
+ *   idea is a margin, and the hardest test of a text palette.
  * - `workspace` is the other end: a rail, a toolbar, statistics, a chart and a
  *   table, with no hero and no marketing bands at all. What somebody looks at
  *   for six hours rather than for six seconds.
@@ -40,7 +40,7 @@
  * is not defended against, because somebody who picked "minimal" has said what
  * they are building. The audit is unaffected either way: it measures the
  * palette rather than what is displayed, so the count in the toolbar is the same
- * on all three.
+ * on all of them.
  *
  * Static on purpose. A layout takes a context and holds no state, so a
  * rendering is final: every change a reader makes to the *theme* reaches it
@@ -53,10 +53,6 @@ import { type Context, Mark } from './themed-contexts'
 
 /* The pieces more than one layout renders, written once.
  *
- * A plain block rather than a doc one: it introduces the four functions under it
- * rather than documenting any of them, and a doc block sitting on another doc
- * block claims a member it does not have.
- *
  * **Extracted because two layouts render them and not because they are
  * components.** A page's footer is a page's footer, and the marketing page and
  * the minimal one disagree about everything above it and about nothing here.
@@ -65,7 +61,7 @@ import { type Context, Mark } from './themed-contexts'
  *
  * They stay plain functions taking a context, like the layouts themselves, so
  * nothing here is a React component with props to hydrate. Called rather than
- * rendered as elements, for the same reason: this tree is serialised once and
+ * rendered as elements, for the same reason: this tree is serialized once and
  * never mounted.
  */
 
@@ -197,9 +193,9 @@ function Detail(context: Context) {
  * **It exists because the series ramp is a third of the palette and had nothing
  * on screen.** Twenty-four tokens rotate off the brand and not one of them
  * appeared in this preview, so a reader could move the saturation and never see
- * what it did to a chart. The minimal layout is the one page that still does
- * not have it, which is what "minimal" costs and is said out loud at the top of
- * this file.
+ * what it did to a chart. The minimal and editorial layouts still do not have
+ * it, which is what those layouts cost and is said out loud at the top of this
+ * file.
  *
  * It reads a table, which is the whole point of the component: the accessible
  * representation is markup a consumer wrote rather than an `aria-label`
@@ -298,12 +294,11 @@ function MarketingPage(context: Context) {
         </div>
 
         {/* **The header repeats the primary action, not the secondary one.**
-            It carried \`hero.secondary\` to save a string, which put "Book a
-            walkthrough" in the header, again as the hero's outlined button and
-            a third time on the closing band: three identical words in one
-            scroll, two of them solid and one outlined, reading as a page that
-            could not decide. Repeating the conversion action in the header is
-            what a landing page does, and it leaves the softer one said once. */}
+            Reusing \`hero.secondary\` here puts the same words in the header, on
+            the hero's outlined button and on the closing band: three identical
+            calls to action in one scroll, reading as a page that could not
+            decide. Repeating the conversion action in the header is what a
+            landing page does, and it leaves the softer one said once. */}
         <helix-flex align="center" gap="xs" slot="end">
           <helix-button emphasis="ghost">Sign in</helix-button>
           <helix-button emphasis="solid" tone="primary">
@@ -616,9 +611,9 @@ function WorkspacePage(context: Context) {
           <helix-text variant="label">{company}</helix-text>
         </helix-flex>
 
-        {/* **The rail says where you are.** It marked no destination at all,
-            which no application does: a sidebar with three identical rows is a
-            list of links rather than a place in a product. `aria-current="page"`
+        {/* **The rail says where you are.** A sidebar with three identical rows
+            is a list of links rather than a place in a product, which is not
+            what any application shows. `aria-current="page"`
             is the mechanism rather than a class, so a screen reader is told the
             same thing the eye is, and the base layer already carries the
             treatment for it. */}
@@ -733,15 +728,15 @@ function WorkspacePage(context: Context) {
  * A rail, a measure, and prose.
  *
  * **The one layout that is a page of writing rather than a page of selling**,
- * and the only one whose organising idea is a margin. Every row is the same two
+ * and the only one whose organizing idea is a margin. Every row is the same two
  * columns: a label in the rail and the text beside it, so the structure is
  * visible without a single box being drawn. Nothing here is a card, and the
  * only rule on the page is between one entry in the list and the next.
  *
  * **It is the only layout that shows two things the builder can change and no
  * other preview could.** Nothing else in this tool renders a `helix-list`, and
- * nothing else pulls `--helix-font-mono`: the rail is set in it, so the Mono
- * face control moved a preview for the first time here. A control whose effect
+ * nothing else pulls `--helix-font-mono`: the rail is set in it, so this is the
+ * only preview the Mono face control moves. A control whose effect
  * is nowhere on screen is a control a reader cannot judge, which is the same
  * argument the chart settles for the series ramp.
  *
@@ -764,12 +759,11 @@ function EditorialPage(context: Context) {
   return (
     <div className="themedEditorial">
       <header className="themedRail themedMasthead">
-        {/* **The mark and the name together, in the rail.** The mark alone left
-            the page with no wordmark at all: a reader arriving at an editorial
-            page could not tell whose it was without reading a paragraph, and
-            every other layout says the name in its header. It sits in the rail
-            column rather than the measure so the destinations still start on
-            the line every paragraph starts on, which is the arrangement the
+        {/* **The mark and the name together, in the rail.** The mark alone
+            leaves the page with no wordmark, so a reader arriving here cannot
+            tell whose page it is without reading a paragraph. It sits in the
+            rail column rather than the measure so the destinations still start
+            on the line every paragraph starts on, which is the arrangement the
             whole layout is for. Not the rail's own label styling, which is mono
             and subtle and would set a masthead in the voice of a margin note. */}
         <div className="themedWordmark">

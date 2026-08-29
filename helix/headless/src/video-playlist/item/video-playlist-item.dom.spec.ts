@@ -17,13 +17,13 @@ const entry = async (attributes = 'value="a"', inner = 'His Girl Friday'): Promi
  * One entry, and the contract that is the entry's rather than the playlist's.
  *
  * **The playlist already proves the coordination**, which is which entry is
- * current and what choosing one plays: the entry is named 23 times in this
- * family's specs. What the entry owns alone is what its *name* is, and that is
- * the one thing the playlist cannot check, because it asks the entry.
+ * current and what choosing one plays. What the entry owns alone is what its
+ * *name* is, and that is the one thing the playlist cannot check, because it
+ * asks the entry.
  */
 describe('one playlist entry', () => {
   /* `textContent` takes the whole subtree, so a row with a duration beside it
-     reported "His Girl Friday0:06", and that string went to the player and on to
+     reads "His Girl Friday0:06", and that string goes to the player and on to
      the lock screen. Only the unslotted nodes are the name; anything named is a
      column beside it. */
   test('is named by its words, not by everything inside it', async () => {

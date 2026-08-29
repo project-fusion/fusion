@@ -14,9 +14,8 @@ import type { OutlineEntry } from '@/utils/outline/outline'
  * where the headings are and writes `aria-current` onto the entry a reader is
  * inside, which is the half a hand-rolled list never has.
  *
- * Nothing renders for a document with no sections. Two of the forty-three docs
- * pages have two headings and one essay has one, and a rail naming the only
- * thing on screen is furniture.
+ * Nothing renders for a document with no sections: a rail naming the only thing
+ * on screen is furniture.
  */
 export function PageOutline({
   className,

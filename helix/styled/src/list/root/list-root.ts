@@ -35,18 +35,15 @@ export class HelixList extends HelixHeadlessList {
   /**
    * Where the marker sits.
    *
-   * On the styled tier because it is decoration, which is the other half of the
-   * argument `kind` makes on the headless one: *that* a list is numbered is a
-   * fact about the content, and *where the numbers are drawn* is not. A railed
-   * ordered list and a plain one say the same thing about their rows.
+   * On the styled tier because it is decoration: *that* a list is numbered is a
+   * fact about the content, which `kind` carries on the headless tier, and
+   * *where the numbers are drawn* is not.
    *
    * - unset draws the platform's marker beside the row, which is what a list of
    *   short rows wants.
    * - `rail` draws the ordinal in a track of its own at the start edge of the
    *   block, so the numbers read as a column and every row's text begins at one
-   *   measure. This is how a numbered argument is set: a claim per item, prose
-   *   under it, and the numbering carried down the left rather than tucked
-   *   against the words.
+   *   measure, which is how a numbered argument is set.
    *
    * A rail replaces the marker rather than joining it, so it applies to
    * `unordered` too, where it numbers what a bullet did not.

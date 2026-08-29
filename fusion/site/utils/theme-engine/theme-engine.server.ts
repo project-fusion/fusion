@@ -2,10 +2,9 @@
  * The theme engine, on the server.
  *
  * **This exists so the theme builder's first paint carries a real palette.** The
- * derivation used to be synchronous JavaScript, so it ran during server
- * rendering without anybody arranging it; it is WebAssembly now and instantiates
- * asynchronously, which took the derived values out of the first paint. Measured
- * before this file: the slider ramps, which are drawn in OKLCH off the *derived*
+ * derivation is WebAssembly and instantiates asynchronously, so without a server
+ * path arranged for it the derived values miss the first paint. Measured without
+ * this file: the slider ramps, which are drawn in OKLCH off the *derived*
  * primary so the track cannot promise a color the engine will not produce,
  * appeared 287ms after navigation. 26ms of that was the module transfer and the
  * rest was hydration.

@@ -47,13 +47,12 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * stylesheet: nothing here is reader-supplied today, since they come from the
  * registry, but a value interpolated into CSS is a value interpolated into CSS.
  *
- * **Scoped by an attribute this file writes, never by a class the page does.**
- * It said `.insightGrid`, which is a CSS module identifier and reaches the
- * document as `insights-module__AoKrvW__insightGrid`, so the rule matched
- * nothing and every card stayed up. The same line was wrong on the component
- * gallery in the same way, and both were silent for the same reason: the URL,
- * the count and the empty state are all computed from `hidden`, so everything
- * downstream of the filter agreed it had run.
+ * **Scoped by an attribute this file writes, never by a class the page does.** A
+ * CSS module identifier reaches the document hashed, as
+ * `insights-module__AoKrvW__insightGrid`, so a rule naming it matches nothing
+ * and every card stays up. It fails silently: the URL, the count and the empty
+ * state are all computed from `hidden`, so everything downstream of the filter
+ * agrees it ran.
  *
  * No lattice and no shines. Those belong to a page whose cards are drawings on
  * that same field, and repeating them here would be decoration quoting a reason
@@ -80,26 +79,19 @@ export function InsightBrowser({
   sorts: string[]
 }) {
   /* Seeded with `default-value` rather than `value`, because what this wants to
-     say is where the field starts. Both seed now; `default-value` is the one a
-     reset returns to, which is the honest word for an opening value. */
+     say is where the field starts. Both seed; `default-value` is the one a reset
+     returns to, which is the honest word for an opening value. */
   const [query, setQuery] = useState(initialQuery)
-  /* A ref only so the shortcut can reach the field. Insights does not focus on
-     mount, unlike the gallery: the reasoning is beside the input. */
+  /* A ref so the `/` shortcut and the focus-on-load below can reach the field. */
   const searchField = useRef<HelixInput>(null)
   const focusSearch = useSearchKey(searchField)
 
   /* Focused on arrival, matching the gallery.
    *
-   * **This page refused it until 25 Aug 2026, and the argument is worth keeping
-   * rather than deleting.** It ran: a reading page with six posts on it, where
-   * pulling a screen reader past the heading and into a text box skips the one
-   * line that says what the page is, to save a keystroke nobody was about to
-   * make. That cost is real and is unchanged by this.
-   *
-   * What changed is the count and the consistency. The two galleries are the
-   * same page shape and a reader should not have to learn which of them takes
-   * the keyboard, and six posts is a floor rather than a ceiling: the argument
-   * gets weaker with every piece published, and would have flipped on its own.
+   * The cost is real and is accepted: pulling a screen reader past the heading
+   * and into a text box skips the one line that says what the page is. It is
+   * paid because the two galleries are the same page shape, and a reader should
+   * not have to learn which of them takes the keyboard.
    *
    * `preventScroll`, as the gallery does, so focusing does not jump the page
    * past the hero it is sitting in. The `/` beside the field stays: it is what

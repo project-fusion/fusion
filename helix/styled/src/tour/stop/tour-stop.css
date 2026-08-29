@@ -30,10 +30,9 @@
   position: fixed;
 }
 
-/* The guard, said the way `Megamenu` learned to say it: an author rule beats
-   the user agent's `[hidden] { display: none }` at any specificity, so a panel
-   given a `display` here keeps it while closed unless something outranks the
-   rule that gave it one. */
+/* The guard: an author rule beats the user agent's `[hidden] { display: none }`
+   at any specificity, so a panel given a `display` here keeps it while closed
+   unless something outranks the rule that gave it one. */
 :host [part="bubble"][hidden] {
   display: none;
 }

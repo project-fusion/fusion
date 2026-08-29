@@ -5,29 +5,30 @@ import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
 import type { NavEntry, NavSection } from '@/content/helix-nav/helix-nav'
 import styles from './components/(reference)/docs.module.css'
 
-/**
- * The sidebar for everything under `/helix`, from `helixNavigation()`.
+/* The sidebar for everything under `/helix`, from `helixNavigation()`.
  *
- * **One component where there were two.** The docs rail and the component rail
- * were separate files rendering the same `helix-tree` with the same link
- * handling over different data, which is what let the two navigations drift
+ * **One component, not one per rail.** Two files rendering the same `helix-tree`
+ * over different data is what let the docs and the component navigations drift
  * into being unreachable from one another. This renders whatever sections it is
  * handed and knows nothing about where they came from, which is what makes the
- * composition in `lib/helix-nav.ts` the only place the shape is decided.
+ * composition in `content/helix-nav/helix-nav.ts` the only place the shape is
+ * decided.
  *
- * **A row's value is its path.** It was the last segment of the slug, which
- * works only while no component shares a name with a doc page, and the merged
- * tree puts eighty-nine families next to forty-one pages in one value space.
- * The path is what the tree is marking current anyway, and it cannot collide.
+ * **A row's value is its path.** The last segment of a slug works only while no
+ * component shares a name with a doc page, and the merged tree puts families and
+ * prose pages in one value space. The path is what the tree is marking current
+ * anyway, and it cannot collide.
  *
  * **Collapsed except the section holding the current page**, and the first
  * section only when no section holds it, which is the landing case. Opening the
- * first one unconditionally put Getting started down beside Components on every
- * component page, so the rail opened with two branches and the one a reader
- * wanted was the lower of them. Decided here rather than after hydration. `usePathname` runs during the
- * server render of a client component, so `default-open` is in the HTML: a nav
- * that opened itself in an effect would paint collapsed and jump on every deep
- * link, which is the largest element on the page doing the exact thing
+ * first one unconditionally puts Getting started down beside Components on every
+ * component page, so the rail opens with two branches and the one a reader
+ * wanted is the lower of them.
+ *
+ * Decided here rather than after hydration. `usePathname` runs during the server
+ * render of a client component, so `default-open` is in the HTML: a nav that
+ * opened itself in an effect would paint collapsed and jump on every deep link,
+ * which is the largest element on the page doing the exact thing
  * `server-rendering.mdx` documents.
  *
  * `default-open` and never `open`, because what this wants to say is where the
@@ -119,14 +120,13 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
               const children = entry.children ?? []
               /* **A row is a destination or a group, and never both.**
                *
-               * A page with children used to be written as one row carrying an
-               * `href` *and* a chevron, which made the row ambiguous and the
-               * component resolve it the only way it could: `TreeItem` toggles
-               * from anywhere in the row when there is no `href`, and where
-               * there is one the row navigates and only the chevron opens. So
-               * pressing "Installation" went to the page and left the branch
-               * shut, and a reader who wanted its children had to find a
-               * fourteen-pixel target.
+               * One row carrying an `href` *and* a chevron is ambiguous, and
+               * `TreeItem` resolves it the only way it can: it toggles from
+               * anywhere in the row when there is no `href`, and where there is
+               * one the row navigates and only the chevron opens. Pressing
+               * "Installation" then goes to the page and leaves the branch shut,
+               * and a reader who wants its children has to find a fourteen-pixel
+               * target.
                *
                * The page is still a page. It moves down a level as the group's
                * first child, so the group toggles from anywhere in its row and
@@ -149,11 +149,11 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
                     ? /* **A group's value is not its page's path.**
                        *
                        * `Tree` marks active whatever `value` matches its
-                       * `active`, so a group that kept the href of the page it
-                       * now holds as a child was selected at the same moment
-                       * that child was: two rows lit for one destination, and
-                       * the group is not a destination at all. It takes the
-                       * same shape a section does. */
+                       * `active`, so a group carrying the href of the page it
+                       * holds as a child lights at the same moment that child
+                       * does: two rows for one destination, and the group is
+                       * not a destination at all. It takes the same shape a
+                       * section does. */
                       { value: `group-${entry.href}` }
                     : { href: entry.href, value: entry.href })}
                   {...(rows.some((row) => row.href === pathname) ? { 'default-open': true } : {})}

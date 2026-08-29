@@ -5,11 +5,9 @@
 }
 
 [part="surface"] {
-  /* A menu taller than the window has to scroll, and could not.
-   *
-   * There was no `max-block-size` and no `overflow`, so a long menu ran off the
-   * bottom of the screen and the keyboard path that walks the rows had nothing
-   * to scroll: the rows below the fold were reachable by arrow and invisible.
+  /* A menu taller than the window has to scroll. Without a `max-block-size` and
+   * an `overflow` the rows below the fold are reachable by arrow and invisible,
+   * and the keyboard path that walks them has nothing to scroll.
    * `--floating-available-block-size` is what the controller measures for exactly
    * this, and `Select`'s surface already reads it. */
   max-block-size: var(--menu-max-block-size, var(--floating-available-block-size, none));
@@ -22,18 +20,17 @@
   background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
-     border rather than none at all. Measured, that is exactly what happened.
+     border rather than none at all.
 
      A surface in the top layer is already off the page, and a rule around it
      draws a second edge just inside the one the shadow makes. The shadow says
-     it is floating; the border only made it look cut out. */
+     it is floating; the border only makes it look cut out. */
   border: var(--menu-border-width, var(--helix-border-floating)) solid
     var(--menu-border-color, var(--helix-color-border));
-  /* The house radius. Dialog, tooltip and toast settled here and the surfaces
-     that float were left at `md`, so a menu and the dialog it opens from drew
-     two different corners. Card's argument is the one that decides it: at
-     anything larger the corner is softer than the controls inside it, and a
-     surface holding controls should recede. */
+  /* The house radius, shared with dialog, tooltip and toast so a menu and the
+     dialog it opens from do not draw two different corners. At anything larger
+     the corner is softer than the controls inside it, and a surface holding
+     controls should recede. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--menu-shadow, var(--helix-shadow-floating));
   /* The popover API puts it in the top layer, so the UA's own inset and border
@@ -53,26 +50,23 @@
 }
 
 /* It grows out of the edge it opened against, gated on `data-placed` so it never
-   moves before the controller has said where it goes. Same entrance as Popover,
-   Select and Tooltip, and the same reasoning: keying it to the open state runs a
-   frame early, because placement is a microtask later than the reveal.
+ * moves before the controller has said where it goes. Same entrance as Popover,
+ * Select and Tooltip: keying it to the open state runs a frame early, because
+ * placement is a microtask later than the reveal.
  *
- * 0.96 rather than 0, as with Select. A list of commands shrinking to a point
- * squashes its own rows; only Tooltip is small enough for the full collapse to
- * read as arriving rather than as a trick. */
-/* And it leaves the same way it arrived.
-   *
-   * The two lines below are what make an exit possible at all on a top-layer
-   * element, and without them the transition above ran in one direction only:
-   * closing removes `data-placed` *and* stops `:popover-open` matching, so the
-   * `display: none` rule landed in the same frame and there was nothing left to
-   * transition. `overlay` is the second half, or the panel drops out of the top
-   * layer immediately and fades out behind whatever it was covering. Dialog
-   * carries the long version of this. */
-/* And it travels, a little, out of the edge it opened against.
+ * 0.96 rather than 0. A list of commands shrinking to a point squashes its own
+ * rows; only Tooltip is small enough for the full collapse to read as arriving
+ * rather than as a trick.
  *
- * On `transform`, never on `translate`: the floating controller writes the
- * panel's position onto `translate`, and a keyframe animating that property took
+ * The `display` and `overlay` lines are what make an exit possible at all on a
+ * top-layer element. Without them, closing removes `data-placed` *and* stops
+ * `:popover-open` matching, so the `display: none` rule lands in the same frame
+ * and there is nothing left to transition; without `overlay` the panel drops out
+ * of the top layer immediately and fades out behind whatever it was covering.
+ * Dialog carries the long version of this.
+ *
+ * The travel is on `transform`, never on `translate`: the floating controller
+ * writes the panel's position onto `translate`, and animating that property took
  * the position over, so the panel traveled from the corner of the viewport
  * instead of from its anchor. Measured, the two compose in the order translate,
  * scale, transform, which means a `translateY` here is relative to wherever the
@@ -145,15 +139,10 @@
   gap: var(--helix-space-2xs);
   margin-block-end: var(--helix-space-2xs);
   /* A short step above and a full one below, against the surface's own padding
-     over the top of this row.
-   *
-   * This was `none` above on the reasoning that the surface already lays a step
-   * there, so anything here would be two. True as arithmetic and a little tight
-   * in the drawing: the back arrow is a glyph rather than a line of text, and it
-   * sits closer to its own top edge than the cap height above it suggests, so
-   * the row read as pushed up against the surface. Half a step gives it
-   * somewhere to sit without matching the space below, which still has to make
-   * up the difference under the rule. */
+     over the top of this row. Not `none` above, though the arithmetic says the
+     surface already lays a step there: the back arrow is a glyph rather than a
+     line of text and sits closer to its own top edge than the cap height above
+     it suggests, so the row reads as pushed up against the surface. */
   padding: var(--helix-space-2xs) var(--helix-space-xs) var(--helix-space-xs);
 }
 
@@ -198,11 +187,11 @@
 
 /* A rule between the pages and the switches. Slotted, because where one belongs
    is the consumer's arrangement, and `helix-divider` already knows how to be a
-   separator a reader is told about. */
-/* Plain `border` again. These two lines were drawn in `border-strong` because
-   `border` and `surface-raised` were the same neutral in dark mode and a rule
-   in it on this surface was invisible; the ramp puts a step between them now,
-   so the workaround is the thing that would be wrong. */
+   separator a reader is told about.
+
+   Plain `border` and not `border-strong`: the ramp puts a step between `border`
+   and `surface-raised` in dark mode, so the stronger value is no longer what a
+   rule on this surface needs to be visible. */
 ::slotted(helix-divider) {
   margin-block: var(--helix-space-2xs);
 }
@@ -257,12 +246,13 @@
 
 /* Not printed, being an overlay.
  *
- * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ * It is over the page rather than part of it, and on paper there is no over: a
+ * menu prints as a slab across whatever it covered.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. See (165). */
 @media print {
   :host {
     display: none;

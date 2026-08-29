@@ -51,11 +51,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * dismiss control raise the same event, so a consumer handles one path and not
  * two.
  *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
- *
  * @since 0.1.0
  * @status experimental
  * @documentation https://helix.fusion.dev/components/toast
@@ -95,8 +90,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   /**
    * What kind of message it is, which picks the mark and its name.
    *
-   * `severity` was a sixth spelling of `tone`, and a subset of it: a toast
-   * reports a status and never a brand role.
+   * A subset of the tone axis: a toast reports a status and never a brand role.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'success' | 'warning'
@@ -112,24 +106,15 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   /**
    * Whether the message is still showing.
    *
-   * The same decide-once contract every other stateful thing here carries, and
-   * it was the one exception: this waited to be told in every case, so
-   * `duration` did nothing at all without consumer script and the dismiss
-   * control looked broken to anyone who pressed it. `Dialog` closes itself,
-   * `Accordion` closes itself, and there was no reason a message should not.
-   *
-   * Declared by the markup and it is the consumer's: the item announces and
-   * waits. Not declared and it is the item's: it goes when it is asked to, and
-   * the consumer still hears `helix-dismiss` and takes it out of their own
-   * list. Read once, at the first update.
+   * The item always applies: it goes when it is asked to, having announced
+   * `helix-dismiss` first, and a consumer who owns the list refuses that event
+   * to take the decision instead.
    *
    * **No `default-open`, unlike the four mixins.** A `default-` seed exists so
    * markup can choose a starting state without claiming ownership, and there is
    * only one starting state that makes sense: a message that has been rendered
    * is showing. An attribute whose only legal value is the default is an
    * attribute nobody can use.
-   *
-   *
    */
   @property({ type: Boolean })
   get open(): boolean {
@@ -172,9 +157,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
          exact. A toast is not an overlay that opens and closes: `next` below is
          `false` and nothing here ever calls `requestOpen(true)`, so it only
          ever asks in one direction, and the verb for that direction is
-         `dismiss`. `HelixDismissEvent` already carries it for a tag leaving a
-         list and an announcement closing itself, which is the same act from the
-         element's side. A consumer controlling `open` therefore answers
+         `dismiss`. A consumer controlling `open` therefore answers
          `onhelix-dismiss`, and the generated types ask for exactly that. */
       event: () => this.dismissEvent(),
       host: this,
@@ -218,14 +201,11 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
    * How many reasons there are to hold the clock, rather than whether there is
    * one.
    *
-   * Hover and focus both stopped the same timer with nothing counting them, so
-   * a reader who tabbed into a message and then moved the pointer off it had
-   * the clock restarted underneath them while they were still reading it. That
-   * is the case the pause exists for, and it was the case that broke it.
-   *
-   * The two are genuinely independent: a pointer can leave while focus stays,
-   * and focus can leave while the pointer stays. Only the last one out starts
-   * it again.
+   * Hover and focus stop the same timer, and the two are genuinely independent:
+   * a pointer can leave while focus stays, and focus can leave while the
+   * pointer stays. Uncounted, a reader who tabs into a message and then moves
+   * the pointer off it has the clock restarted underneath them, which is the
+   * case the pause exists for. Only the last one out starts it again.
    */
   private holds = 0
 
@@ -251,25 +231,22 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* Before anything else reads it, and only the first time. Everything that
-       declares the mode has arrived by now: attributes from markup or from a
-       server's output, and properties a framework assigned on mount. */
     /* Mirrored for CSS rather than reflected onto `open` itself, which is the
        library's rule about state: a reflected `open` is indistinguishable from
        one the consumer declared, and that attribute is what ownership is read
        from. `data-closed` can never be mistaken for a declaration. */
-    /* **`data-closed`, because open is the resting state.** It was `data-open`,
-       written whenever the toast was open, and a toast opens by default: a
-       consumer server-rendering `<helix-toast-item>` got a `data-open` back that
-       React never sent. Inverting keeps a `data-` hook for the headless consumer
-       this publishes it for, and moves the write to the side that only happens
-       after somebody dismisses the message, which is long past hydration. */
+    /* **`data-closed`, because open is the resting state.** A toast opens by
+       default, so a `data-open` would appear on a consumer's server-rendered
+       `<helix-toast-item>` without React having sent it. Inverting keeps the
+       `data-` hook for the headless consumer this publishes it for, and moves
+       the write to the side that only happens after somebody dismisses the
+       message, which is long past hydration. */
     this.toggleAttribute('data-closed', !this.open)
     /* And `hidden` beside it, because `data-closed` is a hook and not a
-       mechanism. A dismissed toast was hidden by `opacity: 0` and
-       `visibility: hidden` in the styled sheet and by nothing at all here, so a
-       consumer on this tier had a message that never went away: measured, a
-       closed base toast printed its text on the page.
+       mechanism. With the hiding living only in the styled sheet's
+       `opacity: 0` and `visibility: hidden`, a consumer on this tier has a
+       dismissed message that never goes away: measured, a closed base toast
+       printed its text on the page.
        It costs the styled tier nothing, the same as the accordion: `:host` sets
        `display: grid` unconditionally so the author rule beats the UA sheet,
        and the exit still animates its row down from `1fr`. */

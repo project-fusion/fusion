@@ -17,11 +17,11 @@
  * browser downloads it once, where the data URI was a second copy of bytes the
  * page already had.
  *
- * **The second payoff is the one that was easier to miss.** `build-frame.mjs`
- * stamps `frame.css` with a hash of its own contents, so inlined faces rode
- * inside a bundle re-stamped by any change to any token in `helix/styles`. A
- * one-character change to a color cost every preview visitor a fresh 111KB of
- * font. They cache on their own now and change when they change.
+ * **The second payoff is caching.** `build-frame.mjs` stamps `frame.css` with a
+ * hash of its own contents, so an inlined face rides inside a bundle re-stamped
+ * by any change to any token in `helix/styles`: a one-character change to a
+ * color costs every preview visitor a fresh 111KB of font. Served as files they
+ * cache on their own and change when they change.
  *
  * **What `next/font` did that this has to do by hand** is the preload, which
  * `layout.tsx` now writes as three `<link rel="preload">` tags, and the

@@ -5,13 +5,11 @@ import { ENGAGEMENT, ENGAGEMENT_COPY } from '@/content/landing/helix-landing'
  * Everything the landing page says, as data.
  *
  * The page renders it as bands of Helix markup; `bun run gen:catalog` renders the
- * same object as `/index.md`. Neither is the source: this is, and that is the
- * whole point. The `.md` used to be a stub saying "this page renders from a
- * typed module", which was honest and useless.
+ * same object as `/index.md`. Neither is the source: this is.
  *
- * The reasoning behind each band stays as a comment in `page.tsx`, beside the
- * layout it explains, because it is about why the section is shaped that way
- * rather than about what it says. What moved here is only the words.
+ * Only the words live here. The reasoning behind each band stays as a comment
+ * in `page.tsx`, beside the layout it explains, because it is about why the
+ * section is shaped that way rather than about what it says.
  */
 export const LANDING: PageCopy = {
   blocks: [
@@ -41,9 +39,9 @@ export const LANDING: PageCopy = {
       title: 'Drawn by the thing it documents',
     },
     {
-      /* The cards live in `helix-landing.ts` now, because the page renders them
-         too. They were only here, which made this document describe a band the
-         page did not have. */
+      /* The cards live in `helix-landing.ts`, because the page renders them
+         too. Holding them here alone makes this document describe a band the
+         page does not have. */
       body: [ENGAGEMENT_COPY.lede],
       items: ENGAGEMENT,
       kicker: 'The engagement',
@@ -68,11 +66,9 @@ export const LANDING: PageCopy = {
   /**
    * **The hero's headline, because this document is that page.**
    *
-   * This read "The interface layer, already built" while the page it mirrors
-   * said something else entirely, so `/index.md` opened on a headline no reader
-   * of the page had seen. The note in `routes.ts` calls this module the source
-   * for the title and warns that a second wording is the drift it exists to
-   * remove; the second wording had grown here instead of there.
+   * A second wording anywhere is the drift `routes.ts` names this module the
+   * source to remove: `/index.md` renders from here, so a headline written
+   * elsewhere opens the file on words no reader of the page has seen.
    *
    * The site's own name stays the *route* title, which is what a sitemap and a
    * search result want. This is the `h1`, and the `h1` is the heading.

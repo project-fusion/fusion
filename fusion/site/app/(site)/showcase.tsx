@@ -82,17 +82,13 @@ const pageIsThemed = (): boolean => document.documentElement.hasAttribute('data-
 /**
  * Re-derives from one color and puts the result on the panel.
  *
- * **All of it comes from the engine, including the seed.** This file used to
- * carry a hand-written bridge and a comment explaining that the two derivations
- * "do not talk to each other": `deriveTheme` computed tokens in JavaScript
- * while the twenty-four series colors a chart reads computed themselves in CSS
- * off `--_helix-seed-brand`, so setting the tokens moved the buttons and the
- * tags and left every chart on the page the original blue. This wrote the
- * private primitive itself to close the gap.
- *
- * The engine emits `seeds` now, so the bridge is gone and nothing here reaches
- * past `helix/styles`'s public surface. `check:css:seeds` holds the two name sets
- * to each other in both directions.
+ * **All of it comes from the engine, including the seed.** The tokens are
+ * computed in JavaScript while the twenty-four series colors a chart reads
+ * compute themselves in CSS off `--_helix-seed-brand`, so setting the tokens
+ * alone moves the buttons and the tags and leaves every chart on the page the
+ * original blue. The engine emits `seeds` for that half, and nothing here
+ * reaches past `helix/styles`'s public surface to write a private primitive.
+ * `check:css:seeds` holds the two name sets to each other in both directions.
  *
  * **`data-helix-theme` is still set before the values, and that is not
  * cosmetic.** A `var()` inside a custom property is substituted on the element
@@ -137,8 +133,8 @@ const restyle = (
  * Paints the panel, and again whenever the color mode moves. Returns its own
  * teardown.
  *
- * Lifted out of the effect that used to hold it, because that effect is now
- * about *when the engine is ready* and this is about what to do once it is.
+ * Separate from the effect that calls it, which is about *when the engine is
+ * ready* where this is about what to do once it is.
  */
 const listen = (engine: ThemeEngine, node: HTMLElement, brand: string): (() => void) => {
   /* **Two signals, because the preference has three states.** The drawer
@@ -326,10 +322,10 @@ export function Showcase(): React.ReactElement {
           control gone would be the same fault the switch avoids. */}
       {/* **`aria-label` rather than `label`, which is the field mixin's own
           distinction: `label` means a visible label and `aria-label` means a
-          name.** The visible one cost a row of the field's grid, so the control
-          sat 20px below the toggle group beside it and the reset button lined
-          up with neither. Nothing here is a workaround for that: the mixin
-          renders the name clipped and the control is 40px, the same
+          name.** A visible label costs a row of the field's grid, which would
+          drop this control 20px below the toggle group beside it and line the
+          reset button up with neither. Nothing here is a workaround for it:
+          the mixin renders the name clipped and the control is 40px, the same
           `--helix-size-control` every other control is. */}
       <helix-color-input
         aria-label="Brand"
@@ -354,10 +350,9 @@ export function Showcase(): React.ReactElement {
 
       <div className={styles.showcase}>
         <div className={styles.showcaseView} hidden={view !== 'controls'}>
-          {/* A form, laid out as one. The previous version was a switch, a
-                checkbox, a slider and an unlabelled bar stacked at even
-                spacing, which is a pile of controls rather than a thing anybody
-                would fill in. Fields first, then the two that are settings. */}
+          {/* A form, laid out as one: fields first, then the two that are
+                settings. Controls stacked at even spacing are a pile rather
+                than a thing anybody would fill in. */}
           <helix-card class={`showcaseCard ${styles.showcaseTall}`} separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-select default-value="dark" label="Color mode" name="mode">
@@ -459,14 +454,12 @@ export function Showcase(): React.ReactElement {
         </div>
 
         <div className={styles.showcaseView} hidden={view !== 'data'}>
-          {/* **The sparkline spans the card, not one stat.** It used to sit
-                under a two stat group aligned to the first of them, 98 wide
-                under a 113 wide figure inside a 174 wide group, so it lined up
-                with nothing and read as a stray line. That was a layout
-                decision rather than a missing component: `Stat` slots a value,
-                a label and a unit, and it is a figure rather than a chart
-                container. Given the card's width and a rule above it, the two
-                are one thing. */}
+          {/* **The sparkline spans the card, not one stat.** Aligned to the
+                first of a two stat group it is 98 wide under a 113 wide figure
+                inside a 174 wide group, lining up with nothing and reading as a
+                stray line. That is a layout decision rather than a missing
+                component: `Stat` slots a value, a label and a unit, and it is a
+                figure rather than a chart container. */}
           <helix-card
             class={`showcaseCard ${styles.showcaseFigures}`}
             media-placement="end"
@@ -486,8 +479,8 @@ export function Showcase(): React.ReactElement {
             {/* **The meter joins the figures rather than standing in a card of
                 its own**, which is what the note beside Progress already said a
                 meter should do: a reading against a range belongs with the
-                readings. Its own card was the last row of a view that runs past
-                what the panel shows, so it rendered for nobody. */}
+                readings. A card of its own would be a fifth in a view the panel
+                shows four of. */}
             <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
             <helix-flex align="center" gap="sm" wrap>
               <helix-tag tone="success">Passing</helix-tag>
@@ -505,9 +498,9 @@ export function Showcase(): React.ReactElement {
             {/* Sparkline has neither axis. Its shading is `plot`, absent being a
                 line and `area` a line with the region beneath it washed, and it
                 has no emphasis because there is no fill to claim more or less
-                of. The twelve mentions of "wash" in its stylesheet are the
-                gradient's own parts, `wash-start` and `wash-end`, rather than an
-                attribute anything can set. */}
+                of. `wash-start` and `wash-end` in its stylesheet are the
+                gradient's own parts rather than an attribute anything can
+                set. */}
             <helix-sparkline
               label="Installs rose from 1,240 to 1,284 over seven days"
               plot="area"
@@ -577,9 +570,9 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
-              {/* `wash` and `emphasis` are two axes since 156, where one `material`
-                  had been doing both jobs: the wash is how a bar is shaded and
-                  the emphasis is how much ink it claims. Outlined bars with a
+              {/* `wash` and `emphasis` are two axes, not one: the wash is how a
+                  bar is shaded and the emphasis is how much ink it claims.
+                  Outlined bars with a
                   gradient in them read as a chart rather than as a block of
                   color, which is what a showcase wants. */}
               <helix-bar-chart
@@ -651,11 +644,9 @@ export function Showcase(): React.ReactElement {
           {/* **Four cards, because the panel shows two rows.** Measured at
               1512x1080: the views area is 433px tall and these two rows come to
               exactly that. A fifth card is not a fifth card, it is a card that
-              renders for nobody, which this view carried for several days in
-              three different positions. The Packages table was the last of them
-              and is the one worth bringing back first if this panel ever gets
-              taller: it is the only place a table and a sparkline appear
-              together. */}
+              renders for nobody. A Packages table is the one worth adding first
+              if this panel ever gets taller, being the only place a table and a
+              sparkline would appear together. */}
         </div>
 
         <div className={styles.showcaseView} hidden={view !== 'surfaces'}>

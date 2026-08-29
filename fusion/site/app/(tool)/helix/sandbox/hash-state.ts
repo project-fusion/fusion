@@ -1,10 +1,9 @@
-/**
+/*
  * What has been typed, carried in the URL fragment.
  *
- * The query string already says which example you are looking at, so a link
- * reproduced the page and never the edit: type into the sandbox, copy the
- * address, open it, and you were handed the example's own file back. The whole
- * point of an editable preview is the thing you changed.
+ * The query string only says which example you are looking at, so without this
+ * a shared link reproduces the page and never the edit, and the whole point of
+ * an editable preview is the thing you changed.
  *
  * **The fragment rather than the query**, for two reasons that both matter. It
  * is not sent to the server, so a document a reader is part way through writing
@@ -34,7 +33,7 @@ export interface SandboxHashState {
  * UTF-8 into base64url.
  *
  * `btoa` takes bytes, not characters, and throws on anything past U+00FF, so a
- * single curly quote in an example was enough to lose the whole fragment.
+ * single curly quote in an example is enough to lose the whole fragment.
  * `TextEncoder` first, then the byte-wise conversion `btoa` is actually for.
  *
  * And base64url rather than base64: `+` and `/` are legal in a fragment but `+`

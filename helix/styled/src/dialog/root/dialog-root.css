@@ -34,21 +34,17 @@
  * any author declaration outranks every UA one, so a one-word layout rule on
  * the panel undoes a rule nothing here mentions and nothing warns about.
  *
- * What it looked like is worth recording, because it does not look like a CSS
- * fault. The dialog painted on load, centered across the frame by the UA's own
- * `margin: auto` and sitting at the top of the flow rather than the middle of
- * the viewport, with no scrim. That reads as a dialog that opened by itself,
- * and every control in it was dead, because the buttons close a dialog that was
- * never opened and `close()` on a closed dialog does nothing. Two bugs to look
- * for, neither of them real, and the real one in a stylesheet.
+ * The symptom does not look like a CSS fault: the dialog paints on load,
+ * centered across the frame by the UA's own `margin: auto` and sitting at the
+ * top of the flow rather than the middle of the viewport, with no scrim, and
+ * every control in it is dead, because the buttons close a dialog that was never
+ * opened and `close()` on a closed dialog does nothing. The tell is the missing
+ * scrim: `::backdrop` exists only for an element in the top layer, so a panel
+ * with no scrim was never shown modally, whatever it looks like.
  *
- * The tell is the missing scrim: `::backdrop` exists only for an element in the
- * top layer, so a panel with no scrim was never shown modally, whatever it
- * looks like.
- *
- * Tooltip and Menu already carry their version of this, `:not(:popover-open)`
- * and `[hidden]` respectively, against the same rule in the same stylesheet.
- * Any part that is a native element the UA hides by state needs it. */
+ * Tooltip and Menu carry their version of this, `:not(:popover-open)` and
+ * `[hidden]` respectively, against the same rule in the same stylesheet. Any
+ * part that is a native element the UA hides by state needs it. */
 [part="dialog"]:not([open]) {
   display: none;
 }
@@ -81,9 +77,6 @@
   --dialog-inline-size: 100vw;
 }
 
-/* The platform's own scrim, in the top layer with the dialog. A div positioned
-   behind it would need a `z-index` that beats whatever the page already has,
-   which is a fight nobody wins for long. */
 /* No ring on the panel itself.
  *
  * `showModal()` moves focus into the dialog, and where nothing inside asks for
@@ -99,28 +92,21 @@
   outline: none;
 }
 
-/* **`::backdrop` inherits from its originating element, and the long note that
- * used to sit here was measuring a browser that did not do that yet.**
+/* The platform's own scrim, in the top layer with the dialog. A div positioned
+ * behind it would need a `z-index` that beats whatever the page already has,
+ * which is a fight nobody wins for long.
  *
- * It recorded that `--helix-color-overlay` "comes out as nothing", that a
- * `var()` fallback could not rescue it because the token resolved to invalid
- * rather than absent, and it concluded with a literal color written out by
- * hand, described as the only literal in this library and as the platform's
- * price. Re-measured in Chromium 148 by putting the original declaration back
- * into a live modal's shadow root: it paints `oklab(0.15 0 0 / 0.64)`, the
- * property is readable from the pseudo-element, and a second token on another
- * property resolves too. `Drawer` never hit it at all, which was the clue.
+ * **A token resolves here, which it did not always.** `::backdrop` originally
+ * inherited from nothing, and the CSS working group changed it to inherit from
+ * its originating element. Measured in Chromium 148 from a live modal's shadow
+ * root: the declaration paints `oklab(0.15 0 0 / 0.64)`, and the property is
+ * readable from the pseudo-element. Anywhere that change has not shipped the
+ * token comes out as nothing, and a `var()` fallback cannot rescue it, the token
+ * resolving to invalid rather than absent.
  *
- * `::backdrop` originally inherited from nothing, and the CSS working group
- * changed it to inherit from its originating element; Chromium shipped that and
- * the comment stayed. So the token comes back, and the duplication the note
- * called unavoidable, along with its warning that nothing would tell you when
- * the two drifted, goes with it.
- *
- * **The hook stays, because it is not what the literal was for.** A consumer
- * overriding the scrim needs a name to set, and setting it on the host is still
- * the right shape: the value resolves where every token is in scope. What has
- * changed is only that the default no longer has to be spelled out. */
+ * The hook is separate from that: a consumer overriding the scrim needs a name
+ * to set, and the host is the right place for it, being where the value resolves
+ * with every token in scope. */
 :host {
   --_dialog-scrim: var(--helix-color-overlay);
 }
@@ -131,12 +117,11 @@
 
 /* The heading, whatever the consumer slotted, without a wrapper to give it a
    box of its own. A dialog with no header has no empty band where one is not.
- 
-   Back here from the base layer, where it lived because `:where(h1)`-`:where(h6)`
-   were unscoped and a document rule beats a `::slotted()` one whatever the
-   specificity or the layer, both measured. Prose theming is behind
-   `[data-prose]` now, so nothing in the document contests this and a dialog
-   decides the size of its own title again. */
+
+   This can only live here while the document contests nothing: a document rule
+   beats a `::slotted()` one whatever the specificity or the layer, both
+   measured, and it is prose theming sitting behind `[data-prose]` that keeps
+   `:where(h1)`-`:where(h6)` out of the way. */
 ::slotted([slot="header"]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
@@ -160,17 +145,13 @@
   justify-content: flex-start;
 }
 
-/* It arrives *and* it leaves, which is the correction.
- *
- * This was two keyframe animations on `[open]`, so the dialog and its scrim
- * played on the way in and snapped away on the way out: the panel was gone
- * before a reader's eye had followed it, and the page underneath reappeared
- * with no sense of the modal having been dismissed. The sibling drawer fades
- * both ways, which is what made the difference visible.
+/* It arrives *and* it leaves.
  *
  * A transition rather than an animation, because a transition runs in both
- * directions by construction and an entry animation cannot. Three things make
- * that work on an element in the top layer, and all three are needed:
+ * directions by construction and an entry animation cannot: keyframes on
+ * `[open]` play on the way in and snap away on the way out, so the panel is
+ * gone before a reader's eye has followed it. Three things make a transition
+ * work on an element in the top layer, and all three are needed:
  *
  * - `display` in the transition list with `transition-behavior: allow-discrete`,
  *   or `display: none` lands the instant `open` goes and takes the exit with it.
@@ -179,13 +160,13 @@
  * - `@starting-style`, which is where an element entering the top layer comes
  *   *from*: without it the entry has no start value and only the exit plays.
  *
- * **The rise is `lg` and was `sm`, which is twelve pixels against twenty-four.**
- * A dialog's whole entrance is a fade and that rise, so twelve was small enough
- * that the *pace* of it could not be read: measured, `snappy` settles at 159ms
- * and `gentle` at 262ms, a difference of a hundred milliseconds that nobody can
- * see across twelve pixels. Doubling the distance is what makes the duration
- * legible, which is the point of having a motion character at all. Behind a hook
- * so a consumer who wants the smaller move can have it back. */
+ * **The rise is `lg`, twenty-four pixels rather than twelve.** A dialog's whole
+ * entrance is a fade and that rise, so at twelve the *pace* of it cannot be
+ * read: measured, `snappy` settles at 159ms and `gentle` at 262ms, a difference
+ * of a hundred milliseconds that nobody can see across twelve pixels. The
+ * distance is what makes the duration legible, which is the point of having a
+ * motion character at all. Behind a hook so a consumer who wants the smaller
+ * move can have it back. */
 [part="dialog"] {
   opacity: 0;
   transition:
@@ -282,11 +263,6 @@
   }
 }
 
-/* Two `animation: none` blocks stood here answering the keyframes this panel
-   used to arrive on. The keyframes went when the entrance became a transition
-   so it could also leave, and the reduce rules for them stayed, naming a
-   property nothing sets. */
-
 /* Saying no, by moving.
  *
  * A persistent dialog that ignores a press on the backdrop is indistinguishable
@@ -371,7 +347,9 @@
 
 /* Not printed, being an overlay.
  *
- * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ * It is over the page rather than part of it, and on paper there is no over: a
+ * dialog prints as a slab across whatever it covered, and a tooltip prints its
+ * tip beside nothing that is hovering.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow

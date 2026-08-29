@@ -44,8 +44,7 @@ describe('splitter', () => {
 
   test('the orientation announced is the way it is drawn, not the way it moves', async () => {
     /* A separator between panes laid out side by side is drawn upright, so the
-       two words are opposite each other here. The code had this right and the
-       sentence beside it said the reverse. */
+       two words are opposite each other here. */
     const side = await splitter()
     expect(separator(side).getAttribute('aria-orientation')).toBe('vertical')
     const stacked = await splitter('orientation="vertical"')
@@ -119,10 +118,8 @@ describe('splitter settling', () => {
   })
 
   test('declaring `position` seeds it, and the divider still moves', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action: the element applies, and a consumer takes the
+       decision by refusing the before event. See (294). */
     const host = await splitter('position="50" step="5"')
     let asked = ''
     host.addEventListener('helix-before-resize', (event) => {
@@ -236,8 +233,8 @@ describe('splitter crossings', () => {
   })
 
   test('a double click on the corner puts both dividers back', async () => {
-    // Free by bubbling while the corner lived inside the separator, and lost the
-    // moment it moved out to sit against the host. Reported.
+    // The corner sits against the host rather than inside the separator, so
+    // none of this arrives by bubbling.
     const [host, within] = await nested(
       'default-position="30" step="5"',
       'orientation="vertical" default-position="60" step="5"',
@@ -259,9 +256,9 @@ describe('splitter crossings', () => {
   })
 
   test('nothing moves until something is pressed', async () => {
-    // Reported: it resized on a bare hover. The move handler runs on every
-    // pointer event the handle sees, so the origin taken at `pointerdown` is
-    // what says a drag is under way.
+    // The move handler runs on every pointer event the handle sees, so the
+    // origin taken at `pointerdown` is what says a drag is under way. Without
+    // it a bare hover resizes.
     const [host, within] = await nested(
       'default-position="30"',
       'orientation="vertical" default-position="60"',
@@ -272,9 +269,9 @@ describe('splitter crossings', () => {
   })
 
   test('the divider underneath never starts its own drag from the same press', async () => {
-    // It used to, and pointer capture then sent every later event to it, so the
-    // corner's `pointerup` never arrived and it kept resizing with no button
-    // held. The corner is a sibling now and stops its events either way.
+    // Pointer capture would then send every later event to the divider, so the
+    // corner's `pointerup` never arrives and it keeps resizing with no button
+    // held. The corner is a sibling and stops its events either way.
     const [host] = await nested()
     let pressed = 0
     ;(part(host, 'separator') as HTMLElement).addEventListener('pointerdown', () => {
@@ -319,7 +316,7 @@ describe('splitter while it moves', () => {
 
   test('the corner reports the divider whose value it carries', async () => {
     // It moves both, and ARIA has no role for that, so the axis it names has to
-    // be the axis of the number it names. It named the perpendicular one.
+    // be the axis of the number it names.
     const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
     const handle = corner(host) as HTMLElement
     expect(handle.getAttribute('aria-valuenow')).toBe('65')
@@ -516,10 +513,8 @@ describe('splitter collapsing', () => {
   })
 
   test('declaring `collapsed` seeds it, and the pane still collapses', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action: the element applies, and a consumer takes the
+       decision by refusing the before event. See (294). */
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
     host.addEventListener('helix-before-collapse', (event) => {
@@ -559,12 +554,9 @@ describe('splitter under a consumer that owns the position', () => {
   }
 
   test('a splitter whose markup declared a position can still be dragged', async () => {
-    /* It could not, twice over. `move` used to refuse to apply anything when the
-       consumer owned the position, so `position` never changed during the drag
-       and letting go settled at *that*: the announcement carried the number it
-       started with and the divider never moved. That was fixed by drawing
-       without applying; it is moot now, since there is no ownership to defer to
-       and the drag applies like any other change. See 294. */
+    /* A declared `position` is a seed, not a claim of ownership: there is
+       nothing to defer to, and the drag applies like any other change.
+       See (294). */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
@@ -579,11 +571,8 @@ describe('splitter under a consumer that owns the position', () => {
   })
 
   test('and announces once at the end, however many times it is drawn', async () => {
-    /* The divider follows the hand and says nothing until the hand lets go. The
-       drawing half was once the interesting part, because a controlled splitter
-       applied nothing and had to be drawn some other way; what survives that is
-       the rule about *telling*, which is once, at the end. This is what the
-       sandbox did for itself before it used this component. */
+    /* The divider follows the hand and says nothing until the hand lets go. It
+       is drawn on every move and tells once, at the end. */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
@@ -628,7 +617,7 @@ describe('splitter under a consumer that owns the position', () => {
     /* `dragging` goes false on `pointerup`. If the drawn position fell back to
        `position` there and then, the divider snapped to where the gesture began
        and jumped again a frame later when the answer arrived: a flash on every
-       drag, reported against the examples rail. */
+       drag. */
     const host = await splitter('position="50"')
     Object.defineProperty(host, 'getBoundingClientRect', {
       value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
@@ -679,10 +668,10 @@ describe('a press that moves nothing', () => {
     new PointerEvent(type, { bubbles: true, clientY: y, composed: true, pointerId: 1 })
 
   test('announces nothing, because nothing changed', async () => {
-    /* Every press used to settle, dispatching the position the divider already
-       had. Harmless where a consumer's value round-trips exactly, and not where
-       it does not: the sandbox stores pixels and divides by a box, so a plain
-       click rewrote a stored size from a gesture that moved nothing. */
+    /* A press that settles dispatches the position the divider already had.
+       Harmless where a consumer's value round-trips exactly, and not where it
+       does not: the sandbox stores pixels and divides by a box, so a plain click
+       rewrites a stored size from a gesture that moved nothing. */
     const host = await splitter('default-position="40"')
     const said: string[] = []
     host.addEventListener('helix-before-resize', (event) => {
@@ -718,13 +707,12 @@ describe('a press that moves nothing', () => {
 /**
  * A splitter under a tag this package has never heard of.
  *
- * **This is the case a tag match cannot answer, and it was the fault.**
- * `findOuter` matched `'helix-splitter, helix-headless-splitter'`, and only
- * `@fusion.dev/helix` registers the first: a headless package naming a styled one
- * by string. Subclassing a headless element under a third tag is exactly what this
- * tier exists to allow and exactly what `helix/styled` itself does, and under one
- * the lookup returned null, so a nested splitter simply had no corner and
- * nothing said why.
+ * **This is the case a tag match cannot answer.** Matching
+ * `'helix-splitter, helix-headless-splitter'` has a headless package naming a
+ * styled one by string, and only `@fusion.dev/helix` registers the first.
+ * Subclassing a headless element under a third tag is exactly what this tier
+ * exists to allow and exactly what `helix/styled` itself does, and under one the
+ * lookup returns null: a nested splitter with no corner and nothing saying why.
  *
  * `closestInstance` asks whether the ancestor *is* a splitter, which is true of
  * every subclass whatever it is called, and walks through shadow roots on the

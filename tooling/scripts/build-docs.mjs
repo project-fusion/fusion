@@ -309,8 +309,7 @@ for (const slug of slugs) {
    * the substance was, and nothing about the file says so.
    *
    * So the rule is narrower than "every component needs a markdown renderer",
-   * which is the protocol `12-ai-native-web.md` calls the most fragile idea in
-   * it. A component that carries its own children passes through. One that does
+   * which is the most fragile idea in the protocol. A component that carries its own children passes through. One that does
    * not has to be given a renderer or taken out. */
   for (const [, tag] of source.matchAll(/<([A-Z][A-Za-z0-9]*)[^>]*\/>/g)) {
     fail(slug, `renders <${tag} /> with no children, which is a hole in its \`.md\``)

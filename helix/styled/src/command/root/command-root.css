@@ -12,13 +12,13 @@
  * and down the screen under the words being typed, taking the field with it.
  * Pinned at the top, only the bottom edge moves and the field stays still.
  *
- * **A fifth of the window down, raised from an eighth on 25 Aug 2026.** At 12vh
- * the panel opened 84 pixels from the top of a 700 pixel laptop viewport, close
- * enough to the edge that it read as hanging off the browser chrome rather than
- * floating over the page. A fifth clears it on a short window and still sits
- * inside the upper third on a tall one, which is where a palette belongs: high
- * enough that the list grows downward into empty space, low enough to look
- * placed rather than pinned. */
+ * **A fifth of the window down, and not less.** At 12vh the panel opens 84
+ * pixels from the top of a 700 pixel laptop viewport, close enough to the edge
+ * that it reads as hanging off the browser chrome rather than floating over the
+ * page. A fifth clears it on a short window and still sits inside the upper
+ * third on a tall one, which is where a palette belongs: high enough that the
+ * list grows downward into empty space, low enough to look placed rather than
+ * pinned. */
 helix-dialog::part(dialog) {
   align-self: start;
   inline-size: min(var(--command-size, 40rem), calc(100vw - var(--helix-space-xl) * 2));
@@ -34,9 +34,9 @@ helix-dialog::part(dialog) {
  * where the mark does and the field's text is the one thing stepped off it,
  * which is what a search row is.
  *
- * Lined up under the *words* instead, which was the first attempt, every row
- * sat a mark's width in from the panel's own edge with nothing in the gutter
- * but the magnifier: still two columns, just further right.
+ * Not the field's words: lined up under those, every row sits a mark's width in
+ * from the panel's own edge with nothing in the gutter but the magnifier, which
+ * is still two columns, just further right.
  *
  * One length, said once here and read by all four. */
 :host {
@@ -93,10 +93,9 @@ helix-listbox::part(search-field) {
  *
  * `Option` sizes itself for a select's dropdown, where a row is one of a few and
  * the list is short. A palette is a page of them read at speed, and at the
- * select's inset the rows ran together. The hook `Option` already reads is the
- * one thing to set, so the rows and the group headings above them move
- * together: the comment there records what happened when two stylesheets each
- * named the inset themselves.
+ * select's inset the rows ran together. Set the hook `Option` already reads and
+ * nothing else, so the rows and the group headings above them move together
+ * rather than two stylesheets each naming the inset.
  *
  * `data-density` is honored because a consumer putting a palette in a dense
  * region means it, and the recipes in `headless.css` set the same attribute on
@@ -144,14 +143,13 @@ helix-listbox::part(search-field) {
   display: none;
 }
 
-/* Not printed, being chrome.
- *
- * It is how a reader moves around a document rather than any of the document: a printed page has no elsewhere to go to, so a bar of destinations is ink spent on navigation that cannot happen.
+/* Not printed, being chrome. A palette is how a reader acts on a document
+ * rather than any of the document, and a printed page has no command to run.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. See (165). */
 @media print {
   :host {
     display: none;

@@ -84,7 +84,9 @@
 
 /* Not printed, being a control.
  *
- * Paper cannot be pressed. A button prints its chrome and its label, and the chrome is the half that says press me, which on a page is an instruction to do the one thing that is not available.
+ * Paper cannot be pressed. A button prints its chrome and its label, and the
+ * chrome is the half that says press me, which on a page is an instruction to do
+ * the one thing that is not available.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow

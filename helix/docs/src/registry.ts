@@ -35,7 +35,7 @@ export interface DocPage {
   order?: number
   /**
    * Slug of the page this one sits under, for the one level of nesting that
-   * exists. Installation and its per-framework pages are the case.
+   * exists. Installation and Coding agents are the cases.
    */
   parent?: string
   /**

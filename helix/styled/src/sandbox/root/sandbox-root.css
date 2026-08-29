@@ -1,11 +1,9 @@
 /* Three rows: a bar, the body, a bar.
  *
- * It was a five row grid with the panes, both dividers and the corner placed
- * into it by hand, and the split written into `grid-template-columns` from a
- * stylesheet this element rewrote on every pointer move. All of that is two
- * nested `helix-splitter`s now. What is left here is the part a splitter has no
- * opinion about: a toolbar above and a status bar below, spanning the whole
- * width, which is why they were never part of the split in the first place.
+ * The panes, both dividers and the corner belong to two nested
+ * `helix-splitter`s. What is left here is the part a splitter has no opinion
+ * about: a toolbar above and a status bar below, spanning the whole width,
+ * which is why they are not part of the split.
  *
  * No border and no radius. Every boundary in a sandbox is already drawn by
  * whatever sits on one side of it: the divider between the panes, the status
@@ -69,11 +67,11 @@
  * because there is also nothing to drag: the position is pinned at a hundred
  * until something is slotted.
  *
- * The flag is on the splitter, not on the host. It was on the host, and that is
- * the one thing this rule may not do: `hasPanel` is answered at hydration, so
- * React's server markup never had the attribute and the client's did, and it
- * reported the mismatch and refused to patch it. Inside the shadow root there is
- * no tree a framework is hydrating. */
+ * The flag is on the splitter and never on the host, which is the one thing
+ * this rule may not do: `hasPanel` is answered at hydration, so React's server
+ * markup has no such attribute and the client's does, and it reports the
+ * mismatch and refuses to patch it. Inside the shadow root there is no tree a
+ * framework is hydrating. */
 [part="body"]:not([data-panel])::part(separator) {
   display: none;
 }
@@ -112,7 +110,7 @@
 /* The preview fills its pane, and carries its own background because it can be
    set to a different color mode than the page around it.
 
-   No padding: the example is in a frame with its own document now, so spacing
+   No padding: the example is in a frame with its own document, so spacing
    around it belongs to that document, where the Environment menu's layout
    modes can change it. Padding here would sit outside the frame and no layout
    mode could reach it. */

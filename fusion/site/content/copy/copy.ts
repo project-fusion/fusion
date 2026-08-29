@@ -1,25 +1,18 @@
-/**
+/*
  * The shape a page's words take when they are data rather than markup.
  *
- * **This is the one place the AI-native plan argues against its own general
- * rule, and the reasoning is worth keeping here** because it is what this
- * module is instead of. Every other content surface in the repository is MDX
- * with a typed registry. The landing page is not prose with headings: it is
+ * **MDX is what this is instead of.** Every other content surface here is MDX
+ * with a typed registry, and the landing page is not prose with headings: it is
  * bands, a statement, a table read from `verticals.ts`, and a grid of cards.
  * Expressing that in MDX means inventing `<Statement>`, `<Verticals />` and
  * `<Questions>`, and then every one of those needs two renderers, one to Helix
  * markup and one to markdown, or its `.md` has a hole in it where the component
- * was.
+ * was. The docs MDX carries no live JSX at all, so moving this page into MDX is
+ * the only thing that would create the problem that protocol solves.
  *
- * That protocol is real work, it is the most fragile idea in that document, and
- * it would be built for a total of zero existing components: the docs MDX has
- * no live JSX in it at all. Moving this page into MDX is the only thing that
- * would create the problem the protocol solves.
- *
- * So the layout stays in TSX and the words move here, which is the pattern
+ * So the layout stays in TSX and the words live here, which is the pattern
  * `verticals.ts` already is and already feeds several consumers. A page renders
  * it as Helix markup; `bun run gen:catalog` renders the same object as markdown.
- * Single source, no component protocol, no new machinery.
  *
  * **The rule that survives is narrower and still holds**: a component may not
  * appear in content that has a `.md` unless it has a markdown renderer. It

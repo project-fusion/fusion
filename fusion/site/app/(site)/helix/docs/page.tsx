@@ -5,18 +5,15 @@ import shell from '../components/(reference)/docs.module.css'
 import styles from './docs-index.module.css'
 
 /**
- * The guides index, which is a page now rather than a redirect.
+ * The guides index, which is a page rather than a redirect to the first page of
+ * the first section.
  *
- * **It was `redirect()` to the first page of the first section**, on the
- * argument that a landing page in front of a table of contents is a click
- * between a reader and what they asked for. That argument was sound and it
- * rested on something that has since changed: it was only true because `/helix`
- * was the component gallery, so the documentation had no product page to be
- * part of and an index here would have been the only thing above it. `/helix`
- * is the overview now, so this is one section of a product rather than the
- * whole of it, and a reader arriving from the masthead's Docs row has asked
- * what the documentation covers rather than to be dropped into the first page
- * of the first section. See 189.
+ * A landing page in front of a table of contents is a click between a reader
+ * and what they asked for, which held while `/helix` was the component gallery
+ * and the documentation had no product page to be part of. `/helix` is the
+ * overview, so this is one section of a product rather than the whole of it,
+ * and a reader arriving from the masthead's Docs row has asked what the
+ * documentation covers. See 189.
  *
  * The sections come from `navigation()`, which is the same call the sidebar
  * makes. Nothing about the shape of the documentation is written here: a
@@ -31,11 +28,11 @@ export const metadata = pageMetadata({
 
 export default function DocsIndex() {
   return (
-    /* **`docsMain`, not the vertical product shell.** This wore
-       `vertical-page.module.css`, whose `padding-block: var(--site-band)` is the
+    /* **`docsMain`, not the vertical product shell.**
+       `vertical-page.module.css` carries `padding-block: var(--site-band)`, the
        marketing band inset that `/helix` and `/cortex` need because they have no
        chrome above them. Inside the docs layout, which already pads 48px below
-       the header, the two stacked: the index's title sat at 249 where every page
+       the header, the two stack: the index's title sits at 249 where every page
        it links to starts at 134, and 108px below its own sidebar. An index that
        does not line up with its siblings reads as a different kind of page. */
     <main className={shell.docsMain}>
@@ -51,11 +48,11 @@ export default function DocsIndex() {
       </helix-flex>
 
       {/* **Descriptions, which is what the sidebar cannot show.** Every page
-          carries a one-line summary in its frontmatter and this rendered none of
-          them, so the index was the navigation again in boxes: the same six
-          sections and the same forty-two titles a reader already had two inches
-          to the left, at 3,838px of page. A card per section added a border and
-          an inset and no information.
+          carries a one-line summary in its frontmatter, and without them the
+          index is the navigation again in boxes: the same six sections and the
+          same forty-two titles a reader already has two inches to the left, at
+          3,838px of page. A card per section adds a border and an inset and no
+          information.
 
           The sections flow rather than sitting in a grid of equal-height cards,
           because they have six, seven, ten and eleven pages: any row of two

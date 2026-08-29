@@ -57,7 +57,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
  * Select should run what Select is tested by, and which tier a file sits in is
  * a fact about this repository rather than about the component.
  */
-const SOURCES = TIERS
+const SOURCES = TIERS.map((tier) => join(root, tier))
 const harness = join(root, 'helix/testing/src/browser.ts')
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'fusion/site/public/specs')

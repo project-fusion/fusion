@@ -5,10 +5,6 @@ import styles from '../insights.module.css'
 
 /* How far through the argument a reader is, and how long ago it was written.
 
-   A plain comment rather than a doc one: the block below documents
-   `ReadingProgress`, and two doc comments in a row leave the first documenting
-   nothing.
-
    Two client components on an otherwise server-rendered page, for the same
    reason the showcase is one: what needs state is a scroll position and a
    clock, and neither of those exists at build time. Everything else about a
@@ -30,10 +26,9 @@ import styles from '../insights.module.css'
  * own height, so it rides the bottom edge of the bar rather than floating under
  * it.
  *
- * **It measures the document, after two attempts at measuring the article.**
- * Scoping it to the body is the better-sounding idea, since the masthead and
- * "keep reading" are not the argument, and both ways of doing it measured
- * wrong on a real post.
+ * **It measures the document, never the article.** Scoping it to the body is the
+ * better-sounding idea, since the masthead and "keep reading" are not the
+ * argument, and both ways of doing that measure wrong on a real post.
  *
  * `height - innerHeight`, the version everybody writes, is how far the body's
  * box travels: on a 962 body in a 900 window that is 62 pixels of travel, so
@@ -50,7 +45,7 @@ import styles from '../insights.module.css'
  * already reporting. The chrome it includes is a masthead and three rows,
  * which is a smaller error than either of the ones it replaces.
  *
- * `scaleX` on a full-width bar rather than an animated `inline-size`, so the
+ * `scale` on a full-width bar rather than an animated `inline-size`, so the
  * fill is a compositor transform and a scroll handler never triggers layout.
  * `passive` for the same reason.
  */

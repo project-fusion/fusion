@@ -1,45 +1,11 @@
-/* The landing page: its light, its bands, and the showcase inside one of them.
- *
- * The largest of the splits and the last, at 600 lines. What stayed behind is
- * everything more than one route applies: `band` and `closing` are the page
- * rhythm eight routes share, `heroTitle` and `heroLede` are read by the aura lab
- * as well, and `gridBand` belongs to both galleries.
- */
+/* The landing page: its light, its bands, and the showcase inside one of them. */
 
-/* One band, one screen.
- *
- * Scoped to the landing page rather than written onto `.band`, which four other
- * routes also use. A services page is a list to compare down and a page of
- * prose is not improved by being cut into screens; here the bands are nine
- * claims, and one at a time is the argument rather than a layout.
- *
- * `min-block-size`, never `block-size`. The verticals band is a heading and
- * five rows and legitimately exceeds a short viewport, and a fixed height would
- * crop it rather than let it grow.
- *
- * `svh` rather than `vh` or `dvh`. `vh` is the tallest the viewport ever gets,
- * so on a phone every band overflows by the height of the browser chrome.
- * `dvh` is whatever it currently is, so a band resizes while that chrome hides
- * and the page moves under the reader's thumb mid-scroll. `svh` is the small
- * stable one and moves for nothing.
- *
- * `align-content` rather than `justify-content`, because the axis being
- * centered on is the block one and a grid's block axis is its content axis.
- * The single `.shell` child still stretches across, so nothing about the
- * horizontal inset changes. */
 /* The containing block for the aura, which is absolute against it. */
 .reel {
   /* **Clipped, because an absolutely positioned child pushes the page taller.**
-     The second field is a child of the band it lights and stands `200svh` from
-     that band's top, which lands 62px past the footer: abspos boxes do not take
-     part in flow but they do contribute scrollable overflow, so the document
-     went from 4774 to 4836 and the footer stopped being the last thing on the
-     page. The first field never showed this, being a child of the reel itself
-     with its 1800 comfortably inside 4690.
-
-     Clipping here rather than shortening the second field, because the height is
-     what makes the two boxes the same shape and the same shape is what lets them
-     share a `terminus`. And the reel is the right edge to clip at: it is the lit
+     Abspos boxes do not take part in flow but they do contribute scrollable
+     overflow, so an aura taller than the reel leaves the footer no longer the
+     last thing on the page. The reel is the right edge to clip at: it is the lit
      region by definition, and it ends exactly where the footer begins.
 
      `clip` rather than `hidden`: it establishes no scroll container, so nothing
@@ -48,25 +14,19 @@
   overflow: clip;
 
   /* **The air under the closing card belongs to the reel, not to the card.**
-     Written first as a margin on the card, and a margin put it *outside* the
-     clip: the reel ended at the card's own bottom edge, so the field stopped
-     dead there and the strip above the footer was black with a hard line across
-     it. Padding here keeps the space inside the lit region, so the light carries
-     under the card and fades into the footer instead of stopping at it. */
+     A margin on the card lands *outside* the clip: the reel would end at the
+     card's own bottom edge, so the field stops dead there and the strip above
+     the footer is black with a hard line across it. Padding here keeps the space
+     inside the lit region, so the light carries under the card and fades into
+     the footer instead of stopping at it. */
   padding-block-end: var(--site-band);
   position: relative;
 }
 
-/* **The hero is a screen. The bands after it are as tall as what is in them.**
- *
- * Every band being a full viewport made the page a slideshow: a section with
- * three cards in it got the same height as one with nine, so the short ones
- * were mostly empty and the long ones were centered with their edges cut. It
- * also meant the length of the page said nothing about how much was on it.
- *
- * The snap went with it. `proximity` was already the careful setting, and it
- * exists to make a reel of equal screens feel deliberate; over bands of honest
- * heights it just tugs at a scroll that was going somewhere. */
+/* **The hero is a screen. The bands after it are as tall as what is in them**,
+ * and there is no scroll snap: snapping exists to make a reel of equal screens
+ * feel deliberate, and over bands of honest heights it only tugs at a scroll
+ * that was going somewhere. */
 /* :global(.band) is not this module's to rename.
 
    `band` is applied by eight routes as a plain string, so hashing it here would
@@ -94,39 +54,29 @@
   position: relative;
 }
 
-/* The header is `position: sticky`, so it takes a row in flow: the first screen
- * is the header plus whatever the band under it asks for. Subtracted, the hero
- * is exactly the window; left alone it is the window plus the bar, and the page
- * opens already scrollable by a sliver that says nothing. Only the first band
- * pays it, because everything after it scrolls under the bar rather than
- * beneath it. */
 .reel > .hero {
   /* Reaches up behind the masthead, which is transparent on this page.
    *
    * The header is `position: sticky`, so it takes a row in flow and the hero
-   * began under it: with the bar see-through, that left a strip of flat page
-   * across the top of the light, which is worse than an opaque bar because it
-   * looks like the aura failed rather than like a decision. The negative start
-   * margin pulls the band up by exactly the header's height and the padding
-   * puts the words back where they were, so the light runs to the top of the
-   * window and nothing inside the hero moves. Same construction `.pageHero`
-   * already uses on the two gallery routes.
+   * would begin under it: with the bar see-through, that leaves a strip of flat
+   * page across the top of the light, which is worse than an opaque bar because
+   * it looks like the aura failed rather than like a decision. The negative
+   * start margin pulls the band up and the padding puts the words back, so the
+   * light runs to the top of the window and nothing inside the hero moves.
    *
-   * The height goes back to a whole viewport, because the band now spans the
-   * strip it was subtracting. */
-  /* The header's height *plus* the hairline under it, which this was missing.
-   *
-   * `--helix-size-header` is the bar's own 56, and `AppHeader` draws a
+   * **The header's height plus the hairline under it, not the height alone.**
+   * `--helix-size-header` is the bar's own 56 and `AppHeader` draws a
    * `border-block-end` under that, so the thing occupying the top of the window
-   * is 57 while the sheet that paints it is 56. Pulled up by 56 the hero
-   * started one pixel late, and that row was painted by neither: the body
-   * showed through as a white line across the top of the window, clearest at
-   * the moment of a navigation because that is when the eye is on the header.
-   *
-   * `.pageHero` in `browser.module.css` has always added the hairline and this
-   * comment already claimed to be "the same construction" as it, which it was
-   * not. It is now. */
+   * is 57 while the sheet that paints it is 56. Pulled up by 56 the hero starts
+   * one pixel late and that row is painted by neither, so the body shows through
+   * as a white line across the top of the window. Same construction `.pageHero`
+   * uses in `browser.module.css`. */
   margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  /* `svh`, never `vh` or `dvh`. `vh` is the tallest the viewport ever gets, so
+     on a phone the band overflows by the height of the browser chrome. `dvh` is
+     whatever it currently is, so the band resizes while that chrome hides and
+     the page moves under the reader's thumb mid-scroll. `svh` is the small
+     stable one and moves for nothing. */
   min-block-size: 100svh;
   /* `max`, not a sum. Added together the band ran twelve pixels past the
      viewport and broke the one-band-one-screen rhythm the rest of the page
@@ -139,28 +89,21 @@
 
 /* ============================================================ hero ======= */
 
-/* The light behind the claim.
- *
- * Absolute rather than a background, because it is a canvas: it has to fill the
- * section without being in the flow, or the hero grows by its height and the
- * type stops being the only thing on screen.
- *
- * `pointer-events: none` said here rather than relied on. The element is not
- * `interactive`, so it asks for no hit test of its own, but it does cover the
- * whole hero including both calls to action, and a layer over those is one
- * refactor away from swallowing the press that pays for the site. */
 /**
  * One field, over the whole reel.
  *
- * **Six of these were a seam generator.** Every band carried its own 200svh
- * aura anchored to its own top, so where one band ended and the next began the
- * two boxes cut against each other and drew a hard horizontal line across the
- * page. Matching their settings could not fix that: the line is the boundary
- * between two canvases, not a difference between them.
+ * Absolute rather than a background, because it is a canvas: it has to fill the
+ * region without being in the flow, or the band grows by its height and the type
+ * stops being the only thing on screen. `pointer-events: none` is said rather
+ * than relied on, because the field covers both calls to action and a layer over
+ * those is one refactor away from swallowing the press that pays for the site.
  *
- * Stretched to the reel instead, which is the lit region by definition and
- * already clips where the footer starts. No boundary inside it, so nothing to
- * see at a band edge, and six fewer WebGL contexts for the compositor to carry.
+ * **One field, not one per band.** A per-band aura anchored to its own band's
+ * top cuts against its neighbor at every band boundary and draws a hard
+ * horizontal line across the page. Matching their settings cannot fix that: the
+ * line is the boundary between two canvases, not a difference between them.
+ * Stretched to the reel there is no boundary inside it, and one WebGL context
+ * for the compositor to carry rather than one per band.
  *
  * **No `z-index`, and one is actively wrong here.** This is positioned, the
  * sections after it are positioned, and positioned boxes with no layer of their
@@ -171,8 +114,7 @@
  * make one. A negative layer therefore does not settle behind the sections, it
  * escapes to the nearest ancestor that does form a context and paints behind
  * *that* element's background, which is opaque. The field disappears entirely.
- * Tried on 27 Aug 2026 as belt-and-braces next to `.reel > section`, which is
- * the belt and is sufficient on its own.
+ * `.reel > section` is what orders this, and is sufficient on its own.
  */
 .reelAura {
   /* Absolute against the reel, not fixed against the window. Fixed pins the
@@ -198,26 +140,12 @@
      every shape, every tilt and every scale, including the ones nobody has
      tried.
 
-     Later than the 62% this held at two screens. That number was the last third
-     of a box the height of two viewports; over the whole reel the same fraction
-     would start fading around the third band and leave half the page dark.
-
-     Later again, from 86 to 96, and the reel grew a bottom margin to put it in.
-     Measured at 1100 wide: the reel ran to 6907 and the closing call to action
-     sat at 6470 to 6825, so a fade beginning at 86 percent started 530px above
-     that section and took it from 45 percent opacity down to 8. The light was
-     not stopping short of the bottom of the page, it was being masked off
-     across the last thing on it. The reel's own end padding is what makes room
-     for the fade to happen below the content instead of over it.
-
-     One band, which is where it started, and the mark at 98 rather than 86.
-     Four bands put 331px of unlit reel under the closing section and two put
-     180, both of which read as the page trailing off rather than arriving at
-     the footer. The room was never the point: the fade only has to begin below
-     the last thing a reader looks at, and a section's own end padding is
-     already empty. Measured at 1200 wide: the reel ends at 6632, the 98 percent
-     mark falls at 6499, and the closing call to action's content stops around
-     6452, so the fade starts in the padding under it and has 133px to run. */
+     The mark is late because the fade only has to begin below the last thing a
+     reader looks at, and a section's own end padding is already empty. An
+     earlier mark masks the closing call to action instead of the space under it.
+     Measured at 1200 wide: the reel ends at 6632, the 98 percent mark falls at
+     6499, and the closing call to action's content stops around 6452, so the
+     fade starts in the padding under it and has 133px to run. */
   mask-image: linear-gradient(to bottom, black 0%, black 98%, transparent 100%);
   pointer-events: none;
   position: absolute;
@@ -229,22 +157,9 @@
   position: relative;
 }
 
-/* The install line: a command and the one thing you do with it.
- *
- * `surface` with a hairline rather than the code block's own treatment, because
- * this is one line in a hero rather than a listing in a document, and at hero
- * scale a filled block reads as a third button.
- *
- * The button pulls back by its own padding so the *line* is what the box is
- * sized to. Left alone, a 40 control inside a chip built for 13px type sets the
- * height of the whole thing and the command ends up floating in a control's
- * worth of air. */
-/* **Centered, so the light has something to be behind.**
- *
- * The column was left-aligned, which is right for a page of prose and wrong for
- * this one: the hero is a claim over a field of moving light, and a claim
- * pushed to one edge leaves the other two thirds of the field looking like
- * space nobody used. Centered, the type sits in the light rather than beside it.
+/* **Centered, so the light has something to be behind.** The hero is a claim
+ * over a field of moving light, and a claim pushed to one edge leaves the other
+ * two thirds of the field looking like space nobody used.
  *
  * The measure comes with it. A centered column that runs the full shell gives a
  * reader a different left edge on every line, which is the failure centering is
@@ -293,6 +208,11 @@
   flex-grow: 1;
 }
 
+/* The install line: a command and the one thing you do with it.
+ *
+ * `surface` with a hairline rather than the code block's own treatment, because
+ * this is one line in a hero rather than a listing in a document, and at hero
+ * scale a filled block reads as a third button. */
 .heroInstall {
   background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -311,28 +231,8 @@
   }
 }
 
-/* **Columns, not a grid.**
- *
- * A grid pads every row to its tallest cell, so a card with a table in it sets
- * the height of the card beside it and the short one floats in a box of its own
- * empty space. CSS columns let each card be its own height and the flow fill
- * around them, which is what a mosaic is and what makes an assortment of
- * different surfaces read as one arrangement.
- *
- * `break-inside: avoid` is what stops a card being cut in half at the column
- * boundary, and it has to be on the card rather than the container. */
-/* **A grid, not columns, once the anchor has to span.**
- *
- * `column-span: all` is the multicol way to say it and it collapsed the whole
- * panel: every card measured 34 wide. Grid says the same thing without the
- * ambiguity, and `align-items: start` is what keeps the masonry property that
- * mattered, each card its own height rather than padded to its row's tallest.
- *
- * Two equal columns of seven equal cards is a stack rather than a composition:
- * every card the same width means nothing in the panel matters more than
- * anything else, which is the opposite of what an anchor is for. */
-/* One cell, with every view stacked in it. The columns moved onto the views
-   themselves, since each one is now its own grid. */
+/* One cell, with every view stacked in it. The columns live on the views
+   themselves, since each one is its own grid. */
 .showcase {
   display: grid;
 }
@@ -368,24 +268,15 @@
  * text, which is `color: inherit` unless it names a tone, so nothing inside
  * needs to know it is on a filled ground. */
 .showcaseAnchor {
-  /* **Not `--helix-color-primary`, which does not carry text.** Measured with
-     `foreground-on-accent` over it in dark mode: 2.8 to 1, under the 4.5 body
-     text wants and under the 3 even large text wants. The hero's solid primary
-     button measures the same, so this is the token layer's own gap rather than
-     anything about this card, and it is filed as such: there is no "a primary
-     surface you can put on-accent text on".
-    
-     `-active` is a state name doing a surface's job, which is the honest
-     caveat, and it is the only primary in the set that carries text: 6.69 to 1,
-     and mode independent where `primary` is `light-dark()` and a mix toward the
-     background would invert in light mode and fail there instead. */
-  /* **`primary-strong`, which is the brand as a surface.** `primary` is solved
-     to be legible *on* the background, so in a dark theme it is light by
-     construction and a card filled with it carries dark text: measured at
-     `#73a8ff`, which is a wash rather than a brand. `primary-strong` is solved
-     the other way, dark enough that its own ink clears it, and comes out at
-     `#276ee0` for this blue. It falls back to `primary-active` for the moment
-     before the derivation runs. */
+  /* **Not `--helix-color-primary`, which does not carry text.** It is solved to
+     be legible *on* the background, so in a dark theme it is light by
+     construction and a card filled with it carries dark text: measured with
+     `foreground-on-accent` over it in dark mode, 2.8 to 1, under the 4.5 body
+     text wants and under the 3 even large text wants.
+
+     `primary-surface` is the brand solved the other way, as a ground dark
+     enough that its own ink clears it, which is what lets everything inside
+     stay `color: inherit`. */
   --card-background-color: var(--helix-color-primary-surface);
   --card-border-color: var(--helix-color-primary-surface);
 
@@ -398,59 +289,19 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* The one band after the hero that takes a whole screen.
- *
- * It is a window rather than a passage: an argument held apart from the thing
- * it is about by a rule. A window wants a frame, and a frame wants a height
- * that was decided rather than one that ended wherever the last card did. */
-/* **A definite height, not a floor.** `min-block-size` lets the region grow,
-   and the stage's contents are twice a screen tall, so the middle row grew to
-   fit them: the band stopped being one screen and the prose, centered in a row
-   far taller than the window, ended up below the fold. A window has a size.
-   `align-content: stretch` overrides the centering every other band wants, so
-   the rows actually divide the height rather than clustering in the middle. */
-/* **A screen means a screen you can see, not a screen's worth of pixels.**
-   The masthead is sticky and takes a row in flow, so a band of exactly 100svh
-   starts below it and ends the same distance past the fold: measured at 57 to
-   777 against a 720 window, which is a full viewport tall and not once visible
-   all at once. Subtracting the header is what makes it fit.
- 
-   `align-content: stretch` on this band alone, overriding the centering every
-   other band wants, or its rows cluster in the middle instead of dividing the
-   height. */
-/* **The ground the panel sits on, and the panel needs one.**
- *
- * The stage is `surface`, which is white in the light theme, and the page is
- * white: measured, the two were the same `#ffffff` and the only thing between
- * them was a shadow at 0.14 alpha. A white panel is the right call and it only
- * reads against something, so the band takes the recess the panel used to be.
- *
- * `surface-sunken` works in both directions, which is why it is one declaration
- * rather than a light-only exception: it is `#e5e8ed` under a white panel, and
- * in the dark it is a step below the `#16181c` the panel takes, so the panel is
- * lighter than its ground either way. The old arrangement had it the other way
- * round, the panel sunken and the page plain, which is what a recess is and is
- * why the comments further down still say so. */
-/* **The closing call to action, as a card rather than a band.**
- *
- * It ran to both window edges and wore `data-material="glass"` with the
- * corrections a full-bleed surface needs, chief among them no left or right
- * border, because those two sides were the window rather than an edge of the
- * object. Capped and centered, all four sides are the object's own, so the border
- * the material carries is doing the job it exists for: keeping a translucent
- * surface a shape when it takes its color from whatever is behind it.
- *
- * The showcase used to share this and no longer does, having lost its grounds
- * entirely, so this is one element's rule now and named for it.
+/* **The closing call to action, as a card rather than a band.** Capped and
+ * centered, all four sides are the object's own, so the border the material
+ * carries is doing the job it exists for: keeping a translucent surface a shape
+ * when it takes its color from whatever is behind it.
  *
  * **And glass admits what is behind it, which in light mode is nothing.** The
- * ground is white at 72%, so over a near-white page the band reads *lighter* than
- * the page and stops being a band at all. The sunken ground is what light mode
- * wants and the translucent one is what dark mode wants, which `light-dark()`
- * says in one declaration. The blur comes off with it: an opaque ground is in
- * front of it, and a `backdrop-filter` that changes nothing still makes the
- * compositor re-read the page on every frame the element moves, which these do
- * for a whole scroll.
+ * ground is white at 72%, so over a near-white page the card reads *lighter*
+ * than the page and stops being a card at all. The sunken ground is what light
+ * mode wants and the translucent one is what dark mode wants, which
+ * `light-dark()` says in one declaration. The blur comes off with it: an opaque
+ * ground is in front of it, and a `backdrop-filter` that changes nothing still
+ * makes the compositor re-read the page on every frame the element moves, which
+ * these do for a whole scroll.
  *
  * Two rules for that, because the attribute is absent for a reader who has never
  * chosen, which is most of them. `[data-color-mode="light"]` catches an explicit
@@ -465,26 +316,22 @@
   );
   border-radius: var(--helix-radii-lg);
   /* **As wide as every other band's content, which is the inset and nothing
-     else.** A fixed cap was the first attempt and it was narrower than the page:
-     the card sat at 64rem while the products, services and insights above it ran
-     to the viewport less `--site-inset`, so the one element meant to close the
-     page was the only one not aligned to it. Deriving the width from the same
-     inset makes the card's edges land on the column every band above already
-     keeps.
+     else.** A fixed cap is narrower than the page: the bands above run to the
+     viewport less `--site-inset`, so the one element meant to close the page
+     would be the only one not aligned to them. Deriving the width from the same
+     inset makes the card's edges land on that column.
 
      The content inside is inset again by the inner `data-shell`, which is what a
      card's padding is and is why the text reads narrower than the text above it
      without the edges disagreeing. */
   margin-inline: auto;
-  /* **The one band whose spacing came out half.**
+  /* **The one band whose spacing would otherwise come out half.**
    *
    * Every other band is a card inside a section, so the section's
    * `padding-block` sits outside the card and two neighbors put a full
    * `--site-band` each between them: 216px measured. This card *is* its section,
-   * so that same padding lands inside the card as its own generous inset, and
-   * the gap above it was one band's worth rather than two. Nothing looked wrong
-   * about the card; it sat closer to the essays than any other pair on the page
-   * sat to each other.
+   * so that same padding lands inside the card as its own inset and the gap
+   * above it is one band's worth rather than two.
    *
    * A margin rather than moving the padding out, because the inset is doing real
    * work: it is what makes the close read as airy instead of cramped. */
@@ -503,50 +350,41 @@
 }
 
 .showcaseBand {
+  /* `stretch` on this band alone, overriding the centering every other band
+     wants, or its rows cluster in the middle instead of dividing the height. */
   align-content: stretch;
   /* **A floor rather than a fixed height, because the content does not fit at
      every window.**
 
      One screen minus the header is the right ambition for a stage: the showcase
      is the page's demonstration and it should own the view when it can. Written
-     as `block-size` it was a promise the content could not keep. Measured at
-     1280 by 900: the band resolved to 844px and the card inside it came out
-     979, so the card ran 232px past the section's own bottom edge and overlapped
-     the next band's card by 136. Every other band on the page ends exactly 96px
-     above its section's bottom, which is the section's end padding, and this one
-     ended below it.
-
-     That is what reads as inconsistent spacing between sections. The gap between
-     two cards is 192 everywhere the sections size to their content, and here it
-     collapsed to a negative number and the following card painted over the
-     overflow.
+     as `block-size` it is a promise the content cannot keep. Measured at 1280 by
+     900: the band resolves to 844px and the card inside it to 979, so the card
+     runs 232px past the section's own bottom edge and overlaps the next band's
+     card by 136. Every other band ends exactly 96px above its section's bottom,
+     which is the section's end padding, and this one ends below it: the gap
+     between two cards is 192 everywhere the sections size to their content, and
+     here it collapses to a negative number.
 
      `min-block-size` keeps the ambition and drops the promise: the band is a
      screen tall wherever the content fits in one, and taller where it does not.
      The stage inside still clips and fades, since that is its own `overflow`
-     and mask rather than anything this height was providing. */
+     and mask rather than anything this height provides.
+
+     **Minus the header, because a screen means a screen you can see.** The
+     masthead is sticky and takes a row in flow, so a band of exactly 100svh
+     starts below it and ends the same distance past the fold: measured at 57 to
+     777 against a 720 window, a full viewport tall and not once visible all at
+     once. */
   min-block-size: calc(100svh - var(--helix-size-header));
 }
 
-/* Prose, rule, stage. The prose column is clamped rather than fractional: a
-   measure is a number of characters, and giving it a share of the width means
-   it gets longer on a wider screen, which is the one direction a line of text
-   must not go. The stage takes what is left. */
-/* Prose, rule, stage, bounded top and bottom.
- *
- * Three rows: a rule, the content, a rule. The content row is `1fr` so it takes
- * whatever the full height band has left, which is what lets the stage fill its
- * half of the region rather than sitting in it.
- *
- * The column gap is on the columns only. A row gap would push the rules away
- * from the thing they bound, and a rule that does not touch what it encloses is
- * a line near a box rather than its edge. The prose gets its clearance from its
- * own block padding instead.
+/* Prose beside the stage.
  *
  * The prose column is clamped rather than fractional: a measure is a number of
  * characters, so a share of the width means longer lines on a wider screen,
- * which is the one direction text must not go. Wider than it was, at 20 to 30
- * rem, because the heading was breaking into five lines at 24. */
+ * which is the one direction text must not go. 20 to 30rem, because the heading
+ * breaks into five lines at 24. The stage takes what is left. */
 .showcaseSplit {
   block-size: 100%;
   column-gap: var(--helix-space-3xl);
@@ -563,44 +401,23 @@
   padding-block: var(--helix-space-2xl);
 }
 
-/* The panel, which is the near surface now rather than the recess: the band
-   behind it holds the sunken ground and this sits on top of it.
- *
- * Masked at the foot rather than cut. A hard edge says the layout ran out; a
- * fade says there is more, which there is. `mask-image` and not a gradient
- * overlay, because an overlay would need the page's own background color and
- * this panel is not that color. */
-/* The stage is a panel again, with its own edges.
- *
- * The rules top and bottom are gone, so nothing else is drawing them: a border
- * and a radius are what say where the recess stops, and rounded is what the
- * rest of this page is. It still fills the height beside the prose, so the
- * middle rule runs its full length.
- *
- * Masked at the foot rather than cut. A hard edge says the layout ran out; a
- * fade says there is more, which there is. `mask-image` and not an overlay,
- * because an overlay needs the color behind it and this panel is not the
- * page's color. */
+/* Masked at the foot rather than cut. A hard edge says the layout ran out; a
+   fade says there is more, which there is. `mask-image` and not an overlay,
+   because an overlay needs the color behind it and this panel has no color of
+   its own. */
 .showcaseStage {
   /* **No paper under the components, and no ground behind them.**
    *
-   * This was a `surface` panel with `shadow-lg` and a radius, sitting on a band
-   * filled with `surface-sunken`: two grounds stacked under a demo whose whole
-   * claim is that the controls are real. A panel with a shadow says "a picture
-   * of an interface". The controls beside the copy *are* the interface, and the
-   * paper was the one thing on the page still arguing otherwise.
+   * A panel with a shadow says "a picture of an interface". The controls beside
+   * the copy *are* the interface, so a surface under them is the one thing on
+   * the page arguing otherwise.
    *
-   * It also fought the field. The band sits inside the reel, so there is an
-   * aura behind it now, and an opaque stage was the surface hiding the thing
-   * three fields exist to draw. Off the page, the components sit on the light
-   * directly.
-   *
-   * The earlier note here argued `surface` over `surface-sunken`, that a shadow
-   * separates where a rule only edges. That was the right call between two
-   * grounds and the wrong question: what was needed was neither.
+   * It also fights the field. The band sits inside the reel, so there is an aura
+   * behind it, and an opaque stage is a surface hiding the thing the field
+   * exists to draw. The components sit on the light directly.
    *
    * The mask, the padding and the overflow stay. Those are about the stage being
-   * a window onto content twice its height, which is still true. */
+   * a window onto content twice its height. */
   /* Same rule again one level down: the stage is a grid item too, and its
      contents are twice the height of the region it sits in. */
   min-block-size: 0;
@@ -612,16 +429,12 @@
 /* Stacked where a split would be two narrow strips, and the rule turns with it.
    A vertical divider between stacked blocks is a line pointing the wrong way.
 
-   **The `grid-template-columns` line is the one that does the stacking, and it
-   was missing.** This block described stacking and only released the heights, so
-   the split stayed two columns all the way down: at 390 the prose column took
-   its 20rem floor, the gap took its own, and the stage was squeezed to 64px and
-   pushed past the edge. Measured, `.showcaseStage` at x=384 running to 448
-   against a 390 viewport, which is a page that scrolls sideways on a phone.
-
-   It is the failure mode a comment is worst at catching, because the block reads
-   as though it has already been done: three declarations that are all about
-   stacking, none of which stacks anything. */
+   **The `grid-template-columns` line is the one that does the stacking**, and
+   releasing the heights alone does not: the split stays two columns all the way
+   down, and at 390 the prose column takes its 20rem floor, the gap takes its
+   own, and the stage is squeezed to 64px and pushed past the edge. Measured,
+   `.showcaseStage` at x=384 running to 448 against a 390 viewport, which is a
+   page that scrolls sideways on a phone. */
 @media (width < 64rem) {
   .showcaseBand {
     align-content: center;
@@ -666,8 +479,6 @@
   justify-self: start;
 }
 
-/* The stage stacks: the anchor, the switch, then whatever the switch is
-   showing, and the grid takes the rest so the fade lands on real content. */
 /* **No `align-items` on the grid, only on the row that wants it.**
  *
  * Centering every row centers the views row too, and the views are taller than
@@ -712,12 +523,11 @@
 
 /* **A gap the pair actually fits in.**
  *
- * `Stat Group` wraps, and its default gap is `2xl`. Two figures measured 113
- * and 174 with 318 of card to sit in, so 287 of content plus a 48 gap came to
- * 335 and the second one wrapped, and the same 48 then became the space
- * between the two lines. That is where the card's height was going: 345 with
- * the figures stacked, 222 with them side by side, for a component whose
- * drawing never changed size.
+ * `Stat Group` wraps, and its default gap is `2xl`. Two figures measure 113 and
+ * 174 with 318 of card to sit in, so 287 of content plus a 48 gap comes to 335
+ * and the second one wraps, and the same 48 then becomes the space between the
+ * two lines: 345 with the figures stacked against 222 with them side by side,
+ * for a component whose drawing never changed size.
  *
  * A custom property rather than a rule on the group, which is what makes this
  * safe from here: it inherits through the shadow boundary and is read inside
@@ -759,11 +569,10 @@
   /* **Every card fills its row, which is a claim about the mosaic and not
      about any card.** A row is as tall as its tallest member, so aligning to
      the start leaves the shorter one floating with a band of ground under it
-     and the pair reads as two sizes of card rather than one grid. The worry
-     that kept this at `start` was the figures card, whose chart is pinned to
-     its own bottom edge: stretching it would move the gap up between the
-     numbers and the line. It does not arise, because that card is the tallest
-     in its row and a stretched row never stretches its tallest member. */
+     and the pair reads as two sizes of card rather than one grid. Safe for the
+     figures card, whose chart is pinned to its own bottom edge: it is the
+     tallest in its row, and a stretched row never stretches its tallest
+     member. */
   align-items: stretch;
   display: grid;
   gap: var(--helix-space-md);
@@ -775,26 +584,23 @@
   display: none;
 }
 
-/* The faces sit in a row, which is `orientation` and not a custom property I
-   invented: five of them stacked is a list of moods, and what a scale wants is
-   to be seen at once. The mark carries the meaning here, so the words under it
-   shrink to a caption. */
+/* The mark carries the meaning here, so the faces are sized to the checkbox
+   scale rather than to the words under them. */
 .showcaseFaces svg {
   inline-size: var(--helix-size-checkbox);
 }
 
-/* The stage's own controls stack too, and only its `views` grid was doing it.
+/* The stage's own controls stack too, not only its `views` grid.
  *
  * `"switch brand reset"` is one row of three at every width, and at 390 there is
- * not room for it: the toggle group broke its four options onto four lines and
- * the color field beside it was squeezed until `#3b82f6` rendered as `32f6`, the
+ * not room for it: the toggle group breaks its four options onto four lines and
+ * the color field beside it is squeezed until `#3b82f6` renders as `32f6`, the
  * two of them overlapping. Measured at 390, the group occupying x=65 to 240 and
  * the field starting at 245 with its value clipped.
  *
- * The switch takes a row of its own and the color keeps its reset beside it,
- * which is the pairing the wide layout already has: the two halves that must
- * stay together are the color and the control that undoes it, and the switch is
- * the one that can be anywhere. */
+ * The switch takes a row of its own and the color keeps its reset beside it: the
+ * two halves that must stay together are the color and the control that undoes
+ * it, and the switch is the one that can be anywhere. */
 @media (width < 56rem) {
   .showcaseView {
     grid-template-columns: minmax(0, 1fr);
@@ -839,11 +645,9 @@
   margin-inline-end: calc(var(--helix-space-2xs) * -1);
 }
 
-/* The compatibility line under the hero's actions.
- *
- * Quiet on purpose. It is a fact a reader needs before they can want anything
- * else on the page, and it is not a claim worth the size of one: `subtle` and a
- * step down from the lede, so it reads as a specification rather than a pitch. */
+/* The compatibility line under the hero's actions. Quiet on purpose: it is a
+   fact a reader needs before they can want anything else on the page, and it is
+   not a claim worth the size of one. */
 .heroWorks {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-sm);

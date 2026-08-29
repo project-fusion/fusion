@@ -31,11 +31,10 @@
   /* The page's own color, so the box reads as a hole punched through to it
      rather than as a fill that happens to match.
 
-     It was `surface-sunken`, and that stopped working the moment `sunken` was
-     lightened: at 0.96 it is the same color as a sunken surface, so a checkbox
-     inside a well had no interior at all, only its border. Measured on the page
-     it separated by 0.04, on a card by 0.025, and in the one place it was for
-     by nothing.
+     Never `surface-sunken`, which stopped working when `sunken` was lightened
+     to 0.96: a checkbox inside a well then had no interior at all, only its
+     border. Measured, it separated from the page by 0.04, from a card by 0.025,
+     and from the well it was for by nothing.
 
      `background` cannot have that problem. On the page it is the page, which is
      what a native checkbox looks like there and leaves the border to define the
@@ -53,15 +52,12 @@
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The edge firms up and takes no color, which is what the paragraph below has
-   said since it was written and what the two rules under it did not do: both
-   named `--helix-color-primary`, so the comment and the code disagreed and the
-   code won. A circle that turns brand-blue on hover is the loudest thing in a
-   form, and it says "recommended" about whichever option a pointer happens to
-   be over. */
-/* Through the hook, so a container saying "these are wrong" is not undone by a
-   pointer passing over one of them. The fallback is what this rule has always
-   been; the hook is only ever set by something that has a reason to. */
+/* The edge firms up and takes no color. A circle that turns brand-blue on hover
+   is the loudest thing in a form, and it says "recommended" about whichever
+   option a pointer happens to be over.
+
+   Through the hook, so a container saying "these are wrong" is not undone by a
+   pointer passing over one of them. */
 :host(:not([disabled])) [part="item"]:hover [part="box"] {
   border-color: var(--radio-border-color, var(--helix-color-foreground-muted));
 }
@@ -133,14 +129,11 @@
   display: block;
 }
 
-/* Through hooks, the way `Card` does it.
- *
- * These named `--helix-color-surface` and `--helix-color-border` outright, so a
- * consumer could restyle a `Card`'s surface and could not restyle the identical
- * surface on a card-shaped choice. Not the duplication the audit called it,
- * which was worth measuring: the two rules share exactly two declarations, `gap`
- * and `transition`, and everything that looks copied is four token references
- * doing what tokens are for. What was actually missing was the API. */
+/* Through hooks, the way `Card` does it, so a consumer who can restyle a
+   `Card`'s surface can restyle the identical surface on a card-shaped choice.
+   Not duplication of `Card`: the two rules share exactly two declarations,
+   `gap` and `transition`, and everything that looks copied is four token
+   references doing what tokens are for. */
 :host([variant="card"]) [part="item"] {
   align-items: start;
   background-color: var(--radio-card-background-color, var(--helix-color-surface));
@@ -159,10 +152,6 @@
   border-color: var(--helix-color-foreground-muted);
 }
 
-/* Lifted rather than colored, which is this component's own rule about the
-   mark restated for the surface: color is reserved for state, and being chosen
-   is an answer rather than a state. The dot is what says which one, and it is
-   already animated and already legible without color. */
 /* The card is where the brand color belongs, because here the whole surface is
  * the answer rather than a mark inside it, and one card in a column being
  * chosen is exactly what a color is for.
@@ -195,11 +184,11 @@
  * block of text, which is where a native control sits beside a paragraph.
  *
  * Half the difference between the line and the circle, derived rather than
- * picked. It was `space-2xs`, a flat 4px, and it put the circle's center 6.5px
- * below the center of the text it sits beside: measured on a one-line card,
- * where a nudge chosen for a paragraph is simply wrong. The line is the font
- * size times its line height, and the circle is taller than that, so the offset
- * comes out negative and lifts it slightly rather than dropping it. */
+ * picked: a flat `space-2xs` put the circle's center 6.5px below the center of
+ * the text beside it, measured on a one-line card, where a nudge chosen for a
+ * paragraph is simply wrong. The line is the font size times its line height,
+ * and the circle is taller than that, so the offset comes out negative and
+ * lifts it slightly rather than dropping it. */
 :host([variant="card"]) [part="box"] {
   margin-block-start: calc(
     (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_radio-size)) /
@@ -210,16 +199,14 @@
 /* The card is the control, so the circle can go.
  *
  * Only safe because the card already carries the answer: `surface-raised`, a
- * primary edge and a three-pixel ring of it. Before that ring landed there was
- * nothing left saying which card was chosen, which is why this is a property
- * now and was not one then.
+ * primary edge and a three-pixel ring of it. Without that ring nothing would be
+ * left saying which card was chosen.
  *
- * `display: none`, not `visibility: hidden`. It was the second for half an hour,
- * on the argument that keeping the column lets a mixed set align down the left.
- * A mixed set is not a thing anyone builds: `hide-control` is a decision about a
- * group, and every card in that group makes it. What it left instead was an
- * empty gutter and the row's gap beside it on every card, which is asking for
- * the circle's space back after asking for the circle to go.
+ * `display: none`, never `visibility: hidden`. Keeping the column to let a mixed
+ * set align down the left answers a set nobody builds: `hide-control` is a
+ * decision about a group, and every card in that group makes it. What it leaves
+ * instead is an empty gutter and the row's gap beside it on every card, which is
+ * asking for the circle's space back after asking for the circle to go.
  *
  * On the box alone either way, so the control the shadow root renders is still
  * there, still focusable and still reported: this takes away a graphic, never a

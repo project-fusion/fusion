@@ -78,16 +78,16 @@ describe('dialog', () => {
     expect(hasState(host, 'open')).toBe(false)
   })
 
-  /* **Declared by 296 and asserted by nothing until now.** `close` is public API
-     on this element, relayed from the inner `<dialog>` because the native one
-     neither bubbles nor composes and so reaches nobody outside this shadow root.
-     The test above dispatches the same event and asks only that the state
-     follows, which passes whether or not a consumer ever hears it.
+  /* **Declared by (296).** `close` is public API on this element, relayed from
+     the inner `<dialog>` because the native one neither bubbles nor composes and
+     so reaches nobody outside this shadow root. The test above dispatches the
+     same event and asks only that the state follows, which passes whether or not
+     a consumer ever hears it.
 
-     Synthesized rather than driven through `close()`, and that is worth stating:
-     the in-app browser used to check this by hand fires no `close` for a bare
-     `<dialog>` either, so the platform half is not observable there and the
-     relay is the half that is ours. */
+     Synthesized rather than driven through `close()`: the in-app browser used to
+     check this by hand fires no `close` for a bare `<dialog>` either, so the
+     platform half is not observable there and the relay is the half that is
+     ours. */
   test('the native close reaches a consumer, which is the whole reason it is relayed', async () => {
     const host = await dialog()
     host.show()
@@ -102,8 +102,7 @@ describe('dialog', () => {
        order this has to imitate: a `<form method="dialog">` submit sets `open`
        false and fires `close` afterwards. Dispatching the event alone leaves the
        inner dialog open, so `updated` sees a difference, calls `close()` itself
-       and a second `close` comes back. Measured, and it is the test that would
-       have been wrong rather than the element. */
+       and a second `close` comes back. Measured. */
     native.open = false
     native.dispatchEvent(new Event('close'))
     await host.updateComplete
@@ -141,8 +140,8 @@ describe('dialog invokers', () => {
 
   /* The inner control, because that is what a reader's pointer lands on: the
      host has no activation behavior of its own, and a click dispatched at it
-     runs none. Measured, and it is the difference between this spec meaning
-     something and this spec passing on a button nobody can press. */
+     runs none. Measured: a spec pressing the host passes on a button nobody can
+     press. */
   const press = (trigger: HTMLElement): void => {
     const inner = trigger.shadowRoot?.querySelector('button')
     if (!inner) {
@@ -182,10 +181,7 @@ describe('dialog invokers', () => {
 
   test('a command naming nothing reaches nothing', async () => {
     /* Both halves, and they say different things. `not.toThrow` is that the
-       press survived; the attribute after it is that it did nothing. A press
-       that threw would fail this test either way, which is why the second
-       assertion was carrying the meaning alone while the harness had no
-       `toThrow` to write the first with. */
+       press survived; the state after it is that it did nothing. */
     const { dialog, trigger } = await wired()
     trigger.setAttribute('commandfor', 'absent')
     await (trigger as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete

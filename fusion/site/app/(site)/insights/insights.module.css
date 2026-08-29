@@ -7,50 +7,23 @@
  * it happens to be styled from.
  */
 
-/* *The lattice this describes is real as of 25 Aug 2026, and was not when this
-   was written.* It sat here as an argument for a rule the file never had. The
-   rule is in `browser.module.css` now, shared by both galleries, and this is
-   what it is for.
- *
- * The same field the drawings sit on, at the same pitch, over the whole band.
- *
- * Dots rather than gridlines. Both would work as texture and only one is
- * already the language: sixty-five cards are drawn on this exact lattice, so
- * repeating it here makes the hero the top of the same sheet rather than a
- * second decoration that happens to be nearby. Gridlines would have been a new
- * idea introduced at the loudest point on the page.
- *
- * Faded out at the bottom and at the sides. Uniform, it ran under the search
- * and straight into the filter bar's own hairline, which put texture behind the
- * one control on the page a reader has to aim at. The mask leaves it strongest
- * across the top, where there is nothing but air, and gone by the time the band
- * ends. */
 /* A step off the page, and the masthead is see-through so it takes the step too.
  *
  * `.pageHero` is the page's own color on both galleries, which is right on
  * `/helix` because the lattice and its lit dots are what separate the band from
- * what follows. Insights has neither, so the hero was the same flat color as
- * the grid below it and the only thing marking the band was the filter bar's
- * hairline: a heading, a search box and no edge until 448 pixels down.
+ * what follows. Insights has neither, so without a color of its own the only
+ * thing marking the band is the filter bar's hairline, 448 pixels down.
  *
- * **One token in both modes, after a pass at two.** This paired
- * `surface-sunken` in light with `surface` in dark, on the reasoning that the
- * neutral ramp is not symmetric and each mode should take whichever token is
- * genuinely one step off its own page. The measurements were right and the band
- * was still too heavy: `surface-sunken` is thirteen values off white across 448
- * pixels of a hero, which is a gray panel rather than a step. `surface` is five,
- * and the band is a change in the paper rather than a block on it.
- *
- * Which also retires a workaround. Pairing two tokens through `light-dark()` to
- * compensate for the ramp is the thing 145 says should not spread, and this was
- * one of the two places doing it. One token, no compensation, and the ramp's
- * asymmetry stays 145's problem rather than becoming this rule's.
+ * **One token in both modes.** `surface-sunken` is thirteen values off white
+ * across 448 pixels of a hero, which is a gray panel rather than a step;
+ * `surface` is five, and the band is a change in the paper rather than a block
+ * on it. Pairing two tokens through `light-dark()` to compensate for the
+ * neutral ramp's asymmetry is the thing 145 says should not spread, so one
+ * token and no compensation.
  *
  * The bar above it needs no rule at all. `/insights` is already in `onHero`, so
  * the masthead is `transparent` at rest, and the hero's negative start margin
- * already pulls up by the header *plus the hairline* for precisely this case,
- * which the rule above calls out as the thing that stops being invisible the
- * day the hero takes a color of its own. This is that day. */
+ * already pulls up by the header *plus the hairline* for precisely this case. */
 .insightsHero {
   background-color: var(--helix-color-surface);
 }
@@ -59,13 +32,11 @@
 
 /* Five across, stepping down as the window narrows.
  *
- * **Five is what the summary being two lines pays for.** The note here used to
- * argue against it, that a card carrying a title and two sentences is a column
- * of broken lines at a fifth of a wide window, and that was true while the
- * summary ran to whatever length the essay's own description happened to be:
- * four and five sentences in places, so the tallest card in a row set the
- * height of all of them. Clamped at two lines the card has a bounded shape, and
- * a bounded shape is what makes the narrower column work.
+ * **Five is what the summary being two lines pays for.** Unclamped, a summary
+ * ran to whatever length the essay's own description happened to be, four and
+ * five sentences in places, so the tallest card in a row set the height of all
+ * of them. Clamped at two lines the card has a bounded shape, and a bounded
+ * shape is what makes the narrower column work.
  *
  * The steps fall where a sentence stops fitting rather than at a list of device
  * widths. */
@@ -104,8 +75,7 @@
    the shell's full width. */
 /* The chevron sits on the column, and the label sits after it.
  *
- * **Both alignments were built and looked at, and this is the one that
- * survives.** Aligning the *label* is the better-sounding argument: a reader
+ * Aligning the *label* instead is the better-sounding argument: a reader
  * aligns on words, not on icons, and with the chevron on the column the label
  * starts 29 inside it, so the masthead has a title and a standfirst at one edge
  * and the only other words at another. Measured at 24 against 53.
@@ -145,20 +115,19 @@
    article: three boxes after a column of prose read as a different page
    starting, where rows read as the same page continuing.
  *
- * **The rules are gone, because the hover wash was already doing their job.**
- * Every row carried a hairline above it *and* a fill on hover, which is two
- * separators for one boundary: the wash says where a row begins and ends more
- * exactly than a line between them does, and it says it on the row the reader
- * is actually pointing at. The one divider that stays is the one above the
- * whole section, which separates the list from the article rather than the rows
- * from each other. That one is a real boundary and nothing else marks it.
+ * **No rules between the rows.** A hairline above every row plus a fill on
+ * hover is two separators for one boundary: the wash says where a row begins
+ * and ends more exactly than a line between them does, and it says it on the
+ * row the reader is actually pointing at. The one divider that stays is the one
+ * above the whole section, which separates the list from the article rather
+ * than the rows from each other. That one is a real boundary and nothing else
+ * marks it.
  *
- * **Inset, and pulled back by the same amount.** The wash had no inline padding
- * at all, so it opened flush against the words and read as a stripe behind the
- * text rather than as a row containing it. The padding gives it room and the
- * negative margin puts the text back on the article's own measure, so nothing
- * moves when the fill appears and the column of prose above still lines up with
- * the titles below. Same construction the back step uses.
+ * **Inset, and pulled back by the same amount.** The padding gives the wash
+ * room, so it reads as a row containing the text rather than a stripe behind
+ * it, and the negative margin puts the text back on the article's own measure,
+ * so nothing moves when the fill appears and the column of prose above still
+ * lines up with the titles below. Same construction the back step uses.
  *
  * The radius comes with the inset: a fill with corners is an object, and a fill
  * that runs to both edges of the page is a band. These are objects. */
@@ -176,12 +145,10 @@
   background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
 }
 
-/* The arrow leans the way the row goes.
- *
- * It was a static glyph at the end of a link, which is a picture of a direction
- * rather than a sign of one: three of them down a page read as decoration
- * because nothing about them answers the pointer. Four pixels is enough, and
- * more is a row that feels like it is trying to leave.
+/* The arrow leans the way the row goes: a static glyph is a picture of a
+   direction rather than a sign of one, since nothing about it answers the
+   pointer. Four pixels is enough, and more is a row that feels like it is
+   trying to leave.
  *
  * `translate` rather than `transform`, so it composites on its own and cannot
  * collide with a transform the icon might want later. Declared on the icon
@@ -211,14 +178,13 @@
  *
  * Five chips in a row each drawing its own hairline is five more lines than the
  * row needs: the fill already says where each one begins and ends, and the
- * edges turned a set of facts into a set of boxes. Through `--tag-border-color`,
- * which `Tag` now publishes beside the fill and label hooks it already had, so
- * this is the component's own property rather than a document rule reaching
- * past it.
+ * edges turn a set of facts into a set of boxes. Through `--tag-border-color`,
+ * which `Tag` publishes beside its fill and label hooks, so this is the
+ * component's own property rather than a document rule reaching past it.
  *
- * `outlined` goes with the edges, since an outlined chip with no outline is
- * nothing at all. Every tag is `subtle` now and the subject keeps `primary`,
- * which is the one distinction the row was making with color anyway. */
+ * No `outlined` here, since an outlined chip with no outline is nothing at all.
+ * Every tag is `subtle` and the subject keeps `primary`, which is the one
+ * distinction the row makes with color. */
 .insightByline helix-tag {
   --tag-border-color: transparent;
 }
@@ -269,14 +235,13 @@
   min-inline-size: 0;
 }
 
-/* The rays field behind the insights hero, added 25 Aug 2026.
+/* The rays field behind the insights hero.
  *
  * **Rays rather than the lattice the gallery wears**, because the two pages
  * should not be interchangeable: one is a set of drawings and this is a set of
  * arguments, and light being cast is what an insight looks like.
  *
- * **Two things about it are unsettled and are written here rather than left to
- * be rediscovered.** The hero still carries the shared lattice underneath from
+ * **Two things about it are unsettled.** The hero still carries the shared lattice underneath from
  * `.pageHero::before`, so there are two textures where the page wants one; the
  * dots are faint under the rays and it has not been decided whether they should
  * be turned off here. And the frame cost of a WebGL context on a page that is
@@ -285,7 +250,7 @@
  *
  * Absolute against the band rather than fixed against the window, so it belongs
  * to the hero and not to the page: the hero already establishes both the
- * stacking context and the positioning, for the lattice it used to want.
+ * stacking context and the positioning.
  *
  * `base` under the content's `raised`, which is the pair `.pageHeroInner`
  * already relies on. */

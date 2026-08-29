@@ -16,12 +16,12 @@
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
-  /* No `space-between`. It pushed the first child to one end and the last to
+  /* No `space-between`. It pushes the first child to one end and the last to
      the other, which is right while the chevron is last and wrong the moment it
-     is first: at `chevron-placement="start"` the glyph pinned to the inline
-     start and the label was flung to the inline end, leaving the trigger's
-     content split across the row. The label takes the room instead, through
-     `flex: 1` on the part below, which reads the same at either placement. */
+     is first: at `chevron-placement="start"` the glyph pins to the inline start
+     and the label is flung to the inline end, leaving the trigger's content
+     split across the row. An auto margin on the chevron at end placement reads
+     the same either way round. */
   gap: var(--helix-space-xs);
   /* The current step, not the fixed `md` one. Naming the step directly is what
      made `data-density` unable to reach a trigger: the token exists so a dense
@@ -34,18 +34,16 @@
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
    substitution. The surface stays flat and the motion carries the change.
 
-   Down when shut and up when open, by a flip rather than a turn. It pointed along the
-   inline axis before, which is a tree's idiom rather than an accordion's and
-   was wrong in the one place the difference shows: a chevron that means "along
-   the line" has to know which way the line runs, and this one did not, so in
-   right-to-left it went on pointing at the text it had just come from. The
-   vertical pair has no side to be on.
+   Down when shut and up when open, never along the inline axis: a chevron that
+   means "along the line" has to know which way the line runs, so in
+   right-to-left it points at the text it has just come from. The vertical pair
+   has no side to be on.
 
    Mirrored on the x axis rather than rotated. The two end in the same place and
    what happens between them is the difference: a half turn sweeps the glyph
-   through the horizontal on the way round, which is the pointing-sideways state
-   this just stopped using, where a flip collapses it and opens it the other way
-   up. The movement says "this folds" rather than "this spins". */
+   through the horizontal on the way round, where a flip collapses it and opens
+   it the other way up. The movement says "this folds" rather than "this
+   spins". */
 [part="chevron"] {
   block-size: 1em;
   color: var(--helix-color-foreground-subtle);
@@ -55,14 +53,9 @@
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Pushed to the far end only where it belongs there.
- *
- * `space-between` on the trigger did this by pushing the first child one way
- * and the last the other, which is right while the chevron is last and wrong
- * the moment it is first: at `chevron-placement="start"` the glyph pinned to
- * the inline start and the label was flung to the inline end, leaving the
- * trigger split across the row. The render already puts the chevron on the
- * correct side, so all that is left is a margin on the end placement. */
+/* Pushed to the far end only where it belongs there. The render already puts
+   the chevron on the correct side, so all that is left is a margin on the end
+   placement. */
 :host(:not([chevron-placement="start"])) [part="chevron"] {
   margin-inline-start: auto;
 }
@@ -116,19 +109,15 @@
 
 /* The padding is here and not on the box above, and it is not conditional.
  *
- * Both of those were wrong together. The spacing and the line height applied
- * only under `:state(open)`, so the moment a toggle began, the text lost its
- * padding and changed leading in one frame and reflowed to a different shape
- * while the row was still traveling: the content squashed and sprang rather
- * than sliding. What is being animated is the row's height, so everything
- * inside it has to hold still.
+ * Never gate the spacing or the leading on `:state(open)`. What is being
+ * animated is the row's height, so anything inside it that reflows mid-toggle
+ * squashes and springs rather than sliding.
  *
- * They could not simply be made unconditional where they were. That element is
- * the grid item, so its padding sits outside the clip and survives a zero
- * track: measured, a closed region went from 0 to 12px, which is a shut
- * accordion with a band of space under it. On the slot the padding is inside
- * the box that clips, so it costs nothing closed and never changes. Measured
- * again after moving it, the slot's own box is the same height open and shut.
+ * And it cannot sit on `[part="content-inner"]`, which is the grid item: its
+ * padding is outside the clip and survives a zero track, so a closed region
+ * measured 12px instead of 0, a shut accordion with a band of space under it.
+ * On the slot the padding is inside the box that clips, so it costs nothing
+ * closed and never changes.
  *
  * A bare `<slot>` is `display: contents` and generates no box to put padding
  * on, so it is made a block. Inherited properties set here reach the slotted

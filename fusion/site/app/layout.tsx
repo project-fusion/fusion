@@ -101,30 +101,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         {/* **The color mode, applied before the first pixel.**
          *
-         * The stored choice was restored in an effect, which runs after the
-         * document has already painted. Until then the page follows
-         * `prefers-color-scheme`, so a reader whose system is light and whose
-         * choice is dark got a frame of the light theme. Everything on the page
-         * survives that; the aura does not. It reads `--helix-color-background`
-         * once on mount to decide which half of its palette to draw, catches the
-         * light value, and renders a full-viewport field at light-mode
-         * brightness under chrome that is already dark. Captured on a screen
-         * recording as the whole page flashing blue on load.
+         * Restoring the stored choice in an effect is not early enough: an
+         * effect runs after the document has painted, and until then the page
+         * follows `prefers-color-scheme`, so a reader whose system is light and
+         * whose choice is dark gets a frame of the light theme. Everything on
+         * the page survives that; the aura does not. It reads
+         * `--helix-color-background` once on mount to decide which half of its
+         * palette to draw, catches the light value, and renders a full-viewport
+         * field at light-mode brightness under chrome that is already dark.
          *
-         * A blocking script in `head` is the only thing that runs early enough, and
-         * `next/script` at `beforeInteractive` is how this framework writes one:
-         * it is emitted into the server-rendered head rather than injected by
-         * the client, so it executes before the document paints. Written as a
-         * bare `<script dangerouslySetInnerHTML>` first, which does the same
-         * thing and which `noDangerouslySetInnerHtml` is right to refuse when a
-         * supported form exists.
+         * A blocking script in `head` is the only thing that runs early enough,
+         * and `next/script` at `beforeInteractive` is how this framework writes
+         * one: it is emitted into the server-rendered head rather than injected
+         * by the client, so it executes before the document paints. A bare
+         * `<script dangerouslySetInnerHTML>` does the same thing and is rightly
+         * refused by `noDangerouslySetInnerHtml` while a supported form exists.
          *
          * The key is interpolated rather than written out, so this and the
          * preferences panel cannot drift onto different keys. It comes from a
          * plain module rather than from `preferences.tsx`: that file is
          * `'use client'`, and a server component importing a non-component value
-         * from a client module gets a reference proxy, so the constant arrived
-         * here as `undefined` and shipped `getItem(undefined)`. Wrapped in
+         * from a client module gets a reference proxy, so the constant arrives
+         * here as `undefined` and ships `getItem(undefined)`. Wrapped in
          * `try`, because storage throws rather than returning null in a
          * private window, and a theme is not worth a blank page. */}
         <Script id="site-color-mode" strategy="beforeInteractive">

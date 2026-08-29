@@ -16,7 +16,7 @@ import { DocsNav } from '../docs-nav'
  * second copy of a two-column shell. The day the two shells genuinely differ is
  * the day to split it.
  *
- * The rail is shared with the component pages now, and renders the same tree on
+ * The rail is shared with the component pages, and renders the same tree on
  * both: prose and reference are one navigation, so a reader partway through
  * Theming can see that Card exists without going back to the masthead.
  */

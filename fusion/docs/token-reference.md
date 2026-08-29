@@ -6,7 +6,7 @@
 185 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
-business and `check:css:tokens` fails on any reference to it from outside.
+business and the `tokens` rule fails on any reference to it from outside.
 
 Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are
 not here. They are API, they default to a semantic token, and the `hooks` rule
@@ -15,7 +15,7 @@ holds them to both directions.
 **Reads** counts every `var()` of that token across `helix` and
 `site`, the sandbox included. Zero is not a fault: a complete scale is part of what is shipped and
 a consumer can reach for a rung we happen not to use. It is worth seeing
-because nothing else can see it, `check:css:tokens` asking only that every token
+because nothing else can see it, the `tokens` rule asking only that every token
 *referenced* exists.
 
 Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-tracking-wider`, `--helix-material-blur-sm`, `--helix-size-checkbox-tight`, `--helix-size-checkbox-loose`, `--helix-size-avatar-md`, `--helix-layer-beneath`.

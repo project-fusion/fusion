@@ -12,11 +12,11 @@ import type { Row } from '../read-series/read-series.js'
  * beside the chart. Escaping that means reimplementing `PopoverController`,
  * which is `Tooltip` with extra steps and a second copy of the hard part.
  *
- * **The tag is the caller's, so this file supplies one.** It used to write
- * `helix-tooltip` itself, which only `helix/styled` registers, so a consumer of the
- * headless tier alone got an inert unknown element. Passing it in is what lets
- * each tier answer with its own name, and it is asserted below rather than
- * assumed, a tag nothing checks being exactly how the first version was wrong.
+ * **The tag is the caller's, so this file supplies one.** Writing
+ * `helix-tooltip` here would name a tag only `helix/styled` registers, leaving a
+ * consumer of the headless tier alone with an inert unknown element. Passing it
+ * in is what lets each tier answer with its own name, and it is asserted below
+ * rather than assumed.
  *
  * The element is still undefined in this package and that still costs nothing:
  * an unknown element carries every attribute and child rendered into it, and
@@ -125,10 +125,9 @@ describe('where the bubble points', () => {
     expect(into.querySelector(`#${named}`)).not.toBeNull()
   })
 
-  /* The whole of the tier fix, asserted from the outside: whatever tag the
-     caller hands over is the tag in the document. A headless tier passes
-     `helix-headless-tooltip` and a styled one passes `helix-tooltip`, and neither
-     of them is written down in this file. */
+  /* Whatever tag the caller hands over is the tag in the document: a headless
+     tier passes `helix-headless-tooltip` and a styled one passes
+     `helix-tooltip`, and neither is written down in the util. */
   test('under whichever tag the caller named, and no other', () => {
     const into = document.createElement('div')
     render(drawTooltip(ROWS, 0, unsafeStatic('helix-headless-tooltip')), into)

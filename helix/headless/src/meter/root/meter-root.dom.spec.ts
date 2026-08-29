@@ -131,10 +131,9 @@ describe('meter geometry', () => {
 
 describe('meter beyond its range', () => {
   test('a value past the end says so, where the bar cannot', async () => {
-    /* The bar filled and the reading said "100%", so 110 and 250 were
-       indistinguishable from exactly full. A meter that cannot say "you are
-       over" is worse than no meter in the one case anybody checks it for, and it
-       is the same fault as a pagination reporting a page it is not on. */
+    /* A filled bar reading "100%" makes 110 and 250 indistinguishable from
+       exactly full, and a meter that cannot say "you are over" is worse than no
+       meter in the one case anybody checks it for. */
     const host = await meter('show-value value="110"')
     expect(part(host, 'value')?.textContent?.trim()).toBe('110%')
     expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBe('over')

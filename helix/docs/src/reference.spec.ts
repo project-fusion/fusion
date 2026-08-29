@@ -134,9 +134,8 @@ describe('reference', () => {
     expect(withLede).toStartWith('# Elements\n\nRead me first.\n')
   })
 
-  // One title-caser, so the reference and the site agree. They did not: this
-  // file had its own, and spelled the family `Qr Code` where the site said
-  // `QR Code`.
+  // One title-caser, so the reference and the site agree. A second one spells
+  // the family `Qr Code` where the site says `QR Code`.
   test('a heading knows an initialism', () => {
     const initialism: HelixManifest = {
       modules: [

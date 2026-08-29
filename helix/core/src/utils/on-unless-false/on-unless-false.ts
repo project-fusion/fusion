@@ -10,11 +10,6 @@ import type { ComplexAttributeConverter } from 'lit'
  * attribute that turns it off at all, and a consumer who writes the obvious
  * thing gets the opposite of what they asked for, silently.
  *
- * Found on `Drawer.modal`, where it mattered: a tour cannot point inside a
- * modal, so `modal="false"` is exactly what a consumer reaches for, and it left
- * the drawer modal. Two others have the same shape, `Video.playsInline` and the
- * sandbox source's `tabIndents`.
- *
  * So: absent is the default, present is on, and the one string that means off
  * is the one a consumer would write. `"false"` only, and not `"0"` or `"no"`,
  * because a converter that accepts a vocabulary invites a consumer to guess at

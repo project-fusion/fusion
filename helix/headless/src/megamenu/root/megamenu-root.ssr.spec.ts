@@ -24,9 +24,8 @@ describe('megamenu server output', () => {
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    // `open` is state and does not reflect: a copied host that came back
-    // declaring it would latch controlled and freeze, which the value mixins
-    // record at length.
+    // `open` is state and does not reflect. A copied host that came back
+    // declaring it would seed the element from markup a consumer never wrote.
     const markup = ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`)
     expect(hostAttributes(markup, 'helix-headless-megamenu')).toEqual(['label'])
   })

@@ -36,11 +36,10 @@ const stop = (cal: DatePicker): string | null =>
 
 /* From the grid, which is where a reader's presses come from.
  *
- * These were dispatched at the host, which is also where the previous and next
- * buttons live, and the handler could not tell the two apart: Enter on the
- * "next month" button was read as "choose the focused day" and then
- * `preventDefault`ed, so the month never moved. The handler asks where the
- * press came from now, and so does this. */
+ * Dispatched at the host instead, a press is indistinguishable from one on the
+ * previous and next buttons that live there too: Enter on "next month" reads as
+ * "choose the focused day" and is then `preventDefault`ed, so the month never
+ * moves. The handler asks where the press came from, and so does this. */
 const press = async (cal: DatePicker, key: string, shiftKey = false): Promise<void> => {
   const grid = (cal as unknown as { renderRoot: ShadowRoot }).renderRoot.querySelector(
     '[part="grid"]',
@@ -222,10 +221,8 @@ describe('date picker', () => {
 })
 
 describe('date picker selection can be refused', () => {
-  /* Same fault the carousel had: `value` was written and then announced, so a
-     listener refusing a date was refusing one already chosen. Every other
-     stateful component in the library announces first, through the helper whose
-     own documentation calls itself the one audited path for this. */
+  /* `value` written and then announced leaves a listener refusing a date it
+     already holds. Announce first, as every other stateful component does. */
   const press = (cal: DatePicker, label: string): void => {
     const day = days(cal).find((one) => one.getAttribute('aria-label')?.includes(label))
     if (!day) {
@@ -360,10 +357,9 @@ describe('date picker as a form control', () => {
   })
 
   test('a declared month is a seed, and the arrows still move it', async () => {
-    /* The reason this is worth a spec of its own. `month` said in its own
-       documentation that a consumer could drive the view, and the calendar
-       wrote it on every page, so a consumer holding it in state was overwritten
-       and never told which way to put it back. */
+    /* `month` says a consumer can drive the view, so a calendar writing it on
+       every page would overwrite a consumer holding it in state and never tell
+       them which way to put it back. */
     const cal = await calendar('month="2026-08" default-value="2026-08-14"')
     let announced = ''
     cal.addEventListener('helix-navigate', (event) => {
@@ -403,8 +399,8 @@ describe('a day from a neighboring month is filler', () => {
 
   test('and a range never draws its end twice, which is what months="2" showed', async () => {
     /* September the 5th is a trailing cell in August's grid and a real cell in
-       September's. Both used to carry the terminus, so one answer was two dark
-       chips on the page. Asserted by counting, because the bug is the count. */
+       September's, so a terminus on both draws two dark chips for one answer.
+       Asserted by counting, because the fault is the count. */
     const cal = await calendar('default-month="2026-08" months="2" mode="range"')
     ;(cal as unknown as { value: string }).value = '2026-08-19,2026-09-05'
     await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete

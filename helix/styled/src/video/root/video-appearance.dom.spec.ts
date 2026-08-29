@@ -31,10 +31,10 @@ if (hasLayout()) {
          replaced it a moment later. It is also a layout shift, over exactly the
          interval a poster is shown for.
 
-         **Sixteen by nine, and deliberately not `auto 16 / 9`**, which is what
-         this asserted while never running. `auto` takes the element's intrinsic
-         ratio, and a video carrying a poster reports the *poster's*, so the box
-         took the still's shape and the clip letterboxed inside it. The element
+         **Sixteen by nine, and deliberately not `auto 16 / 9`.** `auto` takes
+         the element's intrinsic ratio, and a video carrying a poster reports the
+         *poster's*, so the box took the still's shape and the clip letterboxed
+         inside it. The element
          writes `--video-intrinsic-ratio` from `videoWidth` and `videoHeight` instead,
          which is the only source that is always the video. */
       const host = await player()

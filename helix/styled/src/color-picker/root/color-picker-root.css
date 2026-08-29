@@ -7,7 +7,7 @@
  * picker rather than as one.
  *
  * On the rows rather than on the host, which is the whole point. Padding here
- * would inset the square too, which is what it did first. */
+ * would inset the square too. */
 :host {
   display: block;
   padding-block-end: var(--color-picker-padding, var(--helix-space-none));
@@ -126,11 +126,11 @@
  * not navigate or open anything, and `copy` is the one cursor that says exactly
  * what will happen. */
 [part="sample"] {
-  /* Reset by name rather than with `all: unset`, which is what this had and
-     which silently wiped the chip. `all` resets every property the rule does not
-     restate, and the fill and the checkerboard are set in the shared rule
-     *above* this one: measured, `background-image` came back `none` and the chip
-     painted nothing at all. Only the UA's button styling needs removing here. */
+  /* Reset by name rather than with `all: unset`, which silently wipes the chip.
+     `all` resets every property the rule does not restate, and the fill and the
+     checkerboard are set in the shared rule *above* this one: measured,
+     `background-image` came back `none` and the chip painted nothing at all.
+     Only the UA's button styling needs removing here. */
   appearance: none;
   background-color: transparent;
   block-size: var(--color-picker-sample-size, 36px);
@@ -244,28 +244,6 @@
   display: none;
 }
 
-/* The tools, sized down from the field height every button here takes by
- * default.
- *
- * The token is set on the group and inherited, rather than reaching through
- * `::part(button)` into each one: `--helix-size-control` is what a button reads
- * for its height, so scoping the small value to this subtree is the density
- * mechanism working rather than a component being overridden. The document's own
- * `[data-density="sm"]` rule cannot help here, being a document rule that
- * reaches `helix-button::part(button)` and so stopping at the first shadow
- * boundary, which this row is two inside. */
-/* The tools take the width, one half each.
- *
- * `helix-button-group` and two `helix-button`s, which was the first thing tried
- * here and rendered two unstyled words: the button kept its whole appearance in
- * the base layer as `helix-button::part(button)`, and a part selector crosses
- * one shadow boundary, so it reached a button on the page and stopped one short
- * of a button inside this element. That is fixed at the source now, in
- * `button-root.css`, and this is the first component to hold a real one.
- *
- * Full width because there are two of them and the row is theirs. Sized to their
- * labels they were a glyph and a three-letter word floating at one end of a
- * panel, with the swatches under them starting somewhere else again. */
 /* The value and the tools share the row: the color as text on the left, the
  * two controls on the right.
  *
@@ -283,9 +261,9 @@
 [part="value"] {
   all: unset;
   background-color: var(--helix-color-surface-sunken);
-  /* The height the buttons beside it take, which is the density's. It was
-     `control-sm` while they were on `control`, so the row had a short field
-     against two tall buttons and no line through the middle of anything. */
+  /* The height the buttons beside it take, which is the density's. Anything
+     shorter puts a small field against two tall buttons with no line through
+     the middle of anything. */
   block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
@@ -362,9 +340,8 @@
 
 /* Under a rule, because they are a different kind of thing from everything
    above: the square and the ramps build a color and these hand one over
-   finished. Its own row rather than sharing one with the tools, which is what it
-   did and which put eight swatches and two buttons on a line that had room for
-   about half of it. */
+   finished. Its own row rather than sharing one with the tools, which put eight
+   swatches and two buttons on a line with room for about half of it. */
 [part="swatches"] {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
@@ -372,11 +349,10 @@
   gap: var(--helix-space-2xs);
   margin-block-start: var(--helix-space-sm);
   padding-block-start: var(--helix-space-sm);
-  /* The inset every other row takes. This sat outside the footer and so outside
-     the one rule that applied it, and the presets ran to the panel's edge while
-     the square, the ramps and the tools above them all stopped short of it. The
-     rule stays full width, because it is a separator and a separator that stops
-     short of the edges reads as an underline on the thing above it. */
+  /* The inset every other row takes, applied here because this row sits outside
+     the footer. The rule stays full width, because it is a separator and a
+     separator that stops short of the edges reads as an underline on the thing
+     above it. */
   padding-inline: var(--color-picker-padding, var(--helix-space-none));
 }
 
@@ -390,13 +366,12 @@
   padding: var(--helix-space-none);
 }
 
-/* The one in use is not marked at all.
- *
- * It carried a ring, which is a focus ring in another color sitting permanently
- * on one swatch: a row of eight then has a mark on it before anything is
- * touched, and pressing another moves the mark rather than doing something. What
- * the swatch is chosen *for* is already showing, twice, on the chip and in the
- * field. `aria-pressed` stays, because a screen reader has neither of those. */
+/* The one in use is not marked at all. A ring on it is a focus ring in another
+ * color sitting permanently on one swatch: a row of eight then has a mark on it
+ * before anything is touched, and pressing another moves the mark rather than
+ * doing something. What the swatch is chosen *for* is already showing, twice, on
+ * the chip and in the field. `aria-pressed` stays, because a screen reader has
+ * neither of those. */
 @media (prefers-reduced-motion: reduce) {
   [part="eyedropper"],
   [part="format"],
@@ -429,7 +404,9 @@
   opacity: 0.5;
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive: a
+ * state drawn as a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

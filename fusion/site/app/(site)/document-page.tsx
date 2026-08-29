@@ -6,11 +6,9 @@ import styles from './document-page.module.css'
 /**
  * One argued document, laid out the way this site lays out an argument.
  *
- * **Insights, Trust and Thesis are the same kind of page**, which is 206's
- * finding: each is a single sustained argument rather than a marketing surface,
- * and the insight page already had the layout worked out for it. The other two
- * carried a layout apiece that reproduced most of it and none of its reasoning,
- * so the measure, the heading scale and the block rhythm differed between three
+ * **Insights, Trust and Thesis are the same kind of page.** Each is a single
+ * sustained argument rather than a marketing surface, so a layout apiece means
+ * the measure, the heading scale and the block rhythm differing between three
  * pages a reader reads identically.
  *
  * **What it costs is that the three stop being able to diverge**, which is a
@@ -59,8 +57,8 @@ export function DocumentPage({
 }) {
   /* **No `data-shell` on the shell.** That attribute means "full width, held off
      the edges by the inset", and this box is neither: it is capped and centered,
-     so above the cap it is nowhere near an edge, and its `6vw` inset was eating
-     the reading column as the window grew. The shell supplies its own fixed
+     so above the cap it is nowhere near an edge and its `6vw` inset eats the
+     reading column as the window grows. The shell supplies its own fixed
      one. */
   return (
     <helix-flex class={styles.documentShell} direction="column" gap="xl">

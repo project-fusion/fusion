@@ -15,14 +15,9 @@
    title put their footers at two different heights, and a row of cards reads as
    a row of slightly different objects.
  *
- * **Through `--card-align`, which the component publishes now.** This set
- * `align-content` on the host directly, and that is a document rule overruling a
- * shadow one: it worked only because the card set nothing there, and the day the
- * card packed its own regions at the start the two collided and the component's
- * value was the dead one. `check:css:overruled` reported it the same hour. The note
- * this replaces said there was no custom property for it and that inventing one
- * here would name something the component never reads, which was true and is the
- * argument for the component publishing one rather than for reaching past it. */
+ * **Through `--card-align`, never `align-content` on the host.** A document rule
+ * on a shadow host outranks the component's own, so the card's value would be
+ * the dead one. `check:css:overruled` holds it. */
 .insightCard helix-card {
   --card-align: space-between;
 }
@@ -31,32 +26,15 @@
   --card-media-block-size: auto;
 }
 
-/* The surface, stated here so a card is the same object wherever it appears.
+/* The surface, stated here so a card is the same object wherever it appears. It
+ * belongs to the card rather than to any page that renders one: a page can say
+ * where its cards sit and how many are in a row, and what a card is made of is
+ * the card's own business.
  *
- * **Two of the three facts were already shared and the last two were not.** The
- * ground, the corner and the missing stroke reached the gallery on their own,
- * through `material="glass"` and the site's own defaults; the blur and the
- * shadow did not, because those were written on the landing page as part of a
- * draft-wide recipe scoped to `.noRules`. Measured side by side: the gallery
- * blurred at 16px against the carousel's 18, and carried `separation`'s stock
- * `0 4px 12px` where the carousel had a deep, soft drop and a hairline of light
- * along the top edge. Same component, same markup, two objects.
- *
- * It belongs to the card rather than to either page. A page can say where its
- * cards sit and how many are in a row; what a card is made of is the card's own
- * business, and the alternative was for the gallery to import the landing
- * page's stylesheet to borrow a class named after a decision that page made.
- *
- * The values are the carousel's, because that is the one that was asked to be
- * matched and the richer of the two.
- */
-/* **The blur is the card's, the shadow is `separation`'s.** These were written
-   together to match a carousel that no longer exists, and the drop was a
-   hand-rolled `0 18px 40px -24px` beside an inset highlight: a second elevation
-   language on a component that ships one. `separation="elevated"` is what these
-   cards already ask for, so the override was answering a question the card had
-   answered. The blur stays, because that is a material and the card takes it
-   from the page. */
+ * **The blur is the card's, the shadow is `separation`'s.** These cards already
+ * ask for `separation="elevated"`, so a hand-rolled drop beside it is a second
+ * elevation language on a component that ships one. The blur stays, because
+ * that is a material and the card takes it from the page. */
 .insightCard helix-card {
   /* **Through the component's hook, not past it.** `backdrop-filter` written
      here is a document rule on a shadow host, which wins whatever the
@@ -92,26 +70,18 @@
   line-clamp: 2;
 }
 
-/* The generated plate, at the ratio the card's media region expects.
- *
- * Moved here from the landing page's stylesheet with the component that draws
- * it. It was the draft's own class while the plate was the draft's own card;
- * now that every insight card falls back to a cover, the drawing belongs beside
- * the card rather than beside the page that first used it. */
+/* The generated plate, at the ratio the card's media region expects. It sits
+ * beside the card rather than beside a page, because every insight card falls
+ * back to a cover. */
 .cover {
   aspect-ratio: 16 / 7;
   display: block;
   inline-size: 100%;
 }
 
-/* The affordances the carousel's card had and the shared one did not.
- *
- * **Inherited from `InsightPlate` when it was retired.** That card was written
- * locally for the landing page and grew a hover lift and a focus ring there;
- * the shared card had neither, so the gallery's six were a grid of links that
- * answered a pointer with nothing and a keyboard with the browser's default.
- * Retiring the plate would have taken both away from the carousel rather than
- * bringing them to the gallery, so they moved here.
+/* The affordances a card link needs, stated once. Without them the gallery is a
+ * grid of links that answers a pointer with nothing and a keyboard with the
+ * browser's default.
  *
  * Three pixels, which is enough to read as the card coming forward and not
  * enough to disturb the row. `translate` rather than `transform`, so it composes

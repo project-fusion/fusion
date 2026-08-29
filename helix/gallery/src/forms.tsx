@@ -54,10 +54,10 @@ export const formsArt: Record<string, ReactNode> = {
   /**
    * One box and the thing it is an answer to, at twenty pixels.
    *
-   * Ticked, unticked and mixed once, side by side. That is a state table, and a
-   * state table belongs on the API page: three boxes in a row read as a set of
-   * three checkboxes, which is Checkbox Group. One box with a label beside it is
-   * the component, and the label is what separates the two cards.
+   * Not ticked, unticked and mixed side by side: a state table belongs on the
+   * API page, and three boxes in a row read as Checkbox Group. One box with a
+   * label beside it is the component, and the label is what separates the two
+   * cards.
    */
   checkbox: (
     <>
@@ -105,11 +105,9 @@ export const formsArt: Record<string, ReactNode> = {
               d={`M108 ${row.y + 10}l3.5 3.5 7-7.5 1.4 1.4-8.4 8.9-4.9-4.9z`}
             />
           )}
-          {/* 0.55, matching Checkbox and Radio. A control's label is a control's
-              label whether there is one of them or three, and these sat at 0.28
-              while the single checkbox next to them sat at 0.55, so the same
-              text read at two weights across two adjacent cards. Nothing about
-              being in a group makes a label secondary. */}
+          {/* 0.55, matching Checkbox and Radio. A control's label is a
+              control's label whether there is one of them or three, and nothing
+              about being in a group makes a label secondary. */}
           <rect
             className="artInk"
             fillOpacity="0.55"
@@ -124,6 +122,17 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A field with a chip of the color at its trailing end, and the three tracks
+   * it opens below.
+   *
+   * Tonal rather than colored, like every card here. A hue ramp is the one
+   * thing this component has that a picture could show literally, and showing it
+   * would make this the only card on the page painted in something other than
+   * the ink: the row would read as one card lit up and the rest switched off.
+   * Three tracks with their handles at three different places says "channels"
+   * without borrowing the attention.
+   */
   'color-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
@@ -158,9 +167,9 @@ export const formsArt: Record<string, ReactNode> = {
           <circle className="artOverlay" cx={at} cy={136 + row * 26} r="8" />
         </g>
       ))}
-      {/* `artTravel` rather than `artFill`: a handle moves along its track, and
-          the growing version of this drew a bar that got longer, which is what a
-          progress reading looks like and not what a channel does. */}
+      {/* `artTravel` rather than `artFill`: a handle moves along its track,
+          where a growing bar is what a progress reading looks like and not what
+          a channel does. */}
       <g className="artMotion artTravel" style={{ '--art-to': '64px' } as CSSProperties}>
         <g filter="url(#helixArtShadow)">
           <circle className="artOverlay" cx="128" cy="136" r="8" />
@@ -169,47 +178,6 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /* More than one of them is the answer, and only those carry a band. */
-  /**
-   * The field an `Input` draws, with a button welded to each end.
-   *
-   * The two ends are the whole silhouette. Without them this is `Input`
-   * exactly, same sunken box at the same width, and a card that has to be read
-   * rather than recognized has already failed at thumbnail size. The rules
-   * between them and the number are what say the buttons are part of the field
-   * and not two buttons after it, which is the one thing this component's
-   * stylesheet is most careful about.
-   *
-   * The value is centered rather than left-aligned, which is the other thing that
-   * tells it from `Input` at a glance and is true of the component.
-   *
-   * It counts on hover, and the first version did not: `--art-to: 0px` with a
-   * three pixel block offset parses, animates, and moves nothing a reader can
-   * see, which is the exact fault this file records against `Outline`. A value
-   * getting longer is what counting looks like, so it stretches, which is the
-   * archetype `Input` uses for the same thing.
-   */
-  /* A field with a dashed edge and two names under it, which is the one shape
-     that reads as "a place to put files" at this size: a solid box is just a
-     field, and a picture of a cloud says upload to nobody who has not already
-     been told. The dashes are drawn as a run of short bars rather than stroked,
-     for the reason the rules are: a stroke half-renders at the card's
-     three-quarter scale. */
-  /* A field with a calendar mark at its trailing end, and the grid it opens
-     below. Three rows of dots rather than a real month: at card scale the
-     shapes are all a reader can see anyway, and drawing seven columns of
-     numbers would be a picture of text. */
-  /*
-   * A field with a chip of the color at its trailing end, and the three tracks
-   * it opens below.
-   *
-   * Tonal rather than colored, like every card here. A hue ramp is the one
-   * thing this component has that a picture could show literally, and showing it
-   * would make this the only card on the page painted in something other than
-   * the ink: the row would read as one card lit up and the rest switched off.
-   * Three tracks with their handles at three different places says "channels"
-   * without borrowing the attention.
-   */
   /**
    * The square, and the ramp under it.
    *
@@ -285,15 +253,6 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /*
-   * Square at the control height, and the glyph is all of it.
-   *
-   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
-   * icon: the card read as a hamburger button and the subject became what the
-   * button opens rather than what the button is. Three dots is the one mark in
-   * common use that means "this control's content is an icon, and the icon is
-   * not the point", and nothing else in the gallery uses it.
-   */
   /**
    * Two marks in one place, which is the component.
    *
@@ -305,20 +264,12 @@ export const formsArt: Record<string, ReactNode> = {
    */
   'copy-button': (
     <>
-      {/* The button holds the center and everything it holds is inside it.
-       *
-       * Balancing the pair's bounding box put the clipboard at 130 to 170 and
-       * the tick beyond it, which centers the ink and reads left-heavy: the
-       * clipboard is the object and the tick is a mark beside it, so the eye
-       * centers on the clipboard and finds it off to one side. The button is
-       * back on 140 to 180, which is the card's own middle.
-       *
-       * **The tick came with it and it had not.** It stayed at 186 to 200,
-       * which is past the button's own right edge: a control with a check
-       * floating outside it, and the one thing this component never does is put
-       * its confirmation somewhere other than where its clipboard was. Both
-       * marks are on 160,100 now, which is the paragraph above this one and was
-       * always what it claimed. */}
+      {/* The button holds the center and everything it holds is inside it: 140
+          to 180 is the card's own middle, and both marks sit on 160,100.
+          Balancing the pair's bounding box instead centers the ink and reads
+          left-heavy, the clipboard being the object and the tick a mark beside
+          it, and it leaves the tick past the button's own right edge, which is
+          a control with a check floating outside it. */}
       <rect className="artEdge" fill="none" height="40" rx="5" width="40" x="140" y="80" />
       <rect className="artEdge" fill="none" height="20" rx="3" width="16" x="152" y="90" />
       <path className="artStroke" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
@@ -335,6 +286,12 @@ export const formsArt: Record<string, ReactNode> = {
       />
     </>
   ),
+  /**
+   * A field with a calendar mark at its trailing end, and the grid it opens
+   * below. Three rows of dots rather than a real month: at card scale the
+   * shapes are all a reader can see anyway, and drawing seven columns of
+   * numbers would be a picture of text.
+   */
   'date-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
@@ -362,12 +319,12 @@ export const formsArt: Record<string, ReactNode> = {
           />
         )),
       )}
-      {/* The selection moves to the next day. It had `artFill`, which scales,
-          so picking a date grew the circle by half rather than putting it
-          somewhere else, and `artFill` also pivots at `left center`, so it grew
-          sideways off its own column. Twenty eight units is the column pitch,
-          which is what makes the destination land on a day rather than between
-          two. */}
+      {/* The selection moves to the next day, so `artTravel` and not `artFill`:
+          that one scales, so picking a date would grow the circle rather than
+          put it somewhere else, and it pivots at `left center`, so the growth
+          runs sideways off its own column. Twenty eight units is the column
+          pitch, which is what makes the destination land on a day rather than
+          between two. */}
       <circle
         className="artSolid artMotion artTravel"
         cx="121"
@@ -410,6 +367,14 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A field with a dashed edge and two names under it, which is the one shape
+   * that reads as "a place to put files" at this size: a solid box is just a
+   * field, and a picture of a cloud says upload to nobody who has not already
+   * been told. The dashes are drawn as a run of short bars rather than stroked,
+   * for the reason the rules are: a stroke half-renders at the card's
+   * three-quarter scale.
+   */
   'file-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="44" />
@@ -435,9 +400,9 @@ export const formsArt: Record<string, ReactNode> = {
         />
       ))}
       {/* The trigger, centered in the box the way the label is, and static.
-          It carried `artFill` and so the one thing this card animated was a
-          label growing forty percent wider, which is not a thing a file input
-          does to anything. `artFill` is for a value filling a track. */}
+          `artFill` here animates a label growing wider, which is not a thing a
+          file input does to anything: that archetype is for a value filling a
+          track. */}
       <rect className="artSolid" height="8" rx="4" width="64" x="128" y="88" />
       {/* Two chosen files under it, each with the mark that takes it back out.
           The second one slides in, because accepting a file is the whole of
@@ -457,6 +422,15 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * Square at the control height, and the glyph is all of it.
+   *
+   * Three dots, and never three stacked bars: that is *the* menu icon, so the
+   * card would read as a hamburger button and the subject would become what the
+   * button opens rather than what the button is. Three dots is the one mark in
+   * common use that means "this control's content is an icon, and the icon is
+   * not the point", and nothing else in the gallery uses it.
+   */
   'icon-button': (
     <>
       <g className="artMotion artLift">
@@ -471,6 +445,7 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /** More than one of them is the answer, and only those carry a band. */
   listbox: (
     <>
       {[
@@ -495,6 +470,24 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * The field an `Input` draws, with a button welded to each end.
+   *
+   * The two ends are the whole silhouette. Without them this is `Input`
+   * exactly, same sunken box at the same width, and a card that has to be read
+   * rather than recognized has already failed at thumbnail size. The rules
+   * between them and the number are what say the buttons are part of the field
+   * and not two buttons after it, which is the one thing this component's
+   * stylesheet is most careful about.
+   *
+   * The value is centered rather than left-aligned, which is the other thing
+   * that tells it from `Input` at a glance and is true of the component.
+   *
+   * It counts on hover, by stretching: a value getting longer is what counting
+   * looks like, and it is the archetype `Input` uses for the same thing. Not
+   * `--art-to: 0px` with a three pixel block offset, which parses, animates and
+   * moves nothing a reader can see.
+   */
   'number-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="48" x="48" y="52" />
@@ -547,11 +540,9 @@ export const formsArt: Record<string, ReactNode> = {
    * the one thing its stylesheet is most careful about.
    *
    * **The ring moves to the next box on hover**, which is what a pin actually
-   * does: a character lands and the focus steps along. The first version grew
-   * the character instead, with `--art-grow: 1`, which is `scaleX(1)` and is
-   * nothing at all. Same fault this file records against `Outline`'s
-   * `--art-to: 0`, and it survived because a still card looks correct. Caught by
-   * shooting the real gallery rather than a harness that approximates it.
+   * does: a character lands and the focus steps along. Growing the character
+   * instead takes `--art-grow: 1`, which is `scaleX(1)` and is nothing at all,
+   * and a still card looks correct either way.
    *
    * The four sides of the ring travel as a group, so they arrive together.
    */
@@ -670,8 +661,8 @@ export const formsArt: Record<string, ReactNode> = {
    * Width is height times 1.75, exactly, which is what the component computes.
    *
    * One switch, drawn on, and the hover replays the crossing from off. Off and
-   * on side by side was a state table: two tracks reads as two settings, and
-   * the whole point of a switch is that it is *one* thing in one of two states.
+   * on side by side is a state table: two tracks read as two settings, and the
+   * whole point of a switch is that it is *one* thing in one of two states.
    * The motion carries the second state, which is what motion is for here.
    */
   switch: (

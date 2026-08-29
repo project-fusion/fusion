@@ -9,10 +9,10 @@
  *
  * **This is why the split is by name.** `.theme*` is the tool around the preview
  * and stays in `site.css`; `.themed*` is the page being previewed and lives
- * here. The first version of the frame sent the palette and not this, and the
- * page arrived with its tokens correct and no layout at all: the figures stacked
- * one per line instead of running as a row, and the wordmark, an inline `<svg>`
- * carrying no `width` or `height` of its own, rendered at 0x0.
+ * here. Send the palette without this and the page arrives with correct tokens
+ * and no layout at all: the figures stack one per line instead of running as a
+ * row, and the wordmark, an inline `<svg>` carrying no `width` or `height` of
+ * its own, renders at 0x0.
  *
  * **Not `themed-page.css.ts`**, which is what it wanted to be called: `*.css.ts`
  * is the name `bun run styles` generates into and `.gitignore` excludes it
@@ -21,7 +21,7 @@
  */
 
 /**
- * Identity tag, for the editor and for `check:css:tokens`.
+ * Identity tag, for the editor and for `helix component`'s `tokens`.
  *
  * The check reads `` css` ` `` templates out of `.ts` files exactly as it reads
  * whole `.css` files, so the tokens named here are held to the same rule as the
@@ -31,16 +31,10 @@
 const css = (strings: TemplateStringsArray): string => strings.raw.join('')
 
 export const THEMED_PAGE_STYLES = css`
-  /* **The preview paints its own page**, because a theme's background is one of
-     the things being previewed.
-
-     Almost nothing is needed for that any more. This rule used to set the
-     ground, the ink and the face, and said so with a comment explaining that the
-     base layer does it at the document root and a preview is not one. The
-     preview is one now, so the base layer's own \`body\` rule sets all three from
-     the same tokens the theme has just redefined, and the height and the
-     scroller go with them: the frame is the pane, so the document scrolls
-     itself. */
+  /* **The preview paints its own page**, and nothing here has to arrange it: the
+     frame is a document, so the base layer's own \`body\` rule sets the ground,
+     the ink, the face, the height and the scroller from the same tokens the
+     theme has just redefined. */
 
   /* **A container, because the pane is not the window.** Everything inside
      answers to how wide the reader dragged the separator, and a media query
@@ -297,11 +291,11 @@ export const THEMED_PAGE_STYLES = css`
 
   /* **The edge is the theme's to decide, not this page's.**
 
-     It was \`--helix-border-thin\`, which is a width and always one pixel, so a
-     rail drew a line whatever the reader had chosen: pick \`fill\` or \`space\` and
-     the separation control moved every card on the page and left the rail
-     exactly as it was, which is the preview disagreeing with the artifact beside
-     it about what the theme says.
+     Never \`--helix-border-thin\` here: it is a width and always one pixel, so the
+     rail draws a line whatever the reader chose, and picking \`fill\` or \`space\`
+     moves every card on the page and leaves the rail exactly as it was. That is
+     the preview disagreeing with the artifact beside it about what the theme
+     says.
 
      \`--helix-border-surface\` and \`--helix-shadow-surface\` are what the engine
      emits for \`separation.surface\`, and \`Card\` reads exactly this pair. A rail
@@ -394,12 +388,10 @@ export const THEMED_PAGE_STYLES = css`
   /* One grid, used by every row including the masthead and the colophon, so the
      nav, every paragraph and the contact line all start on one vertical. */
   /* **\`baseline\`, rather than nudging the label down by a fraction of an em.**
-     The first attempt was \`padding-block-start: 0.7em\` on the label, which is a
-     magic number that happens to line up at one type scale and stops lining up
-     the moment a reader moves the body size or picks a face with a different
-     x-height. Grid baseline alignment asks the browser to do it, so the label
-     and the paragraph beside it sit on one line at every setting this tool can
-     produce, which is the whole range it has to survive. */
+     A \`padding-block-start\` on the label lines up at one type scale and stops
+     lining up the moment a reader moves the body size or picks a face with a
+     different x-height, both of which this tool can do. Grid baseline alignment
+     asks the browser to do it instead. */
   .themedRail {
     align-items: baseline;
     column-gap: var(--helix-space-xl);

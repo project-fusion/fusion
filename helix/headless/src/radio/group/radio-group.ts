@@ -71,16 +71,15 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   /* Moving and choosing are one act, which is the radio group pattern and is
      what this controller exists to stop being written per component. */
   /* Registered rather than held. A controller adds itself to the host, so there
-     is no reference to keep: nothing here talks to it after construction, which
-     is why it is `protected` and not `private`. A private field nothing reads
-     is an unused one, and the honest reading is that the subclass tier is where
-     a consumer would reach for it. */
+     is no reference to keep, and nothing here talks to it after construction.
+     `protected` rather than `private` because a private field nothing reads is
+     an unused one, and the subclass tier is where a consumer would reach for
+     it. */
   protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
-  /* Stated once, and the group never thinks about it again. See the
-     controller: the cascade was four hand calls from four different
-     methods, so which paths reached it differed by component and a fifth
-     group would have got none at all. */
+  /* Stated once, and the group never thinks about it again. Hand calls from
+     each method that could disable an item reach different paths per
+     component; the controller is what stops that being written per group. */
   protected readonly cascade = new DisabledCascadeController(this, {
     items: () => this.items,
   })
@@ -114,17 +113,14 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
       item.selected = item.value === this.value
     }
     /* Nothing chosen yet, so the first item is the tab stop. A group where
-       every item is `tabindex="-1"` is a group the keyboard cannot enter.
-     *
-     * Taken back the moment there is an answer, which it was not: the attribute
-     * was written on the first item and never removed, so an answered group
-     * carried two tab stops, the entry one and the selected item's own. Tabbing
-     * through a form stopped twice on one question, and the first stop was on an
-     * item that is not the answer.
-     *
-     * `entered` rather than a bare toggle, because this also runs when the
-     * group is answered and the attribute has to go whether or not this call is
-     * the one that put it there. */
+       every item is `tabindex="-1"` is a group the keyboard cannot enter, and
+       an answered group that keeps the entry stop carries two, so tabbing
+       through a form stops twice on one question and the first stop is on an
+       item that is not the answer.
+
+       `entered` rather than a bare toggle, because this also runs when the
+       group is answered and the attribute has to go whether or not this call is
+       the one that put it there. */
     const entered = this.value === '' && items.length > 0 ? items[0] : undefined
     for (const item of items) {
       if (item === entered) {
@@ -159,13 +155,10 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'radiogroup' })
-    /* Announced as required, which it never was.
-     *
-     * `required` reflects, sets validity and paints the asterisk the field sheet
-     * draws, and told the accessibility tree nothing: a reader met a group with
-     * a mark beside its label they could not see and no announcement of why the
-     * form would refuse it. The stylesheet drawing that asterisk depends on the
-     * control saying so. */
+    /* `required` reflects, sets validity and paints the asterisk the field
+       sheet draws, and tells the accessibility tree nothing on its own. Without
+       this a reader meets a mark beside the label they cannot see, and no
+       announcement of why the form would refuse the group. */
     this.internals.ariaRequired = this.required ? 'true' : null
   }
 

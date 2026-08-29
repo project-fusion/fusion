@@ -92,7 +92,7 @@ export function DocumentActions({
       {/* A new tab, because it is the same page in another form and losing the
           one you were reading to see it is a poor trade. Verified in Chromium
           rather than assumed: `text/markdown` renders as text there instead of
-          downloading, which is the question `12-ai-native-web.md` left open. */}
+          downloading, which is the open question here. */}
       <helix-menu-item
         href={`/helix/components/${family}.md`}
         rel="noreferrer"

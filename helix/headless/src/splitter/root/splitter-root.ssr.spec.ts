@@ -52,9 +52,8 @@ describe('splitter crossings on a server', () => {
     // It is an affordance rather than content, so it is allowed to arrive at
     // hydration. Until it does there are still two working dividers.
     //
-    // The divider is asserted alongside it, and that is the point of the pair:
-    // written against a raw string rather than a template, `ssr` rendered
-    // nothing, `hasPart` answered false, and the test passed while proving
+    // The divider is asserted alongside it because a lone negative passes on an
+    // empty render: `hasPart` answers false just as readily when `ssr` produced
     // nothing at all.
     expect(hasPart(ssr(nest), 'separator')).toBe(true)
     expect(hasPart(ssr(nest), 'corner')).toBe(false)

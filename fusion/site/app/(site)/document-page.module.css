@@ -1,21 +1,15 @@
 /* The shell every argued document on this site shares.
  *
  * **Insights, Trust and Thesis are the same kind of page**, which is what 206
- * settled: each is a single argued document rather than a marketing surface,
- * and an insight page already was one. Trust and Thesis were carrying a layout
- * apiece that reproduced most of this and none of its reasoning, so the
- * measure, the leading and the block rhythm differed between three pages that
- * are read the same way.
+ * settled: each is a single argued document rather than a marketing surface. One
+ * shell, so the measure, the leading and the block rhythm do not differ between
+ * three pages that are read the same way.
  *
  * What stays post-specific is in `insights.module.css`: the crumb, the byline
  * row and the Keep reading list are facts about a post in a series, and Trust
  * has no series to be in.
  */
 
-/* **90ch, and in characters rather than rems for the reason a measure is.**
-   `44rem` is a length that happens to hold about 70 characters at the current
-   type size and holds a different number at any other: state the column in the
-   unit it is actually about, and it survives a change to the ramp. */
 .documentShell {
   /* **Fixed, not `--site-inset`.** That clamp opens to seven rem on a wide
      screen, which is right for a layout running to the viewport edge and wrong
@@ -32,14 +26,13 @@
   /* **The measure, plus the gutter, rather than a number in `ch` that is not
      about the text it caps.**
    *
-   * This was `90ch` and then `100ch` on the shell, and a `ch` here resolves
-   * against the *shell's* font size rather than the body's, so it was never a
-   * count of the characters it was supposed to be counting. Worse, the cap is a
-   * border box and the padding came from `[data-shell]`, which is
-   * `clamp(space-lg, 6vw, 7rem)`: a gutter meant to hold *full width* layouts
-   * off the viewport edge. This box is capped and centered, so above the cap it
-   * is nowhere near that edge, and the only thing the growing gutter did was eat
-   * the column.
+   * A `ch` on the shell resolves against the *shell's* font size rather than the
+   * body's, so it never counts the characters it looks like it is counting.
+   * Worse, the cap is a border box and the padding came from `[data-shell]`,
+   * which is `clamp(space-lg, 6vw, 7rem)`: a gutter meant to hold *full width*
+   * layouts off the viewport edge. This box is capped and centered, so above the
+   * cap it is nowhere near that edge, and the only thing the growing gutter did
+   * was eat the column.
    *
    * Measured: the shell sat at 928px from 1024 upward while its padding went 61,
    * 77, 86, 112, so the reading column ran 805, 775, 755, 704. The line got
@@ -68,16 +61,12 @@
  *
  * `variant="label"` sets the kicker at `text-xs` with `tracking-wide`, which is
  * right for a form label and too quiet for the line above a document's title: it
- * read as a stray word rather than as the class of thing the page is.
+ * reads as a stray word rather than as the class of thing the page is.
  *
- * **Sentence case, where this was capitals and wider tracking.** The two went
- * together and they come off together: the note that put them here said capitals
- * at the narrower tracking look cramped, which is true and is an argument about
- * how to set capitals rather than for setting them. An eyebrow reading
- * `ACCEPTABLE USE` is shouting a filing label at somebody who came to read a
- * policy, and it is the only place on the site that shouts. The size and the
- * subdued tone are what make it an eyebrow; the capitals were only making it
- * loud.
+ * **Sentence case, not capitals.** An eyebrow reading `ACCEPTABLE USE` is
+ * shouting a filing label at somebody who came to read a policy, and it would be
+ * the only place on the site that shouts. The size and the subdued tone are what
+ * make it an eyebrow; capitals only make it loud.
  */
 .documentKicker {
   letter-spacing: var(--helix-tracking-wide);
@@ -85,24 +74,22 @@
 
 /* **Left, with the prose under it.**
  *
- * This was centered, on the argument that a centered measure is a column the eye
- * can find. That holds for a narrow column and stops holding at 90ch: the head
- * and the body now share an edge wide enough that a centered title starts in a
- * different place from every line beneath it, and the reader's eye has two left
- * edges to keep. One edge, and the title, the labels and the byline all return
- * to it. */
+ * A centered measure is a column the eye can find, which holds for a narrow
+ * column and stops holding at this one: the head and the body share an edge wide
+ * enough that a centered title starts in a different place from every line
+ * beneath it, and the reader's eye has two left edges to keep. One edge, and the
+ * title, the labels and the byline all return to it. */
 .documentHead {
   text-align: start;
 }
 
 /* **One column, and the head does not break out of it.**
  *
- * This gave the head its own wider measure for a while, on the argument that a
- * headline is taken in rather than read and wants a longer line than prose. The
- * argument is sound in print and it was wrong here, because it produced two
- * columns rather than one: a 112ch shell with a 72ch article pinned to its left
- * edge, so the body sat left of the page's center while the title ran past it.
- * The block stopped looking centered, which it no longer was.
+ * Giving the head its own wider measure, on the argument that a headline is
+ * taken in rather than read and wants a longer line than prose, is sound in
+ * print and wrong here: it produces two columns rather than one, a 112ch shell
+ * with a 72ch article pinned to its left edge, so the body sits left of the
+ * page's center while the title runs past it.
  *
  * A headline that is genuinely long wraps, and that is ordinary. What is not
  * ordinary is a page whose text has two different centers. */
@@ -124,8 +111,8 @@
 
 .documentLede {
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
-  /* **No cap of its own.** This was `34rem`, which held about 55 characters at
-     the current size and a different number at any other, and it made the
+  /* **No cap of its own.** A `34rem` cap holds about 55 characters at the
+     current size and a different number at any other, and it makes the
      standfirst the narrowest thing on the page: measured, it stopped 118px short
      of the paragraph beneath it, so the head had a ragged right edge of its own
      before the shell had one. It takes the column like everything else, and its
@@ -138,16 +125,14 @@
  * A claim with prose under it is not a short row, and the platform's marker is
  * placed for short rows: `outside` hangs it just clear of the row's content box,
  * so widening the gutter moves the words right and takes the marker along. The
- * two stay a marker's width apart whatever the gutter is, which is why this page
- * spent a while approximating the shape with `--list-marker-gutter` and a mono
- * `::marker` and could never actually reach it.
+ * two stay a marker's width apart whatever the gutter is, so
+ * `--list-marker-gutter` and a styled `::marker` cannot reach this shape.
  *
- * `marker="rail"` is the real thing, and it is the component's now rather than
- * this sheet's: the number sits in a track of its own at the start edge, every
- * claim begins at one measure, and the mono, muted, extra-small treatment the
- * rules here used to apply to `::marker` is in `list-item.css` where it belongs.
- * What is left for a page to say is how far apart the claims sit, which is a fact
- * about this kind of page and not about lists.
+ * `marker="rail"` is the component's: the number sits in a track of its own at
+ * the start edge, every claim begins at one measure, and the mono, muted,
+ * extra-small treatment lives in `list-item.css`. What is left for a page to say
+ * is how far apart the claims sit, which is a fact about this kind of page and
+ * not about lists.
  *
  * The rail's width is the component's default and is deliberately not restated
  * here. A page repeating a default is a line that goes stale silently the day the
@@ -159,9 +144,9 @@
  * steps wants its marker beside the words.
  *
  * In the shared shell rather than on Trust, because it is a fact about how this
- * site sets a numbered argument rather than about that page: counted, Trust is
- * still the only document with an ordered list in it, and a thesis or an insight
- * that grows one should get the same treatment without asking for it.
+ * site sets a numbered argument rather than about that page: a thesis or an
+ * insight that grows an ordered list should get the same treatment without
+ * asking for it.
  */
 .documentBody helix-list[kind="ordered"] {
   --list-gap: var(--helix-space-lg);

@@ -5,10 +5,10 @@
  * standing over what is hidden, so there is no missing setting here; the
  * default simply asks for one slot more than a 272px row holds.
  *
- * Wrapping rather than dropping a slot, and the difference matters. Which pages
- * are reachable is what `siblings` says, and a component that quietly reduced it
- * to fit would change what a reader can get to without being asked. A second
- * line changes nothing about that: every page still there, still one press away.
+ * Wrapping rather than dropping a slot: which pages are reachable is what
+ * `siblings` says, and a component that quietly reduced it to fit would change
+ * what a reader can get to without being asked. A second line changes nothing
+ * about that.
  *
  * `helix-button-group` is the case that cannot do this and says so: its buttons
  * share edges as one shape, so a wrapped row carries the corners of a first row
@@ -110,17 +110,16 @@
  * beside it would be two places to keep in step.
  *
  * **The border is what actually distinguishes it, and that is a measurement.**
- * The first pass carried `surface-raised` under `shadow-sm` and nothing else,
- * and the two grays in play are `oklch(0.97 0 258)` for raised against
+ * The two grays in play are `oklch(0.97 0 258)` for raised against
  * `oklch(0.96 0 258)` for the sunken fill a hovered page takes: one per cent of
- * lightness apart, so the page you are on and the page under the pointer were
- * the same chip. A shadow at this size cannot carry a distinction that fine.
+ * lightness apart, so under `surface-raised` and `shadow-sm` alone the page you
+ * are on and the page under the pointer are the same chip. A shadow at this size
+ * cannot carry a distinction that fine.
  *
  * So the edge does it, and the shadow goes with it. Nothing else in the row is
- * framed, which is exactly the argument the gallery's own note makes for when an
- * edge earns its place: it is the only mark here doing work no other state
- * claims. The box already reserves a transparent border, so nothing moves when
- * it is colored in.
+ * framed, so it is the only mark here doing work no other state claims. The box
+ * already reserves a transparent border, so nothing moves when it is colored
+ * in.
  *
  * The hover rule is repeated rather than left to the cascade, so the chip keeps
  * its own surface under the pointer. It is already the one you are on and does
@@ -197,9 +196,9 @@
 /* The gap is a control, so it takes the control box above and needs only what
    makes it quieter than a page: it is a way through rather than a destination.
 
-   Nothing about its position is stated here. It was centered by hand once, on
-   the theory that an ellipsis needed pushing onto the baseline, and measured at
-   1.5px *below* the digits for it: the glyph is already drawn at its baseline,
+   Nothing about its position is stated here, and nothing should be. Centering
+   the ellipsis by hand on the theory that it needs pushing onto the baseline
+   measures 1.5px *below* the digits: the glyph is already drawn at its baseline,
    so aligning the em boxes is the whole of the job and the shared box does that
    already. */
 [part="gap"] {
@@ -258,7 +257,7 @@
 /* Print: a control for reaching pages this one is not.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. See (165). */
 @media print {
   :host {
     display: none;

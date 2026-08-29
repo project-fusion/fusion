@@ -194,10 +194,11 @@ post({ type: 'helix-preview-ready' })
 /**
  * Executes the `<script>` elements in a rendered example.
  *
- * **`innerHTML` parses a script and refuses to run it**, which is why no example
- * in the library demonstrated an event: the two ways markup can respond to one
- * are a `<script>` tag and an inline handler attribute, and measured in Chrome
- * against this exact injection, neither reached a Helix event:
+ * **`innerHTML` parses a script and refuses to run it**, which is why an
+ * injected example cannot demonstrate an event on its own: the two ways markup
+ * can respond to one are a `<script>` tag and an inline handler attribute, and
+ * measured in Chrome against this exact injection, neither reached a Helix
+ * event:
  *
  * ```
  * inline custom    did not run     <helix-checkbox onhelix-toggle="…">
@@ -213,10 +214,10 @@ post({ type: 'helix-preview-ready' })
  *
  * **This grants the example no capability it did not have.** Rows two and three
  * are the whole argument: an example can already run arbitrary JavaScript in
- * this document through `onclick` or `onerror`, and could already append a
- * script element from one. What `innerHTML` was providing was not a control, it
- * was an inconsistency, and the cost of it was that the legible way to write the
- * thing was the one way that did not work.
+ * this document through `onclick` or `onerror`, and can already append a script
+ * element from one. What `innerHTML` withholds is not a control, it is an
+ * inconsistency that makes the legible way to write the thing the one way that
+ * does not work.
  *
  * The boundary is where it always was. This document is sandboxed with
  * `allow-scripts` and never `allow-same-origin`, so it holds an opaque origin

@@ -55,10 +55,9 @@
 
    **`flex-end` plus one auto margin, and not `space-between`.** Most composers
    slot nothing at all, and `space-between` with a single visible child puts that
-   child at the *start*: the send control sat at the bottom left of every
-   composer that had no tools, which is every one in the library's own examples
-   but the assistant. This way the row ends at the trailing edge whatever is in
-   it, and a filled `start` pushes itself back to the leading one. */
+   child at the *start*, which puts the send control at the bottom left. This way
+   the row ends at the trailing edge whatever is in it, and a filled `start`
+   pushes itself back to the leading one. */
 [part="tools"] {
   align-items: center;
   display: flex;
@@ -102,32 +101,27 @@
 
    **Ghost and monotone, and a notch inside the small control step.** A filled
    primary square is what a page's one affirmative action looks like, and this is
-   not on a page: it is inside the composer, under the words being written, and
-   at that strength it was the loudest thing in a component whose whole subject
-   is the text above it. It came down through solid, then a subtle wash, and
-   stops here: no ground at rest, and a wash of the foreground the moment a
-   pointer is on it.
+   not on a page: it is inside the composer, under the words being written, where
+   at that strength it is the loudest thing in a component whose whole subject is
+   the text above it. What tells it apart from its neighbors is the glyph and the
+   corner it sits in, which is what tells it apart in every composer anybody has
+   used.
 
    **The recipe is `Button`'s ghost, value for value, and that is the whole
    reason to take it rather than tune one.** The tools slotted beside this are
    `helix-icon-button` elements at `emphasis="ghost"`, so the same 8% mix means
    send and its neighbors light up identically under the pointer instead of
-   nearly so. The tone is the foreground rather than the brand for the same kind
-   of reason the strength came down: blue put a second color in a composer that
-   already has one on the reader's own turns above it, and pointed at the least
-   surprising control in the component. Nobody needs telling which button sends.
+   nearly so. The tone is the foreground rather than the brand: blue would put a
+   second color in a composer that already has one on the reader's own turns
+   above it, pointing at the least surprising control in the component.
 
-   What tells it apart from its neighbors is the glyph and the corner it sits
-   in, which is what tells it apart in every composer anybody has used.
-
-   **The ink follows `IconButton`'s two, and this rule was the only glyph in the
-   component that did not.** That control inks itself `foreground-muted` at rest
-   and `foreground` under the pointer, on the argument that a control which is
-   not the subject should not be drawn at full strength until it is being used.
-   Measured across the whole component: the copy, retry, attach, stop and header
-   glyphs all sat at `oklch(0.71)` and this one at `oklch(1)`, so the send mark
-   was the single brightest thing in a composer built to be quiet, next to a stop
-   control four pixels away drawn a third weaker.
+   **The ink follows `IconButton`'s two**, `foreground-muted` at rest and
+   `foreground` under the pointer, on the argument that a control which is not
+   the subject should not be drawn at full strength until it is being used. The
+   composer's other glyphs (copy, retry, attach, stop, header) all sit at
+   `oklch(0.71)`, so a send mark at `oklch(1)` is the single brightest thing in a
+   component built to be quiet, four pixels from a stop control drawn a third
+   weaker.
 
    The size is `sm` less the smallest space, which is 28. A control that sits on
    a page takes a step off the control ladder; this one sits inside another

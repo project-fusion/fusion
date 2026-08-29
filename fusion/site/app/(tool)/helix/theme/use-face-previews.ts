@@ -31,18 +31,15 @@ export const FACE_SAMPLE = 'Ag'
  * ship.** The CSS2 endpoint takes many families in one URL, so a scroll fires a
  * few requests rather than a few hundred.
  *
- * **A timer rather than a `requestAnimationFrame`, and that was a bug before it
- * was a preference.** The first version scheduled the batch on a frame, which
- * is a rendering hook: a hidden tab renders nothing, so the callback never runs.
- * Measured in a pane reporting `visibilityState: hidden`, `requestAnimationFrame`
- * did not fire at all. On its own that is harmless, a tab nobody is looking at
- * needing no previews, and it was not on its own: a family was written into
- * `asked` when it was collected rather than when it was sent, so a batch the
- * frame never delivered left those families marked as requested forever. They
- * would stay blank after the tab came back, which is the failure that outlives
- * the condition that caused it.
+ * **A timer rather than a `requestAnimationFrame`.** A frame is a rendering
+ * hook: a hidden tab renders nothing, so the callback never runs. Measured in a
+ * pane reporting `visibilityState: hidden`, `requestAnimationFrame` did not fire
+ * at all. On its own that is harmless, a tab nobody is looking at needing no
+ * previews, but a family written into `asked` when it is collected rather than
+ * when it is sent stays marked for a batch that never went out, and its samples
+ * are blank forever once the tab comes back.
  *
- * So the mark moves to the send, and the send runs on a timer, which a hidden
+ * So the mark goes on the send, and the send runs on a timer, which a hidden
  * tab throttles rather than stops.
  *
  * **One weight, not three.** The chosen faces are asked for 400, 500 and 600
@@ -195,12 +192,11 @@ export function useFacePreviews(root: RefObject<HTMLElement | null>): void {
           timer = setTimeout(send, 30)
         }
       },
-      /* **Four screens of lookahead, because one was not enough.** The list's
-         own viewport is about 220px, so the first version's 200px margin bought
-         a single screen of warning and a reader scrolling at any speed outran
-         it: rows arrived before their faces did. A request has two round trips
-         in it, the stylesheet and then the file it names, so the margin has to
-         cover the scrolling done during both. */
+      /* **Four screens of lookahead, because one is not enough.** The list's own
+         viewport is about 220px, and a single screen of warning is outrun by a
+         reader scrolling at any speed: rows arrive before their faces do. A
+         request has two round trips in it, the stylesheet and then the file it
+         names, so the margin has to cover the scrolling done during both. */
       { rootMargin: '900px' },
     )
 

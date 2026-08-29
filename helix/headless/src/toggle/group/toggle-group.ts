@@ -66,25 +66,15 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  */
 @customElement('helix-headless-toggle-group')
 export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /**
-   * Marks the chosen item, which used to happen inside the placing method.
-   *
-   * They were one method because the geometry needed the active item anyway,
-   * and that made a selection change look like a layout concern. `resolveActiveItem`
-   * rather than the first item, because a group opening on a disabled segment
-   * marked it as chosen.
-   */
+  /** Marks the chosen item, separately from placing the indicator. */
   private sync(): void {
-    /* An exact match and nothing else.
+    /* An exact match and nothing else, never `resolveActiveItem`, which falls
+     * back to the first enabled item: a group with no value would mark one
+     * anyway, `aria-checked="true"` and the thumb under it and full selected
+     * styling, while the group reported nothing. A `required` group would then
+     * tell a reader a value is missing while they are looking at one.
      *
-     * This went through `resolveActiveItem`, which falls back to the first
-     * enabled item, so a group with no value marked one anyway:
-     * `aria-checked="true"`, the thumb placed under it, full selected styling,
-     * while the group reported nothing. A `required` group showed an answer it
-     * did not have, and a reader who submitted without touching it was told a
-     * value was missing while looking at one.
-     *
-     * The fallback is right where it came from. A tab set always shows a panel,
+     * That fallback is right where it came from. A tab set always shows a panel,
      * so something has to be current; a group that reports a form value has the
      * honest option of reporting none. */
     const active = this.items.find((item) => item.value === this.value)
@@ -99,7 +89,6 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     }
   }
 
-  /* The mark. The selection sync it used to share a method with is `sync()`. */
   private readonly indicator = new IndicatorController(this, {
     // The same exact match `sync` makes: nothing chosen means nothing marked,
     // and the controller takes the mark away rather than parking it on item one.
@@ -120,10 +109,9 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      a consumer would reach for it. */
   protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
 
-  /* Stated once, and the group never thinks about it again. See the
-     controller: the cascade was four hand calls from four different
-     methods, so which paths reached it differed by component and a fifth
-     group would have got none at all. */
+  /* Stated once, and the group never thinks about it again. The controller is
+     what stops the cascade being hand-called from whichever methods a component
+     happens to have. */
   protected readonly cascade = new DisabledCascadeController(this, {
     items: () => this.items,
   })
@@ -227,14 +215,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   }
 
   /**
-   * The verdict on the answer, which `required` had been asking for and not
-   * getting.
+   * The verdict on the answer `required` asks for.
    *
-   * `required` arrived with `MixinField` and nothing enforced it: the attribute
-   * reflected, the marker rendered beside the label, and a form with an
-   * unanswered group submitted anyway. An API that exists and does nothing is
-   * worse than one that is missing, because the marker is a promise to the
-   * reader that something will stop them.
+   * `required` arrives with `MixinField` and enforces nothing on its own: the
+   * attribute reflects and the marker renders beside the label, and without this
+   * a form with an unanswered group submits anyway. The marker is a promise to
+   * the reader that something will stop them.
    *
    * The anchor is the track rather than the host, so the browser's own bubble
    * points at the control rather than at a box with nothing in it.
@@ -276,11 +262,11 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    * in it.
    */
   protected override render(): TemplateResult {
-    /* The track is an element now, where it used to be the host itself.
-       It has to be: the label, the hint and the message are the host's children
-       too, and with the track on the host they were flex items in the same row
-       as the segments. The track also owns the box the indicator is measured
-       against, which is why `place` reads it rather than `this`. */
+    /* The track is an element rather than the host, and has to be: the label,
+       the hint and the message are the host's children too, so a track on the
+       host makes them flex items in the same row as the segments. The track also
+       owns the box the indicator is measured against, which is why `place` reads
+       it rather than `this`. */
     /* **Inside the track when it is placed at the start, not beside it.** A
        label sitting outside reads as a field's label that happens to be on one
        line; inside, with a rule after it, the group reads as one control that

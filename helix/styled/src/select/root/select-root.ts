@@ -7,13 +7,11 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './select-root.css.js'
 /* Side-effect imports, because this renders `<helix-listbox>` in its own shadow
    root and a custom element registers on import. Without them a consumer who
-   imported `@fusion.dev/helix/select` and nothing else got a select whose panel
-   never upgraded: an unknown element with unstyled options inside it, and no
-   error anywhere, because an unknown element is legal HTML.
- 
-   The same rule the React wrappers follow, for the same reason. It surfaced
-   first as a spec that passed in the suite and failed alone, which is what a
-   missing registration looks like when some other file happens to supply it. */
+   imports `@fusion.dev/helix/select` and nothing else gets a select whose panel
+   never upgrades: an unknown element with unstyled options inside it, and no
+   error anywhere, because an unknown element is legal HTML. The suite hides it
+   too, some other file happening to supply the registration, so it shows as a
+   spec that passes together and fails alone. */
 import '../../listbox/index.js'
 import '../../option/index.js'
 
@@ -68,10 +66,10 @@ export class HelixSelect extends HelixHeadlessSelect {
    *
    * **`emphasis` and not `separation`, which the registry decides rather than
    * taste.** Emphasis is asked of controls, how loud this one is; separation is
-   * asked of containers, where the surface ends. A trigger is a control, and
-   * a family may not declare both. Two of the four values are
-   * taken: `solid` and `subtle` are a button's way of being the one thing to
-   * press, which is not a thing an answer should ever be.
+   * asked of containers, where the surface ends. A trigger is a control, and a
+   * family may not declare both. Two of the four values are refused: `solid` and
+   * `subtle` are a button's way of being the one thing to press, which is not a
+   * thing an answer should ever be.
    *
    * **The other three fields want this too and do not have it yet.** `Input`,
    * `Textarea` and `Combobox` wear the same frame from the same shared

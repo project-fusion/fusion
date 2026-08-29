@@ -73,17 +73,11 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   label = ''
 
   /**
-   * Whether Escape can close it.
+   * Whether Escape or a press on the backdrop can close it.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
    * refusing to be closed, and a dialog with no way out at all is a trap.
-   *
-   * Escape *and* a press on the backdrop, which it now genuinely means. The
-   * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behavior a consumer would have written their
-   * markup around; the fix then was to narrow the sentence, and the fix now is
-   * to build the half that was missing.
    *
    * A persistent dialog does not ignore that press. It answers it: see
    * `refuse`, which is the only way a dialog that will not be dismissed can say
@@ -123,9 +117,9 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
    * boundary**, which is where this one is: the platform's contract is
-   * `close(value)` then read `returnValue`, and a consumer could do neither
-   * because `querySelector` does not reach the element. A confirmation asking
-   * which button was pressed is the ordinary case and had no answer.
+   * `close(value)` then read `returnValue`, and `querySelector` does not reach
+   * the element to do either. A confirmation asking which button was pressed is
+   * the ordinary case.
    *
    * Held here as well as on the element, so a value set before the first render
    * survives to it and a consumer reading one back gets what they wrote.

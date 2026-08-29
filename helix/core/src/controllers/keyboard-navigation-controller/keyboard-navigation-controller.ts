@@ -91,19 +91,9 @@ const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 
  * Disabled items are skipped rather than stopped at, so a set with a gap in it
  * still moves in one press.
  *
- * Written because `Radio.Group` and `Toggle.Group` had this twice, identically,
- * down to the order of the branches. The second copy is what makes it a
- * controller: one is a component's own business, two is a pattern, and the two
- * had not diverged only because nothing had touched them yet.
- *
- * **`Tabs` is the third, and it is what `origin` and `selects` are for.** It had
- * diverged, which is the case the paragraph above was worried about: it started
- * from focus rather than from the selection, and it moved without choosing when
- * `manual` was set. Both are real and neither is a tabs-only idea, so they are
- * options here rather than a reason to keep a fourth copy. What it does *not*
- * keep is its own key set: it bound the horizontal pair only, and both axes is
- * the house position, argued two paragraphs up. A reader on a tab who presses
- * Down now moves along the row instead of getting nothing.
+ * A set that starts from focus rather than from the selection, or that moves
+ * without choosing, says so through `origin` and `selects`. Neither is a reason
+ * to keep a hand-written copy, and neither exempts a set from both axes.
  */
 export class KeyboardNavigationController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -173,18 +163,15 @@ export class KeyboardNavigationController implements ReactiveController {
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
       /* From nothing, backwards is the last, which the arithmetic did not give.
        *
-       * `(-1 - 1 + length) % length` is `length - 2`: the *second* to last. So a
-       * reader arrowing backwards into an unanswered group landed one short of
-       * the end, and the comment above says plainly that it lands on the end.
-       * The wrapping form is right for every real index and wrong for the one
-       * that is not an index.
+       * `(-1 - 1 + length) % length` is `length - 2`: the *second* to last, so
+       * a reader arrowing backwards into an unanswered group lands one short of
+       * the end. The wrapping form is right for every real index and wrong for
+       * the one that is not an index.
        *
-       * And the clamp is `Math.max` against the forward branch's `Math.min`,
-       * which it was missing. Unclamped this is `-1` on the first item, and
-       * `items[-1]` is undefined, so nothing was focused and nothing chosen on a
-       * press that `preventDefault` had already swallowed. Holding Left on the
-       * first star of a rating got silence, where holding Right on the last one
-       * holds its ground. */
+       * And the clamp is `Math.max` against the forward branch's `Math.min`.
+       * Unclamped this is `-1` on the first item, and `items[-1]` is undefined,
+       * so nothing is focused and nothing chosen on a press that
+       * `preventDefault` has already swallowed. */
       next =
         current < 0
           ? last

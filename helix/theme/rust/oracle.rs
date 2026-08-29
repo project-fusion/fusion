@@ -1,34 +1,24 @@
 //! The engine held to what it answered.
 //!
-//! **This was a differential check and is a snapshot now, and the difference is
-//! worth stating plainly.** `oracle.json` held what the TypeScript engine
-//! answered, and every value below asserted that the port agreed with an
-//! implementation written independently. That engine is deleted: the port passed
-//! and 142 was filed to stop two implementations of a search existing at once.
-//! So these tests prove that nothing has changed since somebody last looked,
-//! rather than that the answers are right.
+//! **This is a snapshot, not a differential check, and the difference is worth
+//! stating plainly.** `oracle.json` holds what the TypeScript engine answered,
+//! and that engine is now deleted. So these tests prove that nothing has changed
+//! since somebody last looked, rather than that the answers are right.
 //!
-//! The reason the check was worth having in the first place is unchanged and is
-//! why the snapshot is worth keeping: both functions here bisect, so agreement
-//! on intent is not agreement on output, and a last-place difference in one
-//! channel moves a byte, which moves the luminance, which moves the side of 4.5
-//! the search lands on. A regression of that shape is invisible to a type
-//! checker and to a reviewer, and this catches it.
+//! That is still worth having: both functions here bisect, so agreement on
+//! intent is not agreement on output, and a last-place difference in one channel
+//! moves a byte, which moves the luminance, which moves the side of 4.5 the
+//! search lands on. A regression of that shape is invisible to a type checker
+//! and to a reviewer, and this catches it.
 //!
 //! `bless.rs` is what rewrites the file, deliberately awkwardly.
 //!
-//! **The port is bit-exact almost everywhere, and finding that out took
-//! correcting the harness twice.**
+//! **`serde_json` must keep `float_roundtrip`**, which `Cargo.toml` says beside
+//! the dependency. Without it the parser takes a fast path that is not correctly
+//! rounded and reads the oracle's own numbers an ulp out, so the harness
+//! corrupts its reference and reports the port for it.
 //!
-//! Bit equality was the first assertion written, on the reasoning that both
-//! engines are IEEE-754 doubles doing the same operations in the same order. It
-//! appeared to fail widely, and the reported divergence was recorded as V8's
-//! libm differing from Rust's in the last place. That was wrong: `serde_json`
-//! without `float_roundtrip` takes a fast path that is not correctly rounded,
-//! and it was parsing the oracle's own numbers an ulp out. The harness was
-//! corrupting its reference and reporting the port for it.
-//!
-//! With the parser fixed, measured:
+//! The port is bit-exact almost everywhere. With the parser correct, measured:
 //!
 //! ```text
 //! rendered hex          0 of 480 differ
@@ -50,10 +40,6 @@
 //! place the two libms actually part company. That one tolerance carries its
 //! measurement; every other assertion is exact and stays exact, which is what
 //! makes a future regression in the solver visible rather than absorbed.
-//!
-//! **Twice now the harness has been the bug**, after the `NaN` that compared
-//! equal to everything. A differential check is a measuring instrument, and an
-//! instrument that reads its own scale wrong reports the specimen.
 
 use serde_json::Value;
 
@@ -143,13 +129,11 @@ impl Divergence {
         }
         self.count += 1;
         let apart = (mine - theirs).abs();
-        /* **A difference that is not a number is not a small difference.** This
-        compared `apart >= self.worst` and nothing else, and `NaN >= 0.0` is
-        false, so a `NaN` on either side left `worst` at zero and the assert
-        below passed: the harness would have certified agreement with a value
-        that is not a value. Measured before fixing, which is the only way this
-        kind of hole is ever visible, since it makes the suite greener rather
-        than redder. */
+        /* **A difference that is not a number is not a small difference.**
+        `apart >= self.worst` on its own is not enough: `NaN >= 0.0` is false, so
+        a `NaN` on either side leaves `worst` at zero and the assert below
+        passes, certifying agreement with a value that is not a value. The hole
+        makes the suite greener rather than redder, so nothing else shows it. */
         if !apart.is_finite() {
             self.worst = f64::INFINITY;
             self.where_at =
@@ -536,7 +520,7 @@ fn perceptual_distance_matches_the_typescript_to_the_bit() {
 
 /// Isolates the disagreement above: is `hypot3` wrong, or is `cos` an ulp out
 /// upstream of it? Fed the TypeScript's own lab triples, `hypot3` should be
-/// exact, which localises any residual to the trigonometry.
+/// exact, which localizes any residual to the trigonometry.
 #[test]
 fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
     let data = oracle();
@@ -583,7 +567,6 @@ fn hypot_is_exact_when_it_is_given_the_same_three_numbers() {
     assert_eq!(wrong, 0, "hypot3 differs given identical inputs");
 }
 
-/// Looks up one token of one theme by name.
 /// The themes whose token list is a pure derivation.
 ///
 /// **A per-phase test looks its token up by name, and a pinned token is the one
@@ -685,7 +668,7 @@ fn assert_token(mine: &DerivedToken, theirs: &Value, at: &str) {
 }
 
 /// The first phase: defaults, the chroma policy, and the ladder the page stands
-/// on. Ten intents, chosen so each moves a different part of it.
+/// on. One oracle intent per part of it that can move.
 #[test]
 fn the_surface_ladder_is_the_one_the_typescript_derives() {
     let data = oracle();
@@ -842,12 +825,6 @@ fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
     );
 }
 
-/// Rebuilds the intent the oracle derived a theme from, by label.
-///
-/// Stated here and in `tooling/scripts/theme-intents.mjs`, and it is the one duplication
-/// here: the oracle stores what a theme *came out as*, not what went in, and a
-/// port asserted against outputs it cannot reproduce the inputs of is asserting
-/// nothing. The labels are the join.
 /// Every theme the oracle records, in the order it records them.
 ///
 /// **The order is the file's order and is load-bearing for review**, not for any
@@ -875,9 +852,16 @@ pub fn labels() -> Vec<&'static str> {
     ]
 }
 
-/* One arm per oracle theme, so this grows by a few lines every time a branch
-turns out to need an input that shows it. Splitting it would file half the
-intents somewhere else and leave a reader chasing which half. */
+/// Rebuilds the intent the oracle derived a theme from, by label.
+///
+/// **Stated here and in `tooling/scripts/lib/theme-intents.mjs`, and it is the
+/// one duplication in this file**: the oracle stores what a theme *came out as*
+/// and not what went in, and a port asserted against outputs whose inputs it
+/// cannot reproduce is asserting nothing. The labels are the join.
+///
+/// One arm per oracle theme, so this grows by a few lines every time a branch
+/// turns out to need an input that shows it. Splitting it would file half the
+/// intents somewhere else and leave a reader chasing which half.
 #[allow(clippy::too_many_lines)]
 pub fn intent_for(label: &str) -> ThemeIntent {
     let blue = || Color::Hex("#3b82f6".to_owned());
@@ -1004,10 +988,9 @@ pub fn intent_for(label: &str) -> ThemeIntent {
 /// The first tokens that go through the contrast search rather than off a
 /// ladder, and the first that carry a measured ratio.
 ///
-/// A bisection agreeing to the bit across ten themes means every branch it took
+/// A bisection agreeing to the bit across every theme means every branch it took
 /// was the same branch: twenty-four halvings per candidate, four candidates per
-/// ink, both directions tried. That is the assertion 142 asks for and the reason
-/// this is a move rather than a second engine.
+/// ink, both directions tried. See (142).
 #[test]
 fn the_neutral_inks_land_where_the_typescript_lands() {
     let data = oracle();
@@ -1038,11 +1021,10 @@ fn the_neutral_inks_land_where_the_typescript_lands() {
 /// `solve_against` keeps the candidate whose weakest pairing is strongest.
 ///
 /// **Asserted as the property rather than as an outcome, because an outcome
-/// test did not catch it.** The first version solved a neutral against a white
-/// page and a black one and checked the answer looked reasonable. Inverting the
-/// rule from "best worst case" to "best best case" left every one of the twenty
-/// tests passing: white and black are symmetric, so the two rules agree there,
-/// and the neutral inks are the only tokens ported so far that use the solver.
+/// test cannot catch it.** Solving a neutral against a white page and a black
+/// one and checking the answer looks reasonable passes with the rule inverted to
+/// "best best case": white and black are symmetric, so the two rules agree
+/// there.
 ///
 /// So this states the rule itself: of the candidates, the one chosen has a
 /// weakest pairing at least as strong as any other's. That is false the moment
@@ -1234,8 +1216,8 @@ fn the_statuses_land_where_the_typescript_lands() {
 ///
 /// Planting the flipped order in `repair_hue` and running the whole suite
 /// changes nothing: the order only decides anything when both directions clear
-/// at the same step, and none of the eleven themes does that. So the four things
-/// the search promises are stated here instead.
+/// at the same step, and no theme in the oracle does that. So the things the
+/// search promises are stated here instead.
 #[test]
 fn the_hue_repair_widens_outward_and_gives_up_rather_than_settling() {
     /* Asked for, and available: nothing moves. */
@@ -1376,16 +1358,14 @@ fn every_token_of_every_theme_matches() {
 ///
 /// The direction only decides an answer when both neighbors clear at the same
 /// step, and for every brand in the oracle either the mark does not move at all
-/// or exactly one side clears first. Reversing the two entries left all thirteen
-/// themes byte-identical: measured by making that edit and watching the suite
+/// or exactly one side clears first. Reversing the two entries leaves every
+/// theme byte-identical: measured by making that edit and watching the suite
 /// stay green.
 ///
 /// So it is asserted as a rule, the way `repair_hue`'s own order is, and against
-/// a synthetic predicate rather than real contrast. Real contrast cannot produce
-/// the tie: against a mid gray the lighter side clears a full step earlier, so
-/// the walk returns before both sides are ever true at once. The first attempt
-/// at this test tried it anyway and failed, which is the finding rather than the
-/// obstacle.
+/// a synthetic predicate rather than real contrast. **Real contrast cannot
+/// produce the tie**: against a mid gray the lighter side clears a full step
+/// earlier, so the walk returns before both sides are ever true at once.
 #[test]
 fn the_brand_mark_prefers_the_darker_side_of_a_tie() {
     /* Both neighbors of the fifth step clear and nothing nearer does, so the
@@ -1420,8 +1400,8 @@ fn the_brand_mark_prefers_the_darker_side_of_a_tie() {
 /// This is the end of the port and the only assertion that covers the tail of
 /// `to_css`: everything below the tokens is emitted only when asked for, so a
 /// port that dropped the whole of it would pass every other test in this file on
-/// every theme that says nothing about fonts, motion or material. Three intents
-/// exist purely to turn those branches on.
+/// every theme that says nothing about fonts, motion or material. Several oracle
+/// intents exist purely to turn those branches on.
 ///
 /// Byte equality rather than a parse, because the artifact is a file a consumer
 /// pastes. Two blocks that mean the same thing and differ in a trailing zero are

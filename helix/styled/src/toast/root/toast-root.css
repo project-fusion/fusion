@@ -11,24 +11,21 @@
   inset-inline: var(--_toast-inset);
   pointer-events: none;
   position: fixed;
-  /* The token that exists for this. `--helix-layer-toast` is the top of the
-     stack and nothing referenced it: a message arriving over an open dialog sat
-     at the dialog's own level and was ordered by source order rather than by
-     intent. */
+  /* `--helix-layer-toast` is the top of the stack. Without it a message
+     arriving over an open dialog sits at the dialog's own level and is ordered
+     by source order rather than by intent. */
   z-index: var(--helix-layer-toast);
 }
 
-/* The resting arrangement, which is bottom-end and used to be a default on the
-   property. A reflected property with a default writes its attribute onto every
-   host, including the ones nobody configured, so the placement lives here and
-   `placement` is optional.
+/* The resting arrangement, which is bottom-end. A reflected property with a
+   default writes its attribute onto every host, including the ones nobody
+   configured, so the placement lives here and `placement` is optional.
  *
-   Behind `:not([placement])` rather than on `:host`, which is where it was
-   first written and was wrong: `inset-block-end` and `inset-block-start` are
-   different properties, so a `top-*` toast would have taken both and stretched
-   the region down the whole viewport. A resting arrangement has to be scoped to
-   the resting state, not left for the departures to undo one declaration at a
-   time. */
+   Behind `:not([placement])` rather than on `:host`: `inset-block-end` and
+   `inset-block-start` are different properties, so a `top-*` toast would take
+   both and stretch the region down the whole viewport. A resting arrangement
+   has to be scoped to the resting state, not left for the departures to undo
+   one declaration at a time. */
 :host(:not([placement])) {
   inset-block-end: var(--_toast-inset);
 
@@ -103,7 +100,8 @@
 
 /* Not printed, being an overlay.
  *
- * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ * It is over the page rather than part of it, and on paper there is no over: a
+ * message printed into the flow is a slab across whatever it was covering.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow

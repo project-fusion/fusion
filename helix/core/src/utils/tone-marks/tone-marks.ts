@@ -9,12 +9,10 @@ import {
 /**
  * The four status tones, as a type anything branching on them can take.
  *
- * **A subset of `tone` rather than an axis of its own, which is what the rename
- * records.** This was `HelixSeverity`, and `severity` turned out to be a sixth
- * spelling of the axis for what a thing *means*: `Callout` and `Toast.Item`
- * report a status and never a brand role, so they take four of the seven values
- * and not four values of their own. The components moved with #158; the
- * vocabulary underneath them was still saying the old word.
+ * **A subset of `tone` rather than an axis of its own.** A `severity` beside it
+ * would be a sixth spelling of the axis for what a thing *means*: `Callout` and
+ * `Toast.Item` report a status and never a brand role, so they take four of the
+ * seven values and not four values of their own. See (158).
  *
  * `Status` stays in the name because that is the half of `tone` these are: there
  * is no mark for `primary` or `accent`, a brand role having nothing to announce.
@@ -33,17 +31,13 @@ export interface ToneMark {
 /**
  * The one status vocabulary.
  *
- * It was two, defined identically in `Callout` and in `Toast.Item`, and only one
- * of the copies carried the comment saying the two must not drift. A reader
- * meets these marks in a passage and in a message and has to read them as the
- * same four things, so there is one place they come from.
+ * A reader meets these marks in a passage and in a message and has to read them
+ * as the same four things, so there is one place they come from.
  *
- * **Filled at every tone**, which is what it already was at one of them.
- * `danger` took `xCircleFill` and the other three took outlines, so a set meant
- * to be read as one vocabulary had one member drawn a different way. Filled
- * because a tone mark is a status indicator and not an action: it wants to
- * read at a glance and at a small size, where an outline at this weight loses
- * its interior.
+ * **Filled at every tone**, or a set meant to be read as one vocabulary has a
+ * member drawn a different way. Filled because a tone mark is a status
+ * indicator and not an action: it wants to read at a glance and at a small
+ * size, where an outline at this weight loses its interior.
  *
  * **The label is not the tone name.** `danger` is announced as "Error",
  * because that is the word a reader understands and `danger` is the word the API

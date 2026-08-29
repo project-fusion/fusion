@@ -86,10 +86,10 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   /**
    * The entry's name, which is the words and not everything in it.
    *
-   * `textContent` was what this used, and it takes the whole subtree: a row with
-   * a duration in `meta` reported "His Girl Friday0:06", and that string went to
-   * the player and on to the lock screen. Only the nodes the consumer left
-   * unslotted are the name; anything named is a column beside it.
+   * `textContent` takes the whole subtree: a row with a duration in `meta`
+   * reads as "His Girl Friday0:06", and that string reaches the player and the
+   * lock screen. Only the nodes the consumer left unslotted are the name;
+   * anything named is a column beside it.
    *
    * Light DOM rather than `assignedNodes`, so it answers on the server too,
    * where there is no slot to ask. `Option.text` reads its own the same way.

@@ -78,9 +78,10 @@ pub(crate) fn trimmed(value: f64, places: usize) -> String {
 /// `String(x)` for a float: JavaScript's shortest round-tripping form.
 ///
 /// Rust's `{}` for `f64` is also shortest-round-trip, so they agree on every
-/// value in this range except that JavaScript writes an integral float without a
-/// fraction, `1` where Rust writes `1`. They agree there too, which is worth
-/// checking rather than assuming: `format!("{}", 1.0_f64)` is `"1"`.
+/// value in this range, the integral case included: JavaScript writes an
+/// integral float without a fraction, and so does Rust, which is worth checking
+/// rather than assuming because `1.0` would be a different string in the emitted
+/// file. `format!("{}", 1.0_f64)` is `"1"`.
 fn number(value: f64) -> String {
     format!("{value}")
 }

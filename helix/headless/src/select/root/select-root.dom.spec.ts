@@ -44,11 +44,10 @@ const shown = (host: Updatable): string =>
 
 describe('select', () => {
   test('the options reach the listbox through the slot', async () => {
-    /* The fault the three-family split was for. The options are the consumer's
-       light DOM, slotted into a listbox in this component's shadow root, so
-       from the listbox's side its only child is a slot: a plain
-       `querySelectorAll` finds the slot and no options, and the whole thing
-       comes up empty. */
+    /* The options are the consumer's light DOM, slotted into a listbox in this
+       component's shadow root, so from the listbox's side its only child is a
+       slot: a plain `querySelectorAll` finds the slot and no options, and the
+       whole thing comes up empty. */
     const host = await select()
     const listbox = part(host as HTMLElement, 'listbox') as HTMLElement & {
       options: HTMLElement[]
@@ -150,11 +149,9 @@ if (hasLayout()) {
 if (hasLayout()) {
   describe('select in a browser', () => {
     test('the open panel is in the top layer, not merely positioned', async () => {
-      /* This is the defect the shared controller was extracted to fix. The
-         select had a `FloatingController` and a `DismissController` and never
-         called `showPopover`, so its panel was an ordinary positioned element:
-         placed correctly, and clipped by the first ancestor with `overflow:
-         hidden`, while a menu in the same position was not.
+      /* A `FloatingController` and a `DismissController` without `showPopover`
+         leave the panel an ordinary positioned element: placed correctly, and
+         clipped by the first ancestor with `overflow: hidden`.
 
          `:popover-open` is the only thing that distinguishes the two. A panel
          that is merely visible passes every other spec in this file. */
@@ -188,9 +185,8 @@ if (hasLayout()) {
     /* Browser-only because the chain crosses a slot: the option is the
        consumer's element, slotted into the listbox inside the select's shadow
        root, and happy-dom does not propagate an event from slotted content
-       through the `<slot>`. Every existing spec here chooses by setting `value`
-       or by calling `select()`, which is why nothing caught that a select could
-       not be operated with a mouse at all. */
+       through the `<slot>`. Every other spec here chooses by setting `value` or
+       by calling `select()`, neither of which exercises a pointer at all. */
     const opened = async (attrs = ''): Promise<Updatable & { value: string }> => {
       const host = (await mount(
         `<helix-headless-select label="Fruit" name="fruit" ${attrs}>

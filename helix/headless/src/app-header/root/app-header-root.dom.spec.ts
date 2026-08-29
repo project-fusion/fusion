@@ -32,10 +32,10 @@ describe('app header', () => {
 
   /* **Asserted through the event and the attribute list, never `:state()`.**
      happy-dom implements neither `ElementInternals.states` nor the selector, so
-     `matches(':state(scrolled)')` is false in every case: the `toBe(false)`
-     assertions this replaces passed on a component that had stopped working, and
-     the `toBe(true)` ones could not pass at all. The event is the observable
-     half by design, and it is the half a consumer uses. */
+     `matches(':state(scrolled)')` is false in every case: a `toBe(false)` there
+     passes on a component that has stopped working, and a `toBe(true)` cannot
+     pass at all. The event is the observable half by design, and it is the half
+     a consumer uses. */
   test('starts un-scrolled, matching what the server rendered', async () => {
     const header = await mount('<helix-headless-app-header></helix-headless-app-header>')
     expect(header.getAttributeNames()).not.toContain('data-scrolled')

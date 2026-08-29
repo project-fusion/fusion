@@ -1,24 +1,19 @@
 import { ImageResponse } from 'next/og'
 import { findFamily } from '../../../../../../content/catalog/catalog'
 
-/**
+/*
  * The card a component family unfurls with, drawn from what the family already
- * says about itself.
+ * says about itself, so every family unfurls as itself rather than as the front
+ * page.
  *
- * **Eighty-eight routes shared one picture.** The title and the description
- * became per-family when 247 landed, and the card did not, so a link to
- * `Accordion` and a link to `VirtualList` still arrived in a chat window as the
- * same image of the site's own pitch. That is most of the site by count
- * unfurling as though every page were the front page.
- *
- * **Drawn rather than shot, which 255 settled and the reasoning is worth
- * keeping.** The alternative was rendering each family's headline example
- * through Playwright, which puts the real component in the card and costs 88
- * binaries in the repository plus a step that has to re-run whenever a
- * component changes. A card is read at thumbnail size in a message list, where
- * a name set large is legible and a screenshot of a control is a gray smudge.
- * Drawing it also cannot go stale: it reads the same `label`, `summary` and
- * `status` the page does, so a renamed component renames its card.
+ * **Drawn rather than shot.** The alternative was rendering each family's
+ * headline example through Playwright, which puts the real component in the
+ * card and costs 88 binaries in the repository plus a step that has to re-run
+ * whenever a component changes. A card is read at thumbnail size in a message
+ * list, where a name set large is legible and a screenshot of a control is a
+ * gray smudge. Drawing it also cannot go stale: it reads the same `label`,
+ * `summary` and `status` the page does, so a renamed component renames its
+ * card.
  *
  * The type is the fallback stack, for the reason the root card gives:
  * `ImageResponse` wants font bytes handed to it, and loading the brand faces to

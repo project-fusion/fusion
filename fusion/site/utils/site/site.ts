@@ -1,8 +1,8 @@
 /**
  * Where this site lives, once.
  *
- * It was three copies, in `robots.ts`, `sitemap.ts` and the `llms.txt` route,
- * which is three chances for a move to be half made. Nothing here is
+ * `robots.ts`, `sitemap.ts` and the `llms.txt` route all want it, and a copy
+ * apiece is a chance for a move to be half made. Nothing here is
  * environment-dependent on purpose: a sitemap and a `.md` link are statements
  * about the published address, so they say the published address even when a
  * build is running on somebody's laptop.
@@ -12,15 +12,12 @@ export const SITE = 'https://fusion.dev'
 /**
  * The public contact address, once, and the `mailto:` built from it.
  *
- * It was a literal in six places across three files. The contact page alone
- * held it three times, as the `href`, as the text inside that link, and as the
- * value a copy control puts on the clipboard, so what a reader copies could
- * drift from what the link opens and nothing would catch it.
- *
- * 269 found this address refusing every sender outside the domain and 283
- * found mail to it not arriving at all, both of which are faults in the one
- * address the site publishes. A second spelling of it is a third way for the
- * same thing to be wrong, and the only one that is ours to prevent.
+ * The contact page alone needs it three ways, as the `href`, as the text inside
+ * that link, and as the value a copy control puts on the clipboard, so a second
+ * literal lets what a reader copies drift from what the link opens with nothing
+ * to catch it. The one address the site publishes has already been found
+ * refusing outside senders (269) and dropping mail entirely (283); a second
+ * spelling is the one failure of it that is ours to prevent.
  */
 export const EMAIL = 'hello@fusion.dev'
 

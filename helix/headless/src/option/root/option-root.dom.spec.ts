@@ -63,16 +63,16 @@ describe('option', () => {
   })
 
   test('takes the default slot and leaves the other two alone', async () => {
-    /* **The regression this exists for was silent and wide.** `text` read
-       `this.textContent`, so an icon in `start` or a shortcut in `end` was run
-       onto the end of the words. Six things read it: the collapsed field of
-       Select and of Combobox, the listbox filter, Combobox's exact match, its
-       inline completion, and the tag it labels a chosen value with.
+    /* **Never read `this.textContent` for `text`.** It runs an icon in `start`
+       or a shortcut in `end` onto the end of the words, and the failure is
+       silent and wide: six things read `text`, the collapsed field of Select
+       and of Combobox, the listbox filter, Combobox's exact match, its inline
+       completion, and the tag it labels a chosen value with.
 
        Measured on a font picker whose options carried a two-letter specimen in
        `end`, the field read `Noto Sans Linear BAg` and typing `ag` matched
-       1,892 of 1,893 rows. Nothing threw, and the filter looked like it worked
-       for every needle that happened not to occur in the slotted content. */
+       1,892 of 1,893 rows. Nothing throws, and the filter looks like it works
+       for every needle that happens not to occur in the slotted content. */
     const host = (await mount(
       `<helix-headless-option value="save">
          <span slot="start">icon</span>

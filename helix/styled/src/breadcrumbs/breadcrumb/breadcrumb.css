@@ -12,9 +12,9 @@
    * the trigger is inside whatever was slotted. A custom property inherits the
    * rest of the way, and one nothing reads costs nothing.
    *
-   * **The arithmetic is `text * leading`, and it was `1lh` until it had a second
-   * reader.** A custom property is substituted unresolved, so `lh` resolves
-   * against whoever *consumes* it rather than against the crumb that wrote it.
+   * **The arithmetic is `text * leading`, never `1lh`.** A custom property is
+   * substituted unresolved, so `lh` resolves against whoever *consumes* it
+   * rather than against the crumb that wrote it.
    * `IconButton` sets no line-height and inherits the crumb's, so the two agreed
    * and the unit looked portable; `Button` sets `leading-tight`, so the same
    * expression measured 23.59 against links of 27.5, four pixels short and in
@@ -131,27 +131,23 @@
 
 /* The current page reads as where you are, not as somewhere you can go. It is
    text with no element to select, so this is on the host: color and weight
-   inherit into it, where a selector has nothing to match. */
-/* A trail is scanned rather than read, so it carries a step more weight than
-   body copy throughout. The current step used to take a second one, `semibold`
-   over the row's `medium`, and it does not any more.
+   inherit into it, where a selector has nothing to match.
 
-   **The color is what says where you are, and the weight was saying it twice.**
-   `:host([current])` already lifts from `foreground-muted` to `foreground`,
-   which is the louder half of that pair by a distance; the extra step bought
-   little on top of it and cost the one thing the row cannot give up, which is
-   agreeing with itself. A control slotted into a crumb is a `Button`, `Button`
-   is `medium` across the library, and `--button-size`, `--button-padding-inline`
-   and `--button-gap` exist so a trigger takes the crumb's box. Weight was the
-   last axis still disagreeing, and a fourth hook forcing a button to `semibold`
-   would have said "this button is not a button" to win an emphasis the color
-   had already won.
+   A trail is scanned rather than read, so it carries a step more weight than
+   body copy throughout, and `medium` is the whole of it.
 
-   So the trail is `medium` throughout and the current step is the one that is
-   not muted. The measurement the older note carried still holds and is why the
-   row is not `regular`: at `regular` against `foreground-muted` the whole thing
-   sat back far enough that the current crumb was doing all the work of saying
-   there was a trail there. */
+   **The color is what says where you are, and a second weight step says it
+   twice.** `:host([current])` already lifts from `foreground-muted` to
+   `foreground`, which is the louder half of that pair by a distance. `medium`
+   is also what a slotted `Button` takes across the library, and
+   `--button-size`, `--button-padding-inline` and `--button-gap` exist so a
+   trigger takes the crumb's box: a fourth hook forcing a button to `semibold`
+   would say "this button is not a button" to win an emphasis the color has
+   already won.
+
+   Not `regular` either: at `regular` against `foreground-muted` the row sits
+   back far enough that the current crumb does all the work of saying there is a
+   trail there. */
 :host {
   font-weight: var(--helix-weight-medium);
 }
@@ -212,14 +208,14 @@
 }
 
 /* The same hover the slotted path has, because `::slotted(a:hover)` cannot
-   reach this one.
+ * reach this one.
  *
  * That rule matches *assigned* nodes, and a crumb with `href` renders its own
- * anchor in this shadow root, where nothing assigned it. So a trail written the
- * new way lit up on hover in color and stayed flat, while a trail written the
- * old way took a background: two ways to write the same trail, behaving
- * differently, with no error anywhere. Same shape as `CopyButton`'s fallback
- * icons, which rendered at the right color and no size at all.
+ * anchor in this shadow root, where nothing assigned it. Without this rule a
+ * crumb rendering its own anchor lights up on hover in color and stays flat
+ * while a slotted one takes a background: two ways to write the same trail,
+ * behaving differently, with no error anywhere. Same shape as `CopyButton`'s
+ * fallback icons, which rendered at the right color and no size at all.
  *
  * Reading the same hook as the slotted rule, so a consumer overriding one
  * overrides both. */

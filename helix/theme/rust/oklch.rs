@@ -1,17 +1,16 @@
-//! OKLCH color math, ported from `src/oklch.ts`.
+//! OKLCH color math, ported from the TypeScript engine `oracle.json` records.
 //!
 //! Theme derivation depends on a perceptual color space. Equal numeric steps in
 //! sRGB are not equal perceptual steps, which makes both scale generation and
 //! contrast targeting unreliable. Everything here exists so that
 //! [`lightness_for_contrast`] can be correct.
 //!
-//! **This is a port rather than a second implementation, and the difference is
-//! the whole reason 142 calls it a move.** `fit_to_gamut` is a twenty step
-//! bisection and `lightness_for_contrast` searches too, so the iteration count,
-//! the bisection order and the float arithmetic are not details, they are the
-//! answer: two implementations that merely agree on intent disagree on output by
-//! construction. So the loops below are the TypeScript's loop bounds, in its
-//! order, and every constant is copied rather than rederived.
+//! **The arithmetic is fixed, not merely correct.** `fit_to_gamut` is a twenty
+//! step bisection and `lightness_for_contrast` searches too, so the iteration
+//! count, the bisection order and the float arithmetic are not details, they are
+//! the answer: two implementations that merely agree on intent disagree on
+//! output by construction. So the loops below are the TypeScript's loop bounds,
+//! in its order, and every constant is copied rather than rederived. See (142).
 //!
 //! `f64` throughout, because a JavaScript number is one and a port that reached
 //! for `f32` would differ in the last place at exactly the point a bisection is

@@ -21,10 +21,9 @@
   );
   overflow: hidden;
   position: relative;
-  /* The house radius. `Card` wrote the argument and the sweep that applied it
-     everywhere else passed this file by: at `md` the corner is softer than the
-     controls inside it and the container stops receding, which is the one thing a
-     container should do. Everything a callout sits beside is `sm`. */
+  /* The house radius, and everything a callout sits beside is `sm`. At `md` the
+     corner is softer than the controls inside it and the container stops
+     receding, which is the one thing a container should do. */
   border-radius: var(--callout-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   display: flex;
@@ -92,10 +91,8 @@ slot[name="icon"]::slotted(*) {
 slot[name="title"]::slotted(*) {
   color: var(--helix-color-foreground);
   /* Its own line. A slotted `<span>` is inline by default, so the title and the
-     first words of the content ran together as one sentence in two weights,
-     which reads as emphasis rather than as a heading. The title is optional and
-     this costs nothing when it is absent: a bare slot with nothing assigned
-     generates no box, so the content sits exactly where it would have. */
+     first words of the content run together as one sentence in two weights,
+     which reads as emphasis rather than as a heading. */
   display: block;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-semibold);

@@ -85,7 +85,7 @@ const tokens = () =>
  * question worth asking is not "is `--nonsense` a token" but "is
  * `--helix-color-border-subtle` a token", which is the shape an agent produces
  * when it is pattern-matching instead of reading. The mutation list is the set
- * of suffixes `check:css:tokens` keeps catching in stylesheets.
+ * of suffixes `helix component`'s `tokens` keeps catching in stylesheets.
  */
 const plausible = (name, real) => {
   const suffixes = ['-subtle', '-strong', '-muted', '-hover', '-inverse']

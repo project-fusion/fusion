@@ -16,11 +16,10 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @summary A short code, one character to a box.
  *
  * @description
- * **One `<input>` per cell, rather than one input drawn as cells.** Both are
- * built in the wild and the trade is real: a single field autofills perfectly
- * and needs a drawn caret nobody can style well, and separate fields give every
- * box a real focus ring, a real caret and a real tab stop for free. This takes
- * the second, and then closes autofill's gap rather than living with it, below.
+ * **One `<input>` per cell, rather than one input drawn as cells.** A single
+ * field autofills perfectly and needs a drawn caret nobody can style well;
+ * separate fields give every box a real focus ring, a real caret and a real tab
+ * stop for free. Autofill's gap is closed below rather than lived with.
  *
  * **Anything longer than one character is treated as a paste, wherever it
  * lands.** That covers the obvious case and two that are not: a browser
@@ -101,12 +100,11 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * other end is going to reject. A consumer whose codes really do carry
    * marked letters wants `text`, which judges nothing.
    *
-   * **Not reflected**, and it was until this component's own server spec caught
-   * it: nothing selects on it, so all reflection did was write `type="numeric"`
-   * onto every `<helix-pin-input>` ever rendered, an attribute no consumer's
-   * markup had. That is the fault `Input`'s own `type` had and the reason the
-   * area rules carry the sentence "reflect only what CSS selects on". The real
-   * inputs take it as a binding, which is what makes the keyboard follow.
+   * **Not reflected**: nothing selects on it, so reflecting only writes
+   * `type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
+   * no consumer's markup had. The area rules carry the sentence "reflect only
+   * what CSS selects on". The real inputs take it as a binding, which is what
+   * makes the keyboard follow.
    */
   @property()
   type: PinType = 'numeric'
@@ -126,9 +124,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * `mask`, where the cell is a password input and a hand-drawn glyph would
    * have to know that.
    *
-   * Empty by default, because a row of boxes already reads as a row of boxes
-   * and a dot in each is a choice about how much the field should announce
-   * itself before anybody has touched it.
+   * Empty by default, because a row of boxes already reads as a row of boxes.
    */
   @property()
   placeholder = ''
@@ -192,16 +188,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     }
     /* **A code has no holes in it**, so a character cannot land past the end of
        what is already there. Clamped rather than allowed, because the value is
-       one compact string and a gap in the middle of it does not exist: writing
-       four characters into box three of an empty field produced "4321" and
-       showed it in boxes one to four, so the boxes and the value disagreed about
-       where the reader had typed.
-    
-       Clamping is what makes them agree, and it reads correctly in both
-       directions. Pasting a whole code while the caret happens to sit in box
-       three fills from the start, which is what a reader pasting a code means.
-       Pasting two characters into box three of a field with two already in it
-       fills from box three, because that is where the end was. */
+       one compact string and a gap in the middle of it does not exist: unclamped,
+       the boxes and the value disagree about where the reader typed.
+
+       It reads correctly in both directions. Pasting a whole code while the
+       caret happens to sit in box three fills from the start, which is what a
+       reader pasting a code means. Pasting two characters into box three of a
+       field with two already in it fills from box three, because that is where
+       the end was. */
     const start = Math.min(from, this.value.length)
     const characters = this.characters
     for (let at = 0; at < cleaned.length && start + at < this.count; at += 1) {
@@ -251,15 +245,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (at === -1) {
       return
     }
-    /* **An emptied box is a deletion, and this used to be unreachable.** A
-       Backspace in a *filled* box is the browser's own: the keydown handler
-       leaves it alone, the character goes, and `input` arrives carrying "". That
-       fell through to `write`, which returns early on empty, and then `paint`
-       put the character straight back. Pressing Backspace on a full code changed
-       nothing at all, twice in a row, measured with real keystrokes rather than
-       dispatched events, which is why every spec and the whole state audit
-       passed over it.
-    
+    /* **An emptied box is a deletion, and without this branch it is
+       unreachable.** A Backspace in a *filled* box is the browser's own: the
+       keydown handler leaves it alone, the character goes, and `input` arrives
+       carrying "". That falls through to `write`, which returns early on empty,
+       and then `paint` puts the character straight back. Only real keystrokes
+       reproduce it: dispatched events do not, which is why the specs pass over
+       it.
+
        The rest collapse left, which is what the model already requires and what
        a single text field does: "123456" with the 2 deleted is "13456", not a
        hole. Focus stays where the reader was, so the box under the caret now
@@ -331,17 +324,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * The code as it stood when focus arrived, so a visit that changed nothing
    * says nothing.
    *
-   * **This is the platform's reading, and it was the other one until it was
-   * measured.** It held the value at the last *commit*, on the argument that
-   * recognizing an arrival is hard here: this component moves focus itself on
-   * every character, so most `focus` events are ones it caused, and telling
-   * those apart rests entirely on `relatedTarget`. That is true and it is not
-   * an obstacle, because `handleFocusOut` was already doing exactly that guard
-   * one method away. The reasoning had talked itself out of a check it had
-   * already written.
-   *
-   * **What the two readings do to a real browser**, measured in Chromium
-   * against a native `<input>` with real keystrokes:
+   * **Baselined on arrival, not at the last commit**, which is the platform's
+   * reading. What the two do to a real browser, measured in Chromium against a
+   * native `<input>` with real keystrokes:
    *
    * | | native | last commit | on arrival |
    * |---|---|---|---|
@@ -377,13 +362,12 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * Whether focus is currently somewhere inside the row.
    *
    * **The arrival is a transition, not a `relatedTarget` reading**, which is
-   * what the first version of this did and is what the exit still does. It does
-   * not work on the way in for two separate reasons and the second is the one
-   * that decides it. Every character moves focus to the next box, so an
-   * unguarded `focusin` re-baselines on each keystroke and the row can never
-   * report anything: measured, the three commit specs went silent at once. And
-   * `focusin` carries `relatedTarget` in a browser and not in happy-dom, so a
-   * guard written on it is a guard that holds in production and not in the
+   * what the exit still does. `relatedTarget` does not work on the way in for
+   * two reasons and the second decides it. Every character moves focus to the
+   * next box, so an unguarded `focusin` re-baselines on each keystroke and the
+   * row can never report anything: measured, the three commit specs went silent
+   * at once. And `focusin` carries `relatedTarget` in a browser and not in
+   * happy-dom, so a guard written on it holds in production and not in the
    * specs, which is the worse half. This flag needs neither: entering is
    * `focusin` while it is `false`, and nothing else is.
    */
@@ -404,16 +388,15 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * Commits when focus leaves the row, which is the moment every other field in
-   * the library has and this one did not.
+   * Commits when focus leaves the row.
    *
    * `change` is one of the two events `MixinField` reads as "the reader has had
-   * a go at this", so a code that was never completed was never `touched` and
-   * its own `tooShort` message could not show: two boxes of four filled and
-   * tabbed away from was answered with nothing at all. `Input` gets this for
-   * free by relaying its control's own `change`; here the cells each fire one,
-   * none of them means the code is entered, and neither does any single one of
-   * them mean the reader has left.
+   * a go at this", so without this a code that was never completed is never
+   * `touched` and its own `tooShort` message cannot show: two boxes of four
+   * filled and tabbed away from is answered with nothing at all. `Input` gets
+   * this for free by relaying its control's own `change`; here the cells each
+   * fire one, none of them means the code is entered, and neither does any
+   * single one of them mean the reader has left.
    *
    * **Focus leaving the row, and not a cell.** Every character moves focus to
    * the next box, so a per-cell blur would commit on every keystroke, which is
@@ -431,11 +414,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * Announces the code as entered, from whichever moment reached it first.
    *
    * **One writer, because the fact has two moments and only one meaning.** A
-   * filled code and a row being left are both "the reader is done with this",
-   * and they were two dispatch sites kept from disagreeing by both remembering
-   * to update `committed`. They are one call now, so a third moment cannot be
-   * added that fires without baselining, which is the way the pair would have
-   * drifted.
+   * filled code and a row being left are both "the reader is done with this".
+   * Dispatching from either site directly is how a moment gets added that fires
+   * without baselining.
    *
    * Silent when nothing moved since the baseline, which is what makes it safe
    * to call from both: completing a code that is already the committed one, or
@@ -456,11 +437,10 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * Reports the code and a verdict on it.
    *
    * **A half-entered code is invalid whether or not it is required, and that is
-   * the platform's answer rather than ours.** It looked like an oversight worth
-   * a question: `required` guards `valueMissing` and nothing guards `tooShort`,
-   * so an optional code is refused for being half filled. Measured in Chromium
-   * against a native `<input minlength="4">` with real keystrokes, which is the
-   * feature this is the same shape as:
+   * the platform's answer rather than ours.** `required` guards `valueMissing`
+   * and nothing guards `tooShort`, so an optional code is refused for being half
+   * filled. Measured in Chromium against a native `<input minlength="4">` with
+   * real keystrokes, which is the feature this is the same shape as:
    *
    * | | optional | required |
    * |---|---|---|

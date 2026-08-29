@@ -28,17 +28,13 @@ export class HelixLoader extends HelixHeadlessLoader {
   /**
    * How the waiting is drawn.
    *
-   * Unset is the turning arc, which is what most waits want and what this
-   * component was called for years.
+   * Unset is the turning arc, which is what most waits want.
    *
    * `pulse` takes the arc away and lets the middle carry the motion on its own:
    * the ring stays as the quiet outline and swells, and whatever is slotted
    * swells with it, in step. It is the shape for a wait that has a mark to
    * show, a splash or a first paint behind a wordmark, where a rotating rim
    * around a logo reads as chrome bolted to the brand.
-   *
-   * That the component can now be drawn without anything spinning is why it is
-   * no longer called Spinner: the old name described one appearance of two.
    */
   @property({ reflect: true })
   variant?: 'pulse'

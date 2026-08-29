@@ -36,15 +36,12 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
   /**
    * How the group separates itself from the page.
    *
-   * **Classified by what it does rather than by what its values were called.**
-   * These were `filled` and `plain` under `appearance`, and `filled` reads like
-   * a fill weight, which is how it came to be listed as emphasis when the axes
-   * were first sorted. The stylesheet settles it: what `plain` drops is the
-   * background *and* the border, so this is where the group ends, not how much
-   * ink it claims. `outlined` because the frame is a border over the group's
-   * own ground, exactly as a Card's is; the track's sunken fill stays either
-   * way, being a groove for the thumb to sit in rather than a way of being
-   * seen.
+   * Separation rather than emphasis, because what `plain` drops is the
+   * background *and* the border: the question is where the group ends, not how
+   * much ink it claims. `outlined` because the frame is a border over the
+   * group's own ground, exactly as a Card's is; the track's sunken fill stays
+   * either way, being a groove for the thumb to sit in rather than a way of
+   * being seen.
    */
   @property({ reflect: true })
   separation?: 'outlined' | 'plain'

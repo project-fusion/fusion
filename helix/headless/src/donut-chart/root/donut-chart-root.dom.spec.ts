@@ -115,19 +115,14 @@ describe('donut chart', () => {
     expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
   })
 
-  /* **The caption fallback is not asserted here any more, and the assertion went
-     with the behavior rather than ahead of it.** The plot carried
-     `title=${named}`, which on an element that is `aria-hidden="true"` is a
-     mouse tooltip and not an accessible name: nothing reading this page with
-     assistive technology ever heard it, and the table it was drawn from is the
-     readable form by design. The attribute was removed from every chart family
-     in one sweep and `title=${named}` now appears in no chart source at all;
-     these two specs were what the sweep left behind.
+  /* **No `title` on the plot, and so nothing here asserting one.** On an element
+     that is `aria-hidden="true"` a `title` is a mouse tooltip and not an
+     accessible name, so no assistive technology ever hears it, and the table it
+     was drawn from is the readable form by design.
 
-     What the fallback itself does is still asserted, in
-     `mixin-chart-source.dom.spec.ts`: "is the table's own caption where the
-     consumer said nothing". That is the fact worth keeping, and it is kept
-     where the one implementation lives rather than in each family. */
+     What the caption fallback does is asserted in
+     `mixin-chart-source.dom.spec.ts`, where the one implementation lives rather
+     than in each family. */
 
   test('a whole of nothing draws no slices rather than dividing by zero', async () => {
     const empty = `<table id="empty">
@@ -181,10 +176,9 @@ describe('donut chart hole', () => {
   const radius = (host: HTMLElement): number => Number(segments(host)[0]?.getAttribute('r') ?? 0)
 
   test('the outer edge holds at 40 whatever the thickness, so nothing clips', async () => {
-    /* The bug this replaced: a fixed `r=40` with the stroke astride it grew
-       outward as well as inward, so a thickness past 20 crossed the view box
-       and was cut with nothing to say so. Derived, `r + thickness / 2` is 40
-       for every value. */
+    /* A fixed `r=40` with the stroke astride it grows outward as well as
+       inward, so a thickness past 20 crosses the view box and is cut with
+       nothing to say so. Derived, `r + thickness / 2` is 40 for every value. */
     for (const [hole, thickness] of [
       ['small', 26],
       ['', 16],
@@ -199,8 +193,7 @@ describe('donut chart hole', () => {
   test('`none` closes the hole entirely, which is a pie', async () => {
     const host = await chart(TRAFFIC, 'for="traffic" hole="none"')
     /* Inner edge at the center: `r - thickness / 2` is zero, which solves to
-       `r = EDGE / 2` and not to `r = 0`. A radius of zero draws nothing, and
-       that was the first version of this arithmetic. */
+       `r = EDGE / 2` and not to `r = 0`. A radius of zero draws nothing. */
     expect(radius(host)).toBeCloseTo(20, 6)
     expect(radius(host) - 40 / 2).toBeCloseTo(0, 6)
   })

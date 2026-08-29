@@ -71,9 +71,9 @@ describe('table columns', () => {
 
   test('the track list comes from the columns', async () => {
     /* Declared together, because a heading and a width are two facts about one
-       column. Held apart they could disagree, and the old shape could not even
-       report it: `columns` took CSS, so a wrong value was an invalid track list,
-       which a grid ignores in silence. */
+       column. Held apart they can disagree with nothing to report it: `columns`
+       takes CSS, so a wrong value is an invalid track list, which a grid
+       ignores in silence. */
     expect(template(await table())).toContain('12rem minmax(max-content, 1fr)')
   })
 

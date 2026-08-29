@@ -139,8 +139,7 @@ export class HelixHeadlessMeter extends HelixElement {
    *
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
    * `data-band` on the fill, because that is the element being colored, so
-   * reflecting here would write an attribute onto the host for no reader. Third
-   * time this rule has caught something today.
+   * reflecting here would write an attribute onto the host for no reader.
    */
   @property()
   band?: MeterBand
@@ -209,15 +208,12 @@ export class HelixHeadlessMeter extends HelixElement {
   /**
    * Where the value really sits, which is what the words report.
    *
-   * **A value past the end used to be swallowed twice.** The bar filled and the
-   * reading said "100%", so 110 and 250 were indistinguishable from exactly
-   * full, measured. A meter that cannot say "you are over" is worse than no
-   * meter for the one case anybody checks it in, and it is the same fault as a
-   * pagination reporting a page it is not on: the number shown and the number
-   * given disagree, quietly.
+   * **Unclamped, so a value past the end is not swallowed.** Clamped as well as
+   * the bar is, 110 and 250 read as exactly full, and a meter that cannot say
+   * "you are over" is worse than no meter for the one case anybody checks it in.
    *
    * The bar still stops at its end, because that is what an end is. The words
-   * and the accessible reading carry the truth, and `data-over` is on the fill
+   * and the accessible reading carry the truth, and `data-beyond` is on the fill
    * so a consumer can say more about it.
    */
   private get ratio(): number {
@@ -289,8 +285,6 @@ export class HelixHeadlessMeter extends HelixElement {
     this.internals.ariaValueMin = String(min)
     this.internals.ariaValueMax = String(max)
     this.internals.ariaValueNow = String(this.reading)
-    /* Spoken instead of the number wherever the consumer gave words, which is
-       what `value-text` is for: "18 GB of 32 GB" rather than "56". */
     /* The consumer's words where they gave any, and otherwise nothing at all
        *unless* the value is past an end. `ariaValueNow` has to sit inside the
        range, so it is the only place a reader can be told that 250 is not 100. */

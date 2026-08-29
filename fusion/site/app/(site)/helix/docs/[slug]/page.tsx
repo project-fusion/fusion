@@ -11,15 +11,10 @@ import prose from '../docs-prose.module.css'
 /**
  * One documentation page.
  *
- * **These were written and never rendered.** Forty-one pages, a registry with
- * `parent`, `pinned` and `path` on it, a navigation function with specs, and
- * `/helix/docs/tokens.md` answering 200 while `/helix/docs/tokens` answered
- * 404. Everything this needed existed; nothing was pointing at it.
- *
  * The body is MDX compiled at build, the same way `/thesis` and the essays are,
  * and the source arrives as a string from the package rather than as a path,
- * because a content package that read the filesystem would put back the
- * tracing this app spent two commits removing.
+ * because a content package that read the filesystem would put back the file
+ * tracing this app does without.
  */
 export function generateStaticParams(): { slug: string }[] {
   return pages.map((page) => ({ slug: page.slug }))

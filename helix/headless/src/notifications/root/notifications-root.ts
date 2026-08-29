@@ -14,26 +14,22 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @summary A feed a reader comes back to, made of notifications they may not have seen.
  *
  * @description
- * **Slotted children rather than a data property**, which is the opposite of the
- * choice `helix-data-table` made and correct for the opposite reason. A table's
- * rows are homogeneous values a consumer wants windowed; a notification is a
- * small piece of somebody's own markup, with an avatar and a link and a button
- * in it, and there are tens of them rather than thousands. Writing them out is
- * the web-component reading of a list and lets an item hold anything.
+ * **Slotted children rather than a data property.** A notification is a small
+ * piece of somebody's own markup, with an avatar and a link and a button in it,
+ * and there are tens of them rather than thousands, so writing them out lets an
+ * item hold anything.
  *
- * **The cost is stated rather than discovered: this does not virtualize, and it
- * cannot.** Windowing needs the list to own the data, and here the consumer owns
- * it: N notifications is N elements by construction. That is the same trade
- * `25-data-table.md` §2.2 rejected for a table and accepts here, because the
- * sizes are not comparable. A feed that really does hold thousands wants a data
- * table with a custom cell, and this component will not grow into one.
+ * **This does not virtualize, and it cannot.** Windowing needs the list to own
+ * the data, and here the consumer owns it: N notifications is N elements by
+ * construction. A feed that really does hold thousands wants a data table with a
+ * custom cell, and this component will not grow into one.
  *
  * **Read state is reported, never invented.** Marking read is usually a round
  * trip: this element asks its items and each item asks the consumer, so a
  * refused `helix-read` leaves everything alone and a consumer who owns `read`
  * sees nothing change until they say so. `unread` is derived from the items and
- * reflected, so a stylesheet and a badge can both read it without either of them
- * counting.
+ * written to an attribute, so a stylesheet and a badge can both read it without
+ * either of them counting.
  *
  * @since 0.1.0
  * @status experimental
@@ -91,17 +87,15 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   /**
    * How many items are unread, counted from the items themselves.
    *
-   * Read-only for the reason it is derived: a count the consumer could set is a
-   * second source of truth for something the items already know, and the first
-   * time the two disagreed the badge would be right and the list would not.
+   * Read-only because it is derived: a count the consumer could set is a second
+   * source of truth for something the items already know.
    *
-   * **The attribute is written in `updated` rather than reflected, and the
-   * difference is a bug that shipped.** `@property({ reflect: true })` on a
-   * getter with no setter reflects once: Lit reflects what is in
-   * `changedProperties`, and nothing puts a derived getter there after the first
-   * update. Measured with two items, one marked read: the property answered 1
-   * and the attribute still said 2, so a badge reading the attribute showed a
-   * count for an item the reader had just opened.
+   * **The attribute is written in `updated`, never reflected.**
+   * `@property({ reflect: true })` on a getter with no setter reflects once: Lit
+   * reflects what is in `changedProperties`, and nothing puts a derived getter
+   * there after the first update. Measured with two items, one marked read: the
+   * property answered 1 and the attribute still said 2, so a badge reading the
+   * attribute showed a count for an item the reader had just opened.
    */
   get unread(): number {
     return this.items.filter((item) => !item.read).length
@@ -111,7 +105,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   get items(): HelixHeadlessNotification[] {
     /* `?? []` is the server. Lit's element shim carries attributes and not a
        tree, so `children` is undefined there, and this getter is reached from
-       `unread`, which is reflected and therefore read during the first update. */
+       `unread` during the first update. */
     return [...(this.children ?? [])].filter(
       (child): child is HelixHeadlessNotification =>
         'isNotification' in child && child.isNotification === true,
@@ -195,11 +189,11 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    *
    * **A fact no item can answer for itself**, which is why it is here. An item
    * knows about its own media slot and nothing about its neighbors, so a feed
-   * where some rows have an avatar and some do not drew two different left
-   * edges for its text and had no way to notice: measured on a four item feed,
-   * the rows without media started their text 32 pixels to the left of the rows
-   * with it. The styled tier turns this into a width; this tier ships no
-   * stylesheet and is unaffected.
+   * where some rows have an avatar and some do not draws two different left
+   * edges for its text: measured on a four item feed, the rows without media
+   * started their text 32 pixels to the left of the rows with it. The styled
+   * tier turns this into a width; this tier ships no stylesheet and is
+   * unaffected.
    *
    * Read off the light DOM rather than off the items, so it does not depend on
    * which children have upgraded by the time this runs.
@@ -214,16 +208,14 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   /**
    * Says on each region whether anything is in it.
    *
-   * **The stylesheet used to ask, and could not.** The rule read
-   * `[part="header"]:not(:has(> slot:has(*)))`, which is two faults at once.
-   * `:has()` may not be nested inside `:has()`, so the selector fails to parse
-   * and the whole rule is discarded; and a slot's assigned nodes are not its DOM
-   * children, so `slot:has(*)` reports whether the slot has *fallback* rather
-   * than whether a consumer filled it, and would have been false either way.
-   * Both verified in a browser: `insertRule` throws a `SyntaxError` on the
-   * first, and an assigned element still leaves `slot.matches(':has(*)')` false.
-   * A feed with no header drew its rule under nothing, and one with no footer
-   * drew another over nothing.
+   * **A stylesheet cannot ask this, and the obvious selector fails twice over.**
+   * `[part="header"]:not(:has(> slot:has(*)))`: `:has()` may not be nested
+   * inside `:has()`, so the selector fails to parse and the whole rule is
+   * discarded; and a slot's assigned nodes are not its DOM children, so
+   * `slot:has(*)` reports whether the slot has *fallback* rather than whether a
+   * consumer filled it, and would have been false either way. Both verified in a
+   * browser: `insertRule` throws a `SyntaxError` on the first, and an assigned
+   * element still leaves `slot.matches(':has(*)')` false.
    *
    * `slotFilled` is what the rest of the library already asks with. It is said
    * on the region inside this shadow root rather than on the host, because an
@@ -232,7 +224,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   private markEmpty(): void {
     /* The header is not empty while this element is drawing its own control into
-       it, which is the case the old selector spelled with a second `:not`. */
+       it. */
     this.markRegion('header', ['header'], '[part="mark-all"]')
     this.markRegion('footer', ['footer'])
   }
@@ -260,21 +252,18 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     super.updated(changed)
     /* Before `markEmpty`, which reads what is assigned: on a feed with no items
        nothing else ever schedules a second update, so a header asked about
-       before its slot was filled stayed hidden for the life of the element. The
-       empty feed is the one state where the header is the only thing on screen,
-       and it was the one state that lost it. */
+       before its slot was filled stays hidden for the life of the element. The
+       empty feed is the one state where the header is the only thing on screen. */
     this.assign()
     this.markEmpty()
     this.markMedia()
     /* Written after the render rather than reflected during it, so it follows
-       every change rather than only the first, and so the server's output and a
-       hydrating consumer's markup agree that neither has it yet. */
-    /* **Zero is the absence of the attribute, not `unread="0"`.** Writing it at
-       rest put an attribute on the host that a consumer's server never sent, and
-       the comment above claimed the opposite: writing in `updated` is not "after
-       hydration", it is the same microtask checkpoint `firstUpdated` runs in,
-       which is exactly how `data-settled` was a bug on three routes. Only a
-       departure from resting writes. */
+       every change rather than only the first.
+
+       **Zero is the absence of the attribute, not `unread="0"`.** Writing it at
+       rest puts an attribute on the host that a consumer's server never sent,
+       and `updated` is no later than hydration: it is the same microtask
+       checkpoint `firstUpdated` runs in. Only a departure from resting writes. */
     const unread = this.unread > 0 ? String(this.unread) : null
     if (this.getAttribute('unread') !== unread) {
       if (unread === null) {

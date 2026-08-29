@@ -9,15 +9,13 @@
      `raised` is the token for that, and it is decided by what is behind the
      pill rather than by what the pill is. A default tab strip has no track: the
      pill lies *on* whatever surface the set was put on, which on a white page
-     means it has to be a step darker to be seen at all. `overlay` was tried
-     here and is wrong for exactly that reason, and it was wrong twice, because
-     the sandbox's panel strip states `background` on itself, so a white pill on
-     a white strip came out as its shadow and nothing else.
+     means it has to be a step darker to be seen at all. `overlay` is wrong here
+     for exactly that reason, and wrong again because the sandbox's panel strip
+     states `background` on itself, so a white pill on a white strip comes out as
+     its shadow and nothing else.
 
      The grooved appearance below takes `overlay` instead, which is the same
-     split the segmented control makes and for the same reason. Where a comment
-     here used to claim `raised` was "the same white as `surface` in light", it
-     was describing a value the token had stopped carrying. */
+     split the segmented control makes and for the same reason. */
   --_tabs-rule: none;
   --_tab-radius: var(--helix-radii-sm);
   --_tab-selected-shadow: var(--helix-shadow-sm);
@@ -28,10 +26,10 @@
      1fr)` rather than `1fr`, because a `1fr` track keeps an automatic minimum
      and refuses to shrink under its content, which is the whole question here.
 
-     It was `display: block`, and then a height on the host meant nothing: the
-     panels sized to their content and overflowed it. A tab set given 12rem is
-     12rem. With no height set, the row still sizes to content, so a tab set
-     that was laying itself out is laying itself out the same way. */
+     A grid rather than `display: block`, under which a height on the host means
+     nothing and the panels size to their content and overflow it. A tab set
+     given 12rem is 12rem, and with no height set the row still sizes to
+     content. */
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
 }
@@ -40,9 +38,8 @@
  *
  * A border is outside the padding box, and this strip has `overflow-x: auto` so
  * a wide tab set can scroll. Overflow clips at the padding box, so a tab pulled
- * down onto a border had its own border clipped away: at `thick` it stood proud
- * of the rule and at `thin` it disappeared. Two attempts, both wrong for the
- * same reason.
+ * down onto a border has its own border clipped away: at `thick` it stands
+ * proud of the rule and at `thin` it disappears.
  *
  * A background paints inside the element's own box and is not clipped by its
  * overflow. Drawn as a gradient in the last pixel of the content box, the rule
@@ -86,10 +83,10 @@
   --_tab-selected-surface: var(--helix-color-surface-overlay);
 
   /* The control is the height of a control, and the tabs are what is left
-     inside it. It was the other way round: the tab took the full forty and the
-     track's padding and border were added outside it, so this appearance stood
-     ten pixels taller than every button beside it and than the toggle group it
-     is meant to match. The same fix Toggle Group carries, and the same reason
+     inside it. The other way round, with the tab taking the full forty and the
+     track's padding and border added outside it, this appearance stands ten
+     pixels taller than every button beside it and than the toggle group it is
+     meant to match. The same fix Toggle Group carries, and the same reason
      `100%` rather than arithmetic: it resolves against the track's content box,
      so the padding and the border are subtracted by the box model instead of by
      a number here that would have to be kept in step with them. */
@@ -151,13 +148,11 @@
    * offset is the appearance's own shift from there, nothing for a pill filling
    * the tab and the tab's height for a bar under it.
    *
-   * It used to be the offset alone, and the measured `y` was written by
-   * `place()` and read by nothing. That is invisible wherever the tabs fill
-   * their strip, which is every appearance's own layout and every example, and
-   * wrong the moment anything gives the strip height of its own: the sandbox's
-   * panel puts 32px tabs in a 48px row, so the pill drew seven and a half
-   * pixels above the label it was marking. A value computed and never used is
-   * the tell, and it sat there through the whole of the indicator work. */
+   * Both terms, never the offset alone. Dropping the measured `y` is invisible
+   * wherever the tabs fill their strip, which is every appearance's own layout
+   * and every example, and wrong the moment anything gives the strip height of
+   * its own: the sandbox's panel puts 32px tabs in a 48px row, and the pill then
+   * draws seven and a half pixels above the label it is marking. */
   translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--_indicator-offset, 0px));
   /* It slides and then settles: `emphasized` overshoots slightly and comes
      back, which is the breath. Width and position move together, so a mark
@@ -221,12 +216,8 @@
 }
 
 /* The default is a pill too, so it travels for the same reason. All three
-   appearances are now one mark that moves and differ only in its shape: a bar
-   on the rule, a pill on the page, a pill in a groove.
-
-   `raised` rather than `overlay` here, because this pill lies *on* the page
-   with nothing framing it, where the segmented one sits inside a sunken track.
-   The same distinction the rest of the library makes. */
+   appearances are one mark that moves and differ only in its shape: a bar on
+   the rule, a pill on the page, a pill in a groove. */
 :host(:not([variant])) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
   /* **`overlay` with an edge, not `raised`.** This pill lies on the page with

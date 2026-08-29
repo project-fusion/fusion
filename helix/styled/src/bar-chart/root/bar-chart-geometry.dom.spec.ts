@@ -62,8 +62,7 @@ if (hasLayout()) {
          so `getBBox` immediately after the update reports the *used* height,
          which is zero, while the `height` attribute already holds the answer.
          Measured in Chrome: attribute 44.44, bbox 0, two transitions running;
-         once they finish, bbox 44.44. The old form read the first of those and
-         reported a bar chart that draws nothing. */
+         once they finish, bbox 44.44. */
       await settled(bar)
       expect(bar.getBBox().height).toBeGreaterThan(0)
     })

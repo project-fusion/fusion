@@ -11,14 +11,6 @@ import styles from './prose.module.css'
 /*
  * What MDX renders its elements as, for every prose surface on this site.
  *
- * **MDX was rendering bare HTML and nothing was mapping it.** `renderMdx` took
- * no components, so a fenced block came out as `<pre><code>` with no
- * highlighting and no way to take the code, and a table came out as a `<table>`
- * styled by nine lines of CSS beside the component the same site uses for every
- * API reference. The base layer was carrying the rest through `[data-prose]`,
- * which is what made the gap invisible: the pages looked deliberate rather than
- * unmapped.
- *
  * **Every element markdown emits maps to a component, where the library has
  * one.** Prose the design system renders is not the case `[data-prose]` was
  * written for: that exists for markup nobody here controls, a CMS or a README,
@@ -26,13 +18,12 @@ import styles from './prose.module.css'
  * it does not use is arguing against itself on every page.
  *
  * **`a` maps to an anchor rather than to a component**, because there is no Link
- * family: links are a base-layer recipe keyed `data-link`. The note here used to
- * say the anchor carried that attribute already and it did not. Nothing put it
- * there, no plugin added one, and the only `data-link` in this package was that
- * sentence. It was invisible because `:where([data-prose] a)` and `[data-link]`
- * share a declaration block in `preview.css`, so a prose link had the base
- * appearance without the base's attribute, and every check that could have
- * noticed reads the source rather than the document.
+ * family: links are a base-layer recipe keyed `data-link`, and the attribute has
+ * to be written here. An anchor missing it looks correct and is not:
+ * `:where([data-prose] a)` and `[data-link]` share a declaration block in
+ * `preview.css`, so a prose link takes the base appearance without the base's
+ * attribute, and every check that could notice reads the source rather than the
+ * document.
  *
  * `subtle` rather than the base variant. The base is the accent, which is right
  * for a link a reader is being sent to and wrong for prose, where a paragraph
@@ -81,7 +72,7 @@ type Fence = ReactElement<{ children?: ReactNode; className?: string }>
  *
  * The text and the language come off the `code` element MDX nests inside the
  * `pre`, which is where remark puts both. A fence whose language has no grammar
- * renders its text as a child rather than as markup: `text` and the unlabelled
+ * renders its text as a child rather than as markup: `text` and the unlabeled
  * ones are code, they are just not code anything here can parse, and passing
  * them through the highlighter would hand back the input with no spans in it
  * while claiming otherwise.
@@ -143,36 +134,6 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
   return heading ? children : <helix-table-row>{children}</helix-table-row>
 }
 
-/*
- * The table itself, and nothing around it.
- *
- * **It had a wrapper carrying `overflow-x: auto`, copied from `.apiTable` on the
- * component pages, and for a markdown table that wrapper can never do
- * anything.** `[part="table"]` is `inline-size: 100%` and a column with no
- * declared width takes `minmax(0, 1fr)`, a track that may shrink below its own
- * content, so the grid cannot exceed its container at any width. Measured on
- * the widest table in the documentation at 1280, 900, 600 and 420: `scrollWidth`
- * equalled `clientWidth` every time.
- *
- * **`.apiTable` is not the same case and keeps its wrapper.** Those tables
- * declare fixed column widths summing to 650px, so they genuinely overflow and
- * genuinely scroll: measured, 650 against a 324 container at 420. The
- * difference is the tracks, not the markup, which is exactly why copying the
- * wrapper across brought none of its behavior with it.
- *
- * Putting the attribute on the element rather than a parent would have been
- * just as inert, and it is where it would belong if these ever do need to
- * scroll, since the host is the box that would move.
- *
- * The squeeze is real and is a separate thing. A long token value in a narrow
- * column wraps, and making it scroll instead means changing the tracks too:
- * under intrinsic sizing `1fr` gives every column the width of the widest, so
- * the same table came out 4261 wide with all three columns equal, which is
- * worse to read than the wrap.
- *
- * No `label`. A markdown table has no caption to take one from, and inventing
- * one would put a name on the table that the page never says out loud.
- */
 /** Every string under a node, which is what decides how wide its column is. */
 const textOf = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === 'boolean') {
@@ -290,23 +251,12 @@ const tracksOf = (children: ReactNode): string | undefined => {
 /**
  * The table itself, and nothing around it.
  *
- * It had a wrapper carrying `overflow-x: auto`, copied from `.apiTable` on the
- * component pages, and for a markdown table that wrapper could never do
- * anything: `[part="table"]` is `inline-size: 100%` and every column was
- * `minmax(0, 1fr)`, so the grid could not exceed its container at any width.
- * Measured at 1280, 900, 600 and 420, `scrollWidth` equalled `clientWidth`
- * every time.
- *
- * `.apiTable` is not the same case and keeps its wrapper: those tables declare
- * fixed column widths summing to 650px, so they genuinely overflow and
- * genuinely scroll. The difference is the tracks rather than the markup, which
- * is why copying the wrapper across brought none of its behavior with it.
- *
- * **Now that a track can be `max-content`, the grid can genuinely outgrow its
- * container**, on a narrow screen or a table of long names, so the host takes
- * the overflow. On the element rather than a parent, which is where it belongs:
- * the host is the box that moves. It costs nothing while everything fits, since
- * `auto` shows no scrollbar until there is something to scroll.
+ * **The overflow belongs on the host, never on a wrapper around it.** A track
+ * can be `max-content` here, so the grid can genuinely outgrow its container on
+ * a narrow screen or a table of long names, and the host is the box that moves.
+ * A wrapper reaches nothing: `[part="table"]` is `inline-size: 100%`, so the box
+ * a wrapper would scroll never exceeds it. It costs nothing while everything
+ * fits, since `auto` shows no scrollbar until there is something to scroll.
  *
  * No `label`. A markdown table has no caption to take one from, and inventing
  * one would put a name on the table that the page never says out loud.
@@ -354,9 +304,8 @@ const slugOf = (node: ReactNode): string => slugify(textOf(node))
 /**
  * A heading, at the level markdown asked for, with a link to itself.
  *
- * The link is what makes a section shareable, which prose had no way to be:
- * headings carried no `id` at all, so the only address a reader could send was
- * the whole page.
+ * The link is what makes a section shareable: with no `id` on a heading, the
+ * only address a reader can send is the whole page.
  *
  * `aria-hidden` on the mark and a label on the link, so a screen reader hears
  * "link, Section name" once rather than the heading text followed by a hash.
@@ -433,13 +382,11 @@ export const PROSE_COMPONENTS = {
  * A numbered list in the component documentation is a list of steps and wants
  * the platform's marker beside the words, so the two cannot share one map.
  *
- * **A spread over `PROSE_COMPONENTS` and never a map of its own.** `renderMdx`
- * passes its components centrally because it once passed none, and every fenced
- * block on all five surfaces came out an unhighlighted `<pre>`. A second map
- * written from scratch is that failure with more steps: it would be a map that
- * drifts one element at a time. Spreading keeps the property the central pass
- * was protecting, which is that no surface can render with less than the base
- * map, while letting one element differ deliberately.
+ * **A spread over `PROSE_COMPONENTS` and never a map of its own.** A second map
+ * written from scratch drifts one element at a time, and an element that falls
+ * out of it renders as bare markdown HTML rather than as an error. Spreading
+ * keeps the property that matters, which is that no surface can render with less
+ * than the base map, while letting one element differ deliberately.
  */
 export const DOCUMENT_COMPONENTS = {
   ...PROSE_COMPONENTS,

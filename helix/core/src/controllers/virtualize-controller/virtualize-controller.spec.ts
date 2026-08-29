@@ -142,10 +142,9 @@ describe('what it asks the host to do', () => {
  * rows, 379 rows lay out as 11831 pixels, 11831 reads as 378, and 378 lay out
  * as 11842. Two-and-a-half thousand passes in eight seconds, forever.
  *
- * **The two heights are the measured ones rather than a row height chosen to
- * produce them.** A first attempt gave the rows a plausible 18.7 pixels each
- * and it *converged*, in nine passes, warning about nothing: the fault is the
- * cycle, and a stub that only approximates the physics does not have one.
+ * **The two heights are the measured ones, never a row height chosen to produce
+ * them.** The fault is the cycle, and a stub that only approximates the physics
+ * converges instead and warns about nothing.
  */
 const CYCLE = { at378: 11_842, at379: 11_831 }
 

@@ -18,7 +18,7 @@
  *   `helix-disclosure::part(trigger)` is the form an override example takes.
  * - **A token, and a per-component hook.** `--helix-color-border-subtle`
  *   resolves to nothing and the property silently falls back, which is the same
- *   failure `check:css:tokens` already catches in CSS and could not see in prose. A
+ *   failure `helix component`'s `tokens` already catches in CSS and could not see in prose. A
  *   hook is held only where its prefix is a real family, because a page
  *   legitimately shows a consumer's own properties: `--site-cta-inline-size` and
  *   `--brand-blue-500` are the reader's to name and not ours to verify.

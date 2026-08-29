@@ -9,7 +9,7 @@
  * in it is a thing you are meant to see, and an icon button rests as a ghost,
  * because a toolbar of framed squares is a toolbar of boxes. So the resting
  * emphasis here is `ghost` and the resting ink is muted, lifting to the full
- * foreground under a pointer, which is what the old bare rules did.
+ * foreground under a pointer.
  *
  * A tone replaces both inks with itself: a danger icon button is red at rest
  * and red under the pointer, and dimming it would say the destructive one is
@@ -30,8 +30,8 @@
    * ramp, and what put this control's glyph at 3.20 against its own fill on the
    * contact page while the `Button` sharing its edge sat at 6.44.
    *
-   * Defaulted to the tone, which is what neutral wants and what this rule did
-   * before there were two of them, so nothing untoned moves. */
+   * Defaulted to the tone, which is what neutral wants, so nothing untoned
+   * moves. */
   --_icon-button-fill: var(--_icon-button-tone);
   --_icon-button-fill-hover: var(--_icon-button-tone-hover);
   --_icon-button-on-tone: var(--helix-color-background);
@@ -52,13 +52,13 @@
   --_icon-button-tone: var(--helix-color-primary);
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
 }
-/* **The second emphasis, and it arrives with the shared surface.**
+/* **Another tone, and it arrives with the shared surface.**
  *
- * `tone` moved to `MixinControlSurface`, which `Button` and `CopyButton` take
+ * `tone` lives in `MixinControlSurface`, which `Button` and `CopyButton` take
  * as well, and Button's union has always carried `accent`: a rotation off the
  * brand seed rather than a color of its own, so it stays in relation when
- * somebody rethemes. Nothing about it was ever specific to a control with words
- * in it, and an icon button doing a second emphasized action wanted it.
+ * somebody rethemes. Nothing about it is specific to a control with words in
+ * it, and an icon button doing a second emphasized action wants it.
  *
  * Written here rather than only widened in the type, because a value a
  * stylesheet does not answer is the quietest kind of broken: valid to write,
@@ -144,18 +144,16 @@
 /* A wash of the foreground, not a rung on the surface ladder.
  *
  * `surface-raised` is the same neutral as `surface-overlay` in dark mode, so
- * the hover vanished inside a menu, a dialog or a popover, which is where most
+ * the hover vanishes inside a menu, a dialog or a popover, which is where most
  * icon buttons live. A percentage of the foreground is a step away from
  * whatever it sits on in either mode, which is the argument the button recipe
- * in the base layer already makes for exactly this. */
-/* Every hover is gated on the control being live.
+ * in the base layer already makes for exactly this.
  *
- * Disabled said `cursor: not-allowed` and half the opacity and nothing else, so
- * the fill still deepened under the pointer: a button that refuses the press and
- * lights up as though it took it. `:not(:disabled)` rather than
- * `:not([disabled])`, for the reason the disabled rule below records: the
- * pseudo-class also matches a control inside a `<fieldset disabled>`, which the
- * attribute never sees. */
+ * Every hover is gated on the control being live, or a button that refuses the
+ * press still deepens under the pointer as though it took it. `:not(:disabled)`
+ * rather than `:not([disabled])`, for the reason the disabled rule below
+ * records: the pseudo-class also matches a control inside a
+ * `<fieldset disabled>`, which the attribute never sees. */
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 8%, transparent);
   color: var(--_icon-button-ink-hover);
@@ -194,8 +192,7 @@
  * Every one names its own hover, including where the fill does not move. The
  * generic hover is four class-equivalents and an emphasis rule is three, so
  * an emphasis without a hover of its own loses its fill the moment a pointer
- * touches it. Both notes below were written the first time that happened here.
- */
+ * touches it. */
 :host([emphasis="solid"]) [part="button"] {
   background-color: var(--_icon-button-fill);
   border-color: transparent;
@@ -210,12 +207,11 @@
  * transparent button next to it reads as a box with something floating after
  * it rather than as one piece of chrome.
  *
- * The same 6% wash `Button` uses, not a fixed neutral. This was `surface`, which
- * is opaque, while the text button beside it filled with 6% of the foreground:
- * measured side by side, two different background colors behind the same
- * border and radius, so a row holding one of each read as two kinds of control.
- * A percentage of the ink is a step away from whatever it sits on in either
- * mode, where a fixed neutral is not. */
+ * The same 6% wash `Button` uses, not a fixed neutral. An opaque neutral puts
+ * two different background colors behind the same border and radius, measured
+ * side by side, so a row holding an icon button and a text button reads as two
+ * kinds of control. A percentage of the ink is a step away from whatever it sits
+ * on in either mode, where a fixed neutral is not. */
 :host([emphasis="outlined"]) [part="button"] {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 6%, transparent);
   border-color: var(--_icon-button-edge);
@@ -262,12 +258,14 @@
 
 /* Not printed, being a control.
  *
- * Paper cannot be pressed. A button prints its chrome and its label, and the chrome is the half that says press me, which on a page is an instruction to do the one thing that is not available.
+ * Paper cannot be pressed. A button prints its chrome and its label, and the
+ * chrome is the half that says press me, which on a page is an instruction to do
+ * the one thing that is not available.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. See (165). */
 @media print {
   :host {
     display: none;

@@ -8,13 +8,10 @@ import { property } from 'lit/decorators.js'
  * @description
  * Layout and semantics, and deliberately not a target.
  *
- * **`href` makes the row itself the link.** *Corrected 19 Aug 2026.* This said a
- * row could not become one, on the grounds that "a whole-row target needs the
- * anchor to wrap the layout, and the layout is what this component is." That is
- * true of the *consumer's* anchor, which cannot wrap slots it does not own, and
- * it is not true of the component's: an `<a part="row">` wraps this component's
- * own layout perfectly well. `Tree.Item` does exactly that, and the two were
- * refusing and accepting `href` on the same argument.
+ * **`href` makes the row itself the link.** A whole-row target needs the anchor
+ * to wrap the layout, which a *consumer's* anchor cannot do for slots it does not
+ * own. The component's can: an `<a part="row">` wraps this component's own layout
+ * perfectly well, which is what `Tree.Item` does.
  *
  * What the anchor buys is what the row could not fake: the whole row is a
  * target, Enter follows it, middle click opens a tab, the status bar shows the
@@ -82,13 +79,12 @@ export class HelixHeadlessListItem extends HelixElement {
    * sit in a track has to be a box in that track.
    *
    * **The box belongs to the styled tier, which is why this returns `nothing`.**
-   * It was rendered here, on the argument that the template lives here, and that
-   * put an unstyled empty box in front of every headless row. A row styled with
-   * `display: flex` and a `gap` draws that gap beside the empty child: measured
-   * on this tier's own example, which is exactly such a row, 1384 pixels moved
-   * and every label sat half a rem further in. It is the fault the styled row's
-   * own comment already records about a column gap beside a zero-width column,
-   * and the one the toast had before it.
+   * Rendering it here puts an unstyled empty box in front of every headless row,
+   * and a row styled with `display: flex` and a `gap` draws that gap beside the
+   * empty child: measured on this tier's own example, which is exactly such a
+   * row, 1384 pixels moved and every label sat half a rem further in. The styled
+   * row's own comment records the same fault about a column gap beside a
+   * zero-width column.
    *
    * A tier that ships no CSS cannot make a box it renders cost nothing, so it
    * does not render one. `marker="rail"` is a styled-tier attribute for the same
@@ -107,8 +103,8 @@ export class HelixHeadlessListItem extends HelixElement {
        rule. That rule is about optional *regions*, which generate an empty box
        when nothing fills them; this is a single always-present container whose
        job is to hold the layout somewhere other than the host.
-     *
-     * The host has to be free for `display: list-item`, which is how an ordered
+
+       The host has to be free for `display: list-item`, which is how an ordered
        or unordered list gets its marker: native numbering, native counters,
        native RTL, and nothing written by script or counted on the server. But
        `list-item` cannot combine with `grid`, so a row whose host carried the

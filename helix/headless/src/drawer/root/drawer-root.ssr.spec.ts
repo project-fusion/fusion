@@ -18,12 +18,10 @@ describe('drawer server output', () => {
   })
 
   test('a drawer opened by default serves the same host as a shut one', () => {
-    /* Which is the point rather than a gap. `data-open` shipped here until 27
-       Aug 2026 and was the one thing in this file the server wrote and the
-       consumer had not: the open state is `ElementInternals.states` now, so the
-       host carries `default-open` and `label` because they were typed, and
-       nothing because the element ran. The dialog is shut either way, a server
-       having no `showModal()` to call. */
+    /* Which is the point rather than a gap. The open state is
+       `ElementInternals.states`, so the host carries `default-open` and `label`
+       because they were typed, and nothing because the element ran. The dialog
+       is shut either way, a server having no `showModal()` to call. */
     const markup = ssr(
       html`<helix-headless-drawer default-open label="Examples">Content</helix-headless-drawer>`,
     )

@@ -67,8 +67,8 @@ let showing: HelixHeadlessMegamenu | undefined
  * anything managing it. Escape closes and puts focus back, because Escape is
  * the one key that has to return the reader to where they were.
  *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
+ * The custom property below is written by this component and read by whoever
+ * draws it. A consumer never sets it: it carries a number this element computed
  * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
  * without measuring anything itself.
  *
@@ -126,8 +126,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    */
   /* Read, never written back. It has a default, and a reflected default puts an
      attribute on the host that the consumer did not write, which the server
-     then ships: the SSR spec for this element checks exactly that and caught
-     it. Nothing selects on it, so there is nothing to reflect for. */
+     then ships: the SSR spec for this element checks exactly that. Nothing
+     selects on it, so there is nothing to reflect for. */
   @property({ attribute: 'open-on' })
   openOn: 'click' | 'hover' = 'hover'
 
@@ -315,9 +315,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * band still sitting at 57.
    *
    * The card has none of this, because the floating controller follows its
-   * anchor. Turning that off for the band, which has nothing to be placed
-   * against, took the scroll handling with it, and this is the half that was
-   * still wanted.
+   * anchor. The band turns that controller off, having nothing to be placed
+   * against, and this is the half of it still wanted.
    *
    * A sticky bar does not move, so re-measuring returns the same number and the
    * band stays where it is. `requestOpen` rather than `close`, because closing
@@ -340,7 +339,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handlePointerEnter = (event: PointerEvent): void => {
-    /* Mouse only. A touch screen synthesises an enter on tap, and acting on it
+    /* Mouse only. A touch screen synthesizes an enter on tap, and acting on it
        would open the panel and then let the click that follows close it again,
        so a tap would do nothing at all. */
     if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
@@ -384,9 +383,9 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /**
    * Shuts the panel when a reader takes one of the destinations in it.
    *
-   * Nothing closed it before, so a click navigated and left the panel hanging
-   * over wherever the reader landed. With a router that navigates in place, and
-   * this is one, that is a panel covering the page it was asked to go to.
+   * Without this a click navigates and leaves the panel hanging over wherever
+   * the reader landed. With a router that navigates in place, that is a panel
+   * covering the page it was asked to go to.
    *
    * **A modified click leaves it open**, which is the same position this
    * element already takes on middle clicks and the status bar: `cmd` on a link
@@ -468,29 +467,25 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     /* A slotted trigger is told the disclosure state, by property.
 
        `render` writes `aria-expanded` onto the button it renders itself, and a
-       consumer who takes the documented `trigger` slot replaces that button: the
-       panel opened and closed and nothing announced it, so a reader was told the
-       control was a plain button forever. Silent, because the slot works in
-       every other respect and the failure is only audible.
+       consumer who takes the documented `trigger` slot replaces that button, so
+       without this the panel opens and closes and nothing announces it. Silent,
+       because the slot works in every other respect and the failure is only
+       audible.
 
-       **It was `setAttribute` and that really was a hydration mismatch**, which
-       is what `Popover`'s class note has said since the day it was written.
-       *Measured 28 Aug 2026 against React 19.2.8*, four families server-rendered
-       and hydrated with the definitions loaded either side of `hydrateRoot`:
-       this one and `SpeedDial` produced "some attributes of the server rendered
-       HTML didn't match the client properties. This won't be patched up" in both
-       orders, and `Popover` and `Menu`, which write nothing, were clean in both.
-       React answers a mismatch by discarding the server's HTML for that subtree
-       and rebuilding it, which is the expensive half rather than the console
-       line.
+       **Never `setAttribute` here: that is a hydration mismatch.** Measured
+       against React 19.2.8, four families server-rendered and hydrated with the
+       definitions loaded either side of `hydrateRoot`: this one and `SpeedDial`
+       produced "some attributes of the server rendered HTML didn't match the
+       client properties. This won't be patched up" in both orders, and
+       `Popover` and `Menu`, which write nothing, were clean in both. React
+       answers a mismatch by discarding the server's HTML for that subtree and
+       rebuilding it, which is the expensive half rather than the console line.
 
-       **The property is the way through, and it is this library's own answer
-       already.** `Menu` tells its items by property for exactly this reason and
-       says so. React diffs the attributes it rendered and never looks at a
-       property, so `expanded` travels to the trigger, lands as `aria-expanded`
-       inside that element's shadow root, and the consumer's markup is left as
-       they served it. Both notes get what they were protecting: nothing is
-       written onto their element, and the reader is still told.
+       **The property is the way through**, as `Menu` already does for its items.
+       React diffs the attributes it rendered and never looks at a property, so
+       `expanded` travels to the trigger, lands as `aria-expanded` inside that
+       element's shadow root, and the consumer's markup is left as they served
+       it.
 
        **What it cannot reach is a trigger that is not a Helix element.** A plain
        `<button slot="trigger">` has no shadow root to hide the state in and no
@@ -499,11 +494,11 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        than written to, on the same argument `Tooltip` makes about a link it
        will not write for the consumer.
 
-       **`aria-controls` is not written here and cannot be.** It named `panel`,
-       an id inside this shadow root, and an IDREF resolves only within the tree
-       that holds it: from a light-DOM trigger looking in, the reference was to
-       nothing. Measured, `document.querySelector('#panel')` came back `null`
-       while the same id resolved inside `megamenu.shadowRoot`. An inert
+       **`aria-controls` is not written here and cannot be.** It would name
+       `panel`, an id inside this shadow root, and an IDREF resolves only within
+       the tree that holds it: from a light-DOM trigger looking in, the reference
+       is to nothing. Measured, `document.querySelector('#panel')` came back
+       `null` while the same id resolved inside `megamenu.shadowRoot`. An inert
        `aria-controls` is worse than none, an audit tool reporting it satisfied
        and a screen reader following it nowhere. See #322. */
     this.tellTrigger()

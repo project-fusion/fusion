@@ -28,11 +28,9 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * `value` is the checked values, comma separated, in the order the boxes are
  * written. Setting it ticks exactly those and unticks the rest.
  *
- * **Its message is always given, never derived.** Every form-related member of
- * `ElementInternals` throws on an element that is not form-associated, and this
- * one is not, on purpose: the boxes submit themselves. So `feedback` is what
- * shows here, and the browser has nothing to say about a set it does not know
- * is a set.
+ * **Its message is always given, never derived.** The group is form-associated
+ * for validity alone and never calls `setFormValue`, so `feedback` is what shows
+ * here: the browser has nothing to say about a set it does not submit.
  *
  * @since 0.1.0
  * @status stable
@@ -55,11 +53,10 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
-  /* `name` is inherited. It arrives with `HelixFormElement` reflected and with
-     the converter that makes an empty one absent rather than `name=""`, which
-     the copy declared here had neither of. What it means differs slightly and
-     the property does not: the group submits nothing under it, and hands it to
-     every box that has none. */
+  /* `name` is inherited from `HelixFormElement`, reflected and with the
+     converter that makes an empty one absent rather than `name=""`. What it
+     means differs slightly and the property does not: the group submits nothing
+     under it, and hands it to every box that has none. */
 
   /**
    * The checked values, comma separated.
@@ -67,10 +64,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   @property()
   value = ''
 
-  /* Stated once, and the group never thinks about it again. See the
-     controller: the cascade was four hand calls from four different
-     methods, so which paths reached it differed by component and a fifth
-     group would have got none at all. */
+  /* Stated once, and the group never thinks about it again. The controller is
+     what stops the cascade being hand-called from whichever methods a component
+     happens to have. */
   protected readonly cascade = new DisabledCascadeController(this, {
     items: () => this.boxes,
   })
@@ -107,18 +103,17 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   /**
    * Reads the boxes' own state into `value`, once, before anything is pushed.
    *
-   * `sync` used to refuse to write anything while `value` was empty, and the
-   * guard was there for this: a group written with no `value` and boxes that
-   * declare their own `checked` would have had them all cleared on the first
-   * update. What it also did was make `group.value = ''` do nothing at all, so
-   * the obvious way to clear a group silently did not, and the last box could
-   * not be unticked through the group either.
+   * Seeding, and never a guard in `sync` refusing to write while `value` is
+   * empty. The guard would answer the same case, a group written with no `value`
+   * whose boxes declare their own `checked` being cleared on the first update,
+   * and it also makes `group.value = ''` do nothing at all: the obvious way to
+   * clear a group would silently not, and the last box could not be unticked
+   * through the group either.
    *
-   * Seeding is the honest version of the same intent. The markup decides the
-   * starting set, exactly as before, and from then on `value` is what the boxes
-   * follow, including when it is empty. The group's `value` is a derived read
-   * of the boxes rather than state it owns, so reading it out of them at the
-   * start is what it already means.
+   * The markup decides the starting set, and from then on `value` is what the
+   * boxes follow, including when it is empty. The group's `value` is a derived
+   * read of the boxes rather than state it owns, so reading it out of them at
+   * the start is what it already means.
    */
   private seed(): void {
     const checked = this.boxes.filter((box) => box.checked).map((box) => box.value)
@@ -147,31 +142,23 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     if (!changed) {
       return
     }
-    /* Still stopped, though the names no longer collide. A box's `helix-toggle`
-       bubbles, and the group is the single voice for the set: a consumer
-       listening here wants the whole answer, not one box's half of it. Before
-       the split this had to be `stopImmediatePropagation` rather than
-       `stopPropagation`, because the box's event and the group's own carried
-       the same name from the same host and the other listeners on it would have
-       received both. */
+    /* A box's `helix-before-toggle` bubbles, and the group is the single voice
+       for the set: a consumer listening here wants the whole answer, not one
+       box's half of it. */
     event.stopImmediatePropagation()
 
     const wanted = (event as HelixBeforeToggleEvent).detail.checked
-    /* Announced before it is written, which is the way round it was not: the
-       group set its value and then dispatched, so `preventDefault()` refused a
-       set that had already changed.
+    /* Announced before it is written, never after: dispatching once the group's
+       value has moved leaves `preventDefault()` refusing a set that has already
+       changed.
 
-       Hand-rolled rather than through `MixinControllerValue`, and that is the
-       decision rather than an omission. The group is deliberately not
-       form-associated: its boxes are the form controls and each submits itself,
-       so the mixin, which is constrained to `HelixFormElement`, does not apply
-       to it. Its `value` is a derived read of the boxes rather than state it
-       owns, which is also why it is not controllable and why that is written
-       down rather than fixed.
+       Hand-rolled rather than through `MixinControllerValue`, and that is a
+       decision rather than an omission. The group's `value` is a derived read of
+       the boxes rather than state it owns, so there is nothing for the mixin to
+       control.
 
        The boxes have already moved either way. Each answered the reader before
-       this ran, so refusing here stops the group's value from following, and
-       the honest limit of that is recorded with the decision. */
+       this ran, so refusing here stops only the group's value from following. */
     const next = this.boxes
       .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)
@@ -186,9 +173,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
        `input` beside it, because this is a discrete control and that is the
        pair a native `<select>` sends and the pair every other discrete control
-       here sends through `MixinControllerValue`. The group had only `change`,
-       so a consumer binding `onInput` on the set heard the boxes and never the
-       group. */
+       here sends through `MixinControllerValue`. */
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
@@ -196,18 +181,16 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   /**
    * Stops a box's own announcement, for the reason the request above is stopped.
    *
-   * **The split gave the requests two names and left the notifications sharing
-   * one.** A box announces `input` and `change` from its own host now, which is
-   * what makes `onChange` work on a checkbox, and both bubble up through this
-   * group: measured, one click produced `change` from the group and `input` and
+   * A box announces `input` and `change` from its own host, which is what makes
+   * `onChange` work on a checkbox, and both bubble up through this group:
+   * measured, one click produced `change` from the group and `input` and
    * `change` from the box, all three at a consumer listening here, two of them
-   * describing one box rather than the set. That is exactly the collision the
-   * comment on `handleToggle` describes, arriving by the other route.
+   * describing one box rather than the set.
    *
-   * `stopImmediatePropagation` and not `stopPropagation`, and for the same
-   * reason it gives: the box's event and this group's own carry one name from
-   * what a consumer sees as one element, so stopping propagation alone still
-   * leaves every other listener on this host receiving both.
+   * `stopImmediatePropagation` and not `stopPropagation`: the box's event and
+   * this group's own carry one name from what a consumer sees as one element,
+   * so stopping propagation alone still leaves every other listener on this
+   * host receiving both.
    *
    * A listener on the box itself is unaffected, which is where per-box handling
    * belongs. Each box is form-associated and submits itself; what this stops is
@@ -253,27 +236,19 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   }
 
   /**
-   * Refuses an empty set where one was required, which nothing did.
+   * Refuses an empty set where one was required.
    *
-   * `required` arrives with `MixinField`, reflects, and paints the asterisk
-   * through the composed field sheet, and enforced nothing at all: no validity,
-   * no message, and nothing cascading to the boxes. A group marked required
-   * submitted empty.
+   * **The group is form-associated, and submits nothing.** Nothing here calls
+   * `setFormValue`, so the set that reaches the server is exactly the boxes,
+   * each of which submits itself. What form association buys is the other half
+   * of participation, validity, and there is no other mechanism for it:
+   * `setValidity` throws `NotSupportedError` on an element the platform does not
+   * know is a control. happy-dom's shim does not throw, so a spec passes against
+   * code that fails on every update in Chromium.
    *
-   * **The group is form-associated, and submits nothing.** It was not, on the
-   * reasoning that its boxes are the controls and each submits itself, which is
-   * still true: nothing here calls `setFormValue`, so the set that reaches the
-   * server is exactly the boxes it always was. What form association buys is the
-   * other half of participation, validity, and there is no other mechanism for
-   * it: `setValidity` throws `NotSupportedError` on an element the platform does
-   * not know is a control.
-   *
-   * So the fix that was written for "a group marked required submitted empty"
-   * threw on every update in a real browser, and happy-dom's shim does not
-   * throw, so the specs passed and the behavior never worked. Eleven of them
-   * failed the moment they were run in Chromium. It is also what makes the rest
-   * work: the form now refuses to submit, which fires `invalid`, which is what
-   * marks the field touched and puts the message on screen.
+   * It is also what makes the rest work: the form refuses to submit, which fires
+   * `invalid`, which is what marks the field touched and puts the message on
+   * screen.
    *
    * Anchored on the list, because the browser needs somewhere to point the
    * bubble.
@@ -297,9 +272,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     return html`${this.renderGroupLabel()}
       <div part="items">
         ${
-          /* A box arriving after first render got neither the shared name nor
-             the value's checked state, because nothing was listening: both
-             sibling groups wire this and this one did not. */
+          /* A box arriving after first render has neither the shared name nor
+             the value's checked state until something pushes them onto it. */
           ''
         }
         <slot @slotchange=${() => this.requestUpdate()}></slot>

@@ -312,12 +312,9 @@ Same origin, and it must stay that way. */
 
 export type CustomElements = {
   /**
-   * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
-   * while a sandbox only had to hold text: undo, selection, spellcheck
-   * suppression, mobile keyboards, and screen-reader support all came from the
-   * platform. What it could not do is highlight what it holds, number its lines,
-   * or say where the cursor is, and a status bar reading line and column has to
-   * ask something.
+   * CodeMirror, not a `<textarea>`. A textarea cannot highlight what it holds,
+   * number its lines, or say where the cursor is, and a status bar reading line
+   * and column has to ask something.
    *
    * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
    * the barrel, because CodeMirror is around 110 KB over the wire where the rest
@@ -360,8 +357,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
-   * were misread as a token fault for days.
+   * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
@@ -416,8 +412,7 @@ export type CustomElements = {
    * decides whether it is laid out at all: inside the panel it was a descendant of
    * an inactive tab, so on any tab but this one it had `display: none` above it
    * and every rectangle inside it was zero. Specs that read geometry then passed
-   * against nothing, which is the failure that looks most like success. Found by
-   * putting a known misplacement back and watching the specs stay green.
+   * against nothing, which is the failure that looks most like success.
    *
    * ## Attributes & Properties
    *
@@ -448,8 +443,7 @@ export type CustomElements = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
-   * were misread as a token fault for days.
+   * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
@@ -465,8 +459,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
-   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
+   * - `--sandbox-specs-fail-color`: Color of a failing one. (default: `undefined`)
+   * - `--sandbox-specs-pass-color`: Color of a passing test. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -487,12 +481,9 @@ export type CustomElements = {
 
 export type CustomElementsSolidJs = {
   /**
-   * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
-   * while a sandbox only had to hold text: undo, selection, spellcheck
-   * suppression, mobile keyboards, and screen-reader support all came from the
-   * platform. What it could not do is highlight what it holds, number its lines,
-   * or say where the cursor is, and a status bar reading line and column has to
-   * ask something.
+   * CodeMirror, not a `<textarea>`. A textarea cannot highlight what it holds,
+   * number its lines, or say where the cursor is, and a status bar reading line
+   * and column has to ask something.
    *
    * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
    * the barrel, because CodeMirror is around 110 KB over the wire where the rest
@@ -535,8 +526,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
-   * were misread as a token fault for days.
+   * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
@@ -594,8 +584,7 @@ export type CustomElementsSolidJs = {
    * decides whether it is laid out at all: inside the panel it was a descendant of
    * an inactive tab, so on any tab but this one it had `display: none` above it
    * and every rectangle inside it was zero. Specs that read geometry then passed
-   * against nothing, which is the failure that looks most like success. Found by
-   * putting a known misplacement back and watching the specs stay green.
+   * against nothing, which is the failure that looks most like success.
    *
    * ## Attributes & Properties
    *
@@ -626,8 +615,7 @@ export type CustomElementsSolidJs = {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
-   * were misread as a token fault for days.
+   * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
@@ -643,8 +631,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--specs-fail-color`: Color of a failing one. (default: `undefined`)
-   * - `--specs-pass-color`: Color of a passing test. (default: `undefined`)
+   * - `--sandbox-specs-fail-color`: Color of a failing one. (default: `undefined`)
+   * - `--sandbox-specs-pass-color`: Color of a passing test. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -668,9 +656,9 @@ export type CustomElementsSolidJs = {
 
 export type CustomCssProperties = {
   /** Color of a failing one. */
-  "--specs-fail-color"?: string;
+  "--sandbox-specs-fail-color"?: string;
   /** Color of a passing test. */
-  "--specs-pass-color"?: string;
+  "--sandbox-specs-pass-color"?: string;
 };
 
 declare module "react" {

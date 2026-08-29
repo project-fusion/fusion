@@ -96,34 +96,24 @@
   rotate: 45deg;
 }
 
-/* **Glass, and it takes the ink with it, which is what makes this different from
-   every other family that carries the axis.** A card and a drawer are already
-   the page's own surface, so glass swaps an opaque ground for a translucent one
-   and nothing else has to move. A tooltip is not: its resting state is
-   `surface-inverse` with `foreground-inverse` on it, a dark bubble over a light
-   page, and `--helix-material-translucent` is the *page's* ground, `neutral-0`
-   in light and `neutral-900` in dark. Take the one without the other and a light
-   bubble carries light ink.
+/* **Glass takes the ink with it, which is what makes this different from every
+   other family that carries the axis.** A tooltip's resting state is
+   `surface-inverse` with `foreground-inverse` on it, and
+   `--helix-material-translucent` is the *page's* ground, `neutral-0` in light
+   and `neutral-900` in dark. Take the one without the other and a light bubble
+   carries light ink, so the whole pair flips.
 
-   So the whole pair flips. The ground becomes the page's translucent one, the
-   ink becomes the page's, and the bubble gains the hairline it did not need
-   while it was the darkest thing on the screen: an inverse bubble is told from
-   the page by being the opposite of it, and a glass one has to be told from what
-   is *behind* it, which is the page.
-
-   The arrow follows the bubble in both, because a point in a different substance
+   The bubble also gains the hairline it did not need while it was the darkest
+   thing on the screen: a glass one has to be told from what is *behind* it. The
+   arrow follows the bubble in both, because a point in a different substance
    from the surface it is on is a seam rather than a point.
 
-   **The edge is a hairline and not `--helix-border-floating`**, which is the
-   theme's answer for a floating surface and defaults to zero because floating is
-   shadow-first. This bubble has no shadow: `border: none` and no `box-shadow`
-   anywhere in this file, because being the darkest thing on the page was the
-   whole of how it separated. Take the inversion away and it has neither, so the
-   replacement cannot be a token whose resting value is nothing. The component is
-   what knows the inversion went, so the component is what replaces it.
+   **The edge is a hairline and not `--helix-border-floating`**, which defaults
+   to zero because floating is shadow-first. This bubble has no shadow, so the
+   replacement cannot be a token whose resting value is nothing.
 
-   The strength is the theme's, and both hooks still win, so a consumer who set
-   `--tooltip-background-color` gets it in either material. */
+   Both hooks still win, so a consumer who set `--tooltip-background-color` gets
+   it in either material. */
 :host([material="glass"]) [part="tooltip"],
 :host([material="glass"]) [part="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));
@@ -162,9 +152,9 @@
 }
 
 /* It grows out of its own point, so a tooltip above its trigger expands
-   downward-out-of the arrow and one to the left expands rightward out of it. A
-   center origin was tried and reads as the bubble inflating in place, which
-   says nothing about what it belongs to.
+   downward out of the arrow and one to the left expands rightward out of it. A
+   center origin reads as the bubble inflating in place, which says nothing about
+   what it belongs to.
 
    The arrow is not reliably at the middle of that edge, which is why these read
    `--floating-arrow-x` and `--floating-arrow-y` rather than `50%`:
@@ -224,12 +214,13 @@
 
 /* Not printed, being an overlay.
  *
- * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ * It is over the page rather than part of it, and on paper there is no over: a
+ * tooltip prints its tip beside nothing that is hovering.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. See (165). */
 @media print {
   :host {
     display: none;

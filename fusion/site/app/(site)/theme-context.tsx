@@ -77,14 +77,13 @@ const derive = (
   /**
    * **Every field the builder passes, not the six this control moves.**
    *
-   * `intentFrom` in the theme tool hands the engine twelve fields. This passed
-   * six and let the engine default the rest, which is not the same thing: the
+   * `intentFrom` in the theme tool hands the engine twelve fields. Passing only
+   * six and letting the engine default the rest is not the same thing: the
    * shipped stylesheet was derived against a specific `contrastTarget` and
    * `status` allowance, so omitting them re-derives the palette against the
-   * engine's own defaults instead. The visible result is that a draft sitting at
-   * the default brand produced a primary that did not match the live page's, and
-   * the logo and the aura, which both read that token, changed color for no
-   * reason a reader could see.
+   * engine's own defaults. A draft sitting at the default brand then produces a
+   * primary that does not match the live page's, and the logo and the aura,
+   * which both read that token, change color for no reason a reader can see.
    *
    * The six the pill moves come from state. The rest are pinned to `INITIAL`,
    * which is what the builder opens on and what the stylesheet ships.
@@ -106,11 +105,10 @@ const derive = (
     status: { allowance: INITIAL.allowance, harmony: INITIAL.harmony / 100 },
   })
 
-  /* **Returned rather than thrown away.** The engine measures every pair it
-     derives and reports what it could not clear, and until now the page set the
-     colors and dropped the report on the floor. That report is the whole
-     argument: a palette anybody can generate is not interesting, and a palette
-     that says which of its own pairs are legible is. */
+  /* The engine measures every pair it derives and reports what it could not
+     clear, and that report is returned rather than dropped: a palette anybody
+     can generate is not interesting, and a palette that says which of its own
+     pairs are legible is. */
   const byName = new Map(theme.tokens.map((t) => [t.name, t.hex]))
 
   /**
@@ -155,9 +153,9 @@ const derive = (
  * media query alone answers only the third. Lifted from `showcase.tsx`, which
  * already had to solve this.
  *
- * Read lazily inside `useState`, so the server render and the first client
- * render agree on `INITIAL.scheme` and the correction happens in the effect
- * below rather than as a hydration mismatch.
+ * Not called during render: the server render and the first client render both
+ * take `INITIAL.scheme`, and the correction happens in the effects below rather
+ * than as a hydration mismatch.
  */
 const readSiteScheme = (): 'dark' | 'light' => {
   if (typeof document === 'undefined') {
@@ -192,17 +190,11 @@ const OWNED = '--helix-'
 /**
  * Writes an already-derived theme onto the scope.
  *
- * **Separate from deriving it, and that separation is the bug it fixes.** The
- * two were one function behind one gate: nothing derived until a reader moved a
- * control, because deriving on arrival opened the page in a palette measurably
- * unlike the rest of the site. The gate was right about painting and wrong
- * about the report, and the sliders paid for it. Their track gradients are
- * built from the derived primary, so with nothing derived they had no ramp to
- * show and the first interaction was what made one appear.
- *
- * Deriving is unconditional now and painting is still gated, so the controls
- * can describe a palette the page has not adopted. Still one derivation per
- * change, which is what the note in the effect was protecting.
+ * **Separate from deriving it.** Deriving is unconditional and painting is
+ * gated on `touched`, so the controls can describe a palette the page has not
+ * adopted. Gating both would leave the sliders blank until the first
+ * interaction, since their track gradients are built from the derived primary.
+ * Still one derivation per change.
  */
 const applyScope = (
   node: HTMLElement,
@@ -212,11 +204,11 @@ const applyScope = (
   /* Set before the values, because a `var()` inside a custom property is
      substituted on the element the property is declared on: a seed written on a
      plain element is read by nothing until this attribute re-runs those
-     declarations. Learned by `showcase.tsx` the hard way. */
+     declarations. */
   node.dataset.helixTheme = ''
   /* Not `--helix-*`: that prefix belongs to the design system, and squatting on
-     it made `check:css:tokens` read this as one of its tokens, renamed or mistyped.
-     It is a page-local flag and now says so. */
+     it made `check:css:tokens` read this as one of its tokens, renamed or
+     mistyped. It is a page-local flag. */
   node.style.setProperty('--preview-color-scheme', scheme)
   for (const token of theme.tokens) {
     node.style.setProperty(`--helix-${token.name}`, token.hex)
@@ -250,22 +242,20 @@ const clearRoot = (): void => {
     }
   }
   delete root.dataset.helixTheme
-  /* **`data-color-mode` is not ours to remove**, and taking it off here was a
-     visible bug.
+  /* **`data-color-mode` is not ours to remove.**
      `paintRoot` writes it as a nudge, to make the token controller notice a
      palette it has already been handed. The attribute itself belongs to the
      reader: `preferences.tsx` persists it and a script in `head` restores it
      before the first paint so the page never renders in the wrong scheme.
-     Deleting it on teardown threw that away.
-     It showed as a hard flash of light-mode blue on every reload. This effect
-     is registered as a cleanup, and React runs effects mount, cleanup, mount in
-     StrictMode, which `next.config.ts` turns on: so on load the attribute was
-     set by the script, stripped here, and set again. In the frame between,
-     `light-dark()` fell back to `prefers-color-scheme`, `--helix-color-background`
-     resolved light, and the aura reads that value once to decide which half of
-     its palette to draw. A full-viewport field at light-mode brightness under
-     chrome that was already dark, for one frame, three times in a row on the
-     recording that reported it.
+     Deleting it on teardown throws that away, and it shows as a hard flash of
+     light-mode blue on every reload. This effect is registered as a cleanup,
+     and React runs effects mount, cleanup, mount in StrictMode, which
+     `next.config.ts` turns on: so on load the attribute is set by the script,
+     stripped here, and set again. In the frame between, `light-dark()` falls
+     back to `prefers-color-scheme`, `--helix-color-background` resolves light,
+     and the aura reads that value once to decide which half of its palette to
+     draw: a full-viewport field at light-mode brightness under chrome that is
+     already dark.
      What this owns is the palette it painted: the `--helix-*` properties above
      and the `data-helix-theme` flag. It removes those and stops. */
 }
@@ -292,12 +282,12 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const [accentHue, setAccentHue] = useState(INITIAL.accentHue)
   const [radius, setRadius] = useState(INITIAL.radius)
   const [density, setDensity] = useState(INITIAL.density)
-  /* **The site's mode, not the builder's default.** `INITIAL.scheme` is
-     `light`, which is right for a tool that opens on a blank canvas and wrong
-     for a page inside a dark site: the scope painted itself white under dark
-     chrome, and the reel's scrim, which is the background color at 70%, became a
-     white blob over the field. A draft should look like the site until a reader
-     says otherwise. */
+  /* Seeded from `INITIAL.scheme` for hydration, then moved to the site's mode
+     by the effects below. `INITIAL.scheme` is `light`, which is right for a tool
+     that opens on a blank canvas and wrong for a page inside a dark site: left
+     there, the scope paints itself white under dark chrome and the reel's scrim,
+     which is the background color at 70%, becomes a white blob over the field. A
+     draft should look like the site until a reader says otherwise. */
   const [scheme, setScheme] = useState<'dark' | 'light'>(INITIAL.scheme)
 
   useEffect(() => {
@@ -311,8 +301,8 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
       /* **Caught rather than voided.** `showcase.tsx` writes
          `void initTheme(...).then(...)`, so an engine that fails to load rejects
          into nothing and the panel silently keeps the stylesheet's own tokens,
-         looking like a design decision. That is how it went unnoticed, and a
-         scope covering a whole page failing the same way would be worse. */
+         looking like a design decision. A scope covering a whole page failing
+         the same way would be worse. */
       .catch((reason: unknown) => {
         console.error('theme engine failed to load', reason)
       })
@@ -327,37 +317,34 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const [chosen, setChosen] = useState(false)
 
   /**
-   * **Nothing is derived until a reader moves something.**
+   * **Nothing is painted until a reader moves something.**
    *
    * The engine and the shipped stylesheet compute the same palette two different
    * ways: the stylesheet steps a ramp with fixed relative-color offsets, the
    * engine runs a contrast search. They agree on direction and not on the exact
-   * numbers, so deriving on arrival meant this page opened in a palette
-   * measurably unlike every other page on the site, and its aura, which reads
-   * four of those tokens, was visibly a different blue from the one on `/`.
+   * numbers, so painting on arrival opens this page in a palette measurably
+   * unlike every other page on the site, and its aura, which reads four of those
+   * tokens, is visibly a different blue from the one on `/`.
    *
-   * At rest the page is now exactly what the stylesheet ships. The first time
-   * somebody touches a control it derives and keeps deriving. That also removes
-   * the flash: there is no longer a first paint in one palette followed by a
-   * swap into another.
+   * At rest the page is exactly what the stylesheet ships. The first time
+   * somebody touches a control it paints and keeps painting. That also removes
+   * the flash: there is no first paint in one palette followed by a swap into
+   * another.
    */
   const [touched, setTouched] = useState(false)
 
   /**
    * Two sources, and only one of them stops being listened to.
    *
-   * **`chosen` used to tear down both and that broke the sync.** It latches
-   * when somebody picks a scheme here, so the page stops moving under them when
-   * the operating system changes its mind. Fair. But the same effect also
-   * carried the observer for `data-color-mode`, and that attribute is how the
-   * masthead's preferences panel states a choice: pick a scheme in this bar,
-   * then pick the other one in preferences, and this control never heard about
-   * it. One deliberate choice was silencing another.
+   * The system query is what `chosen` gates, because a system preference is an
+   * ambient default and a latched choice outranks it. `data-color-mode` is
+   * somebody pressing a control, in the masthead's preferences panel, which
+   * outranks everything here, so it is followed for as long as this scope
+   * exists.
    *
-   * The system query is what `chosen` should gate, because a system preference
-   * is an ambient default and a latched choice outranks it. The attribute is
-   * somebody pressing a control, which outranks everything here, so it is
-   * followed for as long as this scope exists.
+   * **Do not gate the observer on `chosen` too.** It latches when somebody picks
+   * a scheme in this bar, so picking the other one in preferences afterwards
+   * would never reach this control: one deliberate choice silencing another.
    */
   useEffect(() => {
     const follow = () => setScheme(readSiteScheme())

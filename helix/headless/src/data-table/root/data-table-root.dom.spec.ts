@@ -225,18 +225,11 @@ describe('controlled and uncontrolled', () => {
   })
 
   /**
-   * The point of controlled: the element reports the request and changes
-   * nothing, so the value on screen is always the consumer's.
-   *
-   * Declared in markup, which is where the ownership decision is made:
-   * `MixinControllerValue` settles it at the first update, because that is where
-   * an attribute, a hydrating server's output and a framework's initial
-   * properties have all landed.
+   * An axis declared in markup is a seed and a correction, never a claim of
+   * ownership. The element applies it and goes on responding, and a consumer
+   * takes the decision by refusing the event, which is the test below this one.
+   * See (294).
    */
-  /* Asserted the opposite until 26 Aug 2026, when declaring an axis was a claim
-     of ownership and the table announced without re-sorting. Control is an
-     action now: it applies, and a consumer refuses to take the decision.
-     See 294. */
   test('a declared `sort` is a seed, and the element still re-sorts', async () => {
     const { element, remove } = await mount(`
       <helix-headless-data-table sort="size:asc">
@@ -267,8 +260,8 @@ describe('controlled and uncontrolled', () => {
   })
 
   /**
-   * Writing always applies, which used to be half a convention and is now the
-   * whole of it: there is no mode a write could move the element into. See 294.
+   * Writing always applies: there is no mode a write could move the element
+   * into. See (294).
    */
   test('a script write after mount applies, and the element keeps responding', async () => {
     const { element, remove } = await mount(SCHEMA)
@@ -284,8 +277,7 @@ describe('controlled and uncontrolled', () => {
 
   /**
    * An axis set back to empty means unsorted, and the element goes on sorting
-   * from there. This asserted that emptiness kept a controlled axis controlled,
-   * which was a fact about a mode that no longer exists. See 294.
+   * from there. See (294).
    */
   test('an axis set back to empty is unsorted, and the element still sorts', async () => {
     const { element, remove } = await mount(`
@@ -469,8 +461,7 @@ describe('the data property', () => {
   })
 
   /**
-   * **The component `applyReactProperties` was built against, and the reason it
-   * stopped being a design sketch in a comment.**
+   * **The component `applyReactProperties` was built against.**
    *
    * `rows` is an array, so it can only be assigned as a property, and React
    * assigns no property to a custom element while hydrating: the server renderer

@@ -34,14 +34,10 @@ const config: NextConfig = {
    *
    * `bun run gen:frame` stamps the bundle and the stylesheet with a hash of their
    * contents, so `frame.js?v=61ce3e17` is a new URL whenever the code changes,
-   * and an old URL can never be served for new code. That is the whole of the
-   * cache story except for the file carrying those two URLs, which is a static
-   * document under `public/` and was cached like any other. A browser holding
+   * and an old URL can never be served for new code. The one file that cannot
+   * be cached is the static document carrying those two URLs: a browser holding
    * yesterday's `frame.html` asks for yesterday's bundle by name and keeps
-   * getting it, so the stamping accomplishes nothing.
-   *
-   * This is the ordinary shape of it and the reason the stamps exist: the
-   * document is small and uncacheable, the assets it names are immutable.
+   * getting it, which is the stamping accomplishing nothing.
    */
   async headers() {
     return [
@@ -85,9 +81,8 @@ const config: NextConfig = {
    * The old vertical routes, kept alive.
    *
    * `/design` and `/mind` were the verticals' routes, and the pages under them
-   * were always the products: the gallery has titled itself Helix since it was
-   * written, wearing Fusion Design as an eyebrow. The masthead now says
-   * `Products` and names Helix and Cortex, so the URL says so too.
+   * were always the products. The masthead says `Products` and names Helix and
+   * Cortex, so the URL says so too.
    *
    * Permanent, because these are the addresses of the two pages worth linking
    * to and a 308 is what tells a search engine the move is the new truth. The
@@ -101,11 +96,10 @@ const config: NextConfig = {
       { destination: '/helix/:path*', permanent: true, source: '/design/:path*' },
       { destination: '/cortex', permanent: true, source: '/mind' },
 
-      /* `for-coding-agents` lost its preposition: the page has titled itself
-         Coding agents since it was written, and the filename was the only thing
-         still saying otherwise. It is in `llms.txt` and in `published.json`, so
-         an agent may hold the old address, which is the one kind of reader that
-         will not think to try the other one. */
+      /* `for-coding-agents` lost its preposition. The old address is in
+         `llms.txt` and in `published.json`, so an agent may hold it, and an
+         agent is the one kind of reader that will not think to try the other
+         spelling. */
       {
         destination: '/helix/docs/coding-agents',
         permanent: true,
@@ -116,9 +110,8 @@ const config: NextConfig = {
          `helix-sandbox-editor`, from `@fusion.dev/helix-sandbox`, which is
          `private: true` build tooling for this repository, and it reached the
          reference only because the catalog was reading that package's manifest
-         alongside the two that publish. The page it should have been all along
-         is the Sandbox document, which is where the editor is actually
-         explained. */
+         alongside the two that publish. The Sandbox document is where the
+         editor is explained. */
       {
         destination: '/helix/docs/sandbox',
         permanent: true,

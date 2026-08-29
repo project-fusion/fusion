@@ -13,28 +13,23 @@ import { useLayoutEffect } from 'react'
  * treat as plainly 1. An element like that is a *backdrop root*, and a
  * `backdrop-filter` inside one can only sample what is painted within it. Every
  * card on the landing page sits inside one of these sections and blurs a
- * page-length field that does not, so all of them went flat while their computed
- * `backdrop-filter` still read `blur(18px)`. That is the fault that took the
- * reveal off this page in the first place.
+ * page-length field that does not, so all of them go flat while their computed
+ * `backdrop-filter` still reads `blur(18px)`.
  *
  * A transition ends, where that animation never did: when it finishes the
  * element is at exactly `opacity: 1` with nothing attached to it, and the
  * backdrop root goes away.
  *
- * **Which fixed the permanent case and left a visible one, so the fade is gone
- * too.** This first animated opacity alongside the rise, on the reasoning that
- * cards being flat for the few hundred milliseconds of a fade was the one moment
- * nobody could see. That was wrong twice over: the flatness lasts until opacity
- * reaches exactly 1, so it is worst at the end when the card is fully opaque,
- * and the return of the blur is a step rather than a ramp. Reported off a screen
- * recording as the first card snapping from more transparent to less. The reveal
- * is a `transform` now, which forms no backdrop root, and the section carries
- * its cards in fully lit.
+ * **And no opacity in the reveal, only `transform`.** Fading forms the same
+ * backdrop root for the length of the fade, and it is worst at the end, the
+ * flatness lasting until opacity reaches exactly 1, so the blur returns as a
+ * step rather than a ramp: on a screen recording the first card snaps from more
+ * transparent to less. A `transform` forms no backdrop root, and the section
+ * carries its cards in fully lit.
  *
  * **The full list of what forms a backdrop root lives in `site.css`**, above
  * `[data-substrate]`, measured rather than taken from the spec. Consult it
- * before adding a mask, a fade or a transition anywhere above a glass surface;
- * this file is one of three bugs that came from not having it written down.
+ * before adding a mask, a fade or a transition anywhere above a glass surface.
  *
  * **The hidden state is armed from here, not from the stylesheet**, so a reader
  * whose JavaScript never runs is handed a page rather than eight invisible
@@ -70,13 +65,11 @@ export function RevealOnScroll() {
      * under those conditions pushes every section down its own height and then
      * depends on machinery that is asleep to bring it back.
      *
-     * **This used to return instead, and that was a bug with a long reach.** A
-     * document is hidden at mount far more often than it sounds: a link opened
+     * A document is hidden at mount far more often than it sounds: a link opened
      * in a background tab, a restored session, a window behind another, a slow
-     * load the reader tabbed away from. Returning gave up for the life of the
-     * page, so the reveal never ran again no matter how long they read it.
-     * Found by driving a real browser rather than the review pane: the tab
-     * reported `hidden` and all seven sections sat at their served value.
+     * load the reader tabbed away from. Returning instead of waiting gives up
+     * for the life of the page, and the reveal never runs again however long the
+     * reader stays on it.
      *
      * Waiting costs one listener and removes the failure. Nothing is armed until
      * the document is actually being looked at, which is also the first moment
@@ -98,12 +91,12 @@ export function RevealOnScroll() {
         return
       }
 
-      /* **A quarter of the window, so the rise happens where it can be seen.**
-       This was a tenth, which fires as the section's top crosses the bottom
-       edge: the transition then runs while the section is a sliver at the foot
-       of the screen and is finished before any of it is comfortably in view. A
-       reader scrolling past covers far more ground in that time than the rise
-       itself moves, so the motion was there and invisible. */
+      /* **A quarter of the window, so the rise happens where it can be seen.** A
+       smaller margin fires as the section's top crosses the bottom edge: the
+       transition then runs while the section is a sliver at the foot of the
+       screen and is finished before any of it is comfortably in view. A reader
+       scrolling past covers far more ground in that time than the rise itself
+       moves, so the motion is there and invisible. */
       const observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {

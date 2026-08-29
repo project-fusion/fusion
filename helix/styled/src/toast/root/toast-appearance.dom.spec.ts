@@ -25,17 +25,15 @@ type Item = HTMLElement & {
 const region = async (items = ''): Promise<HTMLElement> =>
   (await mount(`<helix-toast label="Notifications">${items}</helix-toast>`)) as HTMLElement
 
-/* Stacking, the timer bar, the severity marks and the inversion, all of which this tier draws.
-
-   The behavior is the headless element's and is tested there. */
+/* Stacking, the timer bar, the severity marks and the inversion, all of which
+   this tier draws. The behavior is the headless element's and is tested there. */
 if (hasLayout()) {
   describe('toast stacking', () => {
     /* Which flex direction puts a new message nearest the edge depends on the
        edge, and it is the reverse of what the property name suggests:
        `column-reverse` puts the *first* item at main-start, so at the bottom it
-       puts the newest furthest from the corner. Both readings are plausible,
-       this was written the wrong way round first, and only a browser can say
-       which is which. */
+       puts the newest furthest from the corner. Both readings are plausible and
+       only a browser can say which is which. */
     const stack = async (placement: string): Promise<{ newest: number; oldest: number }> => {
       const host = (await mount(
         `<helix-toast label="N" placement="${placement}">
@@ -111,9 +109,9 @@ if (hasLayout()) {
     })
 
     test('the tone is a named icon, not only a color', async () => {
-      /* It was a colored bar, which says *something* is different about this
-         message and never says what. A reader who cannot tell green from red
-         was told nothing at all. The glyph carries the name. */
+      /* A colored bar says *something* is different about this message and
+         never says what, so a reader who cannot tell green from red is told
+         nothing at all. The glyph carries the name. */
       const found = await item('tone="danger"')
       const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
       expect(glyph?.getAttribute('role')).toBe('img')
@@ -212,10 +210,8 @@ if (hasLayout()) {
     })
 
     test('a toast is dense, so its controls are one height', async () => {
-      /* Measured before this: the text, the action and the dismiss were at 654,
-         664 and 660, because `start` aligned three boxes of different heights
-         by their tops. The heights differ because a toast is dense by nature
-         and had never said so. */
+      /* A toast is dense by nature, so a control slotted into one has to come
+         out at the dense height rather than the full one. */
       const found = (await mount(
         `<helix-toast label="N"><helix-toast-item dismissible>Message
            <helix-button emphasis="ghost" slot="actions">Retry</helix-button>
@@ -229,10 +225,9 @@ if (hasLayout()) {
         const box = element.getBoundingClientRect()
         return Math.round(box.top + box.height / 2)
       }
-      /* The centers no longer agree, and should not: the action sits on its own
-         row now. What this was really written for is the heights, which is the
-         fault it caught. A toast is dense by nature and had never said so, so a
-         slotted control came out at the full 40px beside a 32px dismiss. */
+      /* Heights, not centers: the action sits on a row of its own, so the
+         centers do not agree and should not. Without the density a slotted
+         control comes out at the full 40px beside a 32px dismiss. */
       expect(Math.round(action.getBoundingClientRect().height)).toBe(
         Math.round(dismiss.getBoundingClientRect().height),
       )
@@ -241,12 +236,12 @@ if (hasLayout()) {
     })
 
     test('the mark and the close hold the first line, and the action sits under the words', async () => {
-      /* Not centered, which floated them to the middle of a long message, and
-         not plain `start`, which is what an earlier version of this row did:
-         boxes of 16px, 21px and 32px sharing a top edge have centers 8px apart,
-         so a one-line message came out staggered. Each is offset by half the
-         difference between the line and itself, so one line reproduces centering
-         exactly and four leave everything where the reading starts.
+      /* Not centered, which floats them to the middle of a long message, and not
+         plain `start`: boxes of 16px, 21px and 32px sharing a top edge have
+         centers 8px apart, so a one-line message comes out staggered. Each is
+         offset by half the difference between the line and itself, so one line
+         reproduces centering exactly and four leave everything where the
+         reading starts.
        *
          The close needed its offset written *inside* its own rule: `all: unset`
          there wipes a margin set earlier, the same way it wipes `box-sizing`,
@@ -275,12 +270,9 @@ if (hasLayout()) {
         expect(Math.abs(center(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
 
         /* The action gets a row of its own, in the message's column, at every
-           message length. This asserted the opposite, that a short message
-           leaves room on the line and the action sits beside it, which is what
-           the row was when it was a wrapping flex: an action is a thing to do
-           about the message, so it belongs under the words rather than beside
-           them or under the mark. The component's own note says so and this
-           spec did not, having never run. */
+           message length: an action is a thing to do about the message, so it
+           belongs under the words rather than beside them or under the mark.
+           Never beside a short message, which is what a wrapping flex gives. */
         const action = found.querySelector('helix-button') as HTMLElement
         const content = part(found, 'content') as HTMLElement
         const actionBox = action.getBoundingClientRect()

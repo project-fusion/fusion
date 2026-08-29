@@ -37,17 +37,14 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * `inline-start` and `inline-end` beside, where a run of dots becomes a
    * column.
    *
-   * **The sides of the content, not positions along a bar.** This was
-   * `start | center | end`, which answered "where along the row" when the
-   * question is "which edge", and could not say "above" at all. The logical
-   * names rather than `top`/`left`, because the component is already careful
-   * about writing direction everywhere else and an `inline-start` carousel
-   * should put its dots on the right in Arabic without being told.
+   * **The sides of the content, not positions along a bar**, and logical names
+   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
+   * the right in Arabic without being told.
    *
    * Independent of `controlsPlacement`. Both default to the block end, where
-   * they share the row and split it, dots to the start and arrows to the end.
-   * That is the arrangement the old shared bar gave, arrived at by two defaults
-   * rather than by a rule about the pair, so moving one leaves the other alone.
+   * they share the row and split it, dots to the start and arrows to the end,
+   * arrived at by two defaults rather than by a rule about the pair, so moving
+   * one leaves the other alone.
    */
   @property({ attribute: 'indicator-placement', reflect: true })
   indicatorPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
@@ -74,8 +71,8 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * what keeps two items in one grid cell from landing on each other. Beside the
    * slides, and over them, both center instead, because a column there has
    * nothing to split the edge with. Putting both groups on the same edge with
-   * the same alignment does overlap them, and always did: that is what the two
-   * different defaults exist to avoid.
+   * the same alignment overlaps them, which is what the two different defaults
+   * exist to avoid.
    */
   @property({ attribute: 'indicator-align', reflect: true })
   indicatorAlign?: 'center' | 'end' | 'start'
@@ -94,12 +91,11 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * surface and a shadow under each arrow, because a glyph drawn straight onto a
    * photograph is legible against about half of one.
    *
-   * **That was `appearance="hero"` and did not need to be.** A third axis for
-   * something these two already describe: what `hero` meant was "the controls
-   * are over the content", and the surface, the edge-to-edge arrows and the bar
-   * that catches no presses all followed from it rather than being separate
-   * decisions. One fewer property, and the two axes are now the whole of where
-   * a carousel's chrome can go.
+   * **It is a value here rather than an axis of its own.** "The controls are
+   * over the content" is the whole of what a `hero` appearance would say, and
+   * the surface, the edge-to-edge arrows and the bar that catches no presses all
+   * follow from it. These two placements are the whole of where a carousel's
+   * chrome can go.
    */
   @property({ attribute: 'controls-placement', reflect: true })
   controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'

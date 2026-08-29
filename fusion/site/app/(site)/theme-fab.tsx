@@ -11,12 +11,11 @@ import { useThemeControls } from './theme-context'
 /**
  * A pill that says "Make it yours", and becomes the toolbar that does it.
  *
- * **The label is an invitation rather than an instruction.** "Theme this page"
- * named a feature and read like a settings row: correct, and nobody wants to
- * theme a page. What the control actually offers is the hero's own promise, one
- * color in and the whole page follows, so it borrows the hero's last three
- * words. Three words is also the most a pill can hold before it stops being a
- * dot with a label and starts being a button.
+ * **The label is an invitation rather than an instruction.** Naming the feature
+ * ("Theme this page") is correct and reads like a settings row. What the control
+ * offers is the hero's own promise, one color in and the whole page follows, so
+ * it borrows the hero's last three words. Three words is also the most a pill
+ * can hold before it stops being a dot with a label and starts being a button.
  *
  * **One element that changes size, not two that swap.** Both faces live in the
  * same grid cell and cross-fade while the container's width animates, so the
@@ -124,11 +123,11 @@ export const ThemeFab = () => {
         <div className={styles.fabTools} inert={!open || undefined}>
           {/* **Rows, not a bar, once the pointer is a finger.** Every control
               here is named by a `helix-tooltip` and an `aria-label`, and a touch
-              screen has neither a hover nor a screen reader in play: on a phone
-              this was three unlabelled sliders and a row of dots. The labels
-              below are the same words the tooltips carry, shown rather than
-              hovered. Each row is `display: contents` above the breakpoint, so
-              the bar it started as is unchanged. */}
+              screen has neither a hover nor a screen reader in play, so without
+              these labels a phone gets three unlabeled sliders and a row of
+              dots. They are the same words the tooltips carry, shown rather
+              than hovered. Each row is `display: contents` above the
+              breakpoint, so the bar is unchanged there. */}
           <helix-flex
             align="center"
             class={styles.fabStack}
@@ -204,12 +203,10 @@ export const ThemeFab = () => {
                 and the tooltip says so, which is the pair that leaves no doubt
                 about which way the control reads.
 
-                **It writes the site preference, not just the scope.** The
-                masthead's preferences panel and this bar were setting the same
-                thing two ways: this one painted the scope and the attribute,
-                that one also persisted. Changing the scheme here then opening
-                preferences showed the old answer, and a reload took the page
-                back to it. Both now go through `STORAGE_KEY`. */}
+                **It writes the site preference, not just the scope.** Painting
+                the scope and the attribute without persisting leaves the
+                masthead's preferences panel showing the old answer and a reload
+                taking the page back to it. Both go through `STORAGE_KEY`. */}
             <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>Color scheme</span>
               <helix-tooltip
@@ -234,11 +231,11 @@ export const ThemeFab = () => {
             <div className={styles.fabDivider} />
 
             {/* **What the engine made of it, which is the point.** The controls
-                on the left are the inputs; without this the bar is a color picker
-                and the claim that every pair is measured is a sentence somewhere
-                else on the page. The swatches are derived roles rather than the
-                brand repeated, and the verdict is the engine's own count. */}
-            {/* **The readout says what the engine found and not what it is**, so
+                on the left are the inputs; without this the bar is a color
+                picker and the claim that every pair is measured is a sentence
+                somewhere else on the page.
+
+                **The readout says what the engine found and not what it is**, so
                 both halves carry a tooltip that does.
 
                 The swatches are the semantic roles derived from the brand, not
@@ -250,10 +247,9 @@ export const ThemeFab = () => {
                 Neither substitutes for the other, and "roles too close" is the
                 second one with no way to know that from the words.
 
-                `helix-tooltip` rather than the native `title` these swatches
-                carried. A `title` is the browser's own delayed box, which is
-                the same thing that was just taken off the charts: it cannot be
-                styled, it cannot be reached by touch, and it arrives late. */}
+                `helix-tooltip` rather than the native `title`. A `title` is the
+                browser's own delayed box: it cannot be styled, it cannot be
+                reached by touch, and it arrives late. */}
             <div className={`${styles.fabRow} ${styles.fabReadoutRow}`}>
               <span className={styles.fabRowLabel}>What the engine derived</span>
               <div className={styles.fabReadout}>
@@ -287,13 +283,12 @@ export const ThemeFab = () => {
                     className={styles.fabVerdict}
                     data-failing={c.derived && c.derived.violations.length > 0 ? '' : undefined}
                   >
-                    {/* **A count is not asserted here, and that was a real bug.**
-                    The first version printed "13 pairs pass", taken from how many
-                    derived roles happened to carry a contrast reading. The
-                    metrics page says 67. Two different numbers for one claim on
-                    one site, and the smaller was invented by this component.
-                    What the engine reports per derivation is its failures, so
-                    that is what this shows. */}
+                    {/* **Never assert a pass count here.** Counting the derived
+                    roles that happen to carry a contrast reading gives "13 pairs
+                    pass" while the metrics page says 67: two numbers for one
+                    claim on one site, and the smaller one invented by this
+                    component. What the engine reports per derivation is its
+                    failures, so that is what this shows. */}
                     {/* Before the first touch nothing has been derived, and the
                     page is wearing the palette the stylesheet ships. Saying
                     "deriving" there would be a spinner for work that is not
@@ -313,10 +308,9 @@ export const ThemeFab = () => {
             {/* **The glyph is a child, not an attribute.** `name` on
                 `IconButton` is the form field name it inherits from `button`,
                 beside `type`, `value` and the `form*` pair. It is not the icon,
-                and setting it to `x-mark` gave the control a form name and no
-                content: an empty button the width of an icon, which is why the
-                close never appeared. The scheme toggle three elements up had it
-                right the whole time.
+                and setting it to `x-mark` gives the control a form name and no
+                content: an empty button the width of an icon, with no close in
+                it.
 
                 `x` rather than `x-mark`, which is not in the set either. */}
             <helix-icon-button

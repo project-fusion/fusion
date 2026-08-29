@@ -12,9 +12,9 @@ import { StillWhenUnseen } from './still-when-unseen'
  * reads as a flowchart, which is a weaker and more common thing.
  *
  * **Two layers over one geometry.** The base is quiet and permanent, the pulse
- * moves over it. The earlier single bright layer drew itself in on a `view()`
- * timeline and looped, so the figure dismantled and rebuilt itself every few
- * seconds while somebody was reading it.
+ * moves over it. A single bright layer drawing itself in on a `view()` timeline
+ * and looping makes the figure dismantle and rebuild itself every few seconds
+ * while somebody is reading it.
  *
  * **The pulses never seam, because every path carries its own length.** A dash
  * of `[16, len - 16]` is exactly one lit segment, and winding the offset by
@@ -26,9 +26,8 @@ import { StillWhenUnseen } from './still-when-unseen'
  * **The reference's intake fade is not copied, and that is a judgment.** Its
  * left card dissolves at the outer edge, which reads well because what fades is
  * a panel behind icons. Applied here it fades the labels themselves, and those
- * are content: it left "brand" and "density" visibly weaker than "179" and "67"
- * across the same figure, which says the inputs matter less. They do not. The
- * asymmetry was worth trying and is not worth its cost.
+ * are content: it leaves "brand" and "density" visibly weaker than "179" and
+ * "67" across the same figure, which says the inputs matter less. They do not.
  */
 export const DerivationDiagram = () => (
   <StillWhenUnseen className={styles.diagram}>
@@ -169,18 +168,18 @@ export const DerivationDiagram = () => (
       {/* **The registration marks, as one rounded rect seen through its own
           corners.**
 
-          They were four `path` elements with a square turn in each, which no
-          amount of theming could round: path data is a string and CSS cannot
-          reach inside it. Every card on the page answers to the radius slider,
-          so moving it left the drawing frame at right angles around content
-          that had gone soft.
+          Four `path` elements with a square turn in each is the obvious version
+          and cannot be themed: path data is a string and CSS cannot reach
+          inside it. Every card on the page answers to the radius slider, so
+          that version leaves the drawing frame at right angles around content
+          that has gone soft.
 
           A `rect` can be themed, because `rx` is an SVG 2 geometry property as
           well as an attribute and CSS may set it. Drawing the whole rectangle
-          and masking it back to four 24-unit squares gives the same four marks,
-          now with whatever corner the theme is using: the mask shows the turn
-          and the first dozen units of each arm, and hides the long sides that
-          the dashed frame underneath is already drawing. */}
+          and masking it back to four 24-unit squares gives the same four marks
+          with whatever corner the theme is using: the mask shows the turn and
+          the first dozen units of each arm, and hides the long sides that the
+          dashed frame underneath is already drawing. */}
       <rect
         className={styles.diagramCorners}
         fill="none"
@@ -200,32 +199,26 @@ export const DerivationDiagram = () => (
 
       {/* ── What you choose ─────────────────────────────────────── */}
       {/* **Every row is centered on the track its connector leaves from.**
-          The taps are at 120, 200, 280 and 360, evenly 80 apart. The brand
-          swatch was drawn at 124 with a height of 32, putting its middle at 140:
-          twenty units below the line running out of it, so the one row a reader
-          looks at first was the one visibly detached from its own wire. The
-          section label sat at 112 and was therefore *inside* that swatch.
-
-          Glyph centers and text baselines are now derived from the tap rather
-          than set by hand, and the label clears the first row. */}
-      {/* **Outside the frame, and that is what centers the drawing.**
-          These are annotations about the figure rather than parts of it, and
-          sitting inside the dashed rectangle they added mass at the top with
-          nothing balancing it below: the four rows are centered on the hub at
-          240, but the block including the labels centered on 227, so the whole
-          drawing read as riding high in its own frame. Lifted out, the frame
+          The taps are at 120, 200, 280 and 360, evenly 80 apart. Glyph centers
+          and text baselines are derived from the tap rather than set by hand, so
+          a row cannot come out detached from its own wire. */}
+      {/* **The section labels sit outside the frame, and that is what centers
+          the drawing.** They are annotations about the figure rather than parts
+          of it: inside the dashed rectangle they add mass at the top with
+          nothing balancing it below, and the block including them centers on 227
+          where the four rows center on the hub at 240. Lifted out, the frame
           holds only the rows, and the rows are already centered. */}
       <text className={styles.diagramLabel} fontSize="13" x="72" y="72">
         What you choose
       </text>
 
       {/* **A hit area, because a stroke is not a target.** The channel a
-          pointer is over decides what the whole figure emphasizes, and until
-          now only the painted pixels answered: `brand` and `saturation` are
-          filled rects and worked, `density` is three 1.6-unit lines and
-          `radius` is a `fill="none"` path, so both wanted the pointer on a
-          hairline. The gap between a glyph and its word answered to nothing at
-          all, which is most of the row.
+          pointer is over decides what the whole figure emphasizes, and painted
+          pixels alone will not answer for it: `brand` and `saturation` are
+          filled rects, but `density` is three 1.6-unit lines and `radius` is a
+          `fill="none"` path, so both would want the pointer on a hairline. The
+          gap between a glyph and its word would answer to nothing at all, which
+          is most of the row.
 
           `fill="transparent"` rather than `fill="none"`: none is not painted
           and not hit-tested, transparent is hit-tested and invisible. The band
@@ -238,10 +231,9 @@ export const DerivationDiagram = () => (
           between the words and the wire whose width is whatever the longest
           label happened to be.
 
-          Measured before this, the outputs sat a flat 34 from the junction and
-          the inputs ranged from 91 (`saturation`) to 121 (`brand`), so the left
-          half of the figure had three times the gap of the right and no two
-          rows agreed. Text now ends at 246, which is 280 minus that same 34.
+          The outputs sit a flat 34 from their junction, and text on this side
+          ends at 246, which is 280 minus that same 34, so both halves of the
+          figure hold the same gap.
 
           **Each icon is placed from its label's width** rather than sharing one
           column, so the 16 between a glyph and its word is the same on every
@@ -413,9 +405,9 @@ export const DerivationDiagram = () => (
       {/* **Real glass, which needs a `foreignObject` to exist at all.**
           `backdrop-filter` on an SVG shape does nothing: tested against sharp
           stripes, a `<circle>` carrying it left them sharp and only an HTML
-          element inside a `foreignObject` blurred them. So the disc was a flat
-          fill of the page background at 82 percent pretending to be a surface,
-          while every card around it was blurring what it sat on.
+          element inside a `foreignObject` blurred them. Without one the disc can
+          only be a flat fill of the page background pretending to be a surface,
+          while every card around it blurs what it sits on.
 
           Blurred harder than the cards, because this one is the subject rather
           than a container: the field and the aura behind it go soft enough that
@@ -436,16 +428,14 @@ export const DerivationDiagram = () => (
       {/* The hub as an instrument: what was measured, on the scale it is judged
           by, and the reading.
 
-          **The bisection funnel is gone, and its own defense is why.** It drew
-          the search rather than the result, which meant the one thing a reader
-          could see was a stack of shrinking brackets whose meaning lived in a
-          comment. A picture that needs a paragraph is not a picture. What the
-          number is actually about is type on a ground, which is the form every
-          contrast checker already uses and nobody has to be taught.
+          **Type on a ground, not a drawing of the search.** Rendering the
+          bisection gives a stack of shrinking brackets whose meaning lives in a
+          comment, and a picture that needs a paragraph is not a picture. What
+          the number is about is type on a ground, the form every contrast
+          checker already uses.
 
-          The gauge stays, because it answers the question the ratio raises:
-          4.9 means nothing until you can see that 4.5 is the line a build
-          passes or fails on. */}
+          The gauge answers the question the ratio raises: 4.9 means nothing
+          until you can see that 4.5 is the line a build passes or fails on. */}
       <g fill="none" strokeLinecap="round">
         <path
           className={styles.diagramGaugeTrack}
@@ -545,9 +535,9 @@ export const DerivationDiagram = () => (
  * units across because that is what four labeled inputs, a hub and three
  * labeled outputs need when they run left to right. Nothing about that reflows:
  * the path data is the layout, so a narrow screen could only scale it down, and
- * at 342px the type came out near four pixels. It scrolls today, which is honest
- * and still means dragging a box twice the width of the screen to read the
- * page's central explanation.
+ * at 342px the type comes out near four pixels. Letting it scroll instead is
+ * honest and still means dragging a box twice the width of the screen to read
+ * the page's central explanation.
  *
  * So the flow runs top to bottom here: four inputs across, converging to the
  * hub, fanning out to three outputs across. Same three beats, same tokens, same

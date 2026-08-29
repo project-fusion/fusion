@@ -23,14 +23,12 @@
    with the row's own step. Everything else it needs is `emphasis="ghost"`: no
    frame, the width of what is in it, and the mark against the value.
 
-   **The label is not hidden from here, and it was.** This carried
-   `::part(label) { display: none }`, which took the label out of the
-   accessibility tree along with the picture. `MixinField` already answers this:
-   a field with an empty `label` and an `aria-label` on the host renders the
-   label *clipped* instead, which is the standard one pixel box, still read and
-   still the target of the `for` that focuses the control. Its own note says the
-   accessibility tree is "the one thing it is here to stay in", and `display:
-   none` was the one thing that took it out. */
+   **Never hide the label from here with `::part(label) { display: none }`**,
+   which takes it out of the accessibility tree along with the picture.
+   `MixinField` already answers this: a field with an empty `label` and an
+   `aria-label` on the host renders the label *clipped* instead, which is the
+   standard one pixel box, still read and still the target of the `for` that
+   focuses the control. */
 .assistant-model {
   --helix-size-icon: var(--helix-size-icon-sm);
 }

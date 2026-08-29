@@ -22,11 +22,10 @@
      rule as well only makes it look cut out. */
   border: var(--popover-border-width, var(--helix-border-floating)) solid
     var(--popover-border-color, var(--helix-color-border));
-  /* The house radius. Dialog, tooltip and toast settled here and the surfaces
-     that float were left at `md`, so a menu and the dialog it opens from drew
-     two different corners. Card's argument is the one that decides it: at
-     anything larger the corner is softer than the controls inside it, and a
-     surface holding controls should recede. */
+  /* The house radius, so a menu and the dialog it opens from draw the same
+     corner. Card's argument is the one that decides it: at anything larger the
+     corner is softer than the controls inside it, and a surface holding
+     controls should recede. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--popover-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
@@ -59,32 +58,7 @@
   padding: var(--popover-padding, var(--helix-space-none));
 }
 
-/* It grows out of the edge it opened against, which `data-placement` is written
-   for: the panel knows which way it flipped, so the movement reads as coming out
-   of the trigger rather than from a fixed direction that is backwards half the
-   time.
- *
- * **This was a keyframe animating `translate`, and it could not stay.** The
- * floating controller writes the panel's position onto that same property, and
- * an animation outranks an inline style for as long as it runs, so the keyframe
- * took the position over and the panel traveled from the viewport corner. The
- * offset it used to add is now the scale instead, which composes with the
- * controller's `translate` rather than fighting it.
- *
- * Gated on `data-placed` rather than `:popover-open`: the controller positions
- * on a microtask after the panel is revealed, so keying the entrance to the open
- * state starts it a frame before anything knows where the panel goes. This is
- * the same signal Select has always waited on. */
-/* And it leaves the same way it arrived.
-   *
-   * The two lines below are what make an exit possible at all on a top-layer
-   * element, and without them the transition above ran in one direction only:
-   * closing removes `data-placed` *and* stops `:popover-open` matching, so the
-   * `display: none` rule landed in the same frame and there was nothing left to
-   * transition. `overlay` is the second half, or the panel drops out of the top
-   * layer immediately and fades out behind whatever it was covering. Dialog
-   * carries the long version of this. */
-/* And it travels, a little, out of the edge it opened against.
+/* It travels, a little, out of the edge it opened against.
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
@@ -99,7 +73,19 @@
  * on the same signal for the same reason.
  *
  * Small on purpose. `2xs` is enough to read as motion and short enough that a
- * fast reader who opens and picks in one gesture is not waiting on it. */
+ * fast reader who opens and picks in one gesture is not waiting on it.
+ *
+ * Gated on `data-placed` rather than `:popover-open`: the controller positions
+ * on a microtask after the panel is revealed, so keying the entrance to the open
+ * state starts it a frame before anything knows where the panel goes. This is
+ * the same signal Select waits on.
+ *
+ * `display` and `overlay` with `allow-discrete` are what make an exit possible
+ * at all on a top-layer element. Without them, closing removes `data-placed`
+ * *and* stops `:popover-open` matching, so the `display: none` rule lands in the
+ * same frame and there is nothing left to transition; without `overlay` the
+ * panel drops out of the top layer immediately and fades out behind whatever it
+ * was covering. Dialog carries the long version of this. */
 [part="popover"] {
   opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
@@ -180,7 +166,8 @@
 
 /* Not printed, being an overlay.
  *
- * It is over the page rather than part of it, and on paper there is no over: a dialog prints as a slab across whatever it covered, and a tooltip prints its tip beside nothing that is hovering.
+ * It is over the page rather than part of it, and on paper there is no over: it
+ * would print as a slab across whatever it was covering.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow

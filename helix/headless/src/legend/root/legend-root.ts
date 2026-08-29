@@ -72,9 +72,8 @@ export class HelixHeadlessLegend extends HelixElement {
   @property()
   for = ''
 
-  /* One controller rather than the resolve-and-watch each chart had written
-     out for itself. Three copies had already drifted into two names for the
-     same lookup. */
+  /* One controller rather than the resolve-and-watch each chart would write
+     out for itself, which drifts into two names for the same lookup. */
   protected readonly source = new SourceController(this)
 
   protected override willUpdate(changed: PropertyValues<this>): void {

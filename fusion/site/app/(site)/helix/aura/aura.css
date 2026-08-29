@@ -89,8 +89,8 @@
 }
 
 /* Sized to its content, not to the row. A toggle group is a block by default,
-   so the shape group took the whole width and pushed pointer onto a line of its
-   own, which is the layout this replaces. */
+   so without this the shape group takes the whole width and pushes pointer onto
+   a line of its own. */
 .auraShapes {
   inline-size: auto;
 }
@@ -154,14 +154,11 @@
    by moving the route out of the group, because everything else the layout
    gives this page is wanted.
  *
- * **`[data-site-footer]`, because the class could never have matched.** This
- * asked for `.siteFooter`, which is the *source* name of a rule in
- * `chrome.module.css`. A CSS module rewrites its class names, so the element
- * carries `chrome-module__sKhELq__siteFooter` and the only thing that can
- * select it is `styles.siteFooter` from inside a module. From a plain
- * stylesheet the selector matched nothing, and it had never once hidden the
- * footer: measured on this route, `display: block`, 84 pixels tall, below a
- * stage that is already `100svh`.
+ * **`[data-site-footer]`, never `.siteFooter`.** That is the *source* name of a
+ * rule in `chrome.module.css`, and a CSS module rewrites its class names, so the
+ * element carries `chrome-module__sKhELq__siteFooter` and the only thing that
+ * can select it is `styles.siteFooter` from inside the module. From a plain
+ * stylesheet the source name matches nothing.
  *
  * That is the same failure as a `[part=]` selector for a part nothing renders,
  * and it is worse here because the module boundary makes it invisible: the rule

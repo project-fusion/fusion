@@ -45,13 +45,13 @@
 
 /* Decorative, and out of the way of everything it is behind.
  *
- * **Conditional, and it was not.** A background must not swallow clicks meant
+ * **Conditional, and it has to be.** A background must not swallow clicks meant
  * for what is laid over it, so the resting state is untouchable. But the
  * element listens for `pointermove` on itself, and an element that is not
  * hit-testable never receives one: measured with a real gesture across it, the
  * host reported `pointer-events: none` and not a single mark reached the wake.
- * Synthetic events hid it completely, because dispatching bypasses hit-testing,
- * so every test of the feature passed while the feature did nothing.
+ * Synthetic events hide this completely, because dispatching bypasses
+ * hit-testing, so a test of the wake passes while the feature does nothing.
  *
  * So `interactive` reflects, which is the one thing that justifies reflecting
  * it: reflection exists so a selector can reach a value, and this is the

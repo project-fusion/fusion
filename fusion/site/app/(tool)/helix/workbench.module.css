@@ -10,12 +10,10 @@
 
 /* The way out of the sandbox rail and into a family's own docs page.
  *
- * The reference sidebar had one of these too, going up to the index, and it is
- * a row in the list now rather than a mark on the branch: a destination among
- * destinations belongs in the list, where it is legible without hovering and in
- * the tab order without a rule saying so. What is left here is the case that
- * genuinely is a mark, one per row against eighty-eight rows, where rows would
- * double the length of the rail to say the same thing.
+ * A mark on the branch rather than a row of its own, because there is one per
+ * row and rows would double the length of the rail to say the same thing. A
+ * destination that is one among several belongs in the list instead, where it
+ * is legible without hovering and in the tab order without a rule saying so.
  *
  * **Hover and focus-within, not hover alone.** A control revealed only by a
  * pointer is one a keyboard reader never finds, and this is a link in a
@@ -37,38 +35,29 @@
   display: inline-flex;
   inline-size: 1.5rem;
   justify-content: center;
-  /* **On hover, as asked, and it took fixing the reasons it could not be seen
-     first.** Revealed-on-hover was reported as simply absent, and the cause was
-     not the gate: a 16 square glyph 4px from a chevron of the same size in the
-     same gray is invisible whenever it is shown. A 24 square target, twelve
-     pixels of air, and it reads. So the gate goes back.
-
-     `opacity` and not `display`, so the row's width does not change as a
-     pointer crosses it and the label does not shift under the reader at the
-     moment they are aiming at it. Not `visibility: hidden` either, which takes
-     it out of the accessibility tree and would hide a link that is there. */
+  /* Revealing this is only half of it: a 16 square glyph 4px from a chevron of
+     the same size in the same gray is invisible whenever it is shown. A 24
+     square target with twelve pixels of air is what makes the gate worth
+     having. */
   opacity: 0;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard),
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 
-  /* Off the chevron, which sits 4px away and is the same size and the same
-     gray. Reported as not being there at all: two 16px marks that close
-     together read as one smudge rather than as a control beside a control. */
+  /* Off the chevron, which is the same size and the same gray: two 16px marks
+     4px apart read as one smudge rather than as a control beside a control. */
   margin-inline-end: var(--helix-space-xs);
 
   --icon-size: var(--helix-size-icon-sm);
 }
 
-/* A surface, not the accent.
- *
- * This painted `--helix-color-primary` and should never have: `tree-item.css`
- * states the rule one file away, that the accent is reserved for state and
- * using it for emphasis made the current page the loudest thing on screen. A
- * link inside that tree does not get to disagree with the tree. The surface
- * does the work and the ink goes to full strength, which is what the row's own
- * hover does. */
+/* A surface, not the accent. `tree-item.css` states the rule one file away,
+   that the accent is reserved for state: painting `--helix-color-primary` here
+   for emphasis makes the current page the loudest thing on screen, and a link
+   inside that tree does not get to disagree with the tree. The surface does the
+   work and the ink goes to full strength, which is what the row's own hover
+   does. */
 .docsJump:hover,
 .docsJump:focus-visible {
   background-color: var(--helix-color-surface-raised);
@@ -117,13 +106,12 @@
 }
 
 /* **The rail opens and closes without a transition, and that is not an
-   oversight.** It was `transition: flex-basis` on the pane, to keep the reveal
-   the old grid animated. Measured, it did not slow the change down, it stopped
-   it happening: the inline style went to `--_splitter-position: 100%` and the
-   computed `flex-basis` stayed at `60%` for good, with the pane frozen at its
-   old width. A transition on a property whose value is substituted from an
-   unregistered custom property has nothing it can interpolate, and it holds the
-   start value rather than declining to run.
+   oversight.** A `transition: flex-basis` on the pane does not slow the change
+   down, it stops it happening: the inline style goes to
+   `--_splitter-position: 100%` and the computed `flex-basis` stays at `60%` for
+   good, with the pane frozen at its old width. A transition on a property whose
+   value is substituted from an unregistered custom property has nothing it can
+   interpolate, and it holds the start value rather than declining to run.
 
    Animating it needs `@property` registration for the splitter's own position,
    which is the splitter's to declare rather than something to reach in and
@@ -189,15 +177,15 @@
 }
 
 /* **The drawer needs the rail's grid and none of its chrome.**
-   `examplesPane` is shared: in the rail it is the two rows of `.examplesRail`,
-   the header pinned and the tree scrolling under it. Dropped into a drawer it
-   got neither, so the filter scrolled away with the list, which is the thing
-   the comment above `.examplesRail` says a filter must never do.
+   `examplesPane` is shared, and in the rail it is the two rows of
+   `.examplesRail`, the header pinned and the tree scrolling under it. Without
+   that grid the filter scrolls away with the list, which is the thing the
+   comment above `.examplesRail` says a filter must never do.
 
    And `.examplesHeader` is dressed to line up with the toolbar strip across the
    window, a background, a border and a fixed control-lg height. There is no
-   strip in a drawer for it to line up with, so it read as a box floating above
-   the list with a gap over it. */
+   strip in a drawer for it to line up with, so it would read as a box floating
+   above the list with a gap over it. */
 /* **The drawer's top padding is `2xl` by default where its sides are `lg`**, which
    is the room a title needs and this one has none: the label is the accessible
    name and nothing draws it, so the gap sat above the filter as empty chrome.
@@ -270,11 +258,9 @@
 
 /* Chrome density, so the marks in a row come down with the type.
  *
- * The children are indented again, which the chevron moving to the end is what
- * allows. At the start it took a gutter every row had to reserve, so a child
- * carried both that and its indent and sat two steps from its parent's name;
- * aligning the two meant no indent at all. At the end there is no gutter, a
- * label starts at its row's own inset, and one step of indent is one step.
+ * The chevron sits at the end, which is what lets the children be indented. At
+ * the start it takes a gutter every row has to reserve, so a child carries both
+ * that and its indent and sits two steps from its parent's name.
  */
 .examplesRail,
 .examplesRail helix-tree {
@@ -292,10 +278,10 @@
  *
  * **A document rule reaching in from `helix-tree-item` is one `check:css:overruled`
  * fails on, and it is right to**: it wins whatever the specificity and whatever
- * the layer, so a property the component sets there is dead. `color` was, which
- * is why an earlier version of this rule had to go. `opacity` is not set
- * anywhere in `tree-item.css`, on the host or on slotted content, so keying the
- * reveal on it collides with nothing and the check stays quiet.
+ * the layer, so a property the component sets there is dead. `color` is one of
+ * those. `opacity` is not set anywhere in `tree-item.css`, on the host or on
+ * slotted content, so keying the reveal on it collides with nothing and the
+ * check stays quiet.
  *
  * `:focus-within` beside `:hover` is not decoration. Gated on hover alone the
  * link is a control a keyboard can focus and never see, which is worse than one

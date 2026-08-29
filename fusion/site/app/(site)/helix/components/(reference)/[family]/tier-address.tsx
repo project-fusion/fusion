@@ -5,18 +5,16 @@ import { useEffect } from 'react'
 /**
  * Keeps `?tier=` describing the tier the page is actually showing.
  *
- * The parameter was only ever read here. A page arriving with `?tier=headless`
- * forces the attribute and documents the headless API, which is the half that makes
- * a link work, but flipping the same choice in the drawer left the address
- * alone. So a reader looking at the headless tables copied a URL that said nothing
- * about tiers, and whoever opened it got their own preference: exactly the
- * failure the parameter exists to prevent, arrived at from the other direction.
- * See 245.
+ * Reading the parameter is only half of it. A page arriving with
+ * `?tier=headless` forces the attribute and documents the headless API, but a
+ * drawer that flips the same choice without writing the address leaves a reader
+ * copying a URL that says nothing about tiers, so whoever opens it gets their
+ * own preference: the failure the parameter exists to prevent, arrived at from
+ * the other direction. See 245.
  *
- * **The sandbox settled this argument already** and this is the same answer, so
- * that one concept does not get two behaviors on top of nearly getting two
- * names. The address describes what is on the page, whichever control put it
- * there, and styled is the absence, so an ordinary reference URL stays clean.
+ * The address describes what is on the page, whichever control put it there,
+ * and styled is the absence, so an ordinary reference URL stays clean. The
+ * sandbox answers this the same way.
  *
  * **The address is written on a change and never on arrival**, which is what
  * protects a deliberate `?tier=styled`. That link is aimed at a reader whose own

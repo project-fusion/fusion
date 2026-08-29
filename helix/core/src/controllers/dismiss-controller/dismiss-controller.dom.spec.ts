@@ -13,8 +13,8 @@ import { DismissController } from './dismiss-controller.js'
  * them listens on `document`, so they are siblings on a single node and the
  * only ordering is registration, which is the order they *opened* rather than
  * the order they are nested in. `stopPropagation` stops an event reaching
- * ancestors and does nothing between siblings, so one Escape ran all of them
- * under a comment claiming the innermost was the one the reader meant.
+ * ancestors and does nothing between siblings, so without a depth to compare
+ * one Escape closes every open overlay rather than the innermost.
  */
 beforeAll(() => {
   registerDom()

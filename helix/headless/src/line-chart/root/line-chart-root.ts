@@ -88,22 +88,19 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   /**
    * How the line gets from one reading to the next.
    *
-   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
-   * argument this comment used to make.* Joining the readings claims nothing in
-   * between, which is true and is why `straight` still exists: a straight
-   * segment asserts nothing about the values between two readings, and a curve
-   * invents them. What settles it the other way is that the invention is
-   * bounded. The interpolation is monotone cubic, so it never leaves the band
+   * **`smooth` is the resting curve.** A curve invents the values between two
+   * readings, which is why `straight` still exists, but the invention is
+   * bounded: the interpolation is monotone cubic, so it never leaves the band
    * the data sets and never introduces a peak or a trough the series does not
-   * have, and within that bound the smoothed line is the easier one to follow
-   * across a long series. `straight` becomes the deliberate claim.
+   * have. Within that bound the smoothed line is the easier one to follow
+   * across a long series, and `straight` becomes the deliberate claim.
    *
-   * **Still absent rather than defaulted on the property**, because a
-   * reflecting property with a default writes its attribute onto every host
-   * anybody renders, including the ones nobody configured.
+   * **Absent rather than defaulted on the property**, because a reflecting
+   * property with a default writes its attribute onto every host anybody
+   * renders, including the ones nobody configured.
    * `line-chart-root.ssr.spec.ts` asserts the host carries only what the
-   * consumer wrote, and caught that the first time. The default therefore lives
-   * where the path is built, as `curve ?? 'smooth'`.
+   * consumer wrote. The default therefore lives where the path is built, as
+   * `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
    */
@@ -124,12 +121,11 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * through each reading, which is what lets a point be traced down to its
    * label across a wide chart. `both` draws both.
    *
-   * **A bare `gridlines` means `value`**, and so does anything unrecognised.
-   * Written out, the attribute a consumer reaches for first should be the grid
-   * they meant, and a typo should fall back to the useful half rather than to
-   * nothing at all: an unrecognised value that draws no rules is
-   * indistinguishable from the attribute being absent, which is the one thing
-   * a reader cannot debug.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognized.
+   * The attribute a consumer reaches for first should be the grid they meant,
+   * and a typo should fall back to the useful half rather than to nothing at
+   * all: an unrecognized value that draws no rules is indistinguishable from
+   * the attribute being absent, which is the one thing a reader cannot debug.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
@@ -233,12 +229,12 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     /* **A reading sits in the middle of its own slot, not at the edge of the
        box**, which is what makes the names underneath line up with it.
      *
-     * Spanning 0 to 100 is the obvious version and is what this did first. The
-     * labels are a grid of equal columns, the same row the bar chart uses, so
-     * each name is centered in its share of the width while the readings sat at
-     * the gridlines between those shares: measured, the first name centered at a
-     * twelfth of the width with its point at zero. Every label was off by half
-     * a slot and the error grew toward the middle.
+     * Spanning 0 to 100 is the obvious version and is wrong. The labels are a
+     * grid of equal columns, the same row the bar chart uses, so each name is
+     * centered in its share of the width while the readings sit at the
+     * gridlines between those shares: measured, the first name centered at a
+     * twelfth of the width with its point at zero. Every label is off by half
+     * a slot and the error grows toward the middle.
      *
      * Insetting by half a slot also means a line chart and a bar chart drawn
      * from the same table stack, which is the arrangement anybody comparing a

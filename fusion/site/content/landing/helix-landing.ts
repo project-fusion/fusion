@@ -1,11 +1,11 @@
 /**
  * Draft C's copy, as data.
  *
- * **Helix first, and services as the way you get it.** The earlier drafts led
- * with the company and listed two substrates and three offers as peers, which
- * asks a reader to care about Fusion before they have been told what Fusion has.
- * Nearly everything here is about the design system, and the engagements are
- * framed as how it arrives rather than as a separate menu.
+ * **Helix first, and services as the way you get it.** Leading with the company,
+ * and listing substrates and offers as peers, asks a reader to care about Fusion
+ * before they have been told what Fusion has. Nearly everything here is about
+ * the design system, and the engagements are framed as how it arrives rather
+ * than as a separate menu.
  *
  * **The shape is borrowed and the voice is not.** Supernova opens on the
  * reader's problem, answers it with three mechanisms, then names capabilities
@@ -39,10 +39,10 @@ export const HERO = {
   /**
    * **The longer form, for a search result and a link preview.**
    *
-   * This and `lede` were one field until the hero was cut to a single line, and
-   * cutting them together would have left a forty-nine character meta
-   * description: a result page and a link card want the sentences a hero is
-   * better without. So the proofs live here, where length is a virtue.
+   * Separate from `lede` because the hero is one line, and cutting the two
+   * together leaves a forty-nine character meta description: a result page and a
+   * link card want the sentences a hero is better without. So the proofs live
+   * here, where length is a virtue.
    *
    * **All three are literal and checkable, which is why they are worth stating
    * flatly.** Open source is MIT across the published packages. Machine-readable
@@ -62,23 +62,20 @@ export const HERO = {
    * is the only honest way to promise speed: nothing here makes a person type
    * faster, it removes a review step they were doing by hand.
    *
-   * This carried three more claims until the hero read as too much text with
-   * them in. They were not wrong, they were early: the bands below evidence each
-   * one at the point a reader is asking for it, and `description` still hands
-   * all three to a search result. What is left is the whole of what someone
-   * needs before the buttons under it.
+   * The other claims are not wrong here, they are early: the bands below
+   * evidence each one at the point a reader is asking for it, and `description`
+   * still hands all three to a search result. What is left is the whole of what
+   * someone needs before the buttons under it.
    *
-   * **And no number in it**, for the reason the ninety-two components went: a
-   * count in the hero is a fact with an owner, wrong the day a component is
-   * added, and nothing checks it. The band below prints the count from the built
-   * packages, where it is generated and cannot drift.
+   * **And no number in it.** A count in the hero is a fact with an owner, wrong
+   * the day a component is added, and nothing checks it. The band below prints
+   * the count from the built packages, where it is generated and cannot drift.
    */
   lede: 'Ship faster because the system does the checking.',
   /**
-   * **Generic before it is clever.** The line this replaces, "We built the parts
-   * every product needs, so you can build the one that is only yours", is a
-   * sentence about us that takes twenty words to reach what the product is. A
-   * reader arriving cold wants the category first and the argument second.
+   * **Generic before it is clever.** A sentence about us that takes twenty words
+   * to reach what the product is loses a reader arriving cold: they want the
+   * category first and the argument second.
    *
    * Reads as one sentence with `accent`: "An intelligent design system, and the
    * engineers behind it." The category is plain and the half worth painting is
@@ -91,12 +88,11 @@ export const HERO = {
    * What the package actually is, for a reader deciding whether it can be used
    * at all.
    *
-   * **The framework question is the first one an engineer asks and the page did
-   * not answer it above the fold.** Everything in the hero was about what the
-   * system does; none of it said what you install or whether it fits what you
-   * already have. Custom elements are the answer to both, and Lit is the honest
-   * footnote: it is what they are built with, and it is 5KB the consumer is also
-   * taking.
+   * **The framework question is the first one an engineer asks.** Everything
+   * else in the hero is about what the system does; none of it says what you
+   * install or whether it fits what you already have. Custom elements are the
+   * answer to both, and Lit is the honest footnote: it is what they are built
+   * with, and it is 5KB the consumer is also taking.
    */
   works: 'Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.',
 } as const
@@ -110,20 +106,13 @@ export const HERO = {
  */
 export const PROBLEM = {
   /**
-   * **Widened from the design system to the interface it is part of.**
-   *
-   * This said "a design system is cheap to start and expensive to keep", which
-   * is true and is one rung below the hero above it: the page now opens on the
-   * system *and* the engineering *and* the people, and the first thing under it
-   * was an argument about tokens. A reader who does not have a design system
-   * problem, and has an interface problem, put the page down here.
-   *
-   * The cost being described was never really the palette's anyway. It is the
-   * second brand, the migration and the audit, and those arrive whether or not
-   * anyone called the thing a design system.
-   *
-   * `is a morning` survives the rewrite because it is the best beat in it: a
-   * unit of time small enough to be dismissive, against a year.
+   * **The interface, not the design system.** The hero opens on the system *and*
+   * the engineering *and* the people, so a reader who does not have a design
+   * system problem, and has an interface problem, puts the page down if the
+   * first thing under it is an argument about tokens. The cost being described
+   * was never really the palette's anyway: it is the second brand, the migration
+   * and the audit, and those arrive whether or not anyone called the thing a
+   * design system.
    *
    * **The last sentence exists so `It` has something to point at.**
    *
@@ -145,14 +134,14 @@ export const PROBLEM = {
  * The four costs the system is built to survive, each with the facts behind it.
  *
  * **Four rather than three, because the page promises intelligence.** The hero
- * calls this an intelligent design system and the three costs here were the
- * second brand, the framework and the audit: all real, none of them the reason
- * that word is in the heading. `Readable, not scraped` is, and it is the one
- * claim on this page an agent can verify by fetching a URL.
+ * calls this an intelligent design system, and the second brand, the framework
+ * and the audit are all real without being the reason that word is in the
+ * heading. `Readable, not scraped` is, and it is the one claim on this page an
+ * agent can verify by fetching a URL.
  *
  * **Two bullets each, not three.** Twelve facts is a wall a reader skims. The
  * pair kept for each card is the mechanism and the guarantee it buys, which is
- * the argument; the third was always the corollary of one of them.
+ * the argument; a third is the corollary of one of them.
  */
 export const MECHANISMS: readonly Capability[] = [
   {
@@ -210,13 +199,12 @@ export const DELIVERY = {
  * What hiring the engineering is actually like, in four cards.
  *
  * **The half of the heading the page was not answering.** "And the engineers
- * behind it" is half the hero and the bands below it were the system, the
- * system, the numbers and a price list: everything about what you buy and
- * nothing about what the work is. These four were already written, sitting in
- * `landing.ts` where only the Markdown mirror could reach them, which meant the
- * document version of this page described a section the page did not have.
+ * behind it" is half the hero, and the other bands are the system, the numbers
+ * and a price list: everything about what you buy and nothing about what the
+ * work is.
  *
- * Typed here and imported there, so the two cannot drift again.
+ * Typed here and imported by the Markdown mirror, so the page and the document
+ * version of it cannot drift.
  */
 export const ENGAGEMENT: readonly CopyItem[] = [
   {

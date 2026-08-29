@@ -101,10 +101,10 @@ export class DismissController implements ReactiveController {
      * same listener on `document`, so they are siblings on one node where the
      * only ordering is registration, and propagation is about ancestors.
      *
-     * Carrying the winning depth on the event does not arrange it either, which
-     * is the version this replaced. A handler that runs before any deeper one
-     * has no way to know a deeper one exists, so it dismisses and only then
-     * loses the comparison. Registration order is the order the overlays
+     * Carrying the winning depth on the event does not arrange it either. A
+     * handler that runs before any deeper one has no way to know a deeper one
+     * exists, so it dismisses and only then loses the comparison. Registration
+     * order is the order the overlays
      * *opened*, and opening the outer one first is the ordinary case: a dialog,
      * then a select inside it. Measured, that closed both.
      *

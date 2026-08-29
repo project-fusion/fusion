@@ -104,22 +104,22 @@ export type HelixSandboxSpecsVueEvents = {};
 
 export type CustomCssProperties = {
   /** Color of a failing one. */
-  "--specs-fail-color"?: string;
+  "--sandbox-specs-fail-color"?: string;
   /** Color of a passing test. */
-  "--specs-pass-color"?: string;
+  "--sandbox-specs-pass-color"?: string;
 };
 
 // Vue SFC template type-checking (GlobalComponents) for non-Vue custom elements.
 // Note: Some tooling expects this augmentation under "@vue/runtime-core", while
 // other docs/examples use "vue". We emit both for compatibility.
 export interface WcToolkitVueGlobalComponents {
-  /** CodeMirror, not a '<textarea>'. The textarea it replaces was the right call while a sandbox only had to hold text: undo, selection, spellcheck suppression, mobile keyboards, and screen-reader support all came from the platform. What it could not do is highlight what it holds, number its lines, or say where the cursor is, and a status bar reading line and column has to ask something.  **On its own path.** This is '@fusion.dev/helix-sandbox/editor' rather than part of the barrel, because CodeMirror is around 110 KB over the wire where the rest of this package is a few. A sandbox with no editable pane should not pay for one, and neither should a site that registers its elements once.  The view is built once and reconfigured, not rebuilt. Replacing it on every change would throw away the undo history, the scroll position, and the selection, which is most of what an editor is. */
+  /** CodeMirror, not a '<textarea>'. A textarea cannot highlight what it holds, number its lines, or say where the cursor is, and a status bar reading line and column has to ask something.  **On its own path.** This is '@fusion.dev/helix-sandbox/editor' rather than part of the barrel, because CodeMirror is around 110 KB over the wire where the rest of this package is a few. A sandbox with no editable pane should not pay for one, and neither should a site that registers its elements once.  The view is built once and reconfigured, not rebuilt. Replacing it on every change would throw away the undo history, the scroll position, and the selection, which is most of what an editor is. */
   "helix-sandbox-editor": DefineCustomElement<
     HelixSandboxEditor,
     HelixSandboxEditorVueProps,
     HelixSandboxEditorVueEvents
   >;
-  /** The specs are not rewritten for this. The same '*.dom.spec.ts' files that run in CI are bundled for the browser with 'bun:test' and the DOM helpers pointed at a browser harness, so a spec deleted in the morning stops being reported in the afternoon and there is no second suite to keep in step.  **A browser is the stricter environment, not the looser one.** The node harness runs against happy-dom, which does not implement 'attachInternals' at all and has to be handed an inert stub, reports ':popover-open' as unmatched for a popover that is open, and returns nothing from 'assignedNodes({ flatten: true })' where a browser returns the fallback. Each of those has already produced a spec that passed while asserting the opposite of what ships. Here they are the platform's own.  They run in a frame of their own rather than the preview's, because 'mount' replaces the document body for every test and would take the example with it.  **That frame is parked at the document root, not in this shadow root.** It is a worker rather than anything to look at, and where it sits in the tree decides whether it is laid out at all: inside the panel it was a descendant of an inactive tab, so on any tab but this one it had 'display: none' above it and every rectangle inside it was zero. Specs that read geometry then passed against nothing, which is the failure that looks most like success. Found by putting a known misplacement back and watching the specs stay green. */
+  /** The specs are not rewritten for this. The same '*.dom.spec.ts' files that run in CI are bundled for the browser with 'bun:test' and the DOM helpers pointed at a browser harness, so a spec deleted in the morning stops being reported in the afternoon and there is no second suite to keep in step.  **A browser is the stricter environment, not the looser one.** The node harness runs against happy-dom, which does not implement 'attachInternals' at all and has to be handed an inert stub, reports ':popover-open' as unmatched for a popover that is open, and returns nothing from 'assignedNodes({ flatten: true })' where a browser returns the fallback. Each of those has already produced a spec that passed while asserting the opposite of what ships. Here they are the platform's own.  They run in a frame of their own rather than the preview's, because 'mount' replaces the document body for every test and would take the example with it.  **That frame is parked at the document root, not in this shadow root.** It is a worker rather than anything to look at, and where it sits in the tree decides whether it is laid out at all: inside the panel it was a descendant of an inactive tab, so on any tab but this one it had 'display: none' above it and every rectangle inside it was zero. Specs that read geometry then passed against nothing, which is the failure that looks most like success. */
   "helix-sandbox-specs": DefineCustomElement<
     HelixSandboxSpecs,
     HelixSandboxSpecsVueProps,

@@ -1,18 +1,15 @@
 /**
  * Documentation registry for Cortex.
  *
- * Docs are a package rather than a folder inside a site so that the docs are
- * pinned to the version of the code they describe. A site renders this
- * registry; it does not own it.
+ * Docs are a package rather than a folder inside a site so they are pinned to
+ * the version of the code they describe. A site renders this registry; it does
+ * not own it.
  *
  * **There is no version axis in here.** The package version is the version:
- * `@fusion.dev/cortex-docs@0.2.0` documents Cortex 0.2.0, because every package in a
- * domain moves in lockstep. A `versions` array beside that would be a second
- * source of truth with nothing keeping the two in step, and the first time they
- * disagreed the registry would win over the package that shipped it.
- *
- * A site serving several versions installs several versions, which is the
- * mechanism npm already provides and the only one that cannot drift.
+ * `@fusion.dev/cortex-docs@0.2.0` documents Cortex 0.2.0, because every package
+ * in a domain moves in lockstep. A `versions` array beside that would be a
+ * second source of truth with nothing keeping the two in step. A site serving
+ * several versions installs several versions.
  */
 
 export interface DocPage {

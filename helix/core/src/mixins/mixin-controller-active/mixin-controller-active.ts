@@ -20,8 +20,9 @@ export declare class MixinControllerActiveInterface {
   /**
    * Which item is current, by its `value`.
    *
-   * Reading gives the real one, in either mode. Writing hands ownership to the
-   * consumer: from then on the set announces changes and applies none of them.
+   * Reading gives the real one. Writing always applies, and is a seed and a
+   * correction rather than a claim of ownership: a consumer who wants the
+   * decision refuses the `helix-before-activate`.
    */
   active: string
 
@@ -34,8 +35,8 @@ export declare class MixinControllerActiveInterface {
   /**
    * Which item is current, given what there is to choose from.
    *
-   * The first enabled one when `value` names nothing, which is a set before its
-   * consumer has chosen and a set whose current item has just been removed.
+   * The first enabled one when `active` names nothing, which is a set before
+   * its consumer has chosen and a set whose current item has just been removed.
    */
   protected resolveActive<Item extends ActivatableItem>(items: Item[]): Item | undefined
 }
@@ -48,19 +49,17 @@ export declare class MixinControllerActiveInterface {
  * is submitted and belongs to `MixinControllerValue`, which is why these are
  * two mixins and not one with a flag.
  *
- * **Announcing before applying is the part worth sharing.** `Tabs` and `Tree`
- * both wrote the current value straight from the item's event, so a consumer
- * had no way to refuse a change, while `Radio.Group` announced first. Neither
- * was wrong on its own and the two together are: whether a selection can be
- * refused should not depend on which component a reader is looking at.
+ * **Announcing before applying is the part worth sharing.** Writing the current
+ * value straight from the item's event leaves a consumer no way to refuse a
+ * change, and whether a selection can be refused must not depend on which
+ * component a reader is looking at.
  *
- * **The fallback is the other half.** Four components had written
- * `items.find(match) ?? items[0]`, and it is not the obvious line it looks
- * like: it is what makes a set with a `value` naming nothing still show
- * something, which is every set before its consumer has set one and every set
- * whose current item has just been removed. `resolveActive` also skips disabled
- * items, which the hand-written copies did not, so a set opening on a disabled
- * first item showed it as current.
+ * **The fallback is the other half.** `items.find(match) ?? items[0]` is not
+ * the obvious line it looks like: it is what makes a set whose `active` names
+ * nothing still show something, which is every set before its consumer has set
+ * one and every set whose current item has just been removed. `resolveActive`
+ * also skips disabled items in that fallback, or a set opening on a disabled
+ * first item shows it as current.
  */
 export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from the interface deliberately. The interface is what
@@ -70,19 +69,12 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     /**
      * Which item is current, by its `value`.
      *
-     * Called `active`, which is what this mixin is named for and what it was
-     * not: it declared `value`, so the one mixin whose whole subject is which
-     * item is active had no such property, and `active` meant something else
-     * entirely elsewhere in the library. It still does, and only there now:
-     * `option.active` is the option the keyboard is on, which is a different
-     * question from which one is chosen.
+     * Not `option.active`, which is the option the keyboard is on: that is a
+     * different question from which one is chosen.
      *
-     * An accessor pair, the same shape as the other three. Reading gives the
-     * real item; writing hands ownership to the consumer, so `<helix-tabs
-     * active="one">` is a set that stays on that tab and `default-active` is
-     * how markup says where to start.
-     *
-     *
+     * Writing always applies, so `<helix-tabs active="one">` starts on that
+     * tab, and `default-active` is how markup says where to start without
+     * naming the current one.
      */
     @property()
     get active(): string {
@@ -107,8 +99,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * The state, whoever set it, and `undefined` until somebody has.
      *
      * One field and not two. Writing always applies, the way a native control
-     * does when a script assigns to it. What the write does not do is change
-     * which mode the element is in.
+     * does when a script assigns to it.
      */
     private activeState: string | undefined = undefined
 
@@ -145,20 +136,16 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     /**
      * Says the current child moved, once it has.
      *
-     * **This was the only one of the four mixins with no notification**, and the
-     * event class said so deliberately: no native word means "a set chose a
-     * different member", so borrowing `change` would be a lie about what moved.
-     * That half still holds, and is why the pair is `helix-activate`. What did
-     * not follow is that a set should therefore announce nothing.
+     * `helix-activate` rather than a native word: nothing on the platform means
+     * "a set chose a different member", and borrowing `change` would be a lie
+     * about what moved.
      *
-     * The cost is the one 294 fixed for values and left here. A consumer who
-     * only wants to know which child is current had one channel and it fires
-     * *before* `apply`, so `currentTarget.active` is the previous value inside
-     * the handler and `detail.value` is a proposal another listener may refuse.
-     * Measured across the four families taking this: `Tabs` and `Tree` looked
-     * covered because `helix-select` bubbles up from a child, which fires when an
-     * item is *chosen* and not when `active` is assigned, and `Steps` and
-     * `Video Playlist` announced nothing at all.
+     * A consumer who only wants to know which child is current cannot use
+     * `helix-before-activate` for it, that one firing *before* `apply`, so
+     * `currentTarget.active` is the previous value inside the handler and
+     * `detail.value` is a proposal another listener may refuse. `helix-select`
+     * is no substitute either: it fires when an item is *chosen* and not when
+     * `active` is assigned.
      *
      * **After `apply`, which is the whole reason it is a second event**, so the
      * state is on the element by the time a handler reads it. Not cancelable:
@@ -172,7 +159,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     /**
      * Which item is current, given what there is to choose from.
      *
-     * The first enabled one when `value` names nothing, which is a set before
+     * The first enabled one when `active` names nothing, which is a set before
      * its consumer has chosen and a set whose current item has just been
      * removed. Disabled items are skipped in the fallback but not in the match:
      * a consumer who names a disabled item meant it, and quietly moving to

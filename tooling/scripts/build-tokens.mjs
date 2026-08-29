@@ -21,7 +21,7 @@ import { execFileSync } from 'node:child_process'
  * **Readers are counted, because a token nothing reads is worth seeing.** Not a
  * fault on its own, a complete scale is part of the product and a consumer can
  * read a rung we do not, but it is the difference between a scale and a
- * leftover, and `check:css:tokens` cannot see it: that check asks that every token
+ * leftover, and `helix component`'s `tokens` cannot see it: that check asks that every token
  * *referenced* exists, never that every token *declared* is read.
  *
  * Run `bun run gen:tokens-reference` to write it, and
@@ -199,7 +199,7 @@ const lines = [
   `${declared.length} semantic tokens in ${CATEGORIES.length} categories, every one in exactly`,
   'one. These are the whole of what a component or an app may use. The primitive',
   "layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own",
-  'business and `check:css:tokens` fails on any reference to it from outside.',
+  'business and the `tokens` rule fails on any reference to it from outside.',
   '',
   'Per-component hooks (`--card-padding`, `--drawer-radii`) are not tokens and are',
   'not here. They are API, they default to a semantic token, and the `hooks` rule',
@@ -208,7 +208,7 @@ const lines = [
   '**Reads** counts every `var()` of that token across `helix` and',
   '`site`, the sandbox included. Zero is not a fault: a complete scale is part of what is shipped and',
   'a consumer can reach for a rung we happen not to use. It is worth seeing',
-  'because nothing else can see it, `check:css:tokens` asking only that every token',
+  'because nothing else can see it, the `tokens` rule asking only that every token',
   '*referenced* exists.',
   '',
 ]

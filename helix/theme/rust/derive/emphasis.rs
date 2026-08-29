@@ -3,9 +3,6 @@
 //! **Solved the same way whichever role it is.** The brand and the accent
 //! behaving differently from each other is a difference a consumer would have to
 //! learn, and there is no reason for one.
-//!
-//! This is the phase that captures the most, and the one the module split was
-//! most worth doing for: six bindings, all of them now in [`Deriving`].
 
 use crate::derive::solve::solve_against;
 use crate::derive::{Cast, Deriving};
@@ -34,11 +31,10 @@ pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
 
     /* **Solved against its own tint as well as the page, because that is where
     it lands.** The model says `primary` sits on the five page surfaces *and* on
-    `primary-subtle`, which is the ground a quiet badge gives it, and the solver
-    was reading a hardcoded surface list that did not include it. In dark mode
+    `primary-subtle`, which is the ground a quiet badge gives it. In dark mode
     the tint is lighter than every page surface, so a primary solved against the
-    page alone came out at 4.25:1 on the one ground a consumer most expects it to
-    work on.
+    page alone comes out at 4.25:1 on the one ground a consumer most expects it
+    to work on.
 
     No cycle: the tint depends on the base color and the scheme, never on the
     solved ink, so it is computed first and solved against. */
@@ -71,8 +67,8 @@ pub fn emphasis(base: Oklch, ctx: &Deriving) -> Emphasis {
     construction, and a card filled with it carries dark text. A filled brand
     panel with light text needs the opposite: dark enough that the ink clears it.
 
-    **The fixed 0.98 ground is not explained in the TypeScript**, so the reading
-    is mine and is marked as one: the ink this ground carries is
+    **The fixed 0.98 ground is not explained in the TypeScript**, so what
+    follows is a reading rather than a record: the ink this ground carries is
     `foreground-on-accent`, which the fills phase later solves as one near-white
     for every filled ground there is, so solving the ground against a near-white
     is solving it against the ink it will hold rather than against the page it

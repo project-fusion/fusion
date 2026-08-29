@@ -29,9 +29,7 @@ const cells = (host: HTMLElement): HTMLInputElement[] => [
  * arriving leaves the component's own focus move (it advances a box per
  * character) as the first `focusin` it ever sees, and the baseline lands on the
  * text that was just typed. That is not what a browser does, where the reader's
- * click or tab is the first one, and it silently turned three commit specs
- * green-to-red when the baseline moved. Modeling the arrival is what makes
- * this helper mean its own name.
+ * click or tab is the first one.
  */
 const arrive = async (host: Pin, at: number, text: string): Promise<void> => {
   const cell = cells(host)[at] as HTMLInputElement
@@ -70,9 +68,9 @@ describe('input pin', () => {
   }
 
   test('a paste into an empty field fills from the start, wherever it landed', async () => {
-    /* A code has no holes in it. Writing from box three of an empty field
-       produced "4321" and showed it in boxes one to four, so the boxes and the
-       value disagreed about where the reader had typed. Pasting a code while the
+    /* A code has no holes in it. Writing from box three of an empty field puts
+       "4321" in the value and draws it in boxes one to four, so the boxes and
+       the value disagree about where the reader typed. Pasting a code while the
        caret happens to sit in the middle means "fill this in", which is what
        clamping to the end of what is there gives. */
     const host = await pin('length="6"')
@@ -178,11 +176,9 @@ describe('input pin', () => {
 describe('input pin deletion', () => {
   test('emptying a box removes that character and the rest close up', async () => {
     /* A Backspace in a *filled* box is the browser's own: the keydown handler
-       leaves it alone, the character goes, and `input` arrives carrying "".
-       That fell through to the write path, which returns early on empty, and the
-       repaint put the character straight back, so Backspace on a full code did
-       nothing at all. Measured with real keystrokes; every synthetic test in this
-       file passed over it. */
+       leaves it alone, the character goes, and `input` arrives carrying "". A
+       write path that returns early on empty lets the repaint put the character
+       straight back, so Backspace on a full code does nothing at all. */
     const host = await pin('default-value="123456"')
     await arrive(host, 2, '')
     expect(host.value).toBe('12456')
@@ -286,12 +282,11 @@ describe('input pin commit', () => {
   }
 
   test('a value the consumer assigned is not announced as one the reader entered', async () => {
-    /* The one row where the platform and the old "value at the last commit"
-       baseline disagreed, measured in Chromium against a native input: a script
-       assigns while the field is unfocused, the reader visits and edits
-       nothing, and native stays silent. `change` on a field is read by
-       `MixinField` as "the reader has had a go at this", so announcing here
-       told a consumer their own assignment was the reader's answer. */
+    /* Measured in Chromium against a native input: a script assigns while the
+       field is unfocused, the reader visits and edits nothing, and native stays
+       silent. `change` on a field is read by `MixinField` as "the reader has had
+       a go at this", so announcing here would tell a consumer their own
+       assignment was the reader's answer. */
     const host = await pin('length="4"')
     const seen = commits(host)
     host.value = '1234'
@@ -346,8 +341,8 @@ describe('input pin commit', () => {
 
   test('so a half-entered code says what is wrong with it once it is left', async () => {
     /* The whole point of the commit: `MixinField` shows nothing until the
-       reader has had a go, and completion was the only thing that counted as
-       one. A code abandoned at two of four was answered with silence. */
+       reader has had a go, and completion alone counting as one leaves a code
+       abandoned at two of four answered with silence. */
     const host = await pin('length="4"')
     await arrive(host, 0, '12')
     expect(part(host, 'feedback')).toBeNull()

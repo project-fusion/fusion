@@ -4,18 +4,9 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
 /**
  * The half of a chart that is about finding its numbers rather than drawing.
  *
- * Four families had written this out separately, and the row that asked for it
- * set the bar: two copies is a coincidence and three is a pattern. There were
- * five copies of `for`, four of `label` and three of the caption fallback by
- * the time the line and donut charts landed.
- *
- * **The bug the extraction found is the one worth a spec of its own.**
- * `SourceController` watches whatever it resolved on connect, and nothing tells
- * it the id changed. `BarChart` re-resolved on `for` and `LineChart` and
- * `DonutChart` did not, which is the kind of difference that survives precisely
- * because each file looked complete on its own: pointing a bar chart at a
- * second table worked, and pointing a line chart at one left it drawing the
- * first.
+ * **The trap these specs hold.** `SourceController` watches whatever it
+ * resolved on connect, and nothing tells it the id changed, so a chart pointed
+ * at a second table goes on watching the first unless it re-resolves.
  */
 const tag = 'probe-chart'
 
@@ -40,9 +31,8 @@ interface Chart extends HTMLElement {
    base class extends bun's own `HTMLElement` rather than happy-dom's. The
    element then defines without complaint and the parser crashes upgrading it,
    inside `innerHTML`, with `attributes.getNamedItem` undefined: an error about
-   the parser that is really about import order. Second time this has bitten,
-   after `HelixFallbackCommandEvent extends Event`, and neither says anything
-   about the constant that dragged the module in. */
+   the parser that is really about import order, and which never mentions the
+   constant that dragged the module in. */
 beforeAll(async () => {
   registerDom()
   const { HelixElement } = await import('../../helix-element/helix-element.js')
@@ -120,16 +110,12 @@ describe('the table a chart reads', () => {
     expect(one.sourceRows.map((row) => row.label)).toEqual(['May'])
   })
 
-  /* **The bug the extraction found, and it is about repainting rather than
-     about the numbers.** `source.element` resolves from `for` on every read, so
-     the figures follow a change of `for` whether or not anything watches. What
-     does not follow is the `MutationObserver`: it stays on the table resolved
-     at connect, so an edit to the new table repaints nothing, and an edit to
-     the *old* one repaints the chart with the new one's data. `BarChart`
-     re-pointed it and `LineChart` and `DonutChart` did not.
-
-     My first attempt at this asserted the rows after changing `for`, which
-     passes either way, so it said nothing. */
+  /* **This is about repainting rather than about the numbers**, so asserting
+     the rows after changing `for` says nothing: `source.element` resolves from
+     `for` on every read, and the figures follow whether or not anything
+     watches. What does not follow is the `MutationObserver`: left on the table
+     resolved at connect, an edit to the new table repaints nothing and an edit
+     to the *old* one repaints the chart with the new one's data. */
   test('and follows it, so an edit to the new table is what repaints', async () => {
     const one = await chart()
     one.for = 'second'
@@ -206,11 +192,9 @@ describe('the numbers and the words', () => {
 })
 
 describe('the palette a series takes its color from', () => {
-  /* Four families held the same `const PALETTE = 24` and the legend held a
-     fifth: when it went from eight to twenty-four, one was missed and drew
-     every ninth series in the first color again while the legend beside it
-     named the ninth. A number two files have to agree on is a number that will
-     stop agreeing. */
+  /* A number two files have to agree on is a number that will stop agreeing:
+     a chart holding its own copy of the count draws every Nth series in the
+     first color while the legend beside it names the Nth. */
   test('counts from one, because the properties are named from one', () => {
     expect([seriesIndex(0), seriesIndex(1)]).toEqual([1, 2])
   })

@@ -240,27 +240,16 @@ absence. Caught by `hydration.dom.spec.ts`. */
   name?: HelixHeadlessAccordionItem["name"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessAccordionItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessAccordionItem["defaultOpen"];
@@ -271,7 +260,7 @@ is what the mirror has always been for. */
 export type HelixHeadlessAccordionItemVueEvents = {
   /** Fired before the section closes, and cancelable. */
   "helix-before-close": HelixHeadlessAccordionItemHelixBeforeCloseElementEvent;
-  /** Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
+  /** Fired before the section opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessAccordionItemHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessAccordionItemElementEvent;
@@ -303,25 +292,11 @@ export type HelixHeadlessAnnouncementHelixDismissElementEvent =
 export type HelixHeadlessAnnouncementVueProps = {
   /** Which color the band wears.
 
-**This was `severity` and it was claiming more than it did.** Severity is a
-judgment about the message, and elsewhere in this library it carries one:
-`Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
-puts a mark beside the text and names it to a screen reader. Here it did
-none of that. It set a color, the live region stayed polite either way, and
-nothing about the announcement's semantics moved. A property that only
-changes the paint should say so.
-
-`tone` is the word this library already uses for exactly that, and `Tag`
-made the identical rename for the identical reason: the word it left was a
-treatment, `tone` is semantic color. The set matches `Tag`'s so the two
-agree, with `neutral` as the resting value and `primary` for a band that is
-about the product rather than about a state.
-
-`neutral` is what an unset announcement already looked like, said out loud
-so a consumer can put a band back to it from markup, and `surface` is the
-one value that is not a color: it lifts the band onto the surface step
-instead of the sunken one, for a strip carrying something that is not a
-state at all. */
+Paint only: unlike `Callout`, no value here draws a mark, changes the label,
+or moves the live region off polite. The set matches `Tag`'s. `neutral` is
+the resting value, said out loud so a consumer can put a band back to it
+from markup, and `surface` is the one value that is not a color: it lifts
+the band onto the surface step instead of the sunken one. */
   tone?: HelixHeadlessAnnouncement["tone"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixHeadlessAnnouncement["dismissible"];
@@ -366,12 +341,9 @@ the wordmark and the actions happen to measure.
 
 `start` is the opt-out, for a header whose middle region trails the brand.
 
-**Named for the region and not for what is usually in it.** It was
-`nav-align`, which reads as a property about `Navigation` and is not: the
-middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centered its search
-box would have been setting `nav-align` to do it. The part is called
-`content`, so the property is too. */
+**Named for the region and not for what is usually in it.** The middle slot
+takes a search field or a breadcrumb trail as readily as a `Navigation`, so
+the property carries the part's name, `content`. */
   "content-align"?: HelixHeadlessAppHeader["contentAlign"];
   /** Where the middle region sits in the bar.
 
@@ -383,12 +355,9 @@ the wordmark and the actions happen to measure.
 
 `start` is the opt-out, for a header whose middle region trails the brand.
 
-**Named for the region and not for what is usually in it.** It was
-`nav-align`, which reads as a property about `Navigation` and is not: the
-middle slot takes whatever a consumer puts there, a search field or a
-breadcrumb trail as readily as a nav, and a header that centered its search
-box would have been setting `nav-align` to do it. The part is called
-`content`, so the property is too. */
+**Named for the region and not for what is usually in it.** The middle slot
+takes a search field or a breadcrumb trail as readily as a `Navigation`, so
+the property carries the part's name, `content`. */
   contentAlign?: HelixHeadlessAppHeader["contentAlign"];
 };
 
@@ -409,16 +378,9 @@ than refusing to render.
 styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
 so the attribute *is* the mechanism: a `max` that reaches this property and
 never reaches the host matches no rule, and every avatar is drawn beside a
-count that says two of them are hidden. That is the failure this repository
-already writes down as "reflect only what CSS selects on", and it went
-unnoticed because the examples set `max` in markup, where the author had
-written the attribute themselves.
-
-It is the path a script takes that was broken, and React takes it for
-everyone: React assigns a matching property rather than an attribute, so
-`<helix-avatar-group max={4}>` folded nothing at all. Measured against the
-markup twin, the fifth and sixth avatars rendered at full size where the
-markup version had them at 0x0.
+count claiming some are hidden. Markup is the safe path and hides the fault;
+a script is the broken one, and React takes it for everyone, assigning a
+matching property rather than an attribute.
 
 **Optional rather than defaulted, per the rule that a reflected property
 takes no default**: `max = 0` would stamp `max="0"` onto every host that
@@ -484,12 +446,11 @@ Absent draws none. `value` rules the axis the columns are *measured* on,
 group, and `both` draws both. Which of those is horizontal turns with
 `direction`, because a rule belongs to an axis and not to a screen edge.
 
-**A bare `gridlines` means `value`**, and so does anything unrecognised: an
-unrecognised value that draws nothing is indistinguishable from the
+**A bare `gridlines` means `value`**, and so does anything unrecognized: an
+unrecognized value that draws nothing is indistinguishable from the
 attribute being absent, which is the one thing a reader cannot debug.
 
-`category` is the quieter half of this on a bar chart and is here for
-completeness rather than because it is usually right: columns already
+`category` is the quieter half of this on a bar chart: columns already
 divide the categories by being separate columns, and a rule through each
 one is a second statement of the same fact. It earns its place on a chart
 of many thin bars, where the eye has stopped counting.
@@ -514,9 +475,7 @@ let the author put any two shapes in any relation by choosing the ranges,
 and the reader has no way to see it happening.
 
 A line among columns still measures from zero, because the columns do and
-they share the axis. That is the trade for comparability, and it is why
-this is a bar chart that can carry a line rather than a line chart that can
-carry columns. */
+they share the axis. */
   lines?: HelixHeadlessBarChart["lines"];
   /** Which series are measured against a scale of their own, by name.
 
@@ -537,7 +496,7 @@ no value axis at all when there is one scale, because the columns are
 measured against each other and a reader needs no numbers to do that. With
 two, a reader has no way of knowing there are two, let alone which series
 is on which, so both scales are labeled the moment this is set. An
-unlabelled second axis is the deceptive case rather than the tidy one.
+unlabeled second axis is the deceptive case rather than the tidy one.
 
 The grid stays on the primary axis, since a rule measured against two
 scales at once is a rule that means nothing. The tooltip is unaffected: it
@@ -581,15 +540,11 @@ decides how tall a crumb is. Unreflected, an `href` set from script reached
 the property, rendered the anchor, and left the host looking unlinked: the
 crumb drew at 20px where a markup twin drew at 28.
 
-*This said the opposite until 27 Aug 2026*, and named the reason as
-"nothing selects on it", which was not true when it was written. The
-paragraph is worth keeping because the rest of it is right and is what makes
-this optional rather than defaulted: an `href` written onto every host would
-be a link to the current page on every crumb nobody asked to be one. That is
-the general rule as well, that a reflected property takes no default, so the
-two agree.
+Optional rather than defaulted, which is the general rule that a reflected
+property takes no default: an `href` written onto every host would be a link
+to the current page on every crumb nobody asked to be one.
 
-Found by the picture comparison rather than by reading: React assigns a
+Reading cannot catch this and the picture comparison can. React assigns a
 matching property instead of an attribute, so every crumb in the React twin
 of `breadcrumbs/links` lost its padding at once. */
   href?: HelixHeadlessBreadcrumb["href"];
@@ -730,10 +685,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessButton["disabled"];
   /** Name submitted with the form.
 
@@ -750,8 +703,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessButton["name"];
   /** Whether the button holds its group's tab stop.
 
@@ -780,9 +732,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it, which is what `Popover`'s note asks for, and the reader is
-still told what the control does, which is what `SpeedDial`'s note asks
-for. See #322.
+they served it and the reader is still told what the control does. See #322.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -793,11 +743,11 @@ host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixHeadlessButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
-The platform's own accessor, and this element had the resolution and kept
-it to itself: `linkCommand` writes the target onto the inner `<button>`,
-where a consumer cannot reach it, and `commandFor` answers with an id
-rather than an element. Writing assigns the inner control directly, which
-is what an invoker without an id in the same tree needs. */
+The platform's own accessor, because the resolution is otherwise kept
+inside: `linkCommand` writes the target onto the inner `<button>`, where a
+consumer cannot reach it, and `commandFor` answers with an id rather than
+an element. Writing assigns the inner control directly, which is what an
+invoker without an id in the same tree needs. */
   commandForElement?: HelixHeadlessButton["commandForElement"];
 };
 
@@ -806,11 +756,10 @@ export type HelixHeadlessButtonVueEvents = {};
 export type HelixHeadlessCalloutVueProps = {
   /** What kind of attention the passage needs.
 
-**`severity` was a sixth spelling of `tone`**, which is the axis for what a
-thing means, and a subset of it: a callout reports a status and never a
-brand role, so it takes four of the seven. One word per axis is the whole
-of the registry, and two words for one axis is how `tone` had drifted into
-five incompatible value sets before anything held it. */
+`tone` is the axis for what a thing means, and this is a subset of it: a
+callout reports a status and never a brand role, so it takes four of the
+seven values. One word per axis is the whole of the registry, which is why
+there is no `severity` beside it. */
   tone?: HelixHeadlessCallout["tone"];
 };
 
@@ -921,14 +870,13 @@ touch device exactly as it does on a desktop. */
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
-the track can stop.** It was declared above as a width, which is what it
-looks like from the stylesheet: one rule per value setting a custom
-property, and the slides divide the track by it. But a carousel showing
-four of six slides has three positions, not six, and everything that counts
-positions is in this file. Left up there, `goTo` clamped to the last
-*slide*, so three of the six indicators pointed at a scroll offset the
-track had already reached and could not pass: pressing next walked the dots
-to the end while the slides stopped moving a third of the way through.
+the track can stop.** From the stylesheet it looks like a width, one rule
+per value setting a custom property that the slides divide the track by.
+But a carousel showing four of six slides has three positions, not six, and
+everything that counts positions is in this file. Declared up there, `goTo`
+clamps to the last *slide*, so three of the six indicators point at an
+offset the track has already reached: pressing next walks the dots to the
+end while the slides stop moving a third of the way through.
 
 No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
@@ -938,14 +886,13 @@ case is the absent attribute, and the styles read it that way. */
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
-the track can stop.** It was declared above as a width, which is what it
-looks like from the stylesheet: one rule per value setting a custom
-property, and the slides divide the track by it. But a carousel showing
-four of six slides has three positions, not six, and everything that counts
-positions is in this file. Left up there, `goTo` clamped to the last
-*slide*, so three of the six indicators pointed at a scroll offset the
-track had already reached and could not pass: pressing next walked the dots
-to the end while the slides stopped moving a third of the way through.
+the track can stop.** From the stylesheet it looks like a width, one rule
+per value setting a custom property that the slides divide the track by.
+But a carousel showing four of six slides has three positions, not six, and
+everything that counts positions is in this file. Declared up there, `goTo`
+clamps to the last *slide*, so three of the six indicators point at an
+offset the track has already reached: pressing next walks the dots to the
+end while the slides stop moving a third of the way through.
 
 No default, because it reflects. A reflected property with a value writes
 its attribute on upgrade, and the host then carries something a consumer's
@@ -1074,10 +1021,10 @@ not left. */
   threshold?: HelixHeadlessChat["threshold"];
   /** Whether the transcript follows new turns to the bottom.
 
-Set it and this element defers: the reader's scrolling fires `helix-change`
-and moves nothing until a new value arrives. `default-pinned` seeds a state
-this element then owns, and it defaults to pinned because a conversation
-opens at its most recent turn.
+The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
+consumer refusing it takes the decision and assigns their own value.
+`default-pinned` seeds the state this element then owns, and it defaults to
+pinned because a conversation opens at its most recent turn.
 
 **Not reflected, and the default is why.** A reflected property that
 defaults to true writes its attribute on upgrade whether or not the
@@ -1140,10 +1087,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessCheckboxGroup["disabled"];
   /** Name submitted with the form.
 
@@ -1160,8 +1105,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessCheckboxGroup["name"];
 };
 
@@ -1192,11 +1136,8 @@ Presentation only. It never submits, and the first change resolves it. */
   indeterminate?: HelixHeadlessCheckbox["indeterminate"];
   /** Whether the control is checked.
 
-One property rather than two. Reading gives the real state whichever
-mode the control is in; writing hands ownership to the consumer, which
-is what the attribute in `<helix-checkbox checked>` does as well. The
-same shape all four of these mixins have, for the reason given on
-`MixinControllerOpen.open`.
+One property rather than two. Writing always applies;
+`<helix-checkbox checked>` is the same statement in markup.
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `:state(checked)` carries the resolved state for
@@ -1220,10 +1161,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessCheckbox["disabled"];
   /** Name submitted with the form.
 
@@ -1240,8 +1179,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessCheckbox["name"];
 };
 
@@ -1268,10 +1206,9 @@ round. The platform already writes booleans like this for the same reason,
 
 **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
 reserves the copy button's width with `:host(:not([no-copy]))`, so the
-attribute is what decides whether the block pays for a control. Set from
-script the button went away, `render` reading the property, and the 40px it
-stood in stayed reserved: the exact waste that rule was written to stop,
-arrived at from the other side.
+attribute is what decides whether the block pays for a control. Unreflected,
+setting it from script takes the button away (`render` reads the property)
+and leaves the 40px it stood in reserved.
 
 A false boolean reflects as the attribute's absence, so this costs no
 `no-copy=""` on hosts that never asked for one, and the rule about a
@@ -1289,10 +1226,9 @@ round. The platform already writes booleans like this for the same reason,
 
 **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
 reserves the copy button's width with `:host(:not([no-copy]))`, so the
-attribute is what decides whether the block pays for a control. Set from
-script the button went away, `render` reading the property, and the 40px it
-stood in stayed reserved: the exact waste that rule was written to stop,
-arrived at from the other side.
+attribute is what decides whether the block pays for a control. Unreflected,
+setting it from script takes the button away (`render` reads the property)
+and leaves the 40px it stood in reserved.
 
 A false boolean reflects as the attribute's absence, so this costs no
 `no-copy=""` on hosts that never asked for one, and the rule about a
@@ -1326,9 +1262,9 @@ export type HelixHeadlessColorInputVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
-point.** The field filters a list rather than collecting a value, so a
-browser offering to fill it with a saved address is competing for the same
-keystrokes as the listbox. A consumer who wants autofill can still ask. */
+point.** The field holds a color, so a browser offering to fill it with a
+saved address is competing for the same keystrokes as the picker. A
+consumer who wants autofill can still ask. */
   autocomplete?: HelixHeadlessColorInput["autocomplete"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
@@ -1350,14 +1286,13 @@ where the color is the answer rather than a setting. */
   alpha?: HelixHeadlessColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
-**Undefaulted, because it reflects.** The two together are what stamp an
-attribute onto every host anybody renders, including the ones nobody
-configured: the server wrote `format="hex"` on every color input on the
-page, and React, holding no such prop, reported a hydration mismatch for
-each one. That is the fault `Tree.chevronPlacement` had and the reason the
-area rules say a reflected property takes no default. Hex is still what an
-unset one writes; the difference is that the resting arrangement is the
-attribute's absence rather than a value spelled out. */
+**Undefaulted, because it reflects.** The two together stamp an attribute
+onto every host anybody renders, including the ones nobody configured: the
+server writes `format="hex"` on every color input on the page, and React,
+holding no such prop, reports a hydration mismatch for each one.
+`helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
+writes; the resting arrangement is the attribute's absence rather than a
+value spelled out. */
   format?: HelixHeadlessColorInput["format"];
   /** Whether the reader may change the format from the panel. */
   "no-format"?: HelixHeadlessColorInput["noFormat"];
@@ -1373,27 +1308,16 @@ attribute's absence rather than a value spelled out. */
   triggerLabel?: HelixHeadlessColorInput["triggerLabel"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessColorInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessColorInput["defaultOpen"];
@@ -1405,17 +1329,10 @@ is what the mirror has always been for. */
   defaultValue?: HelixHeadlessColorInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessColorInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessColorInput["hint"];
@@ -1431,10 +1348,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessColorInput["disabled"];
   /** Name submitted with the form.
 
@@ -1451,8 +1366,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessColorInput["name"];
 };
 
@@ -1493,18 +1407,17 @@ export type HelixHeadlessColorPickerVueProps = {
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
-point.** The field filters a list rather than collecting a value, so a
-browser offering to fill it with a saved address is competing for the same
-keystrokes as the listbox. A consumer who wants autofill can still ask. */
+point.** The field holds a color, so a browser offering to fill it with a
+saved address is competing for the same keystrokes as the square and the
+ramps. A consumer who wants autofill can still ask. */
   autocomplete?: HelixHeadlessColorPicker["autocomplete"];
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Date Picker already drew and
-these two now follow. A flat picker has no room of its own for a sentence:
-the field that wraps one owns the label, the hint and the feedback, and a
-second message inside the panel would be the same error said twice. What is
-left for the picker is the one thing the field cannot draw from outside, the
-mark on the answer itself. */
+A flag rather than a message, the split Date Picker also draws. A flat
+picker has no room of its own for a sentence: the field that wraps one owns
+the label, the hint and the feedback, and a second message inside the panel
+would be the same error said twice. What is left for the picker is the one
+thing the field cannot draw from outside, the mark on the answer itself. */
   invalid?: HelixHeadlessColorPicker["invalid"];
   /** Whether the color carries an alpha channel.
 
@@ -1525,10 +1438,9 @@ should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
 for one value is the outcome worth avoiding: two places to type, and no
-answer to which one is authoritative or which has the caret. The other way
-round was considered, Color Input dropping its own field and letting this be
-the only one, and it is worse for a form: the value cannot be read or pasted
-without opening a panel. */
+answer to which one is authoritative or which has the caret. Do not close it
+the other way round, with Color Input dropping its own field: the value
+would then be unreadable and unpasteable without opening a panel. */
   "no-value"?: HelixHeadlessColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
@@ -1539,10 +1451,9 @@ should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
 for one value is the outcome worth avoiding: two places to type, and no
-answer to which one is authoritative or which has the caret. The other way
-round was considered, Color Input dropping its own field and letting this be
-the only one, and it is worse for a form: the value cannot be read or pasted
-without opening a panel. */
+answer to which one is authoritative or which has the caret. Do not close it
+the other way round, with Color Input dropping its own field: the value
+would then be unreadable and unpasteable without opening a panel. */
   noValue?: HelixHeadlessColorPicker["noValue"];
   /** Whether the reader may change the format. */
   "no-format"?: HelixHeadlessColorPicker["noFormat"];
@@ -1560,17 +1471,10 @@ without opening a panel. */
   defaultValue?: HelixHeadlessColorPicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessColorPicker["value"];
   /** Whether the control is non-interactive.
 
@@ -1578,10 +1482,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessColorPicker["disabled"];
   /** Name submitted with the form.
 
@@ -1598,8 +1500,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessColorPicker["name"];
 };
 
@@ -1722,27 +1623,16 @@ message belongs. */
   emptyText?: HelixHeadlessCombobox["emptyText"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessCombobox["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCombobox["defaultOpen"];
@@ -1754,17 +1644,10 @@ is what the mirror has always been for. */
   defaultValue?: HelixHeadlessCombobox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessCombobox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessCombobox["hint"];
@@ -1780,10 +1663,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessCombobox["disabled"];
   /** Name submitted with the form.
 
@@ -1800,8 +1681,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessCombobox["name"];
   /** Which option is chosen, as an index, or `-1` where none is.
 
@@ -1861,27 +1741,16 @@ with: one key, said once. */
   hotkey?: HelixHeadlessCommand["hotkey"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessCommand["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessCommand["defaultOpen"];
@@ -2009,10 +1878,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessCopyButton["disabled"];
   /** Name submitted with the form.
 
@@ -2029,8 +1896,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessCopyButton["name"];
   /** Whether the button holds its group's tab stop.
 
@@ -2059,9 +1925,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it, which is what `Popover`'s note asks for, and the reader is
-still told what the control does, which is what `SpeedDial`'s note asks
-for. See #322.
+they served it and the reader is still told what the control does. See #322.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -2072,11 +1936,11 @@ host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixHeadlessCopyButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
-The platform's own accessor, and this element had the resolution and kept
-it to itself: `linkCommand` writes the target onto the inner `<button>`,
-where a consumer cannot reach it, and `commandFor` answers with an id
-rather than an element. Writing assigns the inner control directly, which
-is what an invoker without an id in the same tree needs. */
+The platform's own accessor, because the resolution is otherwise kept
+inside: `linkCommand` writes the target onto the inner `<button>`, where a
+consumer cannot reach it, and `commandFor` answers with an id rather than
+an element. Writing assigns the inner control directly, which is what an
+invoker without an id in the same tree needs. */
   commandForElement?: HelixHeadlessCopyButton["commandForElement"];
 };
 
@@ -2239,9 +2103,8 @@ export type HelixHeadlessDateInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
 
 Empty leaves the attribute off, which is the browser's default and is what
-lets autofill work at all. This used to be hardcoded `off`, so a reader
-could never have a birthday or a postal code filled in for them and a
-consumer had no way to ask for it. See 295. */
+lets autofill work at all: hardcoding `off` here means a birthday or a
+postal code can never be filled in for a reader. See (295). */
   autocomplete?: HelixHeadlessDateInput["autocomplete"];
   /** How many dates can be held at once.
 
@@ -2263,7 +2126,7 @@ length of what is in it, neither of which this element knows. What a cap is
 genuinely for is a field in a row or a table cell, where a set of twelve
 dates would push everything below it down a line at a time.
 
-The remainder is counted rather than hidden. "3 more" is a fact a reader can
+The remainder is counted rather than hidden. `+3` is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
   "max-tags"?: HelixHeadlessDateInput["maxTags"];
@@ -2275,7 +2138,7 @@ length of what is in it, neither of which this element knows. What a cap is
 genuinely for is a field in a row or a table cell, where a set of twelve
 dates would push everything below it down a line at a time.
 
-The remainder is counted rather than hidden. "3 more" is a fact a reader can
+The remainder is counted rather than hidden. `+3` is a fact a reader can
 act on, where a row that silently stops is a field that appears to have lost
 what was put in it, and the count is what tells them there is more to see. */
   maxTags?: HelixHeadlessDateInput["maxTags"];
@@ -2382,27 +2245,16 @@ else set needs. */
   readOnly?: HelixHeadlessDateInput["readOnly"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessDateInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDateInput["defaultOpen"];
@@ -2414,17 +2266,10 @@ is what the mirror has always been for. */
   defaultValue?: HelixHeadlessDateInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessDateInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessDateInput["hint"];
@@ -2440,10 +2285,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessDateInput["disabled"];
   /** Name submitted with the form.
 
@@ -2460,8 +2303,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessDateInput["name"];
   /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
 
@@ -2528,26 +2370,22 @@ Absent uses the runtime's own. */
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
 
 Separate from `value` on purpose, so paging selects nothing and a consumer
-can drive the view. It said that and could not do it: the calendar wrote
-this when the reader paged, so a consumer holding it was overwritten and
-never told. Reading gives the month on show; writing declares it theirs,
-and `default-month` seeds one the calendar owns. */
+can drive the view. Reading gives the month on show; writing sets it, and
+`default-month` seeds one the calendar keeps until somebody does. */
   month?: HelixHeadlessDatePicker["month"];
   /** Accessible name for the control that pages back.
 
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
+A property because a calendar rendering its own month names from `locale`
+would otherwise still announce its controls in English. `attribute:`
+spelled out, since Lit lowercases a camelCase name rather than dash-casing
+it. */
   "previous-label"?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages back.
 
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
+A property because a calendar rendering its own month names from `locale`
+would otherwise still announce its controls in English. `attribute:`
+spelled out, since Lit lowercases a camelCase name rather than dash-casing
+it. */
   previousLabel?: HelixHeadlessDatePicker["previousLabel"];
   /** Accessible name for the control that pages forward. */
   "next-label"?: HelixHeadlessDatePicker["nextLabel"];
@@ -2564,8 +2402,8 @@ camelCase name rather than dash-casing it. */
 `<input type="date" step>`'s own unit, counted from `min` where there is
 one and from 1 January 1970 where there is not, which is the platform's own
 base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-on a Monday, and there was no way to say that: `disable-dates` takes a list
-and a year of Mondays is not a list anybody writes.
+on a Monday, which `disable-dates` cannot express: it takes a list, and a
+year of Mondays is not a list anybody writes.
 
 One is every date and needs no rule, which is why anything below one is
 treated as one rather than as an error: a step of zero would block every
@@ -2611,17 +2449,10 @@ else set needs. */
   defaultValue?: HelixHeadlessDatePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessDatePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -2629,10 +2460,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessDatePicker["disabled"];
   /** Name submitted with the form.
 
@@ -2649,8 +2478,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessDatePicker["name"];
   /** The value as a `Date`, at midnight UTC, or `null` while there is no date.
 
@@ -2694,17 +2522,11 @@ export type HelixHeadlessDialogHelixBeforeOpenElementEvent =
 export type HelixHeadlessDialogVueProps = {
   /** Accessible name for the dialog. */
   label?: HelixHeadlessDialog["label"];
-  /** Whether Escape can close it.
+  /** Whether Escape or a press on the backdrop can close it.
 
 Off for a dialog that must be answered. It does not disable the close
 control a consumer slots in: refusing to be dismissed is not the same as
 refusing to be closed, and a dialog with no way out at all is a trap.
-
-Escape *and* a press on the backdrop, which it now genuinely means. The
-sentence said both for a long time while nothing listened for a backdrop
-press, so it promised a behavior a consumer would have written their
-markup around; the fix then was to narrow the sentence, and the fix now is
-to build the half that was missing.
 
 A persistent dialog does not ignore that press. It answers it: see
 `refuse`, which is the only way a dialog that will not be dismissed can say
@@ -2734,27 +2556,16 @@ that a resting value is an attribute's absence. */
   closedBy?: HelixHeadlessDialog["closedBy"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessDialog["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDialog["defaultOpen"];
@@ -2764,9 +2575,9 @@ is what the mirror has always been for. */
 
 **The whole point of a `<dialog>` returning a value is lost behind a shadow
 boundary**, which is where this one is: the platform's contract is
-`close(value)` then read `returnValue`, and a consumer could do neither
-because `querySelector` does not reach the element. A confirmation asking
-which button was pressed is the ordinary case and had no answer.
+`close(value)` then read `returnValue`, and `querySelector` does not reach
+the element to do either. A confirmation asking which button was pressed is
+the ordinary case.
 
 Held here as well as on the element, so a value set before the first render
 survives to it and a consumer reading one back gets what they wrote. */
@@ -2817,11 +2628,11 @@ being harder to judge than length, but it is not *misleading* the way a bar
 measured from anything but zero is, which is why this is a value here and
 the bar chart's baseline is not a property at all.
 
-**Geometry rather than a CSS hook, and it had to move.** This was
-`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
-which needs the radius: reading a custom property means `getComputedStyle`,
-which is client-only, so a server would have drawn a different ring than
-the client. A plot's proportions are markup for the same reason `curve` is. */
+**Geometry rather than a CSS hook.** The dash arithmetic needs the
+circumference, which needs the radius, and reading a custom property means
+`getComputedStyle`, which is client-only: a server would draw a different
+ring than the client. A plot's proportions are markup for the same reason
+`curve` is. */
   hole?: HelixHeadlessDonutChart["hole"];
   /** How much of the circle the whole occupies.
 
@@ -2835,11 +2646,10 @@ different axes and can both be true: `hole` is radial and says how thick
 the band is, this is angular and says how far round it goes. A `half`
 `none` is a semi-pie and is a real thing to want.
 
-**Not a gauge**, and the distinction is worth stating because this row was
-first filed as one. A gauge is one value against a range, which is a
-different data shape entirely and is `Meter`, whose `round` example already
-draws the reading as a ring. This divides a whole into parts and then
-declines to use the bottom half of the circle.
+**Not a gauge.** A gauge is one value against a range, which is a different
+data shape entirely and is `Meter`, whose `round` example already draws the
+reading as a ring. This divides a whole into parts and then declines to use
+the bottom half of the circle.
 
 Reflected, because the stylesheet has three things to say about it: the
 rotation that puts the first slice at nine o'clock, the aspect ratio of a
@@ -2922,27 +2732,16 @@ that a resting value is an attribute's absence. */
   closedBy?: HelixHeadlessDrawer["closedBy"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessDrawer["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessDrawer["defaultOpen"];
@@ -2970,7 +2769,7 @@ export type HelixHeadlessDrawerVueEvents = {
   close: HelixHeadlessDrawerElementEvent;
   /** Fired before the panel closes, and cancelable. */
   "helix-before-close": HelixHeadlessDrawerHelixBeforeCloseElementEvent;
-  /** Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves. */
+  /** Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves. */
   "helix-before-open": HelixHeadlessDrawerHelixBeforeOpenElementEvent;
   /** Says the state moved, carrying `newState` and `oldState`. */
   toggle: HelixHeadlessDrawerElementEvent;
@@ -3001,9 +2800,9 @@ Written by the stack. */
   /** Whether this row holds the region's tab stop. Written by the stack.
 
 A drill-down keeps one stop and moves within it on the arrows, so every
-other row is at `-1`. Every row was, including the first, which left
-nothing in the region tab-reachable at all: the keyboard could not get in
-without first clicking something with a pointer.
+other row is at `-1`. Leave it off every row, including the first, and
+nothing in the region is tab-reachable: the keyboard cannot get in without
+first clicking something with a pointer.
 
 No attribute, the same as `Button`'s: this is coordination between
 elements, and writing `tabindex` onto a host the consumer rendered is a
@@ -3113,10 +2912,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessFileInput["disabled"];
   /** Name submitted with the form.
 
@@ -3133,8 +2930,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessFileInput["name"];
 };
 
@@ -3234,21 +3030,19 @@ A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
 **`"1"` through `"5"` are a ramp and everything else is a category**, which
 is the distinction a heatmap lives or dies on: magnitude has to be one hue
 getting louder, because a reader compares two cells by weight and cannot
-compare two hues at all. This shipped demonstrating the opposite,
-`tones="surface info accent success primary"` for a commit count, and five
-unrelated hues for five amounts is confetti with no order in it. */
+compare two hues at all. `tones="surface info accent success primary"` for a
+commit count is five unrelated hues for five amounts, which is confetti with
+no order in it. */
   tones?: HelixHeadlessHeatmap["tones"];
   /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
 **Set this only to overrule what the strip actually draws.** The arithmetic
 needs a width in pixels and the width is a length the stylesheet resolves,
-so for as long as this was the only answer it was a promise the consumer had
-to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
-believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
-940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
-number a summary is told to trust was the number that was wrong.
+so a number written here that disagrees with the sheet is a promise the
+consumer has to keep by hand, and the one number a summary is told to trust
+is the one it gets wrong.
 
-The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -3262,13 +3056,11 @@ container that cannot get narrow. */
 
 **Set this only to overrule what the strip actually draws.** The arithmetic
 needs a width in pixels and the width is a length the stylesheet resolves,
-so for as long as this was the only answer it was a promise the consumer had
-to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
-believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
-940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
-number a summary is told to trust was the number that was wrong.
+so a number written here that disagrees with the sheet is a promise the
+consumer has to keep by hand, and the one number a summary is told to trust
+is the one it gets wrong.
 
-The strip is measured now, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
 enough on their own and these two are the estimate used until the first
 measurement lands. Writing the attribute pins the value and stops the
 measurement being consulted, which is what a container query or a transition
@@ -3401,10 +3193,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessIconButton["disabled"];
   /** Name submitted with the form.
 
@@ -3421,8 +3211,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessIconButton["name"];
   /** Whether the button holds its group's tab stop.
 
@@ -3451,9 +3240,7 @@ match the client properties. This won't be patched up" in both orders;
 the attributes it rendered, and this one is `attribute: false`, so the state
 travels to the inner `<button>` and lands inside a shadow root React does
 not own and cannot compare. The consumer's own element is left exactly as
-they served it, which is what `Popover`'s note asks for, and the reader is
-still told what the control does, which is what `SpeedDial`'s note asks
-for. See #322.
+they served it and the reader is still told what the control does. See #322.
 
 `undefined` renders nothing at all, so a button that is not a trigger
 carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -3464,11 +3251,11 @@ host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixHeadlessIconButton["expanded"];
   /** The element this button's command is sent to, resolved.
 
-The platform's own accessor, and this element had the resolution and kept
-it to itself: `linkCommand` writes the target onto the inner `<button>`,
-where a consumer cannot reach it, and `commandFor` answers with an id
-rather than an element. Writing assigns the inner control directly, which
-is what an invoker without an id in the same tree needs. */
+The platform's own accessor, because the resolution is otherwise kept
+inside: `linkCommand` writes the target onto the inner `<button>`, where a
+consumer cannot reach it, and `commandFor` answers with an id rather than
+an element. Writing assigns the inner control directly, which is what an
+invoker without an id in the same tree needs. */
   commandForElement?: HelixHeadlessIconButton["commandForElement"];
 };
 
@@ -3525,12 +3312,9 @@ ninety-nine pictures. */
   fetchPriority?: HelixHeadlessImage["fetchPriority"];
   /** Whether the browser may decode off the main thread.
 
-**The template hardcoded `async` and a consumer could not reach it**, which
-is worse than the property being absent: the decision was taken on their
-behalf and nothing said so. `async` is still the resting value and still
-right for a picture in a page, and `sync` is what a consumer reaches for
-when the picture is about to be composited with something else and a tear
-would show. */
+`async` is the resting value and right for a picture in a page. `sync` is
+what a consumer reaches for when the picture is about to be composited with
+something else and a tear would show. */
   decoding?: HelixHeadlessImage["decoding"];
   /** How the picture is fetched across origins, which decides whether a canvas
 can read it. */
@@ -3551,14 +3335,12 @@ state, so reflecting it puts the element's own bookkeeping into the markup
 a consumer rendered: React reads the attribute appearing at upgrade as a
 hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
 back declares that a picture has arrived which this element has never
-fetched. The `data-` name is the library's answer to both, being a
-different name a re-parse cannot mistake for a declaration, and it is what
-`data-closed` on `Toast.Item` already does, and `AppHeader` did until its
-own moved to `:state(scrolled)` for the hydration reason recorded there.
-A picture arrives after somebody fetched it, which puts this on the safe
-side of hydration: a fact that can be true on the *first* update mirrors to
-a custom state instead, which is what `:state(open)` and `:state(checked)`
-became on 27 Aug 2026 for exactly that reason.
+fetched. The `data-` name is the library's answer to both, being a name a
+re-parse cannot mistake for a declaration, and it is what `data-closed` on
+`Toast.Item` already does. A picture arrives after somebody fetched it,
+which puts this on the safe side of hydration: a fact that can be true on
+the *first* update mirrors to a custom state instead, which is what
+`:state(open)` and `:state(checked)` are.
 
 `loading` writes nothing, because it is where every image starts and the
 resting state of a mirror is the attribute's absence. */
@@ -3593,58 +3375,41 @@ Not a label: it goes when typing starts. */
   placeholder?: HelixHeadlessInput["placeholder"];
   /** Whether the field refuses input while still submitting its value.
 
-**`readonly`, which is the platform's spelling, and it was `read-only`
-until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
-and the library had been answering that question two ways: thirteen
-attributes kept the name HTML uses (`crossorigin`, `maxlength`,
-`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
-platform writes as one. `readonly` was the only one on both lists, this
-spelling on `Rating` and `read-only` on the eight other fields, so one
-library shipped both and each was inert on the other's families.
+**The attribute is `readonly`, which is the platform's spelling.** A
+camelCase property needs an explicit `attribute`, and dash-casing a word
+HTML writes as one costs what an attribute always costs here: nothing
+warns. `<helix-input readonly>` is what anybody who has written HTML types;
+against `read-only` it parses to no property at all, and the field stays
+editable with no error anywhere. Measured on the dash-cased form, `readOnly`
+came back `false`.
 
-The cost of the dash-cased form is the one this repository keeps writing
-down about attributes: nothing warns. `<helix-input readonly>` is what
-anybody who has written HTML types, it parsed to no property at all, and
-the field stayed editable with no error anywhere. Measured before the
-rename: `readOnly` came back `false`.
-
-Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
-about the part it renamed for the same kind of reason: there is no
-`helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release. */
+See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+the same kind of reason: there is no `helix-v` tag, so no consumer is
+holding the old spelling, and this is free today and a deprecation after
+the first release. */
   readonly?: HelixHeadlessInput["readOnly"];
   /** Whether the field refuses input while still submitting its value.
 
-**`readonly`, which is the platform's spelling, and it was `read-only`
-until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
-and the library had been answering that question two ways: thirteen
-attributes kept the name HTML uses (`crossorigin`, `maxlength`,
-`formnovalidate`, `dirname` and the rest) and five dash-cased a word the
-platform writes as one. `readonly` was the only one on both lists, this
-spelling on `Rating` and `read-only` on the eight other fields, so one
-library shipped both and each was inert on the other's families.
+**The attribute is `readonly`, which is the platform's spelling.** A
+camelCase property needs an explicit `attribute`, and dash-casing a word
+HTML writes as one costs what an attribute always costs here: nothing
+warns. `<helix-input readonly>` is what anybody who has written HTML types;
+against `read-only` it parses to no property at all, and the field stays
+editable with no error anywhere. Measured on the dash-cased form, `readOnly`
+came back `false`.
 
-The cost of the dash-cased form is the one this repository keeps writing
-down about attributes: nothing warns. `<helix-input readonly>` is what
-anybody who has written HTML types, it parsed to no property at all, and
-the field stayed editable with no error anywhere. Measured before the
-rename: `readOnly` came back `false`.
-
-Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
-about the part it renamed for the same kind of reason: there is no
-`helix-v` tag, so no consumer is holding the old spelling, and this is free
-today and a deprecation after the first release. */
+See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+the same kind of reason: there is no `helix-v` tag, so no consumer is
+holding the old spelling, and this is free today and a deprecation after
+the first release. */
   readOnly?: HelixHeadlessInput["readOnly"];
   /** What the field accepts, which decides the keyboard and the validation.
 
-**Not reflected**, and it was. Reflection exists so a selector can reach a
-value, and no stylesheet in this repository selects on `type`: what it did
-instead was write `type="text"` onto every `<helix-input>` ever rendered,
-an attribute no consumer's markup had. That is precisely the fault `Button`
-had with `href`, `target` and `rel`, written up in the area rules as the
-reason the rule exists, and this was the last property in the library still
-doing it. Audited: ten reflected attributes have no selector anywhere, and
-this is the only one of them with a value that puts itself on the host.
+**Not reflected.** Reflection exists so a selector can reach a value, and
+no stylesheet in this repository selects on `type`. Reflecting it writes
+`type="text"` onto every `<helix-input>` ever rendered, an attribute no
+consumer's markup has, which is the fault the area rules write up under
+`Button`'s `href`, `target` and `rel`.
 
 Nothing reads it from the attribute either. The real `<input>` inside takes
 it as a property binding, which is what makes the keyboard and the
@@ -3678,11 +3443,6 @@ The state is `aria-pressed`, not this. */
   revealLabel?: HelixHeadlessInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
-The class documentation promised `pattern` and `minlength` "and the rest"
-were set on the real input, and no such properties existed: a consumer
-following that sentence wrote an attribute on the host, it reached no input,
-and the field constrained nothing while looking as though it did.
-
 Forwarded rather than checked here, which is the whole reason validity is
 the platform's: the browser knows what a `pattern` means, anchors it at both
 ends, and produces the message in the reader's own language. */
@@ -3701,17 +3461,10 @@ ends, and produces the message in the reader's own language. */
   defaultValue?: HelixHeadlessInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessInput["hint"];
@@ -3727,10 +3480,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessInput["disabled"];
   /** Name submitted with the form.
 
@@ -3747,8 +3498,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessInput["name"];
   /** The caret and the selection, under the platform's own names.
 
@@ -3836,22 +3586,19 @@ ground it should feel like a quantity against is the case for this. */
   area?: HelixHeadlessLineChart["area"];
   /** How the line gets from one reading to the next.
 
-**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
-argument this comment used to make.* Joining the readings claims nothing in
-between, which is true and is why `straight` still exists: a straight
-segment asserts nothing about the values between two readings, and a curve
-invents them. What settles it the other way is that the invention is
-bounded. The interpolation is monotone cubic, so it never leaves the band
+**`smooth` is the resting curve.** A curve invents the values between two
+readings, which is why `straight` still exists, but the invention is
+bounded: the interpolation is monotone cubic, so it never leaves the band
 the data sets and never introduces a peak or a trough the series does not
-have, and within that bound the smoothed line is the easier one to follow
-across a long series. `straight` becomes the deliberate claim.
+have. Within that bound the smoothed line is the easier one to follow
+across a long series, and `straight` becomes the deliberate claim.
 
-**Still absent rather than defaulted on the property**, because a
-reflecting property with a default writes its attribute onto every host
-anybody renders, including the ones nobody configured.
+**Absent rather than defaulted on the property**, because a reflecting
+property with a default writes its attribute onto every host anybody
+renders, including the ones nobody configured.
 `line-chart-root.ssr.spec.ts` asserts the host carries only what the
-consumer wrote, and caught that the first time. The default therefore lives
-where the path is built, as `curve ?? 'smooth'`.
+consumer wrote. The default therefore lives where the path is built, as
+`curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixHeadlessLineChart["curve"];
@@ -3868,12 +3615,11 @@ the same levels. `category` rules the axis they are *arranged* on, one
 through each reading, which is what lets a point be traced down to its
 label across a wide chart. `both` draws both.
 
-**A bare `gridlines` means `value`**, and so does anything unrecognised.
-Written out, the attribute a consumer reaches for first should be the grid
-they meant, and a typo should fall back to the useful half rather than to
-nothing at all: an unrecognised value that draws no rules is
-indistinguishable from the attribute being absent, which is the one thing
-a reader cannot debug.
+**A bare `gridlines` means `value`**, and so does anything unrecognized.
+The attribute a consumer reaches for first should be the grid they meant,
+and a typo should fall back to the useful half rather than to nothing at
+all: an unrecognized value that draws no rules is indistinguishable from
+the attribute being absent, which is the one thing a reader cannot debug.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
@@ -4020,10 +3766,8 @@ gives what is being filtered on; writing declares it theirs, and
 
 The field lives here rather than in whatever frames the list, because the
 filtering already does: `filter`, the empty state and the keyboard are all
-this component's. A select that drew its own search box above a listbox
-would be writing the same field again, and so would a combobox, and so
-would a command palette, which is the fault the three-family split exists
-to prevent. */
+this component's. A select, a combobox and a command palette drawing their
+own search boxes would be three copies of one field. */
   filterable?: HelixHeadlessListbox["filterable"];
   /** Placeholder for the field that narrows the list. */
   "filter-label"?: HelixHeadlessListbox["filterLabel"];
@@ -4061,17 +3805,10 @@ say that without the component knowing what a row looks like. */
   defaultValue?: HelixHeadlessListbox["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessListbox["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessListbox["hint"];
@@ -4087,10 +3824,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessListbox["disabled"];
   /** Name submitted with the form.
 
@@ -4107,8 +3842,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessListbox["name"];
   /** Which option is chosen, as an index, or `-1` where none is.
 
@@ -4218,27 +3952,16 @@ number in two languages, drifting the first time either moved. This sets
   fullBelow?: HelixHeadlessMegamenu["fullBelow"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessMegamenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMegamenu["defaultOpen"];
@@ -4287,7 +4010,7 @@ thing they are not.
 `menuitem` cannot contain a link: measured in Chromium, an anchor inside
 one is exposed as a child and the row loses its accessible name entirely.
 So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
-roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+roves, which is the same maneuver `Tree.Item` makes and the reason `href`
 changes the markup rather than only adding an attribute.
 
 **`Option` cannot have this and the reason is worth knowing**, since a
@@ -4375,27 +4098,16 @@ say that without the component knowing what a row looks like. */
   emptyText?: HelixHeadlessMenu["emptyText"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessMenu["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessMenu["defaultOpen"];
@@ -4468,8 +4180,7 @@ again is a worse API than letting them say it.
 
 Not reflected. Nothing selects on it: the band reaches the stylesheet as
 `data-band` on the fill, because that is the element being colored, so
-reflecting here would write an attribute onto the host for no reader. Third
-time this rule has caught something today. */
+reflecting here would write an attribute onto the host for no reader. */
   band?: HelixHeadlessMeter["band"];
   /** Whether the reading is drawn as a bar, a ring or an arc.
 
@@ -4541,16 +4252,13 @@ Set it and this element defers: a reader's click fires `helix-read` and
 changes nothing until a new value arrives. `default-read` seeds a state
 this element then owns.
 
-**Not reflected, and it was until 27 Aug 2026.** The reason given was that
-unread is a visual state and a stylesheet has no other way to know, which
-is the same reason the four mixins mirror theirs, and the mirror may not be
-the property's own attribute: `<helix-notification default-read>`
-came back from a server without `read` and gained it on the first update,
-which React reports as a hydration mismatch, and a copy of the serialized
-element re-parses that attribute as a declaration. `:state(read)` is what
-the stylesheet reads now. Found by `hydration.dom.spec.ts` on the day it
-learned to mount an element a consumer had configured rather than a bare
-one. */
+**Not reflected.** Unread is a visual state, which is why the four mixins
+mirror theirs, but the mirror may not be the property's own attribute:
+`<helix-notification default-read>` comes back from a server without `read`
+and would gain it on the first update, which React reports as a hydration
+mismatch, and which a copy of the serialized element re-parses as a
+declaration. `:state(read)` is what the stylesheet reads.
+`hydration.dom.spec.ts` holds it. */
   read?: HelixHeadlessNotification["read"];
   /** State to open with, where nothing declared one. */
   "default-read"?: HelixHeadlessNotification["defaultRead"];
@@ -4629,9 +4337,9 @@ export type HelixHeadlessNumberInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
 
 Empty leaves the attribute off, which is the browser's default and is what
-lets autofill work at all. This used to be hardcoded `off`, so a reader
-could never have a birthday or a postal code filled in for them and a
-consumer had no way to ask for it. See 295. */
+lets autofill work at all. Hardcoding `off` here is what stops a reader
+having a birthday or a postal code filled in for them, with no way for a
+consumer to ask for it. See (295). */
   autocomplete?: HelixHeadlessNumberInput["autocomplete"];
   /** Smallest value the reader may reach.
 
@@ -4686,17 +4394,10 @@ one they already know. */
   defaultValue?: HelixHeadlessNumberInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessNumberInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessNumberInput["hint"];
@@ -4712,10 +4413,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessNumberInput["disabled"];
   /** Name submitted with the form.
 
@@ -4732,8 +4431,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessNumberInput["name"];
   /** The value as a number, or `NaN` while the control is empty.
 
@@ -4966,14 +4664,14 @@ written onto a host at upgrade that a server's output never had. */
   /** The page on show, one-based.
 
 An accessor pair, the same shape as the calendar's `month`. Reading gives
-the page on show; writing declares it the consumer's, and `default-page`
-seeds one the element owns.
+the page on show; writing sets it, and `default-page` seeds one the element
+keeps until somebody does.
 
 **Clamped on the way out, because "the page on show" is what it says it
-gives.** It returned whatever had been written, so `default-page="99"` on a
-ten-page result rendered page 10, marked page 10 with `aria-current`, and
-reported 99. A consumer syncing their query from this read a page that does
-not exist while the control in front of them said otherwise. Not a
+gives.** Returning whatever was written means `default-page="99"` on a
+ten-page result renders page 10, marks page 10 with `aria-current`, and
+reports 99, so a consumer syncing their query from this reads a page that
+does not exist while the control in front of them says otherwise. Not a
 far-fetched value: it is a bookmarked link after the result shrank.
 
 Rounded here too, so `2.7` reads as the 2 it renders. */
@@ -5022,17 +4720,17 @@ different address from `?page=1234`. */
   pageLabel?: HelixHeadlessPagination["pageLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
-The word went: it read "Page 7 of 24" and the landmark it sits in is
-already named "Pagination", so the noun was said twice to a screen reader
-and took a third of the width from a control whose whole reason for
-existing is that the row is narrow. The numbers are the reading. */
+No noun: the landmark this sits in is already named "Pagination", so
+"Page 7 of 24" says it twice to a screen reader and takes a third of the
+width from a control whose whole reason for existing is that the row is
+narrow. The numbers are the reading. */
   "status-label"?: HelixHeadlessPagination["statusLabel"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
-The word went: it read "Page 7 of 24" and the landmark it sits in is
-already named "Pagination", so the noun was said twice to a screen reader
-and took a third of the width from a control whose whole reason for
-existing is that the row is narrow. The numbers are the reading. */
+No noun: the landmark this sits in is already named "Pagination", so
+"Page 7 of 24" says it twice to a screen reader and takes a third of the
+width from a control whose whole reason for existing is that the row is
+narrow. The numbers are the reading. */
   statusLabel?: HelixHeadlessPagination["statusLabel"];
   /** Accessible name for the control that moves back. */
   "previous-label"?: HelixHeadlessPagination["previousLabel"];
@@ -5168,12 +4866,11 @@ a filter that accepted it would let through a character the service on the
 other end is going to reject. A consumer whose codes really do carry
 marked letters wants `text`, which judges nothing.
 
-**Not reflected**, and it was until this component's own server spec caught
-it: nothing selects on it, so all reflection did was write `type="numeric"`
-onto every `<helix-pin-input>` ever rendered, an attribute no consumer's
-markup had. That is the fault `Input`'s own `type` had and the reason the
-area rules carry the sentence "reflect only what CSS selects on". The real
-inputs take it as a binding, which is what makes the keyboard follow. */
+**Not reflected**: nothing selects on it, so reflecting only writes
+`type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
+no consumer's markup had. The area rules carry the sentence "reflect only
+what CSS selects on". The real inputs take it as a binding, which is what
+makes the keyboard follow. */
   type?: HelixHeadlessPinInput["type"];
   /** Whether the characters are hidden, the way a password is. */
   mask?: HelixHeadlessPinInput["mask"];
@@ -5185,9 +4882,7 @@ already excluded from the accessible value, and it works the same under
 `mask`, where the cell is a password input and a hand-drawn glyph would
 have to know that.
 
-Empty by default, because a row of boxes already reads as a row of boxes
-and a dot in each is a choice about how much the field should announce
-itself before anybody has touched it. */
+Empty by default, because a row of boxes already reads as a row of boxes. */
   placeholder?: HelixHeadlessPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
   readonly?: HelixHeadlessPinInput["readOnly"];
@@ -5203,17 +4898,10 @@ itself before anybody has touched it. */
   defaultValue?: HelixHeadlessPinInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessPinInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessPinInput["hint"];
@@ -5229,10 +4917,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessPinInput["disabled"];
   /** Name submitted with the form.
 
@@ -5249,8 +4935,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessPinInput["name"];
 };
 
@@ -5288,27 +4973,16 @@ It moves if that side does not fit. */
   placement?: HelixHeadlessPopover["placement"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessPopover["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessPopover["defaultOpen"];
@@ -5463,17 +5137,10 @@ only `horizontal` has to be named. */
   defaultValue?: HelixHeadlessRadioGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessRadioGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRadioGroup["hint"];
@@ -5489,10 +5156,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessRadioGroup["disabled"];
   /** Name submitted with the form.
 
@@ -5509,8 +5174,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessRadioGroup["name"];
 };
 
@@ -5549,11 +5213,10 @@ element has one `selected` doing both jobs, so what is captured here is what
 the markup said at upgrade, before anything could overwrite it: read the
 attribute later and the listbox's own writes answer instead.
 
-**The deeper half is 302 and is not this.** State reflecting under the
-declaration's name is the fault `TreeItem` already avoids by mirroring to
-`data-selected`, and four families here still write `selected` back into a
-consumer's markup. Splitting them means moving what every stylesheet selects
-on, which is a change of its own rather than a property being added. */
+**The deeper half is not this.** State reflecting under the declaration's
+name is the fault `TreeItem` avoids by mirroring to `data-selected`.
+Splitting them means moving what every stylesheet selects on, which is a
+change of its own rather than a property being added. See (302). */
   defaultSelected?: HelixHeadlessRadio["defaultSelected"];
 };
 
@@ -5638,17 +5301,10 @@ reader's own cursor would be worse than no label. */
   defaultValue?: HelixHeadlessRating["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessRating["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessRating["hint"];
@@ -5664,10 +5320,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessRating["disabled"];
   /** Name submitted with the form.
 
@@ -5684,8 +5338,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessRating["name"];
   /** The value as a number, or `NaN` while the control is empty.
 
@@ -5732,10 +5385,7 @@ export type HelixHeadlessSelectVueProps = {
   /** Whether the list can be narrowed by typing.
 
 Passed to the listbox rather than acted on here, because the listbox owns
-the filtering, the empty state and the keyboard. This property existed and
-was never read: it reflected, it type-checked, and nothing anywhere
-rendered a field. API that does nothing is worse than API that is missing,
-because a consumer sets it and believes it. */
+the filtering, the empty state and the keyboard. */
   filterable?: HelixHeadlessSelect["filterable"];
   /** Whether the options are still on their way.
 
@@ -5757,27 +5407,16 @@ consumer wiring the same flag twice. */
   placeholder?: HelixHeadlessSelect["placeholder"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessSelect["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSelect["defaultOpen"];
@@ -5789,17 +5428,10 @@ is what the mirror has always been for. */
   defaultValue?: HelixHeadlessSelect["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessSelect["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSelect["hint"];
@@ -5815,10 +5447,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessSelect["disabled"];
   /** Name submitted with the form.
 
@@ -5835,8 +5465,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessSelect["name"];
   /** Which option is chosen, as an index, or `-1` where none is.
 
@@ -5927,17 +5556,10 @@ rather than a thumb sitting on nothing. */
   defaultValue?: HelixHeadlessSlider["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessSlider["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessSlider["hint"];
@@ -5953,10 +5575,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessSlider["disabled"];
   /** Name submitted with the form.
 
@@ -5973,8 +5593,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessSlider["name"];
 };
 
@@ -6018,18 +5637,15 @@ is markup, the same reason `curve` lives here. */
   plot?: HelixHeadlessSparkline["plot"];
   /** How the line gets from one reading to the next.
 
-**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
-argument this comment used to make.* It read that joining the readings
-claims nothing in between and is the default for that reason, which is true
-and is why `straight` still exists: a straight segment asserts nothing about
-the values between two readings, and a curve invents them.
-
-What settles it the other way is that the invention is bounded. The
-interpolation is monotone cubic, so it never leaves the band the data sets
-and never introduces a peak or a trough the series does not have. Within
-that bound the smoothed line is the easier one to follow across a long
-series, which is what the drawing is for. `straight` becomes the claim a
-consumer makes deliberately rather than the one they get by saying nothing.
+**`smooth` is the resting curve.** A straight segment asserts nothing about
+the values between two readings and a curve invents them, which is why
+`straight` exists. What settles the default the other way is that the
+invention is bounded: the interpolation is monotone cubic, so it never
+leaves the band the data sets and never introduces a peak or a trough the
+series does not have. Within that bound the smoothed line is the easier one
+to follow across a long series, which is what the drawing is for. `straight`
+becomes the claim a consumer makes deliberately rather than the one they get
+by saying nothing.
 
 **The property stays optional and the default lives in the render.** A
 reflecting property with a default writes its attribute onto every host
@@ -6112,27 +5728,16 @@ bottom of the window and there is nothing below it to fan into. */
   offset?: HelixHeadlessSpeedDial["offset"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessSpeedDial["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessSpeedDial["defaultOpen"];
@@ -6167,8 +5772,7 @@ export type HelixHeadlessSplitterVueProps = {
 `horizontal` is side by side with an upright divider between them, and
 `aria-orientation` on that divider is therefore `vertical`: a separator's
 orientation is the direction it is *drawn* in, not the axis it moves along,
-so the two words are opposite each other here on purpose. The code had this
-right and the sentence beside it said the reverse.
+so the two words are opposite each other here on purpose.
 
 Unset is horizontal and stays unset, so a reflected default cannot appear on
 a host whose server output never had it.
@@ -6292,8 +5896,8 @@ preference.** A reflecting property with a default writes its attribute onto
 the host the moment the element upgrades, and the host is markup the
 consumer rendered: React compares what it rendered against what is there and
 reports a hydration mismatch. The absent attribute is the column, which the
-stylesheet reads as the base case. The existing server spec caught this,
-being the one that asserts the host carries nothing nobody wrote. */
+stylesheet reads as the base case, and the server spec asserts the host
+carries nothing nobody wrote. */
   direction?: HelixHeadlessStat["direction"];
 };
 
@@ -6342,17 +5946,12 @@ a reader is told to come back to by number. */
   variant?: HelixHeadlessSteps["variant"];
   /** Which item is current, by its `value`.
 
-Called `active`, which is what this mixin is named for and what it was
-not: it declared `value`, so the one mixin whose whole subject is which
-item is active had no such property, and `active` meant something else
-entirely elsewhere in the library. It still does, and only there now:
-`option.active` is the option the keyboard is on, which is a different
-question from which one is chosen.
+Not `option.active`, which is the option the keyboard is on: that is a
+different question from which one is chosen.
 
-An accessor pair, the same shape as the other three. Reading gives the
-real item; writing hands ownership to the consumer, so `<helix-tabs
-active="one">` is a set that stays on that tab and `default-active` is
-how markup says where to start. */
+Writing always applies, so `<helix-tabs active="one">` starts on that
+tab, and `default-active` is how markup says where to start without
+naming the current one. */
   active?: HelixHeadlessSteps["active"];
   /** Initial item for uncontrolled use.
 
@@ -6410,11 +6009,8 @@ export type HelixHeadlessSwitchVueProps = {
   value?: HelixHeadlessSwitch["value"];
   /** Whether the control is checked.
 
-One property rather than two. Reading gives the real state whichever
-mode the control is in; writing hands ownership to the consumer, which
-is what the attribute in `<helix-checkbox checked>` does as well. The
-same shape all four of these mixins have, for the reason given on
-`MixinControllerOpen.open`.
+One property rather than two. Writing always applies;
+`<helix-checkbox checked>` is the same statement in markup.
 
 Not reflected: the attribute is the consumer's input and stays as they
 wrote it, and `:state(checked)` carries the resolved state for
@@ -6438,10 +6034,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessSwitch["disabled"];
   /** Name submitted with the form.
 
@@ -6458,8 +6052,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessSwitch["name"];
 };
 
@@ -6486,26 +6079,21 @@ A single track value, so anything valid in `grid-template-columns` works:
 `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
 left over equally, as `minmax(max-content, 1fr)`.
 
-**The floor was `0` and that is what broke a narrow table.** A zero floor
-lets a track shrink under its own content, so at 375 the columns were
-squeezed to 75px and `eu-central-1` wrapped across lines, which reads as
-corrupt data rather than as a table that ran out of room. The zero was
-chosen to stop one long value pushing the table past its container, and
-that was the right worry with nowhere for the overflow to go.
+**The floor is `max-content`, never `0` and never `min-content`.** A zero
+floor lets a track shrink under its own content: at 375 the columns squeeze
+to 75px and `eu-central-1` wraps across lines, which reads as corrupt data
+rather than as a table that ran out of room. A `min-content` floor still
+breaks it, a hyphen being a wrap opportunity.
 
-Somewhere now exists: `@fusion.dev/helix` scrolls the table's own box. So a
-long value pushes past the container as the old comment feared, and the
-table scrolls instead of the value being destroyed. Measured at 375: tracks
-of 192, 89 and 102 against a 343 box, so the table scrolls 384 and the page
-does not move.
+The overflow has somewhere to go: `@fusion.dev/helix` scrolls the table's
+own box, so a long value pushes past the container and the table scrolls
+instead of the value being destroyed. Measured at 375: tracks of 192, 89 and
+102 against a 343 box, so the table scrolls 384 and the page does not move.
 
-**`max-content` and not `min-content`, because a hyphen is a wrap
-opportunity.** A `min-content` floor still broke `eu-central-1` at its
-hyphens, which is the whole of the reported fault. The cost is that a
-column of prose asks for its longest paragraph on one line, so a column
-holding sentences rather than values wants `width="minmax(0, 1fr)"` to opt
-back into wrapping. A headless consumer owns the overflow either way, that
-being paint, and gets the honest track list. */
+The cost is that a column of prose asks for its longest paragraph on one
+line, so a column holding sentences rather than values wants
+`width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
+the overflow either way, that being paint, and gets the honest track list. */
   width?: HelixHeadlessTableColumn["width"];
   /** The key this column reads out of a row.
 
@@ -6598,13 +6186,11 @@ Set by the root, which is the only thing that sees both. No attribute,
 because it is coordination between elements rather than anything a consumer
 writes: the tab already says it.
 
-A string where the markup wanted a reference. `aria-labelledby` named
-`tab-${value}`, an id inside the *tab's* own shadow root, and an IDREF
-resolves only in the tree it is written in, so the panel had no accessible
-name at all. An element reference cannot reach there either, a sibling
-shadow tree being neither the same tree nor an ancestor of it. A name is
-the one form that crosses, and `aria-label` on a `tabpanel` is how the
-pattern names one anyway. */
+A string and not a reference: an IDREF resolves only in the tree it is
+written in, and an element reference cannot reach a sibling shadow tree
+either, so `aria-labelledby` to the tab's own id leaves the panel with no
+accessible name. `aria-label` on a `tabpanel` is how the pattern names one
+anyway. */
   label?: HelixHeadlessTabPanel["label"];
 };
 
@@ -6634,18 +6220,9 @@ rule under the row and a thicker one under the selected tab, for a set that
 heads a page. `segmented` puts the pill in a framed, sunken track, which
 reads as one control rather than as a row.
 
-`segmented` and not `toggle`, which is what this was called. An appearance
-value that is another component's name says "it looks like that one", which
-a reader can only act on if they already know what that one looks like, and
-every other appearance in the library describes itself: `outlined`,
-`spaced`, `plain`. This component's own comments called it segmented in
-both places it explained itself, which is the name that was doing the work.
-
-`underlined` and not `underline` for the shape of the word rather than the
-sense: the two values sit in one list and read as a pair, and `segmented`
-is a participle. `outlined` on Accordion is the same word doing the same
-job. The example file was already `underlined.html`, which is what a reader
-meets first.
+A value describes itself rather than naming another component: `segmented`
+and `underlined` are participles reading as a pair, the way `outlined` on
+Accordion does.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
@@ -6660,17 +6237,12 @@ panels on the way. */
   manual?: HelixHeadlessTabs["manual"];
   /** Which item is current, by its `value`.
 
-Called `active`, which is what this mixin is named for and what it was
-not: it declared `value`, so the one mixin whose whole subject is which
-item is active had no such property, and `active` meant something else
-entirely elsewhere in the library. It still does, and only there now:
-`option.active` is the option the keyboard is on, which is a different
-question from which one is chosen.
+Not `option.active`, which is the option the keyboard is on: that is a
+different question from which one is chosen.
 
-An accessor pair, the same shape as the other three. Reading gives the
-real item; writing hands ownership to the consumer, so `<helix-tabs
-active="one">` is a set that stays on that tab and `default-active` is
-how markup says where to start. */
+Writing always applies, so `<helix-tabs active="one">` starts on that
+tab, and `default-active` is how markup says where to start without
+naming the current one. */
   active?: HelixHeadlessTabs["active"];
   /** Initial item for uncontrolled use.
 
@@ -6829,17 +6401,10 @@ would be this library guessing where the point is to stop guessing. */
   defaultValue?: HelixHeadlessTextarea["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessTextarea["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTextarea["hint"];
@@ -6855,10 +6420,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessTextarea["disabled"];
   /** Name submitted with the form.
 
@@ -6875,17 +6438,16 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessTextarea["name"];
   /** The caret and the selection, under the platform's own names.
 
 **The whole reason this renders a real `<textarea>` is the caret**, and the
-caret was the one thing a consumer could not reach: the control is inside
-this shadow root, so `querySelector` does not find it and there was no way
-to ask where the selection is, let alone move it. A field that cannot be
-scripted at the caret cannot do an insert-at-cursor toolbar, which is the
-first thing anybody builds on a textarea.
+control is inside this shadow root, so `querySelector` does not find it and
+a consumer has no other way to ask where the selection is, let alone move
+it. A field that cannot be scripted at the caret cannot do an
+insert-at-cursor toolbar, which is the first thing anybody builds on a
+textarea.
 
 Written through to the control, and answering zero before there is one,
 which is where an empty field's caret would be anyway. */
@@ -6924,9 +6486,7 @@ export type HelixHeadlessTimeInputVueProps = {
   /** What the browser may autofill here, as one of the platform's own tokens.
 
 Empty leaves the attribute off, which is the browser's default and is what
-lets autofill work at all. This used to be hardcoded `off`, so a reader
-could never have a birthday or a postal code filled in for them and a
-consumer had no way to ask for it. See 295. */
+lets autofill work at all. See (295). */
   autocomplete?: HelixHeadlessTimeInput["autocomplete"];
   /** Whether the panel is one list of times or a column each.
 
@@ -7017,27 +6577,16 @@ else set needs. */
   readOnly?: HelixHeadlessTimeInput["readOnly"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessTimeInput["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTimeInput["defaultOpen"];
@@ -7049,17 +6598,10 @@ is what the mirror has always been for. */
   defaultValue?: HelixHeadlessTimeInput["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessTimeInput["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessTimeInput["hint"];
@@ -7075,10 +6617,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessTimeInput["disabled"];
   /** Name submitted with the form.
 
@@ -7095,8 +6635,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessTimeInput["name"];
   /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
 
@@ -7137,12 +6676,11 @@ export type HelixHeadlessTimePickerHelixBeforeChangeElementEvent =
 export type HelixHeadlessTimePickerVueProps = {
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Date Picker already drew and
-these two now follow. A flat picker has no room of its own for a sentence:
-the field that wraps one owns the label, the hint and the feedback, and a
-second message inside the panel would be the same error said twice. What is
-left for the picker is the one thing the field cannot draw from outside, the
-mark on the answer itself. */
+A flag rather than a message, the same split Date Picker draws. A flat
+picker has no room of its own for a sentence: the field that wraps one owns
+the label, the hint and the feedback, and a second message inside the panel
+would be the same error said twice. What is left for the picker is the one
+thing the field cannot draw from outside, the mark on the answer itself. */
   invalid?: HelixHeadlessTimePicker["invalid"];
   /** How far apart the offered times are, in minutes.
 
@@ -7194,7 +6732,7 @@ behavior and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
-**Neither works on wheels and the appearance falls back.** A range on
+**Neither works on wheels and the variant falls back.** A range on
 wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
@@ -7257,17 +6795,10 @@ else set needs. */
   defaultValue?: HelixHeadlessTimePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessTimePicker["value"];
   /** Whether the control is non-interactive.
 
@@ -7275,10 +6806,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessTimePicker["disabled"];
   /** Name submitted with the form.
 
@@ -7295,8 +6824,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessTimePicker["name"];
   /** The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
 
@@ -7356,21 +6884,13 @@ restart a message the reader is already partway through. */
   duration?: HelixHeadlessToastItem["duration"];
   /** What kind of message it is, which picks the mark and its name.
 
-`severity` was a sixth spelling of `tone`, and a subset of it: a toast
-reports a status and never a brand role. */
+A subset of the tone axis: a toast reports a status and never a brand role. */
   tone?: HelixHeadlessToastItem["tone"];
   /** Whether the message is still showing.
 
-The same decide-once contract every other stateful thing here carries, and
-it was the one exception: this waited to be told in every case, so
-`duration` did nothing at all without consumer script and the dismiss
-control looked broken to anyone who pressed it. `Dialog` closes itself,
-`Accordion` closes itself, and there was no reason a message should not.
-
-Declared by the markup and it is the consumer's: the item announces and
-waits. Not declared and it is the item's: it goes when it is asked to, and
-the consumer still hears `helix-dismiss` and takes it out of their own
-list. Read once, at the first update.
+The item always applies: it goes when it is asked to, having announced
+`helix-dismiss` first, and a consumer who owns the list refuses that event
+to take the decision instead.
 
 **No `default-open`, unlike the four mixins.** A `default-` seed exists so
 markup can choose a starting state without claiming ownership, and there is
@@ -7410,15 +6930,12 @@ Named here rather than on each message, because where a page puts its
 toasts is a fact about the page: a stack whose members disagreed about
 where they were would not be a stack.
 
-**Optional, and bottom-end is the absence of it.** It reflected *and*
-defaulted, which is the pair that writes onto a host: every toast region
-anybody rendered gained a `placement="bottom-end"` nobody typed, and a
-React consumer's server markup does not have it. The styled sheet carries
-the resting arrangement in its own `:host` rule now and the selectors
-describe only the departures, which is what `orientation` has always done.
-
-The SSR spec could never have caught it: it passed a placement explicitly,
-so the attribute it asserted was one the consumer had written. */
+**Optional, and bottom-end is the absence of it.** Reflecting *and*
+defaulting is the pair that writes onto a host: every toast region anybody
+rendered would gain a `placement="bottom-end"` nobody typed, which a React
+consumer's server markup does not have. The styled sheet carries the resting
+arrangement in its own `:host` rule and the selectors describe only the
+departures, which is what `orientation` does. */
   placement?: HelixHeadlessToast["placement"];
 };
 
@@ -7473,17 +6990,10 @@ and cannot be used to remove it. */
   defaultValue?: HelixHeadlessToggleGroup["defaultValue"];
   /** What the control holds now, and what its form submits.
 
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds.
-
-helix-input */
+One property, not two, so `input.value` answers the question anyone
+asking it meant. Writing always applies; `<helix-input value="x">` is the
+same statement in markup, and `default-value` is how markup seeds a value
+a reset should return to. */
   value?: HelixHeadlessToggleGroup["value"];
   /** Help under the control, shown while there is nothing wrong. */
   hint?: HelixHeadlessToggleGroup["hint"];
@@ -7499,10 +7009,8 @@ Reflected, because the styled tier selects on it, and mirrored to
 `aria-disabled` rather than removing the element from the accessibility
 tree, so a screen reader can still announce that the control exists.
 
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
+The mirror itself is in `willUpdate` below, here rather than in each
+control, because here is where `disabled` is. */
   disabled?: HelixHeadlessToggleGroup["disabled"];
   /** Name submitted with the form.
 
@@ -7519,8 +7027,7 @@ is already in the markup being hydrated and reflecting it writes what is
 there. It is only a change to the markup when a consumer assigns it
 imperatively later, and nothing is hydrating by then.
 
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
+Here rather than on each control. */
   name?: HelixHeadlessToggleGroup["name"];
 };
 
@@ -7559,17 +7066,16 @@ element has one `selected` doing both jobs, so what is captured here is what
 the markup said at upgrade, before anything could overwrite it: read the
 attribute later and the listbox's own writes answer instead.
 
-**The deeper half is 302 and is not this.** State reflecting under the
-declaration's name is the fault `TreeItem` already avoids by mirroring to
-`data-selected`, and four families here still write `selected` back into a
-consumer's markup. Splitting them means moving what every stylesheet selects
-on, which is a change of its own rather than a property being added. */
+**The deeper half is not this.** State reflecting under the declaration's
+name is the fault `TreeItem` avoids by mirroring to `data-selected`.
+Splitting them means moving what every stylesheet selects on, which is a
+change of its own rather than a property being added. See (302). */
   defaultSelected?: HelixHeadlessToggle["defaultSelected"];
   /** Whether this item holds the group's tab stop while nothing is chosen.
 
 The stop normally rides on the selection, and an unanswered group has no
-selection, so it had no stop and the keyboard could not reach it. Written
-by the group, with no attribute: it is coordination between elements, and
+selection, so without this the keyboard cannot reach it. Written by the
+group, with no attribute: it is coordination between elements, and
 `tabindex` on a host the consumer rendered is the change a React consumer's
 hydration reports and does not patch up. */
   focusable?: HelixHeadlessToggle["focusable"];
@@ -7659,10 +7165,9 @@ at a box the bubble genuinely does not fit inside. See `within` on
 **Activation takes a tooltip down, because a hint about what a control will
 do is spent once the control has done it.** That is right for a gear that
 opens a drawer and wrong for a control whose tooltip *becomes* the answer:
-`CopyButton` swaps its content from Copy to Copied on the same click, so the
-bubble was being hidden at the exact moment it had something to say. What a
-reader saw was a flash, and the confirmation the component had carefully
-written was never on screen long enough to read.
+`CopyButton` swaps its content from Copy to Copied on the same click, so
+the bubble would be hidden at the exact moment it has something to say and
+the confirmation would never be on screen long enough to read.
 
 So this is not "keep it open", it is "the hint is not spent": set it where
 the words change to describe what just happened, and leave it alone
@@ -7682,27 +7187,16 @@ keyboard reader arriving on a control has already committed to it. */
   delayOut?: HelixHeadlessTooltip["delayOut"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessTooltip["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTooltip["defaultOpen"];
@@ -7739,12 +7233,10 @@ export type HelixHeadlessTourVueProps = {
   open?: HelixHeadlessTour["open"];
   /** Which stop the reader is on.
 
-**It announced after it moved for two days, which made refusing it
-impossible.** `index` was a plain property the tour wrote to directly:
-`move` assigned it and *then* announced, so `preventDefault` on the change
-arrived after the move it was refusing. It goes through `requestChange`
-now, which announces first and applies only if nobody refused, and refusing
-is how a consumer takes the decision. See 294.
+**Moved through `requestChange`, never by assignment from `move`.** That
+announces first and applies only if nobody refused, and refusing is how a
+consumer takes the decision; writing the property and then announcing puts
+`preventDefault` after the move it is refusing. See (294).
 
 The shape is `Carousel`'s, which is the nearest thing in the library: a
 `default-index` for markup that only seeds and a held state that is
@@ -7875,14 +7367,11 @@ this library supports implies it for `target="_blank"` already. */
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
 this after it upgrades, so the attribute would be a change to markup the
-consumer rendered and hydration would report it. It reflected, one line
-from the paragraph saying why it must not.
+consumer rendered and hydration would report it. Mirroring to
+`data-selected` on the host instead is the same fault under another name.
 
-The stylesheet reads it from the row inside this shadow root, which is the
-answer `level` gives one paragraph down: the indent it drives is written
-onto the row rather than onto the host, because the row is not part of the
-tree React hydrates. Mirroring to `data-selected` on the host instead was
-the same fault with a different name, and React said so. */
+The stylesheet reads it from the row inside this shadow root, because the
+row is not part of the tree React hydrates. */
   selected?: HelixHeadlessTreeItem["selected"];
   /** Depth from the root, set by the tree so indentation needs no CSS nesting.
 
@@ -7893,27 +7382,16 @@ shadow root, which is not part of the tree React hydrates. */
   level?: HelixHeadlessTreeItem["level"];
   /** Whether the element is open.
 
-One property, not two. Reading gives the real state whichever mode the
-element is in, so `dialog.open` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what the
-attribute in `<helix-dialog open>` does as well: from then on the element
-announces changes and applies none of them.
-
-It reads as an accessor pair rather than a field because those are two
-different questions sharing one name, and the alternative was a second
-property answering the first. That worked for a boolean, where `isOpen`
-reads well; there is no such word for a value or an active item, so all
-four of these mixins now have this shape instead of two shapes.
+One property, not two, so `dialog.open` answers the question anyone
+asking it meant. Writing always applies; `<helix-dialog open>` is the
+same statement in markup.
 
 **Not reflected, and that is required rather than tidy.** Reflection
-writes the resolved state back as an attribute, and writing the attribute
-is how a consumer says they own it. So an uncontrolled element that
-opened itself would put `open` on its own host and, from the next thing
-that read it, be indistinguishable from one the consumer controls:
-cloned, serialised for hydration, or diffed by a framework, it would come
-back holding whatever the last reader did rather than what the author
-wrote. `:state(open)` carries the resolved state for stylesheets, which
-is what the mirror has always been for. */
+writes the resolved state back as an attribute, so an element that opened
+itself would put `open` on its own host: cloned, serialized for
+hydration, or diffed by a framework, it comes back holding whatever the
+last reader did rather than what the author wrote. `:state(open)` carries
+the resolved state for stylesheets, which is what the mirror is for. */
   open?: HelixHeadlessTreeItem["open"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "default-open"?: HelixHeadlessTreeItem["defaultOpen"];
@@ -7968,17 +7446,12 @@ say that without the component knowing what a row looks like. */
   emptyText?: HelixHeadlessTree["emptyText"];
   /** Which item is current, by its `value`.
 
-Called `active`, which is what this mixin is named for and what it was
-not: it declared `value`, so the one mixin whose whole subject is which
-item is active had no such property, and `active` meant something else
-entirely elsewhere in the library. It still does, and only there now:
-`option.active` is the option the keyboard is on, which is a different
-question from which one is chosen.
+Not `option.active`, which is the option the keyboard is on: that is a
+different question from which one is chosen.
 
-An accessor pair, the same shape as the other three. Reading gives the
-real item; writing hands ownership to the consumer, so `<helix-tabs
-active="one">` is a set that stays on that tab and `default-active` is
-how markup says where to start. */
+Writing always applies, so `<helix-tabs active="one">` starts on that
+tab, and `default-active` is how markup says where to start without
+naming the current one. */
   active?: HelixHeadlessTree["active"];
   /** Initial item for uncontrolled use.
 
@@ -8101,17 +7574,12 @@ export type HelixHeadlessVideoPlaylistVueProps = {
   label?: HelixHeadlessVideoPlaylist["label"];
   /** Which item is current, by its `value`.
 
-Called `active`, which is what this mixin is named for and what it was
-not: it declared `value`, so the one mixin whose whole subject is which
-item is active had no such property, and `active` meant something else
-entirely elsewhere in the library. It still does, and only there now:
-`option.active` is the option the keyboard is on, which is a different
-question from which one is chosen.
+Not `option.active`, which is the option the keyboard is on: that is a
+different question from which one is chosen.
 
-An accessor pair, the same shape as the other three. Reading gives the
-real item; writing hands ownership to the consumer, so `<helix-tabs
-active="one">` is a set that stays on that tab and `default-active` is
-how markup says where to start. */
+Writing always applies, so `<helix-tabs active="one">` starts on that
+tab, and `default-active` is how markup says where to start without
+naming the current one. */
   active?: HelixHeadlessVideoPlaylist["active"];
   /** Initial item for uncontrolled use.
 
@@ -8153,27 +7621,21 @@ export type HelixHeadlessVideoVueProps = {
   loop?: HelixHeadlessVideo["loop"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
-**Renamed from `muted`, because that is what it always was.** The platform
-splits these two: the `muted` content attribute reflects to `defaultMuted`,
-and the `muted` property is live state a reader's click moves without
-touching the attribute. This element declared one property called `muted`,
-bound it to the attribute, and tracked the live state privately as
-`silent`, so `<helix-video>.muted` answered what the author wrote rather
-than whether there was sound. A name matching the platform's while meaning
-something else is worse than a name the platform does not have, and
-a name comparison could not see it. */
+**Named for the platform's split, which is real.** The `muted` content
+attribute reflects to `defaultMuted`; the `muted` property is live state a
+reader's click moves without touching the attribute. One property called
+`muted` bound to the attribute answers what the author wrote rather than
+whether there is sound, which is a name matching the platform's while
+meaning something else. */
   muted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
-**Renamed from `muted`, because that is what it always was.** The platform
-splits these two: the `muted` content attribute reflects to `defaultMuted`,
-and the `muted` property is live state a reader's click moves without
-touching the attribute. This element declared one property called `muted`,
-bound it to the attribute, and tracked the live state privately as
-`silent`, so `<helix-video>.muted` answered what the author wrote rather
-than whether there was sound. A name matching the platform's while meaning
-something else is worse than a name the platform does not have, and
-a name comparison could not see it. */
+**Named for the platform's split, which is real.** The `muted` content
+attribute reflects to `defaultMuted`; the `muted` property is live state a
+reader's click moves without touching the attribute. One property called
+`muted` bound to the attribute answers what the author wrote rather than
+whether there is sound, which is a name matching the platform's while
+meaning something else. */
   defaultMuted?: HelixHeadlessVideo["defaultMuted"];
   /** Whether it plays where it sits rather than taking over the screen. */
   playsinline?: HelixHeadlessVideo["playsInline"];
@@ -8212,7 +7674,7 @@ be read. */
 A list rather than a property apiece. A bar is a row with a budget, and a
 boolean per feature invites a consumer to switch all of them on: naming
 them makes the row a decision, and makes the order theirs. Anything
-unrecognised is skipped rather than throwing, since the list is markup and
+unrecognized is skipped rather than throwing, since the list is markup and
 a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
@@ -8233,7 +7695,7 @@ and not something a player can work around. */
 A list rather than a property apiece. A bar is a row with a budget, and a
 boolean per feature invites a consumer to switch all of them on: naming
 them makes the row a decision, and makes the order theirs. Anything
-unrecognised is skipped rather than throwing, since the list is markup and
+unrecognized is skipped rather than throwing, since the list is markup and
 a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
@@ -8281,7 +7743,7 @@ So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
   overflowControls?: HelixHeadlessVideo["overflowControls"];
-  /** The big mark over the picture before anything has played, or `none`.
+  /** The big mark over the picture whenever it is not playing, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
 Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
@@ -8292,17 +7754,12 @@ nothing in it says "press to watch".
 `none` is for the cases where that is wrong rather than right: a muted loop
 behind a hero, a grid of eight thumbnails, anything where the video is
 decoration rather than something to start.
-
-**Only before the first play.** A video paused halfway already has its bar
-up, because a paused video never idles, so the small control is visible and
-the reader has just used it. Covering the picture they stopped to look at
-would be the opposite of helpful.
 
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
   "start-control"?: HelixHeadlessVideo["startControl"];
-  /** The big mark over the picture before anything has played, or `none`.
+  /** The big mark over the picture whenever it is not playing, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
 Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
@@ -8313,11 +7770,6 @@ nothing in it says "press to watch".
 `none` is for the cases where that is wrong rather than right: a muted loop
 behind a hero, a grid of eight thumbnails, anything where the video is
 decoration rather than something to start.
-
-**Only before the first play.** A video paused halfway already has its bar
-up, because a paused video never idles, so the small control is visible and
-the reader has just used it. Covering the picture they stopped to look at
-would be the opposite of helpful.
 
 A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
@@ -8327,20 +7779,20 @@ negation. */
   speeds?: HelixHeadlessVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
-It used to leave the moment the pointer did, which is not how a player
-behaves: a reader moving across the picture to reach a control watched it
-vanish under them. Zero turns the wait off and the bar goes immediately;
-a large number keeps it up for as long as anyone is likely to look.
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
   "idle-delay"?: HelixHeadlessVideo["idleDelay"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
 
-It used to leave the moment the pointer did, which is not how a player
-behaves: a reader moving across the picture to reach a control watched it
-vanish under them. Zero turns the wait off and the bar goes immediately;
-a large number keeps it up for as long as anyone is likely to look.
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
 
 The wait is only ever about *idling*. A video that is paused keeps its bar
 regardless, because a reader who stopped it is deciding what to do next. */
@@ -8377,7 +7829,7 @@ past the end is the one write the platform answers with an exception. */
 };
 
 export type HelixHeadlessVideoVueEvents = {
-  /** Relayed for the same reason. */
+  /** Relayed, because it does not cross a shadow boundary. */
   ended: HelixHeadlessVideoElementEvent;
   /** Fired when the reader asks for the next item. */
   "helix-next": HelixHeadlessVideoHelixNextElementEvent;
@@ -8385,7 +7837,7 @@ export type HelixHeadlessVideoVueEvents = {
   "helix-previous": HelixHeadlessVideoHelixPreviousElementEvent;
   /** Relayed for the same reason. */
   pause: HelixHeadlessVideoElementEvent;
-  /** Relayed, because it does not cross a shadow boundary. */
+  /** Relayed for the same reason. */
   play: HelixHeadlessVideoElementEvent;
 };
 
@@ -8469,7 +7921,7 @@ export type CustomCssProperties = {
   "--meter-fraction"?: string;
   /** How much of the circle the arc covers, as a path length. */
   "--meter-sweep"?: string;
-  /** The value as a fraction of the range, 0 to 1. Absent while indeterminate. */
+  /** The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate. */
   "--progress-fraction"?: string;
   /** How many marks are wholly filled. */
   "--rating-full"?: string;
@@ -8515,7 +7967,7 @@ export type CustomCssProperties = {
 // Note: Some tooling expects this augmentation under "@vue/runtime-core", while
 // other docs/examples use "vue". We emit both for compatibility.
 export interface WcToolkitVueGlobalComponents {
-  /** Carries its own open state, which is why it is an element rather than a slot. Used alone, outside an accordion, it is a disclosure.  Content stays mounted when closed and is hidden by the styled tier's CSS, so it can animate and so the text is present in server-rendered HTML. Closed content is 'inert', keeping it out of the tab order and the accessibility tree without removing it from the box tree. */
+  /** Carries its own open state, which is why it is an element rather than a slot. Used alone, outside an accordion, it is a disclosure.  Content stays mounted when closed, so it can animate and so the text is present in server-rendered HTML. Closed content carries both 'hidden' and 'inert': the first collapses it with no stylesheet in play, the second keeps it out of the tab order and the accessibility tree once the styled tier's 'display' has overridden the first. */
   "helix-headless-accordion-item": DefineCustomElement<
     HelixHeadlessAccordionItem,
     HelixHeadlessAccordionItemVueProps,
@@ -8533,13 +7985,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessAnnouncementVueProps,
     HelixHeadlessAnnouncementVueEvents
   >;
-  /** Tracks whether the page has scrolled and carries it as the custom state 'scrolled', so the styled tier can lift the bar off the page without a scroll handler of its own. Scroll position is the one piece of state the server genuinely cannot know, so it is read on connect rather than derived: a fresh load starts at the top, which is what the server rendered, and a reload part-way down corrects on hydration.  **A custom state and not 'data-scrolled', which is what this used to be.** The attribute was written onto the host by the element itself, so a server sent the header without it and the element added it on upgrade. A framework hydrating the page then found an attribute it had not rendered and reported the tree as mismatched: intermittently, because it only happens when the reader reloads far enough down the page to pass the threshold. Every server-rendered consumer paid for that, and could only answer it by suppressing hydration warnings on an element they did not write.  'ElementInternals.states' is deliberately not in the DOM, so there is nothing for a hydration pass to disagree with, and ':state(scrolled)' selects it. The base class made the same move for 'data-settled' and its note explains the rest.  The listener is passive and reads 'scrollY' only, so it never blocks scrolling.  Three regions, each in its own wrapper, because the row is a grid and a grid needs three items to put the middle one in the middle. A bare slot is 'display: contents', so its assigned elements become grid items themselves: two actions would take two tracks and push the navigation off center. These wrappers earn their boxes, which is the test; they carry no inset or fill of their own, so an empty one still paints nothing.  The host is the banner and spans the viewport; the row inside it is what gets centered. A banner that is itself narrowed leaves its background stopping short of the window edges, which reads as a floating bar rather than as the top of the page. That needs one element and one row, not a wrapper as well: the host carries the material and 'content' carries the measure. */
+  /** Tracks whether the page has scrolled and carries it as the custom state 'scrolled', so the styled tier can lift the bar off the page without a scroll handler of its own. Scroll position is the one piece of state the server genuinely cannot know, so it is read on connect rather than derived: a fresh load starts at the top, which is what the server rendered, and a reload part-way down corrects on hydration.  **A custom state and never 'data-scrolled'.** An attribute the element writes onto its own host is one the server did not send, so a hydrating framework reports the tree as mismatched, intermittently: only when the reader reloads far enough down the page to pass the threshold. A consumer can answer that only by suppressing hydration warnings on an element they did not write. 'ElementInternals.states' is deliberately not in the DOM, so there is nothing for a hydration pass to disagree with, and ':state(scrolled)' selects it. The base class made the same move for 'data-settled' and its note explains the rest.  The listener is passive and reads 'scrollY' only, so it never blocks scrolling.  Three regions, each in its own wrapper, because the row is a grid and a grid needs three items to put the middle one in the middle. A bare slot is 'display: contents', so its assigned elements become grid items themselves: two actions would take two tracks and push the navigation off center. These wrappers earn their boxes, which is the test; they carry no inset or fill of their own, so an empty one still paints nothing.  The host is the banner and spans the viewport; the row inside it is what gets centered. A banner that is itself narrowed leaves its background stopping short of the window edges, which reads as a floating bar rather than as the top of the page. That needs one element and one row, not a wrapper as well: the host carries the material and 'content' carries the measure. */
   "helix-headless-app-header": DefineCustomElement<
     HelixHeadlessAppHeader,
     HelixHeadlessAppHeaderVueProps,
     HelixHeadlessAppHeaderVueEvents
   >;
-  /** A part of 'Avatar' rather than a family of its own: it arranges avatars and is about nothing else, and its member is a complete 'Avatar' the group did not have to explain.  **The overflow count is the group's, not a slot.** Which avatars are hidden is a fact the group works out from 'max' and how many it was given, so a consumer writing the "+3" themselves would be writing a number that has to agree with a list they do not control.  **Hidden, not removed.** Past 'max', the extra avatars stay in the DOM and stop being shown, so nothing re-renders when 'max' changes and the accessible name can still be built from all of them. The count is what a sighted reader gets; the group's own name is what everyone else gets, and "Seven people" is more useful than seven names read in a row.  **And hidden by the stylesheet, not by this class.** It wrote 'data-overflow' onto each avatar from 'updated', which is one update too late and one element too far out: Lit renders on a microtask, so an avatar appended past the limit was laid out and painted before anything ran to hide it, and the group was writing attributes onto markup a consumer owns to do it. Measured in Chrome 148, appending two past 'max="3"' and reading before yielding: five 'flex', folding to three on the next update. The styled tier now does it with ':host([max="N"]) ::slotted(:nth-child(n + N+1))', which is right at the first style resolution and writes nothing.  **The fold is finite, and the count agrees with it.** 'An+B' takes a literal, so there is one selector per value of 'max' and the range stops at twelve. Past that the group shows everyone, counts nothing and says so, because showing everyone is a defensible answer and showing everyone beside a "+5" is not. 'max' above twelve is a list the consumer should be slicing themselves.  **It is a list.** A row of faces is a set of separate people, and a group with no role announces as one run of text. 'role="list"' needs its children to be 'listitem', which they cannot be told to become without writing an attribute onto a consumer's element, so the group carries 'role="group"' and its name instead: one announcement, correct, and nothing written to anyone else's markup. */
+  /** A part of 'Avatar' rather than a family of its own: it arranges avatars and is about nothing else, and its member is a complete 'Avatar' the group did not have to explain.  **The overflow count is the group's, not a slot.** Which avatars are hidden is a fact the group works out from 'max' and how many it was given, so a consumer writing the "+3" themselves would be writing a number that has to agree with a list they do not control.  **Hidden, not removed.** Past 'max', the extra avatars stay in the DOM and stop being shown, so nothing re-renders when 'max' changes and the accessible name can still be built from all of them. The count is what a sighted reader gets; the group's own name is what everyone else gets, and "Seven people" is more useful than seven names read in a row.  **And hidden by the stylesheet, not by this class.** Hiding from 'updated' is one update too late and one element too far out: Lit renders on a microtask, so an avatar appended past the limit is laid out and painted before anything runs to hide it, and marking each one means writing attributes onto markup a consumer owns. The styled tier's ':host([max="N"]) ::slotted(:nth-child(n + N+1))' is right at the first style resolution and writes nothing.  **The fold is finite, and the count agrees with it.** 'An+B' takes a literal, so there is one selector per value of 'max' and the range stops at twelve. Past that the group shows everyone, counts nothing and says so, because showing everyone is a defensible answer and showing everyone beside a "+5" is not. 'max' above twelve is a list the consumer should be slicing themselves.  **It is a list.** A row of faces is a set of separate people, and a group with no role announces as one run of text. 'role="list"' needs its children to be 'listitem', which they cannot be told to become without writing an attribute onto a consumer's element, so the group carries 'role="group"' and its name instead: one announcement, correct, and nothing written to anyone else's markup. */
   "helix-headless-avatar-group": DefineCustomElement<
     HelixHeadlessAvatarGroup,
     HelixHeadlessAvatarGroupVueProps,
@@ -8557,7 +8009,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessBadgeVueProps,
     HelixHeadlessBadgeVueEvents
   >;
-  /** The chart most often asked for and the one most often drawn wrongly, so two decisions are made here rather than left to a consumer.  **It measures from zero and there is no property to change that.** A bar's length *is* its value, so a baseline anywhere else makes the lengths proportional to nothing. That is the oldest misleading chart there is, and a design system that ships the switch has shipped the mistake. A reader who wants the differences between values rather than the values should be drawing a line, which claims only a shape.  **The labels are HTML beside the drawing rather than '<text>' inside it.** An '<svg>' that fills its box scales everything in it, including type: the same 'font-size' comes out at 10px in a narrow chart and 43px in a wide one, and there is no non-scaling-font to answer it the way 'vector-effect' answers strokes. So the columns are drawn and the words are written around them.  The table is the accessible representation and this drawing is 'aria-hidden'. A reader who wants the numbers gets the numbers, not a described picture of them.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Two decisions are made here rather than left to a consumer.  **It measures from zero and there is no property to change that.** A bar's length *is* its value, so a baseline anywhere else makes the lengths proportional to nothing. A reader who wants the differences between values rather than the values should be drawing a line, which claims only a shape.  **The labels are HTML beside the drawing rather than '<text>' inside it.** An '<svg>' that fills its box scales everything in it, including type: the same 'font-size' comes out at 10px in a narrow chart and 43px in a wide one, and there is no non-scaling-font to answer it the way 'vector-effect' answers strokes. So the columns are drawn and the words are written around them.  The table is the accessible representation and this drawing is 'aria-hidden'. A reader who wants the numbers gets the numbers, not a described picture of them.  The custom properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot. */
   "helix-headless-bar-chart": DefineCustomElement<
     HelixHeadlessBarChart,
     HelixHeadlessBarChartVueProps,
@@ -8569,13 +8021,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessBlockquoteVueProps,
     HelixHeadlessBlockquoteVueEvents
   >;
-  /** Contributes the separator, the list-item role, and the link itself where one is wanted.  **'href' makes the crumb the link.** *Added 19 Aug 2026, reversing the note that said an anchor could not be rendered here.* That note was right that a router cannot reach an anchor inside a shadow root, and wrong that this settles it: the consumer restores the soft navigation by intercepting the click on the way out, which is what 'Tree.Item' and 'List.Item' both do. What the anchor buys is the whole crumb as a target, Enter, middle click, the status bar, and a trail that works before any JavaScript runs.  **And the parent needs it.** A trail that collapses has to rebuild its hidden crumbs somewhere else, which means reading each one's destination. From a property that is a read; from a consumer's slotted markup it is a hunt for an anchor and a guess about which element is the link.  A crumb with no 'href' is unchanged: the consumer slots whatever they like, including their own anchor, and this renders a plain '<span>' around it.  Each item renders its own separator and hides it with ':host(:first-child)', so the trail needs no index and no coordination from the parent. ':host()' takes a structural pseudo-class, unlike ':has()', which it rejects.  The current page is text, not a link. Linking a page to itself is a known screen-reader annoyance, and 'aria-current="page"' on the host is what conveys position. */
+  /** Contributes the separator, the list-item role, and the link itself where one is wanted.  **'href' makes the crumb the link.** A router cannot reach an anchor inside a shadow root, and the consumer restores the soft navigation by intercepting the click on the way out, which is what 'Tree.Item' and 'List.Item' both do. What the anchor buys is the whole crumb as a target, Enter, middle click, the status bar, and a trail that works before any JavaScript runs.  **And the parent needs it.** A trail that collapses has to rebuild its hidden crumbs somewhere else, which means reading each one's destination. From a property that is a read; from a consumer's slotted markup it is a hunt for an anchor and a guess about which element is the link.  A crumb with no 'href' is unchanged: the consumer slots whatever they like, including their own anchor, and this renders a plain '<span>' around it.  Each item renders its own separator and hides it with ':host(:first-child)', so the trail needs no index and no coordination from the parent. ':host()' takes a structural pseudo-class, unlike ':has()', which it rejects.  The current page is text, not a link. Linking a page to itself is a known screen-reader annoyance, and 'aria-current="page"' on the host is what conveys position. */
   "helix-headless-breadcrumb": DefineCustomElement<
     HelixHeadlessBreadcrumb,
     HelixHeadlessBreadcrumbVueProps,
     HelixHeadlessBreadcrumbVueEvents
   >;
-  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **The trail does not measure itself, and the overflow is markup.** It held a 'collapse' property, a 'ResizeObserver' through 'CollapseController', an 'overflowed' getter and a 'helix-change' event, all to answer one question: how many crumbs fit. Removed 20 Aug 2026, because the question is the wrong one and answering it cost more than it returned.  - **It can never reach the server.** There is no width without a DOM, so the   server shipped every crumb and the client removed some after hydrating. A   trail that collapses therefore painted wrong on every single load, and the   SSR spec asserting "hides no crumb, whatever collapse says" was recording   that as correct behavior rather than as the cost it is. - **The consumer already wrote the crumbs.** The measurement hid some, then   announced which, so that the consumer could read them back off the element   and clone them into menu items. The overflow example spent 32 lines of   JavaScript making a round trip out of data that started in its own markup. - **Nobody specifies a breadcrumb in units of fit.** Designs say "keep the   root and the current page, fold the middle", which is a fact about depth,   or "fold below this width", which is a fact CSS knows. The arithmetic was   the only thing that needed a width, and it was wrong three times in one day:   the observer watched a container that did not exist yet, the gap between   items went uncounted, and the result was still wrong at 34rem.  So the trail lays out crumbs and separators, and the consumer writes what folds: a 'helix-menu' of 'helix-menu-item's in a crumb, where the gap belongs. Server rendered, no observer, no stylesheet, and correct before the first script runs. A trail that should fold only at some widths is a container query in the consumer's own sheet, which is theirs to write and theirs to leave out.  **And the crumbs carry no marker for any of it.** There was an 'overflow' property on the crumb, which existed so the controller could tell a control from a step and so the trail could size it. With the controller gone the first use went with it, and the second is better answered by the crumb sizing whatever is slotted into it, which is true of every crumb rather than of one a consumer remembered to mark. What is left is a fact CSS can already see: the crumb with the menu in it is ':has(helix-menu)', and the middle is ':not(:first-child, [current])'. A marker would be the design rule written twice, once in the HTML and once in the sheet, with nothing keeping the two honest. */
+  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **The trail does not measure itself, and the overflow is markup.** Measuring how many crumbs fit can never reach the server: there is no width without a DOM, so the server ships every crumb and the client removes some after hydrating, and a trail that collapses paints wrong on every single load. Nor does anybody specify a breadcrumb in units of fit. Designs say "keep the root and the current page, fold the middle", which is a fact about depth, or "fold below this width", which is a fact CSS knows.  So the trail lays out crumbs and separators, and the consumer writes what folds: a 'helix-menu' of 'helix-menu-item's in a crumb, where the gap belongs. Server rendered, no observer, no stylesheet, and correct before the first script runs. A trail that should fold only at some widths is a container query in the consumer's own sheet, which is theirs to write and theirs to leave out.  **And the crumbs carry no marker for any of it.** CSS can already see it: the crumb with the menu in it is ':has(helix-menu)', and the middle is ':not(:first-child, [current])'. A marker would be the design rule written twice, once in the HTML and once in the sheet, with nothing keeping the two honest. */
   "helix-headless-breadcrumbs": DefineCustomElement<
     HelixHeadlessBreadcrumbs,
     HelixHeadlessBreadcrumbsVueProps,
@@ -8605,7 +8057,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessCardVueProps,
     HelixHeadlessCardVueEvents
   >;
-  /** The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and the browser's own momentum all work without being reimplemented. The controls scroll it; they do not drive a transform.  Slides are the consumer's own elements, and nothing is written onto them. The component renders a pane per slide carrying 'role="group"', 'aria-roledescription="slide"' and a name reading its position in the set, and assigns the slide into it: a screen-reader user hears where they are, and a slide that is itself a link is still a link, which it was not while the role was being written on top of it. See 'assign'.  **Rotation stops on focus and on hover, and once stopped it stays stopped.** The APG is explicit: rotation must not resume unless the reader asks for it, so hovering away does not start it again. The control names the action it performs, and it is first in the tab order. */
+  /** The track is a scroller with scroll snapping, so a drag, a trackpad swipe, and the browser's own momentum all work without being reimplemented. The controls scroll it; they do not drive a transform.  Slides are the consumer's own elements, and nothing is written onto them. The component renders a pane per slide carrying 'role="group"', 'aria-roledescription="slide"' and a name reading its position in the set, and assigns the slide into it: a screen-reader user hears where they are, and a slide that is itself a link is still a link. See 'assign'.  **Rotation stops on focus and on hover, and once stopped it stays stopped.** The APG is explicit: rotation must not resume unless the reader asks for it, so hovering away does not start it again. The control names the action it performs, and it is first in the tab order. */
   "helix-headless-carousel": DefineCustomElement<
     HelixHeadlessCarousel,
     HelixHeadlessCarouselVueProps,
@@ -8623,13 +8075,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessChatMessageVueProps,
     HelixHeadlessChatMessageVueEvents
   >;
-  /** **It has no opinion about where it sits.** A chat is asked for as a floating button, a page, a palette, a sidebar, a modal and an inline block, and none of those is a variant of a conversation: they are containers a conversation is put in, and the containers already exist. 'Popover' and 'SpeedDial' make the floating one, 'Drawer' the sidebar, 'Dialog' the modal, 'Command' the palette, and a page is a page. Nothing here is positioned, nothing here has a backdrop, and nothing here owns a trigger, because a trigger opens a container and containers own their own. If a form factor needs a mode on this element, the split is wrong.  **Scroll ownership is the behavior everything else depends on, and it is the most-got-wrong thing in the category.** A transcript that grows wants to stay at the bottom, except when the reader has scrolled up to read, where pinning is hostile. The rule: pin while the reader is within 'threshold' of the bottom, release the moment they leave it, and offer a way back. **Never scroll a reader who is reading.**  The element owns it, because it is the only party that knows a message arrived and where the viewport was when it did. 'pinned' is a controlled property like any other, so a consumer who wants to own it can.  **The live region announces on completion, not on arrival.** The transcript is 'role="log"' with 'aria-live="polite"', and a streaming message carries 'aria-busy' while it arrives: a screen reader reading a stream token by token is unusable, and holding the announcement until the flag clears is the only arrangement that works. Somebody typing is a separate status region, so it never interleaves with what was said.  **Not a client.** No transport, no protocol, no model. It renders a conversation and reports what the reader did. */
+  /** **It has no opinion about where it sits.** A chat is asked for as a floating button, a page, a palette, a sidebar, a modal and an inline block, and none of those is a variant of a conversation: they are containers a conversation is put in, and the containers already exist. 'Popover' and 'SpeedDial' make the floating one, 'Drawer' the sidebar, 'Dialog' the modal, 'Command' the palette, and a page is a page. Nothing here is positioned, nothing here has a backdrop, and nothing here owns a trigger, because a trigger opens a container and containers own their own. If a form factor needs a mode on this element, the split is wrong.  **Scroll ownership is the behavior everything else depends on, and it is the most-got-wrong thing in the category.** A transcript that grows wants to stay at the bottom, except when the reader has scrolled up to read, where pinning is hostile. The rule: pin while the reader is within 'threshold' of the bottom, release the moment they leave it, and offer a way back. **Never scroll a reader who is reading.**  The element owns it, because it is the only party that knows a message arrived and where the viewport was when it did. 'pinned' announces before it moves, so a consumer who wants to own it refuses the request and assigns their own.  **The live region announces on completion, not on arrival.** The transcript is 'role="log"' with 'aria-live="polite"', and a streaming message carries 'aria-busy' while it arrives: a screen reader reading a stream token by token is unusable, and holding the announcement until the flag clears is the only arrangement that works. Somebody typing is a separate status region, so it never interleaves with what was said.  **Not a client.** No transport, no protocol, no model. It renders a conversation and reports what the reader did. */
   "helix-headless-chat": DefineCustomElement<
     HelixHeadlessChat,
     HelixHeadlessChatVueProps,
     HelixHeadlessChatVueEvents
   >;
-  /** The host is the group, so 'role="group"' sits on it through internals and 'label' names it. A run of checkboxes with no name is announced as separate controls, which is what the grouping exists to say it is not.  **Each checkbox still submits itself.** They are form-associated already and a native group is several inputs sharing a name, so this adds no form value of its own: it would submit the same answers twice. What it adds is the grouping, a shared 'name' so it is written once, and one place to read and write the whole set.  'value' is the checked values, comma separated, in the order the boxes are written. Setting it ticks exactly those and unticks the rest.  **Its message is always given, never derived.** Every form-related member of 'ElementInternals' throws on an element that is not form-associated, and this one is not, on purpose: the boxes submit themselves. So 'feedback' is what shows here, and the browser has nothing to say about a set it does not know is a set. */
+  /** The host is the group, so 'role="group"' sits on it through internals and 'label' names it. A run of checkboxes with no name is announced as separate controls, which is what the grouping exists to say it is not.  **Each checkbox still submits itself.** They are form-associated already and a native group is several inputs sharing a name, so this adds no form value of its own: it would submit the same answers twice. What it adds is the grouping, a shared 'name' so it is written once, and one place to read and write the whole set.  'value' is the checked values, comma separated, in the order the boxes are written. Setting it ticks exactly those and unticks the rest.  **Its message is always given, never derived.** The group is form-associated for validity alone and never calls 'setFormValue', so 'feedback' is what shows here: the browser has nothing to say about a set it does not submit. */
   "helix-headless-checkbox-group": DefineCustomElement<
     HelixHeadlessCheckboxGroup,
     HelixHeadlessCheckboxGroupVueProps,
@@ -8653,7 +8105,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessCodeVueProps,
     HelixHeadlessCodeVueEvents
   >;
-  /** **The picker is 'helix-color-picker', not a second one written here.** It owns the square, the ramps, the eyedropper and the syntax toggle, and it is worth having on its own: a settings pane wants a picker flat on the page with nothing to open. This element is the field, the overlay, and the form. Exactly the arrangement Date Input has with 'helix-date-picker'.  **Typed as well as picked, and the typing is the reason this is not '<input type="color">'.** The native control gives a free picker and takes nearly all styling with it, which is a fair trade until a product needs the panel to match everything around it. What is kept from the native one is the part worth keeping: a real text field, so a reader who has the hex pastes it and never opens anything.  **Every syntax is read; the one 'format' names is written.** '#f00', '#ff0000', 'rgb(255 0 0)', 'rgba(255,0,0,.5)', 'rgb(255 0 0 / 50%)' and 'hsl(0 100% 50%)' are all colors, and a field that refuses one because it prefers another is arguing with the person using it. What the field *shows* is the value itself, for the reason Date Input gives about its dates: half-typed input does not survive a round trip through a formatter.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **The picker is 'helix-color-picker', not a second one written here.** It owns the square, the ramps, the eyedropper and the syntax toggle, and it is worth having on its own: a settings pane wants a picker flat on the page with nothing to open. This element is the field, the overlay, and the form. Exactly the arrangement Date Input has with 'helix-date-picker'.  **Typed as well as picked, and the typing is the reason this is not '<input type="color">'.** The native control gives a free picker and takes nearly all styling with it, which is a fair trade until a product needs the panel to match everything around it. What is kept from the native one is the part worth keeping: a real text field, so a reader who has the hex pastes it and never opens anything.  **Every syntax is read; the one 'format' names is written.** '#f00', '#ff0000', 'rgb(255 0 0)', 'rgba(255,0,0,.5)', 'rgb(255 0 0 / 50%)' and 'hsl(0 100% 50%)' are all colors, and a field that refuses one because it prefers another is arguing with the person using it. What the field *shows* is the value itself, for the reason Date Input gives about its dates: half-typed input does not survive a round trip through a formatter.  The custom property below is written by this component and never set by a consumer: it carries a value this element resolved and CSS cannot, which is what lets a stylesheet on this tier paint the swatch without parsing anything itself. */
   "helix-headless-color-input": DefineCustomElement<
     HelixHeadlessColorInput,
     HelixHeadlessColorInputVueProps,
@@ -8665,7 +8117,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessColorPickerVueProps,
     HelixHeadlessColorPickerVueEvents
   >;
-  /** **The list is 'helix-listbox', and the filtering is its own.** It already owns narrowing, the empty state, the highlight, 'aria-activedescendant' and scrolling an option into view, and every one of those is a decision with a long note attached. Rewriting them here would be a second copy to keep in step; what is left for this element is the field, the panel and the traffic between them.  **The text and the value are two things.** What a reader types is a filter, not an answer: it narrows the list and is thrown away. The value is whichever option they then choose, and the field is rewritten to that option's words once they have. A combobox that treated the typing as the value would submit "jav" to a form, which is the mistake a plain input makes and the reason this component exists.  That is also why the field is emptied of its filter on close rather than left holding it: a control reopened still narrowed by the last visit's search is a control whose second use starts from the first one's leftovers. Select records the same, having been fixed for it.  **Focus stays in the field, which is the whole of what a combobox is.** The arrows move the list without leaving the text, which is why the listbox has a public 'navigate': the moving, the wrapping, the skipping of disabled options and the seeding from the current value all stay in the one place that already does them.  'role="combobox"' on the input rather than on a wrapper, because the thing the pattern describes is the text field, and 'aria-controls' can name the listbox because both are in this shadow root. The active option cannot be named that way, being the consumer's light DOM, so it is linked by element reference for the reason Listbox records at length.  **With 'multiple', the chosen options are tags in the field.** A field that says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what is in it, and offers nothing to press to take one out: Select does that today and it is the weakest part of it. A tag apiece is one object per answer, each with its own remove control, which is what the reader already believes they are looking at.  The panel stays open while more than one can be chosen, because a control that shut after each pick is one the reader has to reopen to keep using. The filter clears on each choice instead, so the next pick starts from the whole list rather than from the last search.  **'creatable' announces, and does not write.** The options are the consumer's light DOM and nothing here puts an element into it: a component that grew the consumer's markup would be a component their framework re-renders over. What this does is offer a row saying what would be added, take the value when the reader presses it, and say so with 'helix-create'. A consumer who has to validate first refuses the event and adds nothing.  Which leaves a value naming no option, and that is what the words fall back to: for anything chosen the field shows the option's text if there is one and the value itself otherwise. No copy is stored, so a consumer who then adds a real option with that value has its words take over on the next render.  **'suggest' finishes the word, and only ever forwards.** The field completes to the first option the typing begins, with the part the reader did not type selected, so the next character replaces it and Delete removes it. Applied on insertion alone: completing after a deletion would put back what the reader just took out, and a field that cannot be shortened is a field that cannot be corrected. Measured as the difference between 'insertText' and the several 'delete*' input types, which is what the platform already says about which happened.  The filter stays what was typed rather than what was completed. Filtering on the completion would narrow the list to the one option it came from, so a reader typing "ru" would be shown "Rust" alone and never learn Ruby was there. */
+  /** **The list is 'helix-listbox', and the filtering is its own.** It already owns narrowing, the empty state, the highlight, 'aria-activedescendant' and scrolling an option into view. Rewriting them here would be a second copy to keep in step; what is left for this element is the field, the panel and the traffic between them.  **The text and the value are two things.** What a reader types is a filter, not an answer: it narrows the list and is thrown away. The value is whichever option they then choose, and the field is rewritten to that option's words once they have. A combobox that treated the typing as the value would submit "jav" to a form, which is the mistake a plain input makes and the reason this component exists.  That is also why the field is emptied of its filter on close rather than left holding it: a control reopened still narrowed by the last visit's search is a control whose second use starts from the first one's leftovers. Select records the same.  **Focus stays in the field, which is the whole of what a combobox is.** The arrows move the list without leaving the text, which is why the listbox has a public 'navigate': the moving, the wrapping, the skipping of disabled options and the seeding from the current value all stay in the one place that already does them.  'role="combobox"' on the input rather than on a wrapper, because the thing the pattern describes is the text field, and 'aria-controls' can name the listbox because both are in this shadow root. The active option cannot be named that way, being the consumer's light DOM, so it is linked by element reference for the reason Listbox records at length.  **With 'multiple', the chosen options are tags in the field.** A field that says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what is in it, and offers nothing to press to take one out: Select does that today and it is the weakest part of it. A tag apiece is one object per answer, each with its own remove control, which is what the reader already believes they are looking at.  The panel stays open while more than one can be chosen, because a control that shut after each pick is one the reader has to reopen to keep using. The filter clears on each choice instead, so the next pick starts from the whole list rather than from the last search.  **'creatable' announces, and does not write.** The options are the consumer's light DOM and nothing here puts an element into it: a component that grew the consumer's markup would be a component their framework re-renders over. What this does is offer a row saying what would be added, take the value when the reader presses it, and say so with 'helix-create'. A consumer who has to validate first refuses the event and adds nothing.  Which leaves a value naming no option, and that is what the words fall back to: for anything chosen the field shows the option's text if there is one and the value itself otherwise. No copy is stored, so a consumer who then adds a real option with that value has its words take over on the next render.  **'suggest' finishes the word, and only ever forwards.** The field completes to the first option the typing begins, with the part the reader did not type selected, so the next character replaces it and Delete removes it. Applied on insertion alone: completing after a deletion would put back what the reader just took out, and a field that cannot be shortened is a field that cannot be corrected. Measured as the difference between 'insertText' and the several 'delete*' input types, which is what the platform already says about which happened.  The filter stays what was typed rather than what was completed. Filtering on the completion would narrow the list to the one option it came from, so a reader typing "ru" would be shown "Rust" alone and never learn Ruby was there. */
   "helix-headless-combobox": DefineCustomElement<
     HelixHeadlessCombobox,
     HelixHeadlessComboboxVueProps,
@@ -8683,7 +8135,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessCopyButtonVueProps,
     HelixHeadlessCopyButtonVueEvents
   >;
-  /** **The schema is markup and the data is a property.** Columns are declared as 'helix-table-column' children, because a schema is small, declarative, and something a reader should be able to see in the HTML; rows are handed over as an array, because data is large and a table that draws ten thousand elements cannot window them.  '''html <helix-data-table .rows=${rows} sort="name:asc" page-size="20">   <helix-table-column field="name" sortable>Name</helix-table-column>   <helix-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-table-column> </helix-data-table> '''  This is the resolution of a deferral rather than a new idea. 'helix-table' takes rows as markup and is the right component for a table of twelve things a person wrote out; the repeated 'page', 'page-size' and 'total' attributes on the three pagination elements are placeholders whose own comments name the fix as "a data table composing a pagination inside itself", and 'helix-table' already carried '@aliases DataTable': a name claimed and not kept.  **Sort and filter apply to the whole set, never the page.** Sorting the drawn window is correct on the first screen and wrong on every other one, which is how it survives being looked at. The arithmetic lives in 'order.ts' where nothing can see a window, and its spec asserts the composition rather than the three steps, because each step alone passes either way.  **What it does not do, stated where a consumer will read it: the cell values do not server-render.** The headings do, because a column renders its own, and the row elements do, because their count comes from 'rows'. Reading a cell needs the columns, and the columns are markup children that Lit SSR does not hand this element: 'children' is undefined there. So a crawler and a reader on a slow connection see a table of the right shape with nothing in it, which is strictly less than 'helix-table' serves for a table whose rows are markup.  That is the cost of "the schema is markup and the data is a property". Use 'helix-table' where the content has to be in the served HTML and the result is small enough to write out; use this where the result is large, and accept that the first paint is a shell. The obvious workaround, a 'columns' property beside the markup columns, is deliberately not offered: this family has already shipped one source of truth for columns splitting into two, nothing checked that they agreed, and a table rendering one way on the server and another in the browser is that failure with a hydration mismatch on top.  **Every axis is controlled or uncontrolled, and that is what makes a server mode fall out rather than be bolted on.** 'sort', 'filter', 'page' and 'page-size' each defer to the consumer when set and seed themselves from a 'default-*' when not. A consumer who answers all four holds the data flow: they hear the reader's request, fetch, and hand back a new 'rows' with a 'total'. Retrofitting that inverts the flow and is a rewrite, so it is here from the start. */
+  /** **The schema is markup and the data is a property.** Columns are declared as 'helix-table-column' children, because a schema is small, declarative, and something a reader should be able to see in the HTML; rows are handed over as an array, because data is large and a table that draws ten thousand elements cannot window them.  '''html <helix-data-table .rows=${rows} sort="name:asc" page-size="20">   <helix-table-column field="name" sortable>Name</helix-table-column>   <helix-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-table-column> </helix-data-table> '''  'helix-table' takes rows as markup and is the right component for a table of twelve things a person wrote out.  **Sort and filter apply to the whole set, never the page.** Sorting the drawn window is correct on the first screen and wrong on every other one, which is how it survives being looked at. The arithmetic lives in 'order.ts' where nothing can see a window, and its spec asserts the composition rather than the three steps, because each step alone passes either way.  **What it does not do, stated where a consumer will read it: the cell values do not server-render.** The headings do, because a column renders its own, and the row elements do, because their count comes from 'rows'. Reading a cell needs the columns, and the columns are markup children that Lit SSR does not hand this element: 'children' is undefined there. So a crawler and a reader on a slow connection see a table of the right shape with nothing in it, which is strictly less than 'helix-table' serves for a table whose rows are markup.  That is the cost of "the schema is markup and the data is a property". Use 'helix-table' where the content has to be in the served HTML and the result is small enough to write out; use this where the result is large, and accept that the first paint is a shell. The obvious workaround, a 'columns' property beside the markup columns, is deliberately not offered: it splits one source of truth for the columns into two that nothing checks against each other, and a table rendering one way on the server and another in the browser is that failure with a hydration mismatch on top.  **Every axis is controlled or uncontrolled, and that is what makes a server mode fall out rather than be bolted on.** 'sort', 'filter', 'page' and 'page-size' each defer to the consumer when set and seed themselves from a 'default-*' when not. A consumer who answers all four holds the data flow: they hear the reader's request, fetch, and hand back a new 'rows' with a 'total'. Retrofitting that inverts the flow and is a rewrite, so it is here from the start. */
   "helix-headless-data-table": DefineCustomElement<
     HelixHeadlessDataTable,
     HelixHeadlessDataTableVueProps,
@@ -8695,7 +8147,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessDateInputVueProps,
     HelixHeadlessDateInputVueEvents
   >;
-  /** A grid of days, per the APG date grid: the whole grid is one tab stop, arrows move by day and week, 'PageUp' and 'PageDown' move by month, and 'Home' and 'End' go to the ends of the week. Only the focused cell is in the tab sequence.  Roving 'tabindex' is written on the cells, which is free here because they are rendered into this shadow root rather than being markup a consumer wrote.  Dates are 'YYYY-MM-DD' strings and every calculation is in UTC. A local-time 'Date' shifts across a timezone or a daylight-saving boundary, so the string is what the component holds and the arithmetic never leaves UTC.  'month' is what the grid shows, separately from 'value', so paging through months does not select anything and a consumer can drive the view. Left unset, it follows the first selected date, and then the current month.  'mode' decides how many dates are held. Absent takes one. 'range' takes two and marks everything between them, starting over on the third click rather than replacing an end at random. 'multiple' toggles, so clicking a chosen date takes it out. All three read and write the same comma-separated 'value'.  'locale' is worth setting where the output is compared across environments. Left unset, month and day names come from the runtime's own locale, and a server and a browser need not agree on what that is.  'helix-before-change' was 'helix-select', and it moved when the calendar became form control. A control whose value changes dispatches 'helix-before-change' here: 'Input', 'Select', 'Listbox', 'Radio.Group' and 'Toggle.Group' all do, and a calendar submitting a date is the same kind of thing. 'helix-select' stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as 'Menu' or 'Tree'.  Paging is 'helix-navigate' and not either of those, because it chooses nothing: the view moves and the answer does not.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** A grid of days, per the APG date grid: the whole grid is one tab stop, arrows move by day and week, 'PageUp' and 'PageDown' move by month, and 'Home' and 'End' go to the ends of the week. Only the focused cell is in the tab sequence.  Roving 'tabindex' is written on the cells, which is free here because they are rendered into this shadow root rather than being markup a consumer wrote.  Dates are 'YYYY-MM-DD' strings and every calculation is in UTC. A local-time 'Date' shifts across a timezone or a daylight-saving boundary, so the string is what the component holds and the arithmetic never leaves UTC.  'month' is what the grid shows, separately from 'value', so paging through months does not select anything and a consumer can drive the view. Left unset, it follows the first selected date, and then the current month.  'mode' decides how many dates are held. Absent takes one. 'range' takes two and marks everything between them, starting over on the third click rather than replacing an end at random. 'multiple' toggles, so clicking a chosen date takes it out. All three read and write the same comma-separated 'value'.  'locale' is worth setting where the output is compared across environments. Left unset, month and day names come from the runtime's own locale, and a server and a browser need not agree on what that is.  A control whose value changes dispatches 'helix-before-change': 'Input', 'Select', 'Listbox', 'Radio.Group' and 'Toggle.Group' all do, and a calendar submitting a date is the same kind of thing. 'helix-select' stays what it is elsewhere, which is a row or an item being chosen in something that reports no value at all, such as 'Menu' or 'Tree'.  Paging is 'helix-navigate' and not either of those, because it chooses nothing: the view moves and the answer does not.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-date-picker": DefineCustomElement<
     HelixHeadlessDatePicker,
     HelixHeadlessDatePickerVueProps,
@@ -8719,7 +8171,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessDonutChartVueProps,
     HelixHeadlessDonutChartVueEvents
   >;
-  /** Takes 'MixinControllerOpen', so 'open', 'defaultOpen', and 'OpenChange' behave exactly as they do on an accordion item, and a consumer already knows the API.  Modal by default, which is three things together and not one: focus is trapped inside, Escape and an outside press close it, and the page behind is covered. A panel with the look of a modal and none of its behavior is worse than an inline one, because it invites the reader to treat it as blocking.  Content stays mounted when closed, so it is in the server's markup and can animate. A closed '<dialog>' is already out of the tab order and out of the accessibility tree, so nothing here writes 'inert'.  **This described a hand-written 'inert' until 21 Aug 2026, and had done since the panel became a '<dialog>'.** The rewrite took the 'role', the 'aria-modal', the scrim and the 'inert' with it, because the element brings all four, and the comments at the two call sites say so. The class doc did not, and 'drawer-root.ssr.spec.ts' has asserted the panel carries no 'inert' the whole time: a spec three files away existing to contradict the prose is the same shape as 'Stat''s 'detail' slot, and it is the half a mechanical check cannot see.  Opened declaratively with the platform's invoker attributes:  '''html <helix-button commandfor="nav" command="--toggle">Menu</helix-button> <helix-drawer id="nav">…</helix-drawer> ''' */
+  /** Takes 'MixinControllerOpen', so 'open', 'defaultOpen' and the 'helix-before-open' and 'helix-before-close' requests behave exactly as they do on an accordion item, and a consumer already knows the API.  Modal by default, which is three things together and not one: focus is trapped inside, Escape and an outside press close it, and the page behind is covered. A panel with the look of a modal and none of its behavior is worse than an inline one, because it invites the reader to treat it as blocking.  Content stays mounted when closed, so it is in the server's markup and can animate. A closed '<dialog>' is already out of the tab order and out of the accessibility tree, so nothing here writes 'inert'. The 'role', the 'aria-modal' and the scrim come from the element too, and 'drawer-root.ssr.spec.ts' asserts the panel carries no hand-written 'inert' and no hand-written 'role'.  Opened declaratively with the platform's invoker attributes:  '''html <helix-button commandfor="nav" command="--toggle">Menu</helix-button> <helix-drawer id="nav">…</helix-drawer> ''' */
   "helix-headless-drawer": DefineCustomElement<
     HelixHeadlessDrawer,
     HelixHeadlessDrawerVueProps,
@@ -8743,7 +8195,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessEmptyVueProps,
     HelixHeadlessEmptyVueEvents
   >;
-  /** **A real '<input type="file">', kept and made invisible rather than replaced.** It is the only way to open a file picker: the dialog is a privileged action a script cannot start on its own, and it opens for a click on the input or on a '<label>' pointing at it. Every version of this component that draws its own button ends up calling '.click()' on a hidden input anyway, and then has two things a screen reader can find where there is one control.  So the input stays, holds the label, the name, the validity and the focus, and the visible trigger is a '<label for>' rather than a button. A label is not focusable and does not need to be: the input is, and Enter and Space on it open the picker because that is what the platform does with a file input.  **Dropping is why this is a component rather than an attribute.** A bare file input accepts a drop only on the input itself, which is invisible here, so the field is the drop target and it says when something is over it.  **Files are not a value a consumer can hand back.** Every other control here takes the controlled and uncontrolled pair, and this one does not: a 'FileList' cannot be constructed from markup, and a consumer writing 'value' on a file input is the one thing browsers refuse outright, because a page that could name a file could read it. So this element owns what was chosen, announces it, and offers 'clear()' for the one change a consumer can legitimately ask for.  **The list under it is the control's own, not decoration.** A file input with files chosen reports "3 files" and nothing else, which is unusable for checking that the right ones were picked. The names are rendered, and each carries the way to take it back out. */
+  /** **A real '<input type="file">', kept and made invisible rather than replaced.** It is the only way to open a file picker: the dialog is a privileged action a script cannot start on its own, and it opens for a click on the input or on a '<label>' pointing at it. A component that draws its own button ends up calling '.click()' on a hidden input anyway, and then has two things a screen reader can find where there is one control.  So the input stays, holds the label, the name, the validity and the focus, and the visible trigger is a '<label for>' rather than a button. A label is not focusable and does not need to be: the input is, and Enter and Space on it open the picker because that is what the platform does with a file input.  **Dropping is why this is a component rather than an attribute.** A bare file input accepts a drop only on the input itself, which is invisible here, so the field is the drop target and it says when something is over it.  **Files are not a value a consumer can hand back.** Every other control here takes the controlled and uncontrolled pair, and this one does not: a 'FileList' cannot be constructed from markup, and browsers refuse a consumer writing 'value' on a file input outright, because a page that could name a file could read it. So this element owns what was chosen, announces it, and offers 'clear()' for the one change a consumer can legitimately ask for.  **The list under it is the control's own, not decoration.** A file input with files chosen reports "3 files" and nothing else, which is unusable for checking that the right ones were picked. The names are rendered, and each carries the way to take it back out. */
   "helix-headless-file-input": DefineCustomElement<
     HelixHeadlessFileInput,
     HelixHeadlessFileInputVueProps,
@@ -8755,13 +8207,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessFormatDateVueProps,
     HelixHeadlessFormatDateVueEvents
   >;
-  /** **One family covers both readings, and the split people expect does not exist.** It was filed as two on the argument that a contribution graph needs a continuous ramp where uptime needs a category. GitHub's contribution graph is five discrete levels rather than a gradient, so a cell that takes a tone covers both: 'rows="1"' is a status strip, 'rows="7"' is a contribution graph, and heatmap is the name of that.  **What it cannot be is a bar chart with flat values**, and the data model is what closes that rather than taste: chart color is per *series* everywhere else here, '--chart-series-1' through '-15', so ninety differently colored cells would be ninety series.  The data is a real '<table>' named by 'for', the same convention every chart in this library uses, which also answers the accessibility question without inventing anything: **the table is the accessible representation**, it is already in the markup, and the drawing is a picture of it. Hide it with 'data-hidden-visually' and the reading is still there for anyone who needs it.  A cell takes its tone from its own 'data-tone', or from 'thresholds' and 'tones' bucketing its value. The first is what a status page wants and the second is what a contribution graph wants; the cell's own wins, so a page that already knows a day was degraded does not have to encode that as a number for this component to decode again.  **A tone is a name this tier never resolves.** 'tone="success"' writes '--heatmap-tone: var(--heatmap-tone-success)' onto the cell and stops there, so what a name is worth is the answering tier's to say: 'helix/styled' points the semantic names at the theme's status colors and the numbered ones at a ramp, and a consumer on 'headless' declares the same names as whatever they like. It read 'var(--helix-color-${tone})' until 27 Aug 2026, which is the dependency the tiers exist to prevent and which failed loudly rather than quietly: off-tier that property is not undefined, it is *invalid*, so 'background-color: var(--heatmap-tone, …)' declined its own fallback and every cell came out transparent. The headless baseline was a blank page under a row of footer text. 'shared/chart/series.css' records Bar Chart having had the same fault for the same reason.  **On a narrow container it draws fewer cells rather than thinner ones.** Ninety cells in 320 pixels is three and a half pixels each, which is a smear and not a strip. The cells it drops are the oldest, and it reflects 'visible' and fires 'helix-resize' when the number changes, because **a summary saying "99.2% over 90 days" above a strip drawing 45 of them is telling the reader something false about the picture in front of them** and nothing about the picture says so. */
+  /** **One family covers both readings, and the split people expect does not exist.** The argument for two is that a contribution graph needs a continuous ramp where uptime needs a category. GitHub's contribution graph is five discrete levels rather than a gradient, so a cell that takes a tone covers both: 'rows="1"' is a status strip, 'rows="7"' is a contribution graph, and heatmap is the name of that.  **What it cannot be is a bar chart with flat values**, and the data model is what closes that rather than taste: chart color is per *series* everywhere else here, '--chart-series-1' through '-15', so ninety differently colored cells would be ninety series.  The data is a real '<table>' named by 'for', the same convention every chart in this library uses, which also answers the accessibility question without inventing anything: **the table is the accessible representation**, it is already in the markup, and the drawing is a picture of it. Hide it with 'data-hidden-visually' and the reading is still there for anyone who needs it.  A cell takes its tone from its own 'data-tone', or from 'thresholds' and 'tones' bucketing its value. The first is what a status page wants and the second is what a contribution graph wants; the cell's own wins, so a page that already knows a day was degraded does not have to encode that as a number for this component to decode again.  **A tone is a name this tier never resolves.** 'tone="success"' writes '--heatmap-tone: var(--heatmap-tone-success)' onto the cell and stops there, so what a name is worth is the answering tier's to say: 'helix/styled' points the semantic names at the theme's status colors and the numbered ones at a ramp, and a consumer on 'headless' declares the same names as whatever they like. Reaching for 'var(--helix-color-${tone})' here is the dependency the tiers exist to prevent, and it fails loudly rather than quietly: off-tier that property is not undefined, it is *invalid*, so 'background-color: var(--heatmap-tone, …)' declines its own fallback and every cell comes out transparent, leaving a blank page under a row of footer text. 'shared/chart/series.css' records the same fault in Bar Chart.  **On a narrow container it draws fewer cells rather than thinner ones.** Ninety cells in 320 pixels is three and a half pixels each, which is a smear and not a strip. The cells it drops are the oldest, and it reflects 'visible' and fires 'helix-resize' when the number changes, because **a summary saying "99.2% over 90 days" above a strip drawing 45 of them is telling the reader something false about the picture in front of them** and nothing about the picture says so. */
   "helix-headless-heatmap": DefineCustomElement<
     HelixHeadlessHeatmap,
     HelixHeadlessHeatmapVueProps,
     HelixHeadlessHeatmapVueEvents
   >;
-  /** Everything a button does, with one thing added and it is the reason this is an element rather than a note on 'Button': **an icon-only control has no accessible name unless it is given one.** A button whose content is a glyph announces as "button" and nothing else, which is the single most common way a toolbar becomes unusable without sight. 'label' is not optional in practice, and having a component that says so is what makes it reviewable.  **Registered, so it can be rendered and not only subclassed.** The styled icon button extended 'HelixHeadlessButton' directly, which left no 'helix-headless-icon-button' for anything to use: a headless consumer wanting an icon button had a button and a naming convention. Anything in this tier that needs one, such as an announcement's dismiss control, can now render it without reaching into the styled tier for a tag that would never upgrade.  Top-level rather than 'Button.Icon', because a namespace means composition and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component. */
+  /** Everything a button does, with one thing added and it is the reason this is an element rather than a note on 'Button': **an icon-only control has no accessible name unless it is given one.** A button whose content is a glyph announces as "button" and nothing else, which is the single most common way a toolbar becomes unusable without sight. 'label' is not optional in practice, and having a component that says so is what makes it reviewable.  **Registered, so it can be rendered and not only subclassed.** Anything in this tier needing an icon button, such as an announcement's dismiss control, renders 'helix-headless-icon-button' rather than reaching into the styled tier for a tag that would never upgrade.  Top-level rather than 'Button.Icon', because a namespace means composition and an icon-only button is not part of a button. It is a button with different content and a different shape, which makes it its own component. */
   "helix-headless-icon-button": DefineCustomElement<
     HelixHeadlessIconButton,
     HelixHeadlessIconButtonVueProps,
@@ -8779,13 +8231,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessImageVueProps,
     HelixHeadlessImageVueEvents
   >;
-  /** Renders a real '<input>', so the caret, selection, autofill, spellcheck, the password manager, and the on-screen keyboard a phone chooses all come from the platform. 'delegatesFocus' puts focus on it, and it serializes into the server's markup, so the field is usable before any script loads.  **The input inside a shadow root submits nothing**, because the form is on the other side of the boundary. The host is form-associated instead and reports its own value through 'ElementInternals', which is also what carries validity and what answers a form reset.  'value' and 'defaultValue' are separate for the reason 'checked' and 'defaultChecked' are: 'value' is what is in the field now and 'defaultValue' is what the markup asked for, which is where a reset returns to and is gone the moment anyone types.  **Validity is the platform's.** The 'type' and 'required' are set on the real input and its 'validity' is copied onto the host, so an email field rejects what the browser says is not an email rather than what a regular expression here guesses. What this adds is the anchor, so 'reportValidity' points the bubble at the input rather than at the host.  'pattern', 'minlength' and 'maxlength' are forwarded with them. They were promised by this paragraph and did not exist, so a consumer following the sentence wrote an attribute on the host that reached no input and constrained nothing: the field looked as though it were checked and was not.  **'clearable' and 'reveal' are the field's, not the consumer's.** The 'end' slot used to be the answer to both, which meant every consumer of 'type="search"' built the same button and every consumer of 'type="password"' either built the same toggle or shipped a field a reader cannot check what they typed into. Neither is a slot's worth of variation: one empties the value, the other flips the type, and both want the same position, the same size and the same disabled behavior. The slot stays for what actually varies, a unit or a prefix.  Both opt in rather than following from 'type', and are booleans that default to false. A Lit boolean property that defaults to *true* cannot be turned off from HTML at all, only from script, which is the wrong way round for revealing a password: a consumer should have to ask for it. Drawer's 'modal' defaults true for the opposite reason, that losing a focus trap by forgetting a word is worse than having to say so. */
+  /** Renders a real '<input>', so the caret, selection, autofill, spellcheck, the password manager, and the on-screen keyboard a phone chooses all come from the platform. 'delegatesFocus' puts focus on it, and it serializes into the server's markup, so the field is usable before any script loads.  **The input inside a shadow root submits nothing**, because the form is on the other side of the boundary. The host is form-associated instead and reports its own value through 'ElementInternals', which is also what carries validity and what answers a form reset.  'value' and 'defaultValue' are separate for the reason 'checked' and 'defaultChecked' are: 'value' is what is in the field now and 'defaultValue' is what the markup asked for, which is where a reset returns to and is gone the moment anyone types.  **Validity is the platform's.** The 'type' and 'required' are set on the real input and its 'validity' is copied onto the host, so an email field rejects what the browser says is not an email rather than what a regular expression here guesses. What this adds is the anchor, so 'reportValidity' points the bubble at the input rather than at the host.  'pattern', 'minlength' and 'maxlength' are forwarded with them.  **'clearable' and 'reveal' are the field's, not the consumer's.** Neither is a slot's worth of variation: one empties the value, the other flips the type, and both want the same position, the same size and the same disabled behavior. The 'end' slot stays for what actually varies, a unit or a prefix.  Both opt in rather than following from 'type', and are booleans that default to false. A Lit boolean property that defaults to *true* cannot be turned off from HTML at all, only from script, which is the wrong way round for revealing a password: a consumer should have to ask for it. Drawer's 'modal' defaults true for the opposite reason, that losing a focus trap by forgetting a word is worse than having to say so. */
   "helix-headless-input": DefineCustomElement<
     HelixHeadlessInput,
     HelixHeadlessInputVueProps,
     HelixHeadlessInputVueEvents
   >;
-  /** Renders a real '<kbd>', so the passage still means "press this" to anything reading the markup rather than only to a reader looking at it.  **One key per element, with 'keys' as the stated exception.** A *sequence* is several of these with the separator written between them as ordinary text, because that separator is prose: it is "then" in a sequence and "plus" in a simultaneous press, and a component that inserted one would have to guess which. 'keys' cannot be guessing, since a chord written 'mod+k' has said which it is.  **'keys' exists because the glyphs were being typed by hand and were wrong.** A literal '⌘K' in a template tells a reader on Windows to press a key their keyboard does not have, and nothing catches it, a string being a string. Given 'mod' this renders '⌘K' on Apple and 'Ctrl+K' everywhere else.  **'within' is what binds it, and it is absent by default.** Without it this draws a key and listens for nothing, which is what every existing use of this component wants. The two values are the two honest lifetimes:  - 'control' listens within the element's own parent, which is the case this   is mostly for: a hint sitting inside the control it belongs to, where the   shortcut should work while that control has focus and stop existing when   the control does. - 'document' listens on the document, for a chord that works from anywhere.  *Corrected 25 Aug 2026: this said 'scope', 'self' and 'global' until then, naming a property that has never existed under that name. The rename is explained on the property itself, twenty lines below, and this paragraph above it went on teaching the old one. A reader who trusted the class doc wrote an attribute that binds nothing, which is also what an unset 'within' does, so nothing about the mistake looked like one.*  **A hidden 'kbd' is a dead shortcut, and that is the point rather than a trap.** Binding here ties the key to its own advertisement, so a hint that is not rendered is a shortcut that is not offered. A chord that must outlive its label is a chord whose owner is not a label: give it to whatever owns the action and let this element only describe it.  Nothing binds until this upgrades, so a shortcut is not available in the moments before hydration. */
+  /** Renders a real '<kbd>', so the passage still means "press this" to anything reading the markup rather than only to a reader looking at it.  **One key per element, with 'keys' as the stated exception.** A *sequence* is several of these with the separator written between them as ordinary text, because that separator is prose: it is "then" in a sequence and "plus" in a simultaneous press, and a component that inserted one would have to guess which. 'keys' cannot be guessing, since a chord written 'mod+k' has said which it is.  **'keys' exists because the glyphs were being typed by hand and were wrong.** A literal '⌘K' in a template tells a reader on Windows to press a key their keyboard does not have, and nothing catches it, a string being a string. Given 'mod' this renders '⌘K' on Apple and 'Ctrl+K' everywhere else.  **'within' is what binds it, and it is absent by default.** Without it this draws a key and listens for nothing, which is what every existing use of this component wants. The two values are the two honest lifetimes:  - 'control' listens within the element's own parent, which is the case this   is mostly for: a hint sitting inside the control it belongs to, where the   shortcut should work while that control has focus and stop existing when   the control does. - 'document' listens on the document, for a chord that works from anywhere.  **A hidden 'kbd' is a dead shortcut, and that is the point rather than a trap.** Binding here ties the key to its own advertisement, so a hint that is not rendered is a shortcut that is not offered. A chord that must outlive its label is a chord whose owner is not a label: give it to whatever owns the action and let this element only describe it.  Nothing binds until this upgrades, so a shortcut is not available in the moments before hydration. */
   "helix-headless-kbd": DefineCustomElement<
     HelixHeadlessKbd,
     HelixHeadlessKbdVueProps,
@@ -8803,7 +8255,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessLineChartVueProps,
     HelixHeadlessLineChartVueEvents
   >;
-  /** Layout and semantics, and deliberately not a target.  **'href' makes the row itself the link.** *Corrected 19 Aug 2026.* This said a row could not become one, on the grounds that "a whole-row target needs the anchor to wrap the layout, and the layout is what this component is." That is true of the *consumer's* anchor, which cannot wrap slots it does not own, and it is not true of the component's: an '<a part="row">' wraps this component's own layout perfectly well. 'Tree.Item' does exactly that, and the two were refusing and accepting 'href' on the same argument.  What the anchor buys is what the row could not fake: the whole row is a target, Enter follows it, middle click opens a tab, the status bar shows the destination, and it all works before any JavaScript runs.  What it costs is client-side routing, and that is the consumer's to restore. A router renders its own anchor and cannot render one inside this shadow root, so a framework wanting a soft navigation intercepts the click on the way out: the anchor is in 'composedPath()', and taking only a plain primary press leaves every native gesture alone.  **'data-list-item' is still the answer for a row that is not a destination.** A list row is often a container of controls rather than a place to go, and a row with 'href' unset behaves exactly as it always did. */
+  /** Layout and semantics, and deliberately not a target.  **'href' makes the row itself the link.** A whole-row target needs the anchor to wrap the layout, which a *consumer's* anchor cannot do for slots it does not own. The component's can: an '<a part="row">' wraps this component's own layout perfectly well, which is what 'Tree.Item' does.  What the anchor buys is what the row could not fake: the whole row is a target, Enter follows it, middle click opens a tab, the status bar shows the destination, and it all works before any JavaScript runs.  What it costs is client-side routing, and that is the consumer's to restore. A router renders its own anchor and cannot render one inside this shadow root, so a framework wanting a soft navigation intercepts the click on the way out: the anchor is in 'composedPath()', and taking only a plain primary press leaves every native gesture alone.  **'data-list-item' is still the answer for a row that is not a destination.** A list row is often a container of controls rather than a place to go, and a row with 'href' unset behaves exactly as it always did. */
   "helix-headless-list-item": DefineCustomElement<
     HelixHeadlessListItem,
     HelixHeadlessListItemVueProps,
@@ -8815,7 +8267,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessListVueProps,
     HelixHeadlessListVueEvents
   >;
-  /** **The listbox is the control and the options are its vocabulary.** A Select is this with a trigger in front of it, a Combobox is this with a text input, and a command palette is this again: they differ in what opens the list and what filters it, not in what the list is. Building it as its own family is what stops each of those reimplementing the keyboard and the filtering.  **'value' is comma separated when 'multiple' is set**, the way 'Checkbox.Group''s is. It stays a string because that is what a form submits and what 'MixinControllerValue' holds; an array property would be a second shape for the same fact, and the two would disagree the first time one was set without the other.  **Chosen and active are two different things.** Chosen is the answer; active is where the keyboard is. In a single-select list they move together, which is the radio group pattern and is what a reader expects from arrow keys. With 'multiple' they come apart: the arrows move without choosing and Space chooses, because a reader passing over four options on the way to the fifth did not mean to pick all five.  **This does not use 'KeyboardNavigationController', and the reason given here was the wrong one.** It said the controller moves and chooses in one act by design, so half of this component needed that and half the opposite. The controller does not work that way: it takes 'origin: 'focus' | 'selection'', and 'focus' exists precisely so a reader can arrow without choosing, which is what 'Tabs' uses in 'manual' mode. 'focusItem()' and 'select()' are separate members of 'NavigableItem'. The incompatibility named above is one the controller had already solved.  The real one is where focus lives. 'NavigableItem.focusItem()' moves DOM focus to the item, because the controller's model is a roving tab stop. A filterable list cannot do that: focus has to stay in the field or typing stops, so what moves is a virtual cursor and 'aria-activedescendant' is what says where it is. Those two disagree about the one thing neither can abstract, and no flag reconciles them.  Worth keeping the distinction sharp, because the old wording invites the wrong fix: someone reading it would add 'origin' to the controller, find it already there, and conclude this component could adopt it.  **Filtering hides rather than removes.** An option the filter has hidden is still the consumer's element in the consumer's order, so a filter that clears puts the list back exactly as it was with nothing re-rendered. What counts as a match is a plain case-insensitive substring, and a consumer wanting more hides options itself: 'filter' is a convenience over the same 'hidden' the component uses. */
+  /** **The listbox is the control and the options are its vocabulary.** A Select is this with a trigger in front of it, a Combobox is this with a text input, and a command palette is this again: they differ in what opens the list and what filters it, not in what the list is. Building it as its own family is what stops each of those reimplementing the keyboard and the filtering.  **'value' is comma separated when 'multiple' is set**, the way 'Checkbox.Group''s is. It stays a string because that is what a form submits and what 'MixinControllerValue' holds; an array property would be a second shape for the same fact, and the two would disagree the first time one was set without the other.  **Chosen and active are two different things.** Chosen is the answer; active is where the keyboard is. In a single-select list they move together, which is the radio group pattern and is what a reader expects from arrow keys. With 'multiple' they come apart: the arrows move without choosing and Space chooses, because a reader passing over four options on the way to the fifth did not mean to pick all five.  **This does not use 'KeyboardNavigationController', and the reason is where focus lives rather than whether moving chooses.** The controller already separates those, taking 'origin: 'focus' | 'selection''. What it cannot do is leave focus alone: 'NavigableItem.focusItem()' moves DOM focus to the item, its model being a roving tab stop. A filterable list cannot have that, focus having to stay in the field or typing stops, so what moves is a virtual cursor and 'aria-activedescendant' is what says where it is. No flag reconciles the two.  **Filtering hides rather than removes.** An option the filter has hidden is still the consumer's element in the consumer's order, so a filter that clears puts the list back exactly as it was with nothing re-rendered. What counts as a match is a plain case-insensitive substring, and a consumer wanting more hides options itself: 'filter' is a convenience over the same 'hidden' the component uses. */
   "helix-headless-listbox": DefineCustomElement<
     HelixHeadlessListbox,
     HelixHeadlessListboxVueProps,
@@ -8827,7 +8279,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessLoaderVueProps,
     HelixHeadlessLoaderVueEvents
   >;
-  /** **A disclosure, not a menu, and that is the whole design.** 'role="menu"' and 'menuitem' are for an application's commands: they take over the arrow keys, announce "menu" to a reader who asked for navigation, and put every link inside a role that is not a link. What this is, is a button that shows and hides a region of the consumer's own anchors, which is the pattern the APG gives for site navigation and the one that leaves a middle click, a modified click and the status bar working. 'Menu' remains right for a row of commands.  **It renders no links**, for the reason 'Navigation' gives: a router renders its own anchor and cannot render one inside this shadow root. The panel is a slot, and what goes in it is lists and headings the consumer wrote.  **It opens on hover, and a press is always the fallback.** 'open-on' says which, and hover is the resting value because a nav bar is the one place a reader expects to sweep along a row and see each section: making them click, read, click again to compare two is the interaction hover exists to save.  Hover is not the only way in, and the code is mostly about that. There is no hover on a touch screen, so a tap opens the panel there whatever 'open-on' says, which is why the pointer type is checked rather than assumed. Focus still opens nothing, for the same reason a tab through a nav bar should not unfold it, but Enter on the trigger does, and a keyboard press arrives as a click with no pointer behind it.  A mouse click on a trigger the pointer is already sitting on is the case worth naming: toggling there would close the panel and the pointer, still on the trigger, would open it again, so the trigger would flicker and never close. In hover mode the mouse's own clicks are left alone and hover governs on its own. Escape and a click away still close it.  The delays are intent, not decoration. Opening waits, so a pointer crossing the bar on its way somewhere else opens nothing; closing waits longer, so the diagonal from the trigger down into the panel does not pass through a gap and shut it. Moving along a bar where a panel is already down opens the next one at once, because at that point the reader is reading the bar, not crossing it.  **Focus is not trapped and not moved.** A disclosure leaves the reader on the trigger and the panel follows in the tab order, which is what the markup already says, so Tab walks into the links and out the far side without anything managing it. Escape closes and puts focus back, because Escape is the one key that has to return the reader to where they were.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **A disclosure, not a menu, and that is the whole design.** 'role="menu"' and 'menuitem' are for an application's commands: they take over the arrow keys, announce "menu" to a reader who asked for navigation, and put every link inside a role that is not a link. What this is, is a button that shows and hides a region of the consumer's own anchors, which is the pattern the APG gives for site navigation and the one that leaves a middle click, a modified click and the status bar working. 'Menu' remains right for a row of commands.  **It renders no links**, for the reason 'Navigation' gives: a router renders its own anchor and cannot render one inside this shadow root. The panel is a slot, and what goes in it is lists and headings the consumer wrote.  **It opens on hover, and a press is always the fallback.** 'open-on' says which, and hover is the resting value because a nav bar is the one place a reader expects to sweep along a row and see each section: making them click, read, click again to compare two is the interaction hover exists to save.  Hover is not the only way in, and the code is mostly about that. There is no hover on a touch screen, so a tap opens the panel there whatever 'open-on' says, which is why the pointer type is checked rather than assumed. Focus still opens nothing, for the same reason a tab through a nav bar should not unfold it, but Enter on the trigger does, and a keyboard press arrives as a click with no pointer behind it.  A mouse click on a trigger the pointer is already sitting on is the case worth naming: toggling there would close the panel and the pointer, still on the trigger, would open it again, so the trigger would flicker and never close. In hover mode the mouse's own clicks are left alone and hover governs on its own. Escape and a click away still close it.  The delays are intent, not decoration. Opening waits, so a pointer crossing the bar on its way somewhere else opens nothing; closing waits longer, so the diagonal from the trigger down into the panel does not pass through a gap and shut it. Moving along a bar where a panel is already down opens the next one at once, because at that point the reader is reading the bar, not crossing it.  **Focus is not trapped and not moved.** A disclosure leaves the reader on the trigger and the panel follows in the tab order, which is what the markup already says, so Tab walks into the links and out the far side without anything managing it. Escape closes and puts focus back, because Escape is the one key that has to return the reader to where they were.  The custom property below is written by this component and read by whoever draws it. A consumer never sets it: it carries a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-megamenu": DefineCustomElement<
     HelixHeadlessMegamenu,
     HelixHeadlessMegamenuVueProps,
@@ -8863,7 +8315,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessNotificationVueProps,
     HelixHeadlessNotificationVueEvents
   >;
-  /** **Slotted children rather than a data property**, which is the opposite of the choice 'helix-data-table' made and correct for the opposite reason. A table's rows are homogeneous values a consumer wants windowed; a notification is a small piece of somebody's own markup, with an avatar and a link and a button in it, and there are tens of them rather than thousands. Writing them out is the web-component reading of a list and lets an item hold anything.  **The cost is stated rather than discovered: this does not virtualize, and it cannot.** Windowing needs the list to own the data, and here the consumer owns it: N notifications is N elements by construction. That is the same trade '25-data-table.md' §2.2 rejected for a table and accepts here, because the sizes are not comparable. A feed that really does hold thousands wants a data table with a custom cell, and this component will not grow into one.  **Read state is reported, never invented.** Marking read is usually a round trip: this element asks its items and each item asks the consumer, so a refused 'helix-read' leaves everything alone and a consumer who owns 'read' sees nothing change until they say so. 'unread' is derived from the items and reflected, so a stylesheet and a badge can both read it without either of them counting. */
+  /** **Slotted children rather than a data property.** A notification is a small piece of somebody's own markup, with an avatar and a link and a button in it, and there are tens of them rather than thousands, so writing them out lets an item hold anything.  **This does not virtualize, and it cannot.** Windowing needs the list to own the data, and here the consumer owns it: N notifications is N elements by construction. A feed that really does hold thousands wants a data table with a custom cell, and this component will not grow into one.  **Read state is reported, never invented.** Marking read is usually a round trip: this element asks its items and each item asks the consumer, so a refused 'helix-read' leaves everything alone and a consumer who owns 'read' sees nothing change until they say so. 'unread' is derived from the items and written to an attribute, so a stylesheet and a badge can both read it without either of them counting. */
   "helix-headless-notifications": DefineCustomElement<
     HelixHeadlessNotifications,
     HelixHeadlessNotificationsVueProps,
@@ -8887,19 +8339,19 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessOptionVueProps,
     HelixHeadlessOptionVueEvents
   >;
-  /** A table of contents, named for the job. Three of the obvious names are taken by things that are not this: 'Outline' is a CSS property and the focus ring's whole vocabulary, 'Contents' is 'display: contents' and the 'content' part half this library renders, and 'TableOfContents' would sit beside 'Table' and 'TableColumn' and read as a third part of that family. 'Outline' sits beside 'Navigation', which is the same job at the other scale: one navigates a site, the other navigates a document.  **The links are the consumer's own anchors**, the same as 'Navigation'. A router renders its own '<a>' and cannot render one inside this shadow root, and the hrefs are fragments the page already knows.  **What is current is decided by position, not by intersection.** The obvious build is an 'IntersectionObserver' with a thin band near the top of the window, and it fails in both directions: with headings far apart nothing is in the band and the marker goes out entirely, and with headings close together several are and it flickers between them. So the observer is only the *trigger*, and the answer is computed from where the headings actually are: the current section is the last one whose top has passed the reading line, or the first heading before any of them has.  That rule is what a reader means. Two headings on screen at once are not ambiguous to a person: they are reading under the upper one.  **'aria-current="location"', and it is written onto the consumer's anchor.** This library does not normally write to light-DOM children, because an attribute added after upgrade is one a server's markup never had. It is right here for the reason 'Carousel' names its slides: what is current is derived from scroll position, so no server could have rendered it and there is nothing for hydration to disagree with. 'location' rather than 'page', which is what 'Navigation' uses: 'page' means this is the page, and every one of these is the same page. */
+  /** A table of contents, named for the job. It sits beside 'Navigation', which is the same job at the other scale: one navigates a site, the other navigates a document. 'Contents' and 'TableOfContents' are both taken by something else, 'display: contents' and the 'content' part in one case and the 'Table' family in the other.  **The links are the consumer's own anchors**, the same as 'Navigation'. A router renders its own '<a>' and cannot render one inside this shadow root, and the hrefs are fragments the page already knows.  **What is current is decided by position, not by intersection.** The obvious build is an 'IntersectionObserver' with a thin band near the top of the window, and it fails in both directions: with headings far apart nothing is in the band and the marker goes out entirely, and with headings close together several are and it flickers between them. So the observer is only the *trigger*, and the answer is computed from where the headings actually are: the current section is the last one whose top has passed the reading line, or the first heading before any of them has.  That rule is what a reader means. Two headings on screen at once are not ambiguous to a person: they are reading under the upper one.  **'aria-current="location"', and it is written onto the consumer's anchor.** This library does not normally write to light-DOM children, because an attribute added after upgrade is one a server's markup never had. It is right here for the reason 'Carousel' names its slides: what is current is derived from scroll position, so no server could have rendered it and there is nothing for hydration to disagree with. 'location' rather than 'page', which is what 'Navigation' uses: 'page' means this is the page, and every one of these is the same page. */
   "helix-headless-outline": DefineCustomElement<
     HelixHeadlessOutline,
     HelixHeadlessOutlineVueProps,
     HelixHeadlessOutlineVueEvents
   >;
-  /** The component is the truncation. Given a page and a total it works out which numbers to show and where the runs break, which is the whole of what a consumer would otherwise write by hand and get subtly wrong; everything else here is markup around that. So this is data-driven rather than composed: '<helix-pagination page="4" pages="12">' rather than twelve slotted children a consumer has to keep in step with their own query.  **The width does not change as you page.** The run around the current page is 'siblings' either side normally, and grows to absorb a gap slot when it meets a boundary, so the control holds the same number of slots from the first page to the last. Every arrangement that lets the count vary makes the buttons move under the pointer between one click and the next.  **A gap is only drawn where it hides more than one page.** An ellipsis standing in for a single number costs the same space as the number and tells the reader less.  **And a gap is a control.** It goes to the middle of the run it stands over, which is the binary-search step: any page in a set of any size is a handful of presses, where a jump of a fixed size would need forty of them on a set of a hundred and twenty-eight. A menu listing the hidden pages was the other idea and the arithmetic refuses it, for the reasons on 'renderGap'.  **'href' is what makes these links.** Set it and every page renders an '<a>' with '{page}' filled in, so the server's output is crawlable, a middle click opens a tab, and the address bar is the state. Left unset they are buttons, which is right for a table paging in place. Either way the click announces 'helix-navigate' first, and 'preventDefault()' on it stops the navigation as well as the change: that is how a router takes over without the page reloading underneath it.  **'helix-navigate' and not 'helix-change'**, for the reason the calendar pages with it too. Moving to page four chooses nothing; it moves the view over a result that has not changed. A consumer driving the view has to be able to hear that without being told an answer changed.  **The count and the page-size control are their own elements.** They were briefly a part and a pair of slots in here, and a slot can only offer one place: at one end of one row, in one order, on one axis. 'Pagination.Summary' and 'Pagination.Size' sit beside this one instead, so the direction and the order of a footer are the consumer's, which is what they were always going to want. 'total' and 'page-size' stay here for the arithmetic below and nothing else.  **A single page renders nothing.** A control offering one page offers no navigation, and the row it sits in should close over it rather than hold a space for a thing that cannot be used. Reported through 'ElementInternals.states' rather than an attribute on the host, because an attribute written at upgrade is markup a server's output never had and a framework reports the difference; a custom state carries the same fact to a stylesheet and none of that to the DOM.  **And a page change is announced.** Nothing did: moving the page moves 'aria-current' onto a different element, and a screen reader does not announce that, so a reader who pressed 5 heard the word "5" from the button they were on and nothing at all about having arrived. A polite live region says where they now are. It ships empty and is filled only on a change, because a region populated as it enters the document announces itself on arrival.  'page' is the controlled property and 'default-page' seeds one the element owns. Naming 'page' is a claim of ownership: the element announces and waits to be told, which is what a consumer paging through a router already wants. */
+  /** The component is the truncation. Given a page and a total it works out which numbers to show and where the runs break, which is the whole of what a consumer would otherwise write by hand and get subtly wrong; everything else here is markup around that. So this is data-driven rather than composed: '<helix-pagination page="4" pages="12">' rather than twelve slotted children a consumer has to keep in step with their own query.  **The width does not change as you page.** The run around the current page is 'siblings' either side normally, and grows to absorb a gap slot when it meets a boundary, so the control holds the same number of slots from the first page to the last. Every arrangement that lets the count vary makes the buttons move under the pointer between one click and the next.  **A gap is only drawn where it hides more than one page.** An ellipsis standing in for a single number costs the same space as the number and tells the reader less.  **And a gap is a control.** It goes to the middle of the run it stands over, which is the binary-search step: any page in a set of any size is a handful of presses, where a jump of a fixed size would need forty of them on a set of a hundred and twenty-eight. A menu listing the hidden pages was the other idea and the arithmetic refuses it, for the reasons on 'renderGap'.  **'href' is what makes these links.** Set it and every page renders an '<a>' with '{page}' filled in, so the server's output is crawlable, a middle click opens a tab, and the address bar is the state. Left unset they are buttons, which is right for a table paging in place. Either way the click announces 'helix-navigate' first, and 'preventDefault()' on it stops the navigation as well as the change: that is how a router takes over without the page reloading underneath it.  **'helix-navigate' and not 'helix-change'**, for the reason the calendar pages with it too. Moving to page four chooses nothing; it moves the view over a result that has not changed. A consumer driving the view has to be able to hear that without being told an answer changed.  **The count and the page-size control are their own elements.** A slot can only offer one place: at one end of one row, in one order, on one axis. 'Pagination.Summary' and 'Pagination.Size' sit beside this one instead, so the direction and the order of a footer are the consumer's, which is what they were always going to want. 'total' and 'page-size' stay here for the arithmetic below and nothing else.  **A single page renders nothing.** A control offering one page offers no navigation, and the row it sits in should close over it rather than hold a space for a thing that cannot be used. Reported through 'ElementInternals.states' rather than an attribute on the host, because an attribute written at upgrade is markup a server's output never had and a framework reports the difference; a custom state carries the same fact to a stylesheet and none of that to the DOM.  **And a page change is announced.** Moving the page moves 'aria-current' onto a different element, which a screen reader does not announce, so a reader who pressed 5 hears the word "5" from the button they were on and nothing at all about having arrived. A polite live region says where they now are. It ships empty and is filled only on a change, because a region populated as it enters the document announces itself on arrival.  'page' is what the element holds and 'default-page' seeds it. A consumer paging through a router refuses 'helix-navigate' and assigns their own, which is how they take the decision. */
   "helix-headless-pagination": DefineCustomElement<
     HelixHeadlessPagination,
     HelixHeadlessPaginationVueProps,
     HelixHeadlessPaginationVueEvents
   >;
-  /** Its own element beside 'Pagination' rather than a slot inside it, for the reason 'Pagination.Summary' is: a footer's direction and order are the consumer's, and a control that can only sit at one end of one row has taken that decision for them.  **'Select', not a native '<select>'.** It was native first, on the argument that the platform's own menu is a wheel on a phone and the widget a screen-reader user already knows. What that argument leaves out is that the library then has two dropdowns that are identical closed and different open, and a reader meets both in the same footer as a table's filters. Consistency is the whole product here, and it wins.  What it takes back with it: the caret is 'Select''s again rather than a color literal baked into a data URI, because a background image cannot read 'currentColor', and the label is a real '<label for>' against the trigger's own id, which 'Select' already renders and already tests.  **The label sits on the row, not above it.** Every other field in the library stacks its label because it stands in a column of fields; this one stands in a footer beside a run of page numbers, and a two-line control there makes the whole row two lines tall. 'Select''s host is a column, and an outer-tree rule beats a ':host' rule, so turning it into a row needs no property on 'Select' and nothing written into the consumer's markup.  **An empty 'sizes' renders nothing.** A chooser with nothing to choose from is a control a reader can operate and cannot use, which is worse than an absence. Falling back to the built-in list was the other answer and it is a component overruling a consumer who said "none". Same rule as 'Pagination' over a single page, and reported the same way, through 'ElementInternals.states' rather than an attribute the server never wrote.  'value' is the controlled property and 'default-value' seeds one this owns, the same contract every other stateful element here carries. Changing it announces 'helix-before-change'; what a consumer does with that is re-query and move back to page one, which is theirs to decide because only they know whether the reader's position should survive it. */
+  /** Its own element beside 'Pagination' rather than a slot inside it, for the reason 'Pagination.Summary' is: a footer's direction and order are the consumer's, and a control that can only sit at one end of one row has taken that decision for them.  **'Select', not a native '<select>'.** Two dropdowns identical closed and different open meet each other in the same footer as a table's filters. The caret is 'Select''s rather than a color literal baked into a data URI, because a background image cannot read 'currentColor', and the label is a real '<label for>' against the trigger's own id.  **The label sits on the row, not above it.** 'Select''s host is a column, and an outer-tree rule beats a ':host' rule, so turning it into a row needs no property on 'Select' and nothing written into the consumer's markup.  **An empty 'sizes' renders nothing**, rather than falling back to the built-in list, which would be a component overruling a consumer who said "none". Same rule as 'Pagination' over a single page, and reported the same way, through 'ElementInternals.states' rather than an attribute the server never wrote.  'value' is the controlled property and 'default-value' seeds one this owns. Changing it announces 'helix-before-change'; re-querying and moving back to page one is the consumer's, because only they know whether the reader's position should survive it. */
   "helix-headless-pagination-size": DefineCustomElement<
     HelixHeadlessPaginationSize,
     HelixHeadlessPaginationSizeVueProps,
@@ -8911,7 +8363,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessPaginationSummaryVueProps,
     HelixHeadlessPaginationSummaryVueEvents
   >;
-  /** **One '<input>' per cell, rather than one input drawn as cells.** Both are built in the wild and the trade is real: a single field autofills perfectly and needs a drawn caret nobody can style well, and separate fields give every box a real focus ring, a real caret and a real tab stop for free. This takes the second, and then closes autofill's gap rather than living with it, below.  **Anything longer than one character is treated as a paste, wherever it lands.** That covers the obvious case and two that are not: a browser autofilling an SMS code drops the whole thing into whichever box is focused, and a password manager does the same. So a six-character arrival in cell three fills from cell three rather than being truncated to its first character, which is what a per-cell 'maxlength' would have done silently.  **The code is one value to a form.** The cells are inside a shadow root and submit nothing on their own; the host is form-associated and reports the joined string, which is also what carries validity and answers a reset.  'autocomplete="one-time-code"' is on the first cell only. It is a hint about the field as a whole, and repeating it on six boxes offers a browser six places to put one code. */
+  /** **One '<input>' per cell, rather than one input drawn as cells.** A single field autofills perfectly and needs a drawn caret nobody can style well; separate fields give every box a real focus ring, a real caret and a real tab stop for free. Autofill's gap is closed below rather than lived with.  **Anything longer than one character is treated as a paste, wherever it lands.** That covers the obvious case and two that are not: a browser autofilling an SMS code drops the whole thing into whichever box is focused, and a password manager does the same. So a six-character arrival in cell three fills from cell three rather than being truncated to its first character, which is what a per-cell 'maxlength' would have done silently.  **The code is one value to a form.** The cells are inside a shadow root and submit nothing on their own; the host is form-associated and reports the joined string, which is also what carries validity and answers a reset.  'autocomplete="one-time-code"' is on the first cell only. It is a hint about the field as a whole, and repeating it on six boxes offers a browser six places to put one code. */
   "helix-headless-pin-input": DefineCustomElement<
     HelixHeadlessPinInput,
     HelixHeadlessPinInputVueProps,
@@ -8923,7 +8375,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessPopoverVueProps,
     HelixHeadlessPopoverVueEvents
   >;
-  /** Determinate by default, and 'indeterminate' for a task whose total is not known yet. 'Loader' is still the right answer where the wait is short or has no place of its own on the page; a bar earns its width where the work is the subject of the region it sits in.  A bar that fills at a made-up rate would be a bar that lies, so the indeterminate one does not fill: it runs a segment across the track, which says work is happening and claims no proportion at all. 'aria-valuenow' is omitted with it, which is the platform's own signal for the same thing.  **The fill is a percentage of the track, written as a custom property.** It is derived from 'value' and 'max' rather than measured, so it renders on a server with no layout and needs nothing after upgrade. That is what keeps it out of the class of geometry this library writes only on the client.  **'value' is clamped, and out-of-range input is not an error.** A count that runs past its own total is ordinary in real applications, and a bar that overflows its track or reports 'aria-valuenow' above 'aria-valuemax' is worse than one that reads as finished.  Semantics are on the host through 'ElementInternals', the same as everywhere else: a 'role' in the shadow root announces correctly and leaves the host anonymous to anything walking the light DOM, and a 'role' written onto the host as an attribute is one a server's markup never had.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Determinate by default, and 'indeterminate' for a task whose total is not known yet. 'Loader' is still the right answer where the wait is short or has no place of its own on the page; a bar earns its width where the work is the subject of the region it sits in.  A bar that fills at a made-up rate would be a bar that lies, so the indeterminate one does not fill: it runs a segment across the track, which says work is happening and claims no proportion at all. 'aria-valuenow' is omitted with it, which is the platform's own signal for the same thing.  **The fill is a fraction of the track, written as a custom property.** '--progress-fraction' is derived from 'value' and 'max' rather than measured, so it renders on a server with no layout and needs nothing after upgrade. That is what keeps it out of the class of geometry this library writes only on the client. A consumer never sets it: it carries a number this element computed and CSS cannot, which is what lets a stylesheet draw the thing without measuring anything itself.  **'value' is clamped, and out-of-range input is not an error.** A count that runs past its own total is ordinary in real applications, and a bar that overflows its track or reports 'aria-valuenow' above 'aria-valuemax' is worse than one that reads as finished.  Semantics are on the host through 'ElementInternals', the same as everywhere else: a 'role' in the shadow root announces correctly and leaves the host anonymous to anything walking the light DOM, and a 'role' written onto the host as an attribute is one a server's markup never had. */
   "helix-headless-progress": DefineCustomElement<
     HelixHeadlessProgress,
     HelixHeadlessProgressVueProps,
@@ -8953,7 +8405,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessRadioVueProps,
     HelixHeadlessRadioVueEvents
   >;
-  /** **Half marks decide the shape, so they are decided first.** Supporting them means the value is not an integer and the targets are not the marks: five stars at a half step is ten places to press, and a mark that is filled to the middle. Everything else follows from that, which is why 'step' is here rather than added later, when the pointer handling would have to be rewritten around it.  **A partial mark is the whole mark, clipped.** Not a second glyph filled to the middle: that needs a matching pair drawn for every mark anybody uses, and the moment a consumer wants a heart or a circle they need to draw one too. The fill is the same marks over the same marks, cut off partway, so any mark works and any fraction does.  **Read-only is not this control grayed out, it is a different thing.** The commoner use is showing a score nobody is being asked for, a product's average, and that is not a control at all: it takes no focus, answers no keys, has no options to choose between, and reads as one thing rather than as five. So 'readonly' is 'role="img"' with the score in its name, where the control is a radio group. A disabled control is still a control and still says so; this is not one.  **Moving is choosing here**, which is the radio group's reading and the opposite of 'Menu''s: arriving at four stars *is* rating it four, because nothing else follows and there is nothing to confirm. That is what 'KeyboardNavigationController' takes 'selects' for, and why this can use it where a menu cannot.  **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **Half marks decide the shape.** Supporting them means the value is not an integer and the targets are not the marks: five stars at a half step is ten places to press, and a mark that is filled to the middle. The pointer handling and 'step' are both built around that rather than added over it.  **A partial mark is the whole mark, clipped.** Not a second glyph filled to the middle: that needs a matching pair drawn for every mark anybody uses, and the moment a consumer wants a heart or a circle they need to draw one too. The fill is the same marks over the same marks, cut off partway, so any mark works and any fraction does.  **Read-only is not this control grayed out, it is a different thing.** The commoner use is showing a score nobody is being asked for, a product's average, and that is not a control at all: it takes no focus, answers no keys, has no options to choose between, and reads as one thing rather than as five. So 'readonly' is 'role="img"' with the score in its name, where the control is a radio group. A disabled control is still a control and still says so; this is not one.  **Moving is choosing here**, which is the radio group's reading and the opposite of 'Menu''s: arriving at four stars *is* rating it four, because nothing else follows and there is nothing to confirm. That is what 'KeyboardNavigationController' takes 'selects' for, and why this can use it where a menu cannot.  **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-rating": DefineCustomElement<
     HelixHeadlessRating,
     HelixHeadlessRatingVueProps,
@@ -8977,13 +8429,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessSkeletonVueProps,
     HelixHeadlessSkeletonVueEvents
   >;
-  /** A real '<input type="range">', so the drag, the arrow keys, Home and End, the page keys and the touch target are all the platform's. Every one of those is a thing a hand-built slider gets wrong, and the last is the one nobody notices: a native range has a hit area larger than its thumb, sized by the platform for a finger.  **The value is a string, like every other form control's.** A range submits text and 'MixinControllerValue' holds text, so the number is a reading of the value rather than the value itself. 'valueAsNumber' is there for anything doing arithmetic on it.  **Marks are drawn rather than left to '<datalist>'**, which was the first answer and is the wrong one. A datalist's ticks cannot be styled at all, and Firefox does not render them for a range at all, so the platform's version is a mark that looks like someone else's design where it appears and no mark where it does not. Drawing them costs the semantics nothing, because a mark is decoration: what a reader can actually land on is 'step', which the input enforces whether or not anything is drawn.  'markers' is a count rather than a flag tied to 'step'. A flag reads well until a slider from zero to a hundred stepping by one asks for a hundred and one ticks, and then it is either noise or a silent refusal to draw. A number is what the reader sees, so it cannot surprise anyone.  **A range is two of them, not a hand-built one.** There is no native two-thumb range, and the answer is not to stop using the platform's: it is to stack two of them on one track, so each thumb keeps its own drag, its own arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding would throw away every argument this component is made of, to gain a second handle.  Crossing is stopped in the handler rather than by the bounds, and that is not the obvious way round. Giving the lower input 'max' of the upper reads well and breaks the drawing: an input's thumb sits at a fraction of *its own* range, so a lower thumb bounded at the upper one paints against a shorter track and the two stop lining up. Both inputs span the whole range and the values are clamped against each other on the way in.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** A real '<input type="range">', so the drag, the arrow keys, Home and End, the page keys and the touch target are all the platform's. Every one of those is a thing a hand-built slider gets wrong, and the last is the one nobody notices: a native range has a hit area larger than its thumb, sized by the platform for a finger.  **The value is a string, like every other form control's.** A range submits text and 'MixinControllerValue' holds text, so the number is a reading of the value rather than the value itself. 'valueAsNumber' is there for anything doing arithmetic on it.  **Marks are drawn rather than left to '<datalist>'.** A datalist's ticks cannot be styled at all, and Firefox does not render them for a range at all, so the platform's version is a mark that looks like someone else's design where it appears and no mark where it does not. Drawing them costs the semantics nothing, because a mark is decoration: what a reader can actually land on is 'step', which the input enforces whether or not anything is drawn.  'markers' is a count rather than a flag tied to 'step'. A flag reads well until a slider from zero to a hundred stepping by one asks for a hundred and one ticks, and then it is either noise or a silent refusal to draw. A number is what the reader sees, so it cannot surprise anyone.  **A range is two of them, not a hand-built one.** There is no native two-thumb range, so two are stacked on one track and each thumb keeps its own drag, its own arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding would throw away every argument this component is made of, to gain a second handle.  Crossing is stopped in the handler rather than by the bounds, and that is not the obvious way round. Giving the lower input 'max' of the upper reads well and breaks the drawing: an input's thumb sits at a fraction of *its own* range, so a lower thumb bounded at the upper one paints against a shorter track and the two stop lining up. Both inputs span the whole range and the values are clamped against each other on the way in.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-slider": DefineCustomElement<
     HelixHeadlessSlider,
     HelixHeadlessSliderVueProps,
     HelixHeadlessSliderVueEvents
   >;
-  /** The one chart here that takes its numbers from an attribute, and the reversal is deliberate. Every other chart reads a table because a reader might want to interrogate it; nobody interrogates the squiggle next to a figure. A fourteen-row table behind a bare trend line is fourteen dates read aloud in place of the one sentence that carries the meaning, so 'values' is the list and 'label' is the sentence.  That is the library's own rule rather than a second data channel: a content property is its slot's fallback, which is why 'Tooltip' takes 'content' and 'Avatar' takes 'name'. 'for' stays for the sparkline that genuinely has a table behind it, and it wins where both are given.  **No label means decorative, and that is a choice rather than an oversight.** A sparkline beside a stat that already says "Sessions, 1,102" has nothing of its own to announce, and an unnamed 'role="img"' announces "graphic" and stops. So an unlabelled sparkline is 'aria-hidden', and a labeled one is an image named by its sentence.  It goes *beside* a 'Stat' rather than inside one. The plan this was built from called for a 'trend' slot on 'Stat'; the spec already on 'Stat' says the opposite, that a change beside a figure is a second fact, and the spec is right. 'Trend' composes the same way.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** The one chart here that takes its numbers from an attribute, and the reversal is deliberate. Every other chart reads a table because a reader might want to interrogate it; nobody interrogates the squiggle next to a figure. A fourteen-row table behind a bare trend line is fourteen dates read aloud in place of the one sentence that carries the meaning, so 'values' is the list and 'label' is the sentence.  That is the library's own rule rather than a second data channel: a content property is its slot's fallback, which is why 'Tooltip' takes 'content' and 'Avatar' takes 'name'. 'for' stays for the sparkline that genuinely has a table behind it, and it wins where both are given.  **No label means decorative, and that is a choice rather than an oversight.** A sparkline beside a stat that already says "Sessions, 1,102" has nothing of its own to announce, and an unnamed 'role="img"' announces "graphic" and stops. So an unlabeled sparkline is 'aria-hidden', and a labeled one is an image named by its sentence.  It goes *beside* a 'Stat' rather than inside one: a change beside a figure is a second fact, which is what 'Stat''s own spec says. 'Trend' composes the same way.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-sparkline": DefineCustomElement<
     HelixHeadlessSparkline,
     HelixHeadlessSparklineVueProps,
@@ -8995,13 +8447,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessSpeedDialItemVueProps,
     HelixHeadlessSpeedDialItemVueEvents
   >;
-  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behavior with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would have meant defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab' here, and the reason is worth stating, because a component would have re-declared 'emphasis', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
+  /** **A menu, and deliberately not a new one.** Its rows are commands, which is what 'role="menu"' and 'menuitem' exist for, so this takes them and takes the behavior with them: the arrow keys are 'KeyboardNavigationController', the panel is 'PopoverController', and open and closed is 'MixinControllerOpen'. 'Menu' is built from the same pieces. What is not shared is what actually differs: a dial has no submenus, no headers, no checkable rows and no long list to type ahead through, and shipping it as an appearance of 'Menu' would mean defining what a dial with a submenu in it does.  **The trigger is a control the consumer slots**, and the floating action button is the usual one: 'helix-icon-button' with 'shape="circle"' and 'raised'. There is no 'helix-fab', because it would re-declare 'emphasis', 'tone', 'label' and a size around a control that already has all four. A round raised button is a shape, and where it sits is 'data-dock' in the base layer.  **Nothing is reserved from the keyboard.** A menu that drills has to keep the horizontal pair for going in and coming back; a dial goes nowhere, so all four arrows move through the actions and a reader who guesses either axis is answered. That is the controller's own house position, and this is a component with no reason to argue with it. */
   "helix-headless-speed-dial": DefineCustomElement<
     HelixHeadlessSpeedDial,
     HelixHeadlessSpeedDialVueProps,
     HelixHeadlessSpeedDialVueEvents
   >;
-  /** **One axis, and nesting is how you get two.** The sandbox this was taken from moves a cross: a divider down the middle, another across the bottom, and a corner that moves both. That is a layout rather than a component, and every part of it that is worth sharing is one divider between two panes. A splitter inside a splitter gives the cross back, and gives the three-pane and the four-pane arrangements it never had.  **Where two of them cross there is a corner, and it moves both.** A splitter slotted into a pane of another, at right angles to it, has one end of its divider sitting exactly on the other's. That end grows a handle: 'move' under the pointer, both arrow axes on the keyboard, and a drag that carries the two positions at once.  **The outer splitter draws it and the nested one announces itself upward.** Built the other way round first, because a splitter already knows where its own divider begins and needs no measurement of the other, and that version was clipped: the crossing lies on the boundary between a pane and the divider beside it, a handle centered there reaches back over the boundary, and a pane is 'overflow: auto'. Exactly half the corner was cut off. The outer separator is the one element that already straddles the seam, so the corner belongs in it.  That makes the channel between the two a single call in a single direction: 'cross(child, at)' says where the child crosses, 'moveTo' drives either one, and neither reads the other's state. The child is what calls it, because a parent cannot poll for a child that has not upgraded yet.  The one number it carries is a percentage rather than a measurement, which is what keeps either of them from measuring the other, and it assumes the nested splitter fills its pane. That is what slotting one into a pane does. Give the nested splitter its own inset, or wrap it in something smaller than the pane, and the corner is drawn where the crossing would be rather than where it is.  **It is a client-side enhancement and says so.** Finding the parent means inspecting the tree, which a server cannot do, so the corner appears at 'firstUpdated' and never in the served markup. That is allowed for exactly this: it is an affordance rather than content, and a splitter with no corner yet is a splitter with two working dividers.  Where two dividers are parallel there is no corner, because there is nothing to take hold of. Where they cross without a corner, the inner divider takes the pointer: every separator sits on the same layer, so a tie goes to document order and a deeper splitter is always later.  **A divider that is moving says so, whoever is moving it.** ':hover' cannot carry that: a drag holds the pointer through capture and a fast one leaves the target behind, and a corner moves the nested divider while the reader is on the crossing, nowhere near it. So a drag in progress is a state, and both dividers a corner moves are lit for as long as it moves them.  **The divider is a real 'role="separator"' with 'aria-valuenow', moved by the arrow keys as well as by pointer.** A divider only a mouse can move is unusable without one, which is the reason the sandbox's carries the same, and 'Home' and 'End' take it to its bounds.  **It goes where it is put, all the way to either end.** 'min' and 'max' are nothing and everything unless a consumer says otherwise, because a divider that stops dead short of the edge gives a reader no way to put a pane away. Where a pane should keep a sliver of itself, only whoever put the tabs on it knows how much, so they say so.  **A pane can be shut, and that is not the same as a divider at the edge.** The geometry is identical and the knowledge is not: only a shut pane knows where to open back to. So 'collapsed' is a second state rather than a reading of the position, and the position it opens to is simply the one collapsing never overwrote. 'collapsed-size' keeps a sliver showing where a pane has a tab strip worth leaving, and collapse overrides 'min' and 'max', which is what those are for: they keep a pane from vanishing by accident, and this is the deliberate version.  The two are kept in step in one direction only: a drag that settles on the collapsed size latches shut, and any move opens it again. Otherwise a reader could drag a pane closed and the consumer's own button would still be offering to close it.  A pane shut to nothing is told apart from one shut to a sliver, because the two want different dividers: a sliver still has a boundary worth drawing, and nothing leaves the divider sitting on the container's own edge.  **The box is measured once, when a drag starts.** Measuring per move is a forced layout on every pointer event, in the middle of a gesture whose whole job is to stay ahead of the pointer, and nothing about the box moves while the divider does.  **'helix-before-resize' fires when it settles, not while it moves.** A drag is a stream of positions and only the one it ends at is a preference; announcing each would ask a consumer to write to storage a hundred times to record one decision. Nothing is stored here either: where a preference lives, and whether it should be kept at all, is the consumer's to decide, and a component writing to storage on its own would be deciding for all of them under a key it chose.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **One axis, and nesting is how you get two.** The sandbox this was taken from moves a cross: a divider down the middle, another across the bottom, and a corner that moves both. That is a layout rather than a component, and every part of it that is worth sharing is one divider between two panes. A splitter inside a splitter gives the cross back, and gives the three-pane and the four-pane arrangements it never had.  **Where two of them cross there is a corner, and it moves both.** A splitter slotted into a pane of another, at right angles to it, has one end of its divider sitting exactly on the other's. That end grows a handle: 'move' under the pointer, both arrow axes on the keyboard, and a drag that carries the two positions at once.  **The outer splitter draws it and the nested one announces itself upward.** The nested one drawing its own is the tempting version, since it already knows where its divider begins and needs no measurement of the other, and it is clipped: the crossing lies on the boundary between a pane and the divider beside it, a handle centered there reaches back over the boundary, and a pane is 'overflow: auto'. Exactly half the corner is cut off. The outer separator is the one element that already straddles the seam, so the corner belongs in it.  That makes the channel between the two a single call in a single direction: 'cross(child, at)' says where the child crosses, 'moveTo' drives either one, and neither reads the other's state. The child is what calls it, because a parent cannot poll for a child that has not upgraded yet.  The one number it carries is a percentage rather than a measurement, which is what keeps either of them from measuring the other, and it assumes the nested splitter fills its pane. That is what slotting one into a pane does. Give the nested splitter its own inset, or wrap it in something smaller than the pane, and the corner is drawn where the crossing would be rather than where it is.  **It is a client-side enhancement and says so.** Finding the parent means inspecting the tree, which a server cannot do, so the corner appears at 'firstUpdated' and never in the served markup. That is allowed for exactly this: it is an affordance rather than content, and a splitter with no corner yet is a splitter with two working dividers.  Where two dividers are parallel there is no corner, because there is nothing to take hold of. Where they cross without a corner, the inner divider takes the pointer: every separator sits on the same layer, so a tie goes to document order and a deeper splitter is always later.  **A divider that is moving says so, whoever is moving it.** ':hover' cannot carry that: a drag holds the pointer through capture and a fast one leaves the target behind, and a corner moves the nested divider while the reader is on the crossing, nowhere near it. So a drag in progress is a state, and both dividers a corner moves are lit for as long as it moves them.  **The divider is a real 'role="separator"' with 'aria-valuenow', moved by the arrow keys as well as by pointer.** A divider only a mouse can move is unusable without one, which is the reason the sandbox's carries the same, and 'Home' and 'End' take it to its bounds.  **It goes where it is put, all the way to either end.** 'min' and 'max' are nothing and everything unless a consumer says otherwise, because a divider that stops dead short of the edge gives a reader no way to put a pane away. Where a pane should keep a sliver of itself, only whoever put the tabs on it knows how much, so they say so.  **A pane can be shut, and that is not the same as a divider at the edge.** The geometry is identical and the knowledge is not: only a shut pane knows where to open back to. So 'collapsed' is a second state rather than a reading of the position, and the position it opens to is simply the one collapsing never overwrote. 'collapsed-size' keeps a sliver showing where a pane has a tab strip worth leaving, and collapse overrides 'min' and 'max', which is what those are for: they keep a pane from vanishing by accident, and this is the deliberate version.  The two are kept in step in one direction only: a drag that settles on the collapsed size latches shut, and any move opens it again. Otherwise a reader could drag a pane closed and the consumer's own button would still be offering to close it.  A pane shut to nothing is told apart from one shut to a sliver, because the two want different dividers: a sliver still has a boundary worth drawing, and nothing leaves the divider sitting on the container's own edge.  **The box is measured once, when a drag starts.** Measuring per move is a forced layout on every pointer event, in the middle of a gesture whose whole job is to stay ahead of the pointer, and nothing about the box moves while the divider does.  **'helix-before-resize' fires when it settles, not while it moves.** A drag is a stream of positions and only the one it ends at is a preference; announcing each would ask a consumer to write to storage a hundred times to record one decision. Nothing is stored here either: where a preference lives, and whether it should be kept at all, is the consumer's to decide, and a component writing to storage on its own would be deciding for all of them under a key it chose.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-splitter": DefineCustomElement<
     HelixHeadlessSplitter,
     HelixHeadlessSplitterVueProps,
@@ -9013,7 +8465,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessStatGroupVueProps,
     HelixHeadlessStatGroupVueEvents
   >;
-  /** Label first in the markup and the value after it, which is the reading order a screen reader takes and the order a caption sits above a figure. The eye lands on the number either way, because the number is the loud thing; a reader hearing it needs to know what it counts before hearing how many.  This paragraph said the opposite, value first and label after, on a render that has always emitted the label slot first: the description was published to two tiers and shipped into the generated types, and the component was right and the sentence was wrong.  Both are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
+  /** Label first in the markup and the value after it, which is the reading order a screen reader takes and the order a caption sits above a figure. The eye lands on the number either way, because the number is the loud thing; a reader hearing it needs to know what it counts before hearing how many.  Both are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
   "helix-headless-stat": DefineCustomElement<
     HelixHeadlessStat,
     HelixHeadlessStatVueProps,
@@ -9025,7 +8477,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessStepsVueProps,
     HelixHeadlessStepsVueEvents
   >;
-  /** **The name is a button, and only the name.** A stepper is something a reader goes back through, and the thing they reach for is the name of the stage. The marker is 'aria-hidden' decoration, so wrapping it in the button would add hit area and no meaning: the accessible name would be the text either way, and what is pressable would stop being the same shape as what is readable.  It is 'helix-button', not a '<button>' this element resets and dresses. The hover wash, the focus ring, the disabled treatment and the way the label sits against an icon are all decisions the button already carries, and a second copy of them here is a second copy to keep in step. 'ghost' is the quiet shape: transparent until it is pointed at.  It says nothing about where a reader may go. Every step is pressable and announces itself with 'helix-select'; refusing the ones ahead is 'disabled', which the consumer sets because only the consumer knows whether a form can be skipped. A component that guessed would be wrong on the first wizard that lets you jump to the end.  **The marker is a slot whose fallback is the state.** A finished stage shows a check, the current one a target, and one not yet reached an empty ring: three marks that say what a reader wants to know without a legend. A consumer who wants their own fills the slot instead.  The step renders exactly one of the three, chosen from its own two booleans. Rendering all three and hiding two in CSS would work and is worse: the accessibility tree would carry marks that are not there, and the markup would say three things about a stage that is one.  Numbering is a separate question and belongs to the tier above. 'numeric' hides the mark and shows a CSS counter, which the browser resolves at layout, so the digit costs no script and is right in the server's markup however the steps are ordered. Nothing here knows which appearance is in use, and does not need to.  **'complete' and 'current' are separate, and both can be false.** A stage that is neither is one the reader has not reached, which is the majority of any sequence and therefore the state that needs no attribute. They can also both be true: a reader who steps back into a finished stage is in it and has finished it, and a stepper that forgets the second is one that loses its checks the moment somebody reviews their answers.  **The 'content' slot opens on the current step, and only down a column.** A row has no room under a step to put a form in, and stretching one to fit would set every step's height by the tallest. 'current' is what opens it, so the state that says where the reader is is also the state that shows them the stage: one attribute, no second flag to keep in step with it, and it renders open on the server rather than after hydration. */
+  /** **The name is a button, and only the name.** A stepper is something a reader goes back through, and the thing they reach for is the name of the stage. The marker is 'aria-hidden' decoration, so wrapping it in the button would add hit area and no meaning: the accessible name would be the text either way, and what is pressable would stop being the same shape as what is readable.  It is 'helix-button', not a '<button>' this element resets and dresses: the hover wash, the focus ring and the disabled treatment are decisions the button already carries. 'ghost' is the quiet shape, transparent until it is pointed at.  It says nothing about where a reader may go. Every step is pressable and announces itself with 'helix-select'; refusing the ones ahead is 'disabled', which the consumer sets because only the consumer knows whether a form can be skipped. A component that guessed would be wrong on the first wizard that lets you jump to the end.  **The marker is a slot whose fallback is the state.** A finished stage shows a check, the current one a target, and one not yet reached an empty ring: three marks that say what a reader wants to know without a legend. A consumer who wants their own fills the slot instead.  The step renders exactly one of the three, chosen from its own two booleans. Rendering all three and hiding two in CSS would work and is worse: the accessibility tree would carry marks that are not there, and the markup would say three things about a stage that is one.  Numbering belongs to the tier above. 'numeric' hides the mark and shows a CSS counter, which the browser resolves at layout, so the digit costs no script and is right in the server's markup however the steps are ordered. Nothing here knows which appearance is in use.  **'complete' and 'current' are separate, and both can be false.** A stage that is neither is one the reader has not reached, which is the majority of any sequence and therefore the state that needs no attribute. They can also both be true: a reader who steps back into a finished stage is in it and has finished it, and a stepper that forgets the second is one that loses its checks the moment somebody reviews their answers.  **The 'content' slot opens on the current step, and only down a column.** A row has no room under a step to put a form in, and stretching one to fit would set every step's height by the tallest. 'current' is what opens it, so the state that says where the reader is is also the state that shows them the stage: one attribute, no second flag to keep in step with it, and it renders open on the server rather than after hydration. */
   "helix-headless-step": DefineCustomElement<
     HelixHeadlessStep,
     HelixHeadlessStepVueProps,
@@ -9043,7 +8495,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTableCellVueProps,
     HelixHeadlessTableCellVueEvents
   >;
-  /** A column is a heading and a width, declared together, because they are two facts about one thing and keeping them apart is what went wrong before.  **This replaces a 'columns' string on the table.** That property took a CSS track list, so the headings lived in a row of cells and the widths lived in an attribute, and nothing tied the two together: a table with three headings and a two-track list rendered without complaint. Worse, handing it the headings instead of a track list produced invalid CSS, which the grid silently ignored, so the whole table collapsed into one column and every cell stacked. That happened, in this library's own example, and the failure said nothing at all.  Now the column is the source of both. Add one and the table has another track; remove one and it does not.  **It is also where every per-column fact goes**, which is the reason 'helix-data-table' needs no column config object. 'field' names the key the cell reads, 'sortable' says a reader may reorder by it, 'align' says which edge the values line up against, and 'cell' takes a function for anything the field alone cannot express. The schema is markup and the data is a property: a schema is small, declarative, and something a reader should be able to see in the HTML, and data is large and windowed.  **The same element serves both tables**, the markup one and the data one. It is identified by a flag rather than by 'instanceof', so a 'helix-table-column' works inside either without the two roots sharing anything else.  **It generates no box of its own**, the same as a row: the heading is a grid item of the table, so it lines up with the cells under it rather than sitting in a wrapper that has to be kept the same width. */
+  /** **The column is the source of both its heading and its track.** Add one and the table has another track; remove one and it does not. Declaring the widths separately, as a CSS track list on the table, leaves nothing tying the two together: a table with three headings and a two-track list renders without complaint, and a track list that is accidentally the headings is invalid CSS the grid silently ignores, collapsing the whole table into one column.  **It is also where every per-column fact goes**, which is the reason 'helix-data-table' needs no column config object. 'field' names the key the cell reads, 'sortable' says a reader may reorder by it, 'align' says which edge the values line up against, and 'cell' takes a function for anything the field alone cannot express. The schema is markup and the data is a property: a schema is small, declarative, and something a reader should be able to see in the HTML, and data is large and windowed.  **The same element serves both tables**, the markup one and the data one. It is identified by a flag rather than by 'instanceof', so a 'helix-table-column' works inside either without the two roots sharing anything else.  **It generates no box of its own**, the same as a row: the heading is a grid item of the table, so it lines up with the cells under it rather than sitting in a wrapper that has to be kept the same width. */
   "helix-headless-table-column": DefineCustomElement<
     HelixHeadlessTableColumn,
     HelixHeadlessTableColumnVueProps,
@@ -9067,7 +8519,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTabPanelVueProps,
     HelixHeadlessTabPanelVueEvents
   >;
-  /** Selection is coordinated by event, the same shape the accordion and the tree use: a tab dispatches 'SelectionChange' and the root pairs it with the panel of the same value. Nothing registers with anything, so tabs added later work without the root being told.  The tab list is a single tab stop, moved with the arrow keys through 'KeyboardNavigationController', the same one the radio and toggle groups use. Selection follows focus, which is the right default for a small set where showing a panel is cheap; a set where it is not should use 'manual'. */
+  /** Selection is coordinated by event, the same shape the accordion and the tree use: a tab dispatches 'helix-select' and the root pairs it with the panel of the same value. Nothing registers with anything, so tabs added later work without the root being told.  The tab list is a single tab stop, moved with the arrow keys through 'KeyboardNavigationController', the same one the radio and toggle groups use. Selection follows focus, which is the right default for a small set where showing a panel is cheap; a set where it is not should use 'manual'. */
   "helix-headless-tabs": DefineCustomElement<
     HelixHeadlessTabs,
     HelixHeadlessTabsVueProps,
@@ -9109,19 +8561,19 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTimelineItemVueProps,
     HelixHeadlessTimelineItemVueEvents
   >;
-  /** **Not 'Steps', and the difference is what the thing is for.** A stepper is a process a reader is moving through: it has a stage they are on, stages they have finished, and stages ahead, so it carries 'active' and 'complete' and numbers itself. A timeline is a record of events that already happened, or are scheduled to. Nothing is current, nothing is complete, and what each entry carries instead is a time. Building this as an appearance of 'Steps' would have meant a stepper with no step you are on.  What it does take from 'Steps' is the connector. Each entry draws the line that arrives at it and hides it when it is first, which needs neither an index nor a parent that counts: ':host(:first-child)' is the whole of it, resolved at layout with no script, so a server's markup is right before anything runs.  'role="list"' on the host rather than an '<ol>' in the shadow root, for the reason 'Steps' gives: the entries are the consumer's elements in the light DOM, so a list element here would be a list whose items are somewhere else.  **It runs down the page and has no horizontal form.** There was one, and it was removed rather than tuned: laid along a line there is no room for the time or the sentence that are the whole reason to reach for a timeline, so what survives is a mark and a short label, and that is a stepper. 'Steps' is already horizontal by default and already draws it, so the horizontal version of this was a second component rendering the same picture from thinner data. A run of stages along a page is 'Steps'. */
+  /** **Not 'Steps', and the difference is what the thing is for.** A stepper is a process a reader is moving through: it has a stage they are on, stages they have finished, and stages ahead, so it carries 'active' and 'complete' and numbers itself. A timeline is a record of events that already happened, or are scheduled to. Nothing is current, nothing is complete, and what each entry carries instead is a time. Building this as an appearance of 'Steps' would have meant a stepper with no step you are on.  What it does take from 'Steps' is the connector. Each entry draws the line that arrives at it and hides it when it is first, which needs neither an index nor a parent that counts: ':host(:first-child)' is the whole of it, resolved at layout with no script, so a server's markup is right before anything runs.  'role="list"' on the host rather than an '<ol>' in the shadow root, for the reason 'Steps' gives: the entries are the consumer's elements in the light DOM, so a list element here would be a list whose items are somewhere else.  **It runs down the page and has no horizontal form.** Laid along a line there is no room for the time or the sentence that are the whole reason to reach for a timeline, so what survives is a mark and a short label, and that is a stepper. 'Steps' is already horizontal by default and already draws it. A run of stages along a page is 'Steps'. */
   "helix-headless-timeline": DefineCustomElement<
     HelixHeadlessTimeline,
     HelixHeadlessTimelineVueProps,
     HelixHeadlessTimelineVueEvents
   >;
-  /** An element rather than a slot, because it carries a timeout, a tone, a dismiss control and a lifetime that pauses: behavior, state and API, which is the test for whether a region becomes an element in this library.  **The timer is the item's own.** Held by the region, one message arriving would restart another's, so a stack of three would go from three seconds each to nine for the last one. Each message is on its own clock from the moment it is rendered.  **A message is the opposite of the page it is over.** Inverted by default, because a thing arriving in a corner has to be told apart from the page in the moment before it is read, and inverting does that without spending a color that means something. It is a flip of 'color-scheme' rather than a named inverse surface: every token in the subtree re-resolves, so a 'Retry' a consumer slots in comes out right without knowing where it is. 'Tooltip' can name the inverse surface directly because it holds no controls; this cannot. Set 'data-color-mode' on the region to take the page's mode instead.  **No duration means it stays.** That is the safe default rather than the common one: anything carrying an action has to still be there when the reader decides to take it, and a component cannot tell from the outside whether the message it was given is disposable.  **The clock stops while it is being read.** Hover pauses it, and so does focus landing anywhere inside, which is the case that matters more: a keyboard reader tabbing towards the action in a toast is exactly the person a timer must not race. Both resume where they left off rather than starting again, so a message half-read does not get a full second life every time a pointer crosses it.  **Going away is a request, never an act.** It dispatches a cancelable 'helix-dismiss' and does nothing else: the consumer owns the list, so the item removing itself would leave the two disagreeing. Auto-dismiss and the dismiss control raise the same event, so a consumer handles one path and not two.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** An element rather than a slot, because it carries a timeout, a tone, a dismiss control and a lifetime that pauses: behavior, state and API, which is the test for whether a region becomes an element in this library.  **The timer is the item's own.** Held by the region, one message arriving would restart another's, so a stack of three would go from three seconds each to nine for the last one. Each message is on its own clock from the moment it is rendered.  **A message is the opposite of the page it is over.** Inverted by default, because a thing arriving in a corner has to be told apart from the page in the moment before it is read, and inverting does that without spending a color that means something. It is a flip of 'color-scheme' rather than a named inverse surface: every token in the subtree re-resolves, so a 'Retry' a consumer slots in comes out right without knowing where it is. 'Tooltip' can name the inverse surface directly because it holds no controls; this cannot. Set 'data-color-mode' on the region to take the page's mode instead.  **No duration means it stays.** That is the safe default rather than the common one: anything carrying an action has to still be there when the reader decides to take it, and a component cannot tell from the outside whether the message it was given is disposable.  **The clock stops while it is being read.** Hover pauses it, and so does focus landing anywhere inside, which is the case that matters more: a keyboard reader tabbing towards the action in a toast is exactly the person a timer must not race. Both resume where they left off rather than starting again, so a message half-read does not get a full second life every time a pointer crosses it.  **Going away is a request, never an act.** It dispatches a cancelable 'helix-dismiss' and does nothing else: the consumer owns the list, so the item removing itself would leave the two disagreeing. Auto-dismiss and the dismiss control raise the same event, so a consumer handles one path and not two. */
   "helix-headless-toast-item": DefineCustomElement<
     HelixHeadlessToastItem,
     HelixHeadlessToastItemVueProps,
     HelixHeadlessToastItemVueEvents
   >;
-  /** **The region is why this is one family rather than two.** A live region has to be in the document *before* a message is put into it: assistive technology subscribes to the region, and a region that arrives already holding its message is frequently not announced at all. So the container is a part of the family and not an arranger of complete things, which is the same reasoning that puts 'Radio.Group' inside its own family.  **Polite, never assertive.** 'role="alert"' interrupts whatever a reader is being told, and almost nothing that arrives in a corner of the screen has earned that. Something that genuinely cannot wait is a 'Dialog', which stops the page for everyone rather than only for the people who cannot see it.  **It never creates or destroys anything.** The consumer renders items and removes them; asking to go is a cancelable 'helix-dismiss' from the item. That is still exactly true of the region: an item that has gone hides itself and stays in the tree, so a consumer whose state still lists it does not have their framework fighting a node this component took away. What changed is that the item no longer waits to be told before hiding, unless the consumer declared 'open' and said the state is theirs. There is no 'toast.show()', because an imperative queue inside a component is a second copy of the application's state that nothing can render from: an app that wants a 'toast()' function writes a thin one over the state it already has, and keeps the ability to render the same messages on the server, in a test, or twice. */
+  /** **The region is why this is one family rather than two.** A live region has to be in the document *before* a message is put into it: assistive technology subscribes to the region, and a region that arrives already holding its message is frequently not announced at all. So the container is a part of the family and not an arranger of complete things, which is the same reasoning that puts 'Radio.Group' inside its own family.  **Polite, never assertive.** 'role="alert"' interrupts whatever a reader is being told, and almost nothing that arrives in a corner of the screen has earned that. Something that genuinely cannot wait is a 'Dialog', which stops the page for everyone rather than only for the people who cannot see it.  **It never creates or destroys anything.** The consumer renders items and removes them; asking to go is a cancelable 'helix-dismiss' from the item. An item that has gone hides itself and stays in the tree, so a consumer whose state still lists it does not have their framework fighting a node this component took away. It hides without waiting to be told, unless the consumer declared 'open' and said the state is theirs. There is no 'toast.show()', because an imperative queue inside a component is a second copy of the application's state that nothing can render from: an app that wants a 'toast()' function writes a thin one over the state it already has, and keeps the ability to render the same messages on the server, in a test, or twice. */
   "helix-headless-toast": DefineCustomElement<
     HelixHeadlessToast,
     HelixHeadlessToastVueProps,
@@ -9157,13 +8609,13 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTourVueProps,
     HelixHeadlessTourVueEvents
   >;
-  /** A stop names a target with 'for' and holds whatever the consumer puts in it. It owns no content of its own, which is the whole shape of this family: the tour abstracts the three things that are genuinely hard, and the words are the consumer's.  What it does own:  - **Where the panel goes.** Anchored to the target through the same floating   pass every other overlay here uses. - **That it is on top.** A popover, so it is in the top layer. A tour points   at things inside dialogs, inside scrollers, inside anything with a stacking   context, and a panel in the ordinary flow loses to all three. - **When it shows.** Which is 'current', and which the root decides.  What it does not own is the heading, the paragraph, the picture and the layout. Slot a 'helix-card', or a heading and a line of prose, or anything else. This was written the other way first, with 'title' and 'body' parts and a fixed arrangement, which is a component deciding what a tour is allowed to say.  **The buttons are slot fallback, so the common case costs nothing and the uncommon one is possible.** Write nothing and get Back, Next and Skip already wired. Slot 'actions' and they are yours, driven by 'next()', 'back()' and 'skip()' on the root, which are public for exactly that.  **'for' is an id, the same as 'Tooltip''s.** The target is elsewhere on the page, and an id is the one reference a consumer can write in markup without holding an element. Resolved against the root node, so a stop inside a shadow tree points at a target in that tree. */
+  /** A stop names a target with 'for' and holds whatever the consumer puts in it. It owns no content of its own, which is the whole shape of this family: the tour abstracts the three things that are genuinely hard, and the words are the consumer's.  What it does own:  - **Where the panel goes.** Anchored to the target through the same floating   pass every other overlay here uses. - **That it is on top.** A popover, so it is in the top layer. A tour points   at things inside dialogs, inside scrollers, inside anything with a stacking   context, and a panel in the ordinary flow loses to all three. - **When it shows.** Which is 'current', and which the root decides.  What it does not own is the heading, the paragraph, the picture and the layout. Slot a 'helix-card', or a heading and a line of prose, or anything else. Fixed 'title' and 'body' parts would be a component deciding what a tour is allowed to say.  **The buttons are slot fallback, so the common case costs nothing and the uncommon one is possible.** Write nothing and get Back, Next and Skip already wired. Slot 'actions' and they are yours, driven by 'next()', 'back()' and 'skip()' on the root, which are public for exactly that.  **'for' is an id, the same as 'Tooltip''s.** The target is elsewhere on the page, and an id is the one reference a consumer can write in markup without holding an element. Resolved against the root node, so a stop inside a shadow tree points at a target in that tree. */
   "helix-headless-tour-stop": DefineCustomElement<
     HelixHeadlessTourStop,
     HelixHeadlessTourStopVueProps,
     HelixHeadlessTourStopVueEvents
   >;
-  /** **'open', on 'MixinControllerOpen', where it was a bare 'expanded' boolean.** A branch showing its children is the same state a disclosure holds, and 'AccordionItem' has been on that mixin all along. Written here by hand it had neither half of what the mixin gives: 'this.expanded = !this.expanded' announced nothing, so a consumer could not know a branch had opened, and could not own the state either. 'aria-expanded' is still what the row renders, because that is the attribute a tree uses; the property is what changed, not the semantics.  An element rather than a slot because it owns state: whether it is open, whether it is selected, and whether it is the one holding focus.  A branch is any item with something slotted into 'children', detected in 'firstUpdated' rather than declared by the consumer. That is a client-side enhancement by necessity, since the server cannot inspect children, so the server renders the node as a leaf and the twisty appears on hydration. It appears rather than disappearing, which is the harmless direction.  **'href' makes the row itself the link.** A tree used as navigation is a list of links, and the row is what a reader presses: with the anchor slotted into the name instead, everything outside the words is dead, Enter does nothing, and there is no middle-click, no status bar and no open-in-new-tab. Given an 'href' the row *is* an '<a>', so the platform provides all of that and the keyboard needs no handler at all.  It changes the shape of the ARIA, which is why it is a property and not the default. An anchor cannot contain the group, since the group holds more anchors and nesting them is invalid, so the row carries 'treeitem' and the group becomes its sibling under a presentational wrapper. That is exactly the navigation flavor of the tree pattern, and the arrangement without an 'href' stays as it was: 'treeitem' containing 'group', which is what an '<li>' holding a '<ul>' is.  A consumer whose framework owns routing slots its own link instead and leaves 'href' unset. The row follows that one too, so the whole row works either way; what the anchor adds is what only a real anchor can give.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** **'open', on 'MixinControllerOpen', rather than a bare boolean of its own.** A branch showing its children is the same state a disclosure holds, and 'AccordionItem' is on that mixin too. A hand-written toggle announces nothing, so a consumer can neither know a branch opened nor own the state. 'aria-expanded' is still what the row renders, because that is the attribute a tree uses; the property is what differs, not the semantics.  An element rather than a slot because it owns state: whether it is open, whether it is selected, and whether it is the one holding focus.  A branch is any item with something slotted into 'children', detected in 'firstUpdated' rather than declared by the consumer. That is a client-side enhancement by necessity, since the server cannot inspect children, so the server renders the node as a leaf and the twisty appears on hydration. It appears rather than disappearing, which is the harmless direction.  **'href' makes the row itself the link.** A tree used as navigation is a list of links, and the row is what a reader presses: with the anchor slotted into the name instead, everything outside the words is dead, Enter does nothing, and there is no middle-click, no status bar and no open-in-new-tab. Given an 'href' the row *is* an '<a>', so the platform provides all of that and the keyboard needs no handler at all.  It changes the shape of the ARIA, which is why it is a property and not the default. An anchor cannot contain the group, since the group holds more anchors and nesting them is invalid, so the row carries 'treeitem' and the group becomes its sibling under a presentational wrapper. That is exactly the navigation flavor of the tree pattern, and the arrangement without an 'href' stays as it was: 'treeitem' containing 'group', which is what an '<li>' holding a '<ul>' is.  A consumer whose framework owns routing slots its own link instead and leaves 'href' unset. The row follows that one too, so the whole row works either way; what the anchor adds is what only a real anchor can give.  The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
   "helix-headless-tree-item": DefineCustomElement<
     HelixHeadlessTreeItem,
     HelixHeadlessTreeItemVueProps,
@@ -9175,7 +8627,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessTreeVueProps,
     HelixHeadlessTreeVueEvents
   >;
-  /** Three parts: a direction that is up, down or neutral, the metric that moved, and a label saying over what. The arrow carries the direction and its color carries the judgment, and the two are separate properties because they are separate facts.  **'good' is absent by default, so an unjudged trend is gray.** Every dashboard convention says up is green, and for churn, latency, error rate, cost and bounce rate that convention is a lie told in the most legible color on the page. A component that guesses is wrong roughly a third of the time and silent about it; one that waits to be told is uninformative until it is, which is the cheaper failure. State the metric's polarity once and the component does the part that varies.  The direction is also written as a word, because a colored arrow says nothing to a reader who is not looking at it. 'part="direction"' is what the styled tier clips out of sight and leaves in the accessibility tree.  Both the metric and the label are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
+  /** Three parts: a direction that is up, down or neutral, the metric that moved, and a label saying over what. The arrow carries the direction and its color carries the judgment, and the two are separate properties because they are separate facts.  **'good' is absent by default, so an unjudged trend is gray.** Every dashboard convention says up is green, and for churn, latency, error rate, cost and bounce rate that convention is a lie told in the most legible color on the page. State the metric's polarity once and the component does the part that varies.  The direction is also written as a word, because a colored arrow says nothing to a reader who is not looking at it. 'part="direction"' is what the styled tier clips out of sight and leaves in the accessibility tree.  Both the metric and the label are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
   "helix-headless-trend": DefineCustomElement<
     HelixHeadlessTrend,
     HelixHeadlessTrendVueProps,
@@ -9187,7 +8639,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessVideoPlaylistItemVueProps,
     HelixHeadlessVideoPlaylistItemVueEvents
   >;
-  /** The entries again, reachable without leaving the picture. A playlist beside the player is a list a reader scrolls to; the same list in the control bar is one they open over the video, which is what a full-screen player has and what a phone has room for.  **It is placed by the consumer, not rendered by the playlist**, and that is forced rather than chosen. A shadow root cannot project into a sibling's light DOM, so nothing the playlist renders can land inside the player's control bar. What can is an element the consumer writes there, which is what 'Video''s 'controls' slot is for:  '''html <helix-video-playlist>   <helix-video slot="player" controls>     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>   </helix-video>   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item> </helix-video-playlist> '''  So it finds its playlist upward rather than being handed one, and that chain crosses a shadow boundary in the ordinary arrangement, which is why it is 'closestInstance' and not 'closest'.  **Choosing dispatches 'helix-select', the same event an entry dispatches.** It never writes 'active' on the playlist, which looks like the shorter path and would latch the controlled contract: a playlist assigned 'active' once goes quiet and waits for a consumer who was never there. Announcing is what an entry does, the playlist already listens for it, and a consumer refusing a selection gets 'preventDefault()' on one event rather than two paths that behave differently. */
+  /** The entries again, reachable without leaving the picture. A playlist beside the player is a list a reader scrolls to; the same list in the control bar is one they open over the video, which is what a full-screen player has and what a phone has room for.  **It is placed by the consumer, not rendered by the playlist**, and that is forced rather than chosen. A shadow root cannot project into a sibling's light DOM, so nothing the playlist renders can land inside the player's control bar. What can is an element the consumer writes there, which is what 'Video''s 'controls' slot is for:  '''html <helix-video-playlist>   <helix-video slot="player" controls>     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>   </helix-video>   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item> </helix-video-playlist> '''  So it finds its playlist upward rather than being handed one, and that chain crosses a shadow boundary in the ordinary arrangement, which is why it is 'closestInstance' and not 'closest'.  **Choosing dispatches 'helix-select', the same event an entry dispatches.** It never writes 'active' on the playlist, which looks like the shorter path and skips the cancelable request: an assignment applies the change with no 'helix-before-activate' for anyone to refuse. Announcing is what an entry does, the playlist already listens for it, and a consumer refusing a selection gets 'preventDefault()' on one event rather than two paths that behave differently. */
   "helix-headless-video-playlist-menu": DefineCustomElement<
     HelixHeadlessVideoPlaylistMenu,
     HelixHeadlessVideoPlaylistMenuVueProps,
@@ -9205,7 +8657,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixHeadlessVideoVueProps,
     HelixHeadlessVideoVueEvents
   >;
-  /** **The set arrives as data, which is what makes this a virtual list rather than a box that hides children.** 'for' names a '<script type="application/json">' holding an array of objects, and a '<template>' child says what one row looks like: elements carrying 'data-field="name"' are filled with that field of the item.  Both halves are markup, and that is the whole reason for the shape. 'VirtualizeController' says why the obvious alternatives are shut: an 'items' property cannot survive React hydration, which skips every property it would have to apply imperatively, and light-DOM children exist by the time anything could decide not to create them. Text in the document is neither. A server emits it, React re-emits it as a child rather than applying it, and it is one node whatever the row count.  **The same shape the charts already use**, 'for="<id>"' pointing at markup the consumer wrote, and the difference is what is at the other end. A chart names a '<table>', which is the accessible version of the picture and which a reader with no JavaScript still gets. Ten thousand rows cannot be that: the table would be the cost this exists to avoid. So the accessible version here is the rendered window plus 'aria-setsize' and 'aria-posinset', which is what says "four thousand of ten thousand" rather than "four of twenty".  **Rows are light DOM, deliberately.** They are cloned from the consumer's template and appended to the host, so a document rule reaches them, the base layer applies, and a class in the template means what it says. Cloned into the shadow root they would be markup the consumer wrote and could not style, which is the one thing a row template must not be.  **Reading the source is client-only**, because a server has no document to query. The window renders empty from the server and fills on the first update, which is the same client-side enhancement rule every tree-reading component here follows.  **On this tier the consumer gives the viewport its box**, and the component cannot do it for them: 'helix/headless' ships no stylesheet, and a height is a decision rather than a fact this could publish. So a base list wants two rules before it is a list at all:  '''css helix-headless-virtual-list::part(viewport) {   block-size: 12rem;   overflow-y: auto; } '''  **Without them it is not a scroller**, and the failure is worse than it sounds. 'scrollTop' is always zero, so nothing ever windows; and the box has no height of its own, so 'clientHeight' is a function of the rows just drawn. Measuring then moves what is being measured, and the two need not converge: measured in Chromium at 500 rows, it settled into a two-cycle between 378 and 379 rows and stayed there, at two and a half thousand passes in eight seconds. 'VirtualizeController' gives up after ten passes and says so, so this now draws a bad window rather than stopping the page, but a bad window is still the answer until the rules are written.  The styled tier writes them for you, with '--virtual-list-block-size'. */
+  /** **The set arrives as data, which is what makes this a virtual list rather than a box that hides children.** 'for' names a '<script type="application/json">' holding an array of objects, and a '<template>' child says what one row looks like: elements carrying 'data-field="name"' are filled with that field of the item.  Both halves are markup, and that is the whole reason for the shape. 'VirtualizeController' says why the obvious alternatives are shut: an 'items' property cannot survive React hydration, which skips every property it would have to apply imperatively, and light-DOM children exist by the time anything could decide not to create them. Text in the document is neither. A server emits it, React re-emits it as a child rather than applying it, and it is one node whatever the row count.  **The accessible version is not a '<table>'**, the way it is for the charts that share this 'for="<id>"' shape: ten thousand rows in one is the cost this exists to avoid. It is the rendered window plus 'aria-setsize' and 'aria-posinset', which is what says "four thousand of ten thousand" rather than "four of twenty".  **Rows are light DOM, deliberately.** They are cloned from the consumer's template and appended to the host, so a document rule reaches them, the base layer applies, and a class in the template means what it says. Cloned into the shadow root they would be markup the consumer wrote and could not style, which is the one thing a row template must not be.  **Reading the source is client-only**, because a server has no document to query. The window renders empty from the server and fills on the first update, which is the same client-side enhancement rule every tree-reading component here follows.  **On this tier the consumer gives the viewport its box**, and the component cannot do it for them: 'helix/headless' ships no stylesheet, and a height is a decision rather than a fact this could publish. So a base list wants two rules before it is a list at all:  '''css helix-headless-virtual-list::part(viewport) {   block-size: 12rem;   overflow-y: auto; } '''  **Without them it is not a scroller**, and the failure is worse than it sounds. 'scrollTop' is always zero, so nothing ever windows; and the box has no height of its own, so 'clientHeight' is a function of the rows just drawn. Measuring then moves what is being measured, and the two need not converge: measured in Chromium at 500 rows, it settled into a two-cycle between 378 and 379 rows and stayed there, at two and a half thousand passes in eight seconds. 'VirtualizeController' gives up after ten passes and says so, so this now draws a bad window rather than stopping the page, but a bad window is still the answer until the rules are written.  The styled tier writes them for you, with '--virtual-list-block-size'. */
   "helix-headless-virtual-list": DefineCustomElement<
     HelixHeadlessVirtualList,
     HelixHeadlessVirtualListVueProps,

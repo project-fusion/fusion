@@ -8,12 +8,11 @@
 
   /* Ink on paper, which is the media pair the other way up.
    *
-   * The commit that added this claimed the ground was stated so the code could
-   * not come out light on dark, and then stated it with tokens that turn over
-   * with the mode: on a dark page the ground went dark and the modules went
-   * light, which is a code a good half of the scanners in the world refuse. The
-   * media pair is the only one here that does not turn over, so a code is drawn
-   * with it inverted: the light arm is the paper and the dark arm is the ink. */
+   * Never a token that turns over with the color mode: on a dark page the ground
+   * goes dark and the modules go light, which is a code a good half of the
+   * scanners in the world refuse. The media pair is the only one here that does
+   * not turn over, so a code is drawn with it inverted: the light arm is the
+   * paper and the dark arm is the ink. */
   background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
   block-size: var(--_qr-size);
   border-radius: var(--helix-radii-sm);
@@ -45,8 +44,9 @@
  * not a hole. A hole would be a code with data missing rather than data
  * obscured, and those are not the same thing to a scanner.
  *
- * The ground is the code's own, so the mark sits on the same white the quiet
- * zone is made of and the join does not read as a second shape. */
+ * The ground reads the code's own `--qr-code-background-color`, so a consumer
+ * who sets it gets the same paper under the mark and the join does not read as a
+ * second shape. */
 [part="logo"] {
   align-items: center;
   background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));

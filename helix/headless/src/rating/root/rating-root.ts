@@ -15,12 +15,10 @@ import { property, state } from 'lit/decorators.js'
  * @summary A score out of a few marks, given or shown.
  *
  * @description
- * **Half marks decide the shape, so they are decided first.** Supporting them
- * means the value is not an integer and the targets are not the marks: five
- * stars at a half step is ten places to press, and a mark that is filled to the
- * middle. Everything else follows from that, which is why `step` is here rather
- * than added later, when the pointer handling would have to be rewritten around
- * it.
+ * **Half marks decide the shape.** Supporting them means the value is not an
+ * integer and the targets are not the marks: five stars at a half step is ten
+ * places to press, and a mark that is filled to the middle. The pointer handling
+ * and `step` are both built around that rather than added over it.
  *
  * **A partial mark is the whole mark, clipped.** Not a second glyph filled to
  * the middle: that needs a matching pair drawn for every mark anybody uses, and
@@ -81,15 +79,13 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
   /*
-   * Discrete, which is the default and is said here only because it was wrong.
-   *
-   * `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all announce
-   * input, and every one of them is edited continuously: a value passes through
-   * every keystroke or pixel on its way to the one meant. A rating does not. A
-   * press picks a score, an arrow picks the next one, and the drag deliberately
-   * asks for nothing until it is let go, so there is exactly one value and it
-   * is the chosen one. That is `helix-before-change`, the same as the radio group this
-   * announces itself as.
+   * Discrete. `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all
+   * announce input, and every one of them is edited continuously: a value passes
+   * through every keystroke or pixel on its way to the one meant. A rating does
+   * not. A press picks a score, an arrow picks the next one, and the drag
+   * deliberately asks for nothing until it is let go, so there is exactly one
+   * value and it is the chosen one. That is `helix-before-change`, the same as
+   * the radio group this announces itself as.
    */
   protected override readonly announcesInput = false
 
@@ -308,7 +304,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     try {
       ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
     } catch {
-      /* A synthesised pointer has no capture to take, and the drag works
+      /* A synthesized pointer has no capture to take, and the drag works
          without it right up until the pointer leaves the row. Worth having the
          gesture testable rather than making the specs drive a real device. */
     }
@@ -351,13 +347,10 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   /**
    * Reports the value, and whether the form may go without one.
    *
-   * **`required` was on the API page and did nothing.** The mixin brings it,
-   * so it printed on the reference page and read as supported, and nothing here
-   * ever called `setValidity`: a form holding an unrated required rating
-   * submitted, measured, with `:valid` true and the entry present but empty.
-   * This is the case `min` argues for in its own note, that "no rating" and
-   * "the worst rating" are different answers and a survey that requires one
-   * says so with `required`.
+   * **`required` arrives from the mixin, so it prints on the reference page
+   * whether or not anything here enforces it.** Without a `setValidity` call a
+   * form holding an unrated required rating submits, `:valid` true and the
+   * entry present but empty. `reportRequired` is what makes the property real.
    *
    * **Empty is `value === ''` rather than a score of zero**, because zero is a
    * rating a reader can deliberately give when `min` allows it, and refusing to
@@ -403,7 +396,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`, and the fifteen controls that already did this.
+    // `ColorInput.updated`.
     this.sync()
   }
 

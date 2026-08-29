@@ -79,18 +79,14 @@ export class HelixHeadlessTour extends HelixElement {
   /**
    * Which stop the reader is on.
    *
-   * **It announced after it moved for two days, which made refusing it
-   * impossible.** `index` was a plain property the tour wrote to directly:
-   * `move` assigned it and *then* announced, so `preventDefault` on the change
-   * arrived after the move it was refusing. It goes through `requestChange`
-   * now, which announces first and applies only if nobody refused, and refusing
-   * is how a consumer takes the decision. See 294.
+   * **Moved through `requestChange`, never by assignment from `move`.** That
+   * announces first and applies only if nobody refused, and refusing is how a
+   * consumer takes the decision; writing the property and then announcing puts
+   * `preventDefault` after the move it is refusing. See (294).
    *
    * The shape is `Carousel`'s, which is the nearest thing in the library: a
    * `default-index` for markup that only seeds and a held state that is
    * `undefined` until somebody sets one.
-   *
-   *
    */
   @property({ type: Number })
   get index(): number {
@@ -189,9 +185,9 @@ export class HelixHeadlessTour extends HelixElement {
   /**
    * Leaves the run early, which is a close rather than a completion.
    *
-   * Announced before it is applied, and cancelable because of it. Both closes
-   * wrote `open` first and dispatched after, so a consumer calling
-   * `preventDefault` was refusing something that had already happened.
+   * Announced before it is applied, and cancelable because of it: writing
+   * `open` first and dispatching after leaves a consumer calling
+   * `preventDefault` refusing something that has already happened.
    */
   skip(): void {
     const event = new HelixBeforeCloseEvent()
@@ -212,10 +208,8 @@ export class HelixHeadlessTour extends HelixElement {
     this.open = false
   }
 
-  /* The one audited path, which every stateful change in the library goes
-     through and this did not. It announces, then applies where nothing refused
-     and where the consumer has not taken the value over, and it audits a
-     controlled tour whose consumer never answers. */
+  /* The one path every stateful change in the library goes through: it
+     announces, then applies where nothing refused. */
   private move(to: number): void {
     requestChange({
       apply: (value) => {
@@ -276,10 +270,6 @@ export class HelixHeadlessTour extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* Only the first time, before anything reads it. A script assigning `index`
-       to a tour nobody owns would otherwise hand it to a consumer who never
-       asked, and the tour would stop moving itself from then on. See
-       `MixinControllerOpen`, which argues the whole decide-once rule. */
     hostAria(this.internals, { label: this.label, role: 'region' })
   }
 

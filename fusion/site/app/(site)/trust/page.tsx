@@ -16,17 +16,10 @@ import { DocumentPage } from '../document-page'
  * actually be editing, and the numbering is the list's own for the same reason:
  * the count is a fact about the document, so the document carries it.
  *
- * **This said `##` headings and a CSS counter, and then said markers.** The file
- * holds an ordered list and `renderDocument` turns it into a railed
- * `helix-list`, so the numbers are a counter again: the list resets it and each
- * row increments it, and the row draws the result in a track at the start edge.
- * The correction before this one was right to say no counter existed in the
- * site's CSS, and it does not now either. The counter is the component's.
- *
- * Recorded rather than tidied away because this comment has now been wrong twice
- * about the same six numbers, which is what a comment describing an
- * implementation does when the implementation moves: it is the thing a reader
- * trusts instead of looking.
+ * The numbers are a counter, and it is the component's rather than the site's:
+ * the file holds an ordered list and `renderDocument` turns it into a railed
+ * `helix-list`, which resets the counter on the list, increments it on each row
+ * and draws the result in a track at the start edge.
  *
  * The second half is the part most companies leave out and the reason this page
  * is worth having at all: none of it has been exercised yet, because nothing

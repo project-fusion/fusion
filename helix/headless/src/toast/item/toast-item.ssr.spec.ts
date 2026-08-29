@@ -19,14 +19,13 @@ import '../index.js'
 
    `data-` names are the exception and the library's own answer: a boolean state
    mirrors to one deliberately, the server and the client agree on it, and a
-   pasted `data-closed` is inert because nothing reads it as a declaration. A
-   first version of this asserted no attributes at all and reported
-   `Toast.Item`, which was doing exactly the sanctioned thing.
+   pasted `data-closed` is inert because nothing reads it as a declaration. So
+   the assertion filters them out rather than demanding no attributes at all.
 
    What it deliberately does not assert is the part's own markup. That is the
    component's business and belongs in a spec written about it, not in one
-   generated across twenty-five of them: an assertion nobody chose is an
-   assertion nobody maintains. */
+   generated across a whole tier: an assertion nobody chose is an assertion
+   nobody maintains. */
 describe('toast item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(

@@ -9,8 +9,8 @@ import { resolveActiveItem } from './resolve-active-item.js'
  * like an inconsistency and is the point: naming a disabled item is a consumer's
  * decision and quietly moving off it would be the component overruling them,
  * while falling back *onto* one is the component choosing, and it should not
- * choose something out of play. All four hand-written copies took `items[0]`
- * either way, so a set opening on a disabled first item showed it as current.
+ * choose something out of play. Taking `items[0]` either way opens a set on a
+ * disabled first item and shows it as current.
  */
 const items = (...spec: (string | [string, 'disabled'])[]) =>
   spec.map((one) => (typeof one === 'string' ? { value: one } : { disabled: true, value: one[0] }))

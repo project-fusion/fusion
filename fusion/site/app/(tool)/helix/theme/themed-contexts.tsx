@@ -2,17 +2,16 @@
  * The words one preview says, which is every string on the page that belongs to
  * a company rather than to a browser.
  *
- * **The copy is a company's, not ours.** The page said things like "every
- * foreground measured against the ground it lands on", which is Fusion's pitch
- * wearing a customer's header: a reader judging a palette should not be reading
- * about the palette. Nothing here refers to theming at all.
+ * **The copy is a company's, not ours.** A line like "every foreground measured
+ * against the ground it lands on" is Fusion's pitch wearing a customer's
+ * header, and a reader judging a palette should not be reading about the
+ * palette. Nothing here refers to theming at all.
  *
- * **And it is one company only until a reader says otherwise.** The page was a
- * freight platform and nothing else, so anyone theming a magazine or a shop
- * read three hundred words about berth windows to find out what their headings
- * would look like. Copy that belongs to somebody else is a tax on every reader
- * it does not describe, and the tax is not small: the hero, the features, the
- * table and the drawer are most of the text on screen.
+ * **And no single company is the page.** Copy that belongs to somebody else is
+ * a tax on every reader it does not describe, and the tax is not small: the
+ * hero, the features, the table and the drawer are most of the text on screen,
+ * so a reader theming a shop would be reading three hundred words about berth
+ * windows to find out what their headings look like.
  *
  * **Separate from the layouts because they are two axes.** A context is who is
  * speaking and a layout is how much page they are speaking on, and the test the
@@ -42,12 +41,11 @@ export interface Context {
   /**
    * What the toolbar of the application layout does.
    *
-   * **A conversion CTA is not an application's action.** The workspace toolbar
-   * carried `hero.primary`, which put "Start reading" above a desk and would
-   * have put "Shop the winter range" above a packing bench: a landing page asks
-   * a stranger to begin, and an application gives somebody already inside it a
-   * verb. One string, and it is the only word the workspace needs that no other
-   * layout does.
+   * **A conversion CTA is not an application's action**, so this is its own
+   * string rather than `hero.primary`, which would put "Shop the winter range"
+   * above a packing bench. A landing page asks a stranger to begin; an
+   * application gives somebody already inside it a verb. It is the only word
+   * the workspace needs that no other layout does.
    */
   action: string
   /** The bar chart: its heading, its accessible table, and the numbers in it. */
@@ -68,7 +66,7 @@ export interface Context {
    * `features` between them; this one is a company writing rather than
    * selling, and there is no sentence in the rest of this bundle that reads
    * that way. `rail` is the label in the margin, which is the layout's whole
-   * organising idea, and `body` is the paragraphs beside it.
+   * organizing idea, and `body` is the paragraphs beside it.
    */
   editorial: {
     contact: string
@@ -150,8 +148,7 @@ export interface Context {
  * publication somebody reads, and a shop somebody buys from. A fourth freight
  * company would cost the same bytes and answer nothing new.
  *
- * The first is the resting one, and it is the freight platform the page has
- * always been, so nothing about the default preview moved.
+ * The first is the resting one.
  */
 export const CONTEXTS: readonly Context[] = [
   {
@@ -724,10 +721,8 @@ export const CONTEXTS: readonly Context[] = [
  * filled polygon.
  *
  * **And each one has to be its own**, which is why this is a switch rather than
- * one drawing reused. Strata's middle band is displaced, which is what a fault
- * does to strata and is the one thing here that could not be any other name's
- * mark. Handing that to a magazine would be a mark that means nothing, which is
- * exactly the failure this file exists to fix, one layer down.
+ * one drawing reused: every mark below says something only its own name could
+ * say, and handing one to another company would be a mark that means nothing.
  *
  * **Drawn rather than fetched.** A few rectangles is markup, not an asset: an
  * SVG file would need loading, sizing and a license to say the same thing, and

@@ -8,9 +8,7 @@
 }
 
 slot[name="icon"]::slotted(*) {
-  /* The `lg` step, not a raw rem. It was the only hard-coded icon size in
-     component CSS and the only icon in the library that did not move with
-     density, with nothing saying why it stood outside. */
+  /* The `lg` step, not a raw rem, so the icon moves with density. */
   --icon-size: var(--helix-size-icon-lg);
 
   color: var(--helix-color-foreground-subtle);
@@ -24,21 +22,20 @@ slot[name="heading"]::slotted(*) {
   margin: var(--helix-space-none);
 }
 
-/* The explanation runs to a measure even though the block is centered: centered
-   text past about 50 characters loses the reader on the return sweep. */
 /* The inherited half on the slot, the rest on what was slotted.
  *
  * `::slotted()` matches elements and nothing else, so a value written as bare
- * text between the tags got none of this. Inherited properties set on a slot
+ * text between the tags gets none of this. Inherited properties set on a slot
  * reach its assigned nodes through the flattened tree, text nodes included;
  * anything that is not inherited has to stay on the element, because a text
- * node has no box to put it on. The blockquote had the same fault and it is
- * the same fix. */
+ * node has no box to put it on. */
 slot:not([name]) {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
 }
 
+/* The explanation runs to a measure even though the block is centered: centered
+   text past about 50 characters loses the reader on the return sweep. */
 slot:not([name])::slotted(*) {
   margin: var(--helix-space-none);
   max-inline-size: 46ch;

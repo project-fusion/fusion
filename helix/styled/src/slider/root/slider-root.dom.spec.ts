@@ -20,12 +20,11 @@ describe('slider', () => {
        host went correct, `:disabled` stopped matching, and the inner control
        kept the attribute for good. Every form control in the library, and
        invisible to anything that only ever disables.
-    
+
        **The callback is invoked here rather than awaited.** happy-dom does not
        implement form-associated disabling, so a spec that only sets `disabled`
-       passes whether or not the bug is present: verified by putting the old
-       one-liner back into the built output, where it still went green. What the
-       UA contributes is this call, so the spec makes it. */
+       passes whether or not the bug is present. What the UA contributes is this
+       call, so the spec makes it. */
     const host = (await mount(
       '<helix-slider label="A" max="1" min="0" step="0.05"></helix-slider>',
     )) as Updatable & { disabled: boolean; formDisabledCallback: (off: boolean) => void }
@@ -70,13 +69,11 @@ describe('slider', () => {
     /* Arithmetic the component can do exactly, where a measurement of the thumb
        would be a guess at where the platform drew it.
 
-       On the control, which is the correction. It was written onto the host's
-       inline style from `updated()`, which made it the one host-attribute write
-       in the library and put it in a hook Lit SSR never calls, so a
-       server-rendered slider shipped with no fill at all until it hydrated. A
-       custom property set in the render inherits into
+       On the control and not the host, and never from `updated()`: Lit SSR
+       never calls that hook, so a server-rendered slider ships with no fill at
+       all until it hydrates. A custom property set in the render inherits into
        `::-webkit-slider-runnable-track` and `::-moz-range-track` just the same,
-       which is why the stylesheet needed no change. */
+       so the stylesheet needs no change. */
     const host = await mount(
       '<helix-slider label="A" max="200" min="0" default-value="50"></helix-slider>',
     )
@@ -124,11 +121,10 @@ describe('slider markers', () => {
 
 describe('slider seeding', () => {
   test('a range with no value starts in the middle and still moves', async () => {
-    /* The seed used to be a write to `value`, which under the controlled shape
-       is how a consumer claims it: every range without a value would have
-       declared itself controlled on its first render and frozen the thumb where
-       it started. It seeds `defaultValue` instead, which is where the markup's
-       intent lives, and "no value given" is a fact about the markup. */
+    /* The seed is a write to `defaultValue`, never to `value`: "no value given"
+       is a fact about the markup, and `defaultValue` is where the markup's
+       intent lives. Seeding `value` would make the element's own midpoint
+       indistinguishable from one a consumer asked for. */
     const host = (await mount(
       '<helix-slider label="Level" max="10" min="0"></helix-slider>',
     )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
@@ -175,15 +171,14 @@ describe('slider bounds', () => {
   })
 
   test('and the fill keeps up with the value rather than trailing a render', async () => {
-    /* The fill was arithmetic on the *control's* value, read inside `render()`,
-       and the `style` binding carrying it commits before the `.value` binding
-       below it. So it read the value the same render was about to replace, and
-       on the first pass it read the seeded midpoint and stayed there.
-
-       Measured on the bench before the fix: host `1`, control `1`, fraction
-       `0.5`. Half a track out, and stable, which is why it read as a drawing
-       bug. A 0-to-1 slider is the cheapest reproduction because the seeded
-       midpoint and the wrong answer are the same number. */
+    /* The fill must be arithmetic on this element's value, never on the
+       *control's*: the `style` binding carrying it commits before the `.value`
+       binding below it, so a read of the control inside `render()` returns the
+       value the same render is about to replace, and on the first pass returns
+       the seeded midpoint and stays there. Measured: host `1`, control `1`,
+       fraction `0.5`. Half a track out, and stable, which is why it reads as a
+       drawing bug. A 0-to-1 slider is the cheapest reproduction because the
+       seeded midpoint and the wrong answer are the same number. */
     const host = (await mount(
       '<helix-slider label="Pointer" max="1" min="0" step="0.05"></helix-slider>',
     )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }

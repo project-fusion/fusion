@@ -139,12 +139,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   /**
    * Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Date Picker already drew and
-   * these two now follow. A flat picker has no room of its own for a sentence:
-   * the field that wraps one owns the label, the hint and the feedback, and a
-   * second message inside the panel would be the same error said twice. What is
-   * left for the picker is the one thing the field cannot draw from outside, the
-   * mark on the answer itself.
+   * A flag rather than a message, the same split Date Picker draws. A flat
+   * picker has no room of its own for a sentence: the field that wraps one owns
+   * the label, the hint and the feedback, and a second message inside the panel
+   * would be the same error said twice. What is left for the picker is the one
+   * thing the field cannot draw from outside, the mark on the answer itself.
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
@@ -213,7 +212,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
-   * **Neither works on wheels and the appearance falls back.** A range on
+   * **Neither works on wheels and the variant falls back.** A range on
    * wheels is two sets of wheels, which is two controls; a multiple is a set,
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
@@ -328,12 +327,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    /* `disabled` meant nothing here beyond dropping the value at submit time,
-       the same gap the calendar had: times still took a click, the keyboard
-       still moved through the list, and nothing said the control was off. The
-       listbox is told as well, which is what grays it and takes it out of the
-       tab order, and this refuses at the source so every path in is covered by
-       one check.
+    /* The listbox is told as well, which is what grays it and takes it out of
+       the tab order, and this refuses at the source so every path in is covered
+       by one check.
        `isDisabled` rather than `disabled`, which is only the half a consumer
        wrote: an ancestor `<fieldset disabled>` is the other half. */
     if (this.isDisabled) {
@@ -501,11 +497,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       this.internals.setValidity({ valueMissing: true }, 'Choose a time.', anchor)
       return
     }
-    /* A value the wheels cannot read is bad input, the same as on the calendar
-       and for the same measured reason: `value="not-a-time"` marked no row,
-       reported `:valid` and was handed to the form. `asTime` rejects the hours
-       and minutes that are shaped right and out of range as well as the ones
-       that are not shaped right at all. */
+    /* A value the wheels cannot read is bad input, the same as on the calendar:
+       `value="not-a-time"` marks no row, and would otherwise report `:valid` and
+       be handed to the form. `asTime` rejects the hours and minutes that are
+       shaped right and out of range as well as the ones that are not shaped
+       right at all. */
     const held = this.held
     if (held.length > 0 && held.some((one) => asTime(one) === null)) {
       this.internals.setValidity(
@@ -522,14 +518,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /**
    * Reports the times to the form, one entry each.
-   *
-   * **This element was form-associated, took a `name`, held a `value` and
-   * reported `valueMissing`, and never called `setFormValue` at all.** So
-   * `<helix-time-picker name="start" required>` refused the submit until a
-   * reader filled it and then submitted nothing, which is the worst shape the
-   * omission takes: every visible signal says the control is participating.
-   * Measured before the fix, one form holding both pickers, both named and
-   * both seeded: the entry list carried the date and no time.
    *
    * `FormData` and one entry per time, which is `DatePicker.report` exactly.
    * `mode="multiple"` is genuinely several answers, and a server reading
@@ -566,9 +554,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * sat at `scrollTop: 0` with the answer nine rows down, which reads as a wheel
    * showing the wrong time rather than as one that failed to scroll.
    *
-   * It survived because the case that was tested was the panel, and whatever
-   * opens a panel calls `reveal` again afterwards for the separate reason the
-   * method documents. Flat on a page there is no panel and no second call.
+   * Whatever opens a panel calls `reveal` again afterwards, for the separate
+   * reason that method documents. Flat on a page there is no panel and no
+   * second call.
    *
    * Safe to run on every update: the listbox stops as soon as the chosen row is
    * within a pixel of center, so a call with nothing to do costs two rect reads
@@ -610,9 +598,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
   }
 
-  /* One wheel, which is a listbox like the whole list is. */
   /**
-   * One wheel.
+   * One wheel, which is a listbox like the whole list is.
+   *
+   * `protected` rather than `private`, which is the whole of what a seam is
+   * here: a tier above has to be able to reach it.
    *
    * `barred` is passed per column rather than read from `disableTimes` here,
    * because a column holds a third of a time and only the caller knows the
@@ -621,8 +611,6 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * barred only when every minute in it is, since one free minute is a reason to
    * open the wheel rather than to close it.
    */
-  /* `protected` rather than `private`, which is the whole of what a seam is
-     here: the method already existed and a tier above could not reach it. */
   protected renderColumn(
     part: 'hour' | 'meridiem' | 'minute',
     label: string,
@@ -700,7 +688,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * The flat list of times, for the appearance that is not wheels, behind a seam the styled tier can move.
+   * The flat list of times, for the variant that is not wheels, behind a seam the styled tier can move.
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it

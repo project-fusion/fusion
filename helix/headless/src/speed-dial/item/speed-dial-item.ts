@@ -73,8 +73,8 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
    *
    * Asked of the document rather than of the shadow root: focus lands on the
    * control inside this element and the platform retargets it, so from outside
-   * `activeElement` already is this element. `Menu.Item` records the same, and
-   * the reading it replaced is one that does not survive happy-dom.
+   * `activeElement` already is this element. `Menu.Item` records the same;
+   * reading it off the shadow root does not survive happy-dom.
    */
   get selected(): boolean {
     return this.ownerDocument.activeElement === this

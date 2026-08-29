@@ -1,12 +1,11 @@
-/**
+/*
  * The measured claims, for the front of the site.
  *
- * **The claims are generated now; the comparison below is still by hand.**
- * `CLAIMS` came from this file until the copy drifted, and is emitted by
- * `bun run gen:metrics` into `claims.generated.ts`. `BUTTON` has not moved yet: it
- * needs the peer numbers, which come from `bun run gen:peers` and a set of
- * libraries installed into `.local`, so it is the same defect one step further
- * from the generator that could fix it.
+ * **`CLAIMS` is generated; the comparison below is still by hand.** `bun run
+ * gen:metrics` emits `claims.generated.ts`. `BUTTON` has not moved yet: it needs
+ * the peer numbers, which come from `bun run gen:peers` and a set of libraries
+ * installed into `.local`, so it is the same defect one step further from the
+ * generator that could fix it.
  *
  * Brotli throughout. Gzip is the honest floor and brotli is what a CDN actually
  * serves, and quoting the larger of the two to look conservative would be
@@ -16,16 +15,15 @@
 /**
  * The measured claims, re-exported from what the build wrote.
  *
- * **They were copied by hand and the copy went stale, exactly as the note here
- * predicted.** The component count read 92 while the build measured 93, printed
- * under a heading that says every number on the page was produced rather than
- * written, and the token layer had moved from 1.9 kB to 2.0. Both were found by
- * comparing the page against `bun run gen:metrics` rather than by anybody noticing.
+ * **Never copy these by hand.** Copied, they drift: 92 components printed
+ * against 93 measured, and a token layer quoted at 1.9 kB after it had moved to
+ * 2.0, both under a heading saying every number on the page was produced rather
+ * than written.
  *
- * `build-metrics.mjs` emits `claims.generated.ts` beside the MDX now and
+ * `build-metrics.mjs` emits `claims.generated.ts` beside the MDX and
  * `check:gen:metrics` judges it, so the front of the site quotes the same run as
  * the docs. Re-exported rather than imported at each call site, so nothing
- * downstream had to change.
+ * downstream has to change.
  */
 export { CLAIMS, type Claim } from './claims.generated'
 

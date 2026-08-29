@@ -1,15 +1,9 @@
 /* The component docs: three columns, a preview, and an API table.
  *
- * Split out of `site.css` because it is one route's styling and nothing else
- * reads it: eighteen classes, used by this layout and the `[family]` page under
- * it and nowhere on the rest of the site. A module rather than another global
- * sheet, so the names are scoped and cannot collide with a future `.docsMain`
- * somewhere else, which is the failure this file's own history argues for: a
- * six hundred line region of the old stylesheet was duplicated once and the
- * later copy silently won every selector in it.
- *
- * `.docsRailList` and `.docsRailLink` did not come with it. They styled a
- * hand-rolled list that `Outline` replaced, and nothing has applied them since.
+ * One route's styling, read by this layout and the `[family]` page under it and
+ * nowhere else on the site. A module rather than another global sheet, so the
+ * names are scoped and cannot collide with a future `.docsMain` somewhere else:
+ * a duplicated selector in a global sheet is won silently by the later copy.
  */
 
 /* ============================================================ docs ======= */
@@ -30,9 +24,9 @@
   --site-inset: var(--helix-space-2xl);
 
   /* Both rails the same width, which is what centers the column between them.
-     They were 15 and 13, so the middle track was two rem off center and the
-     prose inside it inherited the error. Equal is not a coincidence to be
-     maintained by hand: it is one number used twice. */
+     Unequal rails put the middle track off center and the prose inside it
+     inherits the error, so this is one number used twice rather than a
+     coincidence maintained by hand. */
   --docs-rail: 15rem;
 
   /* Where the columns begin, which is also where the rails stick. */
@@ -71,18 +65,11 @@
 
 /* Anything the rail can send a reader to clears the masthead.
  *
- * **A child combinator was the bug.** This read `.docsMain > helix-flex > [id]`
- * and so reached the four top-level sections and not the API entries, which sit
- * one level further in: measured on the Copy Button page, `usage`, `preview`,
- * `api` and `examples` had 80px of margin and `helix-copy-button` and
- * `helix-headless-copy-button` had none. Click Root and the heading landed flush
- * against the top of the window, behind a 57px sticky header, which is a
- * destination a reader cannot see.
- *
- * Every section wrapper the outline targets is a `helix-flex` carrying an `id`,
- * at whichever depth the page nests it, so that is what this asks for. Written
- * as a descendant it cannot miss the next level somebody adds, which is the
- * failure this had. */
+ * **A descendant selector, never a child combinator.** Every section wrapper the
+ * outline targets is a `helix-flex` carrying an `id`, at whichever depth the
+ * page nests it: the API entries sit one level deeper than the four top-level
+ * sections, so `.docsMain > helix-flex > [id]` misses them and their headings
+ * land flush against the top of the window behind the sticky header. */
 .docsMain helix-flex[id] {
   scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
@@ -203,8 +190,6 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
-/* Pushed to the far end, so the tabs stay a group and the action is plainly not
-   one of them. */
 /* The two actions sit together at the far end, so the tabs stay a group and
    what can be done to the file is plainly not one of them. */
 .docsPreviewCopy {
@@ -220,26 +205,26 @@
  * square with the padding taken back off, so the two controls at this end of
  * the bar are the same size and shape.
  *
+ * It serves an anchor and a `<button>` both, which is why `border` and `cursor`
+ * are here: the layout control beside the sandbox link is a button, and a bar
+ * whose two icon controls came from two boxes would drift the first time one was
+ * touched.
+ *
  * **This belongs in `helix/styles` rather than here.** A `data-icon-button`
  * beside `data-button` is one decision for two surfaces, which is the pattern
  * the base layer already uses; this is that decision made in one consumer
- * because the page needed it today. It is worth doing properly the next time an
- * anchor has to be an icon button, which will not be long: the sandbox toolbar
- * and the docs title row both want one. */
-/* Serves an anchor and a button both, which is why `border` and `cursor` are
-   here: the layout control beside the sandbox link is a `<button>`, and a bar
-   whose two icon controls came from two boxes would drift the first time one
-   was touched. */
+ * because the page needed it today. The sandbox toolbar and the docs title row
+ * both want one. */
 .docsPreviewOpen {
   aspect-ratio: 1;
   border: none;
   cursor: pointer;
-  /* The same token the icon button beside it reads, so `data-density` moves
-     both together rather than shrinking one and leaving the other. */
   background-color: transparent;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-grid;
+  /* The same token the icon button beside it reads, so `data-density` moves
+     both together rather than shrinking one and leaving the other. */
   inline-size: var(--helix-size-control);
   padding: var(--helix-space-none);
   place-items: center;
@@ -256,11 +241,6 @@
   color: var(--helix-color-foreground);
 }
 
-/* A property's name, in the library's identifier color rather than the brand's.
- *
- * It was `tone="primary"`, which is the color of a link and of a filled
- * button: the first column of six tables was shouting in the one color the
- * page uses for things a reader can act on, and none of them were. */
 /* The table scrolls sideways rather than colliding with itself.
  *
  * A union member is `nowrap`, so it cannot break, and the Type column's floor
@@ -335,6 +315,9 @@
 }
 
 .apiName {
+  /* The library's identifier color, not the brand's. The brand color is what
+     the page uses for things a reader can act on, and the first column of six
+     tables holds names that do nothing when clicked. */
   color: var(--helix-color-syntax-name);
   /* A property name is one identifier and breaking it is worse than a wider
      column: `defaultValue` came out as `defaultValu` and `e`, which is a name a
@@ -349,19 +332,6 @@
   overflow-wrap: normal;
 }
 
-/* And the type beside it, colored by what each part of it is. The tokens are
-   the library's own, so a type on this page is the color the same word takes
-   in the sandbox's editor. */
-/* A type wraps rather than scrolls.
- *
- * Scrolling kept every row one line tall, and hid the end of any type longer
- * than its column behind a gesture: a reader cannot see that
- * `HelixHeadlessAccordionItem[]` is an array without dragging it. A wrapped type is
- * longer to look at and entirely visible, which is what a reference is for.
- *
- * `break-word` rather than `anywhere`, so a break is taken only when a single
- * token genuinely cannot fit. `anywhere` would split short unions mid-literal
- * while there was still room to put them on the next line whole. */
 /* A default value, which is code and is not a union.
  *
  * It shares the type column's colors and none of its wrapping rules: a literal
@@ -376,6 +346,9 @@
   overflow-wrap: anywhere;
 }
 
+/* The type beside the name, colored by what each part of it is. The tokens are
+   the library's own, so a type on this page is the color the same word takes in
+   the sandbox's editor. */
 .apiType {
   color: var(--helix-color-foreground-subtle);
   display: block;
@@ -388,14 +361,17 @@
    * next column. `min-content` is exactly that floor and asks for nothing more,
    * so a column with only short types stays narrow. */
   min-inline-size: min-content;
+  /* A type wraps rather than scrolls: scrolling keeps every row one line tall
+     and hides the end of anything longer than its column behind a gesture, so a
+     reader cannot see that `HelixHeadlessAccordionItem[]` is an array without
+     dragging it. `break-word` rather than `anywhere`, so a break is taken only
+     when a single token genuinely cannot fit; `anywhere` splits short unions
+     mid-literal while there is still room to put them on the next line whole. */
   overflow-wrap: break-word;
 }
 
 /* A union wraps between its members and never inside one, so the bar is always
-   at the start of a line rather than wherever the previous line ran out. It was
-   loose text between tokens: a four-member union came out as four lines each
-   trailing its own `|`, and a twelve-member one had the bar leading some lines
-   and trailing others, which reads as two different lists in one cell. */
+   at the start of a line rather than wherever the previous line ran out. */
 .apiTypeMember {
   /* Unbreakable, so the only break a union can take is between its members and
      the bar therefore starts a line rather than ending one.
@@ -416,9 +392,9 @@
      them, so text alone would run the bar into the value before it. That is
      also what keeps a bar with its member, since a margin is not a break
      opportunity and a space would be.
-     `2xs` on both sides. It was `0.35em`, which scales with the code type and
-     which `check:css:tokens` refused, correctly: the type column is one size, so
-     there is nothing for an em to track that a token does not. */
+     `2xs` rather than an em: `check:css:tokens` refuses a raw value here, and
+     the type column is one size, so there is nothing for an em to track that a
+     token does not. */
   margin-inline: var(--helix-space-2xs);
   opacity: 0.6;
 }
@@ -456,11 +432,10 @@
 
 /* Sticky where they already are, so nothing moves when the page does.
  *
- * The offset was `header + space-md`, a guess, while the rails actually rest at
- * `header + the shell's own top padding`. Measured: resting at 105 and sticking
- * at 72, so the first scroll of the page yanked both rails up 33px and they
- * never returned. A sticky offset that does not match the resting position is
- * a jump on the first pixel of scroll.
+ * A sticky offset that does not match the resting position is a jump on the
+ * first pixel of scroll. The rails rest at `header + the shell's own top
+ * padding`, and an offset of `header + space-md` measured 105 resting against 72
+ * stuck, so the first scroll yanked both rails up 33px and they never returned.
  *
  * `--docs-top` is that one number, used by the padding and by the offset, so
  * the two cannot drift apart again. No taller than what is left of the viewport

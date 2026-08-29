@@ -172,10 +172,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * **Activation takes a tooltip down, because a hint about what a control will
    * do is spent once the control has done it.** That is right for a gear that
    * opens a drawer and wrong for a control whose tooltip *becomes* the answer:
-   * `CopyButton` swaps its content from Copy to Copied on the same click, so the
-   * bubble was being hidden at the exact moment it had something to say. What a
-   * reader saw was a flash, and the confirmation the component had carefully
-   * written was never on screen long enough to read.
+   * `CopyButton` swaps its content from Copy to Copied on the same click, so
+   * the bubble would be hidden at the exact moment it has something to say and
+   * the confirmation would never be on screen long enough to read.
    *
    * So this is not "keep it open", it is "the hint is not spent": set it where
    * the words change to describe what just happened, and leave it alone
@@ -207,11 +206,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   /**
    * What is currently keeping the bubble up.
    *
-   * The pointer and focus are two holders and they shared one timer with
-   * nothing counting them, so whichever left last won: moving the pointer off a
-   * control that still had keyboard focus scheduled a hide and took the bubble
-   * away from under the reader. The same fault the toast timer had, and the
-   * same answer.
+   * The pointer and focus are two holders, so a single timer with nothing
+   * counting them hides on whichever leaves last: moving the pointer off a
+   * control that still has keyboard focus would take the bubble away from under
+   * the reader. Same shape as the toast timer, and the same answer.
    */
   private readonly holds = new Set<'focus' | 'pointer'>()
 
@@ -231,11 +229,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     if (named) {
       return named
     }
-    /* Through the util, which was written from a measurement of this component
-       and then not used by it. Its extra is the descent: the first assigned
-       element may itself draw nothing, and an icon button wrapped in a
-       `display: contents` span was the case that took the bubble to the corner
-       of the window. */
+    /* Through the util, whose extra is the descent: the first assigned element
+       may itself draw nothing, and an icon button wrapped in a
+       `display: contents` span takes the bubble to the corner of the window. */
     return anchorElement(this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])'), this)
   }
 
@@ -268,15 +264,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     return root.getElementById?.(this.for) ?? null
   }
 
-  /* One controller rather than the pair this was: a `FloatingController` beside
-     hand-written `showPopover`/`hidePopover` calls, which is exactly the
-     composition `PopoverController` exists to own. Its own documentation named
-     the controller it was not using.
-   *
-   * The boundary is the host and not the bubble, for the reason `Popover` gives:
-   * the host is `display: contents`, so a press on the trigger is inside the
-   * host and outside the bubble, and a boundary of the bubble alone would treat
-   * the press that opened it as a press outside. */
+  /* The boundary is the host and not the bubble, for the reason `Popover` gives:
+     the host is `display: contents`, so a press on the trigger is inside the
+     host and outside the bubble, and a boundary of the bubble alone would treat
+     the press that opened it as a press outside. */
   private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
     arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
@@ -353,12 +344,11 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       }
       /* A wrapper is empty when it holds nothing; anything else draws.
        *
-       * The test was children-or-text for every element, which reads as careful
-       * and refused the exact case this getter's own paragraph calls the whole
-       * point of slotting. `<helix-icon slot="content">` has no children and no
-       * text, so `hasContent` was false, `show()` returned early, and a tooltip
-       * whose bubble is an icon could not be opened at all. Measured in a
-       * browser: `open` stayed false through a direct `show()`.
+       * Not children-or-text for every element, which reads as careful and
+       * refuses the exact case this getter's own paragraph calls the whole
+       * point of slotting: `<helix-icon slot="content">` has no children and no
+       * text, so `hasContent` would be false, `show()` would return early, and
+       * a tooltip whose bubble is an icon could not be opened at all.
        *
        * The spec beside this one is the other half, and it is why the answer is
        * not simply "an element is content": `<span slot="content">   </span>`
@@ -453,15 +443,11 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * Focus opens the bubble, but only the kind of focus a reader chose.
    *
    * **A mouse press focuses the button it pressed**, so an unconditional focus
-   * hold meant that after any click the bubble was held up by a reader who was
-   * not asking for it: moving the pointer away released the pointer hold, found
-   * a focus hold still set, and left the tooltip on screen until something else
-   * blurred the control.
-   *
-   * It never showed until `persist` arrived, because activation used to clear
-   * every hold and hide, so the click path threw the stale hold away before
-   * anyone could see it. A tooltip that survives its own activation is the first
-   * one to hold that focus long enough to matter.
+   * hold leaves the bubble up after any click for a reader who was not asking
+   * for it: moving the pointer away releases the pointer hold, finds a focus
+   * hold still set, and leaves the tooltip on screen until something else blurs
+   * the control. `persist` is what makes that reachable, activation otherwise
+   * clearing every hold before anyone can see it.
    *
    * `:focus-visible` is the platform's own answer to "did they mean it", and a
    * button does not match it on a mouse press. Keyboard focus still opens with no
@@ -491,14 +477,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * Activating the trigger closes the bubble, which nothing was doing.
+   * Activating the trigger closes the bubble.
    *
    * A tooltip is a hint about what a control will do, and once the control has
-   * been used the hint is spent. Nothing else was going to take it down either:
+   * been used the hint is spent. Nothing else takes it down either:
    * `pointerleave` cannot fire while the pointer is still on the button it just
    * pressed, and `focusout` does not fire when activation leaves focus where it
-   * was. So a gear that opened a drawer left its own label floating over the
-   * drawer until the reader moved the mouse away.
+   * was. Without this, a gear that opened a drawer leaves its own label
+   * floating over the drawer until the reader moves the mouse away.
    *
    * `click` rather than `pointerdown`, because it is the one event both a mouse
    * and a keyboard produce: Enter and Space on a focused button raise it, and a
@@ -525,11 +511,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   /**
    * Escape closes the bubble from wherever the reader is.
    *
-   * On the document, not on the host, which is where it was: a tooltip opened
-   * by hover has focus somewhere else entirely, so the press never reached this
-   * element and Escape worked only for the one case that needed it least. That
-   * is the case the pattern names, a reader escaping a tooltip obscuring what
-   * is under it, and it was the case that did nothing.
+   * On the document, not on the host: a tooltip opened by hover has focus
+   * somewhere else entirely, so a press never reaches this element and Escape
+   * would work for everything except the case the pattern is named for, a
+   * reader escaping a tooltip obscuring what is under it.
    *
    * Not stopped from propagating: a tooltip is not what the reader was trying
    * to escape if it sits inside something else that also closes.
@@ -601,7 +586,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    *
    * On first open rather than on connect, because a framework may render the
    * attribute after this element upgrades, and because a tooltip that never
-   * opens has described nothing eitherway.
+   * opens has described nothing either way.
    *
    * Either attribute counts. WebAwesome uses `aria-labelledby` over
    * `aria-describedby` on purpose, their reasoning being that some screen

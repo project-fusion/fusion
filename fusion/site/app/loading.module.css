@@ -38,13 +38,12 @@
 }
 
 /**
- * Held back twice as long, because the wait it was reporting had ended.
+ * The fallback, held back past the loads that do not need announcing.
  *
- * The delay was `--helix-duration-slow`, 320ms. A page that streams in around
- * half a second cleared that, so the loader faded in and was gone again inside
- * a few frames: a black wordmark appearing and vanishing on a white ground,
- * which reads as a flash rather than as a wait. Doubling the delay puts it past
- * the loads that do not need announcing and leaves it for the ones that do.
+ * At `--helix-duration-slow` alone, 320ms, a page that streams in around half a
+ * second cleared the delay, so the loader faded in and was gone again inside a
+ * few frames: a black wordmark appearing and vanishing on a white ground, which
+ * reads as a flash rather than as a wait.
  *
  * Derived from the token rather than typed as 640ms, so it still moves with the
  * scale if the scale moves.

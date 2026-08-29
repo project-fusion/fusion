@@ -31,11 +31,7 @@
      start on one line down the panel. A group label indented differently from
      its own group reads as belonging to something else.
 
-     `xs`, which is what the rows actually use. This said `sm` and claimed to
-     match them, and it did until the option was moved to `xs` to line up with
-     the select's trigger: the claim stayed and the number did not follow, so a
-     heading sat four pixels right of every option it named. Measured at 13
-     against 9. Two stylesheets naming one inset is what let them drift, and
-     the comment is why it went unnoticed. */
+     `xs`, which is what the rows use. Two stylesheets naming one inset is what
+     lets them drift apart unnoticed. */
   padding-inline: var(--option-padding, var(--helix-space-xs));
 }

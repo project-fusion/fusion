@@ -11,11 +11,9 @@ import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-ma
  * The theme builder.
  *
  * **The engine's first real consumer**, which is most of why it exists here
- * rather than as a demo somewhere. `@fusion.dev/helix-theme` had no consumer in this
- * repository at all: `toCss` was called by nothing, and the one page that
- * themed anything wrote a private primitive by hand to do it. An API nobody has
- * used is an API nobody has tested, and the Rust port in #142 would have frozen
- * whatever shape it happened to have.
+ * rather than as a demo somewhere. An API nobody has used is an API nobody has
+ * tested, and the Rust port in #142 would freeze whatever shape
+ * `@fusion.dev/helix-theme` happened to have.
  *
  * A tool rather than a page in `(site)`, for the reason `SandboxLayout` already
  * gives: every row of chrome around it is a row taken from the thing being
@@ -66,17 +64,14 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
 
   /* **The preview's markup is a generated string, not a DOM read-back.**
 
-     The builder used to render `<ThemedPage />` into a hidden holder and take
-     its `innerHTML`. That works exactly once, on a cold load, and silently
-     loses half the page on a client navigation: React assigns to an element's
-     *property* when the property exists, and on a soft navigation the Helix
-     definitions are already registered, so `name` and `command` were set on
+     Rendering `<ThemedPage />` into a hidden holder and reading its `innerHTML`
+     is the obvious alternative, and it works exactly once, on a cold load. On a
+     client navigation it silently loses half the page: React assigns to an
+     element's *property* when the property exists, and on a soft navigation the
+     Helix definitions are already registered, so `name` and `command` are set on
      accessors rather than written as attributes. Lit reflects neither, so
-     `innerHTML` could not see them. Measured on the same button: a cold load
-     serialised `arrow-right` twice and a navigation zero times, and the hero's
-     trigger arrived in the frame as `<helix-button commandfor="walkthrough">`
-     with no `command` at all, which is a missing arrow and a dialog that does
-     nothing.
+     `innerHTML` cannot see them, and the hero's trigger reaches the frame as
+     `<helix-button commandfor="walkthrough">` with no `command` at all.
 
      A string cannot have that problem, because there is no DOM in between: JSX
      props become attributes and the frame receives what was written. It is also
@@ -88,21 +83,22 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
      is not exported there: Next refuses the import outright. `check:gen:themed-page`
      holds the strings and the JSX to each other.
 
-     **Nine of them, on two axes.** A context is whose page it is, because a
-     reader theming a magazine should not be reading about berth windows to find
-     out what their headings will look like; a layout is how much page there is,
-     because a palette that holds on a dense dashboard can be washed out on a
-     landing page with four things on it. The two are independent, which is the
-     area rules' own test for whether something is one question or two.
+     **Sixteen of them, on two axes of four.** A context is whose page it is,
+     because a reader theming a magazine should not be reading about berth
+     windows to find out what their headings will look like; a layout is how
+     much page there is, because a palette that holds on a dense dashboard can
+     be washed out on a landing page with four things on it. The two are
+     independent, which is the area rules' own test for whether something is one
+     question or two.
 
      The lists carry their own labels for the same reason they carry their own
      markup: the builder is a client component, and importing the layouts to
-     read three labels would send three unrendered pages to the browser. */
+     read four labels would send four unrendered pages to the browser. */
 
-  /* **The default theme, derived before anything renders.** The engine used to
-     be synchronous JavaScript and did this without being asked, which is what
-     put a real palette in the builder's first paint; it is WebAssembly now, so
-     the server has to do it deliberately. The intent is whatever the link
+  /* **The default theme, derived before anything renders.** The engine is
+     WebAssembly, so nothing derives a palette by accident and the server has to
+     do it deliberately or the builder's first paint has none. The intent is
+     whatever the link
      described, defaulting to the one in `defaults`, which is also what the
      builder's sliders start at, so the palette that arrives in the HTML is the
      palette the browser would derive a moment later rather than a stand-in for

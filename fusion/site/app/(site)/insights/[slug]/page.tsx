@@ -38,16 +38,16 @@ export async function generateMetadata({
  *
  * **The head is three tiers and they are ordered by what a reader needs first.**
  * The way out, then what the piece is, then who wrote it and how long it takes.
- * It used to be one undifferentiated row of four chips: topic, kind, date and
- * minutes all at the same weight, so nothing in it was answering a question
- * anyone had. Filing labels belong above the title, the byline belongs under it
- * with the title between them, and the way back belongs at the very top where a
- * reader's hand already is, as a trail rather than an arrow.
+ * One undifferentiated row of chips holds topic, kind, date and minutes at the
+ * same weight, where none of them answers a question anyone had. Filing labels
+ * belong above the title, the byline belongs under it with the title between
+ * them, and the way back belongs at the very top where a reader's hand already
+ * is, as a trail rather than an arrow.
  *
- * Left, and the prose with it. Centered was the old arrangement, on the argument
- * that a centered measure is a column the eye can find, and that holds while the
- * column is narrow. At 90ch it stops: a centered head starts in a different place
- * from every line beneath it, so the reader keeps two left edges instead of one.
+ * Left, and the prose with it. A centered measure is a column the eye can find
+ * while the column is narrow, and at 90ch it stops: a centered head starts in a
+ * different place from every line beneath it, so the reader keeps two left edges
+ * instead of one.
  *
  * `align` and not only `text-align`. This is a flex column, so its children are
  * placed as items rather than flowed as text: with `align="center"` the title,
@@ -122,12 +122,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <>
           {/* One metadata line, and every fact on it is a tag.
 
-                It was text with hairlines between it and two chips on the end,
-                which made one row out of two vocabularies: the same kind of fact,
-                the byline and the filing, drawn as two different kinds of object.
-                As tags they are one set, and the dividers go with the change,
-                because a chip already has an edge and a rule between two of them is
-                a third boundary in a row that only has two.
+                The byline and the filing are the same kind of fact, so drawing
+                them as text with hairlines beside chips makes one row out of two
+                vocabularies. As tags they are one set, and there are no dividers,
+                because a chip already has an edge and a rule between two of them
+                is a third boundary in a row that only has two.
 
                 `outlined` for the facts about this post, which is the appearance
                 `Tag` documents for exactly this case: a dense set of them filled
@@ -164,11 +163,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                 gallery wants it before they want the filing labels.
 
                 **A control, not a crumb.** A trail's separators point forward, into
-                a hierarchy, and this step points out of one, so the single crumb it
-                was built from spent the component on a shape it does not have. The
-                heights say the same thing: a crumb link measures 28 and every
-                control measures 40, so the moment anything sits beside this (a
-                share, a subscribe) the row steps around it.
+                a hierarchy, and this step points out of one, so a single crumb
+                spends the component on a shape it does not have. The heights say
+                the same thing: a crumb link measures 28 and every control measures
+                40, so the moment anything sits beside this (a share, a subscribe)
+                the row steps around it.
 
                 The recipe carries all of it. `[data-button]` is `inline-flex`,
                 centered, with a gap for the icon and a hover wash, so the chevron is

@@ -9,21 +9,6 @@
  * and the surface fill to Insights, and both are in their own modules.
  */
 
-/* =================================================== component art ======= */
-
-/* A family's whole card is one link to its API page.
- *
- * `data-card` in the base layer does the looking-like-a-link-around-a-card
- * part: the radius, the hover lift, the focus ring tracing the card's own
- * corner. What it cannot know is that this particular link is a grid item, and
- * that the row wants square bottoms.
- *
- * Both halves are needed. The anchor stretches because `helix-grid` stretches
- * its items, and the card then has to be told to fill the anchor, because a
- * card sizes to its content and would otherwise leave the link standing empty
- * below it. Neither declaration does anything outside a stretched context:
- * against an auto-height parent a `100%` block-size resolves to `auto`, which
- * is why this is safe to state unconditionally rather than only in the grid. */
 /* ====================================================== design hero ===== */
 
 /* The gallery lines up with the masthead, not with the prose column.
@@ -35,19 +20,14 @@
  * bar looking loosely packed. A grid of sixty-five cards is the same kind of
  * thing: it is furniture running the width of the window, not a paragraph.
  *
- * Measured before this, at 1600: the wordmark sat at 48 and the first card at
- * 96, so the two edges a reader sees stacked down the left of the page
- * disagreed by 48 pixels. They now both read `space-2xl`, at every width, which
- * is the same declaration the header makes rather than a number copied from it.
- *
  * Set as the variable rather than as `padding-inline`, because `.shell` and
  * `.pageHeroInner` already read it. Overriding the input leaves one rule
  * deciding the inset instead of three restating it.
  *
- * `--site-chrome-inset` and not `space-2xl` directly, because the masthead
- * stopped being 48 on a phone and this stayed, which put the wordmark at 16 and
- * the first card at 48. The alignment above is the point and the number is not;
- * `site.css` holds the number for both. */
+ * `--site-chrome-inset` and not `space-2xl` directly: the masthead is 16 on a
+ * phone and 48 on a wide screen, so a literal token here puts the wordmark and
+ * the first card on different edges. The alignment is the point and the number
+ * is not; `site.css` holds the number for both. */
 .pageHero,
 .filterBar,
 .gridBand {
@@ -70,15 +50,7 @@
  * It replaces the shared `VerticalPage` header on the two gallery routes. The
  * three prose verticals keep the left-aligned title, because they are pages of
  * text and this is the front of a gallery: the search is the reason to center
- * it, and a centered column with nothing to type into is just a wide heading.
- *
- * **Shared, because two galleries now wear it.** `/helix` and `/insights` are
- * the same page shape, a hero over a filter bar over a grid, and the part that
- * makes the hero run up behind the sticky masthead is structure rather than
- * decoration. What stays Design's is the lattice and the shines in the rule
- * below, which are a fact about a page whose cards are drawn on that same
- * field. Insights has no drawings, so it takes the structure and none of the
- * texture. */
+ * it, and a centered column with nothing to type into is just a wide heading. */
 .pageHero {
   align-items: center;
   background-color: var(--helix-color-background);
@@ -105,17 +77,8 @@
   padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
 }
 
-/* **The lattice belongs to both galleries now.** *Moved out of `gallery.module.css`
-   on 25 Aug 2026, and the note this replaces said Insights should not have it.*
-   The reasoning there was that the field is "a fact about a page whose cards are
-   drawn on that same field", which is true of the cards and was extended to the
-   hero without anything to support it: a hero is the top of a page rather than a
-   caption for the grid under it, and `.pageHero` has carried `isolation` and
-   `position: relative` for this pseudo-element the whole time.
-  
-   Insights' own stylesheet had already written the argument for it and never the
-   rule, describing a lattice that has never existed on that page. Three comments
-   disagreed; this is the one that is now true. */
+/* The lattice belongs to both galleries: a hero is the top of a page rather
+   than a caption for the grid under it. */
 
 .pageHero::before {
   background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
@@ -172,18 +135,12 @@
  * component's own sheet has to answer the preference because `*` cannot cross a
  * shadow boundary; nothing here is behind one. */
 
-/* **The keyframes live here, beside the only rule that reads them.** *Moved out
-   of `site.css` on 25 Aug 2026, where they had never once run.* A CSS module
-   scopes an animation name, so `animation: siteHeroShine` in a module resolved
-   to `browser-module__…__siteHeroShine` while the `@keyframes` sat unscoped in a
-   global sheet: two names that could not meet. Measured in Chrome,
-   `getAnimations()` on a shine returned an empty array and the computed opacity
-   stayed at its resting 0, which is exactly what an unlit field looks like, so
-   nothing about it read as broken.
-  
-   It was written that way from the start and moving the rule between modules
-   carried it across unchanged. Defined in the same module as the rule, the two
-   names are scoped together and match by construction. */
+/* **The keyframes must stay in this module, beside the only rule that reads
+   them.** A CSS module scopes an animation name, so `animation: siteHeroShine`
+   here resolves to `browser-module__…__siteHeroShine` while an `@keyframes` in
+   a global sheet stays unscoped: two names that cannot meet. It fails silently,
+   `getAnimations()` returning an empty array and the opacity staying at its
+   resting 0, which is exactly what an unlit field looks like. */
 
 /* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and
  `scale: 1`. A `from` that differed from rest would make every one of these
@@ -282,23 +239,13 @@
  * anyone reading the screen, and the filter's toggles say what they are.
  *
  * A class rather than an element selector, so this is a decision taken per
- * control. A form on this site should still show its labels. */
-/* No background rule here, and there was one.
+ * control. A form on this site should still show its labels.
  *
- * It set the field to the page's color because `Input` filled with
- * `--helix-color-surface-sunken`, one step *below the page*, and this search
- * sits on a band one step above it: the control came out a single value from
- * what it sits on and stopped reading as a field. 154 fixed that at the source.
- * `Input` fills with `--helix-color-well` now, a percentage of the foreground
- * mixed toward transparent, which is a step away from whatever is behind it, so
- * the field reads on this band with nothing written here.
- *
- * The rule survived the fix for a sentence, on the argument that the page's own
- * color is a hole cut *through* the band where the well is a recess *in* it.
- * That is true and it was not the reason the rule existed. A consumer override
- * kept for a look nobody asked for is how a site stops demonstrating the system
- * it is built from, and the site is the first thing that would have to be right
- * if the default were still wrong. */
+ * No background override, deliberately. `Input` fills with
+ * `--helix-color-well`, a percentage of the foreground mixed toward
+ * transparent, so it is a step away from whatever is behind it and reads on
+ * this band unaided. A consumer override here is how a site stops
+ * demonstrating the system it is built from. */
 
 .chromeControl::part(label) {
   block-size: 1px;
@@ -383,13 +330,10 @@
   white-space: nowrap;
 }
 
-/* Air around the grid, on both block sides.
- *
- * It sat flush against the filter bar's own hairline above and the footer
- * below, so the first row read as another row of the bar and the last had
- * nothing under it. `space-2xl` is the same 48 the grid uses between its own
- * cards, which is what makes the band read as one field of cards rather than as
- * a grid that happens to start somewhere. */
+/* Air around the grid, on both block sides. `space-2xl` is the same 48 the grid
+ * uses between its own cards, which is what makes the band read as one field of
+ * cards rather than as a grid that happens to start somewhere. Flush, the first
+ * row reads as another row of the filter bar. */
 .gridBand {
   padding-block: var(--helix-space-2xl);
 }

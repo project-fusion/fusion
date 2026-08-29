@@ -1,11 +1,9 @@
 /* The preview document's own layout, which travels with the document.
  *
- * These lived in the site's stylesheet while the frame was a route, and stayed
- * there when it became a static file: the frame loaded the style layers and the
- * component library and none of this, so `data-layout="padded"` set an
- * attribute that nothing read. Measured: a badge on an icon sat five pixels
- * above the viewport and was clipped, because the padding meant to hold it was
- * not there.
+ * The frame is a static file, not a route: it loads the style layers and the
+ * component library and nothing of the site's own stylesheet. A rule for it
+ * written there leaves `data-layout="padded"` setting an attribute that nothing
+ * reads.
  */
 
 /**
@@ -31,16 +29,15 @@
 
 /* Centered: a block box with a measure, centered in the frame.
  *
- * **Three layouts have been tried here and each fixed the last one's fault.**
- * Flex centered the example's *children* along the inline axis, so `tour/nested`
- * came out as three controls on one line with the odd one dropped, and every
- * example separating blocks with a `margin-block-end` was wrong in this mode
- * alone. A single-column grid fixed that by stacking children the way the
- * document would, and introduced the opposite fault: every top-level child
- * became its own row, so the Icon example's seven inline glyphs stacked into a
- * vertical line, and the column track was sized to content, so a block element
- * with nothing intrinsic to be wide about collapsed. Measured: Divider came out
- * 0 by 1 and Progress 0 by 8, which is a preview of nothing.
+ * **Neither flex nor grid here, and both look right until they are measured.**
+ * Flex centers the example's *children* along the inline axis, so `tour/nested`
+ * comes out as three controls on one line with the odd one dropped, and every
+ * example separating blocks with a `margin-block-end` is wrong in this mode
+ * alone. A single-column grid makes every top-level child its own row, so the
+ * Icon example's seven inline glyphs stack into a vertical line, and its
+ * content-sized track collapses a block element with nothing intrinsic to be
+ * wide about: Divider comes out 0 by 1 and Progress 0 by 8, which is a preview
+ * of nothing.
  *
  * Normal flow is what both were reaching for. A block box lays its children out
  * exactly as the document would, so seven inline icons are a row and two

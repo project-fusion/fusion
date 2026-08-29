@@ -25,11 +25,10 @@ export interface Destination {
    * since the division of the product is the argument; letting one be pressed
    * would be the part that lied.
    *
-   * **The stage rather than "Coming soon", which said one thing three times.**
-   * `AGENTS.md` keeps the vocabulary honest and says never to soften it, and the
-   * Cortex page two clicks away already reports Engram and Trace as Building and
-   * Recall as Declared. A menu calling all three the same thing is the softening
-   * that rule exists to refuse, and it disagreed with the page besides.
+   * **The real stage, never a softer word standing in for it.** `AGENTS.md`
+   * says never to soften these, and the Cortex page two clicks away reports
+   * Engram and Trace as Building and Recall as Declared. A menu calling all
+   * three the same thing disagrees with the page as well as with the rule.
    */
   stage?: 'Building' | 'Declared'
   /**
@@ -82,18 +81,16 @@ export interface Product {
   /**
    * The product's own mark, from `helix/icons`.
    *
-   * One mark per column and none on the rows beneath it. Rows carried Phosphor
-   * glyphs before, and three instruments stacked under a fourth mark read as a
-   * panel of icons rather than a panel of destinations: the marks stopped
-   * meaning anything the moment everything had one. The base layer already
+   * One mark per column and none on the rows beneath it: three glyphs stacked
+   * under a fourth mark read as a panel of icons rather than a panel of
+   * destinations, and a mark on everything means nothing. The base layer already
    * expects this, and its row grid keeps the mark's column at `auto`, so a row
    * with nothing in it starts where the heading does.
    *
-   * These are the first bespoke product marks to ship. `5534894c` removed three
-   * earlier attempts because each was a pictogram of the product's metaphor
-   * standing beside a parent that is a geometric monogram. These are monograms
-   * in the parent's construction: one rounded body with material removed, two
-   * notches for Helix and one slot for Cortex.
+   * Monograms in the parent's construction: one rounded body with material
+   * removed, two notches for Helix and one slot for Cortex. A pictogram of the
+   * product's metaphor is the shape to avoid, since the parent it stands beside
+   * is a geometric monogram.
    *
    * **A tile, and the letter is painted rather than cut out.** A mask would
    * make it a real hole, which is the same thing only while the mark sits on
@@ -105,9 +102,9 @@ export interface Product {
    * `--logo-color-knockout`, each falling back to what the wordmark uses, which
    * is why the panel can render these as a near-black tile on a light ground
    * and a near-white one on a dark ground without a second asset: `site.css`
-   * sets the three hooks and the drawing never moves. A monotone variant taking `currentColor` was built first and
-   * is the wrong shape of solution, because it answers in the drawing a
-   * question the hooks already answer in the stylesheet.
+   * sets the three hooks and the drawing never moves. A monotone variant taking
+   * `currentColor` is the wrong shape of solution, because it answers in the
+   * drawing a question the hooks already answer in the stylesheet.
    *
    * The tile carries its own padding, so its letter is 58% of its box, which is
    * why `site.css` sizes it `icon-md` where the base layer says `icon-sm`: a
@@ -144,10 +141,9 @@ export interface Product {
  * count tidy would be softening them by omission, which is the one thing the
  * stage labels exist to prevent.
  *
- * Cortex carries one destination and Helix carries four, and the asymmetry is
- * the honest reporting rather than a gap to fill. Engram, Trace and Recall are
- * named in `AGENTS.md` and none of them is built, so none of them is a row
- * here. The day one is, it is a row.
+ * Engram, Trace and Recall are rows carrying their stage rather than a link,
+ * because the division of Cortex is the argument even before the modules are
+ * built. A row gains an `href` on the day it has somewhere to go.
  */
 export const PRODUCTS: Product[] = [
   {
@@ -163,13 +159,8 @@ export const PRODUCTS: Product[] = [
          masthead would be the last place still pointing at the old front page
          the day the order changes.
 
-         **`Docs` rather than `Guides`.** It was `Guides` while the docs sidebar
-         had no Components section and the destination reached only the prose
-         half. The sidebar carries both now, so the name can be the true one.
-
-         **Components keeps a row of its own, beside it rather than inside it.**
-         It was removed when the sidebar learned to carry both, on the reasoning
-         that one navigation should be one destination. That is a fact about the
+         **Components keeps a row of its own, beside Docs rather than inside
+         it.** The docs sidebar carries both, but that is a fact about the
          sidebar and not about what a reader arrives wanting: an alphabetical
          list of every family is the single most asked-for thing here, and
          putting it one level down behind a word that does not say "components"

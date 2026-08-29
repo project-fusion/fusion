@@ -14,7 +14,7 @@ import type { CSSProperties, ReactNode } from 'react'
  *   checkbox 20, badge 16, switch 24 by 42, icon 20, header 56, track 4.
  * - **Radii are 4, 8 and 12.** The seed is `0.5rem`, so that is the ladder.
  * - **Every color is a semantic token**, through the `art*` classes in
- *   `site.css`. A floating panel is `surface-overlay`, a dimmed page is
+ *   `gallery.css`. A floating panel is `surface-overlay`, a dimmed page is
  *   `overlay`, a tooltip is `surface-inverse`. Ink is the one exception and
  *   stays a percentage of `foreground`, at 0.12, 0.28 or 0.55. Three steps, and
  *   a fourth is a sign the shape wanted a surface token instead.
@@ -35,29 +35,26 @@ import type { CSSProperties, ReactNode } from 'react'
  *   drawing their outline twice, once in shadow and once in hairline, and a
  *   hairline on a floating panel is the one thing that stops it floating.
  * - **A drawing depicts what the component is, not what the treatment suggests.**
- *   Four of these were rebuilt after drifting into other people's illustrations:
- *   a node graph is not a Tree, browser chrome is not an App Header.
+ *   A node graph is not a Tree, and browser chrome is not an App Header.
  * - **One motion archetype per card**, opted into by class, and **nothing moves
- *   at rest**. Skeleton and Spinner were the exception on the grounds that
- *   their motion *is* the component; in a grid of ninety-four still cards two
- *   that move on their own read as the only two that are broken. Both are
- *   recognisable frozen, so both wait for hover like everything else.
+ *   at rest**. Skeleton and Spinner are the tempting exception, their motion
+ *   *being* the component; in a grid of ninety-four still cards two that move
+ *   on their own read as the only two that are broken. Both are recognizable
+ *   frozen, so both wait for hover like everything else.
  */
 export const coreArt: Record<string, ReactNode> = {
   /**
    * Items flush against each other, one hairline between neighbors, and a
    * disclosure indicator on every header.
    *
-   * The indicators are the whole fix. Without them this was a stack of text
-   * rows separated by rules, which is `list` exactly: same vocabulary, same
-   * construction, and the only difference was that one row here had a fainter
-   * line under it. What makes an accordion an accordion is that each row says
-   * whether it is open, so the chevrons are not decoration on this card, they
-   * are the subject. Two point right, the open one points down.
+   * The indicators are what separates this from `list`, which is otherwise the
+   * same vocabulary and the same construction. What makes an accordion an
+   * accordion is that each row says whether it is open, so the chevrons are the
+   * subject here rather than decoration: two point right, the open one points
+   * down.
    *
    * The panel settles open from the header rather than sliding in from the
-   * side. `artRow` was doing the work before, which is a horizontal move for a
-   * component whose entire motion is vertical.
+   * side, an accordion's entire motion being vertical.
    */
   accordion: (
     <>
@@ -88,22 +85,19 @@ export const coreArt: Record<string, ReactNode> = {
   /**
    * A 16 pixel mark pinned at 45 degrees, held off by a ring of the page.
    *
-   * The thing it is pinned to is 56 across, not 80. At 80 the target was the
-   * largest object in the gallery and the drawing read as "a big circle, with a
-   * dot", which is the wrong subject: the mark is the component and the target
-   * is only there to be marked. Smaller also keeps it clear of Avatar, which is
-   * the other card in the set that is a plain circle.
+   * The thing it is pinned to is 56 across, not 80. At 80 it is the largest
+   * object in the gallery and the drawing reads as "a big circle, with a dot",
+   * which is the wrong subject: the mark is the component and the target is
+   * only there to be marked. Smaller also keeps it clear of Avatar, the other
+   * card in the set that is a plain circle.
    */
   badge: (
     <>
       <circle className="artSunken" cx="160" cy="100" r="28" />
       <circle className="artPage" cx="180" cy="80" r="12" />
-      {/* The mark presses. It carried no motion class on the argument that a
-          badge's mark is not a state it toggles into, which was right about the
-          old `artMark`: that one faded up from nothing, and a mark appearing is
-          exactly the claim a badge should not make. `artMark` is a press now,
-          from full size back to full size, so it says "this one" without ever
-          saying "this just arrived". */}
+      {/* The mark presses rather than fading up: `artMark` runs from full size
+          back to full size, so it says "this one" without ever saying "this
+          just arrived", which is a claim a badge must not make. */}
       <circle className="artSolid artMotion artMark" cx="180" cy="80" r="8" />
     </>
   ),
@@ -125,17 +119,13 @@ export const coreArt: Record<string, ReactNode> = {
    * One card, and what a card holds: media, a heading, a line about it, and
    * something to do.
    *
-   * Two overlapping surfaces before, on the idea that a card is a thing that
-   * lifts off a page. That drawing is now Drilldown's, exactly: two panels of
-   * the same size, offset diagonally, the front one on top. Whichever of them
-   * had the better claim to it, they cannot both have it, and "a stack" is a
-   * far better description of Drilldown than of Card. Card's own claim is what
-   * it *contains*, so that is what it shows.
+   * Not two overlapping surfaces: that drawing is Drilldown's, and "a stack"
+   * describes Drilldown far better than it describes Card. Card's own claim is
+   * what it *contains*, so that is what it shows.
    *
    * Everything sits on one 16 unit inset: the media runs full bleed to the
    * card's own edge, and the heading, the line and the action all start at 72
-   * and end 16 above the bottom. The action was at x=180 on a card ending at
-   * 224 once, drawn almost entirely outside the card it belongs to.
+   * and end 16 above the bottom.
    */
   card: (
     <>
@@ -212,8 +202,8 @@ export const coreArt: Record<string, ReactNode> = {
    * A 40 pixel avatar and two lines, at 40% and 70% of the row.
    *
    * The sweep is the component's own: a straight band, traveling leftward,
-   * 1.4s ease-in-out, continuous. It was skewed and resting once, which looked
-   * better and was four separate departures from `helix-skeleton-sweep`.
+   * 1.4s ease-in-out, continuous, matching `helix-skeleton-sweep` rather than
+   * looking better than it.
    *
    * The bars are unequal on purpose. Two of the same length read as a pattern,
    * and a reader waiting on content reads a pattern as decoration rather than
@@ -232,15 +222,14 @@ export const coreArt: Record<string, ReactNode> = {
           <stop offset="0.5" stopColor="var(--helix-color-foreground)" stopOpacity="0.14" />
           <stop offset="1" stopColor="var(--helix-color-foreground)" stopOpacity="0" />
         </linearGradient>
-        {/* The three shapes again, written out, rather than a `use` pointed at
+        {/* The three shapes again, written out, and never a `use` pointed at
             the group above.
          *
-         * That is what it was, and it is why this card had no sweep at all. A
-         * `clipPath` may hold shapes, `text` and `use`, but the `use` has to
+         * A `clipPath` may hold shapes, `text` and `use`, but the `use` has to
          * reference a *basic shape*: pointed at a `<g>` it contributes no
          * geometry, so the clip is empty, and an empty clip does not mean "do
-         * not clip", it means clip everything. The band was traversing the card
-         * on schedule the whole time with every pixel of it discarded.
+         * not clip", it means clip everything. The band then traverses the card
+         * on schedule with every pixel of it discarded.
          *
          * Nothing warns. The markup is well formed, the id resolves, the
          * element exists, and the only symptom is that a thing you cannot see
@@ -284,8 +273,8 @@ export const coreArt: Record<string, ReactNode> = {
    * A raised pill on the selected tab and nothing at all behind the row.
    *
    * The pill is `surface-raised` under a shadow, which is what the component
-   * sets: it is lifted, not filled. Drawn as the heaviest mark once, which
-   * inverted the whole idea.
+   * sets: it is lifted, not filled. Drawing it as the heaviest mark inverts the
+   * whole idea.
    */
   tabs: (
     <>
@@ -311,7 +300,7 @@ export const coreArt: Record<string, ReactNode> = {
    *
    * Staggered, because a tag is almost never on its own: what the card is
    * showing is a set being applied, and a set arrives one at a time. Two is
-   * already a set; the third chip only made the row wider.
+   * already a set.
    */
   tag: (
     <>

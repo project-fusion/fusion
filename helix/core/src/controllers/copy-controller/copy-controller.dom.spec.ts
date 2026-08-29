@@ -206,9 +206,10 @@ describe('an empty copy', () => {
 
 describe('a host that left while the clipboard was being written', () => {
   /* Writing is asynchronous and `hostDisconnected` runs the moment the element
-     leaves, clearing a timer that does not exist yet. Everything after the
-     write used to run regardless, starting a fresh timer on a detached host and
-     calling `requestUpdate` on it a second later. */
+     leaves, clearing a timer that does not exist yet, so everything after the
+     write has to check the host is still on the page: otherwise it starts a
+     fresh timer on a detached host and calls `requestUpdate` on it a second
+     later. */
   test('is not confirmed, and not asked to re-render', async () => {
     routes({ modern: true })
     const one = host()

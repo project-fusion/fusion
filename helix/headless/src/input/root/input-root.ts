@@ -11,8 +11,6 @@ import {
 import { eye, eyeSlash, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-/* Side-effect import, because both buttons render a `helix-icon` and a custom
-   element registers on import. File Input's remove button does the same. */
 
 /** What the control accepts, which is text of one kind or another. */
 export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
@@ -42,19 +40,12 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * here guesses. What this adds is the anchor, so `reportValidity` points the
  * bubble at the input rather than at the host.
  *
- * `pattern`, `minlength` and `maxlength` are forwarded with them. They were
- * promised by this paragraph and did not exist, so a consumer following the
- * sentence wrote an attribute on the host that reached no input and constrained
- * nothing: the field looked as though it were checked and was not.
+ * `pattern`, `minlength` and `maxlength` are forwarded with them.
  *
- * **`clearable` and `reveal` are the field's, not the consumer's.** The `end`
- * slot used to be the answer to both, which meant every consumer of
- * `type="search"` built the same button and every consumer of
- * `type="password"` either built the same toggle or shipped a field a reader
- * cannot check what they typed into. Neither is a slot's worth of variation:
- * one empties the value, the other flips the type, and both want the same
- * position, the same size and the same disabled behavior. The slot stays for
- * what actually varies, a unit or a prefix.
+ * **`clearable` and `reveal` are the field's, not the consumer's.** Neither is
+ * a slot's worth of variation: one empties the value, the other flips the type,
+ * and both want the same position, the same size and the same disabled
+ * behavior. The `end` slot stays for what actually varies, a unit or a prefix.
  *
  * Both opt in rather than following from `type`, and are booleans that default
  * to false. A Lit boolean property that defaults to *true* cannot be turned off
@@ -81,7 +72,6 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart feedback - What is wrong with it.
  * @csspart field - The box holding everything.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart icon - A glyph this component draws.
  * @csspart label - The question, over the field.
  * @csspart reveal - The button that shows and hides a password.
  */
@@ -119,25 +109,18 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * Whether the field refuses input while still submitting its value.
    *
-   * **`readonly`, which is the platform's spelling, and it was `read-only`
-   * until 28 Aug 2026.** A camelCase property needs an explicit `attribute`
-   * and the library had been answering that question two ways: thirteen
-   * attributes kept the name HTML uses (`crossorigin`, `maxlength`,
-   * `formnovalidate`, `dirname` and the rest) and five dash-cased a word the
-   * platform writes as one. `readonly` was the only one on both lists, this
-   * spelling on `Rating` and `read-only` on the eight other fields, so one
-   * library shipped both and each was inert on the other's families.
+   * **The attribute is `readonly`, which is the platform's spelling.** A
+   * camelCase property needs an explicit `attribute`, and dash-casing a word
+   * HTML writes as one costs what an attribute always costs here: nothing
+   * warns. `<helix-input readonly>` is what anybody who has written HTML types;
+   * against `read-only` it parses to no property at all, and the field stays
+   * editable with no error anywhere. Measured on the dash-cased form, `readOnly`
+   * came back `false`.
    *
-   * The cost of the dash-cased form is the one this repository keeps writing
-   * down about attributes: nothing warns. `<helix-input readonly>` is what
-   * anybody who has written HTML types, it parsed to no property at all, and
-   * the field stayed editable with no error anywhere. Measured before the
-   * rename: `readOnly` came back `false`.
-   *
-   * Taken now for the reason [#213](../../../../../fusion/docs/19-queue.md) gives
-   * about the part it renamed for the same kind of reason: there is no
-   * `helix-v` tag, so no consumer is holding the old spelling, and this is free
-   * today and a deprecation after the first release.
+   * See [#213](../../../../../fusion/docs/19-queue.md), which renamed a part for
+   * the same kind of reason: there is no `helix-v` tag, so no consumer is
+   * holding the old spelling, and this is free today and a deprecation after
+   * the first release.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
@@ -145,14 +128,11 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * What the field accepts, which decides the keyboard and the validation.
    *
-   * **Not reflected**, and it was. Reflection exists so a selector can reach a
-   * value, and no stylesheet in this repository selects on `type`: what it did
-   * instead was write `type="text"` onto every `<helix-input>` ever rendered,
-   * an attribute no consumer's markup had. That is precisely the fault `Button`
-   * had with `href`, `target` and `rel`, written up in the area rules as the
-   * reason the rule exists, and this was the last property in the library still
-   * doing it. Audited: ten reflected attributes have no selector anywhere, and
-   * this is the only one of them with a value that puts itself on the host.
+   * **Not reflected.** Reflection exists so a selector can reach a value, and
+   * no stylesheet in this repository selects on `type`. Reflecting it writes
+   * `type="text"` onto every `<helix-input>` ever rendered, an attribute no
+   * consumer's markup has, which is the fault the area rules write up under
+   * `Button`'s `href`, `target` and `rel`.
    *
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the
@@ -311,8 +291,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
        beside the one the mixin announces: measured in Chrome 148, one keystroke
        produced `helix-before-change`, this element's own `input`, and the inner
        control's, so `onInput` ran twice and one of the two carried the value
-       from before the change. `handleChange` two methods down has always done
-       this; the pair was half applied. */
+       from before the change. `handleChange` two methods down does the same. */
     event.stopPropagation()
     const control = event.target as HTMLInputElement
     const next = control.value
@@ -411,11 +390,6 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * A regular expression the value has to match, as the platform reads it.
    *
-   * The class documentation promised `pattern` and `minlength` "and the rest"
-   * were set on the real input, and no such properties existed: a consumer
-   * following that sentence wrote an attribute on the host, it reached no input,
-   * and the field constrained nothing while looking as though it did.
-   *
    * Forwarded rather than checked here, which is the whole reason validity is
    * the platform's: the browser knows what a `pattern` means, anchors it at both
    * ends, and produces the message in the reader's own language.
@@ -463,12 +437,10 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
       />
       <slot name="end"></slot>
       <!-- In the tab order, unlike the browser's own search clear, which is not
-           reachable by keyboard at all. That is defensible for a native control
-           a reader can empty with select-all and Delete, and less so for one
-           whose only affordance is an icon: a control that exists on screen and
-           cannot be reached is one a keyboard reader is told about and cannot
-           use. It only exists while there is a value, so the extra stop appears
-           exactly when there is something to do with it. -->
+           reachable by keyboard at all: a control whose only affordance is an
+           icon and that cannot be reached is one a keyboard reader is told
+           about and cannot use. It only exists while there is a value, so the
+           extra stop appears exactly when there is something to do with it. -->
       ${
         this.showsClear
           ? html`<button

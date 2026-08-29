@@ -22,8 +22,8 @@ interface Focusable {
  * pages runs this after the definitions have already arrived, so the field is
  * upgraded and takes focus exactly as intended. Only a hard load fails, which
  * is the arrival that matters most, and it is the one nobody tests while
- * building. Reported 25 Aug 2026 as "it types when I navigate here but not
- * after a reload", which is the difference stated precisely.
+ * building. The symptom is "it types when I navigate here but not after a
+ * reload".
  *
  * `whenDefined` waits for the class, and `updateComplete` waits for Lit to have
  * rendered the shadow input the focus is actually going to. Both, because the

@@ -56,9 +56,9 @@ describe('a video playlist', () => {
 
   test('and takes the entry`s words, not everything in it, as the player`s name', async () => {
     /* Which is what a lock screen shows, the player handing it to the media
-       session as the title. `textContent` was what this read, and it takes the
-       whole subtree: a row with a duration beside it reported "One12:00", and
-       that string went all the way to the platform. */
+       session as the title. Never read `textContent` for it: that takes the
+       whole subtree, so a row with a duration beside it reports "One12:00" and
+       that string goes all the way to the platform. */
     const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
       <helix-headless-video label="Player" slot="player"></helix-headless-video>
       <helix-headless-video-playlist-item src="/one.mp4" value="one">One<span slot="meta">12:00</span></helix-headless-video-playlist-item>

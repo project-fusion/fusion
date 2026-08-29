@@ -157,8 +157,8 @@ if (hasLayout()) {
       const host = await palette()
       /* Values and identities kept apart, and the identity compared with `toBe`.
          A deep equality against an object holding a DOM node walks the node, and
-         an element in a rendered document is a graph with cycles in it: the first
-         version of this did not fail, it stopped the run. */
+         an element in a rendered document is a graph with cycles: that does not
+         fail the test, it stops the run. */
       const heard: string[] = []
       const targets: EventTarget[] = []
       host.addEventListener('helix-select', (event) => {

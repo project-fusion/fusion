@@ -69,10 +69,9 @@ interface Face {
 /**
  * A named run of faces, which is what a dropdown shows instead of a wall.
  *
- * **Because two thousand alphabetical families is a wall**, and a combobox that filters
- * as it is typed into answers "I know what I want" rather than "show me
- * something reasonable". Six of them led the list already, which helped the
- * second reader and left the other 1,933 in one undifferentiated run.
+ * **Because two thousand alphabetical families is a wall**, and a combobox that
+ * filters as it is typed into answers "I know what I want" rather than "show me
+ * something reasonable".
  */
 interface FaceGroup {
   faces: Face[]
@@ -82,19 +81,12 @@ interface FaceGroup {
 const SYSTEM: Face = { category: 0, family: '', label: 'System default' }
 
 /**
- * Every Google family, rather than the six somebody happened to like.
+ * Every Google family, from the catalog `bun run gen:faces` writes.
  *
- * The nine hardcoded here were a list, not a judgment: they carried the exact
- * weights the token layer uses because each was written out by hand, which is
- * precisely what does not scale and precisely what `bun run gen:faces` now does for
- * two thousand of them. A family is offered when it can serve at least one of 400, 500
- * and 600, and asked for the ones it has: the same request against a family
- * shipping only 400 and 700 returns a stylesheet missing two weights and a page
- * that synthesizes the difference.
- *
- * **The policy did not have to change to allow this**, which is the point the
- * row this came from makes. The builder already fetched `fonts.googleapis.com`
- * and already argued why. A longer list is a longer list.
+ * **A family is asked for the weights it has, not for the three the token layer
+ * uses.** It is offered when it can serve at least one of 400, 500 and 600; the
+ * flat request against a family shipping only 400 and 700 returns a stylesheet
+ * missing two weights and a page that synthesizes the difference.
  */
 const fromCatalog = (row: FaceRow): Face => ({
   category: row[2],
@@ -119,15 +111,12 @@ const CATALOG_MONO: Face[] = GOOGLE_FACES.filter((row) => row[2] === 1).map(from
 /**
  * The six that lead every dropdown, under a heading of their own.
  *
- * These are the ones the builder used to offer, so a reader who opened it before
- * sees what they saw, and a reader with no opinion gets a short list of faces
- * that read well at the sizes the token layer sets rather than the first six
- * words in the alphabet.
+ * A reader with no opinion gets a short list of faces that read well at the
+ * sizes the token layer sets rather than the first six words in the alphabet.
  *
- * **"Recommended" is the honest word for them**, and it was worth checking
- * rather than assuming: they are not the most downloaded, not the newest and not
- * a partnership. They are the ones somebody tried at these sizes and kept, which
- * is what a reader hears when a font picker says recommended.
+ * **"Recommended" is the honest word for them**: not the most downloaded, not
+ * the newest and not a partnership, but the ones somebody tried at these sizes
+ * and kept, which is what a reader hears when a font picker says recommended.
  */
 const LEADING = ['Inter', 'DM Sans', 'Work Sans', 'Fraunces', 'Playfair Display', 'Source Serif 4']
 
@@ -172,12 +161,6 @@ const grouped = (faces: Face[], leading: readonly string[]): FaceGroup[] => {
   ].filter((group) => group.faces.length > 0)
 }
 
-/**
- * The resting option, which sits above every group and belongs to none.
- *
- * It is not a face and grouping it with faces would say it is one. Rendered
- * loose before the first group, the way a select's own empty option is.
- */
 const FACE_GROUPS: FaceGroup[] = grouped(CATALOG, LEADING)
 
 /**
@@ -207,11 +190,11 @@ const ALL_FACES: Face[] = [...CATALOG, ...CATALOG_MONO]
  * The options inside a face dropdown: the resting one loose, then the groups.
  *
  * Written once because three fields render it and the only things that differ
- * are which catalog and which word for choosing none. Three copies would be
- * three chances for one of them to lose its grouping in a later edit.
+ * are which catalog and which word for choosing none.
  *
  * The resting option is not in a group because it is not a face, and putting it
- * under `Recommended` would recommend the absence of one.
+ * under `Recommended` would recommend the absence of one. It renders loose
+ * before the first group, the way a select's own empty option does.
  */
 const faceOptions = (groups: FaceGroup[], rest: Face) => (
   <>
@@ -251,12 +234,10 @@ const faceOptions = (groups: FaceGroup[], rest: Face) => (
             <span aria-hidden="true" className="themeFace" slot="end">
               {/* **The face is named here or the sample is a lie.** It is the
                   one thing in this markup that cannot be moved to a stylesheet,
-                  a rule per family being a rule per family. Dropped once during
-                  an edit and not noticed by eye: every sample rendered in the
-                  page's own face, so a thousand rows showed one typeface wearing
-                  a thousand names, which is the exact failure the skeleton beside
-                  it exists to prevent. Caught by measuring the rendered glyphs
-                  rather than by looking at them. */}
+                  a rule per family being a rule per family. Drop it and every
+                  sample renders in the page's own face: a thousand rows showing
+                  one typeface wearing a thousand names, which is invisible by
+                  eye and shows up only in the rendered glyphs. */}
               <span
                 className="themeFaceSample"
                 data-face-request={face.preview}
@@ -342,11 +323,9 @@ export function ThemeBuilder({
    * Whether the controls are on screen, and how much room they take when they
    * are.
    *
-   * **One control at every width, because the answer is the same question.** The
-   * sandbox learned this the hard way: it had a toggle in the toolbar that did
-   * nothing on a phone and a second button in the masthead that did the work.
-   * Here there is one, and what changes with the viewport is how far the pane
-   * opens rather than what the button means.
+   * **One control at every width, because the answer is the same question.**
+   * What changes with the viewport is how far the pane opens, never what the
+   * button means.
    *
    * **The pane collapses rather than unmounting.** The stage holds an iframe, and
    * wrapping it in a condition would tear it down and reload it every time a
@@ -369,17 +348,17 @@ export function ThemeBuilder({
     return () => query.removeEventListener('change', sync)
   }, [])
 
-  /* Nearly the whole width on a phone, because a column of labeled fields at a
-     quarter of 375px is the thing 244 measured and called a column rather than a
-     form. A sliver is left so the preview says it is still there. */
+  /* Nearly the whole width on a phone: a column of labeled fields at a quarter
+     of 375px reads as a column rather than as a form. A sliver is left so the
+     preview says it is still there. */
   const controlsPosition = controlsShown ? (narrow ? 88 : 24) : 0
 
   /* **Declared as a correction, and answered so it stays one.** The splitter
-     moves itself; this hears where it went and agrees. A reader
-     dragging the separator to the edge has shut the pane, and the toggle has to
-     hear that or it goes on saying "Hide controls" over a pane that is already
-     gone. Two per cent rather than zero, because a drag that lands a pixel short
-     of the edge is still a reader shutting it. */
+     moves itself; this hears where it went and agrees. A reader dragging the
+     separator to the edge has shut the pane, and the toggle has to hear that or
+     it goes on saying "Hide controls" over a pane that is already gone. Two per
+     cent rather than zero, because a drag that lands a pixel short of the edge
+     is still a reader shutting it. */
   const controlsMoved = (event: HelixBeforeResizeEvent) => {
     // The splitter's own, rather than one sent by something inside it.
     if (event.target === event.currentTarget) {
@@ -409,6 +388,19 @@ export function ThemeBuilder({
   const [blur, setBlur] = useState(initialSettings.blur)
   const [translucency, setTranslucency] = useState(initialSettings.translucency)
 
+  /**
+   * Which of the audit's three panels is open.
+   *
+   * **Held here because the toolbar's counts open it.** A tag saying "2 fail"
+   * has to reach the Contrast tab, which is the one mapping nobody can guess
+   * from the words.
+   *
+   * `active` on Tabs is a seed and a correction rather than a strict controlled
+   * property, so the set still moves itself on a click and this only has to
+   * agree with it. Answering `helix-before-activate` is what keeps them agreeing.
+   */
+  const [audit, setAudit] = useState('contrast')
+
   /* **What the preview pretends to be, and neither is part of the theme.**
      They change no token, appear in no artifact and are measured by nothing:
      the palette a reader leaves with is identical whichever pair is chosen. So
@@ -417,38 +409,17 @@ export function ThemeBuilder({
      shipped values rather than about what a reader is looking at while they
      depart from them.
 
-     **Two pieces of state because they are two questions.** A minimal
-     storefront and a dense storefront are both real, so a single list of every
-     combination would be nine rows a reader has to read to find the two facts
-     they are choosing between.
-
      The first entry of each list is its resting one, which is the convention
      the generated lists are ordered by. */
-  /**
-   * Which of the audit's three panels is open.
-   *
-   * **Held here because the toolbar has to be able to move it.** The tags above
-   * the preview count what the panel lists, and a reader with "2 fail" had no
-   * way to get from the count to the list: the tag says fail and the tab says
-   * Contrast, so the one mapping nobody could guess was the one that mattered.
-   * Clicking a tag opens its panel now, which answers it by doing rather than by
-   * renaming.
-   *
-   * `active` on Tabs is a seed and a correction rather than a strict controlled
-   * property, so the set still moves itself on a click and this only has to
-   * agree with it. Answering `helix-before-activate` is what keeps them agreeing.
-   */
-  const [audit, setAudit] = useState('contrast')
-
   const [context, setContext] = useState(initialContext ?? contexts[0]?.value ?? '')
   const [layout, setLayout] = useState(initialLayout ?? layouts[0]?.value ?? '')
 
   const source = markup[`${layout}:${context}`] ?? ''
 
   /* **Every reader-movable value in one object**, which is what the three uses
-     below share. It was stated three times, as state initialisers, as the
-     `pristine` comparison and again in `reset`, and a default changed in two of
-     the three is a builder whose reset goes somewhere the reader never was. */
+     below share. Stated separately in the state initializers, in the `pristine`
+     comparison and in `reset`, a default changed in two of the three is a
+     builder whose reset goes somewhere the reader never was. */
   const settings: Settings = useMemo(
     () => ({
       accentHue,
@@ -567,13 +538,9 @@ export function ThemeBuilder({
   /* Built from the settings above rather than inline, so the server and the
      browser cannot describe the same starting theme differently: the page
      derives `intentFrom(INITIAL)` before it renders, and this derives
-     `intentFrom(settings)` from whatever the reader has moved since. */
-  /* Built from the settings above rather than inline, so the server and the
-     browser cannot describe the same starting theme differently: the page
-     derives `intentFrom(INITIAL)` before it renders, and this derives
      `intentFrom(settings)` from whatever the reader has moved since.
 
-     `settings` is memoised for this: a fresh object every render would make this
+     `settings` is memoized for this: a fresh object every render would make this
      memo miss every time, and a derivation is the expensive thing on this page. */
   const intent = useMemo(() => intentFrom(settings), [settings])
 
@@ -720,9 +687,8 @@ export function ThemeBuilder({
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
      up its lightness. Which way it gives it up depends on where the brand
-     started, and the first version of this said "Darkened" unconditionally,
-     which was a lie for every brand that began too dark: `#2e394a` comes back
-     *lighter* and the label still claimed it had been darkened.
+     started, so the label cannot say "Darkened" unconditionally: `#2e394a`
+     comes back *lighter*.
 
      Comparing hexes would report a move on a rounding difference, so the
      comparison is on lightness and the threshold is what a reader could see. */
@@ -900,14 +866,10 @@ export function ThemeBuilder({
                 A swatch that always says "and here is the same color again" is
                 a row of chrome nobody reads. */}
             {/* **Not a callout.** A callout is an interruption with a severity
-                and an icon, and this is neither: it is a caption under the
-                field it is about, saying what happened to the value that was
-                just typed. As a callout it read as a warning about a normal
-                thing, and its icon and inset crowded a quarter-width pane until
-                the sentence wrapped four times.
-
-                So: the two swatches on their own line, at a size worth looking
-                at, and the reason under them. */}
+                and an icon; this is a caption under the field it is about,
+                saying what happened to the value that was just typed. As a
+                callout it reads as a warning about a normal thing, and its icon
+                and inset crowd a quarter-width pane. */}
             {moved ? (
               <div className="themeShift" key={shift > 0 ? 'up' : 'down'}>
                 <div className="themeShiftPair">
@@ -1014,11 +976,11 @@ export function ThemeBuilder({
                 tracking are a system rather than a choice and are still fixed,
                 which is the honest state of it. */}
             {/* **The placeholder names the resting state, it does not invite a
-                choice.** Select shows the chosen options' words or its
+                choice.** The field shows the chosen option's words or its
                 placeholder, and an option whose value is the empty string
-                contributes no word, so all three of these read `Choose` while
-                sitting on a real, named answer. The option stays in each list so
-                there is a way back to it, and both states now read alike. */}
+                contributes no word, so a generic placeholder makes all three of
+                these read `Choose` while sitting on a real, named answer. The
+                option stays in each list so there is a way back to it. */}
             <helix-combobox
               label="Body face"
               name="body-face"
@@ -1133,13 +1095,11 @@ export function ThemeBuilder({
               set, and trying characters on is the one thing a reader does here
               repeatedly. Six labels they cannot read is not a better version of
               that. */}
-            {/* **The placeholder is the resting state's name, not an invitation.**
-              Select shows the chosen options' words or its placeholder, and an
-              option whose value is the empty string contributes no word, so the
-              default character rendered as `Choose`: a control reporting that
-              nothing had been picked, for a theme that does have a pace, the
-              stylesheet's own. The option stays in the list so there is a way
-              back to it, and both states now read `Default`. */}
+            {/* **The placeholder is the resting state's name, not an invitation**,
+              for the reason the face fields above carry: the empty-valued option
+              contributes no word, so a generic placeholder would report that
+              nothing had been picked for a theme that does have a pace, the
+              stylesheet's own. */}
             <helix-select
               hint="The pace and the curve together. Default keeps the stylesheet’s own."
               label="Motion"
@@ -1223,10 +1183,8 @@ export function ThemeBuilder({
               leads with its source, being a place to write; here the artifact is
               an output rather than an input and a reader is judging a palette,
               not editing CSS. */}
-          {/* **The artifact is a column of custom properties**, so its longest
-              line is a token name and a hex, so it wants a third of the stage
-              and the preview wants the rest. See `PREVIEW_SHARE` for which pane
-              the number is actually about, which is not what the manifest says.
+          {/* See `PREVIEW_SHARE` for which pane the number is about, which is
+              not what the manifest says.
 
               Held as state and written back on settle, which is the workbench's
               pattern and is necessary rather than tidy: `Sandbox` owns `split`
@@ -1273,21 +1231,19 @@ export function ThemeBuilder({
 
               <helix-flex align="center" gap="xs">
                 {/* **The tone belongs to what the tag counts, not to the run.**
-                    This was `danger` whenever anything failed, so a palette with
-                    two bad pairs painted "65 pass" the same red as "2 fail":
-                    two identical tags side by side, one of them good news, and
-                    the count a reader most wants to see going up was the one
-                    that looked like an alarm. The failures have their own tag
-                    and it is already red. */}
+                    Painted `danger` whenever anything failed, "65 pass" is the
+                    same red as "2 fail": two identical tags side by side, one of
+                    them good news, and the count a reader most wants to see
+                    going up is the one that looks like an alarm. */}
                 {/* **Each count opens the panel that lists it.**
 
                     The tags say pass, fail, unverifiable and collisions; the
                     panel's tabs say Contrast, Collisions and Unverifiable. Three
                     map by their own word and the fourth cannot: "2 fail" and
                     "65 pass" are both the Contrast tab, and nothing on screen
-                    said so. Renaming one to match the other was the candidate
-                    against this and is worse, "2 contrast" not being English and
-                    "Contrast failures" not being a tab label that fits.
+                    says so. Renaming one to match the other is worse, "2
+                    contrast" not being English and "Contrast failures" not being
+                    a tab label that fits.
 
                     **Still status rather than settings**, which is the rule the
                     toolbar's own comment sets and this does not break: none of
@@ -1335,23 +1291,23 @@ export function ThemeBuilder({
               </helix-flex>
             </helix-sandbox-toolbar>
 
-            {/* **A document of its own, and the leak is what forced it.** This
-                was a `div` in the site's page, which meant the site's own
-                stylesheet reached it: nineteen bare `helix-*` rules in
-                `site.css`, and three of them landed here. Measured, the preview's
-                header computed `--app-header-backdrop: none` and
-                `--app-header-background-color: transparent` because the masthead sets
-                those for itself, so the material control could be dragged from
-                zero to forty and the one surface most likely to be glass never
-                moved. The drawer took the site's header clearance too, for a
-                header that is not above it.
+            {/* **A document of its own, and the leak is what forces it.** As a
+                `div` in the site's page the site's own stylesheet reaches it:
+                nineteen bare `helix-*` rules in `site.css`, three of which land
+                here. Measured, the preview's header computed
+                `--app-header-backdrop: none` and
+                `--app-header-background-color: transparent` because the masthead
+                sets those for itself, so the material control could be dragged
+                from zero to forty and the one surface most likely to be glass
+                never moved. The drawer took the site's header clearance too, for
+                a header that is not above it.
 
                 Scoping the site's rules away from the preview is the same fix
                 nineteen times and once more for every rule anybody adds. The
                 cause is that a preview of a page was not a page, and
                 `helix-sandbox-preview` already exists for exactly this: its own
                 docstring says an example that restyles `helix-card` restyled the
-                sandbox too. The workbench has previewed this way all along.
+                sandbox too.
 
                 The top layer comes free with it. A dialog opened here covered
                 the whole tool, because `showModal` paints outside every ancestor

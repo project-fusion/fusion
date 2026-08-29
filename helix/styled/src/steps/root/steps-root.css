@@ -1,6 +1,6 @@
 /* Everything about the arrangement is handed down as custom properties rather
    than read from this host's attribute, because a step cannot see it.
-   `orientation` and `appearance` are on this element, and a slotted step's own
+   `orientation` and `variant` are on this element, and a slotted step's own
    stylesheet can only match `:host(...)`, which is the step. The selector that
    would answer it, `:host-context()`, is Chromium-only. Custom properties
    inherit through the flat tree into slotted content, which is the one portable
@@ -16,9 +16,7 @@
    row puts names under the marks, because beside them there is a word in the
    line's path and the rule would be struck through it. A column puts names
    beside, because there is no width to save and a name under its mark would
-   sit where the line has to run. There was a `labels` property offering both
-   in both, and three of its four combinations were arrangements nobody should
-   pick. */
+   sit where the line has to run. */
 :host {
   counter-reset: helix-step;
   display: flex;
@@ -27,10 +25,10 @@
   --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
   --_steps-mark-box: var(--_steps-m);
   /* Air either side of every mark, so the rail arrives at it rather than into
-     it. The line ran to the mark's exact edge, measured at a gap of zero on
-     both sides of all three, which reads as one drawing rather than as a mark
-     on a rail; against an open circle it closes the shape, and the gap is what
-     says the circle is a thing the line passes rather than part of it. */
+     it. At a gap of zero the line runs to the mark's exact edge, which reads as
+     one drawing rather than as a mark on a rail and closes an open circle. The
+     gap is what says the circle is a thing the line passes rather than part
+     of it. */
   --_steps-connector-inset: var(--steps-connector-inset, var(--helix-space-2xs));
   --_steps-columns: minmax(0, 1fr);
   --_steps-marker-column: 1;
@@ -125,11 +123,10 @@
  *
  * And no color on the digits. A green check is green because the check is
  * already the shape for "done" and the hue only confirms it; a green 2 says
- * nothing a reader can read, because a number carries no meaning of its own for
- * a color to agree with. It would be hue used as the whole signal, which is
- * the one thing color must not be. So the digits are ink, and the current step
- * is a step darker rather than a different color, which is the move the names
- * make. The public hooks still win: a consumer who wants a green 2 gets one. */
+ * nothing, because a number carries no meaning of its own for a color to agree
+ * with, so it would be hue used as the whole signal. The digits are ink and the
+ * current step is a step darker, which is the move the names make. The public
+ * hooks still win: a consumer who wants a green 2 gets one. */
 :host([variant="numeric"]) {
   --_steps-mark: none;
   --_steps-count: counter(helix-step);

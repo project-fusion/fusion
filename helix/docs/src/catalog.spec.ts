@@ -138,7 +138,7 @@ describe('examples', () => {
     expect(pagination?.examples[2]?.label).toBe('Compact')
   })
 
-  // Off the markup rather than off the filename, the same test `check:css:tokens`
+  // Off the markup rather than off the filename, the same test `helix component`'s `tokens`
   // uses to know a headless example's stylesheet may write raw values.
   test('the tier comes from what the example renders', () => {
     expect(pagination?.examples.map((example) => example.tier)).toEqual([

@@ -43,10 +43,9 @@ const isInsertion = (event: Event): boolean =>
  * @description
  * **The list is `helix-listbox`, and the filtering is its own.** It already
  * owns narrowing, the empty state, the highlight, `aria-activedescendant` and
- * scrolling an option into view, and every one of those is a decision with a
- * long note attached. Rewriting them here would be a second copy to keep in
- * step; what is left for this element is the field, the panel and the traffic
- * between them.
+ * scrolling an option into view. Rewriting them here would be a second copy to
+ * keep in step; what is left for this element is the field, the panel and the
+ * traffic between them.
  *
  * **The text and the value are two things.** What a reader types is a filter,
  * not an answer: it narrows the list and is thrown away. The value is whichever
@@ -58,7 +57,7 @@ const isInsertion = (event: Event): boolean =>
  * That is also why the field is emptied of its filter on close rather than left
  * holding it: a control reopened still narrowed by the last visit's search is a
  * control whose second use starts from the first one's leftovers. Select
- * records the same, having been fixed for it.
+ * records the same.
  *
  * **Focus stays in the field, which is the whole of what a combobox is.** The
  * arrows move the list without leaving the text, which is why the listbox has a
@@ -145,7 +144,6 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-items - The list itself.
  * @csspart listbox-label - The question, over the list.
  * @csspart listbox-loading - Shown while the options are still on their way.
- * from the listbox.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
  * @csspart rest - The count of choices held beyond `max-tags`.
@@ -328,10 +326,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
-    /* The surface *and* the field, for the reason four components here were
-       fixed for: scoped to the surface alone, a press on the field counts as
-       outside, so `pointerdown` closes the panel and the field's own handler
-       reopens it on the `click` that follows. */
+    /* The surface *and* the field. Scoped to the surface alone, a press on the
+       field counts as outside, so `pointerdown` closes the panel and the
+       field's own handler reopens it on the `click` that follows. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
@@ -580,7 +577,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        it carries what is being *proposed*, dispatched before it is applied,
        which is what makes it refusable. The listbox never applies it anyway,
        since this element passes `.value` down and that is a consumer declaring
-       ownership. Select was fixed for exactly this. */
+       ownership. */
     const { value } = (event as HelixBeforeChangeEvent).detail
     /* And nothing happens on a refusal. Refusing a change should leave the
        control where it was, not clear the filter and shut the panel as though
@@ -600,11 +597,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * Anywhere in the field opens the list, and puts the caret where typing goes.
    *
-   * On the field rather than on the `<input>`, which is where it was. The caret
-   * is a sibling of the input and so is the tag strip, so pressing the one part
-   * of the control that visibly says "this opens" did nothing at all, and a
-   * reader who wanted the list had to find the text box. Anything drawn inside
-   * the field is the field.
+   * On the field rather than on the `<input>`. The caret is a sibling of the
+   * input and so is the tag strip, so a handler on the input alone leaves the
+   * one part of the control that visibly says "this opens" doing nothing.
+   * Anything drawn inside the field is the field.
    *
    * A tag is the exception, because a tag is its own control: its dismiss
    * removes a choice, and opening the list on the way past would leave the
@@ -671,18 +667,17 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        is already `Ru` because the browser replaced the selection, and the
        completion is *still* `Ruby`: unchanged, so Lit writes nothing and
        `changed.has('suggestion')` is false, so nothing is selected either. The
-       completion appeared on the first character and never again, which is
-       exactly how it was reported.
+       completion then appears on the first character and never again.
      
        Reconciled against what the input actually holds, which is the only thing
        that knows. */
     const control = this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
     /* The same expression the template binds, because this has to agree with it
-       in both directions. Writing only when there is a completion put the field
-       right while one was showing and left it stale afterwards: this reconcile
-       writes behind Lit's back, so Lit's own dirty-check then believes the DOM
-       already holds whatever it last wrote and declines to correct it. A field
-       cleared on close kept the last completion for exactly that reason. */
+       in both directions. Writing only when there is a completion puts the
+       field right while one is showing and leaves it stale afterwards: this
+       reconcile writes behind Lit's back, so Lit's own dirty-check then
+       believes the DOM already holds whatever it last wrote and declines to
+       correct it. */
     const wanted = this.multiple || this.open ? this.suggestion || this.typed : this.word
     if (control && control.value !== wanted) {
       control.value = wanted
@@ -698,12 +693,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
          control reopened still narrowed is one whose second use starts from the
          first one's leftovers.
 
-         All three of them, which is the fix. Only the listbox's copy was
-         cleared here, so `typed` survived a dismissal: the field looked empty
-         because a closed single-choice field shows the chosen words instead,
-         and the moment it reopened the old search was back in it with the list
-         behind it showing everything. Measured by pressing Escape on "ru" and
-         opening it again. */
+         All three, not the listbox's copy alone. A surviving `typed` is
+         invisible on close, because a closed single-choice field shows the
+         chosen words instead, and comes back with the list behind it showing
+         everything the moment it reopens. */
       this.typed = ''
       this.suggestion = ''
       this.listbox?.requestFilter('')
@@ -713,12 +706,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * The list the field filters, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
+   * A method rather than a fragment inline, so a tier above can replace, wrap
+   * or omit it without reimplementing the whole template. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * headless element, and a styled subclass that sets `tier` renders the styled
+   * one from the same template.
    */
   protected renderListbox(): TemplateResult {
     return html`<${this.tag('listbox')}
@@ -740,9 +732,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     >
       <!-- The field's words are read off the options, and on the first
            render there are none: the slot has not been assigned yet, so a
-           combobox with a value came up empty. Assignment changes no
+           combobox with a value comes up empty. Assignment changes no
            property, so nothing else would schedule the update that fixes
-           it. Select was fixed for exactly this. -->
+           it. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
     </${this.tag('listbox')}>`
   }
@@ -750,12 +742,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /**
    * One chosen option, as a tag, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
+   * A method rather than a fragment inline, so a tier above can replace, wrap
+   * or omit it without reimplementing the whole template. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * headless element, and a styled subclass that sets `tier` renders the styled
+   * one from the same template.
    */
   protected renderTag(option: { text: string; value: string }): TemplateResult {
     return html`<${this.tag('tag')}

@@ -11,13 +11,11 @@ import { property, state } from 'lit/decorators.js'
  * @summary Links to the headings on this page, marking the one being read.
  *
  * @description
- * A table of contents, named for the job. Three of the obvious names are taken
- * by things that are not this: `Outline` is a CSS property and the focus ring's
- * whole vocabulary, `Contents` is `display: contents` and the `content` part
- * half this library renders, and `TableOfContents` would sit beside `Table` and
- * `TableColumn` and read as a third part of that family. `Outline` sits beside
- * `Navigation`, which is the same job at the other scale: one navigates a site, the
- * other navigates a document.
+ * A table of contents, named for the job. It sits beside `Navigation`, which is
+ * the same job at the other scale: one navigates a site, the other navigates a
+ * document. `Contents` and `TableOfContents` are both taken by something else,
+ * `display: contents` and the `content` part in one case and the `Table` family
+ * in the other.
  *
  * **The links are the consumer's own anchors**, the same as `Navigation`. A router
  * renders its own `<a>` and cannot render one inside this shadow root, and the
@@ -195,10 +193,10 @@ export class HelixHeadlessOutline extends HelixElement {
      * thing being read, and the marker stayed on the second. The last item in a
      * contents list was unreachable by scrolling.
      *
-     * The same fault has no mirror at the top, where `passed` is empty and the
-     * first section is already the fallback. Asked, because the shape suggests
-     * one: the first heading's top starts *at* the line rather than below it,
-     * so there is nothing for it to fail to reach.
+     * There is no mirror of it at the top: `passed` is empty there and the first
+     * section is already the fallback, and the first heading's top starts *at*
+     * the line rather than below it, so there is nothing for it to fail to
+     * reach.
      *
      * What this cannot do is tell trailing sections apart. If the last three
      * share the final screenful, none of them can reach the line and the page
@@ -218,12 +216,10 @@ export class HelixHeadlessOutline extends HelixElement {
         link.removeAttribute('aria-current')
       }
     }
-    /* And say so, which it did not.
-     *
-     * `reading` is derived from scroll position and was announced to nobody, so
-     * a consumer syncing a URL hash to the reading position had to poll for it:
-     * the one fact this component computes that nothing else on the page can,
-     * and the only way out of it was a `MutationObserver` on the anchors.
+    /* And say so. `reading` is derived from scroll position, which is the one
+     * fact this component computes that nothing else on the page can, so a
+     * consumer syncing a URL hash to it has no other way in short of a
+     * `MutationObserver` on the anchors.
      *
      * Only on a change, because this runs from a scroll frame and an event per
      * frame is not a signal, it is a firehose. */
@@ -241,16 +237,16 @@ export class HelixHeadlessOutline extends HelixElement {
    * leaves the position a hair under the height at the very bottom and an exact
    * comparison never fires.
    *
-   * **All three numbers off the same element**, which this did not do: it added
-   * `scrollY` and `innerHeight`, both of the window, and compared them against
-   * `documentElement.scrollHeight`. Those are one coordinate system only while
-   * the viewport is what scrolls, and the body takes that job the moment it
-   * becomes a scroll container. Measured on a page whose body is
+   * **All three numbers off the same element.** Adding the window's `scrollY`
+   * and `innerHeight` and comparing them against
+   * `documentElement.scrollHeight` mixes two coordinate systems, which agree
+   * only while the viewport is what scrolls, and the body takes that job the
+   * moment it becomes a scroll container. Measured on a page whose body is
    * `overflow: clip visible`, which is a pair CSS resolves by making the
    * `visible` axis `auto`: `documentElement.scrollTop` read 1126 at the bottom
    * of the page and `window.scrollY` read 240, so a contents rail never learned
-   * it had reached the end and its last item stayed unreachable. That page is
-   * this library's own base layer.
+   * it had reached the end and its last item stayed unreachable. This library's
+   * own base layer produces exactly that page.
    *
    * `clientHeight` rather than `innerHeight` for the same reason, and because it
    * is the one that excludes a scrollbar, which is what `scrollHeight` is
@@ -277,9 +273,6 @@ export class HelixHeadlessOutline extends HelixElement {
    * The two things an `IntersectionObserver` cannot see, and one listener for
    * both.
    *
-   * This component's own note said the observer keeps the marker honest without
-   * a scroll listener. It was wrong twice.
-   *
    * *At the bottom*, arriving at the end of a page changes no intersection: a
    * short last section is fully visible long before the final pixel, so its
    * ratio reached 1 and stopped moving. Nothing fires for the scroll that ends
@@ -294,13 +287,12 @@ export class HelixHeadlessOutline extends HelixElement {
    * heading has not crossed yet, and no callback follows for the rest of the
    * way.
    *
-   * There was a listener already, added for the first of those, and it compared
-   * two numbers and marked only when the answer *changed*. That was too clever
-   * by half: it fixed the bottom and could not fix the settle. Marking once per
-   * animation frame while a scroll is happening covers both and every other case
-   * of the same shape, and the cost is what `mark()` costs, a `getBoundingClientRect`
-   * per section on frames a reader is already scrolling through. Passive, and
-   * coalesced to one call per frame however many events arrive.
+   * Marking once per animation frame while a scroll is happening covers both,
+   * where a listener that marks only when its own comparison changes fixes the
+   * bottom and cannot fix the settle. The cost is what `mark()` costs, a
+   * `getBoundingClientRect` per section on frames a reader is already scrolling
+   * through. Passive, and coalesced to one call per frame however many events
+   * arrive.
    */
   private readonly handleScroll = (): void => {
     if (this.frame !== 0) {
@@ -315,12 +307,11 @@ export class HelixHeadlessOutline extends HelixElement {
   /**
    * Gives every section the same reading line the marker uses.
    *
-   * `offset` described where the top of the readable area is and was read by
-   * exactly one thing, the marker. Click a link and the browser put the heading
-   * against the very top of the window, underneath the sticky masthead whose
-   * height the consumer had just finished measuring for us. So the component
-   * knew about the chrome when deciding what you were reading and forgot about
-   * it when taking you somewhere, which is the same number meaning two things.
+   * `offset` says where the top of the readable area is, so it has to govern
+   * where a click lands as much as what the marker calls current. Read by the
+   * marker alone, a click puts the heading against the very top of the window
+   * and underneath the sticky masthead the consumer measured the offset from,
+   * which is the same number meaning two things.
    *
    * `scroll-margin-block-start` rather than an interception, because it is the
    * property the platform provides for exactly this and the UA honors it on
@@ -367,9 +358,7 @@ export class HelixHeadlessOutline extends HelixElement {
      * and wrong when they have said where they are going: traveling to the
      * fifth section passes the second, third and fourth, each became current
      * for a frame or two on the way, and the mark stepped down the list one
-     * item at a time instead of making the journey. Asked for as "it stops at
-     * each item rather than seamlessly moving", which is exactly what it was
-     * doing.
+     * item at a time instead of making the journey.
      *
      * Suppressed for any click on one of these links, not only the ones this
      * component scrolls itself: a consumer with `scroll-behavior: smooth` on
@@ -419,18 +408,17 @@ export class HelixHeadlessOutline extends HelixElement {
    * The thresholds are what make the trigger frequent enough: an observer fires
    * on entering and leaving, and a long section scrolled slowly crosses neither
    * for a long time. Asking for a callback at each quarter of visibility is
-   * cheap and keeps the marker honest without a scroll listener.
+   * cheap. It is still only a trigger: see `handleScroll` for the two cases no
+   * intersection can see.
    */
   private watch(): void {
     this.observer?.disconnect()
-    /* Nothing to watch yet is not nothing to watch ever.
-     *
-     * This returned when no href resolved at first update, having already
-     * disconnected the observer, and only `slotchange` ever called it again: a
-     * page whose sections arrive after the nav does, which is every page that
-     * renders its content asynchronously, left the component dead for good. The
-     * observer is left disconnected either way, so re-running is the whole of
-     * the fix, and `updated` re-runs it while there is nothing to watch. */
+    /* Nothing to watch yet is not nothing to watch ever. A page whose sections
+     * arrive after the nav does, which is every page rendering its content
+     * asynchronously, resolves no href at first update, and returning here
+     * without leaving a way back kills the component for the life of the page.
+     * `updated` re-runs this while `observer` is undefined, which is why the
+     * field is cleared rather than left holding a disconnected observer. */
     if (this.sections.length === 0) {
       this.observer = undefined
       return
@@ -470,11 +458,9 @@ export class HelixHeadlessOutline extends HelixElement {
     this.observer = undefined
     this.resize?.disconnect()
     this.resize = undefined
-    /* The landing timer, which nothing was clearing. It holds a closure over
-       this element for 1.2 seconds after it leaves the document and then
-       touches it, which on a route change is a write to a tree nobody is
-       looking at. Every other subscription here was already torn down, which is
-       what made this one easy to miss. */
+    /* The landing timer holds a closure over this element for 1.2 seconds after
+       it leaves the document and then touches it, which on a route change is a
+       write to a tree nobody is looking at. */
     clearTimeout(this.landed)
     this.landed = undefined
   }
@@ -483,15 +469,13 @@ export class HelixHeadlessOutline extends HelixElement {
     super.connectedCallback()
     this.addEventListener('click', this.handleClick)
     globalThis.addEventListener?.('scroll', this.handleScroll, { passive: true })
-    /* Both observers are rebuilt on reconnection, and neither was.
-     *
-     * They were created in `firstUpdated`, which runs once for the life of the
-     * element, and torn down in `disconnectedCallback`, which runs every time it
-     * moves. So a outline moved in the DOM, which a framework does on any
-     * reorder, came back permanently frozen: `aria-current`, `current` and the
-     * traveling mark all stopped for the rest of the page's life with nothing
-     * to say why. Guarded on `hasUpdated`, because the first connection happens
-     * before the first render and there is nothing to watch yet. */
+    /* Both observers are rebuilt on reconnection. `firstUpdated` runs once for
+     * the life of the element and `disconnectedCallback` runs every time it
+     * moves, so without this an outline moved in the DOM, which a framework does
+     * on any reorder, comes back permanently frozen: `aria-current`, `current`
+     * and the traveling mark all stop for the rest of the page's life with
+     * nothing to say why. Guarded on `hasUpdated`, because the first connection
+     * happens before the first render and there is nothing to watch yet. */
     if (this.hasUpdated) {
       this.watch()
       this.resize = new ResizeObserver(() => this.indicator.place())

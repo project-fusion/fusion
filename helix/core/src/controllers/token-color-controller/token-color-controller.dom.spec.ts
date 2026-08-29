@@ -9,11 +9,10 @@ import { TokenColorController } from './token-color-controller.js'
  * whole point is that the browser does the converting: a token derives from an
  * `oklch()` seed, Chrome answers `lab(100 0 0)` for white, and parsing that
  * with a regular expression for numbers reads 100, 0, 0, which divided by 255
- * is a dark red. That shipped, and painted a warm streak down a shader for an
- * afternoon, surviving review because a warm cast on a saturated gradient is
- * also what a screenshot's chroma subsampling produces. A stubbed canvas would
- * be asserting the stub, and the bug was precisely that a plausible conversion
- * is wrong.
+ * is a dark red. A stubbed canvas would be asserting the stub, and the fault is
+ * precisely that a plausible conversion is wrong: it paints a warm streak down
+ * a shader, which is also what a screenshot's chroma subsampling produces on a
+ * saturated gradient, so it survives review.
  *
  * **What is here is everything around it, and one of those paths is the
  * measurement.** happy-dom's `getContext('2d')` answers null, which is the same

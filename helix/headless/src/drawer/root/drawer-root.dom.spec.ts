@@ -20,15 +20,14 @@ const markup = `
 
 describe('drawer', () => {
   test('the panel is a real dialog, so the platform owns the modality', async () => {
-    /* It was a `<div>` with `role="dialog"`, `aria-modal`, `inert`, a scrim
-       div, a `FocusTrapController` and a `DismissController`. `showModal()`
-       carries every one of those, and each hand-written version was a thing
-       that could drift from what the element actually did. */
+    /* `showModal()` carries `role="dialog"`, `aria-modal`, `inert`, the scrim,
+       the focus trap and Escape dismissal. Writing any of them by hand puts a
+       second copy of the state beside the platform's, which can drift from what
+       the element actually does. */
     const drawer = await mount(markup)
     const panel = part(drawer, 'panel') as HTMLElement
     expect(panel.tagName).toBe('DIALOG')
     expect(panel.getAttribute('aria-label')).toBe('Examples')
-    // Nothing hand-written left to drift.
     expect(panel.hasAttribute('role')).toBe(false)
     expect(panel.hasAttribute('aria-modal')).toBe(false)
     expect(part(drawer, 'scrim')).toBeNull()
@@ -36,8 +35,8 @@ describe('drawer', () => {
 
   test('content stays mounted while closed, and the dialog is what hides it', async () => {
     // Mounted so it is in the served markup and can animate. A shut `<dialog>`
-    // is already out of the tab order and the accessibility tree, which is what
-    // the hand-written `inert` was for.
+    // is already out of the tab order and the accessibility tree, so no `inert`
+    // is needed beside it.
     const drawer = await mount(markup)
     expect((part(drawer, 'panel') as HTMLDialogElement).open).toBe(false)
     expect(drawer.textContent).toContain('Inside')
@@ -85,11 +84,9 @@ describe('drawer', () => {
   })
 
   test('opening moves focus into the panel', async () => {
-    /* Browser-only now, and that is the migration showing. Focus-on-open was a
-       `FocusTrapController` calling `focus()` itself, which happy-dom could
-       run. It is `showModal()` doing it now, and happy-dom implements the
-       method as a no-op, so the only place this can be observed is a browser
-       that actually has a top layer. */
+    /* Browser-only: `showModal()` is what moves focus, and happy-dom implements
+       the method as a no-op, so the only place this can be observed is a
+       browser that actually has a top layer. */
     if (!hasLayout()) {
       return
     }
@@ -103,11 +100,11 @@ describe('drawer', () => {
   })
 
   test('Escape closes it, and comes back through the request', async () => {
-    /* `cancel` rather than a keydown on the document. Escape is the platform's
-       now, not a `DismissController`'s, and a native dialog fires `cancel` for
-       it. Intercepted rather than left alone, because a dialog left to close
-       itself shuts while the consumer's state still says open, which is the
-       bug that makes a modal impossible to reopen. */
+    /* `cancel` rather than a keydown on the document: Escape belongs to the
+       platform, and a native dialog fires `cancel` for it. Intercepted rather
+       than left alone, because a dialog left to close itself shuts while the
+       consumer's state still says open, which is the bug that makes a modal
+       impossible to reopen. */
     const drawer = (await mount(markup)) as Updatable
     drawer.requestOpen(true)
     await drawer.updateComplete

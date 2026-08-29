@@ -46,43 +46,28 @@
   inline-size: var(--legend-swatch-size, var(--helix-space-sm));
 }
 
-/* Index to color, which is the whole of what this tier adds.
- *
- * Twenty-four rules rather than one, because the index arrives as an attribute
- * and an attribute cannot select a token. The tier below counts the entries and
- * starts over after twenty-four, so there is no twenty-fifth rule to write.
- *
- * They are the eight hues in three tones: 1 to 8 balanced, 9 to 16 bright,
- * 17 to 24 muted. A legend that runs past eight repeats a hue in a different
- * tone rather than repeating a color, which is the best a palette can do at
- * that count. This said eight until the tokens went to twenty-four, at which
- * point a chart of twelve painted series nine from the palette and its legend
- * painted the same entry series one: the two disagreeing is the one thing the
- * legend exists to prevent. */
-/* One rule, not twenty-four. The headless tier knows which series a mark
-   belongs to and writes `--chart-series` onto it, pointing at one of the
-   twenty-four hooks `chart/series.css` defines, so the index reaches CSS
-   without an attribute selector having to carry it.
+/* Index to color, which is the whole of what this tier adds. The headless tier
+   knows which series a mark belongs to and writes `--chart-series` onto it,
+   pointing at one of the twenty-four hooks `chart/series.css` defines (eight
+   hues in three tones, starting over after twenty-four), so the index reaches
+   CSS without an attribute selector having to carry it.
 
-   It was twenty-four rules keyed on `[data-series]`, which worked from in here
-   and could not be reached from outside: `::part()` takes no attribute
-   selector, so a consumer looking at `data-series="2"` written on the part had
-   no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
-   dropped at parse time. `data-series` stays, because it is what a spec asserts
-   and what a document rule reaching in through the light DOM would still use. */
+   It cannot be an attribute selector: `::part()` takes none, so
+   `::part(bar)[data-series="2"]` is dropped at parse time and a consumer has
+   nothing able to reach the index. `data-series` stays, because it is what a
+   spec asserts and what a document rule reaching in through the light DOM would
+   still use. */
 /* **The axes, drawn so a key matches the chart it keys.** Two knobs and not a
-   rule per combination, the same shape `bar-chart` uses and for the same reason:
-   `--_legend-area` is what emphasis draws and `--_legend-through` is how much of
-   it material lets past, so the two compose instead of multiplying into a rule
-   for every pairing.
+   rule per combination, the same shape `bar-chart` uses: `--_legend-area` is
+   what emphasis draws and `--_legend-through` is how much of it material lets
+   past, so the two compose instead of multiplying into a rule for every pairing.
 
    A swatch is a box and a column is an SVG mark, so the declarations differ and
    the *treatments* do not: `fill` here is `background-color`, `stroke` is a
    border, and the fill under an outline is the same `60%` fade toward the page
-   the chart settled on after two arrangements that read in one mode only. Mixing
-   toward `transparent` rather than setting `opacity`, because `opacity` on the
-   box would take the border with it and the edge is the part that has to
-   survive. */
+   the chart uses. Mix toward `transparent` rather than setting `opacity`:
+   `opacity` on the box would take the border with it and the edge is the part
+   that has to survive. */
 [part="entry"] [part="swatch"] {
   background-color: color-mix(
     in oklab,
@@ -119,9 +104,7 @@
 }
 
 /* Glass, thinning whatever emphasis drew, so an outlined swatch goes see-through
-   at its edge rather than the material being a no-op on a box with no fill. That
-   corner is the one `bar-chart` measured as inert before the two knobs were
-   split apart. */
+   at its edge rather than the material being a no-op on a box with no fill. */
 [part="entry"][data-material="glass"] [part="swatch"],
 :host([material="glass"]) [part="entry"]:not([data-material]) [part="swatch"] {
   --_legend-through: calc(0.62 * var(--helix-material-opacity));

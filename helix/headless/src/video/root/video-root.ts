@@ -151,11 +151,11 @@ const SKIP_SECONDS = 10
  * @slot controls - Added to the control bar, before fullscreen.
  * @slot poster - Shown over the video until it starts.
  *
- * @event {Event} ended - Relayed for the same reason.
+ * @event {Event} ended - Relayed, because it does not cross a shadow boundary.
  * @event {HelixNextEvent} helix-next - Fired when the reader asks for the next item.
  * @event {HelixPreviousEvent} helix-previous - Fired when they ask for the previous one.
  * @event {Event} pause - Relayed for the same reason.
- * @event {Event} play - Relayed, because it does not cross a shadow boundary.
+ * @event {Event} play - Relayed for the same reason.
  *
  * @csspart back - The region top left, for a way out of a set.
  * @csspart captions - Subtitles on and off.
@@ -240,15 +240,12 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * Whether it *starts* silent, which is what an autoplaying video must do.
    *
-   * **Renamed from `muted`, because that is what it always was.** The platform
-   * splits these two: the `muted` content attribute reflects to `defaultMuted`,
-   * and the `muted` property is live state a reader's click moves without
-   * touching the attribute. This element declared one property called `muted`,
-   * bound it to the attribute, and tracked the live state privately as
-   * `silent`, so `<helix-video>.muted` answered what the author wrote rather
-   * than whether there was sound. A name matching the platform's while meaning
-   * something else is worse than a name the platform does not have, and
-   * a name comparison could not see it.
+   * **Named for the platform's split, which is real.** The `muted` content
+   * attribute reflects to `defaultMuted`; the `muted` property is live state a
+   * reader's click moves without touching the attribute. One property called
+   * `muted` bound to the attribute answers what the author wrote rather than
+   * whether there is sound, which is a name matching the platform's while
+   * meaning something else.
    */
   @property({ attribute: 'muted', reflect: true, type: Boolean })
   defaultMuted = false
@@ -310,7 +307,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * A list rather than a property apiece. A bar is a row with a budget, and a
    * boolean per feature invites a consumer to switch all of them on: naming
    * them makes the row a decision, and makes the order theirs. Anything
-   * unrecognised is skipped rather than throwing, since the list is markup and
+   * unrecognized is skipped rather than throwing, since the list is markup and
    * a typo should cost a control, not a page.
    *
    * `pip` is offered only where the platform has it, checked rather than
@@ -350,7 +347,7 @@ export class HelixHeadlessVideo extends HelixElement {
   overflowControls = ''
 
   /**
-   * The big mark over the picture before anything has played, or `none`.
+   * The big mark over the picture whenever it is not playing, or `none`.
    *
    * **On unless it is turned off, because a stopped video has nothing else.**
    * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
@@ -361,11 +358,6 @@ export class HelixHeadlessVideo extends HelixElement {
    * `none` is for the cases where that is wrong rather than right: a muted loop
    * behind a hero, a grid of eight thumbnails, anything where the video is
    * decoration rather than something to start.
-   *
-   * **Only before the first play.** A video paused halfway already has its bar
-   * up, because a paused video never idles, so the small control is visible and
-   * the reader has just used it. Covering the picture they stopped to look at
-   * would be the opposite of helpful.
    *
    * A value rather than a boolean, so the resting state is the attribute's
    * absence: a boolean defaulting to on would have to be spelled as its own
@@ -409,10 +401,10 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * How long the bar waits after the pointer stops before it goes, in ms.
    *
-   * It used to leave the moment the pointer did, which is not how a player
-   * behaves: a reader moving across the picture to reach a control watched it
-   * vanish under them. Zero turns the wait off and the bar goes immediately;
-   * a large number keeps it up for as long as anyone is likely to look.
+   * A wait rather than leaving with the pointer, or a reader moving across the
+   * picture to reach a control watches the bar vanish under them. Zero turns
+   * the wait off and the bar goes immediately; a large number keeps it up for
+   * as long as anyone is likely to look.
    *
    * The wait is only ever about *idling*. A video that is paused keeps its bar
    * regardless, because a reader who stopped it is deciding what to do next.
@@ -500,12 +492,11 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * How many caption tracks there are, which decides which control is drawn.
    *
-   * A count and not a boolean, and that is the whole reason it changed. Tracks
-   * resolve after the element renders, so this is what schedules the update
-   * that draws the control at all; as a boolean it went false to true when the
-   * first one arrived and then never moved again, so a second track landing
-   * left the toggle in place and the language menu was unreachable on exactly
-   * the videos it exists for.
+   * A count and not a boolean. Tracks resolve after the element renders, so
+   * this is what schedules the update that draws the control at all, and a
+   * boolean goes false to true when the first track arrives and then never
+   * moves again: a second one landing leaves the toggle in place and the
+   * language menu unreachable on exactly the videos it exists for.
    */
   @state()
   private captionCount = 0
@@ -619,13 +610,9 @@ export class HelixHeadlessVideo extends HelixElement {
   /**
    * The media's own state, under the platform's own names.
    *
-   * **This element already knew every one of these and kept them private.** It
-   * tracks `currentTime` as `position`, `duration` as `knownDuration`, `volume`
-   * as `loudness`, `paused` as `playing` and `playbackRate` as `rate`, paints
-   * them, and published none of them, so a consumer asking where the video had
-   * reached had nowhere to ask: the `<video>` is inside this shadow root and
-   * `querySelector` does not cross it. 295 is that finding across the library
-   * and this is its clearest case.
+   * **Published because there is no other way in.** The `<video>` is inside
+   * this shadow root and `querySelector` does not cross it, so a consumer
+   * asking where the video has reached has nowhere else to ask. See (295).
    *
    * **Read from the element, with the mirror as the fallback.** The element is
    * the truth and the mirror is a render cache that a media event refreshes, so
@@ -811,10 +798,9 @@ export class HelixHeadlessVideo extends HelixElement {
    * name Video never promised, carrying a seconds count or a level between zero
    * and one rather than anything about the element.
    *
-   * Found by sweeping every family that renders a native control, which is what
-   * 308 said and not what it was read as: the first two passes both took "form
-   * control" as the population and a media component with two rails in its
-   * chrome is neither a form control nor exempt from the mechanism. See 308.
+   * Every family that renders a native control needs this, not only the form
+   * controls: a media component with two rails in its chrome is neither a form
+   * control nor exempt from the mechanism. See (308).
    */
   private takeScrub(event: Event): void {
     event.stopPropagation()
@@ -919,13 +905,10 @@ export class HelixHeadlessVideo extends HelixElement {
     this.position = this.video?.currentTime ?? 0
   }
 
-  /**
-   * Relayed, because none of these cross a shadow boundary on their own.
-   *
-   * The video is inside this element's shadow root, so a consumer listening on
-   * the element they wrote hears nothing at all without this. Input relays
-   * `change` for the same reason.
-   */
+  /* Relayed, because none of these cross a shadow boundary on their own. The
+     video is inside this element's shadow root, so a consumer listening on the
+     element they wrote hears nothing at all without this. Input relays `change`
+     for the same reason. */
   /* `emptied` is in the list for a reason worth keeping. Assigning `src` runs
      the media load algorithm, which stops playback and sets `paused` without
      firing `pause`: the only events are `emptied` and `loadstart`. Listening for
@@ -1012,12 +995,6 @@ export class HelixHeadlessVideo extends HelixElement {
     })
     session.setActionHandler('play', () => this.toggle())
     session.setActionHandler('pause', () => this.toggle())
-    session.setActionHandler('seekbackward', (details) => {
-      this.seek((this.video?.currentTime ?? 0) - (details.seekOffset ?? 10))
-    })
-    session.setActionHandler('seekforward', (details) => {
-      this.seek((this.video?.currentTime ?? 0) + (details.seekOffset ?? 10))
-    })
     session.setActionHandler('seekto', (details) => {
       if (details.seekTime !== undefined && details.seekTime !== null) {
         this.seek(details.seekTime)
@@ -1230,11 +1207,11 @@ export class HelixHeadlessVideo extends HelixElement {
    * user activation. Both are `TypeError: Permissions check failed`, which is
    * the same message for two different causes.
    *
-   * It was `void`ed, so a refusal became an unhandled rejection: the button did
-   * nothing and said nothing, and the console entry it left named neither the
-   * element nor the reason. Caught here, the state stays honest because
-   * `aria-pressed` follows `fullscreenchange` rather than this call, so a
-   * refused request leaves a button that correctly reports "not fullscreen".
+   * Caught rather than `void`ed, or a refusal becomes an unhandled rejection
+   * naming neither the element nor the reason. The state stays honest either
+   * way, because `aria-pressed` follows `fullscreenchange` rather than this
+   * call, so a refused request leaves a button that correctly reports "not
+   * fullscreen".
    */
   private async toggleFullscreen(): Promise<void> {
     try {
@@ -1399,9 +1376,8 @@ export class HelixHeadlessVideo extends HelixElement {
    *
    * Because CSS cannot ask. `paused` is a property of a `<video>` and never an
    * attribute, so `video:not([paused])` matches every video that has ever
-   * existed: the first version of the rule that hides the bar used exactly that
-   * and hid it always, including on a paused video, which is the one state it
-   * was written to keep it in.
+   * existed and a rule written on it hides the bar always, including on the
+   * paused video it was written to keep the bar up for.
    *
    * **A `data-` attribute is right here because of when it is written.** A fact
    * that can be true on the first update mirrors to a custom state instead, or
@@ -1409,9 +1385,8 @@ export class HelixHeadlessVideo extends HelixElement {
    * React reports a mismatch it will not patch up. Nothing plays until somebody
    * presses play, so this one is written long past hydration and there is
    * nothing for it to disagree with. `data-closed` on `Toast.Item` and
-   * `data-closed` on `Toast.Item` is the same case; `:state(open)` and
-   * `:state(checked)` are the other one, and were `data-` attributes until
-   * 27 Aug 2026.
+   * `data-scrolled` on `AppHeader` are the same case; `:state(open)` and
+   * `:state(checked)` are the other one.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
@@ -1438,8 +1413,6 @@ export class HelixHeadlessVideo extends HelixElement {
    * two lists that have to stay in step is how a control ends up offered in one
    * place and not the other.
    */
-  /* `protected` rather than `private`: the method was already the seam and a
-     tier above simply could not reach it. */
   protected renderExtra(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<button
@@ -1453,10 +1426,8 @@ export class HelixHeadlessVideo extends HelixElement {
       </button>`
     }
     /* Two templates rather than one with the name bound in, for the reason
-       written under `previous` below: a part is read from the source, so
-       `part=${one}` is a part no check can prove anything about. These two were
-       left bound when that pair was split: both were documented and neither
-       could be found. */
+       written under `previous` below: a part is read from the source as a
+       literal, so `part=${one}` is a part no check can prove anything about. */
     if (one === 'rewind') {
       return html`<button
         part="rewind"
@@ -1488,10 +1459,9 @@ export class HelixHeadlessVideo extends HelixElement {
       </button>`
     }
     /* Two templates rather than one with the name bound in, because a part is
-       read from the source as a literal, so a part written as `part=${one}` is
-       a part no stylesheet can be proved to reach, and nothing can match it
-       against the documentation
-       either. It reported both of these as matching nothing. */
+       read from the source as a literal: `part=${one}` is a part no stylesheet
+       can be proved to reach, and nothing can match it against the
+       documentation either. */
     if (one === 'previous') {
       return html`<button
         part="previous"
@@ -1548,14 +1518,6 @@ export class HelixHeadlessVideo extends HelixElement {
     </button>`
   }
 
-  /*
-   * The same control as a row in the overflow menu.
-   *
-   * The label is words rather than a mark, which is the difference between a
-   * bar and a menu: a row has the width for a name and a reader scanning one is
-   * reading rather than recognising. `download` is a linked row, which is what
-   * `Menu.Item`'s `href` is for.
-   */
   /**
    * A toggle for one track, a menu for several, and nothing for none.
    *
@@ -1569,8 +1531,6 @@ export class HelixHeadlessVideo extends HelixElement {
    * nobody can choose between and that is the markup's fault to fix, not this
    * component's to paper over with "Track 2".
    */
-  /* `protected` rather than `private`: the method was already the seam and a
-     tier above simply could not reach it. */
   protected renderCaptions(): TemplateResult | typeof nothing {
     /* Branched on the state rather than on the getter, so the render that draws
        this is one the state scheduled. Reading the tracks for their labels is
@@ -1622,8 +1582,14 @@ export class HelixHeadlessVideo extends HelixElement {
     </${this.tag('menu')}>`
   }
 
-  /* `protected` rather than `private`: the method was already the seam and a
-     tier above simply could not reach it. */
+  /*
+   * The same control as a row in the overflow menu.
+   *
+   * The label is words rather than a mark, which is the difference between a
+   * bar and a menu: a row has the width for a name and a reader scanning one is
+   * reading rather than recognizing. `download` is a linked row, which is what
+   * `Menu.Item`'s `href` is for.
+   */
   protected renderOverflowItem(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<${this.tag('menu-item')} part="entry"
@@ -1688,8 +1654,6 @@ export class HelixHeadlessVideo extends HelixElement {
     </${this.tag('menu-item')}>`
   }
 
-  /* `protected` rather than `private`: the method was already the seam and a
-     tier above simply could not reach it. */
   protected renderBar(): TemplateResult {
     const done = this.knownDuration > 0 ? this.position / this.knownDuration : 0
     return html`<div part="controls">
@@ -1895,12 +1859,10 @@ export class HelixHeadlessVideo extends HelixElement {
       }
       ${
         /* Whenever it is not playing, which is what the mark means: press this
-           to play. It said that only before the first play, on the reasoning
-           that a paused video keeps its bar so the small control is already
-           there. True, and it makes the mark mean two different things at two
-           moments that are the same state. Every player a reader has used shows
-           it on pause, and the one who paused to study a frame clears it by
-           pressing the thing in the way.
+           to play. Not only before the first play, which would make the mark
+           mean two different things at two moments that are the same state.
+           Every player a reader has used shows it on pause, and the one who
+           paused to study a frame clears it by pressing the thing in the way.
 
            Not drawn at all where the browser draws its own controls, since that
            bar has a play button and two would be two. */

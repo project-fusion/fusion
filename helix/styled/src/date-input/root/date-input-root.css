@@ -85,18 +85,16 @@
  *
  * `border: none` said rather than left out. The UA stylesheet gives `[popover]`
  * `border: solid`, so dropping the declaration leaves a three-pixel medium
- * border rather than none at all: this shipped with one, and the comment above
- * it claimed there was none. Popover, Menu and Tooltip each carry the same
- * sentence, which is what makes the omission embarrassing rather than
- * surprising.
+ * border rather than none at all. Popover, Menu and Tooltip each record the
+ * same.
  *
- * The width is the calendar's own, not the field's. It was matched to the field,
- * copied from Select, and Select is the case where that is right: its panel is a
- * list of the same options its trigger shows, so a list narrower or wider than
- * the control reads as misaligned. A calendar is not a longer version of a date
- * field. Seven columns have a width that belongs to them, and stretching them to
- * a field that happens to be 600 pixels wide gives a month with its days spread
- * across half a screen. */
+ * The width is the calendar's own, not the field's. Select is the case where
+ * matching the control is right, its panel being a list of the same options its
+ * trigger shows, so a list narrower or wider than the control reads as
+ * misaligned. A calendar is not a longer version of a date field: seven columns
+ * have a width that belongs to them, and stretching them to a field that happens
+ * to be 600 pixels wide gives a month with its days spread across half a
+ * screen. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--date-input-border-width, var(--helix-border-floating)) solid
@@ -213,28 +211,17 @@
 /* The count of what is not shown. Reads as a note rather than as another tag,
    which it must: a reader who cannot tell them apart has been told there are
    fourteen dates and shown thirteen. */
-/* At the end of the row, after the field rather than between the tags and it.
- *
- * Between them it read as a third tag with the placeholder running on after it:
- * "August 4, August 11, 2 more YYYY-MM-DD" is four things where a reader sees
- * one sentence. At the end it is what it is, a note about the row, and the caret
- * sits directly after the last tag where typing continues the list. */
 [part="rest"] {
   color: var(--helix-color-foreground-subtle);
   flex: none;
   align-self: center;
-  /* Beside the tags it counts, not at the far end of the row.
-   *
-   * It sat there, pushed by `margin-inline-start: auto`, on the reasoning that
-   * at the end it is a note about the row and the caret then follows the last
-   * tag directly. Rendered against the combobox, which counts beside its chips:
-   * pushed right the count lands against the trigger with the whole width of the
-   * field between it and the tags, so it reads as part of the trigger cluster
-   * and what it counts has to be worked out. Beside them it reads as "and two
-   * more of these" with nothing to work out.
-   *
-   * The caret still follows the set. The set is now the tags and their count,
-   * which is the thing the caret should follow. */
+  /* Beside the tags it counts, never pushed to the far end of the row with
+   * `margin-inline-start: auto`. Pushed right, the count lands against the
+   * trigger with the whole width of the field between it and the tags, so it
+   * reads as part of the trigger cluster and what it counts has to be worked
+   * out. Beside them it reads as "and two more of these" with nothing to work
+   * out, and the caret still follows the set, which is the tags and their count
+   * together. */
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
@@ -247,11 +234,7 @@
  * length: the focus rule owns the `outline` and nothing here was changing its
  * color, so a focused field with an error came out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do.
- *
- * This was missing on every field added after Input, which is what a sweep of
- * all sixteen form controls turned up: `:state(invalid)` reached the host and
- * only the message underneath answered it. */
+ * and the ring are one edge, so when one turns they both do. */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -260,7 +243,8 @@
   outline-color: var(--helix-color-danger);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and a state carried by a fill has
+ * to survive, or the paper says the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. See 165. */

@@ -19,11 +19,10 @@
 /* On the slot, not on what was slotted into it.
  *
  * `::slotted()` matches elements and nothing else, so a quote written as bare
- * text between the tags got none of this: measured, the component's own example
- * rendered at fifteen pixels and weight four hundred where a quote wrapped in a
- * paragraph got twenty-four and five hundred. The example was showing the
- * component not working, and the plainest way to write a quote was the one way
- * that failed.
+ * text between the tags gets none of this: measured, that rendered at fifteen
+ * pixels and weight four hundred where a quote wrapped in a paragraph got
+ * twenty-four and five hundred. The plainest way to write a quote is the one
+ * that fails.
  *
  * Every property here is inherited, and inherited properties set on a slot
  * reach its assigned nodes through the flattened tree, text nodes included. The

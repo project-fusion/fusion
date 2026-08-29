@@ -58,8 +58,7 @@ export class HelixHeadlessDivider extends HelixElement {
    * A divider with no content has to be one continuous line, and the space
    * either side of the content is what would break it. `:empty` cannot answer
    * this and neither can `:host(:has(...))`, which is invalid CSS dropped at
-   * parse time: that exact rule was written in this file anyway, by an author
-   * who had already read the note saying so.
+   * parse time.
    *
    * On the region inside the shadow root rather than on the host, because an
    * attribute written onto the host is a change to markup the consumer rendered.

@@ -15,17 +15,12 @@ const preview = async (attributes = 'src="/frame.html"'): Promise<Preview> =>
  * The preview pane, and the contract that is the pane's rather than the
  * sandbox's.
  *
- * **The sandbox already proves the arrangement**, which is which pane leads,
- * what the splitter does and how the source reaches the preview: the preview is
- * named 32 times in this family's specs. What this pane owns alone is that it
- * *is* the security boundary, and the sandbox cannot assert that, because a
- * frame with `allow-same-origin` on it renders every example correctly and
- * passes every layout assertion ever written. It fails only against an example
- * that attacks the page, which nothing here runs on purpose.
- *
- * These are the assertions that make the name honest. `Sandbox.Preview` shipping
- * from `@fusion.dev/helix` was argued on exactly this: the component is the boundary
- * rather than a layout that happens to sit near one.
+ * **The sandbox already proves the arrangement**: which pane leads, what the
+ * splitter does and how the source reaches the preview. What this pane owns
+ * alone is that it *is* the security boundary, and the sandbox cannot assert
+ * that, because a frame with `allow-same-origin` on it renders every example
+ * correctly and passes every layout assertion ever written. It fails only
+ * against an example that attacks the page, which nothing here runs on purpose.
  */
 describe('the preview pane', () => {
   /* `allow-scripts` with `allow-same-origin` beside it is the same as no sandbox

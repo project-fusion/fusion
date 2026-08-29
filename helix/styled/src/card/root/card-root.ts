@@ -8,20 +8,17 @@ import { styles } from './card-root.css.js'
  * @summary Groups related content and actions into a single surface.
  *
  * @description
- * Regions are slots: `media`, `header`, the default slot for content, and
- * `footer`. An omitted region takes no space, so a card with only content needs
- * no wrapper markup at all.
+ * Regions are bare slots with no wrapper element: `media`, `header`, the default
+ * slot for content, and `footer`. An omitted one occupies no space without the
+ * card having to detect that it is missing, so a card with only content needs no
+ * wrapper markup at all. Style slotted content directly rather than reaching for
+ * a part: a header is whatever element you slotted, not a wrapper around it.
  *
  * `media` runs edge to edge and clips to the card's corners, so an image needs
  * no inset correction. Set `orientation="horizontal"` to move it alongside the
  * header, content, and footer stack rather than above it, or
  * `media-placement="end"` to put it under the content instead of over it, which
  * is what a chart concluding a card wants.
- *
- * Regions are bare slots with no wrapper element, so an omitted one occupies no
- * space without the card having to detect that it is missing. Style slotted
- * content directly rather than reaching for a part: a header is whatever
- * element you slotted, not a wrapper around it.
  *
  * @since 0.1.0
  * @status stable
@@ -59,11 +56,7 @@ export class HelixCard extends HelixHeadlessCard {
    *
    * **One value per mechanism, and the theme has the same four.**
    * `ThemeIntent.separation` is `border | fill | shadow | space`, so these are
-   * the component's words for what a theme states as a policy, one to one. It
-   * was `appearance`, which is the library's word for four different questions
-   * and is being retired from all of them: `outlined` on a Card says where the
-   * surface ends and `outlined` on a Button says how much ink, and one word
-   * cannot keep saying both.
+   * the component's words for what a theme states as a policy, one to one.
    *
    * - `outlined` is the default, and a hairline is usually enough. It costs
    *   less attention than a shadow: a screen of shadowed cards reads as a stack
@@ -79,10 +72,10 @@ export class HelixCard extends HelixHeadlessCard {
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
    *
-   * **`filled` is new and it closes a hole the engine could already see.**
-   * `plain` clears the ground *and* the edge, so a surface with its own color
-   * and neither edge nor lift was unsayable while being one of the four things
-   * a theme could ask for.
+   * `filled` closes a hole `plain` cannot: `plain` clears the ground *and* the
+   * edge, so a surface with its own color and neither edge nor lift would
+   * otherwise be unsayable while being one of the four things a theme can ask
+   * for.
    */
   @property({ reflect: true })
   separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
@@ -98,20 +91,17 @@ export class HelixCard extends HelixHeadlessCard {
    * **An attribute rather than a hook, because glass is not one declaration.**
    * It is a translucent ground *and* a backdrop filter, and either without the
    * other does nothing: a blur behind an opaque background is invisible, and a
-   * translucent card over an unfiltered page is a smear. `--card-backdrop`
-   * shipped on its own for exactly one commit and was that trap, a published
-   * hook a consumer could set and see nothing happen. The component owns the
-   * pair; a theme owns how strong it is.
+   * translucent card over an unfiltered page is a smear. `--card-backdrop` on
+   * its own is that trap, a published hook a consumer could set and see nothing
+   * happen. The component owns the pair; a theme owns how strong it is.
    *
    * Absent is opaque, per the rule that a reflected property takes no default,
    * so the stylesheet only describes the departure.
    *
-   * **The whole axis, which it did not used to be.** `glass` shipped alone,
-   * so a card offered one point of a three-point language and said nothing
-   * about the other two. `frosted` is the same pair turned up, the heavier
-   * ground under the heavier blur, for a card that has to stay readable over
-   * a busy page; `transparent` drops both, for one that is structure and
-   * spacing with the page showing through. See 270.
+   * **The whole axis, not one point of it.** `frosted` is the same pair turned
+   * up, the heavier ground under the heavier blur, for a card that has to stay
+   * readable over a busy page; `transparent` drops both, for one that is
+   * structure and spacing with the page showing through. See (270).
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'

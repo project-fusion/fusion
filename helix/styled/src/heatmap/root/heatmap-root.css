@@ -19,9 +19,8 @@
      time into a row. One `--heatmap-cell-size` could say either and not both.
 
      Each axis falls back to the shared hook, so `--heatmap-cell-size` still sets
-     both and existing markup is untouched, and the private is what the rules
-     read: a consumer moving one hook moves every rule that draws with it, and
-     the fallback chain is written twice rather than five times. */
+     both, and the rules read the private names, so the fallback chain is written
+     once per axis rather than at every use. */
   --_heatmap-cell-width: var(--heatmap-cell-inline-size, var(--heatmap-cell-size, 0.75rem));
   --_heatmap-cell-height: var(--heatmap-cell-height, var(--heatmap-cell-size, 0.75rem));
 

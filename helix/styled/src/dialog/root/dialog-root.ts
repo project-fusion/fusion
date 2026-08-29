@@ -50,18 +50,13 @@ export class HelixDialog extends HelixHeadlessDialog {
    * rather than assigned here, for the reason `Drawer.placement` gives: this
    * reflects, and a default would put `size="md"` into markup no consumer wrote.
    *
-   * **This was `appearance`, and it was the wrong word.** That word said how a
-   * thing *reads*, and here it said how wide the panel is, which its own
-   * description admitted in as many words. It turned out to be the first of
-   * many: `appearance` held four axes across 21 components and #158 retired it
-   * entirely, so this rename was that sweep arriving early at one component.
-   *
    * `size` is right despite the rule that controls have no size, because that
    * rule's own test is whether two of them sitting together could legitimately
    * differ, and it is answering "a ragged row is unwritable". Two dialogs never
    * sit together. One is on screen at a time, in the top layer, and it is the
    * region rather than a control in one, which is the same reason `Avatar` and
-   * `Spinner` keep theirs.
+   * `Spinner` keep theirs. Not `appearance`, which says how a thing reads
+   * rather than how wide it is. See (158).
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'

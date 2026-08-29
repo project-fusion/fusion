@@ -9,11 +9,9 @@
  * frontmatter to derive from, so it is written here.
  *
  * **A section with no pages is not declared.** A navigation entry is the
- * strongest existence claim a site can make, and the sections this library
- * intends to grow (Foundations, Components, Tooling) have nothing in them yet.
- * `bun run check:gen:docs` fails on an empty section rather than rendering a
- * heading with nothing under it.
- *
+ * strongest existence claim a site can make, so a section is added with the
+ * pages that fill it rather than ahead of them. `bun run check:gen:docs` fails
+ * on an empty section rather than rendering a heading with nothing under it.
  */
 
 /** A top-level grouping in the sidebar. */

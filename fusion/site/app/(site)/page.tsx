@@ -29,12 +29,12 @@ export const metadata = pageMetadata({
  * Draft C: the design system is the product, and the engagements are how it
  * arrives.
  *
- * **The reordering is the change.** Earlier drafts opened with the company and
- * put two substrates and three offers on the page as peers, which asks a reader
- * to care about Fusion before being told what Fusion has. This one states a
- * problem, answers it with three mechanisms, shows the mechanism working, proves
- * it with measurements, and only then says what it costs to have someone bring
- * it to you.
+ * **The order is the argument.** Opening with the company, or putting two
+ * substrates and three offers on the page as peers, asks a reader to care about
+ * Fusion before being told what Fusion has. This states a problem, answers it
+ * with three mechanisms, shows the mechanism working, proves it with
+ * measurements, and only then says what it costs to have someone bring it to
+ * you.
  *
  * **Cortex is not on this page and that is deliberate.** It is real and it is
  * Building, and it is also a second thing to understand at the moment a reader
@@ -49,13 +49,11 @@ export default function Home() {
       <div
         className={`${landing.reel} ${styles.oneBrand} ${styles.fabClearance} ${styles.noRules}`}
       >
-        {/* **The field, and nothing tempering it.** A scrim used to sit over
-          this, a vertical gradient of the page background holding the aura back
-          everywhere at once. It was written when the light was the only thing
-          between the reader and the text; every claim on the page now sits on
-          glass, so the ground behind the type is the card rather than the
-          field, and a sheet dimming the whole reel was paying for a problem
-          that had been solved somewhere else. */}
+        {/* **The field, and nothing tempering it.** A scrim over this, a
+          vertical gradient of the page background holding the aura back
+          everywhere at once, answers a problem already solved elsewhere: every
+          claim on the page sits on glass, so the ground behind the type is the
+          card rather than the field. */}
         {/* **Coarser features, because the box grew and the field does not
             repeat to fill it.**
 
@@ -68,17 +66,16 @@ export default function Home() {
 
             A card on glass reads by contrast against what is behind it rather
             than by how bright that is, so an even field gives it nothing to
-            separate from and it goes flat however correct its blur is. That is
-            what "the cards regressed" was, and raising `gain` to 1 made it
-            worse by evening the field further.
+            separate from and it goes flat however correct its blur is. Raising
+            `gain` toward 1 makes that worse by evening the field further.
 
-            Multiplied rather than divided, which is the correction: at 3.2 a
-            shape-unit is about 730px again, near the ~1000 the two-screen box
-            drew at 1.7. The cost is the ends, since `flow` closes on
-            `exp(-0.55 * scale)` of its center brightness at the box edge: 39%
-            at 1.7, 17% here. Hero and footer sit dimmer than the middle bands
-            do, which is a page-length gradient rather than a seam, and is the
-            price of one canvas over nine screens instead of two over four. */}
+            Multiplied rather than divided: measured at 3.2, a shape-unit is
+            about 730px again, near the ~1000 the two-screen box drew at 1.7. The
+            cost is the ends, since `flow` closes on `exp(-0.55 * scale)` of its
+            center brightness at the box edge: 39% at 1.7, 17% at 3.2. Hero and
+            footer sit dimmer than the middle bands do, which is a page-length
+            gradient rather than a seam, and is the price of one canvas over nine
+            screens instead of two over four. */}
         <helix-aura
           class={landing.reelAura}
           data-layer
@@ -98,9 +95,8 @@ export default function Home() {
             gap="lg"
           >
             {/* The latest thing published, which is what a chip pointing at the
-                writing should say. It read "the theme engine now measures every
-                pair it derives", a release note for one part of one product,
-                sitting directly under a heading about the company. */}
+                writing should say. Not a release note for one part of one
+                product, sitting directly under a heading about the company. */}
             <NewsKicker href="/insights" label="News" text="Helix ships as one open tier" />
 
             <h1 className={styles.tDisplay}>
@@ -172,12 +168,11 @@ export default function Home() {
             <div className={styles.bandCard} data-material="glass" data-substrate>
               {/* **Labeled as the first of the three, because that is what it
                   is.** The band above ends on three claims and this draws one of
-                  them out; labeled "The derivation" it read as the page
-                  narrowing back to the theme engine one section after widening
-                  to the interface. The label now names the card it belongs to
-                  and the lede says which of the three costs is being answered,
-                  so a reader arrives knowing this is depth rather than a change
-                  of subject. */}
+                  them out. A label naming the subject instead, "The derivation",
+                  reads as the page narrowing back to the theme engine one section
+                  after widening to the interface; naming the card it belongs to,
+                  with the lede saying which of the three costs is answered, tells
+                  a reader this is depth rather than a change of subject. */}
               <helix-flex class={styles.bandSection} direction="column" gap="md">
                 <p className={styles.tLabel}>Derived, not picked</p>
                 <h2 className={styles.tTitle}>What happens between the color and the page</h2>
@@ -195,25 +190,21 @@ export default function Home() {
           </helix-flex>
         </section>
 
-        {/* **The one band with no field behind it.** The showcase is already a
-          panel full of live components with their own surfaces, and a moving
-          light under that is two things competing for the same attention. It
-          paints its own ground rather than merely lacking an aura, because the
-          field above it runs `200svh` and would otherwise reach down into it. */}
-        {/* **The band no longer paints its own ground.** It carried `solidBand`, an
-          opaque fill that cut the field out of this one band deliberately. With
-          the showcase in a card of the same glass as the others, the card is the
-          surface and the field can run behind it like everywhere else. */}
+        {/* **The band does not paint its own ground.** An opaque fill here cut
+          the field out of this one band, on the argument that a moving light
+          under a panel of live components is two things competing for the same
+          attention. With the showcase in a card of the same glass as the others,
+          the card is the surface and the field runs behind it like everywhere
+          else. */}
         <section className={`${landing.showcaseBand} ${styles.fieldBand}`} data-band>
           <div data-shell>
             <div className={styles.bandCard} data-material="glass" data-substrate>
               <div className={styles.bandSplit}>
                 <helix-flex class={styles.bandSection} direction="column" gap="md">
-                  {/* The card this band draws out, named after it. The other
-                    two mechanisms are labeled this way already: "Derived, not
-                    picked" above and "Measured, not claimed" below. This said
-                    "The library", which named the subject rather than the
-                    argument and left the pattern two-thirds visible. */}
+                  {/* The card this band draws out, named after it, the way the
+                    other two mechanisms are: "Derived, not picked" above and
+                    "Measured, not claimed" below. A label naming the subject,
+                    "The library", leaves the pattern two-thirds visible. */}
                   <p className={styles.tLabel}>Standards, not bindings</p>
                   <h2 className={styles.tTitle}>Every control here is the real one</h2>
                   <p className={styles.tLede}>
@@ -345,20 +336,19 @@ export default function Home() {
           the offer and the close: a reader who is not ready to talk has
           somewhere to go that is not away.
 
-          **A card of four, where this was a carousel of six.** Two things were
-          wrong with the reel and only one of them was visible. It was the single
-          band with no glass behind its heading, so it read as unfinished beside
-          seven that had one. And the fix that would have finished it, dissolving
-          each card as it reached the boundary, is not available: an edge fade is
-          a mask, a mask flattens every `backdrop-filter` beneath it, and the
-          six cards it was framing are the things that would have gone flat. The
-          note above `[data-substrate]` in `site.css` has the measurements.
+          **A card of four, not a carousel.** A reel here is the one band with no
+          glass behind its heading, so it reads as unfinished beside the seven
+          that have one, and the fix that would finish it is not available:
+          dissolving each card at the boundary needs an edge fade, an edge fade is
+          a mask, and a mask flattens every `backdrop-filter` beneath it, which is
+          the cards themselves. The note above `[data-substrate]` in `site.css`
+          has the measurements.
 
           So the band is a card like every other, the four newest essays are
           cells inside it, and each one drops its own glass rather than nesting
           it. Four because that is a row, and because a set that fits on one
           screen does not need controls, an indicator or a scroll position to be
-          restored. `Read all` was always where the sixth essay was going. */}
+          restored. `Read all` is where the rest go. */}
         <section className={styles.fieldBand} data-band>
           <helix-flex data-shell direction="column">
             <div className={styles.bandCard} data-material="glass" data-substrate>
@@ -379,14 +369,14 @@ export default function Home() {
                 </p>
               </helix-flex>
 
-              {/* **No card and no art, because the band is the card.** The four
-                  were `InsightCard` at first, which meant a card inside a card:
-                  two edges, and a `backdrop-filter` sampling a surface that was
-                  already frosted. Dropping to the three things a reader chooses
-                  from, what it is about, what it is called and what it argues,
-                  removes the nesting rather than exempting it, and the cell is
-                  the link so the whole of it is the target. The full card, with
-                  its art and its glass, is what `/insights` shows. */}
+              {/* **No card and no art, because the band is the card.**
+                  `InsightCard` here would be a card inside a card: two edges, and
+                  a `backdrop-filter` sampling a surface that is already frosted.
+                  The three things a reader chooses from, what it is about, what it
+                  is called and what it argues, remove the nesting rather than
+                  exempting it, and the cell is the link so the whole of it is the
+                  target. The full card, with its art and its glass, is what
+                  `/insights` shows. */}
               <div className={`${styles.bandRow} ${styles.insightRow}`}>
                 {INSIGHTS.slice(0, 4).map((insight) => (
                   <Link

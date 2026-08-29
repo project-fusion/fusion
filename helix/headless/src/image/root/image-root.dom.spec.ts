@@ -10,8 +10,8 @@ type Picture = HTMLElement & { status: string; updateComplete: Promise<unknown> 
 
 const image = async (attrs = ''): Promise<Picture> => {
   /* The caller's `alt` wins rather than being written twice: a duplicate
-     attribute keeps the first, so a spec about an empty alt was reading the
-     helper's own. */
+     attribute keeps the first, so a helper-supplied one would shadow what a
+     spec about an empty alt is asserting. */
   const alt = attrs.includes('alt=') ? '' : 'alt="A pier"'
   const host = (await mount(
     `<helix-headless-image ${alt} ${attrs}></helix-headless-image>`,
@@ -85,9 +85,8 @@ describe('an image', () => {
   test("says it arrived, under the platform's own name", async () => {
     /* `load` and `error` on an `<img>` neither bubble nor compose, so the ones
        fired inside this shadow root reach nobody outside it. Relaying from the
-       host is what makes them audible, and it keeps the native name: this sent
-       `helix-load` until 26 Aug 2026, which was a second word for something the
-       platform had already named. See 294. */
+       host is what makes them audible, and it keeps the native name rather than
+       coining a second word for it. See (294). */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
     host.addEventListener('load', () => {
@@ -110,12 +109,11 @@ describe('an image', () => {
   })
 
   test('and does not bubble, because a native `load` does not', async () => {
-    /* The retired `helix-load` bubbled deliberately, so a gallery could count
-       with one listener. A bubbling relay of `load` reaches nothing in React:
-       it is in react-dom's `nonDelegatedEvents`, so no root listener exists,
-       and `bindReactHandler` binds only the non-bubbling ones. Matching the
-       native propagation is what makes `onLoad` work at all, and a gallery
-       does here what it does for `<img>`. See 294. */
+    /* A bubbling relay of `load` reaches nothing in React: it is in react-dom's
+       `nonDelegatedEvents`, so no root listener exists, and `bindReactHandler`
+       binds only the non-bubbling ones. Matching the native propagation is what
+       makes `onLoad` work at all, and a gallery does here what it does for
+       `<img>`. See (294). */
     const host = await image('src="/pier.jpg"')
     const heard: string[] = []
     host.parentElement?.addEventListener('load', () => heard.push('heard'))
@@ -150,14 +148,12 @@ describe('an image', () => {
 
 if (hasLayout()) {
   describe('an image whose stand-in has been put away', () => {
-    /* Asserting on the `hidden` attribute is what let this ship. The attribute
-       was set correctly on every path and the stand-in stayed painted over the
-       picture anyway, because `display: flex` is an author rule and
-       `[hidden] { display: none }` is the user agent's, and an author rule wins
-       at any specificity. Every image in the gallery was a gray rectangle under
-       a photograph that had loaded. A box is the only thing that answers
-       "is it out of the way" from the reader's side. `Megamenu` learned this
-       first and its own layout spec says the same. */
+    /* Never assert on the `hidden` attribute here. It can be set correctly on
+       every path while the stand-in stays painted over the picture, because
+       `display: flex` is an author rule and `[hidden] { display: none }` is the
+       user agent's, and an author rule wins at any specificity. A box is the
+       only thing that answers "is it out of the way" from the reader's side.
+       `Megamenu`'s own layout spec says the same. */
     const shown = async (attrs: string): Promise<Picture> => {
       const host = (await mount(
         `<helix-headless-image alt="A pier" style="inline-size:120px;--image-aspect:1/1" ${attrs}></helix-headless-image>`,
@@ -180,10 +176,9 @@ if (hasLayout()) {
     })
 
     test('a slotted placeholder fills the box rather than centering in it', async () => {
-      /* Measured before this rule existed: a slotted `Skeleton` came out 200
-         wide and nothing high. It has no height of its own, and what held it
-         was a centering flex box, which gave it its content height of zero. The
-         stand-in was a plain rectangle and the skeleton was never visible. */
+      /* A slotted `Skeleton` has no height of its own, so a centering flex box
+         gives it its content height of zero: measured at 200 wide and nothing
+         high, a plain rectangle with the skeleton never visible. */
       const host = (await mount(
         `<helix-headless-image alt="Waiting" style="inline-size:120px;--image-aspect:1/1"><i slot="placeholder"></i></helix-headless-image>`,
       )) as Picture

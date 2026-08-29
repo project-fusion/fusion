@@ -1,13 +1,10 @@
 import type { CSSProperties, ReactNode } from 'react'
 
 /**
- * Gallery art for the six families that draw a reading.
+ * Gallery art for the seven families in the `charts` category.
  *
- * **Split out of `content.tsx` because the taxonomy split first.** `content`
- * held 27 of the 88 families and meant none of the other seven, and its art
- * file was 1,136 lines for exactly that reason: a drawer in the catalog is a
- * drawer in the gallery. `charts` is a category now, so this is the file that
- * matches it.
+ * A drawer in the catalog is a drawer in the gallery, so this file exists
+ * because `charts` is a category.
  *
  * The system every drawing obeys is documented at the top of `core.tsx`, and
  * the vocabulary these inherit is the one `content.tsx` fixes: a bar is a line,
@@ -120,11 +117,6 @@ export const chartsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
-   * Nothing here, and what to do about it. The space is the subject, which is
-   * why there is no plane: an empty state drawn inside a box is a box.
-   */
-
   legend: (
     <>
       <rect className="artInk" fillOpacity="0.55" height="12" rx="4" width="12" x="100" y="62" />
@@ -153,11 +145,11 @@ export const chartsArt: Record<string, ReactNode> = {
     <>
       {/* Both series plot themselves, back one first, and the baseline holds.
        *
-       * The leading line used to lift on a pointer, which is the whole chart
-       * translating upward: a reading does not move, and a chart that slides is
-       * a picture being nudged rather than a series being drawn. `artDraw`
-       * writes each path from its first point to its last, which is the one
-       * gesture a line chart actually performs.
+       * Never a lift on the pointer, which translates the whole chart: a
+       * reading does not move, and a chart that slides is a picture being
+       * nudged rather than a series being drawn. `artDraw` writes each path
+       * from its first point to its last, which is the one gesture a line
+       * chart actually performs.
        *
        * Staggered so the emphasized series lands last. Drawn together they
        * cross in the same instant and the crossing is the fact this card exists
@@ -200,11 +192,10 @@ export const chartsArt: Record<string, ReactNode> = {
       />
       {/* The line writes itself and the terminus goes with it.
        *
-       * The line used to hold still while the dot pressed, on the argument that
-       * a sparkline is one line and swelling it swells the only thing on the
-       * card. That is an argument against a swell, not against motion: `artDraw`
-       * moves the line's *end* rather than its size, which is the one thing a
-       * series does.
+       * A swell is wrong here, a sparkline being one line and swelling it
+       * swelling the only thing on the card. That is an argument against a
+       * swell rather than against motion: `artDraw` moves the line's *end*
+       * rather than its size, which is the one thing a series does.
        *
        * `artMark` on the dot rather than `artOn`, for the fade. The dot marks
        * where the series ended, so it cannot sit out in the field at full
@@ -216,25 +207,22 @@ export const chartsArt: Record<string, ReactNode> = {
 
   trend: (
     <>
-      {/* One reading rather than two. Two of them said "here are two trends";
+      {/* One reading rather than two. Two of them say "here are two trends";
           the component says which way a number went, and an arrow that turns
           says that. */}
-      {/* One path, head and shaft together, because two shapes left a notch
+      {/* One path, head and shaft together, because two shapes leave a notch.
        *
-       * The head was a chevron whose inner apex sat at y 63 and the shaft was a
-       * rect starting at y 64, so along the shaft's own two units the head fell
-       * away to a point one unit above where the shaft began: a triangular gap
-       * at the top of the arrow, widest exactly on its center line. Meeting them
-       * by dropping the apex would put the inner edges off 45 degrees against
-       * outer edges that are on it, and overlapping them would darken the
-       * overlap, both shapes being ink at the same alpha.
+       * A chevron head whose inner apex sits at y 63 over a shaft rect starting
+       * at y 64 falls away, along the shaft's own two units, to a point one
+       * unit above where the shaft begins: a triangular gap at the top of the
+       * arrow, widest exactly on its center line. Meeting them by dropping the
+       * apex puts the inner edges off 45 degrees against outer edges that are
+       * on it, and overlapping them darkens the overlap, both shapes being ink
+       * at the same alpha.
        *
-       * The outline is the union of the two and is otherwise the same arrow.
-       * Everything a reader could measure is unchanged: the apex at 58,60, the
-       * 45 degree edges, the 2 unit shaft, and the foot still ends in the same
-       * semicircle, which is now an arc of radius 1 rather than the rect's `rx`.
-       * Only the top of the shaft had to change, and it had to change into the
-       * head. */}
+       * So the outline is the union of the two: apex at 58,60, 45 degree edges,
+       * a 2 unit shaft, and a foot ending in a semicircle drawn as an arc of
+       * radius 1 rather than a rect's `rx`. */}
       <g className="artMotion artTurn">
         <path
           className="artInk"

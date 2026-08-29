@@ -25,24 +25,17 @@ type DisableableHost = ReactiveControllerHost &
  * Pushes a group's `disabled` onto its members, on every update, unasked.
  *
  * **The cascade itself is `inheritDisabled`, and this is what makes it
- * automatic.** Four groups called that function by hand from inside whichever
- * method they happened to use for writing to their items: `place` in two of
- * them, `sync` in a third, `place` again in the fourth. That works, and it is
- * the wrong shape for three reasons.
+ * automatic.** Called by hand it runs only when whichever method holds the call
+ * runs, so a group whose items changed by some other path leaves them holding
+ * the last answer, and a group that forgets the call gets no cascade at all
+ * with nothing to say so: the property exists, the attribute reflects, and the
+ * members simply ignore it. That is invisible in review and shows up only when
+ * someone disables a set.
  *
- * It runs when that method runs. A group whose items changed without going
- * through it left them holding the last answer, and which paths reach it is a
- * different set in each of the four.
- *
- * It has to be remembered. A fifth group gets no cascade at all, and nothing
- * says so: the property exists, the attribute reflects, and the members simply
- * ignore it. That is the failure this exists to make impossible, because it is
- * invisible in review and only shows up when someone disables a set.
- *
- * And it adds no API. A group already has `disabled`, from `HelixFormElement`
- * or from the consumer; nothing here introduces a property or a method for
- * anyone to call. By this repo's own rule that makes it a controller and not a
- * mixin: it reacts to a lifecycle and nothing else.
+ * It adds no API. A group already has `disabled`, from `HelixFormElement` or
+ * from the consumer; nothing here introduces a property or a method for anyone
+ * to call. By this repo's own rule that makes it a controller and not a mixin:
+ * it reacts to a lifecycle and nothing else.
  *
  * So a group states its members once, at construction, and never thinks about
  * it again:

@@ -19,9 +19,9 @@
   --_tag-height: var(--helix-size-tag);
 
   /* Every tone is one status color, tinted for the fill and used at full
-     strength for the label. Deriving beats a token per status: the alternative
-     was eight tokens whose only job was to be a lighter version of one that
-     already existed, re-derived by every theme. */
+     strength for the label. Deriving beats a token per status, which would be
+     eight tokens whose only job is to be a lighter version of one that already
+     exists, re-derived by every theme. */
   --_tag-color: var(--helix-color-foreground-muted);
   --_tag-text: var(--helix-text-xs);
   --_tag-inset: var(--helix-space-xs);
@@ -38,15 +38,12 @@
   /* **These mix in sRGB, and the measurement is why.**
  *
  * oklab is the right space for choosing a color *between* two colors, which is
- * what this is, and that is why it was used. What it does against a near-black
- * ground is compress: measured in Chromium at 14 percent, a tone fill separates
- * from the page by 30 to 33 sRGB levels in light and by **4 to 10 in dark**,
- * where the same mix in sRGB gives 26 to 37 in both. A success tag in dark mode
- * had no fill anybody could see, from a token that works in light.
- *
- * That is the same asymmetry #188 records in the surface ramp, arriving through
- * a mix rather than through a token, and it is the compression #187 predicted
- * from the hero's wash without yet measuring here.
+ * what this is, but against a near-black ground it compresses: measured in
+ * Chromium at 14 percent, a tone fill separates from the page by 30 to 33 sRGB
+ * levels in light and by **4 to 10 in dark**, where the same mix in sRGB gives
+ * 26 to 37 in both. A success tag in dark mode had no fill anybody could see,
+ * from a token that works in light. Same asymmetry the surface ramp carries.
+ * See #187 and #188.
  *
  * Only the mixes toward a *ground* change. `--_tag-label` mixes toward the
  * foreground and the solid fill mixes toward it too, which is a different
@@ -58,25 +55,23 @@
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
 }
 
-/* **The label stays inside the pill**, which it did not.
+/* **The label stays inside the pill.**
  *
  * The host is `white-space: nowrap` and its overflow is visible, so a tag given
- * less room than its text painted the words straight out through the rounded
+ * less room than its text paints the words straight out through the rounded
  * end: measured in a table whose Status column had squeezed to 92px around a
  * 95px label, with "Missed window" running past the pink. A pill whose text
  * escapes it reads as a rendering fault rather than as a tight column.
  *
- * **Whatever squeezes it, that is this component's invariant to keep**, and
- * being squeezed is normal rather than exceptional: `helix-table-cell` sets
+ * Being squeezed is normal rather than exceptional: `helix-table-cell` sets
  * `min-inline-size: 0` on everything slotted into it, on purpose, so a cell can
  * shrink and take its content with it. That reasoning is about text, which
  * wraps. A pill cannot.
  *
  * On the slot rather than the host, and the difference matters: the host also
  * holds the dismiss button, whose focus ring is drawn outside its box, so
- * hiding overflow up there would clip the ring exactly the way the drawer's
- * scrolling region was clipping its button's. Truncating the one box that holds
- * the words leaves every other part's overflow alone.
+ * hiding overflow up there would clip the ring. Truncating the one box that
+ * holds the words leaves every other part's overflow alone.
  *
  * `display: block` because a `<slot>` is `display: contents` and generates no
  * box to truncate in, and `min-inline-size: 0` because the block it now
@@ -121,10 +116,11 @@ slot:not([name])::slotted(helix-icon) {
 
 /* Filled with the tone, label on top of it. `foreground-inverse` rather than a
    per-tone choice: every tone at full strength is dark enough in light mode and
-   light enough in dark for the inverse of the page to read on it. */
-/* The fill is the tone taken a step towards the page's own foreground, not the
-   tone itself. At full strength `primary` measured 4.21:1 against an inverse
-   label, under the 4.5 that 12px text needs; every other tone cleared it. One
+   light enough in dark for the inverse of the page to read on it.
+
+   The fill is the tone taken a step towards the page's own foreground, not the
+   tone itself. At full strength `primary` measures 4.21:1 against an inverse
+   label, under the 4.5 that 12px text needs; every other tone clears it. One
    value short is still a failure, and darkening the fill fixes it for all of
    them without a per-tone exception. */
 :host([emphasis="solid"]) {
@@ -144,9 +140,7 @@ slot:not([name])::slotted(helix-icon) {
   --_tag-color: var(--helix-color-primary);
 }
 
-/* Added with `Announcement`'s rename, so one word means one set. `Tag` had five
-   tones and the band had four, overlapping in three, which is two vocabularies
-   wearing one name. */
+/* Present so `Tag` and `Announcement` name one set of tones between them. */
 :host([tone="accent"]) {
   --_tag-color: var(--helix-color-accent);
 }
@@ -169,19 +163,16 @@ slot:not([name])::slotted(helix-icon) {
 
 /* Inside the tag's inline padding, and not pulled past it.
  *
- * This had `margin-inline-end: calc(var(--_tag-inset) * -1)`, which canceled
- * the tag's own inset so the control sat flush to the border. The intent was
- * for the tag not to grow a second inset around it; the effect was that the
- * control's hover fill and focus ring ran into the tag's edge, and a rounded
- * square touching a rounded rectangle reads as a mistake rather than as a
- * control inside a chip.
+ * Pulled back by its own padding, never by the tag's inset. Canceling the inset
+ * sits the control flush to the border, where its hover fill and focus ring run
+ * into the tag's edge, and a rounded square touching a rounded rectangle reads
+ * as a mistake rather than as a control inside a chip.
  *
- * Pulled back by its own padding, though, and not by the tag's inset. The
- * control's four pixels are hit area rather than space, so left to sit inside
- * the inset they added to it and the gap on the right came out at the inset
- * plus four while the label's on the left was the inset exactly. Canceling the
- * padding puts the visible gap back at the inset on both sides and leaves the
- * control the same size to press. */
+ * The control's four pixels are hit area rather than space, so left alone they
+ * add to the inset: the gap on the right comes out at the inset plus four while
+ * the label's on the left is the inset exactly. Canceling the padding puts the
+ * visible gap at the inset on both sides and leaves the control the same size
+ * to press. */
 [part="dismiss"] {
   /* `font: inherit` first, or the `em` below is not the tag's em.
    *
@@ -221,9 +212,11 @@ slot:not([name])::slotted(helix-icon) {
  * coloring the first half would make it two things sitting next to each other.
  * Weight says "this names what follows" without leaving the sentence.
  *
- * A rule between the two rather than a gap, since a gap alone reads as an
- * accidental space in a phrase, and a colon would be a character the consumer
- * did not write.
+ * No rule between the two: the heavier face and the gap have each said it
+ * already, and at tag size a hairline lands within a couple of pixels of the
+ * glyphs either side, which reads as a stroke that escaped from a letter. One
+ * gap and not a padding and a margin both, which at this size is twice the
+ * space the whole tag can afford.
  *
  * **Every declaration is on the slotted element, none on the slot.** A slot is
  * `display: contents` in the UA stylesheet, so an unassigned one generates no
@@ -231,15 +224,6 @@ slot:not([name])::slotted(helix-icon) {
  * measured, a tag with no prefix carried nine pixels of border and padding for
  * a slot with nothing in it. On the slotted element there is nothing to style
  * until something is there. */
-/* No rule between the two, because there is already one. The prefix is a
-   heavier face with a gap after it, and a hairline on top of that is a third
-   thing saying what the weight and the space have both said: at tag size it
-   also lands within a couple of pixels of the glyphs on either side of it,
-   which reads as a stroke that escaped from a letter. */
-/* One gap, not two. The padding and the margin were a pair because a rule sat
-   between them: the padding held the prefix off the line and the margin held
-   the line off the label. With the line gone they are two gaps in a row, which
-   is twice the space at a size where the whole tag is a few characters. */
 slot[name="prefix"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);

@@ -42,11 +42,11 @@ const STACK_BELOW = 512
  * positions at once.
  *
  * **The outer splitter draws it and the nested one announces itself upward.**
- * Built the other way round first, because a splitter already knows where its
- * own divider begins and needs no measurement of the other, and that version was
- * clipped: the crossing lies on the boundary between a pane and the divider
+ * The nested one drawing its own is the tempting version, since it already
+ * knows where its divider begins and needs no measurement of the other, and it
+ * is clipped: the crossing lies on the boundary between a pane and the divider
  * beside it, a handle centered there reaches back over the boundary, and a pane
- * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
+ * is `overflow: auto`. Exactly half the corner is cut off. The outer separator
  * is the one element that already straddles the seam, so the corner belongs in
  * it.
  *
@@ -152,8 +152,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * `horizontal` is side by side with an upright divider between them, and
    * `aria-orientation` on that divider is therefore `vertical`: a separator's
    * orientation is the direction it is *drawn* in, not the axis it moves along,
-   * so the two words are opposite each other here on purpose. The code had this
-   * right and the sentence beside it said the reverse.
+   * so the two words are opposite each other here on purpose.
    *
    * Unset is horizontal and stays unset, so a reflected default cannot appear on
    * a host whose server output never had it.
@@ -182,8 +181,6 @@ export class HelixHeadlessSplitter extends HelixElement {
    * Reading gives where it is; writing declares it the consumer's, and
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
-   *
-   *
    */
   @property({ type: Number })
   get position(): number {
@@ -197,12 +194,11 @@ export class HelixHeadlessSplitter extends HelixElement {
   set position(next: number) {
     const previous = this.position
     this.positionState = next
-    /* The consumer has spoken, so the drag stops standing in for them.
-       Without this the divider flashed back: `dragging` goes false on
-       `pointerup`, `showing` fell straight back to the position they had set
-       before the gesture, and it was drawn there for the frame it took them to
-       answer the announcement. Snapping to where it started and then jumping to
-       where it was dropped, on every drag. */
+    /* The consumer has spoken, so the drag stops standing in for them. Without
+       this the divider flashes back: `showing` falls to the position set before
+       the gesture and is drawn there for the frame it takes them to answer the
+       announcement, snapping to where the drag started and then jumping to
+       where it was dropped. */
     this.reached = undefined
     this.requestUpdate('position', previous)
   }
@@ -225,8 +221,6 @@ export class HelixHeadlessSplitter extends HelixElement {
    *
    * It overrides `min` and `max`, which is the point of it. Those keep a sliver
    * of a pane during a drag; this is the thing that says the sliver can go.
-   *
-   *
    */
   @property()
   get collapsed(): 'end' | 'start' | undefined {
@@ -381,14 +375,12 @@ export class HelixHeadlessSplitter extends HelixElement {
    * The position to draw, which is not always the position to report.
    *
    * A controlled splitter applies nothing, so `position` holds still for the
-   * whole gesture and the divider stayed where it was until the pointer came up
-   * and the consumer answered: it jumped to the end rather than following the
-   * hand. Reported as resizing that was not seamless and did not work as it had.
+   * whole gesture: drawn from it, the divider stays where it was until the
+   * pointer comes up and the consumer answers, jumping to the end rather than
+   * following the hand.
    *
-   * So a drag draws itself. The number is not announced until it settles, which
-   * is the rule that has not changed, and the consumer's answer takes over the
-   * moment they give one. It is what the sandbox did for itself before it used
-   * this component: write the size on every pointer move, tell anyone once.
+   * So a drag draws itself. The number is still not announced until it settles,
+   * and the consumer's answer takes over the moment they give one.
    */
   private get showing(): number {
     return this.reached === undefined ? this.position : this.clamp(this.reached)
@@ -464,17 +456,6 @@ export class HelixHeadlessSplitter extends HelixElement {
     }
   }
 
-  /*
-   * The collapse a settled position amounts to, if any.
-   *
-   * So that a pane dragged shut and a pane shut by a consumer's button are the
-   * same state. Left apart, a reader could drag the panel closed and the button
-   * offering to reopen it would read as already open.
-   *
-   * No separate threshold. Landing on the collapsed size *is* the gesture, and
-   * `clamp` puts every overshoot exactly on the bound, so the default of zero
-   * latches on any drag that runs off the end.
-   */
   /** The collapsed size, held inside the range a percentage can be. */
   private get sliver(): number {
     return Math.min(100, Math.max(0, this.collapsedSize))
@@ -483,11 +464,11 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Whether the divider is against an edge with nothing beside it.
    *
-   * Geometry, not state, which is the second answer here: it asked whether the
-   * pane was `collapsed`, and a divider driven to the edge by a consumer setting
-   * `position` is just as flush and drew a line anyway. What the stylesheet
-   * needs to know is whether there is a pane on both sides, and that is a fact
-   * about where the divider is however it got there.
+   * Geometry, not state. Asking whether the pane is `collapsed` is the wrong
+   * question: a divider driven to the edge by a consumer setting `position` is
+   * just as flush and would still get a line drawn. What the stylesheet needs
+   * to know is whether there is a pane on both sides, which is a fact about
+   * where the divider is however it got there.
    *
    * Still not the same question as `collapsed`: a pane shut to a sliver has a
    * boundary worth drawing, and one shut to nothing has the container's own edge
@@ -497,6 +478,14 @@ export class HelixHeadlessSplitter extends HelixElement {
     return this.sliver === 0 && this.shutAt(this.position) !== undefined
   }
 
+  /**
+   * The collapse a settled position amounts to, if any, so a pane dragged shut
+   * and a pane shut by a consumer's button are the same state.
+   *
+   * No separate threshold. Landing on the collapsed size *is* the gesture, and
+   * `clamp` puts every overshoot exactly on the bound, so the default of zero
+   * latches on any drag that runs off the end.
+   */
   private shutAt(position: number): 'end' | 'start' | undefined {
     const size = this.sliver
     if (position <= size) {
@@ -572,11 +561,10 @@ export class HelixHeadlessSplitter extends HelixElement {
     const wanted = this.clamp(next)
     /* Where the gesture has reached, recorded before anything decides whether to
        apply it. A controlled splitter applies nothing, so its `position` is
-       whatever the consumer last said, and settling at *that* announces the
-       number it already had: the drag ended where it began and the divider never
-       moved. Reported as a splitter that could not be dragged at all, and it was
-       every controlled one. The keyboard was fine because it computes its next
-       position rather than reading it back. */
+       whatever the consumer last said, and settling at *that* would announce
+       the number it already had: the drag ends where it began and the divider
+       never moves. Only the pointer is exposed to it, the keyboard computing
+       its next position rather than reading it back. */
     this.reached = wanted
     if (wanted === this.position) {
       return
@@ -673,12 +661,11 @@ export class HelixHeadlessSplitter extends HelixElement {
     }
     this.origin = null
     this.dragging = false
-    /* Nothing moved, so nothing is announced.
-       Every press on the divider used to settle, which dispatched a change
-       carrying the position it already had: a plain click rewrote a consumer's
-       stored value from a gesture that moved nothing. Harmless where the value
-       round-trips exactly, and not where it does not, which is any consumer
-       storing pixels and dividing by a box. */
+    /* Nothing moved, so nothing is announced. Settling on every press would
+       dispatch a change carrying the position it already had, so a plain click
+       rewrites a consumer's stored value from a gesture that moved nothing:
+       harmless where the value round-trips exactly, and not where it does not,
+       which is any consumer storing pixels and dividing by a box. */
     if (this.reached === undefined) {
       return
     }
@@ -694,19 +681,12 @@ export class HelixHeadlessSplitter extends HelixElement {
    * for its bounds. The other two arrows are left alone and the page scrolls
    * under them as it would anywhere else.
    *
-   * *Corrected 18 Aug 2026. This said "both axes, always", on the reasoning
-   * `KeyboardNavigationController` uses for a set of items: a reader who guesses
-   * the wrong arrow gets nothing. The code has never done it, and measuring the
-   * three tab stops of a nested pair is what turned that up, so the prose was
-   * describing a decision nobody implemented.*
-   *
-   * *Leaving it as one axis, because nesting is what settles it. Taking all four
-   * would mean `ArrowLeft` moving a horizontal divider up and down, which is not
-   * a reader being helped past a guess, it is an arrow that does not go the way
-   * it points. And the guess it was protecting against is answered better by the
-   * corner: there, all four arrows are live and each moves the divider it points
-   * along, which is the only place in a splitter where a second axis means
-   * anything.*
+   * **Not all four, which is the tempting version.** Taking every arrow would
+   * mean `ArrowLeft` moving a horizontal divider up and down: not a reader
+   * being helped past a wrong guess, an arrow that does not go the way it
+   * points. A reader who guesses wrong is answered better by the corner, where
+   * all four are live and each moves the divider it points along, which is the
+   * only place in a splitter where a second axis means anything.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const back = this.vertical ? 'ArrowUp' : 'ArrowLeft'
@@ -731,16 +711,16 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   /** Puts the divider back where the markup put it. */
   private reset(): void {
-    /* `default-position`, not the position at first render, which is what this
-       read and which is only the same thing when nobody owns the position. A
-       consumer who does owns what it was on that first frame too, and theirs can
-       be a number they cannot compute yet: the sandbox sizes its panel in pixels
-       and has no box to divide by until it has rendered once, so the divider
-       recorded "panel closed" as home and a double click on the crossing shut
-       the panel instead of restoring it. Reported.
+    /* `default-position`, never the position captured at first render. Those
+       are the same only when nobody owns the position: a consumer who does owns
+       what it was on that first frame too, and theirs can be a number they
+       cannot compute yet, as the sandbox's is, sizing its panel in pixels with
+       no box to divide by until it has rendered once. Home would then be
+       "panel closed" and a double click would shut the panel rather than
+       restore it.
 
-       Declared rather than remembered, so it is a value a consumer can state and
-       change, and it needs no capture at all. */
+       Declared rather than remembered, so it is a value a consumer can state
+       and change, and it needs no capture at all. */
     const home = this.clamp(this.defaultPosition)
     this.move(home)
     this.settle(home)
@@ -753,10 +733,9 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Both of them, because the corner moves both.
    *
-   * It needs its own handler now. Inside the separator this came free by
-   * bubbling, and moving the corner out to sit against the host for the stacking
-   * reason took the double click with it: the divider reset and the crossing
-   * did not. Reported.
+   * Its own handler, because the corner is a sibling of the separator rather
+   * than a child of it, for the stacking reason in the stylesheet, so nothing
+   * reaches the separator's own double click by bubbling.
    */
   private readonly handleCornerDoubleClick = (event: MouseEvent): void => {
     const crossing = this.crossings[Number((event.currentTarget as HTMLElement).dataset.cross)]
@@ -810,13 +789,11 @@ export class HelixHeadlessSplitter extends HelixElement {
    *
    * `parentElement` first, so a splitter does not find itself.
    *
-   * **By identity rather than by tag, which `closestInstance` exists for and
-   * counts this file in its own documentation.** It matched
-   * `'helix-splitter, helix-headless-splitter'`, and only `@fusion.dev/helix` registers
-   * the first of those: a headless package naming a styled one by string. Under
-   * any third tag, which is exactly what subclassing a headless element is for and
-   * what `helix/styled` itself does, the lookup returned null and a nested
-   * splitter had no corner, with no error anywhere.
+   * **By identity rather than by tag, which is what `closestInstance` exists
+   * for.** A selector like `'helix-splitter, helix-headless-splitter'` names a
+   * styled tag from a headless package and misses any third tag, which is
+   * exactly what subclassing a headless element produces: the lookup returns
+   * null, the nested splitter gets no corner, and nothing reports an error.
    *
    * It also crosses shadow boundaries, which `closest` does not: a splitter
    * slotted into another component's shadow root has a `parentNode` chain
@@ -941,18 +918,14 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Keeps a gesture on the corner to itself.
    *
-   * The corner was a child of the separator first, and every one of its events
-   * bubbled there, so the separator started its own drag from the same press.
-   * That is worse than moving twice: the separator calls `setPointerCapture`,
-   * which retargets every later pointer event to *it*, so the corner's
-   * `pointerup` never arrived, its origin was never cleared, and it went on
-   * resizing with no button held. Reported as resizing without a press.
+   * The stop is not redundant with the corner being a sibling of the separator.
+   * Should a press on the corner ever reach the separator, the separator calls
+   * `setPointerCapture`, which retargets every later pointer event to *it*: the
+   * corner's `pointerup` never arrives, its origin is never cleared, and it
+   * goes on resizing with no button held. Worse than moving twice.
    *
-   * The corner is a sibling now, for the stacking reason in the stylesheet, so
-   * nothing reaches the separator by bubbling. This stays because the fix should
-   * not depend on where the element happens to sit, and `preventDefault` is
-   * still needed either way: a drag across a pane would otherwise select the
-   * text under it.
+   * `preventDefault` is needed either way: a drag across a pane would otherwise
+   * select the text under it.
    */
   private leaveSeparator(event: Event): void {
     event.stopPropagation()

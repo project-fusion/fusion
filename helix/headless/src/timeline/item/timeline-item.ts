@@ -31,9 +31,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - What happened.
  * @slot marker - The mark on the line. Falls back to a dot, which is the slot's
- * own fallback content rather than anything this element works out: whether a
- * consumer slotted a mark is a question only the platform can answer, and it
- * answers it by rendering what is inside the slot when nothing replaced it.
+ * own fallback content: whether a consumer slotted a mark is a question only the
+ * platform can answer, and it answers it at assignment time.
  * @slot time - When it happened, as a reader should see it written.
  *
  * @csspart connector - The line arriving at this entry.
@@ -69,13 +68,11 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   /**
    * The mark for an entry that slotted none, which the tone decides.
    *
-   * **A `protected render…()` and not a getter, which is what it was.** A slot's
-   * fallback answers a consumer and a seam answers the tier above, and a getter
-   * answers neither: `${this.x}` is permitted because a property is not markup
-   * a tier would redraw, and the test is for parentheses, so a getter
-   * returning a template reads as a bare reference and was let through. That is
-   * the same hole the check's own comment records closing for a static helper,
-   * reopened by a different spelling of the same thing.
+   * **A seam is a `protected render…()` and never a getter.** A slot's fallback
+   * answers a consumer and a seam answers the tier above, and a getter answers
+   * neither. The check tests for parentheses, `${this.x}` being permitted
+   * because a property is not markup a tier would redraw, so a getter returning
+   * a template reads as a bare reference and is let through.
    *
    * Toned entries are reporting something, so they take the circle with a
    * center, which is `Steps` drawing the stage a reader is standing on. Untoned

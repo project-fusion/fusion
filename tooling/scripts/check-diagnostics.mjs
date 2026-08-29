@@ -13,7 +13,7 @@
  *
  * That assumption is the whole product. A collector that silently reads nothing
  * is `check:prose:dialect` again, green and structurally incapable of failing, which
- * is the failure `24-diagnostics.md` was written around. So it is asserted
+ * is the failure this was written around. So it is asserted
  * here, in Chromium, on a page holding real Helix elements with real adopted
  * stylesheets, with deliberate faults planted and an exact expected set.
  *

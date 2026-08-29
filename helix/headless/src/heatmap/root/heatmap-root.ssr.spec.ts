@@ -56,13 +56,13 @@ describe('heatmap server output', () => {
   })
 
   /**
-   * **Nothing added, and `rows` used to be.** It was declared `reflect: true`
-   * out of habit, so the server wrote `rows="1"` onto a host whose consumer had
-   * written no such attribute, which is a hydration mismatch a React consumer
-   * reports and does not patch up. Nothing reads the attribute either: the
-   * stylesheet takes the row count from an inline custom property. `visible` is
-   * written after the first render for the same reason, so the server's output
-   * and a hydrating consumer's markup agree that neither has it yet.
+   * **Nothing added, and `rows` must never reflect.** Reflecting it makes the
+   * server write `rows="1"` onto a host whose consumer wrote no such attribute,
+   * which is a hydration mismatch a React consumer reports and does not patch
+   * up. Nothing reads the attribute either: the stylesheet takes the row count
+   * from an inline custom property. `visible` is written after the first render
+   * for the same reason, so the server's output and a hydrating consumer's
+   * markup agree that neither has it yet.
    */
   test('the host writes no attributes of its own', () => {
     expect(hostAttributes(markup, 'helix-headless-heatmap')).toEqual(['for', 'label'])

@@ -170,20 +170,18 @@ export class HelixHeadlessButton extends HelixFormElement {
   private readonly handleClick = (): void => {
     /* **Re-linked here, and this is the line that makes a trigger reliable.**
      *
-     * `linkCommand` used to run from `updated` alone, so the target was
-     * resolved once, whenever the button last rendered, and never again. A
-     * button whose properties do not change does not update again, so one whose
-     * target had not been inserted yet stayed wired to nothing for good.
-     * Measured: `commandForElement` read null with the target absent, null
-     * again after the target was inserted, and resolved the instant an
-     * unrelated property forced an update. Whether a trigger worked came down
-     * to insertion order, which is why it survived a full reload and not a
-     * client navigation, where the same markup arrives in pieces.
+     * From `updated` alone the target resolves once, whenever the button last
+     * rendered, and never again. A button whose properties do not change does
+     * not update again, so one whose target had not been inserted yet stays
+     * wired to nothing for good. Measured: `commandForElement` read null with
+     * the target absent, null again after the target was inserted, and resolved
+     * the instant an unrelated property forced an update. Whether a trigger
+     * works then comes down to insertion order, which is why it survives a full
+     * reload and not a client navigation, where the same markup arrives in
+     * pieces.
      *
-     * **The fallback path was the correct one all along**, which is the tell:
-     * `sendCommand` resolves through `commandTarget` at activation, so a
-     * browser *without* invokers ran this correctly and a browser with them did
-     * not.
+     * `sendCommand` resolves through `commandTarget` at activation, so a browser
+     * *without* invokers was never affected and one with them was.
      *
      * A click listener is early enough, and that is measured rather than read
      * off the specification: activation behavior runs after the click has
@@ -249,9 +247,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    * the attributes it rendered, and this one is `attribute: false`, so the state
    * travels to the inner `<button>` and lands inside a shadow root React does
    * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it, which is what `Popover`'s note asks for, and the reader is
-   * still told what the control does, which is what `SpeedDial`'s note asks
-   * for. See #322.
+   * they served it and the reader is still told what the control does. See #322.
    *
    * `undefined` renders nothing at all, so a button that is not a trigger
    * carries no `aria-expanded`: the resting state is the attribute's absence,
@@ -318,11 +314,11 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * The element this button's command is sent to, resolved.
    *
-   * The platform's own accessor, and this element had the resolution and kept
-   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
-   * where a consumer cannot reach it, and `commandFor` answers with an id
-   * rather than an element. Writing assigns the inner control directly, which
-   * is what an invoker without an id in the same tree needs.
+   * The platform's own accessor, because the resolution is otherwise kept
+   * inside: `linkCommand` writes the target onto the inner `<button>`, where a
+   * consumer cannot reach it, and `commandFor` answers with an id rather than
+   * an element. Writing assigns the inner control directly, which is what an
+   * invoker without an id in the same tree needs.
    */
   get commandForElement(): Element | null {
     const button = this.renderRoot?.querySelector('button') as
@@ -352,13 +348,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    *
    * `commandForElement` takes an element instead, and an element reference
    * resolves outward: a node in a shadow root may point at one in the document.
-   * The same asymmetry the listbox relies on for `aria-activedescendant`, and
-   * the second place in this library where the id form is the one that cannot
-   * work.
-   *
-   * The id is looked up in the host's own root rather than the document, so a
-   * button inside somebody else's shadow root finds a target in that same root
-   * and not a coincidence in the page.
+   * The same asymmetry the listbox relies on for `aria-activedescendant`.
    */
   private linkCommand(): void {
     const button = this.renderRoot?.querySelector('button')
@@ -384,12 +374,10 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * Sends the `command` event where the browser will not.
    *
-   * Invoker commands are recent, and where they are missing `linkCommand` set a
-   * property that does not exist and returned, so the button did nothing at all
-   * when clicked. Silently: the markup was right, the component was right, and
-   * every `command` in the library was inert at once with no error to find. A
-   * design system cannot ship an example that depends on a feature failing that
-   * quietly.
+   * Invoker commands are recent, and where they are missing `linkCommand` sets a
+   * property that does not exist and returns, so the button does nothing at all
+   * when clicked. Silently: the markup is right, the component is right, and
+   * every `command` in the library is inert at once with no error to find.
    *
    * Only where the platform is absent, so a browser that has invokers sends
    * exactly one event and this sends none. Doing both would open a dialog and

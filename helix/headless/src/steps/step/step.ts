@@ -20,11 +20,10 @@ import '../../button/index.js'
  * hit area and no meaning: the accessible name would be the text either way,
  * and what is pressable would stop being the same shape as what is readable.
  *
- * It is `helix-button`, not a `<button>` this element resets and dresses. The
- * hover wash, the focus ring, the disabled treatment and the way the label sits
- * against an icon are all decisions the button already carries, and a second
- * copy of them here is a second copy to keep in step. `ghost` is the quiet
- * shape: transparent until it is pointed at.
+ * It is `helix-button`, not a `<button>` this element resets and dresses: the
+ * hover wash, the focus ring and the disabled treatment are decisions the
+ * button already carries. `ghost` is the quiet shape, transparent until it is
+ * pointed at.
  *
  * It says nothing about where a reader may go. Every step is pressable and
  * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
@@ -42,11 +41,10 @@ import '../../button/index.js'
  * accessibility tree would carry marks that are not there, and the markup would
  * say three things about a stage that is one.
  *
- * Numbering is a separate question and belongs to the tier above. `numeric`
- * hides the mark and shows a CSS counter, which the browser resolves at layout,
- * so the digit costs no script and is right in the server's markup however the
- * steps are ordered. Nothing here knows which appearance is in use, and does
- * not need to.
+ * Numbering belongs to the tier above. `numeric` hides the mark and shows a CSS
+ * counter, which the browser resolves at layout, so the digit costs no script
+ * and is right in the server's markup however the steps are ordered. Nothing
+ * here knows which appearance is in use.
  *
  * **`complete` and `current` are separate, and both can be false.** A stage
  * that is neither is one the reader has not reached, which is the majority of
@@ -130,16 +128,14 @@ export class HelixHeadlessStep extends HelixElement {
    * center for the one they are standing on, a bare check for one that is done.
    * The first two are one shape filling in, which is the progression, and the
    * check is the only mark that leaves the family because finishing is the only
-   * state that is not a position in the sequence.
+   * state that is not a position in the sequence. A coin around the check would
+   * put two of the three inside the same container and leave hue doing the work
+   * of telling them apart.
    *
-   * What went was the coin around the check: a filled disc carrying a check
-   * beside a filled disc carrying a ring put two of the three inside the same
-   * container, and left hue doing most of the work of telling them apart.
-   *
-   * The bare check is `Timeline`'s, deliberately: the two components report the
-   * same kind of thing, a sequence with marks down it, and a check floating on
-   * a hairline in one beside a check inside a green coin in the other was two
-   * answers to one question. Timeline's rings came off the same day.
+   * The bare check matches `Timeline`, deliberately: the two components report
+   * the same kind of thing, a sequence with marks down it, and a check on a
+   * hairline in one beside a check inside a coin in the other is two answers to
+   * one question.
    */
   protected renderMarker(): TemplateResult {
     const icon = this.complete ? check : this.current ? record : circle
@@ -160,11 +156,10 @@ export class HelixHeadlessStep extends HelixElement {
    * The step's own label, which is a control because a step can be gone to, behind a seam the styled tier can move.
    *
    * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * wrap this one, or leave it out, without reimplementing the whole template.
+   * The tag is interpolated rather than written, so `tier` resolves it: this
+   * renders the headless element, and a styled subclass that sets `tier`
+   * renders the styled one from the same template.
    */
   protected renderLabel(): TemplateResult {
     return html`<${this.tag('button')}
@@ -181,13 +176,13 @@ export class HelixHeadlessStep extends HelixElement {
   protected override render(): TemplateResult {
     /* Two half lines, one either side of the mark, rather than one line running
        the whole way to the next step.
-       A single line was tried twice. Drawn to the next marker it has to know
-       how far away that is, which is the next step's size, and a step knows
-       only its own. Drawn across the gap alone it is a stub. Two halves need
-       neither: each reaches from the mark to its own step's edge and half the
-       gap beyond, so it meets the one coming the other way in the middle of the
-       gap and the rule reads as continuous however wide the steps are or how
-       differently they are filled.
+       A single line drawn to the next marker has to know how far away that is,
+       which is the next step's size, and a step knows only its own; drawn
+       across the gap alone it is a stub. Two halves need neither: each reaches
+       from the mark to its own step's edge and half the gap beyond, so it meets
+       the one coming the other way in the middle of the gap and the rule reads
+       as continuous however wide the steps are or how differently they are
+       filled.
        The first has nothing on its leading side and the last nothing on its
        trailing one, which `:host(:first-child)` and `:host(:last-child)` say
        with no index and no parent counting its children. */

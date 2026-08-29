@@ -30,9 +30,10 @@ export interface Route {
   /** Path as served, with a leading slash and no extension. */
   path: string
   /**
-   * How often this changes, for the sitemap.
+   * Relative importance, for the sitemap.
    *
-   * Generated pages move with the library; prose moves when somebody writes.
+   * 1 is the landing page and 0.3 the legal pages: what a reader came for
+   * ranks above what the site is obliged to serve.
    */
   priority: number
   /** Grouping in `llms.txt`. */

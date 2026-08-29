@@ -20,13 +20,12 @@ import '../../tooltip/index.js'
  * A track is drawn under the slices, so a ring whose values do not fill it
  * still reads as a ring with a gap rather than as a broken arc.
  *
- * **How thick the ring is drawn is `hole`, not a CSS hook.** It was
- * `--donut-chart-thickness`, and the stroke's width and the ring's radius have
- * to agree: the outer edge is `r + width / 2`, so setting one in CSS and
- * deriving the other in markup gives a drawing that is wrong in both. Measured
- * with the hook still in place, every ring came out twelve units thick whatever
- * its `hole`, so a pie was a small ring with a hole in it and `large` was drawn
- * larger than the default.
+ * **How thick the ring is drawn is `hole`, not a CSS hook.** The stroke's width
+ * and the ring's radius have to agree: the outer edge is `r + width / 2`, so
+ * setting one in CSS and deriving the other in markup gives a drawing that is
+ * wrong in both. Measured with such a hook in place, every ring came out twelve
+ * units thick whatever its `hole`, so a pie was a small ring with a hole in it
+ * and `large` was drawn larger than the default.
  *
  * @since 0.1.0
  * @status experimental
@@ -70,17 +69,13 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
    * page, leaving a boundary in the series' own color, which is the same trade
    * `BarChart` makes on a column.
    *
-   * **This took three values on 25 Aug 2026, and the note it replaces argued it
-   * could not.** That note was right about the mark: a slice is a stroke on a
-   * ring, the edge *is* the mark, and there is nothing within it to fade. It
-   * concluded that `outlined` would mean drawing slices as filled paths instead
-   * of arcs, and called that changing what a donut is to satisfy a word.
-   *
-   * What it did not weigh is that the two can both be there. The arc still draws
-   * the slice and still carries the animation, and a closed path traces the same
-   * wedge beside it for anything that needs a boundary. Nothing about the donut
-   * changed; something was added next to it. See `renderEdge` on the tier below
-   * for why the dash could not simply be replaced.
+   * **A slice is a stroke on a ring, so `outlined` is a second mark rather than
+   * a change to the first.** The edge *is* the mark and there is nothing within
+   * it to fade, so the arc keeps drawing the slice and carrying the animation
+   * and a closed path traces the same wedge beside it. Redrawing slices as
+   * filled paths instead of arcs would be changing what a donut is to satisfy a
+   * word. See `renderEdge` on the tier below for why the dash could not simply
+   * be replaced.
    *
    * The value that stays refused is `ghost`, which on a ring is a chart with no
    * slices.

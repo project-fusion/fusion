@@ -44,13 +44,11 @@ const DESTINATIONS: Findable[] = [
          nothing else in the palette could reach the thing that drives it. */
       { description: 'A palette and its audit', href: '/helix/theme', label: 'Theme builder' },
       /* Not a tool, and here for the opposite reason to the two above: nothing
-         reaches it at all. It is in `routes.ts`, so it is in the sitemap and in
-         `llms.txt`, and that was the whole of it: no panel row, no palette
-         entry, and no link from any page or any documentation page.
-         `motion.mdx` mentions the aura shader in a sentence about what stops
-         under reduced motion, without linking it.
+         else reaches it. It is in `routes.ts`, so it is in the sitemap and in
+         `llms.txt`, and there is no panel row and no link from any page.
 
-         The link is here rather than in that sentence because `@fusion.dev/helix-docs`
+         The link is here rather than from `motion.mdx`, which mentions the aura
+         shader without linking it, because `@fusion.dev/helix-docs`
          is a content package and `/helix/aura` is this site's route. The
          package links its own pages relatively and describes the sandbox and
          the theme builder without linking either, which is the same boundary
@@ -128,19 +126,13 @@ const ranked =
 /**
  * The search trigger and the palette behind it, for any header that wants one.
  *
- * **Extracted because two headers exist and only one of them had this.** The
- * site renders `SiteNav` and the workbench renders a header of its own, and
- * they differed in ways nobody could state: the palette and its trigger were on
- * the first and absent from the second, which is the request that surfaced the
- * whole question. A reader in the sandbox had no way to reach anything without
- * going back to the site first.
- *
- * **Extraction rather than unification, and the two are separable.** The
- * workbench's header is deliberately not the site's: `SandboxLayout` says
- * outright that this is a tool and every row of chrome around it is a row taken
- * from the thing being examined, which is right. So the shared piece is the
- * palette, not the header: each header keeps its own density, its own inset and
- * its own center, and both render this.
+ * **Extraction rather than unification.** Two headers exist, the site's
+ * `SiteNav` and the workbench's own, and the workbench's is deliberately not
+ * the site's: `SandboxLayout` says outright that this is a tool and every row
+ * of chrome around it is a row taken from the thing being examined. So the
+ * shared piece is the palette, not the header: each header keeps its own
+ * density, its own inset and its own center, and both render this. Without it a
+ * reader in the sandbox cannot reach anything without going back to the site.
  *
  * `findable` is built on a server and handed down, in both places. The
  * catalog reads the manifest off disk and the insight registry is the whole
@@ -156,20 +148,17 @@ export function SiteFind({
   /**
    * Which slot the trigger goes in, or `undefined` for whatever it is inside.
    *
-   * **An assumption about the parent, made explicit after it cost a feature.**
-   * The trigger hardcoded `slot="end"`, which is right as a direct child of
-   * `helix-app-header` and wrong anywhere else: the workbench groups its
-   * end-slot items in a `helix-flex`, which has no `end` slot, so the button
-   * was unassigned and generated no box at all. Nothing threw and nothing
-   * warned, and a slot that matches nothing looks exactly like a component
-   * that decided not to render.
+   * **An assumption about the parent, made explicit.** `slot="end"` is right as
+   * a direct child of `helix-app-header` and wrong anywhere else: the workbench
+   * groups its end-slot items in a `helix-flex`, which has no `end` slot, so
+   * the button is unassigned and generates no box at all. Nothing throws and
+   * nothing warns, and a slot that matches nothing looks exactly like a
+   * component that decided not to render.
    *
-   * **No default, deliberately, and the first attempt had one.** Written
-   * `slot = 'end'` the workbench could not opt out: a default parameter is
-   * what `undefined` selects, so `slot={undefined}` resolved straight back to
-   * `'end'` and the button stayed unassigned through two reloads that looked
-   * like a stale bundle. A prop whose whole job is to say where something goes
-   * should be said rather than assumed.
+   * **No default, deliberately.** A default parameter is what `undefined`
+   * selects, so `slot = 'end'` would resolve `slot={undefined}` straight back
+   * to `'end'` and leave the caller no way to opt out. A prop whose whole job
+   * is to say where something goes should be said rather than assumed.
    */
   slot?: string | undefined
   trigger?: boolean
@@ -179,7 +168,7 @@ export function SiteFind({
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
 
-  /* **Bound here rather than as a prop, and the reason is worth keeping.**
+  /* **Bound here rather than as a prop.**
    *
    * `helix-filter` is composed, so it does cross out of the palette's shadow
    * root, but it is dispatched by the *listbox* inside it. `HelixElement`
@@ -274,11 +263,10 @@ export function SiteFind({
           ),
         )}
 
-        {/* **Four hints, and each one is a group rather than a clause.** They
-            were a single sentence with commas doing the separating, which asks
-            a reader to parse punctuation to find out where one key's job ends
-            and the next begins. A key and the word for what it does are one
-            object; the space between objects is what says so.
+        {/* **Four hints, and each one is a group rather than a clause.** A key
+            and the word for what it does are one object, and the space between
+            objects is what says so; run together in a sentence, a reader has to
+            parse punctuation to find where one key's job ends.
 
             The fourth is the second destination, which is why it is here rather
             than in the component: only this knows that a component row's

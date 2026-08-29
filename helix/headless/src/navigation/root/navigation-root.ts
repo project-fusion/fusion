@@ -35,10 +35,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-navigation')
 export class HelixHeadlessNavigation extends HelixElement {
-  /* The mark, and the RTL sign and border correction that came with it. This
-     was hand-written and had neither: the distance was measured from the
-     physical left and applied from the inline-start edge, so it traveled the
-     wrong way in a right-to-left document. */
+  /* The controller carries the RTL sign and border correction: a distance
+     measured from the physical left and applied from the inline-start edge
+     travels the wrong way in a right-to-left document. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'),
     indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
@@ -65,20 +64,13 @@ export class HelixHeadlessNavigation extends HelixElement {
     this.observer?.disconnect()
     this.current?.disconnect()
 
-    /* Nothing is written onto the items any more.
-     *
-     * `data-navigation-item` used to be put here, because the base layer styled a
-     * destination with it and forgetting it was silent and total: the links
-     * kept working and came out as bare underlined anchors. Writing it fixed
-     * that and bought two problems. It happened after upgrade, so a
-     * server-rendered nav arrived unstyled and restyled itself a frame later;
-     * and a React consumer who wrote the attribute themselves got
-     * `data-navigation-item="true"` from JSX, which this then had to be careful not to
-     * overwrite or hydration reported a mismatch.
-     *
-     * The base layer selects `helix-navigation a` as well now, so the styling is
-     * true the moment the markup is parsed, on the server and on the client,
-     * and there is nothing to write or to be careful about. */
+    /* Nothing is written onto the items, and `data-navigation-item` must not be
+     * written here: it would land after upgrade, so a server-rendered nav would
+     * arrive unstyled and restyle itself a frame later, and a React consumer
+     * who wrote the attribute themselves gets `data-navigation-item="true"`
+     * from JSX, which overwriting reports as a hydration mismatch. The base
+     * layer selects `helix-navigation a`, so the styling is true the moment the
+     * markup is parsed, on the server and on the client. */
     this.indicator.place()
 
     this.observer = new ResizeObserver(() => this.indicator.place())

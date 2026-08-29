@@ -11,7 +11,7 @@ import browser from '@/app/(site)/browser.module.css'
  * tile of `--site-lattice-pitch` positioned `center`, so dots sit at the
  * section's center and at whole multiples of the pitch out from it. Fixed
  * offsets in pitches would hold that alignment and cluster in the middle of a
- * wide viewport, which is what these used to do.
+ * wide viewport.
  *
  * Written out rather than generated. A random position chosen at render time
  * differs between the server and the client, which is a hydration mismatch on
@@ -21,7 +21,7 @@ import browser from '@/app/(site)/browser.module.css'
  * clear without depending on a rule that only holds at one width.
  *
  * The durations are coprime on purpose. Given one period, all of them would
- * light in the same order every cycle and the sequence becomes recognisable;
+ * light in the same order every cycle and the sequence becomes recognizable;
  * at seventeen, nineteen, twenty-three and twenty-nine seconds the pattern does
  * not come back around for hours.
  */
@@ -58,12 +58,10 @@ const SHINE: readonly (readonly [number, number, number, number])[] = [
 /**
  * The lit lattice a gallery hero is drawn on.
  *
- * **Shared because two galleries wear it**, and it was Design's alone until
- * 25 Aug 2026. The argument for keeping it there was that the field is a fact
- * about a page whose cards are drawn on the same lattice, which is true of the
- * cards and does not reach the hero: a hero is the top of a page rather than a
- * caption for the grid beneath it. Insights' own stylesheet had already written
- * that argument out and never written the rule.
+ * **Shared because two galleries wear it.** The field looks like a fact about a
+ * page whose cards are drawn on the same lattice, which is true of the cards and
+ * does not reach the hero: a hero is the top of a page rather than a caption for
+ * the grid beneath it.
  *
  * One masked field, not two dozen loose elements. The mask is the lattice's own,
  * shared through a custom property, so a shine fades toward the edges exactly as

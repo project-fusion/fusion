@@ -12,12 +12,11 @@
    start. Custom properties rather than a selector, because the item draws its
    own row inside its own shadow root and `::slotted()` stops at the host.
 
-   Whether, not how much. This said how much, as
-   `calc(var(--helix-size-icon) + var(--helix-space-2xs))`, and the item draws
-   its chevron at `--helix-size-icon-tight`: two declarations naming one
-   measurement, four pixels apart, so every leaf sat four pixels right of every
-   branch at the same depth. The width belongs to whoever draws the thing, and
-   that is the item. All the tree decides is the policy. */
+   Whether, not how much. A width stated here is a second declaration of the
+   width the item draws its chevron at, and two declarations naming one
+   measurement drift: four pixels apart puts every leaf four pixels right of
+   every branch at the same depth. The width belongs to whoever draws the thing,
+   and that is the item. All the tree decides is the policy. */
 :host {
   --tree-chevron-order: 0;
 }
@@ -29,14 +28,10 @@
  * depth is covered by one declaration and nothing has to re-render when it
  * changes.
  *
- * One rule, and that is the fix. There were two, keyed on two attributes for
- * one idea: a `chevron` left on the base class when the property moved up to
- * this tier, and `chevron-placement` which replaced it. Each did half the job.
- * `chevron="end"` dropped the gutter and never moved the chevron, because the
- * order it set was overridden further down by the hook this rule writes;
- * `chevron-placement="end"` moved the chevron and never dropped the gutter.
- * Measured both: with the first, a leaf sat twenty pixels left of the branch
- * beside it, and with the second a leaf sat twenty right. */
+ * One attribute and one rule. Placement moves the chevron and drops the gutter
+ * together, and a second attribute meaning the same thing does half the job
+ * each way: a leaf twenty pixels left of the branch beside it, or twenty
+ * right. */
 :host([chevron-placement="end"]) {
   /* Past the `end` slot, which already sits at `order: 1` with an auto margin
      of its own. Sharing that order put the two side by side and, more to the

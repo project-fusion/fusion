@@ -13,10 +13,9 @@ import styles from './vertical-page.module.css'
  * The masthead says Products and names Helix and Cortex, so a reader who
  * clicks Cortex and lands on a page headed `Fusion Mind` has been handed a
  * division when they asked for a product. Given one, the product is the title
- * and the vertical becomes the eyebrow over it, which is the arrangement
- * `/helix` has used since it was written. Energy and Capital pass nothing,
- * because there is no product in either and inventing an eyebrow to match
- * would be shape for its own sake.
+ * and the vertical becomes the eyebrow over it, matching `/helix`. Energy and
+ * Capital pass nothing, because there is no product in either and inventing an
+ * eyebrow to match would be shape for its own sake.
  */
 export function VerticalPage({
   children,
