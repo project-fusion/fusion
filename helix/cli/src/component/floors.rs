@@ -16,29 +16,24 @@
 //! **The other half is refused before any rule runs.** A configuration whose
 //! every tier is missing makes all of them report zero at once, and that is a
 //! fault in the configuration rather than in the rules, so `run` names it
-//! rather than letting this report it N times.
+//! rather than letting this report it once per rule.
 
-use crate::component::{all, Context, Finding, Report};
+use crate::component::{Finding, Measured, Report};
 
-pub fn run(context: &Context) -> Report {
-    let mut findings = Vec::new();
-    let mut checked = 0;
-    for rule in all().iter().filter(|rule| !rule.meta) {
-        checked += 1;
-        let report = (rule.run)(context);
-        if report.checked > 0 {
-            continue;
-        }
-        findings.push(Finding {
+pub fn run(measured: &[Measured]) -> Report {
+    let findings = measured
+        .iter()
+        .filter(|one| one.checked == 0)
+        .map(|one| Finding {
             detail: "The number a rule reports has to be what it tested. Zero means it looked at \
                      nothing, which reads identically to having found nothing wrong."
                 .to_owned(),
-            file: format!("rule: {}", rule.name),
-            message: format!("counted no {}", report.unit),
-        });
-    }
+            file: format!("rule: {}", one.name),
+            message: format!("counted no {}", one.unit),
+        })
+        .collect();
     Report {
-        checked,
+        checked: measured.len(),
         findings,
         unit: "rules",
     }

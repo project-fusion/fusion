@@ -132,31 +132,51 @@ impl Report {
 }
 
 pub struct Rule {
-    /// Runs the others, so it is never part of the set it runs.
-    pub meta: bool,
     pub name: &'static str,
+    pub run: Runner,
     pub summary: &'static str,
-    pub run: fn(&Context) -> Report,
+}
+
+/// Where a rule gets what it judges.
+///
+/// **A meta rule reads the others' measurements rather than re-running them.**
+/// Re-running is the obvious shape and it doubles the walk of the whole source
+/// tree, which is most of what this command spends its time on.
+pub enum Runner {
+    /// Reads what the source rules counted.
+    Meta(fn(&[Measured]) -> Report),
+    /// Reads the source.
+    Source(fn(&Context) -> Report),
+}
+
+impl Rule {
+    pub fn meta(&self) -> bool {
+        matches!(self.run, Runner::Meta(_))
+    }
+}
+
+/// What one rule counted, which is all a meta rule needs of it.
+pub struct Measured {
+    pub checked: usize,
+    pub name: &'static str,
+    pub unit: &'static str,
 }
 
 pub fn all() -> Vec<Rule> {
     vec![
         Rule {
-            meta: false,
             name: "attribute-names",
-            run: attribute_names::run,
+            run: Runner::Source(attribute_names::run),
             summary: "a property mirroring a platform attribute uses the platform's spelling",
         },
         Rule {
-            meta: true,
             name: "floors",
-            run: floors::run,
+            run: Runner::Meta(floors::run),
             summary: "every rule counted something",
         },
         Rule {
-            meta: false,
             name: "reflected",
-            run: reflected::run,
+            run: Runner::Source(reflected::run),
             summary: "no reflected property carries a default",
         },
     ]

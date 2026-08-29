@@ -8,7 +8,7 @@
 use std::path::{Path, PathBuf};
 
 use crate::args::Rules;
-use crate::component::{all, Context, Report, Rule, Settings};
+use crate::component::{all, Context, Measured, Report, Rule, Runner, Settings};
 use crate::error::Failure;
 use crate::exit::Code;
 use crate::style::Paint;
@@ -58,7 +58,7 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
         .filter(|rule| {
             if args.only.is_empty() {
                 /* A meta rule runs by default only where it was asked for. */
-                !rule.meta || settings.floors
+                !rule.meta() || settings.floors
             } else {
                 args.only.iter().any(|one| one == rule.name)
             }
@@ -67,36 +67,77 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
     Ok((selected, Context { root, settings }))
 }
 
-/// Prints every rule and what it found, then the findings.
-pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
-    let (selected, context) = prepare(args, from)?;
-    let reports: Vec<(Rule, Report)> = selected
+/// Runs the source rules once, then the meta rules over what they counted.
+fn measure(selected: Vec<Rule>, context: &Context) -> Vec<(Rule, Report)> {
+    let (meta, source): (Vec<Rule>, Vec<Rule>) = selected.into_iter().partition(Rule::meta);
+
+    let mut reports: Vec<(Rule, Report)> = source
         .into_iter()
         .map(|rule| {
-            let report = (rule.run)(&context);
+            let report = match rule.run {
+                Runner::Source(run) => run(context),
+                Runner::Meta(_) => unreachable!("partitioned above"),
+            };
             (rule, report)
         })
         .collect();
 
+    let measured: Vec<Measured> = reports
+        .iter()
+        .map(|(rule, report)| Measured {
+            checked: report.checked,
+            name: rule.name,
+            unit: report.unit,
+        })
+        .collect();
+    for rule in meta {
+        let report = match rule.run {
+            Runner::Meta(run) => run(&measured),
+            Runner::Source(_) => unreachable!("partitioned above"),
+        };
+        reports.push((rule, report));
+    }
+
+    reports.sort_by_key(|(rule, _)| rule.name);
+    reports
+}
+
+/// Every rule and what it found, as JSON for a caller that parses it.
+fn payload(reports: &[(Rule, Report)]) -> serde_json::Value {
+    serde_json::json!({
+        "ok": reports.iter().all(|(_, report)| report.ok()),
+        "rules": reports.iter().map(|(rule, report)| serde_json::json!({
+            "checked": report.checked,
+            "findings": report.findings,
+            "name": rule.name,
+            "unit": report.unit,
+        })).collect::<Vec<_>>(),
+    })
+}
+
+/// Prints every rule and what it found, then the findings.
+pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
+    let (selected, context) = prepare(args, from)?;
+    let reports = measure(selected, &context);
+
     if json {
-        let payload = serde_json::json!({
-            "ok": reports.iter().all(|(_, report)| report.ok()),
-            "rules": reports.iter().map(|(rule, report)| serde_json::json!({
-                "checked": report.checked,
-                "findings": report.findings,
-                "name": rule.name,
-                "unit": report.unit,
-            })).collect::<Vec<_>>(),
-        });
-        println!("{payload:#}");
+        println!("{:#}", payload(&reports));
         return Ok(verdict(&reports));
     }
 
+    let width = reports
+        .iter()
+        .map(|(rule, _)| rule.name.len())
+        .max()
+        .unwrap_or(0)
+        + 2;
     for (rule, report) in &reports {
+        /* Padded before painting: a width applies to bytes, and an escape
+        sequence is bytes that occupy no column. */
         println!(
-            "{} {:<18}{} {} checked",
+            "{} {}{} {} checked",
             if report.ok() { " " } else { "x" },
-            paint.bold(rule.name),
+            paint.bold(&format!("{:<width$}", rule.name)),
             report.checked,
             report.unit
         );
@@ -113,24 +154,9 @@ pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
 /// The same measurement, silent unless something is wrong.
 pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
     let (selected, context) = prepare(args, from)?;
-    let reports: Vec<(Rule, Report)> = selected
-        .into_iter()
-        .map(|rule| {
-            let report = (rule.run)(&context);
-            (rule, report)
-        })
-        .collect();
+    let reports = measure(selected, &context);
     if json {
-        let payload = serde_json::json!({
-            "ok": reports.iter().all(|(_, report)| report.ok()),
-            "rules": reports.iter().map(|(rule, report)| serde_json::json!({
-                "checked": report.checked,
-                "findings": report.findings,
-                "name": rule.name,
-                "unit": report.unit,
-            })).collect::<Vec<_>>(),
-        });
-        println!("{payload:#}");
+        println!("{:#}", payload(&reports));
         return Ok(verdict(&reports));
     }
     speak(&reports, paint);
