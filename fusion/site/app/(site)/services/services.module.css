@@ -148,62 +148,52 @@
 /**
  * Three offers on one panel, and the rules between them are the whole point.
  *
- * `auto-fit` was not used, for the reason the landing rows record: a sibling
- * rule cannot know a wrap happened, so the first cell of a wrapped row wears a
- * divider on the side facing nothing. Both layouts are stated, and the divider
- * turns with them.
+ * **Stacked first and columns at 60rem, which is how the landing rows are
+ * written.** Mobile-first is not a style preference here: a row that starts in
+ * columns and is narrowed by a query has to un-draw the dividers it already
+ * drew, and the landing's own note records what that costs, a first cell wearing
+ * a line on the side facing nothing. Starting stacked means each layout states
+ * its own divider and neither has to undo the other.
  *
- * The floor is where a price stops fitting beside its own bullets rather than a
- * device width: three tracks give each offer about 390px at 1440, which is what
- * this content wants, and comparison wants them adjacent rather than a scroll
- * apart.
+ * 60rem is the step the landing bands turn at, so a reader resizing the window
+ * sees the two pages break at the same place rather than a hundred pixels apart.
  */
 .offerRow {
-  /* The rule under the head, which is the landing row's own: a section and the
-     row below it are told apart by a line rather than by a gap, because a gap
-     inside one panel reads as two panels that failed to meet. */
   border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  /* The four bands every offer is made of: what it is, what it costs, what is
-     in it, and what you keep. Named on the row so the cells can share them. */
-  grid-template-rows: repeat(4, auto);
+  grid-template-columns: 1fr;
 }
 
-/**
- * **Each offer takes the row's own tracks, which is what lines the prices up.**
- *
- * Three flex columns beside each other agree about nothing: a summary that runs
- * to three lines in one and four in another pushes that offer's price down, and
- * the figures land on three different baselines on the one page whose whole job
- * is that they can be compared. Measured before this: 698, 719 and 698.
- *
- * `subgrid` is the tool for exactly that, and it is why the cell is a `div`
- * rather than a `helix-flex`. Setting `display: grid` on that component's host
- * from a document rule would beat its own `display: flex` whatever the
- * specificity, which is the failure `helix component`'s `overruled` exists to
- * catch. A box the page owns is the page's to lay out.
- */
 .offer {
-  display: grid;
-  gap: var(--helix-space-lg);
-  grid-row: span 4;
-  grid-template-rows: subgrid;
   padding: var(--helix-space-xl);
 }
 
+/* Adjacent, not every cell: a bare rule draws a line on the first one too,
+   doubled against the row's own top border. The landing records the same. */
 .offer + .offer {
-  border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
 }
 
-@media (width < 64rem) {
+@media (min-width: 60rem) {
   .offerRow {
-    grid-template-columns: 1fr;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    /* The four bands every offer is made of: what it is, how long it runs, what
+       is in it, and what you keep. Only meaningful once they sit side by side. */
+    grid-template-rows: repeat(4, auto);
+  }
+
+  .offer {
+    display: grid;
+    gap: var(--helix-space-lg);
+    grid-row: span 4;
+    grid-template-rows: subgrid;
   }
 
   .offer + .offer {
-    border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
-    border-inline-start: 0;
+    border-block-start: 0;
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
   }
 }
 
@@ -232,11 +222,11 @@
 .closingRow {
   display: grid;
   gap: var(--helix-space-lg);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
-@media (width < 64rem) {
+@media (min-width: 60rem) {
   .closingRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
