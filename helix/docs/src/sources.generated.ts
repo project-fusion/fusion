@@ -2240,7 +2240,7 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 863,756 | 113 | 159,944 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-core\` | 863,645 | 113 | 159,943 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 9,626,448 | 422 | 735,715 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 64,947 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,183 | 5 | 0 | none |
@@ -3939,7 +3939,7 @@ export const theme = { brand: '#2563eb', chroma: { ceiling: 0.1 }, radius: 2 }
 
 **Keep the intent, not the tokens.** The tokens are the output of a solver, and
 the solver improves: a theme stored as its inputs picks up a better derivation,
-and a theme stored as 176 literal values is frozen at the version that produced
+and a theme stored as literal values is frozen at the version that produced
 it. The tokens are for pasting into a system that cannot run the engine.
 
 ## What it does not do
@@ -4889,8 +4889,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 ## Why two axes
 
 **The library had four axes and one word for all of them.** Counted across both
-tiers, \`appearance\` held 21 declarations describing at least four different
-questions: where a surface ends (\`outlined\` against \`plain\` on a Card), how much
+tiers, \`appearance\` described at least four different questions: where a surface ends (\`outlined\` against \`plain\` on a Card), how much
 ink a control claims (\`ghost\` against \`solid\` on a Button), which widget gets
 rendered (\`segmented\` against \`underlined\` on Tabs), and in one case a plain
 misfiled tone.
@@ -4925,7 +4924,7 @@ choice between two widgets, which is structural wherever it is made, so it lives
 on either tier.
 
 **What it may not be is a place to put something that is on an axis.** That is
-the failure mode \`appearance\` demonstrated for 21 components.
+the failure mode \`appearance\` demonstrated.
 
 ## \`tone\` is the one axis both tiers carry
 

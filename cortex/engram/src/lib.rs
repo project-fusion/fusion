@@ -2,8 +2,9 @@
 //!
 //! Storage is not memory: a table of everything that ever happened is the raw
 //! material it operates on. What makes this a memory system is
-//! **consolidation**: episodic records accumulate, and a background pass
-//! distills them into semantic facts that supersede and decay.
+//! **consolidation**: episodic records accumulate and are distilled into
+//! semantic facts that supersede and decay. `unconsolidated()` identifies the
+//! episodes waiting for that, and the pass that consumes them is not built.
 //!
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1

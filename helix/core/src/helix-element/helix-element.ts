@@ -30,14 +30,13 @@ const BOX_SIZING = css`
  * forget the fifty-eighth.
  *
  * **The selector is (0,3,0) on purpose, and the obvious (0,2,0) is not enough.**
- * A bare `:host([hidden])` beats a bare `:host`, which is what the first version
- * of this rule assumed and it was wrong: six components set their `display` from
- * an attribute selector at the *same* (0,2,0) and win on source order because
- * they are injected after this. Measured, all five still rendered while hidden:
- * `flex[inline]` at `inline-flex`, `divider[orientation="vertical"]` at
- * `inline-block`, and `text[as]`, `checkbox[appearance="card"]` and
- * `radio[appearance="card"]` at `block`. The `:not()` lifts it a step and it
- * wins from first position, so the rule can stay prepended.
+ * A bare `:host([hidden])` beats a bare `:host`, but it only ties with the
+ * `:host([attr])` rules a component uses to set its own `display`, and those win
+ * on source order because they are injected after this. Measured, elements
+ * styled that way still rendered while hidden: `flex[inline]` at `inline-flex`,
+ * `divider[orientation="vertical"]` at `inline-block`, `text[as]` at `block`.
+ * The `:not()` lifts it a step and it wins from first position, so the rule can
+ * stay prepended.
  *
  * **And the `:not()` is load-bearing beyond specificity.** `hidden="until-found"`
  * is how the platform lets find-in-page reveal collapsed content: the browser

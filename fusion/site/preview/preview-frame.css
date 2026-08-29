@@ -91,10 +91,9 @@
  * left. Both were centered, exactly, and both looked pinned to the left edge,
  * because what a reader sees is the ink and not the box around it.
  *
- * Measured across 71 families: 23 draw content that hugs and sits at the start,
- * and 44 genuinely fill. So this is a mode a component opts into rather than
- * the default, because flipping it would collapse a Divider, a Progress and a
- * Table, whose whole shape is the width they are given.
+ * So this is a mode a component opts into rather than the default, because
+ * flipping it would collapse a Divider, a Progress and a Table, whose whole
+ * shape is the width they are given.
  *
  * `fit-content` rather than centering the text, and that distinction is the
  * reason this is a mode at all. Inheriting `text-align: center` would center a

@@ -69,10 +69,10 @@ export default function Home() {
             separate from and it goes flat however correct its blur is. Raising
             `gain` toward 1 makes that worse by evening the field further.
 
-            Multiplied rather than divided: measured at 3.2, a shape-unit is
-            about 730px again, near the ~1000 the two-screen box drew at 1.7. The
-            cost is the ends, since `flow` closes on `exp(-0.55 * scale)` of its
-            center brightness at the box edge: 39% at 1.7, 17% at 3.2. Hero and
+            Multiplied rather than divided, so a shape-unit stays near the size
+            the two-screen box drew at 1.7. The cost is the ends, since `flow`
+            closes on `exp(-0.55 * scale)` of its center brightness at the box
+            edge: 39% at 1.7, 15% at 3.5. Hero and
             footer sit dimmer than the middle bands do, which is a page-length
             gradient rather than a seam, and is the price of one canvas over nine
             screens instead of two over four. */}
