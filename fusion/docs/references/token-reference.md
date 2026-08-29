@@ -119,10 +119,10 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 153 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 165 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 112 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 95 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 97 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 44 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 50 |
-| `--helix-space-3xl` | `var(--_helix-scale-16)` | 13 |
+| `--helix-space-3xl` | `var(--_helix-scale-16)` | 15 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
 ## radii
@@ -145,7 +145,7 @@ The three families.
 |---|---|---|
 | `--helix-font-sans` | `var(--_helix-family-sans)` | 99 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 21 |
-| `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 11 |
+| `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 12 |
 
 ## text
 
@@ -159,7 +159,7 @@ Font size.
 | `--helix-text-lg` | `var(--_helix-size-18)` | 23 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
-| `--helix-text-3xl` | `var(--_helix-size-44)` | 13 |
+| `--helix-text-3xl` | `var(--_helix-size-44)` | 14 |
 | `--helix-text-control` | `var(--helix-text-sm)` | 5 |
 
 ## weight
@@ -178,7 +178,7 @@ Line height. The three steps are unitless and scale with the size; the heading o
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-leading-tight` | `1.2` | 24 |
+| `--helix-leading-tight` | `1.2` | 25 |
 | `--helix-leading-normal` | `1.5` | 35 |
 | `--helix-leading-loose` | `1.7` | 1 |
 | `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | 9 |
@@ -189,7 +189,7 @@ Letter spacing.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-tracking-tight` | `-0.01em` | 20 |
+| `--helix-tracking-tight` | `-0.01em` | 21 |
 | `--helix-tracking-normal` | `0` | 13 |
 | `--helix-tracking-wide` | `0.02em` | 14 |
 | `--helix-tracking-wider` | `0.12em` | 0 |
@@ -268,7 +268,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 5 |
 | `--helix-size-control-tight` | `calc(var(--helix-size-control) * 0.8)` | 25 |
 | `--helix-size-control-loose` | `calc(var(--helix-size-control) * 1.2)` | 3 |
-| `--helix-size-icon-tight` | `calc(var(--helix-size-icon) * 0.8)` | 31 |
+| `--helix-size-icon-tight` | `calc(var(--helix-size-icon) * 0.8)` | 32 |
 | `--helix-size-icon-loose` | `calc(var(--helix-size-icon) * 1.2)` | 18 |
 | `--helix-size-checkbox-tight` | `calc(var(--helix-size-checkbox) * 0.8)` | 0 |
 | `--helix-size-checkbox-loose` | `calc(var(--helix-size-checkbox) * 1.2)` | 0 |
@@ -295,7 +295,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 1 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 4 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 20 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 59 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 9 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 10 |
@@ -311,7 +311,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-beneath` | `-1` | 0 |
-| `--helix-layer-base` | `0` | 7 |
+| `--helix-layer-base` | `0` | 8 |
 | `--helix-layer-raised` | `10` | 17 |
 | `--helix-layer-sticky` | `100` | 5 |
 | `--helix-layer-overlay` | `1000` | 2 |
