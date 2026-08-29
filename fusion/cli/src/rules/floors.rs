@@ -42,6 +42,7 @@ pub fn run(measured: &[Measured]) -> Report {
     Report {
         checked: measured.len(),
         findings,
+        notes: Vec::new(),
         unit: "rules",
     }
 }

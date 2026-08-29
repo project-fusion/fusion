@@ -202,6 +202,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: read,
         findings,
+        notes: Vec::new(),
         unit: "specs",
     }
 }

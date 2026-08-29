@@ -148,6 +148,20 @@ pub struct Report {
     /// silently stopped checking.
     pub checked: usize,
     pub findings: Vec<Finding>,
+
+    /// Work rather than fault: named, counted, and not part of the verdict.
+    ///
+    /// **Here so the two command lines say the same thing.** `helix component`
+    /// has carried notes since a rule needed to report something worth seeing
+    /// that must not fail, and `fusion` did not — so `--json`, which both
+    /// promise on every verb as the contract, meant two shapes. Anything reading
+    /// both had to know which it was holding, and `fusion helix` makes that a
+    /// question one caller asks of one command.
+    ///
+    /// Skipped when empty, so a rule that has no notes costs no key.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub notes: Vec<String>,
+
     /// What `checked` counts, for a sentence that reads.
     pub unit: &'static str,
 }

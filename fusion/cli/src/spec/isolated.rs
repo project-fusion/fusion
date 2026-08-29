@@ -51,6 +51,7 @@ pub fn run(context: &Context) -> Report {
     let nothing = |findings| Report {
         checked: 0,
         findings,
+        notes: Vec::new(),
         unit,
     };
     let said = |message: &str, detail: &str, file: &str| Finding {
@@ -147,6 +148,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: ancestors.len(),
             findings: Vec::new(),
+            notes: Vec::new(),
             unit,
         };
     }
@@ -172,6 +174,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: registering.len(),
         findings,
+        notes: Vec::new(),
         unit,
     }
 }

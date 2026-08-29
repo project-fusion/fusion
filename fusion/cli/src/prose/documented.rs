@@ -378,6 +378,7 @@ pub fn run(context: &Context) -> Report {
                 message: "no manifest declares any tag, so there is nothing to hold a page to"
                     .to_owned(),
             }],
+            notes: Vec::new(),
             unit: "API references in the documentation",
         };
     }
@@ -614,6 +615,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "API references in the documentation",
     }
 }

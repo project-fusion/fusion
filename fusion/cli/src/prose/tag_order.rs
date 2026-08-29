@@ -310,6 +310,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: blocks,
         findings,
+        notes: Vec::new(),
         unit: "class doc blocks",
     }
 }

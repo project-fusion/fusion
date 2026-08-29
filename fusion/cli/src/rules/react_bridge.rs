@@ -65,6 +65,7 @@ pub fn run(context: &Context) -> Report {
     let nothing = Report {
         checked: 0,
         findings: Vec::new(),
+        notes: Vec::new(),
         unit: "framework bundles",
     };
 
@@ -147,6 +148,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "framework bundles and measured notes",
     }
 }

@@ -110,6 +110,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "scripts read for a path out of their package",
     }
 }

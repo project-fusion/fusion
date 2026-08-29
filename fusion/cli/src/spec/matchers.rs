@@ -104,6 +104,7 @@ pub fn run(context: &Context) -> Report {
                 file: context.settings.spec.harness.clone(),
                 message: "the browser harness is not there".to_owned(),
             }],
+            notes: Vec::new(),
             unit: "assertions across the DOM specs",
         };
     };
@@ -122,6 +123,7 @@ pub fn run(context: &Context) -> Report {
                 file: context.settings.spec.harness.clone(),
                 message: "no matcher names could be read out of the browser harness".to_owned(),
             }],
+            notes: Vec::new(),
             unit: "assertions across the DOM specs",
         };
     }
@@ -176,6 +178,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: asserted,
         findings,
+        notes: Vec::new(),
         unit: "assertions across the DOM specs",
     }
 }

@@ -15,6 +15,7 @@
 //! named.
 
 mod prose;
+mod route;
 mod rules;
 mod spec;
 mod workspace;
@@ -55,6 +56,20 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Noun {
+    /// Run the Helix command line, which owns its own nouns.
+    ///
+    /// **A route rather than a reimplementation.** The rest of the line goes to
+    /// `helix` untouched and its exit code comes back, so `fusion helix
+    /// component audit` and `helix component audit` cannot disagree. It is a
+    /// convenience over a CLI that works standalone, never a gate in front of
+    /// one.
+    #[command(disable_help_flag = true)]
+    Helix {
+        /// Everything after `helix`, handed over as written.
+        #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
+        args: Vec<String>,
+    },
+
     /// Hold the prose to what it describes.
     ///
     /// **A separate noun rather than more workspace rules**, because the subject
@@ -83,9 +98,15 @@ enum Noun {
 }
 
 impl Noun {
+    /// The verb asked of a noun this binary answers for itself.
+    ///
+    /// **A routed noun never reaches here.** `main` hands its line to the other
+    /// product before reading a verb, because the verbs are that product's and
+    /// this one has no business naming them.
     fn verb(&self) -> &Verb {
         match self {
             Self::Prose { verb } | Self::Spec { verb } | Self::Workspace { verb } => verb,
+            Self::Helix { .. } => unreachable!("routed before a verb is read"),
         }
     }
 
@@ -95,6 +116,7 @@ impl Noun {
             Self::Prose { .. } => prose::all(),
             Self::Spec { .. } => spec::all(),
             Self::Workspace { .. } => all(),
+            Self::Helix { .. } => unreachable!("routed before a rule set is asked for"),
         }
     }
 }
@@ -130,6 +152,20 @@ impl Verb {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
+
+    /* **Routed before anything else is read**, because a routed noun has no verb
+    and no rule set: everything below belongs to the nouns this binary answers
+    for itself, and asking a route for its rules is a question with no answer. */
+    if let Noun::Helix { args } = &cli.noun {
+        return match route::to("helix", args) {
+            Ok(code) => ExitCode::from(u8::try_from(code).unwrap_or(70)),
+            Err(why) => {
+                eprintln!("fusion: {why}");
+                ExitCode::from(69)
+            }
+        };
+    }
+
     let verb = cli.noun.verb();
     let common = verb.common();
 
@@ -275,6 +311,7 @@ fn report(
                 "checked": report.checked,
                 "findings": report.findings,
                 "name": rule.name,
+                "notes": report.notes,
                 "unit": report.unit,
             })).collect::<Vec<_>>(),
         });

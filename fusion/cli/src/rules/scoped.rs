@@ -133,6 +133,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: owned.len(),
         findings,
+        notes: Vec::new(),
         unit: "module classes",
     }
 }

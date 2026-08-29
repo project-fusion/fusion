@@ -38,6 +38,7 @@ pub fn run(context: &Context) -> Report {
     let nothing = |findings| Report {
         checked: 0,
         findings,
+        notes: Vec::new(),
         unit: "files naming this repository",
     };
 
@@ -119,6 +120,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: mentions + manifests,
         findings,
+        notes: Vec::new(),
         unit: "files naming this repository",
     }
 }

@@ -183,6 +183,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: held,
         findings,
+        notes: Vec::new(),
         unit: "doc blocks attached to something",
     }
 }

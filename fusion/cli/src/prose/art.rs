@@ -221,6 +221,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: families.len(),
             findings,
+            notes: Vec::new(),
             unit: "families in the catalog",
         };
     };
@@ -321,6 +322,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: families.len(),
         findings,
+        notes: Vec::new(),
         unit: "families in the catalog",
     }
 }

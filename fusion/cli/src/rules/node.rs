@@ -51,6 +51,7 @@ pub fn run(context: &Context) -> Report {
     let nothing = |findings| Report {
         checked: 0,
         findings,
+        notes: Vec::new(),
         unit: "declared floors",
     };
     let Some(root) = manifests(&context.root)
@@ -144,6 +145,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "declared floors",
     }
 }

@@ -294,6 +294,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked: sources.len() + prose.len(),
         findings,
+        notes: Vec::new(),
         unit: "sources and documents",
     }
 }

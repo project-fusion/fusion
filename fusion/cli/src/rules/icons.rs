@@ -32,6 +32,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings: Vec::new(),
+            notes: Vec::new(),
             unit: "icon names in markup",
         };
     };
@@ -46,6 +47,7 @@ pub fn run(context: &Context) -> Report {
         return Report {
             checked: 0,
             findings: Vec::new(),
+            notes: Vec::new(),
             unit: "icon names in markup",
         };
     }
@@ -97,6 +99,7 @@ pub fn run(context: &Context) -> Report {
     Report {
         checked,
         findings,
+        notes: Vec::new(),
         unit: "icon names in markup",
     }
 }
