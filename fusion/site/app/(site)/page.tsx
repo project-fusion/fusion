@@ -1,3 +1,4 @@
+import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
 import { INSIGHTS } from '@/content/insights'
 import {
@@ -44,6 +45,11 @@ export const metadata = pageMetadata({
  * siblings for why a landing page wants a different curve from a document.
  */
 export default function Home() {
+  const [latest] = INSIGHTS
+  /* The pill's words are the page's own title, so the two cannot disagree about
+     what is being announced. */
+  const announcements = findSitePage('/announcements')
+
   return (
     <ThemeScope>
       <div
@@ -96,8 +102,17 @@ export default function Home() {
           >
             {/* The latest thing published, which is what a chip pointing at the
                 writing should say. Not a release note for one part of one
-                product, sitting directly under a heading about the company. */}
-            <NewsKicker href="/insights" label="News" text="Helix ships as one open tier" />
+                product, sitting directly under a heading about the company.
+
+                Read off the registry rather than typed here, because a title
+                typed here is correct on the day it is written and silently
+                stale from the next post on. The chip carried a retired essay's
+                title for exactly that reason. `INSIGHTS` is newest first, and
+                the whole block goes when there is nothing published, which is
+                a truthful empty state rather than a chip about nothing. */}
+            {announcements ? (
+              <NewsKicker href="/announcements" label="Coming soon" text={announcements.title} />
+            ) : undefined}
 
             <h1 className={styles.tDisplay}>
               {HERO.title} <span className={styles.tDisplayAccent}>{HERO.accent}</span>
