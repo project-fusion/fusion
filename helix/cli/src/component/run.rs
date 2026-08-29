@@ -5,10 +5,11 @@
 //! pair `theme` already established here and the reason this reads like it
 //! belongs beside it rather than beneath it.
 
+use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
 
-use crate::args::Rules;
-use crate::component::{all, Context, Measured, Report, Rule, Runner, Settings};
+use crate::args::{ComponentAudit, Rules};
+use crate::component::{all, tui, Context, Measured, Report, Rule, Runner, Settings};
 use crate::error::Failure;
 use crate::exit::Code;
 use crate::style::Paint;
@@ -118,13 +119,36 @@ fn payload(reports: &[(Rule, Report)]) -> serde_json::Value {
 }
 
 /// Prints every rule and what it found, then the findings.
-pub fn audit(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
-    let (selected, context) = prepare(args, from)?;
+pub fn audit(
+    args: &ComponentAudit,
+    from: &Path,
+    json: bool,
+    paint: Paint,
+) -> Result<Code, Failure> {
+    let (selected, context) = prepare(&args.rules, from)?;
     let reports = measure(selected, &context);
 
     if json {
         println!("{:#}", payload(&reports));
         return Ok(verdict(&reports));
+    }
+
+    /* **The tty decides, and `--plain` is the only override.** A screen written
+    to a pipe is escape sequences in a log file, and `check` never draws at all:
+    its whole shape is silence on success, which a screen cannot be. Both forms
+    read the same measurement, so neither can disagree with the other. */
+    if !args.plain && std::io::stdout().is_terminal() {
+        let code = verdict(&reports);
+        let drawn: Vec<(&Rule, &Report)> =
+            reports.iter().map(|(rule, report)| (rule, report)).collect();
+        if let Err(why) = tui::run(&drawn) {
+            return Err(Failure::new(
+                Code::Internal,
+                "cannot open the audit screen".to_owned(),
+                format!("{why}. Run `helix component audit --plain` for the report."),
+            ));
+        }
+        return Ok(code);
     }
 
     let width = reports

@@ -68,6 +68,7 @@ pub mod separation;
 pub mod ssr;
 pub mod stable;
 pub mod tier;
+pub mod tui;
 pub mod token_defaults;
 pub mod tokens;
 pub mod vocabulary;

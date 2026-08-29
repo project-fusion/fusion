@@ -177,14 +177,31 @@ pub struct Init {
 #[derive(Debug, Subcommand)]
 pub enum Component {
     /// Report every rule and what it found, and exit 1 on a finding.
-    Audit(Rules),
+    Audit(ComponentAudit),
     /// The CI shape of `audit`: same measurement, nothing printed on success.
     Check(Rules),
     /// Run the rules that can write.
     Fix(Rules),
 }
 
-/// What both component verbs take.
+/// What `component audit` takes, which is the rules plus how to show them.
+#[derive(Args, Debug)]
+pub struct ComponentAudit {
+    #[command(flatten)]
+    pub rules: Rules,
+
+    /* **Not the CI flag**: without a tty the report already prints, so a
+    pipeline needs nothing, and a flag that had to be remembered there would be
+    one nobody remembered. */
+    /// Print the report instead of opening the screen.
+    ///
+    /// For scrolling your own scrollback, copying a line, or diffing two runs.
+    /// Not needed in a pipeline, where the report already prints.
+    #[arg(long)]
+    pub plain: bool,
+}
+
+/// What the component verbs take.
 #[derive(Args, Debug)]
 pub struct Rules {
     /// Run just these rules.
