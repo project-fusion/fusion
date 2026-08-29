@@ -62,7 +62,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { domainOf, manifests, publishes, root } from './lib/workspace.mjs'
+import { domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 
 const run = (command, args, cwd) =>
   execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })

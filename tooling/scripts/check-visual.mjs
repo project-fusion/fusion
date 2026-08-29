@@ -94,10 +94,10 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { dirname, join, relative, resolve } from 'node:path'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
-import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 

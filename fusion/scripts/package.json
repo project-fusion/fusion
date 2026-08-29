@@ -1,0 +1,21 @@
+{
+  "name": "@fusion.dev/scripts",
+  "description": "What more than one package's build needs, and no one package owns.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "fusion/scripts",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "exports": {
+    "./compositions": "./lib/compositions.mjs",
+    "./format-open-tags": "./lib/format-open-tags.mjs",
+    "./formatted": "./lib/formatted.mjs",
+    "./theme-facts": "./lib/theme-facts.mjs",
+    "./theme-intents": "./lib/theme-intents.mjs",
+    "./workspace": "./lib/workspace.mjs"
+  }
+}

@@ -53,7 +53,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { emitted as emittedNames, modelNames, seedNames } from './lib/theme-facts.mjs'
+import { emitted as emittedNames, modelNames, seedNames } from '@fusion.dev/scripts/theme-facts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 

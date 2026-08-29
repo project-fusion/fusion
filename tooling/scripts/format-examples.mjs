@@ -63,8 +63,8 @@ const walk = (dir, found = []) => {
   return found
 }
 
-import { format } from './lib/format-open-tags.mjs'
-import { SOURCE } from './lib/workspace.mjs'
+import { format } from '@fusion.dev/scripts/format-open-tags'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 
 /* Fenced HTML only, and the fence is reformatted in place rather than the file:
    an MDX page is mostly prose, and prose has angle brackets in it. */

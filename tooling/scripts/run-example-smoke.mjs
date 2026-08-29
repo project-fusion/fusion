@@ -28,8 +28,8 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
+import { SOURCE, TAG_PREFIX } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
-import { SOURCE, TAG_PREFIX } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'fusion/site/public/sandbox')

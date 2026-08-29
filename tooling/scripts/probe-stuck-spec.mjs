@@ -43,8 +43,8 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
  */
 import { createServer } from 'node:http'
 import { extname, join, relative, resolve } from 'node:path'
+import { TIERS } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
-import { TIERS } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const harness = join(root, 'helix/testing/src/browser.ts')

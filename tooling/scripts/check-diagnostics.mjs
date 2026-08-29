@@ -27,8 +27,8 @@
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
-import { SOURCE } from './lib/workspace.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const specs = join(root, 'fusion/site/public/specs')

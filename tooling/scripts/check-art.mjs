@@ -25,7 +25,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { SOURCE } from './lib/workspace.mjs'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 
 const MANIFESTS = [
   'helix/styled/custom-elements.json',

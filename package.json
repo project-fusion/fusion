@@ -101,6 +101,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@fusion.dev/scripts": "workspace:*",
     "@happy-dom/global-registrator": "^20.11.2",
     "@lit-labs/nextjs": "^0.2.4",
     "@lit-labs/ssr": "^4.1.0",
@@ -125,6 +126,7 @@
     "cortex/docs",
     "fusion/cli/npm",
     "fusion/docs/insights",
+    "fusion/scripts",
     "fusion/site",
     "helix/*",
     "helix/cli/npm",

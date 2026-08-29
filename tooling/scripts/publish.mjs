@@ -52,7 +52,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { DOMAINS, domainOf, manifests, publishes, root } from './lib/workspace.mjs'
+import { DOMAINS, domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 
 const argument = (name) => {
   const at = process.argv.indexOf(`--${name}`)

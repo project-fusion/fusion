@@ -28,6 +28,9 @@
     "token-layer": "bun scripts/build-token-layer.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
+  "devDependencies": {
+    "@fusion.dev/scripts": "workspace:*"
+  },
   "homepage": "https://fusion.dev",
   "keywords": [
     "design-tokens",

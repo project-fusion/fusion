@@ -41,7 +41,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { TIERS } from '../../../tooling/scripts/lib/workspace.mjs'
+import { TIERS } from '@fusion.dev/scripts/workspace'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 

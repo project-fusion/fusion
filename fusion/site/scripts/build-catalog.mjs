@@ -26,9 +26,9 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SOURCE } from '@fusion.dev/scripts/workspace'
 import { catalog } from '../../../helix/docs/src/catalog.ts'
 import { reference } from '../../../helix/docs/src/reference.ts'
-import { SOURCE } from '../../../tooling/scripts/lib/workspace.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const OUT = join(ROOT, 'fusion/site/content/catalog/catalog.generated.json')

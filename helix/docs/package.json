@@ -34,7 +34,8 @@
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
-    "@fusion.dev/helix-cem": "workspace:*"
+    "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/scripts": "workspace:*"
   },
   "homepage": "https://fusion.dev",
   "keywords": [
