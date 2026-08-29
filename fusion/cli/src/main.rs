@@ -23,7 +23,7 @@ use std::process::ExitCode;
 
 use clap::{Args, Parser, Subcommand};
 
-use crate::rules::{all, Context};
+use crate::rules::{all, Context, Settings};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -123,7 +123,8 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
 
-    let context = Context { root };
+    let settings = Settings::read(&root);
+    let context = Context { root, settings };
     let selected: Vec<rules::Rule> = all()
         .into_iter()
         .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))

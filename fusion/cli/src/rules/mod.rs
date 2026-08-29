@@ -13,18 +13,58 @@ pub mod node;
 pub mod order;
 pub mod prerequisites;
 pub mod react_bridge;
+pub mod registration;
 pub mod scoped;
 pub mod scripts;
 pub mod shaders;
 pub mod shipped;
 
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// The workspace under test.
 pub struct Context {
     pub root: PathBuf,
+    pub settings: Settings,
+}
+
+/// `fusion.rules.json`, which is what a workspace says about itself.
+///
+/// **Optional, every key of it.** A rule needing something this does not carry
+/// reports nothing rather than guessing, and `floors` is what makes that visible
+/// rather than silent: a rule counting zero is a rule that stopped checking.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Settings {
+    /// The products a package name can belong to, which is what versions in
+    /// lockstep and what may be published beside what.
+    pub domains: Vec<String>,
+
+    /// Roots whose modules run under a framework that hydrates, where
+    /// registering a custom element at module scope is a fault.
+    pub hydrates: Vec<String>,
+
+    /// The list of names an icon set actually has.
+    pub icons: Option<String>,
+
+    /// The one npm scope every package in this repository is published under.
+    pub scope: Option<String>,
+
+    /// Paths inside `hydrates` that are their own document, with nothing to
+    /// hydrate, where registering at module scope is what an entry point is for.
+    pub standalone: Vec<String>,
+}
+
+impl Settings {
+    /// Reads the settings beside the workspace, or an empty set.
+    pub fn read(root: &Path) -> Self {
+        fs::read_to_string(root.join("fusion.rules.json"))
+            .ok()
+            .and_then(|raw| serde_json::from_str(&raw).ok())
+            .unwrap_or_default()
+    }
 }
 
 /// One thing wrong, in the place it is wrong.
@@ -117,6 +157,13 @@ pub fn all() -> Vec<Rule> {
             name: "react-bridge",
             run: react_bridge::run,
             summary: "the key the framework bridge reads still exists in the framework installed",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "registration",
+            run: registration::run,
+            summary: "an import that registers a custom element is deferred past hydration",
         },
         Rule {
             fix: None,
