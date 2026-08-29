@@ -87,7 +87,7 @@ impl Paint {
 /// **Padded here, to the width of the widest**, and that is not cosmetic. A
 /// terminal counts an escape sequence as characters, so `{:>2}` applied to an
 /// already-colored `x` sees a string of twelve and adds nothing, while the same
-/// format applied to an uncoloured one adds a space. The column was therefore
+/// format applied to an uncolored one adds a space. The column was therefore
 /// straight with `NO_COLOR` set and ragged by exactly one character without it,
 /// which is the shape of bug that survives every run in CI, CI not being a
 /// terminal.

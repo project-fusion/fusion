@@ -6,7 +6,7 @@
 //! reach for an attribute a component never promised — and it fails in exactly
 //! one navigation mode.
 //!
-//! **The failure this exists for.** A theme builder routed two coloured slider
+//! **The failure this exists for.** A theme builder routed two colored slider
 //! tracks with `.themeChannel[label="Saturation"]`. A `label` attribute is only
 //! in the DOM when a *server* wrote the element into HTML: on a client-side
 //! navigation React creates the element and assigns `label` as a property, Lit
