@@ -34,6 +34,8 @@ pub mod composed;
 pub mod compositions;
 pub mod disabled;
 pub mod events;
+pub mod example_values;
+pub mod examples_paired;
 pub mod exportparts;
 pub mod fallbacks;
 pub mod floors;
@@ -318,6 +320,16 @@ pub fn all() -> Vec<Rule> {
             name: "events",
             run: Runner::Source(events::run),
             summary: "an event a component dispatches is one it declares",
+        },
+        Rule {
+            name: "example-values",
+            run: Runner::Source(example_values::run),
+            summary: "every attribute value in an example is one its component states",
+        },
+        Rule {
+            name: "examples-paired",
+            run: Runner::Source(examples_paired::run),
+            summary: "every example is authored on both layers and in both syntaxes",
         },
         Rule {
             name: "exportparts",

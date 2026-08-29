@@ -86,7 +86,7 @@ for (const source of EXAMPLES) {
       }
       const slug = file.replace(/\.html$/, '')
       const stylesheet = join(dir, `${slug}.css`)
-      /* Read, never converted. `check:prose:examples-paired` is what guarantees the
+      /* Read, never converted. `helix component`'s `examples-paired` is what guarantees the
          file is there, so an empty string here means that check is not running
          rather than that the example has no React form. */
       const authored = join(dir, `${slug}.tsx`)
@@ -107,13 +107,12 @@ writeFileSync(OUT, `${JSON.stringify(families)}\n`)
 
 /* Every page's sibling `.md`, as a file in the build output.
  *
- * **Files rather than a route handler**, which is what `13-site-architecture.md`
- * means by layer 0: static text on our own domain, generated from the
+ * **Files rather than a route handler**, which is layer 0: static text on our own domain, generated from the
  * repository. A handler would put the same bytes behind a running server, and
  * the point of this surface is that it survives one not running.
  *
- * `12-ai-native-web.md` specifies a catch-all route with
- * `generateStaticParams` instead, and it works but is not what ships. It has to
+ * A catch-all route with `generateStaticParams` was the alternative, and it
+ * works but is not what ships. It has to
  * read the MDX and the per-family markdown off disk at request time, which is
  * the filesystem access that takes this app's whole repository into the server
  * bundle; and a root-level catch-all swallows every unmatched URL unless it

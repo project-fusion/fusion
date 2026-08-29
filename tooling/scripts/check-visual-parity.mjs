@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process'
  *
  * **This is the assertion that makes two authored files safe.** Both syntaxes
  * are written by hand, neither derived from the other, which costs exactly one
- * thing: nothing stops them drifting. `check:prose:examples-paired` holds the
+ * thing: nothing stops them drifting. `helix component`'s `examples-paired` holds the
  * two files to each other. This holds the two pictures to each other, which is
  * the only comparison that can see a React example rendering something else.
  *
@@ -588,7 +588,7 @@ await tab.route('**/*', (route) =>
    adjusting the HTML side to match. The premise is wrong: this compares what the
    two examples *ship as*, and the HTML one ships with those spaces. Rewriting it
    to render like the TSX asks the comparison whether the two say the same thing,
-   which is a question `check:prose:examples-paired` already covers and not the
+   which is a question `helix component`'s `examples-paired` already covers and not the
    one worth a browser.
 
    So the difference is real and it belongs to the TSX. Prose wrapping an inline
