@@ -28,6 +28,7 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod floors;
 pub mod reflected;
 pub mod run;
 
@@ -53,6 +54,17 @@ pub struct Context {
 pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
+
+    /// Whether to refuse a rule that counted nothing. Off unless asked for.
+    ///
+    /// **A floor is a maintainer's rule and not a consumer's.** A library with
+    /// ninety families has a corpus for every rule, so one reporting zero has
+    /// stopped checking. A consumer with three components may legitimately
+    /// declare no reflected property at all, and telling them a rule is broken
+    /// because their library is small is the kind of false positive that gets a
+    /// whole command turned off.
+    #[serde(default)]
+    pub floors: bool,
 }
 
 impl Settings {
@@ -71,11 +83,27 @@ impl Settings {
     }
 
     /// The tiers as absolute paths, skipping any that are not there.
+    ///
+    /// **Skipping is right and silence is not.** A consumer reorganizing their
+    /// source leaves a stale entry behind and the rules should carry on reading
+    /// the rest; a consumer whose entries are *all* stale has configured a
+    /// command that reads nothing and reports every rule clean, which is
+    /// indistinguishable from having no faults. `missing` is what the caller
+    /// checks before running anything.
     pub fn roots(&self, root: &Path) -> Vec<PathBuf> {
         self.tiers
             .iter()
             .map(|tier| root.join(tier))
             .filter(|path| path.is_dir())
+            .collect()
+    }
+
+    /// The configured tiers that are not directories, for the caller to refuse.
+    pub fn missing(&self, root: &Path) -> Vec<&str> {
+        self.tiers
+            .iter()
+            .filter(|tier| !root.join(tier).is_dir())
+            .map(String::as_str)
             .collect()
     }
 }
@@ -104,6 +132,8 @@ impl Report {
 }
 
 pub struct Rule {
+    /// Runs the others, so it is never part of the set it runs.
+    pub meta: bool,
     pub name: &'static str,
     pub summary: &'static str,
     pub run: fn(&Context) -> Report,
@@ -112,11 +142,19 @@ pub struct Rule {
 pub fn all() -> Vec<Rule> {
     vec![
         Rule {
+            meta: false,
             name: "attribute-names",
             run: attribute_names::run,
             summary: "a property mirroring a platform attribute uses the platform's spelling",
         },
         Rule {
+            meta: true,
+            name: "floors",
+            run: floors::run,
+            summary: "every rule counted something",
+        },
+        Rule {
+            meta: false,
             name: "reflected",
             run: reflected::run,
             summary: "no reflected property carries a default",

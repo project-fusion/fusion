@@ -32,9 +32,37 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
     let settings = Settings::read(&root)
         .map_err(|why| Failure::input("component rules need to know where the source is", why))?;
 
+    /* **Every tier missing is a configuration fault, not a clean run.** Rules
+    would each read nothing and report nothing, and a command that says every
+    rule is clean because it looked at no files is the exact shape this
+    repository has a meta-rule about. One stale entry among several is
+    tolerated: the rest still answer. */
+    let missing = settings.missing(&root);
+    if missing.len() == settings.tiers.len() {
+        return Err(Failure::input(
+            "none of the configured tiers exist",
+            format!(
+                "`helix.rules.json` names {}, and none of them is a directory under {}",
+                missing
+                    .iter()
+                    .map(|one| format!("`{one}`"))
+                    .collect::<Vec<String>>()
+                    .join(", "),
+                root.display()
+            ),
+        ));
+    }
+
     let selected = all()
         .into_iter()
-        .filter(|rule| args.only.is_empty() || args.only.iter().any(|one| one == rule.name))
+        .filter(|rule| {
+            if args.only.is_empty() {
+                /* A meta rule runs by default only where it was asked for. */
+                !rule.meta || settings.floors
+            } else {
+                args.only.iter().any(|one| one == rule.name)
+            }
+        })
         .collect();
     Ok((selected, Context { root, settings }))
 }

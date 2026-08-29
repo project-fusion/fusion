@@ -4,5 +4,6 @@
     "helix/headless/src",
     "helix/sandbox/src",
     "helix/styled/src"
-  ]
+  ],
+  "floors": true
 }
